@@ -1,4 +1,4 @@
-import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -8,6 +8,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  CaptchaWidgetType,
   CreateEmailLinkFlowReturn,
   PrepareEmailAddressVerificationParams,
   PreparePhoneNumberVerificationParams,
@@ -16,6 +17,16 @@ import type {
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpField,
+  SignUpFutureCreateParams,
+  SignUpFutureEmailCodeVerifyParams,
+  SignUpFutureFinalizeParams,
+  SignUpFuturePasswordParams,
+  SignUpFuturePhoneCodeSendParams,
+  SignUpFuturePhoneCodeVerifyParams,
+  SignUpFutureResource,
+  SignUpFutureSSOParams,
+  SignUpFutureTicketParams,
+  SignUpFutureUpdateParams,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -26,10 +37,15 @@ import type {
   Web3Provider,
 } from '@clerk/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import {
+  generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  getBaseIdentifier,
+  getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
@@ -39,13 +55,15 @@ import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
   clerkVerifyEmailAddressCalledBeforeCreate,
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
-import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
+import { eventBus } from '../events';
+import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -57,10 +75,10 @@ export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
 
   id: string | undefined;
-  status: SignUpStatus | null = null;
+  private _status: SignUpStatus | null = null;
   requiredFields: SignUpField[] = [];
-  optionalFields: SignUpField[] = [];
   missingFields: SignUpField[] = [];
+  optionalFields: SignUpField[] = [];
   unverifiedFields: SignUpIdentificationField[] = [];
   verifications: SignUpVerifications = new SignUpVerifications(null);
   username: string | null = null;
@@ -77,13 +95,63 @@ export class SignUp extends BaseResource implements SignUpResource {
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
 
+  /**
+   * The current status of the sign-up process.
+   *
+   * @returns The current sign-up status, or null if no status has been set
+   */
+  get status(): SignUpStatus | null {
+    return this._status;
+  }
+
+  /**
+   * Sets the sign-up status and logs the transition at debug level.
+   *
+   * @param value - The new status to set. Can be null to clear the status.
+   * @remarks When setting a new status that differs from the previous one,
+   * a debug log entry is created showing the transition from the old to new status.
+   */
+  set status(value: SignUpStatus | null) {
+    const previousStatus = this._status;
+    this._status = value;
+
+    if (value && previousStatus !== value) {
+      debugLogger.debug('SignUp.status', { id: this.id, from: previousStatus, to: value });
+    }
+  }
+
+  /**
+   * @experimental This experimental API is subject to change.
+   *
+   * An instance of `SignUpFuture`, which has a different API than `SignUp`, intended to be used in custom flows.
+   */
+  __internal_future: SignUpFuture = new SignUpFuture(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
+   * of `SignUp`.
+   */
+  __internal_basePost = this._basePost.bind(this);
+
+  /**
+   * @internal Only used for internal purposes, and is not intended to be used directly.
+   *
+   * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
+   * of `SignUp`.
+   */
+  __internal_basePatch = this._basePatch.bind(this);
+
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
     this.fromJSON(data);
   }
 
-  create = async (_params: SignUpCreateParams): Promise<SignUpResource> => {
-    let params: Record<string, unknown> = _params;
+  create = async (params: SignUpCreateParams): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
+
+    let finalParams = { ...params };
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -91,20 +159,24 @@ export class SignUp extends BaseResource implements SignUpResource {
       if (!captchaParams) {
         throw new ClerkRuntimeError('', { code: 'captcha_unavailable' });
       }
-      params = { ...params, ...captchaParams };
+      finalParams = { ...finalParams, ...captchaParams };
     }
 
-    if (params.transfer && this.shouldBypassCaptchaForAttempt(params)) {
-      params.strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+    if (finalParams.transfer && this.shouldBypassCaptchaForAttempt(finalParams)) {
+      const strategy = SignUp.clerk.client?.signIn.firstFactorVerification.strategy;
+      if (strategy) {
+        finalParams = { ...finalParams, strategy: strategy as SignUpCreateParams['strategy'] };
+      }
     }
 
     return this._basePost({
       path: this.pathRoot,
-      body: normalizeUnsafeMetadata(params),
+      body: normalizeUnsafeMetadata(finalParams),
     });
   };
 
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
+    debugLogger.debug('SignUp.prepareVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'prepare_verification',
@@ -112,6 +184,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   attemptVerification = (params: AttemptVerificationParams): Promise<SignUpResource> => {
+    debugLogger.debug('SignUp.attemptVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
       body: params,
       action: 'attempt_verification',
@@ -256,6 +329,21 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
+  public authenticateWithBase = async (
+    params?: SignUpAuthenticateWithWeb3Params & {
+      legalAccepted?: boolean;
+    },
+  ): Promise<SignUpResource> => {
+    const identifier = await getBaseIdentifier();
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithBase,
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_base_signature',
+      legalAccepted: params?.legalAccepted,
+    });
+  };
+
   public authenticateWithOKXWallet = async (
     params?: SignUpAuthenticateWithWeb3Params & {
       legalAccepted?: boolean;
@@ -290,18 +378,11 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
 
-    // When force after-auth is enabled, redirect to SSO callback route.
-    // This ensures organization selection tasks are displayed after sign-up,
-    // rather than redirecting to potentially unprotected pages while the session is pending.
-    const actionCompleteRedirectUrl = SignUp.clerk.__internal_hasAfterAuthFlows
-      ? redirectUrlWithAuthToken
-      : redirectUrlComplete;
-
     const authenticateFn = () => {
       const authParams = {
         strategy,
         redirectUrl: redirectUrlWithAuthToken,
-        actionCompleteRedirectUrl,
+        actionCompleteRedirectUrl: redirectUrlComplete,
         unsafeMetadata,
         emailAddress,
         legalAccepted,
@@ -396,6 +477,8 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
     }
+
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
@@ -454,5 +537,195 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     return false;
+  }
+}
+
+class SignUpFuture implements SignUpFutureResource {
+  verifications = {
+    sendEmailCode: this.sendEmailCode.bind(this),
+    verifyEmailCode: this.verifyEmailCode.bind(this),
+    sendPhoneCode: this.sendPhoneCode.bind(this),
+    verifyPhoneCode: this.verifyPhoneCode.bind(this),
+  };
+
+  constructor(readonly resource: SignUp) {}
+
+  get status() {
+    // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
+    return this.resource.status || 'missing_requirements';
+  }
+
+  get unverifiedFields() {
+    return this.resource.unverifiedFields;
+  }
+
+  get isTransferable() {
+    // TODO: we can likely remove the error code check as the status should be sufficient
+    return (
+      this.resource.verifications.externalAccount.status === 'transferable' &&
+      this.resource.verifications.externalAccount.error?.code === 'external_account_exists'
+    );
+  }
+
+  get existingSession() {
+    if (
+      (this.resource.verifications.externalAccount.status === 'failed' ||
+        this.resource.verifications.externalAccount.status === 'unverified') &&
+      this.resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
+      this.resource.verifications.externalAccount.error?.meta?.sessionId
+    ) {
+      return { sessionId: this.resource.verifications.externalAccount.error?.meta?.sessionId };
+    }
+
+    return undefined;
+  }
+
+  private async getCaptchaToken(): Promise<{
+    captchaToken?: string;
+    captchaWidgetType?: CaptchaWidgetType;
+    captchaError?: unknown;
+  }> {
+    const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
+    const response = await captchaChallenge.managedOrInvisible({ action: 'signup' });
+    if (!response) {
+      throw new Error('Captcha challenge failed');
+    }
+
+    const { captchaError, captchaToken, captchaWidgetType } = response;
+    return { captchaToken, captchaWidgetType, captchaError };
+  }
+
+  async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      const body: Record<string, unknown> = {
+        transfer: params.transfer,
+        captchaToken,
+        captchaWidgetType,
+        captchaError,
+        ...params,
+        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+      };
+
+      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+    });
+  }
+
+  async update(params: SignUpFutureUpdateParams): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const body: Record<string, unknown> = {
+        ...params,
+        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+      };
+
+      await this.resource.__internal_basePatch({ path: this.resource.pathRoot, body });
+    });
+  }
+
+  async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      const body: Record<string, unknown> = {
+        strategy: 'password',
+        captchaToken,
+        captchaWidgetType,
+        captchaError,
+        ...params,
+        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+      };
+
+      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+    });
+  }
+
+  async sendEmailCode(): Promise<{ error: unknown }> {
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code' },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'email_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+    const { phoneNumber, channel = 'sms' } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.id) {
+        const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+        await this.resource.__internal_basePost({
+          path: this.resource.pathRoot,
+          body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
+        });
+      }
+
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', channel },
+        action: 'prepare_verification',
+      });
+    });
+  }
+
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+    const { code } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      await this.resource.__internal_basePost({
+        body: { strategy: 'phone_code', code },
+        action: 'attempt_verification',
+      });
+    });
+  }
+
+  async sso(params: SignUpFutureSSOParams): Promise<{ error: unknown }> {
+    const { strategy, redirectUrl, redirectCallbackUrl } = params;
+    return runAsyncResourceTask(this.resource, async () => {
+      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+      await this.resource.__internal_basePost({
+        path: this.resource.pathRoot,
+        body: {
+          strategy,
+          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+          redirectUrlComplete: redirectUrl,
+          captchaToken,
+          captchaWidgetType,
+          captchaError,
+        },
+      });
+
+      const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
+
+      if (status === 'unverified' && !!externalVerificationRedirectURL) {
+        windowNavigate(externalVerificationRedirectURL);
+      } else {
+        clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+      }
+    });
+  }
+
+  async ticket(params?: SignUpFutureTicketParams): Promise<{ error: unknown }> {
+    const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
+    return this.create({ ...params, ticket: ticket ?? undefined });
+  }
+
+  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: unknown }> {
+    const { navigate } = params || {};
+    return runAsyncResourceTask(this.resource, async () => {
+      if (!this.resource.createdSessionId) {
+        throw new Error('Cannot finalize sign-up without a created session.');
+      }
+
+      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+    });
   }
 }

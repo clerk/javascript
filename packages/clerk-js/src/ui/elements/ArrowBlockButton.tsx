@@ -7,7 +7,7 @@ import { ArrowRightIcon } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
 
 type ArrowBlockButtonProps = PropsOfComponent<typeof Button> & {
-  rightIcon?: React.ComponentType;
+  rightIcon?: React.ComponentType | null;
   rightIconSx?: ThemableCssProp;
   leftIcon?: React.ComponentType | React.ReactElement;
   leftIconSx?: ThemableCssProp;
@@ -59,7 +59,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
       ref={ref}
       sx={theme => [
         {
-          gap: theme.space.$1,
+          gap: theme.space.$2,
           position: 'relative',
           justifyContent: 'center',
           borderColor: theme.colors.$neutralAlpha100,
@@ -78,7 +78,7 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
       {(isLoading || leftIcon) && (
         <Flex
           as='span'
-          sx={theme => ({ flex: `0 0 ${theme.space.$5}` })}
+          sx={theme => ({ width: theme.space.$4, height: theme.space.$4, flex: 'none', alignItems: 'center' })}
         >
           {isLoading ? (
             <Spinner
@@ -93,7 +93,9 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
               icon={leftIcon as React.ComponentType}
               sx={[
                 theme => ({
-                  width: theme.sizes.$5,
+                  width: theme.sizes.$4,
+                  // Fixes a bug in Safari where the icon shifts when navigating between routes.
+                  transform: 'translateZ(0)',
                 }),
                 leftIconSx,
               ]}
@@ -125,23 +127,25 @@ export const ArrowBlockButton = React.forwardRef<HTMLButtonElement, ArrowBlockBu
         </Text>
         {badge}
       </Flex>
-      <Icon
-        elementDescriptor={arrowElementDescriptor}
-        elementId={arrowElementId}
-        icon={rightIcon}
-        sx={[
-          theme => ({
-            transition: 'all 100ms ease',
-            minWidth: theme.sizes.$4,
-            minHeight: theme.sizes.$4,
-            width: '1em',
-            height: '1em',
-            opacity: `var(--arrow-opacity)`,
-            transform: `var(--arrow-transform)`,
-          }),
-          rightIconSx,
-        ]}
-      />
+      {rightIcon && (
+        <Icon
+          elementDescriptor={arrowElementDescriptor}
+          elementId={arrowElementId}
+          icon={rightIcon}
+          sx={[
+            theme => ({
+              transition: 'all 100ms ease',
+              minWidth: theme.sizes.$4,
+              minHeight: theme.sizes.$4,
+              width: '1em',
+              height: '1em',
+              opacity: `var(--arrow-opacity)`,
+              transform: `var(--arrow-transform)`,
+            }),
+            rightIconSx,
+          ]}
+        />
+      )}
     </SimpleButton>
   );
 });

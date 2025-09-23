@@ -10,15 +10,15 @@ const createMessageForDisabledOrganizations = (
     | 'OrganizationSwitcher'
     | 'OrganizationList'
     | 'CreateOrganization'
-    | 'TaskSelectOrganization',
+    | 'TaskChooseOrganization',
 ) => {
   return formatWarning(
     `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
   );
 };
-const createMessageForDisabledCommerce = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
+const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
-    `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable commerce. Since commerce is disabled, this is no-op.`,
+    `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
   );
 };
 const warnings = {
@@ -29,7 +29,7 @@ const warnings = {
   cannotRenderSignUpComponentWhenTaskExists:
     'The <SignUp/> component cannot render when a user has a pending task, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the task instead.',
   cannotRenderComponentWhenTaskDoesNotExist:
-    '<TaskSelectOrganization/> cannot render unless a session task is pending. Clerk is redirecting to the value set in `redirectUrlComplete` instead.',
+    '<TaskChooseOrganization/> cannot render unless a session task is pending. Clerk is redirecting to the value set in `redirectUrlComplete` instead.',
   cannotRenderSignInComponentWhenSessionExists:
     'The <SignIn/> component cannot render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, Clerk is redirecting to the `afterSignIn` URL instead.',
   cannotRenderSignInComponentWhenTaskExists:
@@ -38,7 +38,7 @@ const warnings = {
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
   cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
-  cannotRenderAnyCommerceComponent: createMessageForDisabledCommerce,
+  cannotRenderAnyBillingComponent: createMessageForDisabledBilling,
   cannotOpenUserProfile:
     'The UserProfile modal cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotOpenCheckout:

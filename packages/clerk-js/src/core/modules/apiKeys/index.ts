@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   ApiKeyJSON,
   APIKeyResource,
@@ -9,7 +10,7 @@ import type {
 
 import type { FapiRequestInit } from '@/core/fapiClient';
 
-import { APIKey, BaseResource, ClerkRuntimeError } from '../../resources/internal';
+import { APIKey, BaseResource } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
   /**
@@ -43,6 +44,8 @@ export class APIKeys implements APIKeysNamespace {
         path: '/api_keys',
         search: {
           subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
+          // TODO: (rob) Remove when server-side pagination is implemented.
+          limit: '100',
         },
       })
       .then(res => {

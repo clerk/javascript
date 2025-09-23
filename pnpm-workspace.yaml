@@ -2,12 +2,14 @@ packages:
   - 'packages/*'
   - 'tools/*'
 
+minimumReleaseAge: 2880
+
 catalogs:
   # Can be referenced through "catalog:react"
   react:
     react: 18.3.1
     react-dom: 18.3.1
-    '@types/react': 18.3.23
+    '@types/react': 18.3.24
     '@types/react-dom': 18.3.7
 
   # Can be referenced through "catalog:peer-react"
@@ -20,4 +22,4 @@ catalogs:
     tslib: 2.8.1
     tsup: 8.5.0
     typescript: 5.8.3
-    zx: 8.7.1
+    zx: 8.8.1

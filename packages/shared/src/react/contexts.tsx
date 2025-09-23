@@ -1,9 +1,10 @@
 'use client';
 
 import type {
+  BillingSubscriptionPlanPeriod,
   ClerkOptions,
   ClientResource,
-  CommerceSubscriptionPlanPeriod,
+  ForPayerType,
   LoadedClerk,
   OrganizationResource,
   SignedInSessionResource,
@@ -25,8 +26,8 @@ const [SessionContext, useSessionContext] = createContextAndHook<SignedInSession
 const OptionsContext = React.createContext<ClerkOptions>({});
 
 type UseCheckoutOptions = {
-  for?: 'organization';
-  planPeriod: CommerceSubscriptionPlanPeriod;
+  for?: ForPayerType;
+  planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
 };
 

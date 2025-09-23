@@ -91,7 +91,7 @@ sessions.pem
 
 # Workflow Outputs
 /packages/*/*.tgz
-/packages/*/tsconfig.test.vitest-temp.json
+/packages/*/tsconfig*.vitest-temp.json
 
 # Scripts
 scripts/.env

@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
@@ -53,6 +53,7 @@ const LINK_REPLACEMENTS = [
   ['saml-account', '/docs/references/backend/types/backend-saml-account'],
   ['web3-wallet', '/docs/references/backend/types/backend-web3-wallet'],
   ['verify-token-options', '#verify-token-options'],
+  ['localization-resource', '/docs/customization/localization'],
 ];
 
 /**
@@ -84,10 +85,6 @@ function getCatchAllReplacements() {
     {
       pattern: /\(setActiveParams\)/g,
       replace: '([setActiveParams](/docs/references/javascript/types/set-active-params))',
-    },
-    {
-      pattern: /`_LocalizationResource`/g,
-      replace: '[Localization](/docs/customization/localization)',
     },
     {
       pattern: /`LoadedClerk`/g,

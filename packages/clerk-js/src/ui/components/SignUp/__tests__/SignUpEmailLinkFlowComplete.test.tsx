@@ -1,6 +1,5 @@
-import React from 'react';
+import { EmailLinkError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 
-import { EmailLinkError, EmailLinkErrorCodeStatus } from '../../../../core/resources';
 import { render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';

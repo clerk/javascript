@@ -11,6 +11,7 @@ interface InternalEnv {
   readonly CLERK_API_VERSION?: string;
   readonly CLERK_JWT_KEY?: string;
   readonly CLERK_SECRET_KEY?: string;
+  readonly CLERK_MACHINE_SECRET_KEY?: string;
   readonly PUBLIC_CLERK_DOMAIN?: string;
   readonly PUBLIC_CLERK_IS_SATELLITE?: string;
   readonly PUBLIC_CLERK_PROXY_URL?: string;
@@ -18,7 +19,6 @@ interface InternalEnv {
   readonly PUBLIC_CLERK_SIGN_UP_URL?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DISABLED?: string;
   readonly PUBLIC_CLERK_TELEMETRY_DEBUG?: string;
-  readonly PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT?: string;
 }
 
 interface ImportMeta {

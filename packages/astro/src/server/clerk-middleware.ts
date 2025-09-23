@@ -1,4 +1,4 @@
-import type { ClerkClient } from '@clerk/backend';
+import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
   ClerkRequest,
@@ -7,7 +7,15 @@ import type {
   SignedInAuthObject,
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
-import { AuthStatus, constants, createClerkRequest, createRedirect } from '@clerk/backend/internal';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  createRedirect,
+  getAuthObjectForAcceptedToken,
+  signedOutAuthObject,
+  TokenType,
+} from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
@@ -20,7 +28,6 @@ import { authAsyncStorage } from '#async-local-storage';
 import { buildClerkHotloadScript } from './build-clerk-hotload-script';
 import { clerkClient } from './clerk-client';
 import { createCurrentUser } from './current-user';
-import { getAuth } from './get-auth';
 import { getClientSafeEnv, getSafeEnv } from './get-safe-env';
 import { serverRedirectWithAuth } from './server-redirect-with-auth';
 import type {
@@ -28,6 +35,8 @@ import type {
   AstroMiddlewareContextParam,
   AstroMiddlewareNextParam,
   AstroMiddlewareReturn,
+  AuthFn,
+  AuthOptions,
 } from './types';
 import { isRedirect, setHeader } from './utils';
 
@@ -40,7 +49,7 @@ type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
 };
 
 type ClerkAstroMiddlewareHandler = (
-  auth: () => ClerkMiddlewareAuthObject,
+  auth: AuthFn,
   context: AstroMiddlewareContextParam,
   next: AstroMiddlewareNextParam,
 ) => AstroMiddlewareReturn | undefined;
@@ -94,24 +103,39 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]): any => {
       throw new Error('Clerk: handshake status without redirect');
     }
 
-    const authObject = requestState.toAuth();
+    const authObjectFn = (opts?: PendingSessionOptions) => requestState.toAuth(opts);
 
     const redirectToSignIn = createMiddlewareRedirectToSignIn(clerkRequest);
-    const authObjWithMethods: ClerkMiddlewareAuthObject = Object.assign(authObject, { redirectToSignIn });
 
-    decorateAstroLocal(clerkRequest, context, requestState);
+    decorateAstroLocal(clerkRequest, authObjectFn, context, requestState);
 
     /**
      * ALS is crucial for guaranteeing SSR in UI frameworks like React.
      * This currently powers the `useAuth()` React hook and any other hook or Component that depends on it.
      */
-    return authAsyncStorage.run(context.locals.auth(), async () => {
+    const asyncStorageAuthObject =
+      authObjectFn().tokenType === TokenType.SessionToken ? authObjectFn() : signedOutAuthObject({});
+
+    const authHandler = (opts?: AuthOptions) => {
+      const authObject = getAuthObjectForAcceptedToken({
+        authObject: authObjectFn({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut }),
+        acceptsToken: opts?.acceptsToken,
+      });
+
+      if (authObject.tokenType === TokenType.SessionToken) {
+        return Object.assign(authObject, { redirectToSignIn });
+      }
+
+      return authObject;
+    };
+
+    return authAsyncStorage.run(asyncStorageAuthObject, async () => {
       /**
        * Generate SSR page
        */
       let handlerResult: Response;
       try {
-        handlerResult = (await handler?.(() => authObjWithMethods, context, next)) || (await next());
+        handlerResult = (await handler?.(authHandler as AuthFn, context, next)) || (await next());
       } catch (e: any) {
         handlerResult = handleControlFlowErrors(e, clerkRequest, requestState, context);
       }
@@ -166,6 +190,7 @@ export const createAuthenticateRequestOptions = (
     signInUrl: options.signInUrl || getSafeEnv(context).signInUrl,
     signUpUrl: options.signUpUrl || getSafeEnv(context).signUpUrl,
     ...handleMultiDomainAndProxy(clerkRequest, options, context),
+    acceptsToken: 'any',
   };
 };
 
@@ -246,40 +271,52 @@ Check if signInUrl is missing from your configuration or if it is not an absolut
    PUBLIC_CLERK_SIGN_IN_URL='SOME_URL'
    PUBLIC_CLERK_IS_SATELLITE='true'`;
 
-function decorateAstroLocal(clerkRequest: ClerkRequest, context: APIContext, requestState: RequestState) {
+function decorateAstroLocal(
+  clerkRequest: ClerkRequest,
+  authObjectFn: (opts?: PendingSessionOptions) => AuthObject,
+  context: APIContext,
+  requestState: RequestState,
+) {
   const { reason, message, status, token } = requestState;
   context.locals.authToken = token;
   context.locals.authStatus = status;
   context.locals.authMessage = message;
   context.locals.authReason = reason;
-  context.locals.auth = ({ treatPendingAsSignedOut }: PendingSessionOptions = {}) => {
-    const authObject = getAuth(clerkRequest, context.locals, { treatPendingAsSignedOut });
+  context.locals.auth = (({ acceptsToken, treatPendingAsSignedOut }: AuthOptions = {}) => {
+    const authObject = getAuthObjectForAcceptedToken({
+      authObject: authObjectFn({ treatPendingAsSignedOut }),
+      acceptsToken,
+    });
 
-    const clerkUrl = clerkRequest.clerkUrl;
+    if (authObject.tokenType === TokenType.SessionToken) {
+      const clerkUrl = clerkRequest.clerkUrl;
 
-    const redirectToSignIn: RedirectFun<Response> = (opts = {}) => {
-      const devBrowserToken =
-        clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
-        clerkRequest.cookies.get(constants.Cookies.DevBrowser);
+      const redirectToSignIn: RedirectFun<Response> = (opts = {}) => {
+        const devBrowserToken =
+          clerkRequest.clerkUrl.searchParams.get(constants.QueryParameters.DevBrowser) ||
+          clerkRequest.cookies.get(constants.Cookies.DevBrowser);
 
-      return createRedirect({
-        redirectAdapter,
-        devBrowserToken: devBrowserToken,
-        baseUrl: clerkUrl.toString(),
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        publishableKey: getSafeEnv(context).pk!,
-        signInUrl: requestState.signInUrl,
-        signUpUrl: requestState.signUpUrl,
-        sessionStatus: requestState.toAuth()?.sessionStatus,
-      }).redirectToSignIn({
-        returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
-      });
-    };
+        return createRedirect({
+          redirectAdapter,
+          devBrowserToken: devBrowserToken,
+          baseUrl: clerkUrl.toString(),
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          publishableKey: getSafeEnv(context).pk!,
+          signInUrl: requestState.signInUrl,
+          signUpUrl: requestState.signUpUrl,
+          sessionStatus: requestState.toAuth()?.sessionStatus,
+        }).redirectToSignIn({
+          returnBackUrl: opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkUrl.toString(),
+        });
+      };
 
-    return Object.assign(authObject, { redirectToSignIn });
-  };
+      return Object.assign(authObject, { redirectToSignIn });
+    }
 
-  context.locals.currentUser = createCurrentUser(clerkRequest, context);
+    return authObject;
+  }) as AuthFn;
+
+  context.locals.currentUser = createCurrentUser(context);
 }
 
 /**

@@ -3,7 +3,14 @@ import { retry } from '@clerk/shared/retry';
 import { camelToSnake } from '@clerk/shared/underscore';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
-import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
+import { debugLogger } from '@/utils/debug';
+
+import {
+  buildEmailAddress as buildEmailAddressUtil,
+  buildURL as buildUrlUtil,
+  filterUndefinedValues,
+  stringifyQueryParams,
+} from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 
@@ -102,6 +109,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     return true;
   }
 
+  // TODO @userland-errors:
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
     const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
@@ -146,8 +154,12 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     const { path, pathPrefix = 'v1' } = requestInit;
 
     if (options.proxyUrl) {
+      // TODO @userland-errors:
       const proxyBase = new URL(options.proxyUrl);
-      const proxyPath = proxyBase.pathname.slice(1, proxyBase.pathname.length);
+      let proxyPath = proxyBase.pathname.slice(1);
+      if (proxyPath.endsWith('/')) {
+        proxyPath = proxyPath.slice(0, -1);
+      }
       return buildUrlUtil(
         {
           base: proxyBase.origin,
@@ -180,12 +192,17 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     });
   }
 
+  // TODO @userland-errors:
   async function request<T>(
     _requestInit: FapiRequestInit,
     requestOptions?: FapiRequestOptions,
   ): Promise<FapiResponse<T>> {
     const requestInit = { ..._requestInit };
     const { method = 'GET', body } = requestInit;
+
+    if (body && typeof body === 'object' && !(body instanceof FormData)) {
+      requestInit.body = filterUndefinedValues(body);
+    }
 
     requestInit.url = buildUrl({
       ...requestInit,
@@ -206,7 +223,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // Massage the body depending on the content type if needed.
     // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
     // foo=bar&baz=bar&whatever=1
-
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
       // The native BodyInit type is too wide for our use case,
       // so we're casting it to a more specific type here.
@@ -216,13 +232,14 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         : body;
     }
 
+    // TODO @userland-errors:
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
     // avoid triggering a CORS OPTION request as it currently breaks cookie dropping in Safari.
     const overwrittenRequestMethod = method === 'GET' ? 'GET' : 'POST';
     let response: Response;
-    const urlStr = requestInit.url.toString();
+    const url = requestInit.url;
     const fetchOpts: FapiRequestInit = {
       ...requestInit,
       method: overwrittenRequestMethod,
@@ -232,7 +249,8 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
-        response = await retry(() => fetch(urlStr, fetchOpts), {
+        // TODO @userland-errors:
+        response = await retry(() => fetch(url, fetchOpts), {
           // This retry handles only network errors, not 4xx or 5xx responses,
           // so we want to try once immediately to handle simple network blips.
           // Since fapiClient is responsible for the network layer only,
@@ -245,17 +263,28 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
             // We want to retry only GET requests, as other methods are not idempotent.
             return overwrittenRequestMethod === 'GET' && iterations < maxTries;
           },
+          onBeforeRetry: (iteration: number): void => {
+            // Add the retry attempt to the query string params.
+            // We use params to keep the request simple for CORS.
+            url.searchParams.set('_clerk_retry_attempt', iteration.toString());
+          },
         });
       } else {
         response = new Response('{}', requestInit); // Mock an empty json response
       }
     } catch (e) {
+      const urlStr = url.toString();
+      debugLogger.error('network error', { error: e, url: urlStr, method }, 'fapiClient');
       clerkNetworkError(urlStr, e);
     }
 
     // 204 No Content responses do not have a body so we should not try to parse it
     const json: FapiResponseJSON<T> | null = response.status !== 204 ? await response.json() : null;
     const fapiResponse: FapiResponse<T> = Object.assign(response, { payload: json });
+    if (!response.ok) {
+      debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
+    }
+    // TODO @userland-errors:
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }

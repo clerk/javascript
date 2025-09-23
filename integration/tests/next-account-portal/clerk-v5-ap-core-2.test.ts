@@ -12,6 +12,7 @@ test.describe('Next with ClerkJS V5 <-> Account Portal Core 2 @ap-flows', () => 
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     app = await appConfigs.next.appRouterAPWithClerkNextLatest.clone().commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withAPCore2ClerkLatest);

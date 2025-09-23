@@ -327,14 +327,13 @@ export interface PublicUserData {
 }
 
 /**
- * Represents a required action that a user must complete
- * before their session becomes fully active
+ * Represents the current pending task of a session.
  */
 export interface SessionTask {
   /**
-   * The unique identifier for the type of task that needs to be completed
+   * A unique identifier for the task
    */
-  key: 'select-organization';
+  key: 'choose-organization';
 }
 
 export type GetTokenOptions = {

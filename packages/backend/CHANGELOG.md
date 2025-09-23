@@ -1,5 +1,395 @@
 # Change Log
 
+## 2.15.0
+
+### Minor Changes
+
+- Add invite, reject, and delete to Waitlist Entry API resources ([#6799](https://github.com/clerk/javascript/pull/6799)) by [@tmilewski](https://github.com/tmilewski)
+
+- [Billing Beta] Rename types and classes that contain commerce to use billing instead. ([#6812](https://github.com/clerk/javascript/pull/6812)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix a case where handshakes would get triggered in a loop on cross origin requests in development. ([#6755](https://github.com/clerk/javascript/pull/6755)) by [@brkalow](https://github.com/brkalow)
+
+- Update jsdocs mentions of `@experimental` tag. ([#6651](https://github.com/clerk/javascript/pull/6651)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Billing Beta] Rename types, interfaces and classes that contain `commerce` to use `billing` instead. ([#6757](https://github.com/clerk/javascript/pull/6757)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`41e0a41`](https://github.com/clerk/javascript/commit/41e0a4190b33dd2c4bdc0d536bbe83fcf99af9b0), [`1aa9e9f`](https://github.com/clerk/javascript/commit/1aa9e9f10c051319e9ff4b1a0ecd71507bd6a6aa), [`a88ee58`](https://github.com/clerk/javascript/commit/a88ee5827adee0cc8a62246d03a3034d8566fe21), [`d6c7bbb`](https://github.com/clerk/javascript/commit/d6c7bbba23f38c0b3ca7edebb53028a05c7b38e6)]:
+  - @clerk/shared@3.26.1
+  - @clerk/types@4.88.0
+
+## 2.14.1
+
+### Patch Changes
+
+- Added missing `orderBy` field to machines list method ([#6767](https://github.com/clerk/javascript/pull/6767)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```ts
+  clerkClient.machines.list({
+    ...params,
+    orderBy: 'name',
+  });
+  ```
+
+- Add JSDoc around Machine and M2M resource types ([#6774](https://github.com/clerk/javascript/pull/6774)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97)]:
+  - @clerk/types@4.87.0
+  - @clerk/shared@3.26.0
+
+## 2.14.0
+
+### Minor Changes
+
+- Adds the ability to create bulk invitations with `.createInvitationBulk([{...}])` ([#6751](https://github.com/clerk/javascript/pull/6751)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add lastAuthenticationStrategy to API resources ([#6748](https://github.com/clerk/javascript/pull/6748)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Align create params for Invitation and OrganizationInvitation with backend API ([#6750](https://github.com/clerk/javascript/pull/6750)) by [@tmilewski](https://github.com/tmilewski)
+
+- Add machine secret key rotation BAPI method ([#6760](https://github.com/clerk/javascript/pull/6760)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  clerkClient.machines.rotateSecretKey({
+    machineId: 'mch_xxx',
+    previousTokenTtl: 3600,
+  });
+  ```
+
+- Remove `expired` from `OrganizationInvitationStatus` according to latest Backend API spec ([#6753](https://github.com/clerk/javascript/pull/6753)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+
+## 2.13.0
+
+### Minor Changes
+
+- Extend the trial of a subscription item via the BillingAPI. ([#6714](https://github.com/clerk/javascript/pull/6714)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`55490c3`](https://github.com/clerk/javascript/commit/55490c31fadc82bdca6cd5f2b22e5e158aaba0cb), [`e8d21de`](https://github.com/clerk/javascript/commit/e8d21de39b591973dad48fc1d1851c4d28b162fe), [`637f2e8`](https://github.com/clerk/javascript/commit/637f2e8768b76aaf756062b6b5b44bf651f66789)]:
+  - @clerk/types@4.85.0
+  - @clerk/shared@3.24.2
+
+## 2.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`fced4fc`](https://github.com/clerk/javascript/commit/fced4fc869bb21c77826dfaf281b6640e0f0c006), [`e6e19d2`](https://github.com/clerk/javascript/commit/e6e19d2d2f3b2c4617b25f53830216a1d550e616), [`1b1e8b1`](https://github.com/clerk/javascript/commit/1b1e8b1fd33b787f956b17b193e5fd0a4cdc6cec)]:
+  - @clerk/types@4.84.1
+  - @clerk/shared@3.24.1
+
+## 2.12.0
+
+### Minor Changes
+
+- [Billing Beta] Use correct casing for past due events types. ([#6687](https://github.com/clerk/javascript/pull/6687)) by [@panteliselef](https://github.com/panteliselef)
+
+  - `'subscription.past_due'` -> `'subscription.pastDue'`
+  - `'subscriptionItem.past_due'` -> `'subscriptionItem.pastDue'`
+
+- Include `'subscriptionItem.freeTrialEnding'` event in `CommerceSubscriptionItemWebhookEvent`. ([#6684](https://github.com/clerk/javascript/pull/6684)) by [@panteliselef](https://github.com/panteliselef)
+
+## 2.11.0
+
+### Minor Changes
+
+- Get user's subscription via BillingApi. ([#6667](https://github.com/clerk/javascript/pull/6667)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- - Export `Feature` type from backend resource. ([#6649](https://github.com/clerk/javascript/pull/6649)) by [@alexisintech](https://github.com/alexisintech)
+
+  - Re-export canonical `CommerceMoneyAmount` type from `@clerk/types`.
+
+- Updated dependencies [[`2a82737`](https://github.com/clerk/javascript/commit/2a8273705b9764e1a4613d5a0dbb738d0b156c05), [`cda5d7b`](https://github.com/clerk/javascript/commit/cda5d7b79b28dc03ec794ea54e0feb64b148cdd2), [`ba25a5b`](https://github.com/clerk/javascript/commit/ba25a5b5a3fa686a65f52e221d9d1712a389fea9), [`a50cfc8`](https://github.com/clerk/javascript/commit/a50cfc8f1dd168b436499e32fc8b0fc41d28bbff), [`377f67b`](https://github.com/clerk/javascript/commit/377f67b8e552d1a19efbe4530e9306675b7f8eab), [`65b12ee`](https://github.com/clerk/javascript/commit/65b12eeeb57ee80cdd8c36c5949d51f1227a413e), [`263722e`](https://github.com/clerk/javascript/commit/263722e61fd27403b4c8d9794880686771e123f9)]:
+  - @clerk/types@4.84.0
+  - @clerk/shared@3.24.0
+
+## 2.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`600c648`](https://github.com/clerk/javascript/commit/600c648d4087a823341041c90018797fbc0033f0)]:
+  - @clerk/shared@3.23.0
+  - @clerk/types@4.83.0
+
+## 2.10.0
+
+### Minor Changes
+
+- Add missing properties to OAuthApplicationJSON ([#6378](https://github.com/clerk/javascript/pull/6378)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- [Billing Beta] Add `cancelSubscriptionItem` to BillingApi. ([#6611](https://github.com/clerk/javascript/pull/6611)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add `getOrganizationBillingSubscription` to BillingApi. ([#6632](https://github.com/clerk/javascript/pull/6632)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes an issue where a handshake would trigger more than intended in development. ([#6635](https://github.com/clerk/javascript/pull/6635)) by [@brkalow](https://github.com/brkalow)
+
+- Fix logic for forcing a session sync on cross origin requests. ([#6600](https://github.com/clerk/javascript/pull/6600)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`d52714e`](https://github.com/clerk/javascript/commit/d52714e4cb7f369c74826cd4341c58eb1900abe4), [`ce49740`](https://github.com/clerk/javascript/commit/ce49740d474d6dd9da5096982ea4e9f14cf68f09), [`2ed539c`](https://github.com/clerk/javascript/commit/2ed539cc7f08ed4d70c33621563ad386ea8becc5), [`deaafe4`](https://github.com/clerk/javascript/commit/deaafe449773632d690aa2f8cafaf959392622b9), [`a26ecae`](https://github.com/clerk/javascript/commit/a26ecae09fd06cd34f094262f038a8eefbb23f7d), [`c16a7a5`](https://github.com/clerk/javascript/commit/c16a7a5837fc15e0e044baf9c809b8da6fbac795), [`05b6d65`](https://github.com/clerk/javascript/commit/05b6d65c0bc5736443325a5defee4c263ef196af)]:
+  - @clerk/types@4.82.0
+  - @clerk/shared@3.22.1
+
+## 2.9.4
+
+### Patch Changes
+
+- Add `orderBy` parameter to OAuth Applications list request ([#6593](https://github.com/clerk/javascript/pull/6593)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`e52bf8e`](https://github.com/clerk/javascript/commit/e52bf8ebef74a9e123c69b69acde1340c01d32d7), [`c043c19`](https://github.com/clerk/javascript/commit/c043c1919854aaa5b9cf7f6df5bb517f5617f7a1), [`c28d29c`](https://github.com/clerk/javascript/commit/c28d29c79bb4f144d782313ca72df7db91a77340), [`172e054`](https://github.com/clerk/javascript/commit/172e054a3511be12d16ba19037db320c2d9838bf)]:
+  - @clerk/types@4.81.0
+  - @clerk/shared@3.22.0
+
+## 2.9.3
+
+### Patch Changes
+
+- Updated dependencies [[`8dc6bad`](https://github.com/clerk/javascript/commit/8dc6bad5c7051b59bd8c73e65d497f6a974bb1c3), [`aa6a3c3`](https://github.com/clerk/javascript/commit/aa6a3c3d3ba2de67a468c996cbf0bff43a09ddb8), [`db50c47`](https://github.com/clerk/javascript/commit/db50c4734920ada6002de8c62c994047eb6cb5a0)]:
+  - @clerk/types@4.80.0
+  - @clerk/shared@3.21.2
+
+## 2.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`413468c`](https://github.com/clerk/javascript/commit/413468c9b9c8fb7576f8e4cbdccff98784e33fef), [`7b7eb1f`](https://github.com/clerk/javascript/commit/7b7eb1fc0235249c5c179239078294118f2947cd)]:
+  - @clerk/shared@3.21.1
+  - @clerk/types@4.79.0
+
+## 2.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`5b24129`](https://github.com/clerk/javascript/commit/5b24129ddcfc2f7dc6eb79d8c818b4ff97c68e9a)]:
+  - @clerk/shared@3.21.0
+  - @clerk/types@4.78.0
+
+## 2.9.0
+
+### Minor Changes
+
+- Remove `secret` in favor of `token` in m2m response. ([#6542](https://github.com/clerk/javascript/pull/6542)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before:
+
+  ```ts
+  const result = await clerkClient.m2mTokens.create();
+
+  console.log(result.secret);
+  ```
+
+  After:
+
+  ```ts
+  const result = await clerkClient.m2mTokens.create();
+
+  console.log(result.token);
+  ```
+
+- Rename M2M namespace from `m2mTokens` to `m2m` in Backend API client ([#6544](https://github.com/clerk/javascript/pull/6544)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before:
+
+  ```ts
+  clerkClient.m2mTokens.create();
+
+  clerkClient.m2mTokens.revoke();
+
+  clerkClient.m2mTokens.verifySecret({ secret: 'ak_xxx' });
+  ```
+
+  After:
+
+  ```ts
+  clerkClient.m2m.createToken();
+
+  clerkClient.m2m.revokeToken();
+
+  clerkClient.m2m.verifyToken({ token: 'ak_xxx' });
+  ```
+
+  The `verifySecret()` method is removed. Please use `.verifyToken()` instead.
+
+- Deprecates `clerkClient.m2mTokens.verifySecret({ secret: 'mt_xxx' })` in favor or `clerkClient.m2mTokens.verifyToken({ token: 'mt_xxx' })` ([#6536](https://github.com/clerk/javascript/pull/6536)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`4db1e58`](https://github.com/clerk/javascript/commit/4db1e58d70b60e1e236709b507666715d571e925), [`69498df`](https://github.com/clerk/javascript/commit/69498dfca3e6bb388eb8c94313eac06347dd5a27), [`59f1559`](https://github.com/clerk/javascript/commit/59f15593bab708b9e13eebfff6780c2d52b31b0a)]:
+  - @clerk/types@4.77.0
+  - @clerk/shared@3.20.1
+
+## 2.8.0
+
+### Minor Changes
+
+- Exports `Machine` and `M2MToken` resource classes ([#6500](https://github.com/clerk/javascript/pull/6500)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`15fe106`](https://github.com/clerk/javascript/commit/15fe1060f730a6a4391f3d2451d23edd3218e1ae), [`173837c`](https://github.com/clerk/javascript/commit/173837c2526aa826b7981ee8d6d4f52c00675da5), [`8b52d7a`](https://github.com/clerk/javascript/commit/8b52d7ae19407e8ab5a5451bd7d34b6bc38417de), [`854dde8`](https://github.com/clerk/javascript/commit/854dde88e642c47b5a29ac8f576c8c1976e5d067), [`ae2e2d6`](https://github.com/clerk/javascript/commit/ae2e2d6b336be6b596cc855e549843beb5bfd2a1), [`037f25a`](https://github.com/clerk/javascript/commit/037f25a8171888168913b186b7edf871e0aaf197), [`f8b38b7`](https://github.com/clerk/javascript/commit/f8b38b7059e498fef3ac1271346be0710aa31c76)]:
+  - @clerk/types@4.76.0
+  - @clerk/shared@3.20.0
+
+## 2.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`b72a3dd`](https://github.com/clerk/javascript/commit/b72a3dda2467720e5dc8cab3e7e6a110f3beb79b), [`d93b0ed`](https://github.com/clerk/javascript/commit/d93b0edf4adc57d48a26cb08444192887ccec659), [`6459f7d`](https://github.com/clerk/javascript/commit/6459f7dabe5f163f48ed73106bb901d8187da3e2), [`0ff648a`](https://github.com/clerk/javascript/commit/0ff648aeac0e2f5481596a98c8046d9d58a7bf75), [`9084759`](https://github.com/clerk/javascript/commit/90847593300be605e1ee1c06dac147ce68b25dc7)]:
+  - @clerk/types@4.75.0
+  - @clerk/shared@3.19.0
+
+## 2.7.0
+
+### Minor Changes
+
+- Add billing API for fetching available plans. ([#6449](https://github.com/clerk/javascript/pull/6449)) by [@panteliselef](https://github.com/panteliselef)
+
+- Adds machine-to-machine endpoints to the Backend SDK: ([#6479](https://github.com/clerk/javascript/pull/6479)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  **Note:** Renamed from "machine_tokens" to "m2m_tokens" for clarity and consistency with canonical terminology. This avoids confusion with other machine-related concepts like machine secrets.
+
+  ### Create M2M Tokens
+
+  A machine secret is required when creating M2M tokens.
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  clerkClient.m2mTokens.create({
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
+    secondsUntilExpiration: 3600,
+  });
+  ```
+
+  ### Revoke M2M Tokens
+
+  You can revoke tokens using either a machine secret or instance secret:
+
+  ```ts
+  // Using machine secret
+  const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY });
+  clerkClient.m2mTokens.revoke({
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
+    m2mTokenId: 'mt_xxxxx',
+    revocationReason: 'Revoked by user',
+  });
+
+  // Using instance secret (default)
+  const clerkClient = createClerkClient({ secretKey: 'sk_xxxx' });
+  clerkClient.m2mTokens.revoke({
+    m2mTokenId: 'mt_xxxxx',
+    revocationReason: 'Revoked by user',
+  });
+  ```
+
+  ### Verify M2M Tokens
+
+  You can verify tokens using either a machine secret or instance secret:
+
+  ```ts
+  // Using machine secret
+  const clerkClient = createClerkClient({ machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY });
+  clerkClient.m2mTokens.verifySecret({
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
+    secret: 'mt_secret_xxxxx',
+  });
+
+  // Using instance secret (default)
+  const clerkClient = createClerkClient({ secretKey: 'sk_xxxx' });
+  clerkClient.m2mTokens.verifySecret({
+    secret: 'mt_secret_xxxxx',
+  });
+  ```
+
+  To verify machine-to-machine tokens using when using `authenticateRequest()` with a machine secret, use the `machineSecret` option:
+
+  ```ts
+  const clerkClient = createClerkClient({
+    machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY,
+  });
+
+  const authReq = await clerkClient.authenticateRequest(c.req.raw, {
+    // or pass as an option here
+    // machineSecretKey: process.env.CLERK_MACHINE_SECRET_KEY
+    acceptsToken: 'm2m_token', // previously machine_token
+  });
+
+  if (authReq.isAuthenticated) {
+    // ... do something
+  }
+  ```
+
+### Patch Changes
+
+- feat(nextjs): Forward user-agent, arch, platform, and npm config with POST requests to /accountless_applications ([#6483](https://github.com/clerk/javascript/pull/6483)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Updated dependencies [[`1ad16da`](https://github.com/clerk/javascript/commit/1ad16daa49795a861ae277001831230580b6b9f4), [`4edef81`](https://github.com/clerk/javascript/commit/4edef81dd423a0471e3f579dd6b36094aa8546aa), [`696f8e1`](https://github.com/clerk/javascript/commit/696f8e11a3e5391e6b5a97d98e929b8973575b9a), [`f318d22`](https://github.com/clerk/javascript/commit/f318d22cf83caaef272bcf532561a03ca72575e7), [`1cc66ab`](https://github.com/clerk/javascript/commit/1cc66aba1c0adac24323876e4cc3d96be888b07b)]:
+  - @clerk/types@4.74.0
+  - @clerk/shared@3.18.1
+
+## 2.6.3
+
+### Patch Changes
+
+- Updated dependencies [[`9368daf`](https://github.com/clerk/javascript/commit/9368dafb119b5a8ec6a9d6d82270e72bab6d8f1e), [`f93965f`](https://github.com/clerk/javascript/commit/f93965f64c81030f9fcf9d1cc4e4984d30cd12ec), [`7b6dcee`](https://github.com/clerk/javascript/commit/7b6dceea5bfd7f1cc1bf24126aa715307e24ae7f), [`ef87617`](https://github.com/clerk/javascript/commit/ef87617ae1fd125c806a33bfcfdf09c885319fa8)]:
+  - @clerk/shared@3.18.0
+  - @clerk/types@4.73.0
+
+## 2.6.2
+
+### Patch Changes
+
+- Fix Node 18 compatibility issues with `snakecase-keys`. ([#6441](https://github.com/clerk/javascript/pull/6441)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`7a46679`](https://github.com/clerk/javascript/commit/7a46679a004739a7f712097c5779e9f5c068722e), [`05cc5ec`](https://github.com/clerk/javascript/commit/05cc5ecd82ecdbcc9922d3286224737a81813be0), [`22c35ef`](https://github.com/clerk/javascript/commit/22c35efb59226df2efaa2891fa4775c13312f4c6), [`e8d816a`](https://github.com/clerk/javascript/commit/e8d816a3350e862c3e9e1d4f8c96c047a0a016a2), [`aa9f185`](https://github.com/clerk/javascript/commit/aa9f185e21b58f8a6e03ea44ce29ee09ad2477d9), [`af0e123`](https://github.com/clerk/javascript/commit/af0e12393c9412281626e20dafb1b3a15558f6d9), [`3d1d871`](https://github.com/clerk/javascript/commit/3d1d8711405646cf3c2aabe99e08337a1028703a)]:
+  - @clerk/shared@3.17.0
+  - @clerk/types@4.72.0
+
+## 2.6.1
+
+### Patch Changes
+
+- Adds scoping and secret key retrieval to machines BAPI methods: ([#6417](https://github.com/clerk/javascript/pull/6417)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  // Creates a new machine scope
+  clerkClient.machines.createScope('machine_id', 'to_machine_id');
+
+  // Deletes a machine scope
+  clerkClient.machines.deleteScope('machine_id', 'other_machine_id');
+
+  // Retrieve a secret key
+  clerkClient.machines.getSecretKey('machine_id');
+  ```
+
+- Fix SAML Connection `attributeMapping` keys not being converted from camelCase to snake_case. ([#6418](https://github.com/clerk/javascript/pull/6418)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes an issue where the Clerk SDK was improperly detecting the request's origin. ([#6393](https://github.com/clerk/javascript/pull/6393)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e404456`](https://github.com/clerk/javascript/commit/e4044566bca81f63c8e9c630fdec0f498ad6fc08), [`2803133`](https://github.com/clerk/javascript/commit/28031330a9810946feb44b93be10c067fb3b63ba), [`f1d9d34`](https://github.com/clerk/javascript/commit/f1d9d3482a796dd5f7796ede14159850e022cba2), [`d58b959`](https://github.com/clerk/javascript/commit/d58b9594cf65158e87dbaa90d632c45f543373e1), [`822ba1f`](https://github.com/clerk/javascript/commit/822ba1fd5e7daf665120cf183e4600a227098d53), [`d4d2612`](https://github.com/clerk/javascript/commit/d4d2612483baf356c389ef0ba5084059025481f2)]:
+  - @clerk/types@4.71.0
+  - @clerk/shared@3.16.0
+
 ## 2.6.0
 
 ### Minor Changes

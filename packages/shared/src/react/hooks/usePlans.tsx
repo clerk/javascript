@@ -1,17 +1,23 @@
-import type { CommercePlanResource, GetPlansParams } from '@clerk/types';
+import type { BillingPlanResource, GetPlansParams } from '@clerk/types';
 
 import { useClerkInstanceContext } from '../contexts';
-import { createCommercePaginatedHook } from './createCommerceHook';
+import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
  * @internal
  */
-export const usePlans = createCommercePaginatedHook<CommercePlanResource, GetPlansParams>({
+export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlansParams>({
   hookName: 'usePlans',
-  resourceType: 'commerce-plans',
+  resourceType: 'billing-plans',
   useFetcher: _for => {
     const clerk = useClerkInstanceContext();
-    return params => clerk.billing.getPlans({ ...params, for: _for === 'organization' ? 'org' : 'user' });
+    if (!clerk.loaded) {
+      return undefined;
+    }
+    return ({ orgId, ...rest }) => {
+      // Cleanup `orgId` from the params
+      return clerk.billing.getPlans({ ...rest, for: _for });
+    };
   },
   options: {
     unauthenticated: true,

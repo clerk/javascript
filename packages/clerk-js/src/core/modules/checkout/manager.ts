@@ -1,8 +1,8 @@
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
+  BillingCheckoutResource,
   ClerkAPIResponseError,
-  CommerceCheckoutResource,
 } from '@clerk/types';
 
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
@@ -36,8 +36,8 @@ const createManagerCache = <CacheKey, CacheState>() => {
 const managerCache = createManagerCache<CheckoutKey, __experimental_CheckoutCacheState>();
 
 const CHECKOUT_STATUS = {
-  AWAITING_INITIALIZATION: 'awaiting_initialization',
-  AWAITING_CONFIRMATION: 'awaiting_confirmation',
+  NEEDS_INITIALIZATION: 'needs_initialization',
+  NEEDS_CONFIRMATION: 'needs_confirmation',
   COMPLETED: 'completed',
 } as const;
 
@@ -54,15 +54,23 @@ function deriveCheckoutState(
   baseState: Omit<__experimental_CheckoutCacheState, 'fetchStatus' | 'status'>,
 ): __experimental_CheckoutCacheState {
   const fetchStatus = (() => {
-    if (baseState.isStarting || baseState.isConfirming) return FETCH_STATUS.FETCHING;
-    if (baseState.error) return FETCH_STATUS.ERROR;
+    if (baseState.isStarting || baseState.isConfirming) {
+      return FETCH_STATUS.FETCHING;
+    }
+    if (baseState.error) {
+      return FETCH_STATUS.ERROR;
+    }
     return FETCH_STATUS.IDLE;
   })();
 
   const status = (() => {
-    if (baseState.checkout?.status === CHECKOUT_STATUS.COMPLETED) return CHECKOUT_STATUS.COMPLETED;
-    if (baseState.checkout) return CHECKOUT_STATUS.AWAITING_CONFIRMATION;
-    return CHECKOUT_STATUS.AWAITING_INITIALIZATION;
+    if (baseState.checkout?.status === CHECKOUT_STATUS.COMPLETED) {
+      return CHECKOUT_STATUS.COMPLETED;
+    }
+    if (baseState.checkout) {
+      return CHECKOUT_STATUS.NEEDS_CONFIRMATION;
+    }
+    return CHECKOUT_STATUS.NEEDS_INITIALIZATION;
   })();
 
   return {
@@ -128,7 +136,7 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
     // Shared operation handler to eliminate duplication
     async executeOperation(
       operationType: 'start' | 'confirm',
-      operationFn: () => Promise<CommerceCheckoutResource>,
+      operationFn: () => Promise<BillingCheckoutResource>,
     ): Promise<CheckoutResult> {
       const operationId = `${cacheKey}-${operationType}`;
       const isRunningField = operationType === 'start' ? 'isStarting' : 'isConfirming';
@@ -143,7 +151,7 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
 
       // Create and store the operation promise
       const operationPromise = (async () => {
-        let data: CommerceCheckoutResource | null = null;
+        let data: BillingCheckoutResource | null = null;
         let error: ClerkAPIResponseError | null = null;
         try {
           // Mark operation as in progress and clear any previous errors

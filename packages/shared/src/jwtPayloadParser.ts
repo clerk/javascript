@@ -56,7 +56,9 @@ function buildOrgPermissions({
     }
 
     const permissionBits = featurePermissionMap[featureIndex];
-    if (!permissionBits) continue;
+    if (!permissionBits) {
+      continue;
+    }
 
     for (let permIndex = 0; permIndex < permissionBits.length; permIndex++) {
       if (permissionBits[permIndex] === 1) {
@@ -69,9 +71,9 @@ function buildOrgPermissions({
 }
 
 /**
- * @experimental
- *
  * Resolves the signed-in auth state from JWT claims.
+ *
+ * @experimental
  */
 const __experimental_JWTPayloadToAuthObjectProperties = (claims: JwtPayload): SharedSignedInAuthObjectProperties => {
   let orgId: string | undefined;

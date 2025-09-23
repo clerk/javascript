@@ -117,6 +117,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         label={localizationKeys('organizationSwitcher.action__manageOrganization')}
         onClick={() => handleItemClick()}
         trailing={<NotificationCountBadgeManageButton />}
+        focusRing
       />
     );
 
@@ -125,6 +126,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         icon={Billing}
         label={runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Upgrade'}
         onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
+        focusRing
       />
     );
 
@@ -135,7 +137,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             elementId={'organizationSwitcherActiveOrganization'}
             organization={currentOrg}
             user={user}
-            fetchRoles
             mainIdentifierVariant='buttonLarge'
             sx={t => ({
               padding: `${t.space.$4} ${t.space.$5}`,
@@ -175,7 +176,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
             elementId={'organizationSwitcherActiveOrganization'}
             organization={currentOrg}
             user={user}
-            fetchRoles
             mainIdentifierVariant='buttonLarge'
             sx={t => ({
               padding: `${t.space.$4} ${t.space.$5}`,

@@ -30,16 +30,15 @@ describe('Token', () => {
         message: '500',
       });
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
-        // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
-        expect.objectContaining({
-          method: 'POST',
-          body: '',
-          credentials: 'include',
-          headers: new Headers(),
-        }),
-      );
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      const [url, options] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
+      expect(options).toMatchObject({
+        method: 'POST',
+        body: '',
+        credentials: 'include',
+        headers: expect.any(Headers),
+      });
     });
 
     describe('with offline browser and network failure', () => {
@@ -67,16 +66,15 @@ describe('Token', () => {
 
         const token = await Token.create('/path/to/tokens');
 
-        expect(global.fetch).toHaveBeenCalledWith(
-          `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
-          // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
-          expect.objectContaining({
-            method: 'POST',
-            body: '',
-            credentials: 'include',
-            headers: new Headers(),
-          }),
-        );
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+        const [url, options] = (global.fetch as Mock).mock.calls[0];
+        expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
+        expect(options).toMatchObject({
+          method: 'POST',
+          body: '',
+          credentials: 'include',
+          headers: expect.any(Headers),
+        });
 
         expect(token.getRawString()).toEqual('');
         expect(warnSpy).toBeCalled();
@@ -92,16 +90,15 @@ describe('Token', () => {
           `ClerkJS: Network error at "https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test" - TypeError: Failed to fetch. Please try again.`,
         );
 
-        expect(global.fetch).toHaveBeenCalledWith(
-          `https://clerk.example.com/v1/path/to/tokens?__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
-          // TODO(dimkl): omit extra params from fetch request (eg path, url) - remove expect.objectContaining
-          expect.objectContaining({
-            method: 'POST',
-            body: '',
-            credentials: 'include',
-            headers: new Headers(),
-          }),
-        );
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+        const [url, options] = (global.fetch as Mock).mock.calls[0];
+        expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
+        expect(options).toMatchObject({
+          method: 'POST',
+          body: '',
+          credentials: 'include',
+          headers: expect.any(Headers),
+        });
       });
     });
   });

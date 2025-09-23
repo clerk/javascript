@@ -57,11 +57,14 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
             <TabPanel sx={{ width: '100%', flexDirection: 'column' }}>
               <SubscriptionsList
                 title={localizationKeys('organizationProfile.billingPage.subscriptionsListSection.title')}
-                arrowButtonText={localizationKeys(
+                switchPlansLabel={localizationKeys(
                   'organizationProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
                 )}
-                arrowButtonEmptyText={localizationKeys(
+                newSubscriptionLabel={localizationKeys(
                   'organizationProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
+                )}
+                manageSubscriptionLabel={localizationKeys(
+                  'organizationProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
                 )}
               />
               <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
@@ -83,7 +86,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
 
 export const OrganizationBillingPage = () => {
   return (
-    <SubscriberTypeContext.Provider value='org'>
+    <SubscriberTypeContext.Provider value='organization'>
       <OrganizationBillingPageInternal />
     </SubscriberTypeContext.Provider>
   );

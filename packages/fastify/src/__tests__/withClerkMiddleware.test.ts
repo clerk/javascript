@@ -1,13 +1,15 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import Fastify from 'fastify';
+import { vi } from 'vitest';
 
 import { clerkPlugin, getAuth } from '../index';
 
-const authenticateRequestMock = jest.fn();
+const authenticateRequestMock = vi.fn();
 
-jest.mock('@clerk/backend', () => {
+vi.mock('@clerk/backend', async () => {
+  const actual = await vi.importActual('@clerk/backend');
   return {
-    ...jest.requireActual('@clerk/backend'),
+    ...actual,
     createClerkClient: () => {
       return {
         authenticateRequest: (...args: any) => authenticateRequestMock(...args),
@@ -18,8 +20,8 @@ jest.mock('@clerk/backend', () => {
 
 describe('withClerkMiddleware(options)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
+    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('handles signin with Authorization Bearer', async () => {
@@ -53,7 +55,7 @@ describe('withClerkMiddleware(options)', () => {
 
     expect(response.statusCode).toEqual(200);
     expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
-    expect(authenticateRequestMock).toBeCalledWith(
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
@@ -92,7 +94,7 @@ describe('withClerkMiddleware(options)', () => {
 
     expect(response.statusCode).toEqual(200);
     expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
-    expect(authenticateRequestMock).toBeCalledWith(
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',
@@ -163,7 +165,7 @@ describe('withClerkMiddleware(options)', () => {
 
     expect(response.statusCode).toEqual(200);
     expect(response.body).toEqual(JSON.stringify({ auth: { tokenType: 'session_token' } }));
-    expect(authenticateRequestMock).toBeCalledWith(
+    expect(authenticateRequestMock).toHaveBeenCalledWith(
       expect.any(Request),
       expect.objectContaining({
         secretKey: 'TEST_SECRET_KEY',

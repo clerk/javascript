@@ -1,16 +1,15 @@
-import type { ClerkAPIResponseError, CommerceCheckoutResource } from '@clerk/types';
+import type { BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/types';
 import type { MockedFunction } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { type CheckoutCacheState, type CheckoutKey, createCheckoutManager, FETCH_STATUS } from '../manager';
 
-// Type-safe mock for CommerceCheckoutResource
-const createMockCheckoutResource = (overrides: Partial<CommerceCheckoutResource> = {}): CommerceCheckoutResource => ({
+// Type-safe mock for BillingCheckoutResource
+const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> = {}): BillingCheckoutResource => ({
   id: 'checkout_123',
-  status: 'pending',
+  status: 'needs_confirmation',
   externalClientSecret: 'cs_test_123',
   externalGatewayId: 'gateway_123',
-  statement_id: 'stmt_123',
   totals: {
     totalDueNow: { amount: 1000, currency: 'USD', currencySymbol: '$', amountFormatted: '10.00' },
     credit: { amount: 0, currency: 'USD', currencySymbol: '$', amountFormatted: '0.00' },
@@ -21,18 +20,37 @@ const createMockCheckoutResource = (overrides: Partial<CommerceCheckoutResource>
   },
   isImmediatePlanChange: false,
   planPeriod: 'month',
+  freeTrialEndsAt: null,
+  payer: {
+    id: 'payer_123',
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+    firstName: 'Test Payer',
+    lastName: 'Test Payer',
+    email: 'test@clerk.com',
+    imageUrl: 'https://example.com/avatar.png',
+    pathRoot: '',
+    reload: vi.fn(),
+  },
   plan: {
     id: 'plan_123',
     name: 'Pro Plan',
     description: 'Professional plan',
     features: [],
-    amount: 1000,
-    amountFormatted: '10.00',
-    annualAmount: 12000,
-    annualAmountFormatted: '120.00',
-    currency: 'USD',
-    currencySymbol: '$',
+    fee: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+    annualFee: { amount: 12000, amountFormatted: '120.00', currency: 'USD', currencySymbol: '$' },
+    annualMonthlyFee: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
     slug: 'pro-plan',
+    isDefault: false,
+    isRecurring: true,
+    hasBaseFee: false,
+    forPayerType: 'user',
+    publiclyVisible: true,
+    freeTrialDays: 0,
+    freeTrialEnabled: false,
+    avatarUrl: '',
+    pathRoot: '',
+    reload: vi.fn(),
   },
   paymentSource: undefined,
   confirm: vi.fn(),
@@ -72,7 +90,7 @@ describe('createCheckoutManager', () => {
         error: null,
         checkout: null,
         fetchStatus: 'idle',
-        status: 'awaiting_initialization',
+        status: 'needs_initialization',
       });
     });
 
@@ -138,7 +156,7 @@ describe('createCheckoutManager', () => {
         isStarting: false,
         error: null,
         fetchStatus: 'idle',
-        status: 'awaiting_confirmation',
+        status: 'needs_confirmation',
       });
 
       expect(listener1).toHaveBeenCalledWith(expectedState);
@@ -167,7 +185,7 @@ describe('createCheckoutManager', () => {
   describe('executeOperation - start operations', () => {
     it('should execute start operation successfully', async () => {
       const mockCheckout = createMockCheckoutResource();
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(mockCheckout);
 
@@ -186,14 +204,14 @@ describe('createCheckoutManager', () => {
           checkout: mockCheckout,
           error: null,
           fetchStatus: 'idle',
-          status: 'awaiting_confirmation',
+          status: 'needs_confirmation',
         }),
       );
     });
 
     it('should set isStarting to true during operation', async () => {
       let capturedState: CheckoutCacheState | null = null;
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
           // Capture state while operation is running
@@ -213,7 +231,7 @@ describe('createCheckoutManager', () => {
 
     it('should handle operation errors correctly', async () => {
       const mockError = createMockError('Operation failed');
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockRejectedValue(mockError);
 
@@ -230,7 +248,7 @@ describe('createCheckoutManager', () => {
           isStarting: false,
           error: mockError,
           fetchStatus: 'error',
-          status: 'awaiting_initialization',
+          status: 'needs_initialization',
         }),
       );
     });
@@ -238,7 +256,7 @@ describe('createCheckoutManager', () => {
     it('should clear previous errors when starting new operation', async () => {
       // First, create an error state
       const mockError = createMockError('Previous error');
-      const failingOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const failingOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockRejectedValue(mockError);
 
@@ -253,7 +271,7 @@ describe('createCheckoutManager', () => {
 
       // Now start a successful operation
       const mockCheckout = createMockCheckoutResource();
-      const successfulOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const successfulOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(mockCheckout);
 
@@ -272,7 +290,7 @@ describe('createCheckoutManager', () => {
   describe('executeOperation - confirm operations', () => {
     it('should execute confirm operation successfully', async () => {
       const mockCheckout = createMockCheckoutResource({ status: 'completed' });
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(mockCheckout);
 
@@ -297,7 +315,7 @@ describe('createCheckoutManager', () => {
 
     it('should set isConfirming to true during operation', async () => {
       let capturedState: CheckoutCacheState | null = null;
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
           capturedState = manager.getCacheState();
@@ -316,7 +334,7 @@ describe('createCheckoutManager', () => {
 
     it('should handle confirm operation errors', async () => {
       const mockError = createMockError('Confirm failed');
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockRejectedValue(mockError);
 
@@ -340,7 +358,7 @@ describe('createCheckoutManager', () => {
   describe('operation deduplication', () => {
     it('should deduplicate concurrent start operations', async () => {
       const mockCheckout = createMockCheckoutResource();
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(mockCheckout), 50)));
 
@@ -371,7 +389,7 @@ describe('createCheckoutManager', () => {
 
     it('should deduplicate concurrent confirm operations', async () => {
       const mockCheckout = createMockCheckoutResource();
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(mockCheckout), 50)));
 
@@ -388,10 +406,10 @@ describe('createCheckoutManager', () => {
       const startCheckout = createMockCheckoutResource({ id: 'start_checkout' });
       const confirmCheckout = createMockCheckoutResource({ id: 'confirm_checkout' });
 
-      const startOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const startOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(startCheckout), 50)));
-      const confirmOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const confirmOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(confirmCheckout), 50)));
 
@@ -414,7 +432,7 @@ describe('createCheckoutManager', () => {
 
     it('should propagate errors to all concurrent callers', async () => {
       const mockError = createMockError('Concurrent operation failed');
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise((_, reject) => setTimeout(() => reject(mockError), 50)));
 
@@ -440,8 +458,8 @@ describe('createCheckoutManager', () => {
       const checkout1 = createMockCheckoutResource({ id: 'checkout1' });
       const checkout2 = createMockCheckoutResource({ id: 'checkout2' });
 
-      const operation1: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockResolvedValue(checkout1);
-      const operation2: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockResolvedValue(checkout2);
+      const operation1: MockedFunction<() => Promise<BillingCheckoutResource>> = vi.fn().mockResolvedValue(checkout1);
+      const operation2: MockedFunction<() => Promise<BillingCheckoutResource>> = vi.fn().mockResolvedValue(checkout2);
 
       const result1 = await manager.executeOperation('start', operation1);
       const result2 = await manager.executeOperation('start', operation2);
@@ -473,7 +491,7 @@ describe('createCheckoutManager', () => {
         error: null,
         checkout: null,
         fetchStatus: 'idle',
-        status: 'awaiting_initialization',
+        status: 'needs_initialization',
       });
 
       // Should notify listeners
@@ -482,11 +500,11 @@ describe('createCheckoutManager', () => {
 
     it('should not clear checkout state when operations are pending', async () => {
       const mockCheckout = createMockCheckoutResource();
-      let resolveOperation: ((value: CommerceCheckoutResource) => void) | undefined;
+      let resolveOperation: ((value: BillingCheckoutResource) => void) | undefined;
 
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockImplementation(
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi.fn().mockImplementation(
         () =>
-          new Promise<CommerceCheckoutResource>(resolve => {
+          new Promise<BillingCheckoutResource>(resolve => {
             resolveOperation = resolve;
           }),
       );
@@ -515,7 +533,7 @@ describe('createCheckoutManager', () => {
       manager.clearCheckout();
       state = manager.getCacheState();
       expect(state.checkout).toBeNull();
-      expect(state.status).toBe('awaiting_initialization');
+      expect(state.status).toBe('needs_initialization');
     });
   });
 
@@ -526,7 +544,7 @@ describe('createCheckoutManager', () => {
 
       // During operation - fetching
       let capturedState: CheckoutCacheState | null = null;
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
           capturedState = manager.getCacheState();
@@ -541,7 +559,7 @@ describe('createCheckoutManager', () => {
 
       // After error - error
       const mockError = createMockError();
-      const failingOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const failingOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockRejectedValue(mockError);
 
@@ -554,21 +572,21 @@ describe('createCheckoutManager', () => {
     });
 
     it('should derive status based on checkout state', async () => {
-      // Initially awaiting initialization
-      expect(manager.getCacheState().status).toBe('awaiting_initialization');
+      // Initially needs initialization
+      expect(manager.getCacheState().status).toBe('needs_initialization');
 
-      // After starting checkout - awaiting confirmation
-      const pendingCheckout = createMockCheckoutResource({ status: 'pending' });
-      const startOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      // After starting checkout - needs confirmation
+      const pendingCheckout = createMockCheckoutResource({ status: 'needs_confirmation' });
+      const startOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(pendingCheckout);
 
       await manager.executeOperation('start', startOperation);
-      expect(manager.getCacheState().status).toBe('awaiting_confirmation');
+      expect(manager.getCacheState().status).toBe('needs_confirmation');
 
       // After completing checkout - completed
       const completedCheckout = createMockCheckoutResource({ status: 'completed' });
-      const confirmOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const confirmOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(completedCheckout);
 
@@ -580,7 +598,7 @@ describe('createCheckoutManager', () => {
       let startCapturedState: CheckoutCacheState | null = null;
       let confirmCapturedState: CheckoutCacheState | null = null;
 
-      const startOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const startOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
           await new Promise(resolve => setTimeout(resolve, 30));
@@ -588,7 +606,7 @@ describe('createCheckoutManager', () => {
           return createMockCheckoutResource({ id: 'start' });
         });
 
-      const confirmOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const confirmOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
           await new Promise(resolve => setTimeout(resolve, 20));
@@ -621,8 +639,8 @@ describe('createCheckoutManager', () => {
       const checkout1 = createMockCheckoutResource({ id: 'checkout1' });
       const checkout2 = createMockCheckoutResource({ id: 'checkout2' });
 
-      const operation1: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockResolvedValue(checkout1);
-      const operation2: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi.fn().mockResolvedValue(checkout2);
+      const operation1: MockedFunction<() => Promise<BillingCheckoutResource>> = vi.fn().mockResolvedValue(checkout1);
+      const operation2: MockedFunction<() => Promise<BillingCheckoutResource>> = vi.fn().mockResolvedValue(checkout2);
 
       await manager1.executeOperation('start', operation1);
       await manager2.executeOperation('confirm', operation2);
@@ -631,7 +649,7 @@ describe('createCheckoutManager', () => {
       const state2 = manager2.getCacheState();
 
       expect(state1.checkout?.id).toBe('checkout1');
-      expect(state1.status).toBe('awaiting_confirmation');
+      expect(state1.status).toBe('needs_confirmation');
 
       expect(state2.checkout?.id).toBe('checkout2');
       expect(state2.isStarting).toBe(false);
@@ -649,7 +667,7 @@ describe('createCheckoutManager', () => {
       manager2.subscribe(listener2);
 
       // Trigger operation on manager1
-      const mockOperation: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockResolvedValue(createMockCheckoutResource());
       await manager1.executeOperation('start', mockOperation);
@@ -666,10 +684,10 @@ describe('createCheckoutManager', () => {
       const checkout1 = createMockCheckoutResource({ id: 'checkout1' });
       const checkout2 = createMockCheckoutResource({ id: 'checkout2' });
 
-      const operation1: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const operation1: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(checkout1), 50)));
-      const operation2: MockedFunction<() => Promise<CommerceCheckoutResource>> = vi
+      const operation2: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve(checkout2), 50)));
 

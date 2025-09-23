@@ -10,18 +10,18 @@ const Initiator = () => {
   const { checkout } = useCheckout();
 
   useEffect(() => {
-    checkout.start().catch(() => null);
+    void checkout.start();
     return checkout.clear;
   }, []);
   return null;
 };
 
 const Root = ({ children }: { children: React.ReactNode }) => {
-  const { planId, planPeriod, subscriberType } = useCheckoutContext();
+  const { planId, planPeriod, for: _for } = useCheckoutContext();
 
   return (
     <CheckoutProvider
-      for={subscriberType === 'org' ? 'organization' : undefined}
+      for={_for}
       planId={
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         planId!
@@ -62,7 +62,7 @@ const FetchStatus = ({
   const { fetchStatus, error } = checkout;
 
   const internalFetchStatus = useMemo(() => {
-    if (fetchStatus === 'error' && error?.errors) {
+    if (fetchStatus === 'error') {
       const errorCodes = error.errors.map(e => e.code);
 
       if (errorCodes.includes('missing_payer_email')) {
@@ -75,7 +75,7 @@ const FetchStatus = ({
     }
 
     return fetchStatus;
-  }, [fetchStatus, error]);
+  }, [fetchStatus]);
 
   if (internalFetchStatus !== status) {
     return null;

@@ -76,6 +76,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'socialButtonsProviderIcon',
   'socialButtonsProviderInitialIcon',
 
+  'lastAuthenticationStrategyBadge',
+
   'enterpriseButtonsProviderIcon',
 
   'providerIcon',
@@ -211,6 +213,11 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationListPreviewButton',
   'organizationListPreviewItemActionButton',
   'organizationListCreateOrganizationActionButton',
+
+  'taskChooseOrganizationPreviewItem',
+  'taskChooseOrganizationPreviewItems',
+  'taskChooseOrganizationCreateOrganizationActionButton',
+  'taskChooseOrganizationPreviewButton',
 
   'userPreview',
   'userPreviewAvatarContainer',
@@ -419,6 +426,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'profileSectionSubtitleText',
   'profileSectionContent',
   'profileSectionPrimaryButton',
+  'profileSectionButtonGroup',
   'profilePage',
 
   'formattedPhoneNumber',

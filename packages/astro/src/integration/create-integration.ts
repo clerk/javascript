@@ -19,15 +19,7 @@ type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
 
 function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() {
   return (params?: Params): AstroIntegration => {
-    const {
-      proxyUrl,
-      isSatellite,
-      domain,
-      signInUrl,
-      signUpUrl,
-      enableEnvSchema = true,
-      treatPendingAsSignedOut,
-    } = params || {};
+    const { proxyUrl, isSatellite, domain, signInUrl, signUpUrl, enableEnvSchema = true } = params || {};
 
     // These are not provided when the "bundled" integration is used
     const clerkJSUrl = (params as any)?.clerkJSUrl as string | undefined;
@@ -65,7 +57,6 @@ function createIntegration<Params extends HotloadAstroClerkIntegrationParams>() 
                 /**
                  * Convert the integration params to environment variable in order for it to be readable from the server
                  */
-                ...buildEnvVarFromOption(treatPendingAsSignedOut, 'PUBLIC_CLERK_TREAT_PENDING_AS_SIGNED_OUT'),
                 ...buildEnvVarFromOption(signInUrl, 'PUBLIC_CLERK_SIGN_IN_URL'),
                 ...buildEnvVarFromOption(signUpUrl, 'PUBLIC_CLERK_SIGN_UP_URL'),
                 ...buildEnvVarFromOption(isSatellite, 'PUBLIC_CLERK_IS_SATELLITE'),
@@ -190,6 +181,7 @@ function createClerkEnvSchema() {
     PUBLIC_CLERK_TELEMETRY_DISABLED: envField.boolean({ context: 'client', access: 'public', optional: true }),
     PUBLIC_CLERK_TELEMETRY_DEBUG: envField.boolean({ context: 'client', access: 'public', optional: true }),
     CLERK_SECRET_KEY: envField.string({ context: 'server', access: 'secret' }),
+    CLERK_MACHINE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
     CLERK_JWT_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
   };
 }

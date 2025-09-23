@@ -1,6 +1,6 @@
-export * from './beforeUnloadTracker';
 export * from './appearance';
-export * from './commerce';
+export * from './beforeUnloadTracker';
+export * from './billing';
 export * from './completeSignUpFlow';
 export * from './componentGuards';
 export * from './dynamicParamParser';
@@ -8,6 +8,7 @@ export * from './email';
 export * from './encoders';
 export * from './errors';
 export * from './errorThrower';
+export * from './filterUndefinedValues';
 export * from './getClerkQueryParam';
 export * from './hex';
 export * from './ignoreEventValue';

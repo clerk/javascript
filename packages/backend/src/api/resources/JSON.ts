@@ -1,4 +1,4 @@
-import type { SignUpStatus, VerificationStatus } from '@clerk/types';
+import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/types';
 
 import type {
   ActorTokenStatus,
@@ -35,7 +35,9 @@ export const ObjectType = {
   InstanceSettings: 'instance_settings',
   Invitation: 'invitation',
   Machine: 'machine',
-  MachineToken: 'machine_to_machine_token',
+  MachineScope: 'machine_scope',
+  MachineSecretKey: 'machine_secret_key',
+  M2MToken: 'machine_to_machine_token',
   JwtTemplate: 'jwt_template',
   OauthAccessToken: 'oauth_access_token',
   IdpOAuthAccessToken: 'clerk_idp_oauth_access_token',
@@ -63,10 +65,12 @@ export const ObjectType = {
   TestingToken: 'testing_token',
   Role: 'role',
   Permission: 'permission',
-  CommercePayer: 'commerce_payer',
-  CommercePaymentAttempt: 'commerce_payment_attempt',
-  CommerceSubscription: 'commerce_subscription',
-  CommerceSubscriptionItem: 'commerce_subscription_item',
+  BillingPayer: 'commerce_payer',
+  BillingPaymentAttempt: 'commerce_payment_attempt',
+  BillingSubscription: 'commerce_subscription',
+  BillingSubscriptionItem: 'commerce_subscription_item',
+  BillingPlan: 'commerce_plan',
+  Feature: 'feature',
 } as const;
 
 export type ObjectType = (typeof ObjectType)[keyof typeof ObjectType];
@@ -138,6 +142,7 @@ export interface ClientJSON extends ClerkResourceJSON {
   sign_in_id: string | null;
   sign_up_id: string | null;
   last_active_session_id: string | null;
+  last_authentication_strategy: LastAuthenticationStrategy | null;
   created_at: number;
   updated_at: number;
 }
@@ -316,6 +321,11 @@ export interface OAuthApplicationJSON extends ClerkResourceJSON {
   instance_id: string;
   name: string;
   client_id: string;
+  client_uri: string | null;
+  client_image_url: string | null;
+  dynamically_registered: boolean;
+  consent_screen_enabled: boolean;
+  pkce_required: boolean;
   public: boolean;
   scopes: string;
   redirect_uris: Array<string>;
@@ -710,11 +720,27 @@ export interface MachineJSON extends ClerkResourceJSON {
   instance_id: string;
   created_at: number;
   updated_at: number;
+  default_token_ttl: number;
+  scoped_machines: MachineJSON[];
+  secret_key?: string;
 }
 
-export interface MachineTokenJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.MachineToken;
-  name: string;
+export interface MachineScopeJSON {
+  object: typeof ObjectType.MachineScope;
+  from_machine_id: string;
+  to_machine_id: string;
+  created_at?: number;
+  deleted?: boolean;
+}
+
+export interface MachineSecretKeyJSON {
+  object: typeof ObjectType.MachineSecretKey;
+  secret: string;
+}
+
+export interface M2MTokenJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.M2MToken;
+  token?: string;
   subject: string;
   scopes: string[];
   claims: Record<string, any> | null;
@@ -722,8 +748,6 @@ export interface MachineTokenJSON extends ClerkResourceJSON {
   revocation_reason: string | null;
   expired: boolean;
   expiration: number | null;
-  created_by: string | null;
-  creation_reason: string | null;
   created_at: number;
   updated_at: number;
 }
@@ -761,8 +785,8 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface CommercePayerJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.CommercePayer;
+export interface BillingPayerJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingPayer;
   instance_id: string;
   user_id?: string;
   first_name?: string;
@@ -775,71 +799,103 @@ export interface CommercePayerJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
-export interface CommercePayeeJSON {
+interface BillingPayeeJSON {
   id: string;
   gateway_type: string;
   gateway_external_id: string;
   gateway_status: 'active' | 'pending' | 'restricted' | 'disconnected';
 }
 
-export interface CommerceAmountJSON {
+interface BillingMoneyAmountJSON {
   amount: number;
   amount_formatted: string;
   currency: string;
   currency_symbol: string;
 }
 
-export interface CommerceTotalsJSON {
-  subtotal: CommerceAmountJSON;
-  tax_total: CommerceAmountJSON;
-  grand_total: CommerceAmountJSON;
+interface BillingTotalsJSON {
+  subtotal: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+  grand_total: BillingMoneyAmountJSON;
 }
 
-export interface CommercePaymentSourceJSON {
+export interface FeatureJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.Feature;
+  name: string;
+  description: string;
+  slug: string;
+  avatar_url: string;
+}
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingPlanJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingPlan;
   id: string;
-  gateway: string;
-  gateway_external_id: string;
-  gateway_external_account_id?: string;
-  payment_method: string;
-  status: 'active' | 'disconnected';
-  card_type?: string;
-  last4?: string;
-}
-
-export interface CommercePaymentFailedReasonJSON {
-  code: string;
-  decline_code: string;
-}
-
-export interface CommerceSubscriptionCreditJSON {
-  amount: CommerceAmountJSON;
-  cycle_days_remaining: number;
-  cycle_days_total: number;
-  cycle_remaining_percent: number;
-}
-
-export interface CommercePlanJSON {
-  id: string;
-  instance_id: string;
   product_id: string;
   name: string;
   slug: string;
   description?: string;
   is_default: boolean;
   is_recurring: boolean;
-  amount: number;
-  period: 'month' | 'annual';
-  interval: number;
   has_base_fee: boolean;
-  currency: string;
-  annual_monthly_amount: number;
   publicly_visible: boolean;
+  fee: BillingMoneyAmountJSON;
+  annual_fee: BillingMoneyAmountJSON;
+  annual_monthly_fee: BillingMoneyAmountJSON;
+  for_payer_type: 'org' | 'user';
+  features: FeatureJSON[];
 }
 
-export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.CommerceSubscriptionItem;
-  status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
-  credit: CommerceSubscriptionCreditJSON;
+type BillingSubscriptionItemStatus =
+  | 'abandoned'
+  | 'active'
+  | 'canceled'
+  | 'ended'
+  | 'expired'
+  | 'incomplete'
+  | 'past_due'
+  | 'upcoming';
+
+/**
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
+ */
+export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingSubscriptionItem;
+  status: BillingSubscriptionItemStatus;
+  plan_period: 'month' | 'annual';
+  payer_id: string;
+  period_start: number;
+  period_end: number | null;
+  is_free_trial?: boolean;
+  ended_at: number | null;
+  created_at: number;
+  updated_at: number;
+  canceled_at: number | null;
+  past_due_at: number | null;
+  lifetime_paid: BillingMoneyAmountJSON;
+  next_payment: {
+    amount: number;
+    date: number;
+  } | null;
+  amount: BillingMoneyAmountJSON | null;
+  plan?: BillingPlanJSON | null;
+  plan_id?: string | null;
+}
+
+/**
+ * Webhooks specific interface for BillingSubscriptionItem.
+ */
+export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingSubscriptionItem;
+  status: BillingSubscriptionItemStatus;
+  credit: {
+    amount: BillingMoneyAmountJSON;
+    cycle_days_remaining: number;
+    cycle_days_total: number;
+    cycle_remaining_percent: number;
+  };
   proration_date: string;
   plan_period: 'month' | 'annual';
   period_start: number;
@@ -849,13 +905,32 @@ export interface CommerceSubscriptionItemJSON extends ClerkResourceJSON {
   lifetime_paid: number;
   next_payment_amount: number;
   next_payment_date: number;
-  amount: CommerceAmountJSON;
-  plan: CommercePlanJSON;
-  plan_id: string;
+  amount: BillingMoneyAmountJSON;
+  plan?: {
+    id: string;
+    instance_id: string;
+    product_id: string;
+    name: string;
+    slug: string;
+    description?: string;
+    is_default: boolean;
+    is_recurring: boolean;
+    amount: number;
+    period: 'month' | 'annual';
+    interval: number;
+    has_base_fee: boolean;
+    currency: string;
+    annual_monthly_amount: number;
+    publicly_visible: boolean;
+  } | null;
+  plan_id?: string | null;
 }
 
-export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.CommercePaymentAttempt;
+/**
+ * Webhooks specific interface for BillingPaymentAttempt.
+ */
+export interface BillingPaymentAttemptWebhookEventJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingPaymentAttempt;
   instance_id: string;
   payment_id: string;
   statement_id: string;
@@ -865,18 +940,33 @@ export interface CommercePaymentAttemptJSON extends ClerkResourceJSON {
   updated_at: number;
   paid_at?: number;
   failed_at?: number;
-  failed_reason?: CommercePaymentFailedReasonJSON;
+  failed_reason?: {
+    code: string;
+    decline_code: string;
+  };
   billing_date: number;
   charge_type: 'checkout' | 'recurring';
-  payee: CommercePayeeJSON;
-  payer: CommercePayerJSON;
-  totals: CommerceTotalsJSON;
-  payment_source: CommercePaymentSourceJSON;
-  subscription_items: CommerceSubscriptionItemJSON[];
+  payee: BillingPayeeJSON;
+  payer: BillingPayerJSON;
+  totals: BillingTotalsJSON;
+  payment_source: {
+    id: string;
+    gateway: string;
+    gateway_external_id: string;
+    gateway_external_account_id?: string;
+    payment_method: string;
+    status: 'active' | 'disconnected';
+    card_type?: string;
+    last4?: string;
+  };
+  subscription_items: BillingSubscriptionItemWebhookEventJSON[];
 }
 
-export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.CommerceSubscription;
+/**
+ * Webhooks specific interface for BillingSubscription.
+ */
+export interface BillingSubscriptionWebhookEventJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingSubscription;
   status: 'abandoned' | 'active' | 'canceled' | 'ended' | 'expired' | 'incomplete' | 'past_due' | 'upcoming';
   active_at?: number;
   canceled_at?: number;
@@ -886,9 +976,25 @@ export interface CommerceSubscriptionJSON extends ClerkResourceJSON {
   updated_at: number;
   latest_payment_id: string;
   payer_id: string;
-  payer: CommercePayerJSON;
+  payer: BillingPayerJSON;
   payment_source_id: string;
-  items: CommerceSubscriptionItemJSON[];
+  items: BillingSubscriptionItemWebhookEventJSON[];
+}
+
+export interface BillingSubscriptionJSON extends ClerkResourceJSON {
+  object: typeof ObjectType.BillingSubscription;
+  status: 'active' | 'past_due' | 'canceled' | 'ended' | 'abandoned' | 'incomplete';
+  payer_id: string;
+  created_at: number;
+  updated_at: number;
+  active_at: number | null;
+  past_due_at: number | null;
+  subscription_items: BillingSubscriptionItemJSON[];
+  next_payment?: {
+    date: number;
+    amount: BillingMoneyAmountJSON;
+  };
+  eligible_for_free_trial?: boolean;
 }
 
 export interface WebhooksSvixJSON {

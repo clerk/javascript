@@ -1,8 +1,7 @@
-import { parseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/types';
 import { describe, it, jest } from '@jest/globals';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render, screen, waitFor } from '../../../../testUtils';
 import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { runFakeTimers } from '../../../utils/test/runFakeTimers';
@@ -34,7 +33,7 @@ describe('SignInFactorTwo', () => {
       );
       render(<SignInFactorTwo />, { wrapper });
 
-      const inputs = screen.getAllByLabelText(/digit/i);
+      const inputs = screen.getAllByTestId('otp-input-segment');
       expect(inputs.length).toBe(6);
     });
 
