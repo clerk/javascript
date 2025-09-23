@@ -31,7 +31,7 @@ type SessionAuthWithRedirect<TRedirect> = SessionAuthObject & {
    * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign in.
    *
    * > [!NOTE]
-   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/reference/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignIn: RedirectFun<TRedirect>;
 
@@ -41,7 +41,7 @@ type SessionAuthWithRedirect<TRedirect> = SessionAuthObject & {
    * @param [returnBackUrl] {string | URL} - The URL to redirect the user back to after they sign up.
    *
    * > [!NOTE]
-   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys).
+   * > `auth()` on the server-side can only access redirect URLs defined via [environment variables](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) or [`clerkMiddleware` dynamic keys](https://clerk.com/docs/reference/nextjs/clerk-middleware#dynamic-keys).
    */
   redirectToSignUp: RedirectFun<TRedirect>;
 };
@@ -95,7 +95,7 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
    *
    * | Authenticated | Authorized | `auth.protect()` will |
    * | - | - | - |
-   * | Yes | Yes | Return the [`Auth`](https://clerk.com/docs/references/backend/types/auth-object) object. |
+   * | Yes | Yes | Return the [`Auth`](https://clerk.com/docs/reference/backend/types/auth-object) object. |
    * | Yes | No | Return a `404` error. |
    * | No | No | Redirect the user to the sign-in page\*. |
    *
@@ -108,11 +108,11 @@ export interface AuthFn<TRedirect = ReturnType<typeof redirect>> {
 }
 
 /**
- * The `auth()` helper returns the [`Auth`](https://clerk.com/docs/references/backend/types/auth-object) object of the currently active user, as well as the [`redirectToSignIn()`](https://clerk.com/docs/references/nextjs/auth#redirect-to-sign-in) method.
+ * The `auth()` helper returns the [`Auth`](https://clerk.com/docs/reference/backend/types/auth-object) object of the currently active user, as well as the [`redirectToSignIn()`](https://clerk.com/docs/reference/nextjs/app-router/auth#redirect-to-sign-in) method.
  *
  * - Only available for App Router.
  * - Only works on the server-side, such as in Server Components, Route Handlers, and Server Actions.
- * - Requires [`clerkMiddleware()`](https://clerk.com/docs/references/nextjs/clerk-middleware) to be configured.
+ * - Requires [`clerkMiddleware()`](https://clerk.com/docs/reference/nextjs/clerk-middleware) to be configured.
  */
 export const auth: AuthFn = (async (options?: AuthOptions) => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports

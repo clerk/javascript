@@ -57,7 +57,7 @@ type ResourceResponse<T> = {
  *
  * If the promise resolves, you will get back the [properties](#properties) listed below. `data` will be an array of the resource type you requested. You can use the `totalCount` property to determine how many total items exist remotely.
  *
- * Some methods that return this type allow pagination with the `limit` and `offset` parameters, in which case the first 10 items will be returned by default. For methods such as [`getAllowlistIdentifierList()`](https://clerk.com/docs/references/backend/allowlist/get-allowlist-identifier-list), which do not take a `limit` or `offset`, all items will be returned.
+ * Some methods that return this type allow pagination with the `limit` and `offset` parameters, in which case the first 10 items will be returned by default. For methods such as [`getAllowlistIdentifierList()`](https://clerk.com/docs/reference/backend/allowlist/get-allowlist-identifier-list), which do not take a `limit` or `offset`, all items will be returned.
  *
  * If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
  *
