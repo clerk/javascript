@@ -22,7 +22,9 @@ export class FraudProtection {
     private CaptchaChallengeImpl: typeof CaptchaChallenge,
   ) {}
 
+  // TODO @userland-errors:
   public async execute<T extends () => Promise<any>, R = Awaited<ReturnType<T>>>(clerk: Clerk, cb: T): Promise<R> {
+    // TODO @userland-errors:
     if (this.captchaAttemptsExceeded()) {
       throw new ClerkRuntimeError(
         'Security verification failed. Please try again by refreshing the page, clearing your browser cookies, or using a different web browser.',

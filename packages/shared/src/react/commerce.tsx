@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { CommerceCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
+import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -70,7 +70,7 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
 
   const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
     {
-      key: 'commerce-payment-source-initialize',
+      key: 'billing-payment-source-initialize',
       resourceId: resource?.id,
     },
     () => {
@@ -140,7 +140,7 @@ type internalStripeAppearance = {
 };
 
 type PaymentElementProviderProps = {
-  checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  checkout?: BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   stripeAppearance?: internalStripeAppearance;
   /**
    * Default to `user` if not provided.

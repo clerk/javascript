@@ -1,6 +1,6 @@
 export * from './appearance';
 export * from './beforeUnloadTracker';
-export * from './commerce';
+export * from './billing';
 export * from './completeSignUpFlow';
 export * from './componentGuards';
 export * from './dynamicParamParser';

@@ -1,4 +1,4 @@
-// @ts-check
+// @ts-check - Enable TypeScript checks for safer MDX post-processing and link rewriting
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
 /**
@@ -54,8 +54,6 @@ const LINK_REPLACEMENTS = [
   ['web3-wallet', '/docs/references/backend/types/backend-web3-wallet'],
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/customization/localization'],
-  ['commerce-subscription-item-resource', '/docs/references/javascript/types/commerce-subscription-item-resource'],
-  ['commerce-money-amount', '/docs/references/javascript/types/commerce-money-amount'],
 ];
 
 /**

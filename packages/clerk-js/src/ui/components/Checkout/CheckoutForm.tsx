@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { CommerceMoneyAmount, CommercePaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { BillingMoneyAmount, BillingPaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -13,7 +13,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
-import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Text } from '../../customizables';
+import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
 import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
@@ -187,12 +187,37 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id, totals, freeTrialEndsAt } = checkout;
+  const { id } = checkout;
+
+  const { isLoading } = usePaymentMethods();
+
+  if (!id) {
+    return null;
+  }
+
+  if (isLoading) {
+    return (
+      <Spinner
+        sx={{
+          margin: 'auto',
+        }}
+      />
+    );
+  }
+
+  return <CheckoutFormElementsInternal />;
+};
+
+const CheckoutFormElementsInternal = () => {
+  const { checkout } = useCheckout();
+  const { id, totals, isImmediatePlanChange, freeTrialEndsAt } = checkout;
   const { data: paymentSources } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentSources.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
+
+  const showPaymentMethods = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt);
 
   if (!id) {
     return null;
@@ -206,8 +231,7 @@ const CheckoutFormElements = () => {
     >
       {__BUILD_DISABLE_RHC__ ? null : (
         <>
-          {/* only show if there are payment sources and there is a total due now */}
-          {paymentSources.length > 0 && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt) && (
+          {paymentSources.length > 0 && showPaymentMethods && (
             <SegmentedControl.Root
               aria-label='Payment method source'
               value={paymentMethodSource}
@@ -342,16 +366,16 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     totalDueNow,
     paymentSources,
   }: {
-    totalDueNow: CommerceMoneyAmount;
-    paymentSources: CommercePaymentSourceResource[];
+    totalDueNow: BillingMoneyAmount;
+    paymentSources: BillingPaymentSourceResource[];
   }) => {
     const submitLabel = useSubmitLabel();
     const { checkout } = useCheckout();
-    const { paymentSource, freeTrialEndsAt } = checkout;
+    const { paymentSource, isImmediatePlanChange, freeTrialEndsAt } = checkout;
 
     const { payWithExistingPaymentSource } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<CommercePaymentSourceResource | undefined>(
+    const [selectedPaymentSource, setSelectedPaymentSource] = useState<BillingPaymentSourceResource | undefined>(
       paymentSource || paymentSources.find(p => p.isDefault),
     );
 
@@ -369,7 +393,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       });
     }, [paymentSources]);
 
-    const shouldDefaultBeUsed = totalDueNow.amount === 0 || !freeTrialEndsAt;
+    const showPaymentMethods = isImmediatePlanChange && (totalDueNow.amount > 0 || !!freeTrialEndsAt);
 
     return (
       <Form
@@ -380,7 +404,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           rowGap: t.space.$4,
         })}
       >
-        {shouldDefaultBeUsed ? (
+        {showPaymentMethods ? (
           <Select
             elementId='paymentSource'
             options={options}

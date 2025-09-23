@@ -36,7 +36,7 @@ import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { getFullName } from '../../utils/user';
 import { eventBus, events } from '../events';
-import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
+import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/billing';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,

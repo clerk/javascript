@@ -1,5 +1,27 @@
 # Change Log
 
+## 2.15.2
+
+### Patch Changes
+
+- Update jsdocs mentions of `@experimental` tag. ([#6651](https://github.com/clerk/javascript/pull/6651)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`13d08c8`](https://github.com/clerk/javascript/commit/13d08c89745d7cf29068b0cd8873de11f6140d76), [`f0f1a3f`](https://github.com/clerk/javascript/commit/f0f1a3fc5186462f51b7547d8dc024091dcd225e), [`41e0a41`](https://github.com/clerk/javascript/commit/41e0a4190b33dd2c4bdc0d536bbe83fcf99af9b0), [`1aa9e9f`](https://github.com/clerk/javascript/commit/1aa9e9f10c051319e9ff4b1a0ecd71507bd6a6aa), [`a48de44`](https://github.com/clerk/javascript/commit/a48de4402f214e76e0ab25c4cddfb7f09495d18f), [`a88ee58`](https://github.com/clerk/javascript/commit/a88ee5827adee0cc8a62246d03a3034d8566fe21), [`d6c7bbb`](https://github.com/clerk/javascript/commit/d6c7bbba23f38c0b3ca7edebb53028a05c7b38e6)]:
+  - @clerk/clerk-js@5.95.0
+  - @clerk/shared@3.26.1
+  - @clerk/clerk-react@5.48.1
+  - @clerk/types@4.88.0
+
+## 2.15.1
+
+### Patch Changes
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`f6f890c`](https://github.com/clerk/javascript/commit/f6f890c0cb71bb840b5a60f4ecfdecb6de0657b1), [`adfed91`](https://github.com/clerk/javascript/commit/adfed91d93abf6fd9823207b39565e2059f02f90), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`a059017`](https://github.com/clerk/javascript/commit/a059017683580df82224e73c81387d82f484819d), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97), [`719856f`](https://github.com/clerk/javascript/commit/719856fee23acde3f9953f48f0a83c3eedf9e429)]:
+  - @clerk/clerk-js@5.94.0
+  - @clerk/clerk-react@5.48.0
+  - @clerk/types@4.87.0
+  - @clerk/shared@3.26.0
+
 ## 2.15.0
 
 ### Minor Changes

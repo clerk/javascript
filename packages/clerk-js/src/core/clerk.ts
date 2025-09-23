@@ -30,13 +30,13 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  BillingNamespace,
   Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
-  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   CredentialReturn,
@@ -147,8 +147,8 @@ import type { FapiClient, FapiRequestCallback } from './fapiClient';
 import { createFapiClient } from './fapiClient';
 import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
+import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
-import { CommerceBilling } from './modules/commerce';
 import {
   BaseResource,
   Client,
@@ -206,7 +206,7 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
   };
 
-  private static _billing: CommerceBillingNamespace;
+  private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
 
@@ -337,9 +337,9 @@ export class Clerk implements ClerkInterface {
     return this.#options.standardBrowser || false;
   }
 
-  get billing(): CommerceBillingNamespace {
+  get billing(): BillingNamespace {
     if (!Clerk._billing) {
-      Clerk._billing = new CommerceBilling();
+      Clerk._billing = new Billing();
     }
     return Clerk._billing;
   }
@@ -625,7 +625,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('Checkout'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyBillingComponent('Checkout'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
@@ -654,7 +654,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PlanDetails'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyBillingComponent('PlanDetails'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
@@ -1113,7 +1113,7 @@ export class Clerk implements ClerkInterface {
     this.assertComponentsReady(this.#componentControls);
     if (disabledAllBillingFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyCommerceComponent('PricingTable'), {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyBillingComponent('PricingTable'), {
           code: CANNOT_RENDER_BILLING_DISABLED_ERROR_CODE,
         });
       }
@@ -1158,8 +1158,7 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Mount a api keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
@@ -1201,8 +1200,7 @@ export class Clerk implements ClerkInterface {
   };
 
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Unmount a api keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
@@ -2370,6 +2368,7 @@ export class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   };
 
+  // TODO @userland-errors:
   __unstable__updateProps = (_props: any) => {
     // We need to re-init the options here in order to keep the options passed to ClerkProvider
     // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:

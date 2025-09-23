@@ -1,7 +1,7 @@
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
-  CommerceCheckoutResource,
+  BillingCheckoutResource,
   SetActiveNavigate,
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
@@ -27,7 +27,7 @@ type ForceNull<T> = {
   [K in keyof T]: null;
 };
 
-type CheckoutProperties = Omit<RemoveFunctions<CommerceCheckoutResource>, 'pathRoot' | 'status'>;
+type CheckoutProperties = Omit<RemoveFunctions<BillingCheckoutResource>, 'pathRoot' | 'status'>;
 
 type FetchStatusAndError =
   | {

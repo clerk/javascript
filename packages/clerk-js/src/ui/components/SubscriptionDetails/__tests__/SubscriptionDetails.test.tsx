@@ -999,7 +999,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, queryByText, queryByRole } = render(
+    const { getByRole, getByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -1018,9 +1018,6 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Subscribed on')).toBeNull();
       expect(getByText('Past due on')).toBeVisible();
       expect(getByText('January 15, 2021')).toBeVisible();
-
-      // Menu button should be present but disabled
-      expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
     });
   });
 
