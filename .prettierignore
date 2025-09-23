@@ -20,5 +20,7 @@ package-lock.json
 pnpm-lock.yaml
 playground
 packages/backend/tests/**/*.js
+packages/clerk-js/src/core/resources/internal.ts
+packages/clerk-js/src/core/resources/index.ts
 /**/CHANGELOG.md
 renovate.json5
