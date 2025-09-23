@@ -5,7 +5,12 @@ import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
 import { debugLogger } from '@/utils/debug';
 
-import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
+import {
+  buildEmailAddress as buildEmailAddressUtil,
+  buildURL as buildUrlUtil,
+  filterUndefinedValues,
+  stringifyQueryParams,
+} from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 
@@ -195,6 +200,10 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     const requestInit = { ..._requestInit };
     const { method = 'GET', body } = requestInit;
 
+    if (body && typeof body === 'object' && !(body instanceof FormData)) {
+      requestInit.body = filterUndefinedValues(body);
+    }
+
     requestInit.url = buildUrl({
       ...requestInit,
       // TODO: Pass these values to the FAPI client instead of calculating them on the spot
@@ -214,7 +223,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // Massage the body depending on the content type if needed.
     // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
     // foo=bar&baz=bar&whatever=1
-
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
       // The native BodyInit type is too wide for our use case,
       // so we're casting it to a more specific type here.
