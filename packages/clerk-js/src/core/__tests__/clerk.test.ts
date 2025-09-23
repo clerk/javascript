@@ -743,7 +743,7 @@ describe('Clerk singleton', () => {
     const mockClientRemoveSessions = jest.fn();
     const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
     const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
-    const mockSession3 = { id: '2', remove: jest.fn(), status: 'pending', user: {}, getToken: jest.fn() };
+    const mockSession3 = { id: '3', remove: jest.fn(), status: 'pending', user: {}, getToken: jest.fn() };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
