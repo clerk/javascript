@@ -81,6 +81,7 @@ export const nbNO: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1030,7 +1031,8 @@ export const nbNO: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
-      messageLine1: 'Er du sikker på at du vil slette kontoen din?',
+      messageLine1:
+        'Er du sikker på at du vil slette kontoen din fra Clerk? Vennligst kontakt applikasjonseieren for å slette informasjonen din fra deres applikasjon og andre tjenester.',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',
       title: 'Slett konto',
     },

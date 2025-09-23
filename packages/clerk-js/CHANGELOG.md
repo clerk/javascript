@@ -1,5 +1,82 @@
 # Change Log
 
+## 5.95.0
+
+### Minor Changes
+
+- [Experimental] Add support for ticket sign-ins and sign-ups ([#6806](https://github.com/clerk/javascript/pull/6806)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Rename types, interfaces and classes that contain `commerce` to use `billing` instead. ([#6757](https://github.com/clerk/javascript/pull/6757)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `TaskChooseOrganizationScreen` to render accepted suggestions properly ([#6804](https://github.com/clerk/javascript/pull/6804)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Correct ticket field reference in `SignUpStart.tsx` `handleSubmit` logic gate ([#6824](https://github.com/clerk/javascript/pull/6824)) by [@kduprey](https://github.com/kduprey)
+
+- Update jsdocs mentions of `@experimental` tag. ([#6651](https://github.com/clerk/javascript/pull/6651)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Correctly determine destination first factor based on identifier. ([#6789](https://github.com/clerk/javascript/pull/6789)) by [@dstaley](https://github.com/dstaley)
+
+- Update `<ArrowBlockButton />` icon sizing to be consistent with usage within billing components ([#6803](https://github.com/clerk/javascript/pull/6803)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`4a142e9`](https://github.com/clerk/javascript/commit/4a142e9ee5f9afafc127d9eeeece17db2c8de69e), [`41e0a41`](https://github.com/clerk/javascript/commit/41e0a4190b33dd2c4bdc0d536bbe83fcf99af9b0), [`1aa9e9f`](https://github.com/clerk/javascript/commit/1aa9e9f10c051319e9ff4b1a0ecd71507bd6a6aa), [`40e1b01`](https://github.com/clerk/javascript/commit/40e1b01171cf192aa7065e03543154c3d9c34850), [`a88ee58`](https://github.com/clerk/javascript/commit/a88ee5827adee0cc8a62246d03a3034d8566fe21), [`d6c7bbb`](https://github.com/clerk/javascript/commit/d6c7bbba23f38c0b3ca7edebb53028a05c7b38e6)]:
+  - @clerk/localizations@3.25.3
+  - @clerk/shared@3.26.1
+  - @clerk/types@4.88.0
+
+## 5.94.0
+
+### Minor Changes
+
+- [Experimental] Signal email link support ([#6766](https://github.com/clerk/javascript/pull/6766)) by [@dstaley](https://github.com/dstaley)
+
+- Add retry attempt tracking to FAPI client GET requests ([#6777](https://github.com/clerk/javascript/pull/6777)) by [@jacekradko](https://github.com/jacekradko)
+
+  The FAPI client now adds a `_clerk_retry_attempt` query parameter to retry attempts for GET requests, allowing servers to track and handle retry scenarios appropriately. This parameter is only added during retry attempts, not on the initial request.
+
+- [Billing Beta] Remove deprecated `subscription` attribute from Billing ([#6788](https://github.com/clerk/javascript/pull/6788)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Fix ArrowButtonBlock truncation within payment sources ([#6764](https://github.com/clerk/javascript/pull/6764)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Hide flows inside UserProfile and OrganizationProfile that depend on Stripe.js when remotely hosted code is not permitted. ([#6754](https://github.com/clerk/javascript/pull/6754)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for canceling past due subscriptions ([#6783](https://github.com/clerk/javascript/pull/6783)) by [@aeliox](https://github.com/aeliox)
+
+- Hide payment methods from checkout if the new subscription does not result in an immediate change to the end user's plan. ([#6786](https://github.com/clerk/javascript/pull/6786)) by [@panteliselef](https://github.com/panteliselef)
+
+- Bug fix that allowed `useStatements()`, `usePaymentMethods()` and `usePaymentAttempts()` to fire a request when the billing feature was turned off for the instance. ([#6785](https://github.com/clerk/javascript/pull/6785)) by [@panteliselef](https://github.com/panteliselef)
+
+- Performance improvements for `<Checkout />`. ([#6765](https://github.com/clerk/javascript/pull/6765)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`f7c6b49`](https://github.com/clerk/javascript/commit/f7c6b49cfe5edc7c381fead3a055ddae097dd4b5), [`f070459`](https://github.com/clerk/javascript/commit/f070459a835a47142ee247d6450178779eba0ae6), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97), [`9eac18f`](https://github.com/clerk/javascript/commit/9eac18f0dd59ec5e5ad8c5cb200aa592b24abb58)]:
+  - @clerk/types@4.87.0
+  - @clerk/localizations@3.25.2
+  - @clerk/shared@3.26.0
+
+## 5.93.0
+
+### Minor Changes
+
+- [Billing Beta] Removal of Billing experimental methods: `organization.getSubscriptions()` and `billing.getSubscriptions()` ([#6738](https://github.com/clerk/javascript/pull/6738)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Experimental] Add support for additional params for SignUp ([#6716](https://github.com/clerk/javascript/pull/6716)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Remove Base for non-RHC environments to ensure Coinbase dependencies aren't bundled. ([#6742](https://github.com/clerk/javascript/pull/6742)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fixes errors in react-native without polyfill for window.location ([#6737](https://github.com/clerk/javascript/pull/6737)) by [@bratsos](https://github.com/bratsos)
+
+- Add theme-usage telemetry ([#6529](https://github.com/clerk/javascript/pull/6529)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+  - @clerk/localizations@3.25.1
+
 ## 5.92.1
 
 ### Patch Changes

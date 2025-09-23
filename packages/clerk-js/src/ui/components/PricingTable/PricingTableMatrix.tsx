@@ -1,4 +1,4 @@
-import type { CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
@@ -25,11 +25,11 @@ import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 
 interface PricingTableMatrixProps {
-  plans: CommercePlanResource[] | undefined;
-  highlightedPlan?: CommercePlanResource['slug'];
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
+  plans: BillingPlanResource[] | undefined;
+  highlightedPlan?: BillingPlanResource['slug'];
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 export function PricingTableMatrix({
@@ -140,7 +140,7 @@ export function PricingTableMatrix({
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
+                      onChange={value => setPlanPeriod(value as BillingSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'

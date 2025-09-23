@@ -84,6 +84,7 @@ export const roRO: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Poți folosi în continuare funcțiile „{{plan}}” până la {{ date | longDate('ro-RO') }}, după care nu vei mai avea acces.",
     cancelSubscriptionNoCharge: 'Nu vei fi taxat pentru acest abonament.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Anulezi abonamentul {{plan}}?',
     cannotSubscribeMonthly:
       'Nu te poți abona la acest plan cu plată lunară. Pentru acest plan este necesară plata anuală.',
@@ -1045,7 +1046,8 @@ export const roRO: LocalizationResource = {
     deletePage: {
       actionDescription: 'Tastează „Șterge contul” mai jos pentru a continua.',
       confirm: 'Șterge contul',
-      messageLine1: 'Sigur vrei să îți ștergi contul?',
+      messageLine1:
+        'Sigur vrei să îți ștergi contul din Clerk? Te rugăm să contactezi proprietarul aplicației pentru a-ți șterge informațiile din aplicația lor și din alte servicii.',
       messageLine2: 'Această acțiune este permanentă și ireversibilă.',
       title: 'Șterge contul',
     },

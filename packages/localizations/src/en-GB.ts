@@ -81,6 +81,7 @@ export const enGB: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -205,7 +206,7 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Confirm account deletion',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
   formFieldInputPlaceholder__emailAddress_username: 'Enter email or username',
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
@@ -1036,7 +1037,8 @@ export const enGB: LocalizationResource = {
     deletePage: {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
+      messageLine1:
+        'Are you sure you want to delete your account from Clerk? Please contact the application owner to delete your information from their application and other services.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

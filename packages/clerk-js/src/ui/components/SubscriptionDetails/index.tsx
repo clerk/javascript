@@ -2,8 +2,8 @@ import { useClerk, useOrganization } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
-  CommercePlanResource,
-  CommerceSubscriptionItemResource,
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
 } from '@clerk/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
@@ -44,12 +44,12 @@ import {
 } from '../../customizables';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 
-const isFreePlan = (plan: CommercePlanResource) => !plan.hasBaseFee;
+const isFreePlan = (plan: BillingPlanResource) => !plan.hasBaseFee;
 
 // We cannot derive the state of confirmation modal from the existence subscription, as it will make the animation laggy when the confirmation closes.
 const SubscriptionForCancellationContext = React.createContext<{
-  subscription: CommerceSubscriptionItemResource | null;
-  setSubscription: (subscription: CommerceSubscriptionItemResource | null) => void;
+  subscription: BillingSubscriptionItemResource | null;
+  setSubscription: (subscription: BillingSubscriptionItemResource | null) => void;
   confirmationOpen: boolean;
   setConfirmationOpen: (confirmationOpen: boolean) => void;
 }>({
@@ -77,17 +77,17 @@ export const SubscriptionDetails = (props: __internal_SubscriptionDetailsProps) 
 
 type UseGuessableSubscriptionResult<Or extends 'throw' | undefined = undefined> = Or extends 'throw'
   ? {
-      upcomingSubscription?: CommerceSubscriptionItemResource;
-      pastDueSubscription?: CommerceSubscriptionItemResource;
-      activeSubscription?: CommerceSubscriptionItemResource;
-      anySubscription: CommerceSubscriptionItemResource;
+      upcomingSubscription?: BillingSubscriptionItemResource;
+      pastDueSubscription?: BillingSubscriptionItemResource;
+      activeSubscription?: BillingSubscriptionItemResource;
+      anySubscription: BillingSubscriptionItemResource;
       isLoading: boolean;
     }
   : {
-      upcomingSubscription?: CommerceSubscriptionItemResource;
-      pastDueSubscription?: CommerceSubscriptionItemResource;
-      activeSubscription?: CommerceSubscriptionItemResource;
-      anySubscription?: CommerceSubscriptionItemResource;
+      upcomingSubscription?: BillingSubscriptionItemResource;
+      pastDueSubscription?: BillingSubscriptionItemResource;
+      activeSubscription?: BillingSubscriptionItemResource;
+      anySubscription?: BillingSubscriptionItemResource;
       isLoading: boolean;
     };
 
@@ -114,7 +114,7 @@ function useGuessableSubscription<Or extends 'throw' | undefined = undefined>(op
 
 const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps) => {
   const [subscriptionForCancellation, setSubscriptionForCancellation] =
-    useState<CommerceSubscriptionItemResource | null>(null);
+    useState<BillingSubscriptionItemResource | null>(null);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   const { subscriptionItems, isLoading } = useSubscription();
@@ -295,11 +295,13 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                     })
                   : selectedSubscription.status === 'upcoming'
                     ? localizationKeys('commerce.cancelSubscriptionNoCharge')
-                    : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
-                        plan: selectedSubscription.plan.name,
-                        // this will always be defined in this state
-                        date: selectedSubscription.periodEnd as Date,
-                      })
+                    : selectedSubscription.status === 'past_due'
+                      ? localizationKeys('commerce.cancelSubscriptionPastDue')
+                      : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                          plan: selectedSubscription.plan.name,
+                          // this will always be defined in this state
+                          date: selectedSubscription.periodEnd as Date,
+                        })
               }
             />
             <CardAlert>{error}</CardAlert>
@@ -361,7 +363,7 @@ function SubscriptionDetailsSummary() {
   );
 }
 
-const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
+const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { portalRoot } = useSubscriptionDetailsContext();
   const { __internal_openCheckout } = useClerk();
   const subscriberType = useSubscriberTypeContext();
@@ -376,7 +378,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
-  const isCancellable = subscription.canceledAt === null && !isFree && subscription.status !== 'past_due';
+  const isCancellable = subscription.canceledAt === null && !isFree;
   const isReSubscribable = subscription.canceledAt !== null && !isFree;
 
   const openCheckout = useCallback(
@@ -475,7 +477,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: CommerceSubsc
 };
 
 // New component for individual subscription cards
-const SubscriptionCard = ({ subscription }: { subscription: CommerceSubscriptionItemResource }) => {
+const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
 
   const fee = subscription.planPeriod === 'month' ? subscription.plan.fee : subscription.plan.annualFee;

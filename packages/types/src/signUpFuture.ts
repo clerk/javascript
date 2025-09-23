@@ -2,21 +2,33 @@ import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 
-export interface SignUpFutureCreateParams {
-  transfer?: boolean;
+interface SignUpFutureAdditionalParams {
+  firstName?: string;
+  lastName?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
 }
+
+export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
+  transfer?: boolean;
+  ticket?: string;
+}
+
+// This will likely get more properties
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface SignUpFutureUpdateParams extends SignUpFutureAdditionalParams {}
 
 export interface SignUpFutureEmailCodeVerifyParams {
   code: string;
 }
 
-export type SignUpFuturePasswordParams = {
+export type SignUpFuturePasswordParams = SignUpFutureAdditionalParams & {
   password: string;
 } & (
-  | { emailAddress: string; phoneNumber?: string; username?: string }
-  | { emailAddress?: string; phoneNumber: string; username?: string }
-  | { emailAddress?: string; phoneNumber?: string; username: string }
-);
+    | { emailAddress: string; phoneNumber?: string; username?: string }
+    | { emailAddress?: string; phoneNumber: string; username?: string }
+    | { emailAddress?: string; phoneNumber?: string; username: string }
+  );
 
 export interface SignUpFuturePhoneCodeSendParams {
   phoneNumber?: string;
@@ -37,6 +49,10 @@ export interface SignUpFutureSSOParams {
    * TODO @revamp-hooks: This should be handled by FAPI instead.
    */
   redirectCallbackUrl: string;
+}
+
+export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
+  ticket: string;
 }
 
 export interface SignUpFutureFinalizeParams {
@@ -66,6 +82,8 @@ export interface SignUpFutureResource {
   readonly existingSession?: { sessionId: string };
 
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
+
+  update: (params: SignUpFutureUpdateParams) => Promise<{ error: unknown }>;
 
   /**
    *
@@ -103,7 +121,12 @@ export interface SignUpFutureResource {
   sso: (params: SignUpFutureSSOParams) => Promise<{ error: unknown }>;
 
   /**
-   * Used to convert a sign-up with `status === ‘complete’` into an active session. Will cause anything observing the
+   * Used to perform a ticket-based sign-up.
+   */
+  ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+
+  /**
+   * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the
    * session state (such as the `useUser()` hook) to update automatically.
    */
   finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: unknown }>;

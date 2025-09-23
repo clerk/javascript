@@ -83,6 +83,7 @@ export const csCZ: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Funkce '{{plan}}' můžete používat do {{ date | longDate('cs-CZ') }}, poté k nim ztratíte přístup.",
     cancelSubscriptionNoCharge: 'Za toto předplatné vám nebudou účtovány žádné poplatky.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Zrušit předplatné {{plan}}?',
     cannotSubscribeMonthly:
       'Nelze se přihlásit k tomuto plánu s měsíční platbou. Abyste se k němu přihlásili, musíte zvolit roční platbu.',
@@ -858,9 +859,10 @@ export const csCZ: LocalizationResource = {
     form_param_max_length_exceeded__last_name: 'Příjmení nesmí přesáhnout 256 znaků.',
     form_param_max_length_exceeded__name: 'Jméno nesmí přesáhnout 256 znaků.',
     form_param_nil: 'Tento parametr je povinný.',
-    form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
+    form_param_type_invalid: undefined,
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
+    form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
     form_password_incorrect: 'Heslo je nesprávné.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
@@ -1040,7 +1042,8 @@ export const csCZ: LocalizationResource = {
     deletePage: {
       actionDescription: 'Napište "Smazat účet" níže pro pokračování.',
       confirm: 'Smazat účet',
-      messageLine1: 'Jste si jisti, že chcete smazat svůj účet?',
+      messageLine1:
+        'Jste si jisti, že chcete smazat svůj účet z Clerk? Kontaktujte prosím vlastníka aplikace pro smazání vašich informací z jejich aplikace a dalších služeb.',
       messageLine2: 'Tato akce je trvalá a nevratná.',
       title: 'Smazat účet',
     },

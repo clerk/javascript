@@ -1,7 +1,7 @@
 import type {
-  CommercePaymentAttemptWebhookEventJSON,
-  CommerceSubscriptionItemWebhookEventJSON,
-  CommerceSubscriptionWebhookEventJSON,
+  BillingPaymentAttemptWebhookEventJSON,
+  BillingSubscriptionItemWebhookEventJSON,
+  BillingSubscriptionWebhookEventJSON,
   DeletedObjectJSON,
   EmailJSON,
   OrganizationDomainJSON,
@@ -65,17 +65,17 @@ export type PermissionWebhookEvent = Webhook<
 
 export type WaitlistEntryWebhookEvent = Webhook<'waitlistEntry.created' | 'waitlistEntry.updated', WaitlistEntryJSON>;
 
-export type CommercePaymentAttemptWebhookEvent = Webhook<
+export type BillingPaymentAttemptWebhookEvent = Webhook<
   'paymentAttempt.created' | 'paymentAttempt.updated',
-  CommercePaymentAttemptWebhookEventJSON
+  BillingPaymentAttemptWebhookEventJSON
 >;
 
-export type CommerceSubscriptionWebhookEvent = Webhook<
+export type BillingSubscriptionWebhookEvent = Webhook<
   'subscription.created' | 'subscription.updated' | 'subscription.active' | 'subscription.pastDue',
-  CommerceSubscriptionWebhookEventJSON
+  BillingSubscriptionWebhookEventJSON
 >;
 
-export type CommerceSubscriptionItemWebhookEvent = Webhook<
+export type BillingSubscriptionItemWebhookEvent = Webhook<
   | 'subscriptionItem.created'
   | 'subscriptionItem.updated'
   | 'subscriptionItem.active'
@@ -86,7 +86,7 @@ export type CommerceSubscriptionItemWebhookEvent = Webhook<
   | 'subscriptionItem.incomplete'
   | 'subscriptionItem.pastDue'
   | 'subscriptionItem.freeTrialEnding',
-  CommerceSubscriptionItemWebhookEventJSON
+  BillingSubscriptionItemWebhookEventJSON
 >;
 
 export type WebhookEvent =
@@ -101,8 +101,8 @@ export type WebhookEvent =
   | RoleWebhookEvent
   | PermissionWebhookEvent
   | WaitlistEntryWebhookEvent
-  | CommercePaymentAttemptWebhookEvent
-  | CommerceSubscriptionWebhookEvent
-  | CommerceSubscriptionItemWebhookEvent;
+  | BillingPaymentAttemptWebhookEvent
+  | BillingSubscriptionWebhookEvent
+  | BillingSubscriptionItemWebhookEvent;
 
 export type WebhookEventType = WebhookEvent['type'];

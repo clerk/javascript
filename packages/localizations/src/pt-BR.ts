@@ -83,6 +83,7 @@ export const ptBR: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Você pode continuar usando os recursos de {{plan}} até {{ date | longDate('pt-BR') }}, após o qual você não terá mais acesso.",
     cancelSubscriptionNoCharge: 'Você não será cobrado por esta assinatura.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Cancelar assinatura do plano {{plan}}?',
     cannotSubscribeMonthly:
       'Você não pode assinar este plano pagando mensalmente. Para assinar este plano, você precisa escolher pagar anualmente.',
@@ -1046,7 +1047,8 @@ export const ptBR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Digite Excluir conta abaixo para continuar.',
       confirm: 'Excluir conta',
-      messageLine1: 'Tem certeza de que deseja excluir sua conta?',
+      messageLine1:
+        'Tem certeza de que deseja excluir sua conta do Clerk? Entre em contato com o proprietário do aplicativo para excluir suas informações de seu aplicativo e outros serviços.',
       messageLine2: 'Esta ação é permanente e irreversível.',
       title: 'Excluir conta',
     },

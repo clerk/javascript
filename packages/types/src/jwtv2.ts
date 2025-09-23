@@ -85,8 +85,8 @@ type JWTPayloadBase = {
 
   /**
    * Factor verification age (fva). The tuple represents the minutes that have passed since the last time a first or second factor were verified.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    */
   fva?: [fistFactorAge: number, secondFactorAge: number];
 
@@ -128,9 +128,9 @@ export type VersionedJwtPayload =
     }
   | {
       /**
-       * @experimental
-       *
        * The version of the JWT payload.
+       *
+       * @experimental
        */
       v: 2;
 
@@ -145,9 +145,9 @@ export type VersionedJwtPayload =
       pla?: string;
 
       /**
-       * @experimental - This structure is subject to change.
-       *
        * Active organization information.
+       *
+       * @experimental This structure is subject to change.
        */
       o?: {
         /**

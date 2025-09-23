@@ -35,6 +35,7 @@ export class StateProxy implements State {
   }
 
   private buildSignInProxy() {
+    const gateProperty = this.gateProperty.bind(this);
     const target = () => this.client.signIn.__internal_future;
 
     return {
@@ -44,6 +45,27 @@ export class StateProxy implements State {
         status: 'needs_identifier' as const,
         availableStrategies: [],
         isTransferable: false,
+        get firstFactorVerification() {
+          return gateProperty(target, 'firstFactorVerification', {
+            status: null,
+            error: null,
+            expireAt: null,
+            externalVerificationRedirectURL: null,
+            nonce: null,
+            attempts: null,
+            message: null,
+            strategy: null,
+            verifiedAtClient: null,
+            verifiedFromTheSameClient: () => false,
+            __internal_toSnapshot: () => {
+              throw new Error('__internal_toSnapshot called before Clerk is loaded');
+            },
+            pathRoot: '',
+            reload: () => {
+              throw new Error('__internal_toSnapshot called before Clerk is loaded');
+            },
+          });
+        },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
@@ -51,6 +73,12 @@ export class StateProxy implements State {
         finalize: this.gateMethod(target, 'finalize'),
 
         emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
+        emailLink: this.wrapStruct(
+          () => target().emailLink,
+          ['sendLink', 'waitForVerification'] as const,
+          ['verification'] as const,
+          { verification: null },
+        ),
         resetPasswordEmailCode: this.wrapMethods(() => target().resetPasswordEmailCode, [
           'sendCode',
           'verifyCode',
@@ -63,6 +91,7 @@ export class StateProxy implements State {
           'verifyTOTP',
           'verifyBackupCode',
         ] as const),
+        ticket: this.gateMethod(target, 'ticket'),
       },
     };
   }
@@ -88,8 +117,10 @@ export class StateProxy implements State {
         },
 
         create: gateMethod(target, 'create'),
+        update: gateMethod(target, 'update'),
         sso: gateMethod(target, 'sso'),
         password: gateMethod(target, 'password'),
+        ticket: gateMethod(target, 'ticket'),
         finalize: gateMethod(target, 'finalize'),
 
         verifications: wrapMethods(() => target().verifications, [
@@ -146,5 +177,28 @@ export class StateProxy implements State {
     keys: K,
   ): Pick<T, K[number]> {
     return Object.fromEntries(keys.map(k => [k, this.gateMethod(getTarget, k)])) as Pick<T, K[number]>;
+  }
+
+  private wrapStruct<T extends object, M extends readonly (keyof T)[], G extends readonly (keyof T)[]>(
+    getTarget: () => T,
+    methods: M,
+    getters: G,
+    fallbacks: Pick<T, G[number]>,
+  ): Pick<T, M[number] | G[number]> & {
+    [K in M[number]]: T[K] extends (...args: any[]) => any ? T[K] : never;
+  } & {
+    [K in G[number]]: T[K] extends (...args: any[]) => any ? never : T[K];
+  } {
+    const out: any = {};
+    for (const m of methods) {
+      out[m] = this.gateMethod(getTarget, m as any);
+    }
+    for (const g of getters) {
+      Object.defineProperty(out, g, {
+        get: () => this.gateProperty(getTarget, g as any, (fallbacks as any)[g]),
+        enumerable: true,
+      });
+    }
+    return out;
   }
 }

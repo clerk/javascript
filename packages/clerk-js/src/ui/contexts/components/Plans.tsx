@@ -9,9 +9,9 @@ import {
 } from '@clerk/shared/react';
 import type {
   Appearance,
-  CommercePlanResource,
-  CommerceSubscriptionItemResource,
-  CommerceSubscriptionPlanPeriod,
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
 } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
 
@@ -90,8 +90,8 @@ export const usePlans = (params?: { mode: 'cache' }) => {
 };
 
 type HandleSelectPlanProps = {
-  plan: CommercePlanResource;
-  planPeriod: CommerceSubscriptionPlanPeriod;
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
   mode?: 'modal' | 'mounted';
   event?: React.MouseEvent<HTMLElement>;
   appearance?: Appearance;
@@ -141,7 +141,7 @@ export const usePlansContext = () => {
 
   // return the active or upcoming subscription for a plan if it exists
   const activeOrUpcomingSubscription = useCallback(
-    (plan: CommercePlanResource) => {
+    (plan: BillingPlanResource) => {
       return subscriptionItems.find(subscription => subscription.plan.id === plan.id);
     },
     [subscriptionItems],
@@ -149,7 +149,7 @@ export const usePlansContext = () => {
 
   // returns all subscriptions for a plan that are active or upcoming
   const activeAndUpcomingSubscriptions = useCallback(
-    (plan: CommercePlanResource) => {
+    (plan: BillingPlanResource) => {
       return subscriptionItems.filter(subscription => subscription.plan.id === plan.id);
     },
     [subscriptionItems],
@@ -157,7 +157,7 @@ export const usePlansContext = () => {
 
   // return the active or upcoming subscription for a plan based on the plan period, if there is no subscription for the plan period, return the first subscription
   const activeOrUpcomingSubscriptionWithPlanPeriod = useCallback(
-    (plan: CommercePlanResource, planPeriod: CommerceSubscriptionPlanPeriod = 'month') => {
+    (plan: BillingPlanResource, planPeriod: BillingSubscriptionPlanPeriod = 'month') => {
       const plansSubscriptions = activeAndUpcomingSubscriptions(plan);
       // Handle multiple subscriptions for the same plan
       if (plansSubscriptions.length > 1) {
@@ -182,7 +182,7 @@ export const usePlansContext = () => {
   );
 
   const canManageSubscription = useCallback(
-    ({ plan, subscription: sub }: { plan?: CommercePlanResource; subscription?: CommerceSubscriptionItemResource }) => {
+    ({ plan, subscription: sub }: { plan?: BillingPlanResource; subscription?: BillingSubscriptionItemResource }) => {
       const subscription = sub ?? (plan ? activeOrUpcomingSubscription(plan) : undefined);
 
       return !subscription || !subscription.canceledAt;
@@ -199,10 +199,10 @@ export const usePlansContext = () => {
       isCompact = false,
       selectedPlanPeriod = 'annual',
     }: {
-      plan?: CommercePlanResource;
-      subscription?: CommerceSubscriptionItemResource;
+      plan?: BillingPlanResource;
+      subscription?: BillingSubscriptionItemResource;
       isCompact?: boolean;
-      selectedPlanPeriod?: CommerceSubscriptionPlanPeriod;
+      selectedPlanPeriod?: BillingSubscriptionPlanPeriod;
     }): {
       localizationKey: LocalizationKey;
       variant: 'bordered' | 'solid';
@@ -284,7 +284,7 @@ export const usePlansContext = () => {
     [activeOrUpcomingSubscriptionWithPlanPeriod, canManageBilling, subscriptionItems, topLevelSubscription],
   );
 
-  const captionForSubscription = useCallback((subscription: CommerceSubscriptionItemResource) => {
+  const captionForSubscription = useCallback((subscription: BillingSubscriptionItemResource) => {
     if (subscription.pastDueAt) {
       return localizationKeys('badge__pastDueAt', { date: subscription.pastDueAt });
     }

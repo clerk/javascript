@@ -140,21 +140,19 @@ export interface State {
   signUpSignal: SignUpSignal;
 
   /**
-   * @experimental This experimental API is subject to change.
-   *
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
+   * @experimental This experimental API is subject to change.
    */
   __internal_effect: (callback: () => void) => () => void;
 
   /**
-   * @experimental This experimental API is subject to change.
-   *
    * An alias for `computed()` from `alien-signals`, which can be used to create a computed Signal that updates when
    * its dependencies change.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
+   * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;
 }

@@ -1,5 +1,49 @@
 # Change Log
 
+## 4.12.2
+
+### Patch Changes
+
+- Updated dependencies [[`8d1514a`](https://github.com/clerk/javascript/commit/8d1514a99743ec64d2a05de7f01dd9081e02bd0d), [`a8ba926`](https://github.com/clerk/javascript/commit/a8ba926109704e31b097f3545e61910abc76d99a), [`41e0a41`](https://github.com/clerk/javascript/commit/41e0a4190b33dd2c4bdc0d536bbe83fcf99af9b0), [`1aa9e9f`](https://github.com/clerk/javascript/commit/1aa9e9f10c051319e9ff4b1a0ecd71507bd6a6aa), [`1ad3b92`](https://github.com/clerk/javascript/commit/1ad3b92019361bc3350e429a840aa0dd4d0be089), [`a88ee58`](https://github.com/clerk/javascript/commit/a88ee5827adee0cc8a62246d03a3034d8566fe21), [`d6c7bbb`](https://github.com/clerk/javascript/commit/d6c7bbba23f38c0b3ca7edebb53028a05c7b38e6)]:
+  - @clerk/backend@2.15.0
+  - @clerk/shared@3.26.1
+  - @clerk/clerk-react@5.48.1
+  - @clerk/types@4.88.0
+
+## 4.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`bcf24f2`](https://github.com/clerk/javascript/commit/bcf24f2f91913fa0dd3fbf02b3bbef345c4e1ea9), [`0006c82`](https://github.com/clerk/javascript/commit/0006c82fb023f4fc39e49350b5440940dcf6deba), [`7c976b4`](https://github.com/clerk/javascript/commit/7c976b4da2dc621e872846097723291dab09476f), [`1ceedad`](https://github.com/clerk/javascript/commit/1ceedad4bc5bc3d5f01c95185f82ff0f43983cf5), [`de90ede`](https://github.com/clerk/javascript/commit/de90ede82664b58bef9e294498384cf2c99a331e), [`9d4a95c`](https://github.com/clerk/javascript/commit/9d4a95c766396a0bc327fbf0560228bedb4828eb), [`428cd57`](https://github.com/clerk/javascript/commit/428cd57a8581a58a6a42325ec50eb98000068e97)]:
+  - @clerk/clerk-react@5.48.0
+  - @clerk/types@4.87.0
+  - @clerk/backend@2.14.1
+  - @clerk/shared@3.26.0
+
+## 4.12.0
+
+### Minor Changes
+
+- Add deprecation warning for maintenance mode. Please use `@clerk/react-router` package instead. ([#6744](https://github.com/clerk/javascript/pull/6744)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Migration guide: https://reactrouter.com/upgrading/remix
+  React Router SDK: https://clerk.com/docs/quickstarts/react-router
+
+- Remove `machineSecretKey` option. Please migrate to `@clerk/react-router` instead. ([#6749](https://github.com/clerk/javascript/pull/6749)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Migration guide: https://reactrouter.com/upgrading/remix
+  React Router SDK: https://clerk.com/docs/quickstarts/react-router
+
+- [Billing Beta] Drop experimental `subscriptions` property from params of `useOrganization()`. Use [`useSubscription()`](https://clerk.com/docs/nextjs/hooks/use-subscription) instead. ([#6738](https://github.com/clerk/javascript/pull/6738)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`b598581`](https://github.com/clerk/javascript/commit/b598581ae673ca42fac713ee9e1a0f04b56cb8de), [`19f18f8`](https://github.com/clerk/javascript/commit/19f18f818d7c69eb2ecd27b727c403e9b00f4401), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105), [`7382e13`](https://github.com/clerk/javascript/commit/7382e1384a67a2648e077d9ce677eb5424987322), [`24d0742`](https://github.com/clerk/javascript/commit/24d0742ec8453ab7ca01e81e7b4b15eed014ab81), [`82b84fe`](https://github.com/clerk/javascript/commit/82b84fed5f207673071ba7354a17f4a76e101201), [`54b4b5a`](https://github.com/clerk/javascript/commit/54b4b5a5f811f612fadf5c47ffda94a750c57a5e), [`50a8622`](https://github.com/clerk/javascript/commit/50a8622c3579306f15e5d40e5ea72b4fe4384ef7), [`939df73`](https://github.com/clerk/javascript/commit/939df73f393eefcf930481ee6f5c7f913e2e26b3), [`23948dc`](https://github.com/clerk/javascript/commit/23948dc777ec6a17bafbae59c253a93143b0e105)]:
+  - @clerk/backend@2.14.0
+  - @clerk/types@4.86.0
+  - @clerk/shared@3.25.0
+  - @clerk/clerk-react@5.47.0
+
 ## 4.11.10
 
 ### Patch Changes

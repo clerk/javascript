@@ -62,6 +62,7 @@ export abstract class BaseResource {
     return !this.id;
   }
 
+  // TODO @userland-errors:
   static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
@@ -69,6 +70,7 @@ export abstract class BaseResource {
     return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
   }
 
+  // TODO @userland-errors:
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
@@ -85,6 +87,7 @@ export abstract class BaseResource {
     } catch (e) {
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
+        // TODO @userland-errors:
         throw new ClerkRuntimeError(e?.message || e, {
           code: 'network_error',
         });
@@ -201,6 +204,7 @@ export abstract class BaseResource {
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
     const { action, body, method, path } = params;
+    // TODO @userland-errors:
     const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
     return this.fromJSON((json?.response || json) as J);
   }

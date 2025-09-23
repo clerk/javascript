@@ -1,4 +1,4 @@
-import type { CommerceSubscriptionItemResource } from '@clerk/types';
+import type { BillingSubscriptionItemResource } from '@clerk/types';
 
 import { Badge, localizationKeys } from '@/ui/customizables';
 import type { ElementDescriptor } from '@/ui/customizables/elementDescriptors';
@@ -17,7 +17,7 @@ const colors = {
   free_trial: 'secondary',
 };
 
-export const SubscriptionBadge = <T extends { status: CommerceSubscriptionItemResource['status'] }>({
+export const SubscriptionBadge = <T extends { status: BillingSubscriptionItemResource['status'] }>({
   subscription,
   elementDescriptor,
 }: {

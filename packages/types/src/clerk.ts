@@ -20,15 +20,15 @@ import type {
   UserVerificationTheme,
   WaitlistTheme,
 } from './appearance';
-import type { ClientResource } from './client';
 import type {
-  CommerceBillingNamespace,
-  CommerceCheckoutResource,
-  CommercePlanResource,
-  CommerceSubscriptionPlanPeriod,
+  BillingCheckoutResource,
+  BillingNamespace,
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
   ForPayerType,
-} from './commerce';
+} from './billing';
+import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
 import type { InstanceType } from './instance';
@@ -67,20 +67,20 @@ export type __experimental_CheckoutCacheState = Readonly<{
   isStarting: boolean;
   isConfirming: boolean;
   error: ClerkAPIResponseError | null;
-  checkout: CommerceCheckoutResource | null;
+  checkout: BillingCheckoutResource | null;
   fetchStatus: 'idle' | 'fetching' | 'error';
   status: __experimental_CheckoutStatus;
 }>;
 
 export type __experimental_CheckoutOptions = {
   for?: ForPayerType;
-  planPeriod: CommerceSubscriptionPlanPeriod;
+  planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
 };
 
 type CheckoutResult =
   | {
-      data: CommerceCheckoutResource;
+      data: BillingCheckoutResource;
       error: null;
     }
   | {
@@ -230,24 +230,17 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /**
-   * @experimental This experimental API is subject to change.
-   *
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
+   *
+   * @experimental This experimental API is subject to change.
    */
   __internal_state: State;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * @see https://clerk.com/docs/billing/overview
-   *
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  billing: CommerceBillingNamespace;
+  billing: BillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -488,8 +481,8 @@ export interface Clerk {
   /**
    * Prefetches the data displayed by an organization switcher.
    * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
-   * This API is still under active development and may change at any moment.
-   * @experimental
+   *
+   * @experimental This experimental API is subject to change.
    * @param props Optional user verification configuration parameters.
    */
   __experimental_prefetchOrganizationSwitcher: () => void;
@@ -1584,9 +1577,9 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * If true the `<UserButton />` will only render the popover.
    * Enables developers to implement a custom dialog.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
    * @default undefined
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
@@ -1654,9 +1647,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * If true, `<OrganizationSwitcher />` will only render the popover.
      * Enables developers to implement a custom dialog.
-     * This API is experimental and may change at any moment.
-     * @experimental
+     *
      * @default undefined
+     * @experimental This API is experimental and may change at any moment.
      */
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
@@ -1876,19 +1869,12 @@ export type RevokeAPIKeyParams = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
@@ -1902,18 +1888,11 @@ export type __internal_CheckoutProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_CheckoutButtonProps = {
   planId: string;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
@@ -1930,14 +1909,7 @@ export type __experimental_CheckoutButtonProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_PlanDetailsProps = (
   | {
@@ -1948,25 +1920,18 @@ export type __internal_PlanDetailsProps = (
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
-      plan: CommercePlanResource;
+      plan: BillingPlanResource;
       planId?: never;
     }
 ) & {
   appearance?: PlanDetailTheme;
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_PlanDetailsButtonProps = (
   | {
@@ -1977,11 +1942,11 @@ export type __experimental_PlanDetailsButtonProps = (
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
-      plan: CommercePlanResource;
+      plan: BillingPlanResource;
       planId?: never;
     }
 ) & {
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
     portalId?: string;
@@ -1990,14 +1955,7 @@ export type __experimental_PlanDetailsButtonProps = (
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_SubscriptionDetailsProps = {
   /**
@@ -2013,14 +1971,7 @@ export type __internal_SubscriptionDetailsProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**

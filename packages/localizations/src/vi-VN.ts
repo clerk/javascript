@@ -83,6 +83,7 @@ export const viVN: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Bạn có thể tiếp tục sử dụng tính năng '{{plan}}' cho đến {{ date | longDate('vi-VN') }}, sau đó bạn sẽ không còn quyền truy cập.",
     cancelSubscriptionNoCharge: 'Bạn sẽ không bị tính phí cho đăng ký này.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Hủy đăng ký {{plan}}?',
     cannotSubscribeMonthly:
       'Bạn không thể đăng ký gói này bằng cách thanh toán hàng tháng. Để đăng ký gói này, bạn cần chọn thanh toán hàng năm.',
@@ -1038,7 +1039,8 @@ export const viVN: LocalizationResource = {
     deletePage: {
       actionDescription: 'Nhập "Xóa tài khoản" dưới đây để tiếp tục.',
       confirm: 'Xóa tài khoản',
-      messageLine1: 'Bạn có chắc chắn muốn xóa tài khoản của bạn?',
+      messageLine1:
+        'Bạn có chắc chắn muốn xóa tài khoản của bạn khỏi Clerk? Vui lòng liên hệ với chủ sở hữu ứng dụng để xóa thông tin của bạn khỏi ứng dụng và các dịch vụ khác của họ.',
       messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
       title: 'Xóa tài khoản',
     },

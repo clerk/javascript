@@ -81,6 +81,7 @@ export const bnIN: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1040,7 +1041,8 @@ export const bnIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'চালিয়ে যেতে নীচে "Delete account" টাইপ করুন।',
       confirm: 'অ্যাকাউন্ট মুছুন',
-      messageLine1: 'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট মুছতে চান?',
+      messageLine1:
+        'আপনি কি নিশ্চিত যে আপনি Clerk থেকে আপনার অ্যাকাউন্ট মুছতে চান? আপনার তথ্য তাদের অ্যাপ্লিকেশন এবং অন্যান্য সেবা থেকে মুছে ফেলার জন্য অ্যাপ্লিকেশনের মালিকের সাথে যোগাযোগ করুন।',
       messageLine2: 'এই কার্যটি স্থায়ী এবং অপরিবর্তনীয়।',
       title: 'অ্যাকাউন্ট মুছুন',
     },

@@ -84,6 +84,7 @@ export const thTH: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "คุณสามารถใช้ฟีเจอร์ '{{plan}}' ต่อไปได้จนถึง {{ date | longDate('th-TH') }} หลังจากนั้นคุณจะไม่สามารถเข้าถึงได้อีก",
     cancelSubscriptionNoCharge: 'คุณจะไม่ถูกเรียกเก็บเงินสำหรับการสมัครสมาชิกนี้',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'ยกเลิกการสมัครสมาชิก {{plan}}?',
     cannotSubscribeMonthly: 'คุณไม่สามารถสมัครแผนนี้โดยการชำระรายเดือน หากต้องการสมัครแผนนี้ คุณต้องเลือกชำระรายปี',
     cannotSubscribeUnrecoverable: 'คุณไม่สามารถสมัครแผนนี้ได้ การสมัครสมาชิกปัจจุบันของคุณมีราคาแพงกว่าแผนนี้',
@@ -1030,7 +1031,8 @@ export const thTH: LocalizationResource = {
     deletePage: {
       actionDescription: 'พิมพ์ "Delete account" ด้านล่างเพื่อดำเนินการต่อ',
       confirm: 'Delete account',
-      messageLine1: 'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ?',
+      messageLine1:
+        'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณจาก Clerk? กรุณาติดต่อเจ้าของแอปพลิเคชันเพื่อลบข้อมูลของคุณออกจากแอปพลิเคชันและบริการอื่นๆ ของพวกเขา',
       messageLine2: 'การดำเนินการนี้จะถาวรและไม่สามารถยกเลิกได้',
       title: 'ลบบัญชี',
     },

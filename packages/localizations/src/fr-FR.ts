@@ -81,6 +81,7 @@ export const frFR: LocalizationResource = {
     cancelSubscription: 'Annuler la souscription',
     cancelSubscriptionAccessUntil: "Accès annulé jusqu'au",
     cancelSubscriptionNoCharge: 'Pas de charge',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Annuler la souscription',
     cannotSubscribeMonthly: 'Ne peut pas souscrire mensuellement',
     cannotSubscribeUnrecoverable: undefined,
@@ -1043,7 +1044,8 @@ export const frFR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Saisissez "Supprimer le compte" ci-dessous pour continuer.',
       confirm: 'Supprimer le compte',
-      messageLine1: 'Êtes-vous sûr(e) de vouloir supprimer votre compte ?',
+      messageLine1:
+        "Êtes-vous sûr(e) de vouloir supprimer votre compte de Clerk ? Veuillez contacter le propriétaire de l'application pour supprimer vos informations de leur application et d'autres services.",
       messageLine2: 'Cette action est définitive et irréversible.',
       title: 'Supprimer le compte',
     },

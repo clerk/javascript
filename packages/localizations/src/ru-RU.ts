@@ -81,6 +81,7 @@ export const ruRU: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1046,7 +1047,8 @@ export const ruRU: LocalizationResource = {
     deletePage: {
       actionDescription: 'Введите "Удалить учетную запись" ниже, чтобы продолжить.',
       confirm: 'Удалить учетную запись',
-      messageLine1: 'Вы уверены, что хотите удалить свою учетную запись?',
+      messageLine1:
+        'Вы уверены, что хотите удалить свою учетную запись из Clerk? Пожалуйста, свяжитесь с владельцем приложения, чтобы удалить вашу информацию из их приложения и других сервисов.',
       messageLine2: 'Это действие является окончательным и необратимым.',
       title: 'Удалить учетную запись',
     },

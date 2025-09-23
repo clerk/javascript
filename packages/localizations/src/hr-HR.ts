@@ -81,6 +81,7 @@ export const hrHR: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -1035,7 +1036,8 @@ export const hrHR: LocalizationResource = {
     deletePage: {
       actionDescription: 'Upišite "Izbriši račun" ispod za nastavak.',
       confirm: 'Izbriši račun',
-      messageLine1: 'Jeste li sigurni da želite izbrisati svoj račun?',
+      messageLine1:
+        'Jeste li sigurni da želite izbrisati svoj račun iz Clerk-a? Molimo vas da kontaktirate vlasnika aplikacije da ukloni vaše informacije iz njihove aplikacije i drugih usluga.',
       messageLine2: 'Ova radnja je trajna i nepovratna.',
       title: 'Izbriši račun',
     },
