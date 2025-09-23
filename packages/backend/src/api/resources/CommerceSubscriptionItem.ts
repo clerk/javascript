@@ -46,11 +46,11 @@ export class BillingSubscriptionItem {
     /**
      * The plan associated with this subscription item.
      */
-    readonly plan: BillingPlan,
+    readonly plan: BillingPlan | null,
     /**
      * The plan ID.
      */
-    readonly planId: string,
+    readonly planId: string | null,
     /**
      * Unix timestamp (milliseconds) of when the subscription item was created.
      */
@@ -112,8 +112,8 @@ export class BillingSubscriptionItem {
       data.period_start,
       data.next_payment,
       formatAmountJSON(data.amount),
-      BillingPlan.fromJSON(data.plan),
-      data.plan_id,
+      data.plan ? BillingPlan.fromJSON(data.plan) : null,
+      data.plan_id ?? null,
       data.created_at,
       data.updated_at,
       data.period_end,
