@@ -6,15 +6,18 @@ const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
 
 /**
  * Manages throttling for telemetry events using the browser's localStorage to
- * mitigate event flooding in frequently executed code paths.
+ * mitigate event flooding in frequently executed code paths. Falls back to
+ * in-memory storage in environments without localStorage (e.g., React Native).
  */
 export class TelemetryEventThrottler {
   #storageKey = 'clerk_telemetry_throttler';
   #cacheTtl = DEFAULT_CACHE_TTL_MS;
+  #memoryCache: Map<string, TtlInMilliseconds> | null = null;
 
   isEventThrottled(payload: TelemetryEvent): boolean {
     if (!this.#isValidBrowser) {
-      return false;
+      // React Native or other non-browser environment - use in-memory cache
+      return this.#isEventThrottledInMemory(payload);
     }
 
     const now = Date.now();
@@ -39,6 +42,32 @@ export class TelemetryEventThrottler {
     }
 
     return !!entry;
+  }
+
+  /**
+   * Handles throttling in non-browser environments using in-memory storage.
+   * This is used in React Native and other environments without localStorage.
+   */
+  #isEventThrottledInMemory(payload: TelemetryEvent): boolean {
+    if (!this.#memoryCache) {
+      this.#memoryCache = new Map();
+    }
+
+    const now = Date.now();
+    const key = this.#generateKey(payload);
+
+    // Defensive: clear cache if it gets too large to prevent memory issues
+    if (this.#memoryCache.size > 10000) {
+      this.#memoryCache.clear();
+    }
+
+    const lastSeen = this.#memoryCache.get(key);
+    if (!lastSeen || now - lastSeen > this.#cacheTtl) {
+      this.#memoryCache.set(key, now);
+      return false; // Not throttled - allow the event
+    }
+
+    return true; // Event is throttled
   }
 
   /**
