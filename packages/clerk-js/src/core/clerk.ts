@@ -1,7 +1,14 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { deprecated } from '@clerk/shared/deprecated';
-import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import {
+  ClerkRuntimeError,
+  EmailLinkError,
+  EmailLinkErrorCodeStatus,
+  is4xxError,
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+} from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -149,15 +156,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
-import {
-  BaseResource,
-  Client,
-  EmailLinkError,
-  Environment,
-  isClerkRuntimeError,
-  Organization,
-  Waitlist,
-} from './resources/internal';
+import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';

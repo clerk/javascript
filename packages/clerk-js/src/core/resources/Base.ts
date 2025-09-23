@@ -1,4 +1,5 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
 import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
 
@@ -6,7 +7,7 @@ import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
-import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
+import { Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
