@@ -132,7 +132,7 @@ export interface SignInFutureResource {
    * The status of the current sign-in attempt as a string (for example, `'needs_identifier'`, `'needs_first_factor'`,
    * `'complete'`, etc.)
    */
-  readonly status: SignInStatus | null;
+  readonly status: SignInStatus;
 
   /**
    * Indicates that there is not a matching user for the first-factor verification used, and that the sign-in can be

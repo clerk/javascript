@@ -608,7 +608,8 @@ class SignInFuture implements SignInFutureResource {
   constructor(readonly resource: SignIn) {}
 
   get status() {
-    return this.resource.status;
+    // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
+    return this.resource.status || 'needs_identifier';
   }
 
   get availableStrategies() {

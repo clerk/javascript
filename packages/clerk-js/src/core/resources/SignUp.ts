@@ -551,7 +551,8 @@ class SignUpFuture implements SignUpFutureResource {
   constructor(readonly resource: SignUp) {}
 
   get status() {
-    return this.resource.status;
+    // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
+    return this.resource.status || 'missing_requirements';
   }
 
   get unverifiedFields() {
