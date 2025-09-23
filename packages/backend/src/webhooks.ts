@@ -57,6 +57,7 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  * @param options - Optional configuration object.
  *
  * @displayFunctionSignature
+ * @hideReturns
  *
  * @example
  * See the [guide on syncing data](https://clerk.com/docs/webhooks/sync-data) for more comprehensive and framework-specific examples that you can copy and paste into your app.
