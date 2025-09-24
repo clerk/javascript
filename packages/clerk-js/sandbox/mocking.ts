@@ -50,6 +50,7 @@ export async function setupMockingControls(): Promise<MockingControls> {
 
     try {
       mockController = new ClerkMockController({
+        debug: true,
         scenario: scenarioSelect.value || undefined,
       });
 

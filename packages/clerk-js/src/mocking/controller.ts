@@ -117,7 +117,7 @@ export class ClerkMockController {
     }
 
     if (this.config.debug) {
-      console.log(`🔄 Switched to scenario: ${scenarioName}`);
+      console.log(`Switched to scenario: ${scenarioName}`);
     }
   }
 
