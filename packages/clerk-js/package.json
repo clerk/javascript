@@ -104,11 +104,17 @@
     "bundlewatch": "^0.4.1",
     "jsdom": "^24.1.3",
     "minimatch": "^10.0.3",
+    "msw": "^2.0.0",
     "webpack-merge": "^5.10.0"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
+  },
+  "peerDependenciesMeta": {
+    "msw": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=18.17.0"
@@ -116,5 +122,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "browserslistLegacy": "Chrome > 73, Firefox > 66, Safari > 12, iOS > 12, Edge > 18, Opera > 58"
+  "browserslistLegacy": "Chrome > 73, Firefox > 66, Safari > 12, iOS > 12, Edge > 18, Opera > 58",
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
 }

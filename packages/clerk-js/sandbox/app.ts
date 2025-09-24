@@ -1,5 +1,6 @@
-import type { Clerk as ClerkType } from '../';
 import * as l from '../../localizations';
+import type { Clerk as ClerkType } from '../';
+import { getMockController, isMockingActive, setupMockingControls } from './mocking';
 
 const AVAILABLE_LOCALES = Object.keys(l) as (keyof typeof l)[];
 
@@ -194,7 +195,6 @@ function appearanceVariableOptions() {
   const updateVariables = () => {
     void Clerk.__unstable__updateProps({
       appearance: {
-        // Preserve existing appearance properties like baseTheme
         ...Clerk.__internal_getOption('appearance'),
         variables: Object.fromEntries(
           Object.entries(variableInputs).map(([key, input]) => {
@@ -269,6 +269,14 @@ void (async () => {
   fillLocalizationSelect();
   const { updateVariables } = appearanceVariableOptions();
   const { updateOtherOptions } = otherOptions();
+  await setupMockingControls();
+
+  // Wait for MSW to initialize before loading Clerk
+  if (isMockingActive() && getMockController()) {
+    console.log('🔧 MSW is ready, proceeding with Clerk load...');
+  } else {
+    console.log('🔧 No mocking enabled, proceeding with Clerk load...');
+  }
 
   const sidebars = document.querySelectorAll('[data-sidebar]');
   document.addEventListener('keydown', e => {
@@ -359,11 +367,18 @@ void (async () => {
   if (route in routes) {
     const renderCurrentRoute = routes[route];
     addCurrentRouteIndicator(route);
-    await Clerk.load({
+
+    const clerkConfig = {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-    });
+    };
+
+    if (isMockingActive()) {
+      console.log('🔧 Loading Clerk with mocking enabled - MSW will intercept API calls');
+    }
+
+    await Clerk.load(clerkConfig);
     renderCurrentRoute();
     updateVariables();
     updateOtherOptions();
