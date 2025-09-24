@@ -4,7 +4,7 @@ import { getSecureAttribute } from '../getSecureAttribute';
 
 export const createActiveContextCookie = () => {
   const handler = createCookieHandler('clerk_active_context');
-  const attributes = { Secure: getSecureAttribute('None') };
+  const attributes = { secure: getSecureAttribute('None') };
 
   return {
     set: (value: string) => {
