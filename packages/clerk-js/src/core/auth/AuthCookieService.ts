@@ -229,7 +229,7 @@ export class AuthCookieService {
     const contextValue = `${sessionId}:${orgId}`;
 
     if (contextValue !== ':') {
-      this.activeCookie.set(contextValue, {});
+      this.activeCookie.set(contextValue);
     } else {
       this.activeCookie.remove();
     }
