@@ -3,7 +3,7 @@ import type { EmailAddressJSON } from './JSON';
 import { Verification } from './Verification';
 
 /**
- * The Backend `EmailAddress` object is a model around an email address. Email addresses are one of the [identifiers](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#identifiers) used to provide identification for users.
+ * The Backend `EmailAddress` object is a model around an email address.
  *
  * Email addresses must be **verified** to ensure that they are assigned to their rightful owners. The `EmailAddress` object holds all necessary state around the verification process.
  *

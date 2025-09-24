@@ -53,7 +53,7 @@ declare global {
 }
 
 /**
- * The `User` object holds all of the information for a single user of your application and provides a set of methods to manage their account. Each `User` has at least one authentication [identifier](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#identifiers), which might be their email address, phone number, or a username.
+ * The `User` object holds all of the information for a single user of your application and provides a set of methods to manage their account.
  *
  * A user can be contacted at their primary email address or primary phone number. They can have more than one registered email address, but only one of them will be their primary email address. This goes for phone numbers as well; a user can have more than one, but only one phone number will be their primary. At the same time, a user can also have one or more external accounts by connecting to [social providers](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/all-providers) such as Google, Apple, Facebook, and many more.
  *

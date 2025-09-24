@@ -74,7 +74,7 @@ export class OrganizationMembership {
 export class OrganizationMembershipPublicUserData {
   constructor(
     /**
-     * The [identifier](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#identifiers) of the user.
+     * The identifier of the user.
      */
     readonly identifier: string,
     /**
