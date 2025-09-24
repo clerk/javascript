@@ -9,6 +9,7 @@ import type { Clerk, InstanceType } from '@clerk/types';
 import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
+import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
 import type { SessionCookieHandler } from './cookies/session';
@@ -75,7 +76,7 @@ export class AuthCookieService {
 
     this.clientUat = createClientUatCookie(cookieSuffix);
     this.sessionCookie = createSessionCookie(cookieSuffix);
-    this.activeCookie = createCookieHandler('clerk_active_context');
+    this.activeCookie = createActiveContextCookie();
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
@@ -232,7 +233,7 @@ export class AuthCookieService {
     const contextValue = `${sessionId}:${orgId}`;
 
     if (contextValue !== ':') {
-      this.activeCookie.set(contextValue);
+      this.activeCookie.set(contextValue, {});
     } else {
       this.activeCookie.remove();
     }
