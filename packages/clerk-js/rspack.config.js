@@ -5,7 +5,6 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
 const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -368,21 +367,16 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkBrowser),
     isSandbox
       ? {
-          entry: { sandbox: './sandbox/app.ts' },
+          entry: {
+            sandbox: './sandbox/app.ts',
+            mockServiceWorker: './public/mockServiceWorker.js',
+          },
           plugins: [
             new rspack.HtmlRspackPlugin({
               minify: false,
               template: './sandbox/template.html',
               inject: false,
               hash: true,
-            }),
-            new CopyWebpackPlugin({
-              patterns: [
-                {
-                  from: 'public/mockServiceWorker.js',
-                  to: 'mockServiceWorker.js',
-                },
-              ],
             }),
           ],
         }
@@ -583,15 +577,6 @@ const devConfig = ({ mode, env }) => {
             template: './sandbox/template.html',
             inject: false,
           }),
-        isSandbox &&
-          new CopyWebpackPlugin({
-            patterns: [
-              {
-                from: 'public/mockServiceWorker.js',
-                to: 'mockServiceWorker.js',
-              },
-            ],
-          }),
       ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
       output: {
@@ -636,7 +621,10 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      isSandbox ? { entry: { sandbox: './sandbox/app.ts' } } : {},
+      isSandbox ? { entry: { 
+        sandbox: './sandbox/app.ts',
+        mockServiceWorker: './public/mockServiceWorker.js'
+      } } : {},
       common({ mode, variant: variants.clerkBrowser }),
       commonForDev(),
     ),
