@@ -1,3 +1,4 @@
+import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -13,7 +14,7 @@ import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
-import { BaseResource, Client, EmailLinkErrorCodeStatus, Environment, SignIn, SignUp } from '../resources/internal';
+import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 import { mockJwt } from '../test/fixtures';
 
 const mockClientFetch = jest.fn();
@@ -742,7 +743,7 @@ describe('Clerk singleton', () => {
     const mockClientRemoveSessions = jest.fn();
     const mockSession1 = { id: '1', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
     const mockSession2 = { id: '2', remove: jest.fn(), status: 'active', user: {}, getToken: jest.fn() };
-    const mockSession3 = { id: '2', remove: jest.fn(), status: 'pending', user: {}, getToken: jest.fn() };
+    const mockSession3 = { id: '3', remove: jest.fn(), status: 'pending', user: {}, getToken: jest.fn() };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();
