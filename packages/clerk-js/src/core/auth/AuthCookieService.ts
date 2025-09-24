@@ -1,6 +1,6 @@
 import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
-import { createCookieHandler } from '@clerk/shared/cookie';
+import type { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import { noop } from '@clerk/shared/utils';
@@ -85,10 +85,6 @@ export class AuthCookieService {
   }
 
   public async setup() {
-    // Cleanup old cookie
-    // TODO: This should be removed after 2025-08-01
-    createCookieHandler('clerk_active_org').remove();
-
     if (this.instanceType === 'production') {
       return this.setupProduction();
     } else {
