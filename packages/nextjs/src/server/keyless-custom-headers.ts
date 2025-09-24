@@ -13,6 +13,7 @@ interface MetadataHeaders {
   xPort: string;
   xProtocol: string;
   xClerkAuthStatus: string;
+  isCI: boolean;
 }
 
 /**
@@ -32,7 +33,54 @@ export async function collectKeylessMetadata(): Promise<MetadataHeaders> {
     xHost: headerStore.get('x-forwarded-host') ?? 'unknown x-forwarded-host',
     xProtocol: headerStore.get('x-forwarded-proto') ?? 'unknown x-forwarded-proto',
     xClerkAuthStatus: headerStore.get('x-clerk-auth-status') ?? 'unknown x-clerk-auth-status',
+    isCI: detectCIEnvironment(),
   };
+}
+
+/**
+ * Detects if the application is running in a CI environment
+ */
+function detectCIEnvironment(): boolean {
+  // Common CI environment variables
+  const ciIndicators = [
+    'CI',
+    'CONTINUOUS_INTEGRATION',
+    'BUILD_NUMBER',
+    'BUILD_ID',
+    'BUILDKITE',
+    'CIRCLECI',
+    'GITHUB_ACTIONS',
+    'GITLAB_CI',
+    'JENKINS_URL',
+    'TRAVIS',
+    'APPVEYOR',
+    'WERCKER',
+    'DRONE',
+    'CODESHIP',
+    'SEMAPHORE',
+    'SHIPPABLE',
+    'TEAMCITY_VERSION',
+    'BAMBOO_BUILDKEY',
+    'GO_PIPELINE_NAME',
+    'TF_BUILD',
+    'SYSTEM_TEAMFOUNDATIONCOLLECTIONURI',
+    'BITBUCKET_BUILD_NUMBER',
+    'HEROKU_TEST_RUN_ID',
+    'VERCEL',
+    'NETLIFY',
+  ];
+
+  return ciIndicators.some(indicator => {
+    const value = process.env[indicator];
+    if (value === undefined) {
+      return false;
+    }
+
+    const normalizedValue = value.trim().toLowerCase();
+    const falsyValues = ['', 'false', '0', 'no'];
+
+    return !falsyValues.includes(normalizedValue);
+  });
 }
 
 /**
@@ -91,6 +139,8 @@ export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
   if (metadata.xClerkAuthStatus) {
     headers.set('Clerk-Auth-Status', metadata.xClerkAuthStatus);
   }
+
+  headers.set('Clerk-Is-CI', metadata.isCI.toString());
 
   return headers;
 }
