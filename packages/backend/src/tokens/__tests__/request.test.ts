@@ -959,7 +959,7 @@ describe('tokens.authenticateRequest(options)', () => {
     );
 
     const errMessage =
-      'Subject claim (sub) is required and must be a string. Received undefined. Make sure that this is a valid Clerk generate JWT. (reason=token-verification-failed, token-carrier=cookie)';
+      'Subject claim (sub) is required and must be a string. Received undefined. Make sure that this is a valid Clerk-generated JWT. (reason=token-verification-failed, token-carrier=cookie)';
     expect(requestState).toBeSignedOut({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
       message: errMessage,
