@@ -76,8 +76,8 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@tanstack/react-router": "1.131.34",
-    "@tanstack/react-start": "1.131.34",
+    "@tanstack/react-router": "1.131.49",
+    "@tanstack/react-start": "1.131.49",
     "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "peerDependencies": {
