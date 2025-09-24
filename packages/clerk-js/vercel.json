@@ -1,5 +1,5 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }],
+  "rewrites": [{ "source": "/((?!mockServiceWorker\\.js).*)", "destination": "/" }],
   "headers": [
     {
       "source": "/mockServiceWorker.js",
