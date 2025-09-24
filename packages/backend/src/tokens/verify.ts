@@ -40,6 +40,7 @@ export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
  * @param options - Options for verifying the token.
  *
  * @displayFunctionSignature
+ * @hideReturns
  *
  * @paramExtension
  *

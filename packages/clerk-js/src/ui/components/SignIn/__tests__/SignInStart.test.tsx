@@ -1,10 +1,10 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
 import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';

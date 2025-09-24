@@ -1,9 +1,8 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { OrganizationInvitationResource } from '@clerk/types';
 import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/dom';
-import React from 'react';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
 import { render } from '../../../../testUtils';
 import { Action } from '../../../elements/Action';
 import { clearFetchCache } from '../../../hooks';

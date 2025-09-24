@@ -252,6 +252,136 @@ describe('request', () => {
     it.todo('sets the __clerk_db_jwt cookie from the response Clerk-Cookie header');
   });
 
+  describe('request body filtering', () => {
+    it('filters out undefined values from request body objects', async () => {
+      const requestBody = {
+        definedValue: 'test',
+        undefinedValue: undefined,
+        nullValue: null,
+        falseValue: false,
+        zeroValue: 0,
+        emptyString: '',
+      } as any;
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'POST',
+        body: requestBody,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: 'defined_value=test&null_value=&false_value=false&zero_value=0&empty_string=',
+        }),
+      );
+    });
+
+    it('preserves FormData objects without filtering', async () => {
+      const formData = new FormData();
+      formData.append('key', 'value');
+      formData.append('undefinedKey', 'undefined'); // FormData doesn't have undefined values
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'POST',
+        body: formData,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: formData,
+        }),
+      );
+    });
+
+    it('preserves non-object bodies without filtering', async () => {
+      const stringBody = 'raw string body';
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'POST',
+        body: stringBody,
+        headers: {
+          'content-type': 'text/plain',
+        },
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: stringBody,
+        }),
+      );
+    });
+
+    it('handles empty objects', async () => {
+      await fapiClient.request({
+        path: '/foo',
+        method: 'POST',
+        body: {} as any,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: '',
+        }),
+      );
+    });
+
+    it('handles objects with only undefined values', async () => {
+      const requestBody = {
+        undefinedValue1: undefined,
+        undefinedValue2: undefined,
+      } as any;
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'POST',
+        body: requestBody,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: '',
+        }),
+      );
+    });
+
+    it('does not perform deep filtering - preserves nested undefined values', async () => {
+      const requestBody = {
+        topLevel: 'value',
+        topLevelUndefined: undefined,
+        nested: {
+          nestedDefined: 'nested value',
+          nestedUndefined: undefined,
+        },
+      } as any;
+
+      await fapiClient.request({
+        path: '/foo',
+        method: 'POST',
+        body: requestBody,
+      });
+
+      // The nested object should be JSON stringified with undefined values preserved
+      // Note: JSON.stringify removes undefined values, so we expect only the defined nested value
+      const expectedNestedJson = JSON.stringify({
+        nestedDefined: 'nested value',
+      } as any);
+
+      expect(fetch).toHaveBeenCalledWith(
+        expect.any(URL),
+        expect.objectContaining({
+          body: `top_level=value&nested=${encodeURIComponent(expectedNestedJson).replace(/%20/g, '+')}`,
+        }),
+      );
+    });
+  });
+
   describe('retry logic', () => {
     it('does not send retry query parameter on initial request', async () => {
       await fapiClient.request({
