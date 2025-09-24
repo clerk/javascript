@@ -43,21 +43,52 @@ export class ClerkMockController {
    * Start the mock service worker
    */
   async start(scenarioName?: string): Promise<void> {
-    // Initialize MSW (browser-only)
     const handlers = this.getHandlers(scenarioName);
     console.log(
       `🔧 MSW: Loaded ${this.scenarios.size} scenarios, starting with scenario: ${scenarioName || 'default'} (${handlers.length} handlers)`,
     );
 
     this.worker = setupWorker(...handlers);
-    await this.worker.start({
-      onUnhandledRequest: this.config.debug ? 'warn' : 'bypass',
-      serviceWorker: {
-        url: '/mockServiceWorker.js',
-      },
-    });
 
-    console.log('🔧 MSW: Worker started successfully');
+    const isDeployed =
+      window.location.hostname !== 'localhost' &&
+      !window.location.hostname.includes('127.0.0.1') &&
+      !window.location.hostname.includes('192.168.');
+
+    const workerConfig = {
+      onUnhandledRequest: this.config.debug ? ('warn' as const) : ('bypass' as const),
+      ...(isDeployed
+        ? {
+            serviceWorker: {
+              url: '/mockServiceWorker.js',
+              options: {
+                scope: '/',
+              },
+            },
+          }
+        : {
+            serviceWorker: {
+              url: '/mockServiceWorker.js',
+            },
+          }),
+    };
+
+    try {
+      await this.worker.start(workerConfig);
+      console.log(`🔧 MSW: Worker started successfully ${isDeployed ? '(deployed mode)' : '(local mode)'}`);
+    } catch (error) {
+      console.warn('🔧 MSW: Failed to start service worker, falling back to development mode:', error);
+
+      try {
+        await this.worker.start({
+          onUnhandledRequest: this.config.debug ? ('warn' as const) : ('bypass' as const),
+        });
+        console.log('🔧 MSW: Worker started in fallback mode');
+      } catch (fallbackError) {
+        console.error('🔧 MSW: Failed to start worker in fallback mode:', fallbackError);
+        throw new Error(`Failed to initialize mocking: ${fallbackError.message}`);
+      }
+    }
   }
 
   /**
