@@ -11,6 +11,7 @@ import type {
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
+import { Billing } from '../modules/billing/namespace';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentSource, BillingPlan, isClerkAPIResponseError } from './internal';
 
@@ -60,9 +61,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     return retry(
       () =>
         this._basePatch({
-          path: this.payer.organizationId
-            ? `/organizations/${this.payer.organizationId}/commerce/checkouts/${this.id}/confirm`
-            : `/me/commerce/checkouts/${this.id}/confirm`,
+          path: Billing.path(`/checkouts/${this.id}/confirm`, { orgId: this.payer.organizationId }),
           body: params as any,
         }),
       {
