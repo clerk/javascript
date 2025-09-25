@@ -37,7 +37,7 @@ export const MfaForm = withCardStateProvider((props: MfaFormProps) => {
     if (secondFactorsAvailableToAdd.length === 0) {
       card.setError('There are no second factors available to add');
     }
-  }, [secondFactorsAvailableToAdd.length, card]);
+  }, []);
 
   if (card.error) {
     return <FormContainer headerTitle={title} />;
