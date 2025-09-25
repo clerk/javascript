@@ -37,38 +37,40 @@ export async function collectKeylessMetadata(): Promise<MetadataHeaders> {
   };
 }
 
+// Common CI environment variables
+const CI_ENV_VARS = [
+  'CI',
+  'CONTINUOUS_INTEGRATION',
+  'BUILD_NUMBER',
+  'BUILD_ID',
+  'BUILDKITE',
+  'CIRCLECI',
+  'GITHUB_ACTIONS',
+  'GITLAB_CI',
+  'JENKINS_URL',
+  'TRAVIS',
+  'APPVEYOR',
+  'WERCKER',
+  'DRONE',
+  'CODESHIP',
+  'SEMAPHORE',
+  'SHIPPABLE',
+  'TEAMCITY_VERSION',
+  'BAMBOO_BUILDKEY',
+  'GO_PIPELINE_NAME',
+  'TF_BUILD',
+  'SYSTEM_TEAMFOUNDATIONCOLLECTIONURI',
+  'BITBUCKET_BUILD_NUMBER',
+  'HEROKU_TEST_RUN_ID',
+  'VERCEL',
+  'NETLIFY',
+];
+
 /**
  * Detects if the application is running in a CI environment
  */
 function detectCIEnvironment(): boolean {
-  // Common CI environment variables
-  const ciIndicators = [
-    'CI',
-    'CONTINUOUS_INTEGRATION',
-    'BUILD_NUMBER',
-    'BUILD_ID',
-    'BUILDKITE',
-    'CIRCLECI',
-    'GITHUB_ACTIONS',
-    'GITLAB_CI',
-    'JENKINS_URL',
-    'TRAVIS',
-    'APPVEYOR',
-    'WERCKER',
-    'DRONE',
-    'CODESHIP',
-    'SEMAPHORE',
-    'SHIPPABLE',
-    'TEAMCITY_VERSION',
-    'BAMBOO_BUILDKEY',
-    'GO_PIPELINE_NAME',
-    'TF_BUILD',
-    'SYSTEM_TEAMFOUNDATIONCOLLECTIONURI',
-    'BITBUCKET_BUILD_NUMBER',
-    'HEROKU_TEST_RUN_ID',
-    'VERCEL',
-    'NETLIFY',
-  ];
+  const ciIndicators = CI_ENV_VARS;
 
   const falsyValues = new Set<string>(['', 'false', '0', 'no']);
 
@@ -140,7 +142,9 @@ export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
     headers.set('Clerk-Auth-Status', metadata.xClerkAuthStatus);
   }
 
-  headers.set('Clerk-Is-CI', metadata.isCI.toString());
+  if (metadata.isCI) {
+    headers.set('Clerk-Is-CI', 'true');
+  }
 
   return headers;
 }
