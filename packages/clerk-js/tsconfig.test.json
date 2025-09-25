@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "noEmit": true,
-    "types": ["vite/client", "node"]
-  },
-  "include": ["src", "vitest.setup.mts", "vitest.config.mts", "src/**/*.__tests__/*", "src/**/*.test.*"]
-}
