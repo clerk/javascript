@@ -85,7 +85,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
 
   if (forOrganization === 'organization' && !organization) {
     throw new Error(
-      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/reference/backend/types/auth-object#how-to-access-the-auth-object',
     );
   }
 

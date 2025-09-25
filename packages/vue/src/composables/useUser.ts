@@ -8,7 +8,7 @@ import { useClerkContext } from './useClerkContext';
 type UseUser = () => ToComputedRefs<UseUserReturn>;
 
 /**
- * Returns the current user's [`User`](https://clerk.com/docs/references/javascript/user/user) object along with loading states.
+ * Returns the current user's [`User`](https://clerk.com/docs/reference/javascript/user/user) object along with loading states.
  *
  * @example
  * <script setup>
