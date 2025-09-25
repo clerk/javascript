@@ -562,6 +562,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    // TODO: Investigate why this test is failing in vitest
     it.skip('hides the invite screen when user clicks cancel button', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
