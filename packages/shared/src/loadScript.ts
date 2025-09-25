@@ -11,9 +11,6 @@ type LoadScriptOptions = {
   beforeLoad?: (script: HTMLScriptElement) => void;
 };
 
-/**
- *
- */
 export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTMLScriptElement> {
   const { async, defer, beforeLoad, crossOrigin, nonce } = opts || {};
 
