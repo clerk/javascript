@@ -54,6 +54,7 @@ const LINK_REPLACEMENTS = [
   ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
+  ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
 ];
 
 /**
