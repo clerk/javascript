@@ -119,7 +119,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               value={search}
               onChange={e => {
                 setSearch(e.target.value);
-                setPage(1);
+                // Don't reset page for client-side filtering
+                // setPage(1);
               }}
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
