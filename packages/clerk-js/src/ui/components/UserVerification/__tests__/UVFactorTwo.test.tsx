@@ -1,9 +1,9 @@
+import { describe, it } from '@jest/globals';
 import { waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../vitestUtils';
+import { render, runFakeTimers } from '../../../../testUtils';
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { UserVerificationFactorTwo } from '../UserVerificationFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('UserVerification');
@@ -20,15 +20,15 @@ describe('UserVerificationFactorTwo', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'phone_code' }],
-    } as any);
+    });
 
-    vi.spyOn(fixtures.session!, 'prepareSecondFactorVerification').mockResolvedValue({
+    fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'phone_code' }],
-    } as any);
+    });
 
     const { getByText, getAllByTestId } = render(<UserVerificationFactorTwo />, { wrapper });
 
@@ -43,15 +43,15 @@ describe('UserVerificationFactorTwo', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'totp' }],
-    } as any);
+    });
 
-    vi.spyOn(fixtures.session!, 'prepareSecondFactorVerification').mockResolvedValue({
+    fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'totp' }],
-    } as any);
+    });
     const { getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
 
     await waitFor(() => {
@@ -65,15 +65,15 @@ describe('UserVerificationFactorTwo', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ username: 'clerkuser' });
     });
-    vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+    fixtures.session?.startVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'backup_code' }],
-    } as any);
+    });
 
-    vi.spyOn(fixtures.session!, 'prepareSecondFactorVerification').mockResolvedValue({
+    fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
       status: 'needs_second_factor',
       supportedSecondFactors: [{ strategy: 'backup_code' }],
-    } as any);
+    });
     const { getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
 
     await waitFor(() => {
@@ -88,9 +88,9 @@ describe('UserVerificationFactorTwo', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_first_factor',
-      } as any);
+      });
       render(<UserVerificationFactorTwo />, { wrapper });
 
       await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../'));
@@ -102,31 +102,34 @@ describe('UserVerificationFactorTwo', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedSecondFactors: [{ strategy: 'phone_code' }],
-      } as any);
+      });
 
-      vi.spyOn(fixtures.session!, 'prepareSecondFactorVerification').mockResolvedValue({
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedSecondFactors: [{ strategy: 'phone_code' }],
-      } as any);
+      });
 
-      vi.spyOn(fixtures.session!, 'attemptSecondFactorVerification').mockResolvedValue({
+      fixtures.session?.attemptSecondFactorVerification.mockResolvedValue({
         status: 'complete',
         supportedSecondFactors: [],
         session: {
           id: '123',
         },
-      } as any);
+      });
 
-      const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
+      await runFakeTimers(async timers => {
+        const { userEvent, getByLabelText, getByText } = render(<UserVerificationFactorTwo />, { wrapper });
 
-      await waitFor(() => getByText('Verification required'));
+        await waitFor(() => getByText('Verification required'));
 
-      await userEvent.type(getByLabelText(/Enter verification code/i), '123456');
-      await waitFor(() => {
-        expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        await userEvent.type(getByLabelText(/Enter verification code/i), '123456');
+        timers.runOnlyPendingTimers();
+        await waitFor(() => {
+          expect(fixtures.clerk.setActive).toHaveBeenCalled();
+        });
       });
     });
   });
@@ -136,7 +139,7 @@ describe('UserVerificationFactorTwo', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedSecondFactors: [
           {
@@ -150,18 +153,18 @@ describe('UserVerificationFactorTwo', () => {
             safeIdentifier: '+3069XXXXXXX2',
           },
         ],
-      } as any);
-      vi.spyOn(fixtures.session!, 'prepareSecondFactorVerification').mockResolvedValue({} as any);
+      });
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({});
 
-      const { userEvent, getByText, getByRole } = render(<UserVerificationFactorTwo />, { wrapper });
+      const { getByText, getByRole } = render(<UserVerificationFactorTwo />, { wrapper });
 
       await waitFor(() => {
         getByText('Verification required');
         getByText('Use another method');
       });
 
-      await userEvent.click(getByText('Use another method'));
       await waitFor(() => {
+        getByText('Use another method').click();
         expect(getByRole('button')).toHaveTextContent('Send SMS code to +3069XXXXXXX2');
         expect(getByRole('button')).not.toHaveTextContent('Send SMS code to +3069XXXXXXX1');
       });
@@ -171,7 +174,7 @@ describe('UserVerificationFactorTwo', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });
       });
-      vi.spyOn(fixtures.session!, 'startVerification').mockResolvedValue({
+      fixtures.session?.startVerification.mockResolvedValue({
         status: 'needs_second_factor',
         supportedSecondFactors: [
           {
@@ -185,10 +188,10 @@ describe('UserVerificationFactorTwo', () => {
             safeIdentifier: '+3069XXXXXXX2',
           },
         ],
-      } as any);
-      vi.spyOn(fixtures.session!, 'prepareSecondFactorVerification').mockResolvedValue({} as any);
+      });
+      fixtures.session?.prepareSecondFactorVerification.mockResolvedValue({});
 
-      const { userEvent, getByText, container } = render(<UserVerificationFactorTwo />, { wrapper });
+      const { getByText, container } = render(<UserVerificationFactorTwo />, { wrapper });
 
       await waitFor(() => {
         getByText('Verification required');
@@ -197,8 +200,10 @@ describe('UserVerificationFactorTwo', () => {
         getByText('Use another method');
       });
 
-      await userEvent.click(getByText('Use another method'));
-      await userEvent.click(getByText('Send SMS code to +3069XXXXXXX2'));
+      await waitFor(() => {
+        getByText('Use another method').click();
+        getByText('Send SMS code to +3069XXXXXXX2').click();
+      });
 
       await waitFor(() => {
         getByText('Verification required');
@@ -206,8 +211,8 @@ describe('UserVerificationFactorTwo', () => {
         getByText('Use another method');
       });
 
-      await userEvent.click(getByText('Use another method'));
       await waitFor(() => {
+        getByText('Use another method').click();
         expect(container).toHaveTextContent('+3069XXXXXXX1');
       });
     });

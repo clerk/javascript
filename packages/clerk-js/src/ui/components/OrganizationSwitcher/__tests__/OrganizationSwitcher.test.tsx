@@ -1,9 +1,9 @@
 import type { MembershipRole } from '@clerk/types';
+import { describe } from '@jest/globals';
 import { waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 
-import { act, render } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { act, render } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { OrganizationSwitcher } from '../';
 import {
   createFakeUserOrganizationInvitation,

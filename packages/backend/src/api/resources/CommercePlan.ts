@@ -1,14 +1,14 @@
 import type { BillingMoneyAmount } from '@clerk/types';
 
 import { Feature } from './Feature';
-import type { CommercePlanJSON } from './JSON';
+import type { BillingPlanJSON } from './JSON';
 
 /**
- * The `CommercePlan` object is similar to the [`BillingPlanResource`](/docs/references/javascript/types/billing-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `CommercePlan` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/plans) and is not directly accessible from the Frontend API.
+ * The `BillingPlan` object is similar to the [`BillingPlanResource`](/docs/reference/javascript/types/billing-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `BillingPlan` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/plans) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export class CommercePlan {
+export class BillingPlan {
   constructor(
     /**
      * The unique identifier for the plan.
@@ -68,8 +68,8 @@ export class CommercePlan {
     readonly features: Feature[],
   ) {}
 
-  static fromJSON(data: CommercePlanJSON): CommercePlan {
-    const formatAmountJSON = (fee: CommercePlanJSON['fee']) => {
+  static fromJSON(data: BillingPlanJSON): BillingPlan {
+    const formatAmountJSON = (fee: BillingPlanJSON['fee']) => {
       return {
         amount: fee.amount,
         amountFormatted: fee.amount_formatted,
@@ -77,7 +77,7 @@ export class CommercePlan {
         currencySymbol: fee.currency_symbol,
       };
     };
-    return new CommercePlan(
+    return new BillingPlan(
       data.id,
       data.product_id,
       data.name,

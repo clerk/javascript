@@ -37,9 +37,9 @@ import {
   User,
 } from '.';
 import { AccountlessApplication } from './AccountlessApplication';
-import { CommercePlan } from './CommercePlan';
-import { CommerceSubscription } from './CommerceSubscription';
-import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
+import { BillingPlan } from './CommercePlan';
+import { BillingSubscription } from './CommerceSubscription';
+import { BillingSubscriptionItem } from './CommerceSubscriptionItem';
 import { Feature } from './Feature';
 import type { PaginatedResponseJSON } from './JSON';
 import { ObjectType } from './JSON';
@@ -57,7 +57,7 @@ type ResourceResponse<T> = {
  *
  * If the promise resolves, you will get back the [properties](#properties) listed below. `data` will be an array of the resource type you requested. You can use the `totalCount` property to determine how many total items exist remotely.
  *
- * Some methods that return this type allow pagination with the `limit` and `offset` parameters, in which case the first 10 items will be returned by default. For methods such as [`getAllowlistIdentifierList()`](https://clerk.com/docs/references/backend/allowlist/get-allowlist-identifier-list), which do not take a `limit` or `offset`, all items will be returned.
+ * Some methods that return this type allow pagination with the `limit` and `offset` parameters, in which case the first 10 items will be returned by default. For methods such as [`getAllowlistIdentifierList()`](https://clerk.com/docs/reference/backend/allowlist/get-allowlist-identifier-list), which do not take a `limit` or `offset`, all items will be returned.
  *
  * If the promise is rejected, you will receive a `ClerkAPIResponseError` or network error.
  *
@@ -183,12 +183,12 @@ function jsonToObject(item: any): any {
       return User.fromJSON(item);
     case ObjectType.WaitlistEntry:
       return WaitlistEntry.fromJSON(item);
-    case ObjectType.CommercePlan:
-      return CommercePlan.fromJSON(item);
-    case ObjectType.CommerceSubscription:
-      return CommerceSubscription.fromJSON(item);
-    case ObjectType.CommerceSubscriptionItem:
-      return CommerceSubscriptionItem.fromJSON(item);
+    case ObjectType.BillingPlan:
+      return BillingPlan.fromJSON(item);
+    case ObjectType.BillingSubscription:
+      return BillingSubscription.fromJSON(item);
+    case ObjectType.BillingSubscriptionItem:
+      return BillingSubscriptionItem.fromJSON(item);
     case ObjectType.Feature:
       return Feature.fromJSON(item);
     default:

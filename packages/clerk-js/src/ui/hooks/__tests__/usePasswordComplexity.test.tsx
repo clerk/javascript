@@ -1,7 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
-import { act, renderHook } from '../../../vitestUtils';
-import { bindCreateFixtures } from '../../utils/vitest/createFixtures';
+import { act, renderHook } from '../../../testUtils';
+import { bindCreateFixtures } from '../../utils/test/createFixtures';
 import { usePasswordComplexity } from '../usePasswordComplexity';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

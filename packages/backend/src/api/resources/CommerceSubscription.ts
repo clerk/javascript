@@ -1,23 +1,23 @@
-import { type BillingMoneyAmount } from '@clerk/types';
+import type { BillingMoneyAmount } from '@clerk/types';
 
-import { CommerceSubscriptionItem } from './CommerceSubscriptionItem';
-import type { CommerceSubscriptionJSON } from './JSON';
+import { BillingSubscriptionItem } from './CommerceSubscriptionItem';
+import type { BillingSubscriptionJSON } from './JSON';
 
 /**
- * The `CommerceSubscription` object is similar to the [`CommerceSubscriptionResource`](/docs/references/javascript/types/commerce-subscription-resource) object as it holds information about a subscription, as well as methods for managing it. However, the `CommerceSubscription` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/get/organizations/%7Borganization_id%7D/billing/subscription) and is not directly accessible from the Frontend API.
+ * The `BillingSubscription` object is similar to the [`BillingSubscriptionResource`](/docs/reference/javascript/types/commerce-subscription-resource) object as it holds information about a subscription, as well as methods for managing it. However, the `BillingSubscription` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/billing/get/organizations/%7Borganization_id%7D/billing/subscription) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export class CommerceSubscription {
+export class BillingSubscription {
   constructor(
     /**
-     * The unique identifier for the commerce subscription.
+     * The unique identifier for the billing subscription.
      */
     readonly id: string,
     /**
      * The current status of the subscription.
      */
-    readonly status: CommerceSubscriptionJSON['status'],
+    readonly status: BillingSubscriptionJSON['status'],
     /**
      * The ID of the payer for this subscription.
      */
@@ -41,7 +41,7 @@ export class CommerceSubscription {
     /**
      * Array of subscription items in this subscription.
      */
-    readonly subscriptionItems: CommerceSubscriptionItem[],
+    readonly subscriptionItems: BillingSubscriptionItem[],
     /**
      * Information about the next scheduled payment.
      */
@@ -52,7 +52,7 @@ export class CommerceSubscription {
     readonly eligibleForFreeTrial: boolean,
   ) {}
 
-  static fromJSON(data: CommerceSubscriptionJSON): CommerceSubscription {
+  static fromJSON(data: BillingSubscriptionJSON): BillingSubscription {
     const nextPayment = data.next_payment
       ? {
           date: data.next_payment.date,
@@ -65,7 +65,7 @@ export class CommerceSubscription {
         }
       : null;
 
-    return new CommerceSubscription(
+    return new BillingSubscription(
       data.id,
       data.status,
       data.payer_id,
@@ -73,7 +73,7 @@ export class CommerceSubscription {
       data.updated_at,
       data.active_at ?? null,
       data.past_due_at ?? null,
-      data.subscription_items.map(item => CommerceSubscriptionItem.fromJSON(item)),
+      data.subscription_items.map(item => BillingSubscriptionItem.fromJSON(item)),
       nextPayment,
       data.eligible_for_free_trial ?? false,
     );

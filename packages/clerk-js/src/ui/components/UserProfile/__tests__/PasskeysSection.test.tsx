@@ -1,11 +1,11 @@
 import type { PasskeyJSON, PasskeyResource } from '@clerk/types';
+import { describe, it } from '@jest/globals';
 import { act } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { render, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { PasskeySection } from '../PasskeySection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -36,7 +36,7 @@ const getMenuItemFromText = (element: HTMLElement) => {
 describe('PasskeySection', () => {
   it('renders the section', async () => {
     const { wrapper, fixtures } = await createFixtures(withPasskeys);
-
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fixtures.clerk.user!.getSessions.mockReturnValue(Promise.resolve([]));
 
     const { getByText } = render(
@@ -92,6 +92,7 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -114,6 +115,7 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -141,6 +143,7 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -152,24 +155,22 @@ describe('PasskeySection', () => {
 
     it('removes a passkey', async () => {
       const { wrapper, fixtures } = await createFixtures(withPasskeys);
-      const { getByText, userEvent, getByRole } = render(
+      const { getByText, userEvent, getByRole, queryByRole } = render(
         <CardStateProvider>
           <PasskeySection />
         </CardStateProvider>,
         { wrapper },
       );
 
-      const deleteMock = fixtures.clerk.user?.passkeys?.[0]?.delete;
-      if (deleteMock) {
-        vi.mocked(deleteMock).mockResolvedValue({
-          object: 'passkey',
-          deleted: true,
-        });
-      }
+      fixtures.clerk.user?.passkeys[0].delete.mockResolvedValue({
+        object: 'passkey',
+        deleted: true,
+      });
 
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -179,12 +180,14 @@ describe('PasskeySection', () => {
 
       await userEvent.click(getByRole('button', { name: /remove/i }));
       expect(fixtures.clerk.user?.passkeys[0].delete).toHaveBeenCalled();
+
+      await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).not.toBeInTheDocument());
     });
 
     describe('Form buttons', () => {
       it('hides screen when when pressing cancel', async () => {
         const { wrapper } = await createFixtures(withPasskeys);
-        const { getByRole, userEvent, getByText } = render(
+        const { getByRole, userEvent, getByText, queryByRole } = render(
           <CardStateProvider>
             <PasskeySection />
           </CardStateProvider>,
@@ -194,6 +197,7 @@ describe('PasskeySection', () => {
         const item = getByText(passkeys[0].name);
         const menuButton = getMenuItemFromText(item);
         await act(async () => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           await userEvent.click(menuButton!);
         });
 
@@ -202,10 +206,7 @@ describe('PasskeySection', () => {
         await waitFor(() => getByRole('heading', { name: /remove passkey/i }));
 
         await userEvent.click(getByRole('button', { name: /cancel$/i }));
-        // The form should close when cancel is clicked
-        await waitFor(() => {
-          expect(getByRole('button', { name: /add a passkey/i })).toBeInTheDocument();
-        });
+        await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).not.toBeInTheDocument());
       });
     });
   });
@@ -213,7 +214,7 @@ describe('PasskeySection', () => {
   describe('Handles opening/closing actions', () => {
     it('closes remove passkey form when add a passkey action is clicked', async () => {
       const { wrapper } = await createFixtures(withPasskeys);
-      const { getByRole, userEvent, getByText } = render(
+      const { getByRole, userEvent, getByText, queryByRole } = render(
         <CardStateProvider>
           <PasskeySection />
         </CardStateProvider>,
@@ -223,6 +224,7 @@ describe('PasskeySection', () => {
       const item = getByText(passkeys[0].name);
       const menuButton = getMenuItemFromText(item);
       await act(async () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await userEvent.click(menuButton!);
       });
 
@@ -230,12 +232,11 @@ describe('PasskeySection', () => {
       await userEvent.click(getByRole('menuitem', { name: /remove/i }));
       await waitFor(() => getByRole('heading', { name: /remove passkey/i }));
 
+      await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).toBeInTheDocument());
+
       await userEvent.click(getByRole('button', { name: /add a passkey/i }));
 
-      // The form should close when add passkey is clicked
-      await waitFor(() => {
-        expect(getByRole('button', { name: /add a passkey/i })).toBeInTheDocument();
-      });
+      await waitFor(() => expect(queryByRole('heading', { name: /remove passkey/i })).not.toBeInTheDocument());
     });
   });
 });

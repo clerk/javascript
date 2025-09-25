@@ -69,7 +69,7 @@ export class User {
      */
     readonly primaryPhoneNumberId: string | null,
     /**
-     * The ID for the [`Web3Wallet`](https://clerk.com/docs/references/backend/types/backend-web3-wallet) that the user signed up with.
+     * The ID for the [`Web3Wallet`](https://clerk.com/docs/reference/backend/types/backend-web3-wallet) that the user signed up with.
      */
     readonly primaryWeb3WalletId: string | null,
     /**
@@ -141,7 +141,7 @@ export class User {
      */
     readonly deleteSelfEnabled: boolean,
     /**
-     * The unix timestamp of when the user accepted the legal requirements. `null` if [**Require express consent to legal documents**](https://clerk.com/docs/authentication/configuration/legal-compliance) is not enabled.
+     * The unix timestamp of when the user accepted the legal requirements. `null` if [**Require express consent to legal documents**](https://clerk.com/docs/guides/secure/legal-compliance) is not enabled.
      */
     readonly legalAcceptedAt: number | null,
   ) {}

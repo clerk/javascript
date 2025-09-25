@@ -5,7 +5,12 @@ import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
 import { debugLogger } from '@/utils/debug';
 
-import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, stringifyQueryParams } from '../utils';
+import {
+  buildEmailAddress as buildEmailAddressUtil,
+  buildURL as buildUrlUtil,
+  filterUndefinedValues,
+  stringifyQueryParams,
+} from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 
@@ -104,21 +109,9 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     return true;
   }
 
+  // TODO @userland-errors:
   function buildQueryString({ method, path, sessionId, search, rotatingTokenNonce }: FapiRequestInit): string {
-    const filteredSearch =
-      search && typeof search === 'object'
-        ? Object.keys(search as Record<string, any>).reduce(
-            (acc, key) => {
-              const value = (search as Record<string, any>)[key];
-              if (value !== undefined) {
-                acc[key] = value;
-              }
-              return acc;
-            },
-            {} as Record<string, any>,
-          )
-        : search;
-    const searchParams = new URLSearchParams(filteredSearch as any);
+    const searchParams = new URLSearchParams(search as any);
     // the above will parse {key: ['val1','val2']} as key: 'val1,val2' and we need to recreate the array bellow
 
     // Append supported FAPI version to the query string
@@ -161,6 +154,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     const { path, pathPrefix = 'v1' } = requestInit;
 
     if (options.proxyUrl) {
+      // TODO @userland-errors:
       const proxyBase = new URL(options.proxyUrl);
       let proxyPath = proxyBase.pathname.slice(1);
       if (proxyPath.endsWith('/')) {
@@ -198,12 +192,17 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     });
   }
 
+  // TODO @userland-errors:
   async function request<T>(
     _requestInit: FapiRequestInit,
     requestOptions?: FapiRequestOptions,
   ): Promise<FapiResponse<T>> {
     const requestInit = { ..._requestInit };
     const { method = 'GET', body } = requestInit;
+
+    if (body && typeof body === 'object' && !(body instanceof FormData)) {
+      requestInit.body = filterUndefinedValues(body);
+    }
 
     requestInit.url = buildUrl({
       ...requestInit,
@@ -224,7 +223,6 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     // Massage the body depending on the content type if needed.
     // Currently, this is needed only for form-urlencoded, so that the values reach the server in the form
     // foo=bar&baz=bar&whatever=1
-
     if (requestInit.headers.get('content-type') === 'application/x-www-form-urlencoded') {
       // The native BodyInit type is too wide for our use case,
       // so we're casting it to a more specific type here.
@@ -234,6 +232,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
         : body;
     }
 
+    // TODO @userland-errors:
     const beforeRequestCallbacksResult = await runBeforeRequestCallbacks(requestInit);
     // Due to a known Safari bug regarding CORS requests, we are forced to always use GET or POST method.
     // The original HTTP method is used as a query string parameter instead of as an actual method to
@@ -250,6 +249,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     try {
       if (beforeRequestCallbacksResult) {
         const maxTries = requestOptions?.fetchMaxTries ?? (isBrowserOnline() ? 4 : 11);
+        // TODO @userland-errors:
         response = await retry(() => fetch(url, fetchOpts), {
           // This retry handles only network errors, not 4xx or 5xx responses,
           // so we want to try once immediately to handle simple network blips.
@@ -284,6 +284,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
     if (!response.ok) {
       debugLogger.error('request failed', { method, path: requestInit.path, status: response.status }, 'fapiClient');
     }
+    // TODO @userland-errors:
     await runAfterResponseCallbacks(requestInit, fapiResponse);
     return fapiResponse;
   }

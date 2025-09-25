@@ -1,23 +1,21 @@
-import { describe, expect, it, vi } from 'vitest';
-
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { render, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { Checkout } from '..';
 
 const { createFixtures } = bindCreateFixtures('Checkout');
 
 // Mock Payment Element to be ready so the submit button is rendered during tests
-vi.mock('@clerk/shared/react', async importOriginal => {
-  const actual = await importOriginal();
+jest.mock('@clerk/shared/react', () => {
+  const actual = jest.requireActual('@clerk/shared/react');
   return {
     ...actual,
     __experimental_PaymentElementProvider: ({ children }: { children: any }) => children,
     __experimental_PaymentElement: (_: { fallback?: any }) => null,
     __experimental_usePaymentElement: () => ({
-      submit: vi.fn().mockResolvedValue({ data: { gateway: 'stripe', paymentToken: 'tok_test' }, error: null }),
-      reset: vi.fn().mockResolvedValue(undefined),
+      submit: jest.fn().mockResolvedValue({ data: { gateway: 'stripe', paymentToken: 'tok_test' }, error: null }),
+      reset: jest.fn().mockResolvedValue(undefined),
       isFormReady: true,
       provider: { name: 'stripe' },
       isProviderReady: true,
@@ -367,7 +365,7 @@ describe('Checkout', () => {
         freeTrialEnabled: true,
       },
       paymentSource: undefined,
-      confirm: vi.fn(),
+      confirm: jest.fn(),
       freeTrialEndsAt,
     } as any);
 
@@ -451,7 +449,7 @@ describe('Checkout', () => {
         freeTrialEnabled: true,
       },
       paymentSource: undefined,
-      confirm: vi.fn(),
+      confirm: jest.fn(),
       freeTrialEndsAt,
     } as any);
 
@@ -539,13 +537,13 @@ describe('Checkout', () => {
         isRemovable: true,
         status: 'active',
         walletType: undefined,
-        remove: vi.fn(),
-        makeDefault: vi.fn(),
+        remove: jest.fn(),
+        makeDefault: jest.fn(),
         pathRoot: '/',
-        reload: vi.fn(),
+        reload: jest.fn(),
       },
       planPeriodStart: new Date('2025-08-19'),
-      confirm: vi.fn(),
+      confirm: jest.fn(),
       freeTrialEndsAt: null,
     } as any);
 
@@ -631,12 +629,12 @@ describe('Checkout', () => {
         isRemovable: true,
         status: 'active',
         walletType: undefined,
-        remove: vi.fn(),
-        makeDefault: vi.fn(),
+        remove: jest.fn(),
+        makeDefault: jest.fn(),
         pathRoot: '/',
-        reload: vi.fn(),
+        reload: jest.fn(),
       },
-      confirm: vi.fn(),
+      confirm: jest.fn(),
       freeTrialEndsAt: null,
     } as any);
 
@@ -676,10 +674,10 @@ describe('Checkout', () => {
             isRemovable: true,
             status: 'active',
             walletType: undefined,
-            remove: vi.fn(),
-            makeDefault: vi.fn(),
+            remove: jest.fn(),
+            makeDefault: jest.fn(),
             pathRoot: '/',
-            reload: vi.fn(),
+            reload: jest.fn(),
           },
           {
             id: 'pm_test_mastercard',
@@ -690,10 +688,10 @@ describe('Checkout', () => {
             isRemovable: true,
             status: 'active',
             walletType: undefined,
-            remove: vi.fn(),
-            makeDefault: vi.fn(),
+            remove: jest.fn(),
+            makeDefault: jest.fn(),
             pathRoot: '/',
-            reload: vi.fn(),
+            reload: jest.fn(),
           },
         ],
         total_count: 2,
@@ -748,7 +746,7 @@ describe('Checkout', () => {
           freeTrialEnabled: true,
         },
         paymentSource: undefined,
-        confirm: vi.fn(),
+        confirm: jest.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
       } as any);
 
@@ -815,10 +813,10 @@ describe('Checkout', () => {
             isRemovable: true,
             status: 'active',
             walletType: undefined,
-            remove: vi.fn(),
-            makeDefault: vi.fn(),
+            remove: jest.fn(),
+            makeDefault: jest.fn(),
             pathRoot: '/',
-            reload: vi.fn(),
+            reload: jest.fn(),
           },
           {
             id: 'pm_test_mastercard',
@@ -829,10 +827,10 @@ describe('Checkout', () => {
             isRemovable: true,
             status: 'active',
             walletType: undefined,
-            remove: vi.fn(),
-            makeDefault: vi.fn(),
+            remove: jest.fn(),
+            makeDefault: jest.fn(),
             pathRoot: '/',
-            reload: vi.fn(),
+            reload: jest.fn(),
           },
         ],
         total_count: 2,
@@ -887,7 +885,7 @@ describe('Checkout', () => {
           freeTrialEnabled: true,
         },
         paymentSource: undefined,
-        confirm: vi.fn(),
+        confirm: jest.fn(),
         freeTrialEndsAt: null,
       } as any);
 
@@ -954,10 +952,10 @@ describe('Checkout', () => {
             isRemovable: true,
             status: 'active',
             walletType: undefined,
-            remove: vi.fn(),
-            makeDefault: vi.fn(),
+            remove: jest.fn(),
+            makeDefault: jest.fn(),
             pathRoot: '/',
-            reload: vi.fn(),
+            reload: jest.fn(),
           },
           {
             id: 'pm_test_mastercard',
@@ -968,10 +966,10 @@ describe('Checkout', () => {
             isRemovable: true,
             status: 'active',
             walletType: undefined,
-            remove: vi.fn(),
-            makeDefault: vi.fn(),
+            remove: jest.fn(),
+            makeDefault: jest.fn(),
             pathRoot: '/',
-            reload: vi.fn(),
+            reload: jest.fn(),
           },
         ],
         total_count: 2,
@@ -1026,7 +1024,7 @@ describe('Checkout', () => {
           freeTrialEnabled: true,
         },
         paymentSource: undefined,
-        confirm: vi.fn(),
+        confirm: jest.fn(),
         freeTrialEndsAt: null,
       } as any);
 
