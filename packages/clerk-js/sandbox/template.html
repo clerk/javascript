@@ -8,8 +8,59 @@
       content="width=device-width,initial-scale=1"
     />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      /* Simple focus styles */
+      select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      /* Collapsible animation */
+      .collapsible-content {
+        transition: all 0.3s ease-in-out;
+        overflow: hidden;
+      }
+
+      .collapsible-content.hidden {
+        max-height: 0;
+        opacity: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      .collapsible-content:not(.hidden) {
+        max-height: 500px;
+        opacity: 1;
+      }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const enableMockingCheckbox = document.getElementById('enableMocking');
+        const mockingContent = document.getElementById('mockingContent');
+        const mockStatusIndicator = document.getElementById('mockStatusIndicator');
+        const mockStatusText = document.getElementById('mockStatusText');
+
+        function updateMockingStatus() {
+          if (enableMockingCheckbox.checked) {
+            mockingContent.classList.remove('hidden');
+            mockStatusIndicator.className = 'h-2 w-2 rounded-full bg-green-500';
+            mockStatusText.textContent = 'Mocking enabled';
+            mockStatusText.className = 'text-sm font-medium text-green-600';
+          } else {
+            mockingContent.classList.add('hidden');
+            mockStatusIndicator.className = 'h-2 w-2 rounded-full bg-gray-400';
+            mockStatusText.textContent = 'Mocking disabled';
+            mockStatusText.className = 'text-sm font-medium text-gray-600';
+          }
+        }
+
+        updateMockingStatus();
+        enableMockingCheckbox.addEventListener('change', updateMockingStatus);
+      });
+    </script>
   </head>
-  <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50 lg:has-[*[data-sidebar]:not(.hidden)]:px-72">
+  <body class="flex min-h-full flex-col overflow-x-hidden bg-gray-50 lg:has-[*[data-sidebar]:not(.hidden)]:px-80">
     <div
       data-sidebar
       class="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-100 bg-white px-2 py-4 max-lg:hidden"
@@ -184,14 +235,70 @@
 
     <div
       data-sidebar
-      class="fixed inset-y-0 right-0 w-72 overflow-y-auto border-l border-gray-100 bg-white px-2 py-4 max-lg:hidden"
+      class="fixed inset-y-0 right-0 w-80 overflow-y-auto border-l border-gray-200 bg-white px-6 py-6 max-lg:hidden"
     >
-      <fieldset>
-        <div class="mb-2 flex items-center justify-between">
-          <legend class="block text-sm">Variables</legend>
+      <fieldset class="mb-6">
+        <div class="mb-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <legend class="text-lg font-semibold text-gray-900">Mocking</legend>
+            <div class="flex items-center gap-1">
+              <input
+                type="checkbox"
+                id="enableMocking"
+                class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label
+                for="enableMocking"
+                class="text-sm font-medium text-gray-700"
+                >Enable</label
+              >
+            </div>
+          </div>
+          <button
+            id="resetMockingBtn"
+            class="rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+          >
+            Reset
+          </button>
+        </div>
+
+        <div class="mb-3 flex items-center gap-2">
+          <div
+            id="mockStatusIndicator"
+            class="h-2 w-2 rounded-full bg-gray-400"
+          ></div>
+          <span
+            id="mockStatusText"
+            class="text-sm font-medium text-gray-600"
+            >Mocking disabled</span
+          >
+        </div>
+
+        <div
+          id="mockingContent"
+          class="collapsible-content hidden"
+        >
+          <div class="space-y-3">
+            <div>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Scenario</label>
+              <select
+                id="mockScenarioSelect"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="user-button-signed-in">UserButton - Signed In</option>
+                <option value="user-profile-barebones">User Profile - Barebones</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="mb-6">
+        <div class="mb-4 flex items-center justify-between">
+          <legend class="text-lg font-semibold text-gray-900">Variables</legend>
           <button
             id="resetVariablesBtn"
-            class="text-sm"
+            class="rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
           >
             Reset
           </button>
@@ -323,20 +430,25 @@
           />
         </label>
       </fieldset>
-      <fieldset>
-        <div class="mb-2 mt-4 flex items-center justify-between">
-          <legend class="block text-sm">Other options</legend>
+      <fieldset class="mb-6">
+        <div class="mb-4 flex items-center justify-between">
+          <legend class="text-lg font-semibold text-gray-900">Other Options</legend>
           <button
             id="resetOtherOptionsBtn"
-            class="text-sm"
+            class="rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
           >
             Reset
           </button>
         </div>
-        <label class="flex items-center justify-between border-t border-gray-100 py-2">
-          <span class="font-mono text-xs">localization</span>
-          <select id="localizationSelect"></select>
-        </label>
+        <div class="space-y-3">
+          <label class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+            <span class="font-medium text-gray-700">Localization</span>
+            <select
+              id="localizationSelect"
+              class="rounded-md border border-gray-200 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+            ></select>
+          </label>
+        </div>
       </fieldset>
     </div>
 

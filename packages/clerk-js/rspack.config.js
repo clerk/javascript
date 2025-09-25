@@ -367,7 +367,10 @@ const prodConfig = ({ mode, env, analysis }) => {
     entryForVariant(variants.clerkBrowser),
     isSandbox
       ? {
-          entry: { sandbox: './sandbox/app.ts' },
+          entry: {
+            sandbox: './sandbox/app.ts',
+            mockServiceWorker: './public/mockServiceWorker.js',
+          },
           plugins: [
             new rspack.HtmlRspackPlugin({
               minify: false,
@@ -618,7 +621,10 @@ const devConfig = ({ mode, env }) => {
     // prettier-ignore
     [variants.clerkBrowser]: merge(
       entryForVariant(variants.clerkBrowser),
-      isSandbox ? { entry: { sandbox: './sandbox/app.ts' } } : {},
+      isSandbox ? { entry: { 
+        sandbox: './sandbox/app.ts',
+        mockServiceWorker: './public/mockServiceWorker.js'
+      } } : {},
       common({ mode, variant: variants.clerkBrowser }),
       commonForDev(),
     ),
