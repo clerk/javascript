@@ -70,6 +70,8 @@ function detectCIEnvironment(): boolean {
     'NETLIFY',
   ];
 
+  const falsyValues = new Set<string>(['', 'false', '0', 'no']);
+
   return ciIndicators.some(indicator => {
     const value = process.env[indicator];
     if (value === undefined) {
@@ -77,9 +79,7 @@ function detectCIEnvironment(): boolean {
     }
 
     const normalizedValue = value.trim().toLowerCase();
-    const falsyValues = ['', 'false', '0', 'no'];
-
-    return !falsyValues.includes(normalizedValue);
+    return !falsyValues.has(normalizedValue);
   });
 }
 
