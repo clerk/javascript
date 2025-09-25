@@ -121,11 +121,15 @@ if (typeof window !== 'undefined') {
   // Mock requestAnimationFrame for auto-animate library
   let animationFrameHandleCounter = 0;
   const animationFrameTimeouts = new Map<number, NodeJS.Timeout>();
+  let isTestEnvironmentActive = true;
 
   const mockRequestAnimationFrame = vi.fn().mockImplementation((callback: FrameRequestCallback) => {
     const handle = ++animationFrameHandleCounter;
     const timeoutId = global.setTimeout(() => {
-      callback(performance.now());
+      // Only execute callback if test environment is still active
+      if (isTestEnvironmentActive) {
+        callback(performance.now());
+      }
       animationFrameTimeouts.delete(handle);
     }, 0);
     animationFrameTimeouts.set(handle, timeoutId);
@@ -140,6 +144,23 @@ if (typeof window !== 'undefined') {
     }
   });
 
+  // Cleanup function to prevent post-test execution
+  const cleanupAnimationFrames = () => {
+    isTestEnvironmentActive = false;
+    // Clear all pending animation frames
+    for (const timeoutId of animationFrameTimeouts.values()) {
+      global.clearTimeout(timeoutId);
+    }
+    animationFrameTimeouts.clear();
+  };
+
+  // Register cleanup to run after each test
+  afterEach(() => {
+    cleanupAnimationFrames();
+    // Reset for next test
+    isTestEnvironmentActive = true;
+  });
+
   global.requestAnimationFrame = mockRequestAnimationFrame;
   global.cancelAnimationFrame = mockCancelAnimationFrame;
   window.requestAnimationFrame = mockRequestAnimationFrame;
@@ -147,8 +168,9 @@ if (typeof window !== 'undefined') {
 
   // Patch JSDOM's getComputedStyle to handle null/undefined elements gracefully
   // This prevents the "Cannot convert undefined or null to object" error
-  const originalGetComputedStyle = window.getComputedStyle;
-  window.getComputedStyle = function (element: Element | null, pseudoElement?: string | null) {
+  const originalGetComputedStyle = window.getComputedStyle.bind(window);
+  const patchedGetComputedStyle: typeof window.getComputedStyle = (element, pseudoElement) => {
+    const el = element as unknown as Element | null;
     if (!element) {
       // Return a minimal CSSStyleDeclaration object for null elements
       return {
@@ -175,7 +197,7 @@ if (typeof window !== 'undefined') {
     }
 
     try {
-      return originalGetComputedStyle.call(this, element, pseudoElement);
+      return originalGetComputedStyle(el as Element, (pseudoElement ?? null) as any);
     } catch {
       // If JSDOM fails, return a safe fallback
       return {
@@ -201,6 +223,7 @@ if (typeof window !== 'undefined') {
       } as unknown as CSSStyleDeclaration;
     }
   };
+  window.getComputedStyle = patchedGetComputedStyle;
 }
 
 // Mock browser-tabs-lock to prevent window access errors in tests
