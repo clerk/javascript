@@ -39,7 +39,7 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
 
       script.addEventListener('error', event => {
         script.remove();
-        reject(event.error);
+        reject(event.error ?? new Error(`failed to load script: ${src}`));
       });
 
       script.src = src;
