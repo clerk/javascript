@@ -84,10 +84,10 @@ describe('OrganizationSettings', () => {
         total_count: 1,
       }),
     );
-    const { findByText, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
+    const { findByText, findByRole, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
     await findByText('General');
     expect(queryByRole('button', { name: /update profile/i })).not.toBeInTheDocument();
-    const leaveButton = queryByRole('button', { name: /leave organization/i });
+    const leaveButton = await findByRole('button', { name: /leave organization/i });
     expect(leaveButton).not.toBeDisabled();
   });
 

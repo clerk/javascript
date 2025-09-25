@@ -1,5 +1,5 @@
 import type { OrganizationResource } from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
+import { waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';

@@ -1,5 +1,5 @@
 import type { SessionWithActivitiesResource } from '@clerk/types';
-import { within } from '@testing-library/dom';
+import { within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';

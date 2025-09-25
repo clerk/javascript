@@ -7,7 +7,7 @@ import type {
   SignUpJSON,
   TokenResource,
 } from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
+import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';
