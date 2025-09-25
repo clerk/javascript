@@ -99,3 +99,4 @@ scripts/.env
 # typedoc
 .typedoc/docs
 .typedoc/docs.json
+tsup.config.bundled_*
