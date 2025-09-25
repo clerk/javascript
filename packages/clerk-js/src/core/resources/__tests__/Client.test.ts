@@ -1,7 +1,8 @@
 import type { ClientJSON, ClientJSONSnapshot } from '@clerk/types';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { createSession, createSignIn, createSignUp, createUser } from '../../vitest/fixtures';
+import { createSession, createSignIn, createSignUp, createUser } from '@/test/core-fixtures';
+
 import { BaseResource, Client } from '../internal';
 
 const FIXED_DATE = new Date('2025-01-01T00:00:00Z');

@@ -2,12 +2,12 @@ import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignUpResource } from '@clerk/types';
 import { describe, expect, it, vi } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { fireEvent, render, screen, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { fireEvent, render, screen, waitFor } from '../../../../vitestUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SignUpStart } from '../SignUpStart';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

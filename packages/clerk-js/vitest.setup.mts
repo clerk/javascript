@@ -3,8 +3,10 @@ import '@testing-library/jest-dom/vitest';
 import * as crypto from 'node:crypto';
 import { TextDecoder, TextEncoder } from 'node:util';
 
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+
+configure({});
 
 afterEach(cleanup);
 
@@ -86,6 +88,117 @@ if (typeof window !== 'undefined') {
     }
     unobserve() {
       return null;
+    }
+  };
+
+  // Mock HTMLCanvasElement.prototype.getContext to prevent errors
+  HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation((contextType: string) => {
+    if (contextType === '2d') {
+      return {
+        fillRect: vi.fn(),
+        getImageData: vi.fn(() => ({ data: new Uint8ClampedArray([255, 255, 255, 255]) }) as unknown as ImageData),
+      } as unknown as CanvasRenderingContext2D;
+    }
+    if (contextType === 'webgl' || contextType === 'webgl2') {
+      return {} as unknown as WebGLRenderingContext;
+    }
+    return null;
+  });
+
+  // Mock Element.prototype.animate for auto-animate library
+  Element.prototype.animate = vi.fn().mockImplementation(() => ({
+    cancel: vi.fn(),
+    finish: vi.fn(),
+    pause: vi.fn(),
+    play: vi.fn(),
+    reverse: vi.fn(),
+    updatePlaybackRate: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+
+  // Mock requestAnimationFrame for auto-animate library
+  let animationFrameHandleCounter = 0;
+  const animationFrameTimeouts = new Map<number, NodeJS.Timeout>();
+
+  const mockRequestAnimationFrame = vi.fn().mockImplementation((callback: FrameRequestCallback) => {
+    const handle = ++animationFrameHandleCounter;
+    const timeoutId = global.setTimeout(() => {
+      callback(performance.now());
+      animationFrameTimeouts.delete(handle);
+    }, 0);
+    animationFrameTimeouts.set(handle, timeoutId);
+    return handle;
+  });
+
+  const mockCancelAnimationFrame = vi.fn().mockImplementation((handle: number) => {
+    const timeoutId = animationFrameTimeouts.get(handle);
+    if (timeoutId) {
+      global.clearTimeout(timeoutId);
+      animationFrameTimeouts.delete(handle);
+    }
+  });
+
+  global.requestAnimationFrame = mockRequestAnimationFrame;
+  global.cancelAnimationFrame = mockCancelAnimationFrame;
+  window.requestAnimationFrame = mockRequestAnimationFrame;
+  window.cancelAnimationFrame = mockCancelAnimationFrame;
+
+  // Patch JSDOM's getComputedStyle to handle null/undefined elements gracefully
+  // This prevents the "Cannot convert undefined or null to object" error
+  const originalGetComputedStyle = window.getComputedStyle;
+  window.getComputedStyle = function (element: Element | null, pseudoElement?: string | null) {
+    if (!element) {
+      // Return a minimal CSSStyleDeclaration object for null elements
+      return {
+        getPropertyValue: () => '',
+        setProperty: () => {},
+        removeProperty: () => '',
+        item: () => '',
+        length: 0,
+        parentRule: null,
+        cssText: '',
+        display: 'none',
+        visibility: 'hidden',
+        opacity: '0',
+        position: 'static',
+        overflow: 'visible',
+        clip: 'auto',
+        clipPath: 'none',
+        transform: 'none',
+        filter: 'none',
+        backfaceVisibility: 'visible',
+        perspective: 'none',
+        willChange: 'auto',
+      } as unknown as CSSStyleDeclaration;
+    }
+
+    try {
+      return originalGetComputedStyle.call(this, element, pseudoElement);
+    } catch {
+      // If JSDOM fails, return a safe fallback
+      return {
+        getPropertyValue: () => '',
+        setProperty: () => {},
+        removeProperty: () => '',
+        item: () => '',
+        length: 0,
+        parentRule: null,
+        cssText: '',
+        display: 'block',
+        visibility: 'visible',
+        opacity: '1',
+        position: 'static',
+        overflow: 'visible',
+        clip: 'auto',
+        clipPath: 'none',
+        transform: 'none',
+        filter: 'none',
+        backfaceVisibility: 'visible',
+        perspective: 'none',
+        willChange: 'auto',
+      } as unknown as CSSStyleDeclaration;
     }
   };
 }

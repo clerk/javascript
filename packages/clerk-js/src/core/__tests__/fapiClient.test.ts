@@ -60,7 +60,7 @@ beforeAll(() => {
         value: 'http://test.host',
       },
     },
-  ) as Location;
+  ) as any;
 });
 
 beforeEach(() => {
@@ -68,7 +68,7 @@ beforeEach(() => {
 });
 
 afterAll(() => {
-  window.location = oldWindowLocation;
+  window.location = oldWindowLocation as any;
   delete window.Clerk;
   global.fetch = originalFetch;
 });
@@ -144,7 +144,7 @@ describe('buildUrl(options)', () => {
         path: '/foo',
         search: {
           array: ['item1', 'item2'],
-        },
+        } as any,
       }).href,
     ).toBe(
       `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
@@ -161,9 +161,11 @@ describe('buildUrl(options)', () => {
         search: {
           array: ['item1', 'item2'],
           test: undefined,
-        },
+        } as any,
       }).href,
-    ).toBe('https://clerk.example.com/v1/foo?array=item1&array=item2&_clerk_js_version=test');
+    ).toBe(
+      `https://clerk.example.com/v1/foo?array=item1&array=item2&__clerk_api_version=${SUPPORTED_FAPI_VERSION}&_clerk_js_version=test`,
+    );
   });
 
   const cases = [

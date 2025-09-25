@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "sourceMap": true
+    "noEmit": true,
+    "types": ["vite/client", "node"]
   },
-  "include": ["src/**/*", "./jest.setup-after-env.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src", "vitest.setup.mts", "vitest.config.mts", "src/**/*.__tests__/*", "src/**/*.test.*"]
 }
