@@ -286,6 +286,8 @@ jobs:
             # 'localhost',
             'sessions',
             'sessions:staging',
+            'handshake',
+            'handshake:staging',
             # 'astro',
             # 'expo-web',
             # 'tanstack-react-start',
