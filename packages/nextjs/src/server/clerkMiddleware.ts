@@ -190,7 +190,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       logger.debug('requestState', () => ({
         status: requestState.status,
-        // @ts-expect-error : REMOVE THIS WHEN UPGRADING TO NODE@20
         headers: JSON.stringify(Object.fromEntries(requestState.headers)),
         reason: requestState.reason,
       }));
