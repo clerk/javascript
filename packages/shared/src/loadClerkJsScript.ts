@@ -189,18 +189,12 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLS
   const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
 
   if (existingScript) {
-    // Check if the existing script has a request error
-    const hasError = hasScriptRequestError(scriptUrl);
-
-    if (hasError) {
-      // Request error detected - remove failed script and initiate loadScript immediately
+    if (hasScriptRequestError(scriptUrl)) {
       existingScript.remove();
     } else {
-      // No request error - wait for timeout, then retry if needed
       try {
         return await waitForClerkWithTimeout(timeout);
       } catch {
-        // Timeout expired without success - remove script and retry
         existingScript.remove();
       }
     }
