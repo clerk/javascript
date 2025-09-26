@@ -152,10 +152,10 @@
     "yalc": "1.0.0-pre.53",
     "zx": "catalog:repo"
   },
-  "packageManager": "pnpm@10.17.0",
+  "packageManager": "pnpm@10.17.1",
   "engines": {
     "node": ">=18.17.0",
-    "pnpm": ">=10.17.0"
+    "pnpm": ">=10.17.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
