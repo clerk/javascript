@@ -14,7 +14,8 @@ export async function loader(args: Route.LoaderArgs) {
   const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.getUser(userId);
 
   return {
-    user,
+    firstName: user.firstName,
+    emailAddress: user.emailAddresses[0].emailAddress,
   };
 }
 
@@ -24,8 +25,8 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
       <h1>Protected</h1>
       <UserProfile />
       <ul>
-        <li>First name: {loaderData.user.firstName}</li>
-        <li>Email: {loaderData.user.emailAddresses[0].emailAddress}</li>
+        <li>First name: {loaderData.firstName}</li>
+        <li>Email: {loaderData.emailAddress}</li>
       </ul>
     </div>
   );
