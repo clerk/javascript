@@ -1,5 +1,6 @@
 packages:
   - 'packages/*'
+  - 'tools/*'
 
 minimumReleaseAge: 2880
 

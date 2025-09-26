@@ -40,6 +40,7 @@ testem.log
 /typings
 **/coverage/**
 *.tsbuildinfo
+.tmp
 
 # System Files
 .DS_Store
@@ -99,3 +100,10 @@ scripts/.env
 # typedoc
 .typedoc/docs
 .typedoc/docs.json
+
+# API Breakage Detection
+.api-snapshots/current/
+.api-snapshots/temp/
+.api-snapshots/.baseline-cache.json
+# Keep baseline snapshots in Git for CI
+!.api-snapshots/baseline/
