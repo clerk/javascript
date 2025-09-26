@@ -80,5 +80,4 @@ If you'd like to contribute in any way, please read [our contribution guidelines
 ## 📝 License
 
 This project is licensed under the **MIT license**.
-
 See [LICENSE](https://github.com/clerk/javascript/blob/main/LICENSE) for more information.
