@@ -100,7 +100,6 @@ export type FlowMetadata = {
     | 'apiKeys'
     | 'oauthConsent'
     | 'subscriptionDetails'
-    | 'subscriptionDetails'
     | 'tasks'
     | 'taskChooseOrganization';
   part?:

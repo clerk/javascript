@@ -34,8 +34,8 @@ const TaskChooseOrganizationInternal = () => {
 
   return (
     <Flow.Root flow='taskChooseOrganization'>
-      <Card.Root>
-        <Flow.Part part={hasExistingResources ? 'chooseOrganization' : 'createOrganization'}>
+      <Flow.Part part={hasExistingResources ? 'chooseOrganization' : 'createOrganization'}>
+        <Card.Root>
           <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
             {isLoading ? (
               <Flex
@@ -57,31 +57,31 @@ const TaskChooseOrganizationInternal = () => {
               <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
             )}
           </Card.Content>
-        </Flow.Part>
 
-        <Card.Footer>
-          <Card.Action
-            elementId='signOut'
-            gap={2}
-            justify='center'
-            sx={() => ({ width: '100%' })}
-          >
-            {identifier && (
-              <Card.ActionText
-                truncate
-                localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
-                  identifier,
-                })}
+          <Card.Footer>
+            <Card.Action
+              elementId='signOut'
+              gap={2}
+              justify='center'
+              sx={() => ({ width: '100%' })}
+            >
+              {identifier && (
+                <Card.ActionText
+                  truncate
+                  localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
+                    identifier,
+                  })}
+                />
+              )}
+              <Card.ActionLink
+                sx={() => ({ flexShrink: 0 })}
+                onClick={handleSignOut}
+                localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
               />
-            )}
-            <Card.ActionLink
-              sx={() => ({ flexShrink: 0 })}
-              onClick={handleSignOut}
-              localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
-            />
-          </Card.Action>
-        </Card.Footer>
-      </Card.Root>
+            </Card.Action>
+          </Card.Footer>
+        </Card.Root>
+      </Flow.Part>
     </Flow.Root>
   );
 };
