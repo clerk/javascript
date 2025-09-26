@@ -2,7 +2,7 @@ import type { OrganizationInvitationStatus, OrganizationMembershipRole } from '.
 import type { OrganizationInvitationJSON, PublicOrganizationDataJSON } from './JSON';
 
 /**
- * The Backend `OrganizationInvitation` object is similar to the [`OrganizationInvitation`](https://clerk.com/docs/references/javascript/types/organization-invitation) object as it's the model around an organization invitation. However, the Backend `OrganizationInvitation` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `OrganizationInvitation` object is similar to the [`OrganizationInvitation`](https://clerk.com/docs/reference/javascript/types/organization-invitation) object as it's the model around an organization invitation. However, the Backend `OrganizationInvitation` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class OrganizationInvitation {
   private _raw: OrganizationInvitationJSON | null = null;
@@ -17,7 +17,7 @@ export class OrganizationInvitation {
      */
     readonly id: string,
     /**
-     * The email address of the user who is invited to the [`Organization`](https://clerk.com/docs/references/backend/types/backend-organization).
+     * The email address of the user who is invited to the [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization).
      */
     readonly emailAddress: string,
     /**
@@ -29,7 +29,7 @@ export class OrganizationInvitation {
      */
     readonly roleName: string,
     /**
-     * The ID of the [`Organization`](https://clerk.com/docs/references/backend/types/backend-organization) that the user is invited to.
+     * The ID of the [`Organization`](https://clerk.com/docs/reference/backend/types/backend-organization) that the user is invited to.
      */
     readonly organizationId: string,
     /**
