@@ -88,6 +88,10 @@ function hasScriptRequestError(scriptUrl: string): boolean {
     if (scriptEntry.responseEnd > 0 && scriptEntry.responseStart > 0) {
       return true;
     }
+
+    if (scriptEntry.responseStatus === 0) {
+      return true;
+    }
   }
 
   return false;
