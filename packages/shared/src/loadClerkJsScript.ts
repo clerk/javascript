@@ -60,6 +60,40 @@ function isClerkProperlyLoaded(): boolean {
 }
 
 /**
+ * Checks if an existing script has a request error using Performance API.
+ *
+ * @param scriptUrl - The URL of the script to check.
+ * @returns True if the script has failed to load due to a network/HTTP error.
+ */
+function hasScriptRequestError(scriptUrl: string): boolean {
+  if (typeof window === 'undefined' || !window.performance) {
+    return false;
+  }
+
+  const entries = performance.getEntries() as PerformanceResourceTiming[];
+  const scriptEntry = entries.find(entry => entry.name === scriptUrl);
+
+  if (!scriptEntry) {
+    return false;
+  }
+
+  // transferSize === 0 with responseEnd === 0 indicates network failure
+  // transferSize === 0 with responseEnd > 0 might be a 4xx/5xx error or blocked request
+  if (scriptEntry.transferSize === 0 && scriptEntry.decodedBodySize === 0) {
+    // If there was no response at all, it's definitely an error
+    if (scriptEntry.responseEnd === 0) {
+      return true;
+    }
+    // If we got a response but no content, likely an HTTP error (4xx/5xx)
+    if (scriptEntry.responseEnd > 0 && scriptEntry.responseStart > 0) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Waits for Clerk to be properly loaded with a timeout mechanism.
  * Uses polling to check if Clerk becomes available within the specified timeout.
  *
@@ -117,11 +151,13 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
 }
 
 /**
- * Hotloads the Clerk JS script with robust failure detection.
+ * Hotloads the Clerk JS script with robust failure detection and retry logic.
  *
- * Uses a timeout-based approach to ensure absolute certainty about load success/failure.
- * If the script fails to load within the timeout period, or loads but doesn't create
- * a proper Clerk instance, the promise rejects with an error.
+ * For existing scripts:
+ * - If no request error detected: waits for timeout, then retries with loadScript if timeout expires
+ * - If request error detected: immediately retries with loadScript.
+ *
+ * For new scripts: uses loadScript which has built-in retry logic via the retry utility.
  *
  * @param opts - The options used to build the Clerk JS script URL and load the script.
  *               Must include a `publishableKey` if no existing script is found.
@@ -144,20 +180,35 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLS
     return null;
   }
 
-  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
-
-  if (existingScript) {
-    return waitForClerkWithTimeout(timeout);
-  }
-
   if (!opts?.publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
     return null;
   }
 
+  const scriptUrl = clerkJsScriptUrl(opts);
+  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
+
+  if (existingScript) {
+    // Check if the existing script has a request error
+    const hasError = hasScriptRequestError(scriptUrl);
+
+    if (hasError) {
+      // Request error detected - remove failed script and initiate loadScript immediately
+      existingScript.remove();
+    } else {
+      // No request error - wait for timeout, then retry if needed
+      try {
+        return await waitForClerkWithTimeout(timeout);
+      } catch {
+        // Timeout expired without success - remove script and retry
+        existingScript.remove();
+      }
+    }
+  }
+
   const loadPromise = waitForClerkWithTimeout(timeout);
 
-  loadScript(clerkJsScriptUrl(opts), {
+  loadScript(scriptUrl, {
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
