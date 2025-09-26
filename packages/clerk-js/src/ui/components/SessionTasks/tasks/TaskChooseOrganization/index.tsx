@@ -33,31 +33,29 @@ const TaskChooseOrganizationInternal = () => {
   const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
   return (
-    <Flow.Root flow='taskChooseOrganization'>
+    <Flow.Part part='taskChooseOrganization'>
       <Card.Root>
-        <Flow.Part part={hasExistingResources ? 'chooseOrganization' : 'createOrganization'}>
-          <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
-            {isLoading ? (
-              <Flex
-                direction={'row'}
-                align={'center'}
-                justify={'center'}
-                sx={t => ({
-                  height: '100%',
-                  minHeight: t.sizes.$100,
-                })}
-              >
-                <Spinner
-                  size={'lg'}
-                  colorScheme={'primary'}
-                  elementDescriptor={descriptors.spinner}
-                />
-              </Flex>
-            ) : (
-              <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
-            )}
-          </Card.Content>
-        </Flow.Part>
+        <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
+          {isLoading ? (
+            <Flex
+              direction={'row'}
+              align={'center'}
+              justify={'center'}
+              sx={t => ({
+                height: '100%',
+                minHeight: t.sizes.$100,
+              })}
+            >
+              <Spinner
+                size={'lg'}
+                colorScheme={'primary'}
+                elementDescriptor={descriptors.spinner}
+              />
+            </Flex>
+          ) : (
+            <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
+          )}
+        </Card.Content>
 
         <Card.Footer>
           <Card.Action
@@ -82,7 +80,7 @@ const TaskChooseOrganizationInternal = () => {
           </Card.Action>
         </Card.Footer>
       </Card.Root>
-    </Flow.Root>
+    </Flow.Part>
   );
 };
 

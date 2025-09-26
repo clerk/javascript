@@ -51,7 +51,7 @@ function SessionTasksRoutes(): JSX.Element {
   const ctx = useSessionTasksContext();
 
   return (
-    <Flow.Root flow='tasks'>
+    <Flow.Root flow='sessionTasks'>
       <Switch>
         <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
           <TaskChooseOrganizationContext.Provider
