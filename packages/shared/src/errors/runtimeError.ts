@@ -18,7 +18,12 @@ export class ClerkRuntimeError extends Error {
    */
   code: string;
 
-  constructor(message: string, { code }: { code: string }) {
+  /**
+   * The original error that was caught to throw an instance of ClerkRuntimeError.
+   */
+  cause?: Error;
+
+  constructor(message: string, { code, cause }: { code: string; cause?: Error }) {
     const prefix = '🔒 Clerk:';
     const regex = new RegExp(prefix.replace(' ', '\\s*'), 'i');
     const sanitized = message.replace(regex, '');
@@ -27,6 +32,7 @@ export class ClerkRuntimeError extends Error {
 
     Object.setPrototypeOf(this, ClerkRuntimeError.prototype);
 
+    this.cause = cause;
     this.code = code;
     this.message = _message;
     this.clerkRuntimeError = true;
