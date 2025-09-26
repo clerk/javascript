@@ -221,6 +221,7 @@ export interface FeatureResource extends ClerkResource {
  * @inline
  */
 export type BillingPaymentMethodStatus = 'active' | 'expired' | 'disconnected';
+// TODO(@COMMERCE): Is expired returned from FAPI ?
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -283,9 +284,9 @@ export interface BillingPaymentMethodResource extends ClerkResource {
    */
   last4: string;
   /**
-   * The type of payment method. For example, `'card'` or `'bank_account'`.
+   * The type of payment method. For example, `'card'` or `'link'`.
    */
-  paymentMethod: string;
+  paymentType: 'card' | 'link';
   /**
    * The brand or type of card. For example, `'visa'` or `'mastercard'`.
    */
@@ -694,10 +695,10 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 }>;
 
 /**
- * The `confirm()` method accepts the following parameters. **Only one of `paymentSourceId`, `paymentToken`, or `useTestCard` should be provided.**
+ * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**
  *
  * @unionReturnHeadings
- * ["paymentSourceId", "paymentToken", "useTestCard"]
+ * ["paymentMethodId", "paymentToken", "useTestCard"]
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -706,7 +707,7 @@ export type ConfirmCheckoutParams =
       /**
        * The ID of a saved payment source to use for this checkout.
        */
-      paymentSourceId?: string;
+      paymentMethodId?: string;
     }
   | {
       /**

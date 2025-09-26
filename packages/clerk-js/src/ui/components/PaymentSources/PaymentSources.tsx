@@ -63,7 +63,7 @@ const RemoveScreen = ({
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
-    `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
+    `${paymentSource.paymentType === 'card' ? paymentSource.cardType : paymentSource.paymentType} ${paymentSource.paymentType === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
   );
 
   if (!ref.current) {

@@ -439,9 +439,8 @@ export const CheckoutComplete = () => {
               text={
                 totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? paymentMethod
-                    ? // is this the right place?
-                      paymentMethod.paymentMethod !== 'card'
-                      ? `${capitalize(paymentMethod.paymentMethod)}`
+                    ? paymentMethod.paymentType !== 'card'
+                      ? `${capitalize(paymentMethod.paymentType)}`
                       : `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
                     : '–'
                   : planPeriodStart

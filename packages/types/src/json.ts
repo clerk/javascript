@@ -675,7 +675,7 @@ export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
   object: 'commerce_payment_method';
   id: string;
   last4: string;
-  payment_method: string;
+  payment_type: 'card' | 'link';
   card_type: string;
   is_default: boolean;
   is_removable: boolean;

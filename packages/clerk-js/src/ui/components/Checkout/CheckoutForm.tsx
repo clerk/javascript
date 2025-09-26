@@ -23,6 +23,8 @@ type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
+const HIDDEN_INPUT_NAME = 'payment_method_id';
+
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
@@ -163,10 +165,10 @@ const useCheckoutMutations = () => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    const paymentSourceId = data.get('payment_source_id') as string;
+    const paymentMethodId = data.get(HIDDEN_INPUT_NAME) as string;
 
     return confirmCheckout({
-      paymentSourceId,
+      paymentMethodId,
     });
   };
 
@@ -382,8 +384,8 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     const options = useMemo(() => {
       return paymentSources.map(source => {
         const label =
-          source.paymentMethod !== 'card'
-            ? `${capitalize(source.paymentMethod)}`
+          source.paymentType !== 'card'
+            ? `${capitalize(source.paymentType)}`
             : `${capitalize(source.cardType)} ⋯ ${source.last4}`;
 
         return {
@@ -417,7 +419,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           >
             {/*Store value inside an input in order to be accessible as form data*/}
             <input
-              name='payment_source_id'
+              name={HIDDEN_INPUT_NAME}
               type='hidden'
               value={selectedPaymentSource?.id}
             />
@@ -439,7 +441,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           </Select>
         ) : (
           <input
-            name='payment_source_id'
+            name={HIDDEN_INPUT_NAME}
             type='hidden'
             value={selectedPaymentSource?.id}
           />

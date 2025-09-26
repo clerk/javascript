@@ -14,7 +14,7 @@ import { BaseResource, DeletedObject } from './internal';
 export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
   id!: string;
   last4!: string;
-  paymentMethod!: string;
+  paymentType!: 'card' | 'link';
   cardType!: string;
   isDefault!: boolean;
   isRemovable!: boolean;
@@ -33,7 +33,7 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
 
     this.id = data.id;
     this.last4 = data.last4;
-    this.paymentMethod = data.payment_method;
+    this.paymentType = data.payment_type;
     this.cardType = data.card_type;
     this.isDefault = data.is_default;
     this.isRemovable = data.is_removable;
