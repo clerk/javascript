@@ -180,6 +180,7 @@ export const OTPCodeControl = () => {
       sx={{ position: 'relative' }}
     >
       <OTPInput
+        autoFocus
         aria-label='Enter verification code'
         aria-required
         maxLength={length}
