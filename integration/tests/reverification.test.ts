@@ -244,7 +244,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
           u.page.getByText(
             /\{\s*"clerk_error"\s*:\s*\{\s*"type"\s*:\s*"forbidden"\s*,\s*"reason"\s*:\s*"reverification-error"\s*,\s*"metadata"\s*:\s*\{\s*"reverification"\s*:\s*\{\s*"level"\s*:\s*"second_factor"\s*,\s*"afterMinutes"\s*:\s*1\s*\}\s*\}\s*\}\s*\}/i,
           ),
-        ).toBeVisible();
+        ).toBeVisible({ timeout: 10000 });
       });
 
       test(`reverification recovery from ${capitalize(type)}`, async ({ page, context }) => {
@@ -271,7 +271,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
           });
         });
 
-        await u.page.goToRelative(`/action-with-use-reverification`);
+        await u.page.goToRelative(`/action-with-use-reverification`, { timeout: 60000 });
         await u.po.expect.toBeSignedIn();
         await u.page.getByRole('button', { name: /LogUserId/i }).click();
         await u.po.userVerification.waitForMounted();

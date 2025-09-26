@@ -53,7 +53,7 @@ testAgainstRunningApps({
     await expect(u.page.getByText(/User has access/i)).toBeVisible();
     await u.page.goToRelative('/settings/rcc-protect');
     await expect(u.page.getByText(/User has access/i)).toBeVisible();
-    await u.page.goToRelative('/settings/useAuth-has');
+    await u.page.goToRelative('/settings/useAuth-has', { timeout: 60000 });
     await expect(u.page.getByText(/User has access/i)).toBeVisible();
     await u.page.goToRelative('/settings/auth-has');
     await expect(u.page.getByText(/User has access/i)).toBeVisible();

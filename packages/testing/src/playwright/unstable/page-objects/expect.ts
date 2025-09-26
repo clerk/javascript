@@ -21,10 +21,14 @@ export const createExpectPageObject = ({ page }: { page: EnhancedPage }) => {
         { timeout: args?.timeOut },
       );
     },
-    toBeSignedIn: async () => {
-      return page.waitForFunction(() => {
-        return !!window.Clerk?.user;
-      });
+    toBeSignedIn: async (args?: { timeOut?: number }) => {
+      return page.waitForFunction(
+        () => {
+          return !!window.Clerk?.user;
+        },
+        null,
+        { timeout: args?.timeOut },
+      );
     },
     toBeSignedInAsActor: async () => {
       return page.waitForFunction(() => {

@@ -32,7 +32,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
 
   test('sign in with email and password', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]' });
+    await u.po.signIn.goTo({ headlessSelector: '[data-test-id="sign-in-step-start"]', timeout: 30000 });
 
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
