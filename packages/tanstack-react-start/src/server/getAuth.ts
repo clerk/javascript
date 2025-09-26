@@ -1,10 +1,10 @@
 import type { AuthenticateRequestOptions, GetAuthFn } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
-import { getContext } from '@tanstack/react-start/server';
+import { getGlobalStartContext } from '@tanstack/react-start';
 
 import { errorThrower } from '../utils';
-import { clerkHandlerNotConfigured, noFetchFnCtxPassedInGetAuth } from '../utils/errors';
+import { clerkMiddlewareNotConfigured, noFetchFnCtxPassedInGetAuth } from '../utils/errors';
 
 type GetAuthOptions = PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'>;
 
@@ -13,13 +13,14 @@ export const getAuth: GetAuthFn<Request, true> = (async (request: Request, opts?
     return errorThrower.throw(noFetchFnCtxPassedInGetAuth);
   }
 
-  const authObjectFn = getContext('auth');
+  // @ts-expect-error: Untyped internal Clerk start context
+  const authObjectFn = getGlobalStartContext().auth;
 
   if (!authObjectFn) {
-    return errorThrower.throw(clerkHandlerNotConfigured);
+    return errorThrower.throw(clerkMiddlewareNotConfigured);
   }
 
-  // We're keeping it a promise for now to minimize breaking changes
+  // We're keeping it a promise for now for future changes
   const authObject = await Promise.resolve(authObjectFn({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut }));
 
   return getAuthObjectForAcceptedToken({ authObject, acceptsToken: opts?.acceptsToken });
