@@ -1,9 +1,9 @@
 import type {
-  BillingInitializedPaymentSourceJSON,
-  BillingInitializedPaymentSourceResource,
-  BillingPaymentSourceJSON,
-  BillingPaymentSourceResource,
-  BillingPaymentSourceStatus,
+  BillingInitializedPaymentMethodJSON,
+  BillingInitializedPaymentMethodResource,
+  BillingPaymentMethodJSON,
+  BillingPaymentMethodResource,
+  BillingPaymentMethodStatus,
   DeletedObjectJSON,
   MakeDefaultPaymentSourceParams,
   RemovePaymentSourceParams,
@@ -11,22 +11,22 @@ import type {
 
 import { BaseResource, DeletedObject } from './internal';
 
-export class BillingPaymentSource extends BaseResource implements BillingPaymentSourceResource {
+export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
   id!: string;
   last4!: string;
   paymentMethod!: string;
   cardType!: string;
   isDefault!: boolean;
   isRemovable!: boolean;
-  status!: BillingPaymentSourceStatus;
+  status!: BillingPaymentMethodStatus;
   walletType: string | undefined;
 
-  constructor(data: BillingPaymentSourceJSON) {
+  constructor(data: BillingPaymentMethodJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: BillingPaymentSourceJSON | null): this {
+  protected fromJSON(data: BillingPaymentMethodJSON | null): this {
     if (!data) {
       return this;
     }
@@ -71,17 +71,17 @@ export class BillingPaymentSource extends BaseResource implements BillingPayment
   }
 }
 
-export class BillingInitializedPaymentSource extends BaseResource implements BillingInitializedPaymentSourceResource {
+export class BillingInitializedPaymentMethod extends BaseResource implements BillingInitializedPaymentMethodResource {
   externalClientSecret!: string;
   externalGatewayId!: string;
   paymentMethodOrder!: string[];
 
-  constructor(data: BillingInitializedPaymentSourceJSON) {
+  constructor(data: BillingInitializedPaymentMethodJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: BillingInitializedPaymentSourceJSON | null): this {
+  protected fromJSON(data: BillingInitializedPaymentMethodJSON | null): this {
     if (!data) {
       return this;
     }

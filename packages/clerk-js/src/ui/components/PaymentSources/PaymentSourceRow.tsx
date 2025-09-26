@@ -1,9 +1,9 @@
-import type { BillingPaymentSourceResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { CreditCard, GenericPayment } from '../../icons';
 
-export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaymentSourceResource }) => {
+export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaymentMethodResource }) => {
   return (
     <Flex
       sx={{ overflow: 'hidden' }}

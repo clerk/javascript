@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { BillingPaymentSourceResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/types';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -26,7 +26,7 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
 
   const onAddPaymentSourceSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
     const resource = subscriberType === 'organization' ? clerk?.organization : clerk.user;
-    await resource?.addPaymentSource(context);
+    await resource?.addPaymentMethod(context);
     onSuccess();
     close();
     return Promise.resolve();
@@ -54,7 +54,7 @@ const RemoveScreen = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: BillingPaymentSourceResource;
+  paymentSource: BillingPaymentMethodResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -193,7 +193,7 @@ const PaymentSourceMenu = ({
   paymentSource,
   revalidate,
 }: {
-  paymentSource: BillingPaymentSourceResource;
+  paymentSource: BillingPaymentMethodResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();
