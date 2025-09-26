@@ -60,19 +60,19 @@ type WithReverification<T> = T & {
 export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -102,19 +102,19 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 type CheckAuthorizationParams = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -154,19 +154,19 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/organizations/roles-permissions) to check for.
+       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/billing/overview) to check for.
+       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/billing/overview) to check for.
+       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -196,14 +196,14 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
  *
  * The `Session` object includes methods for recording session activity and ending the session client-side. For security reasons, sessions can also expire server-side.
  *
- * As soon as a [`User`](https://clerk.com/docs/references/javascript/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/references/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
+ * As soon as a [`User`](https://clerk.com/docs/reference/javascript/user) signs in, Clerk creates a `Session` for the current [`Client`](https://clerk.com/docs/reference/javascript/client). Clients can have more than one sessions at any point in time, but only one of those sessions will be **active**.
  *
- * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/authentication/configuration/session-options#multi-session-applications).
+ * In certain scenarios, a session might be replaced by another one. This is often the case with [multi-session applications](https://clerk.com/docs/guides/secure/session-options#multi-session-applications).
  *
  * All sessions that are **expired**, **removed**, **replaced**, **ended** or **abandoned** are not considered valid.
  *
  * > [!NOTE]
- * > For more information regarding the different session states, see the [guide on session management](https://clerk.com/docs/authentication/configuration/session-options).
+ * > For more information regarding the different session states, see the [guide on session management](https://clerk.com/docs/guides/secure/session-options).
  */
 export interface SessionResource extends ClerkResource {
   /**
