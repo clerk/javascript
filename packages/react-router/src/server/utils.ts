@@ -40,10 +40,19 @@ export function assertValidHandlerResult(val: any, error?: string): asserts val 
   }
 }
 
+/**
+ * `get` and `set` properties will only be available if v8_middleware flag is enabled
+ * See: https://reactrouter.com/upgrading/future#futurev8_middleware
+ */
+export const IsOptIntoMiddleware = (context: AppLoadContext) => {
+  return 'get' in context && 'set' in context;
+};
+
 export const injectRequestStateIntoResponse = async (
   response: Response,
   requestState: RequestStateWithRedirectUrls,
   context: AppLoadContext,
+  includeClerkHeaders = false,
 ) => {
   const clone = new Response(response.body, response);
   const data = await clone.json();
@@ -52,9 +61,13 @@ export const injectRequestStateIntoResponse = async (
 
   // set the correct content-type header in case the user returned a `Response` directly
   clone.headers.set(constants.Headers.ContentType, constants.ContentTypes.Json);
-  headers.forEach((value, key) => {
-    clone.headers.append(key, value);
-  });
+
+  // Only add Clerk headers if requested (for legacy mode)
+  if (includeClerkHeaders) {
+    headers.forEach((value, key) => {
+      clone.headers.append(key, value);
+    });
+  }
 
   return Response.json({ ...(data || {}), ...clerkState }, clone);
 };

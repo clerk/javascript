@@ -1,5 +1,12 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`deprecated ssr public exports > should not change unexpectedly 1`] = `
+[
+  "getAuth",
+  "rootAuthLoader",
+]
+`;
+
 exports[`root public exports > should not change unexpectedly 1`] = `
 [
   "APIKeys",
@@ -54,9 +61,13 @@ exports[`root public exports > should not change unexpectedly 1`] = `
 ]
 `;
 
-exports[`ssr public exports > should not change unexpectedly 1`] = `
+exports[`server public exports > should not change unexpectedly 1`] = `
 [
+  "clerkClient",
+  "clerkMiddleware",
+  "createClerkClient",
   "getAuth",
   "rootAuthLoader",
+  "verifyToken",
 ]
 `;
