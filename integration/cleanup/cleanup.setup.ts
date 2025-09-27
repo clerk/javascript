@@ -143,23 +143,25 @@ setup('cleanup instances ', async () => {
       }
 
       // Report instance results
+      const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
       if (instanceSummary.usersDeleted > 0 || instanceSummary.orgsDeleted > 0) {
         console.log(
-          `✅ ${entry.instanceName}: ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
+          `✅ ${entry.instanceName} (${maskedKey}): ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
         );
       } else {
-        console.log(`✅ ${entry.instanceName}: clean`);
+        console.log(`✅ ${entry.instanceName} (${maskedKey}): clean`);
       }
 
       if (instanceSummary.errors.length > 0) {
         instanceSummary.status = 'error';
       }
     } catch (error) {
+      const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
       if (isClerkAPIResponseError(error) && (error.status === 401 || error.status === 403)) {
-        console.log(`🔒 ${entry.instanceName}: Unauthorized access`);
+        console.log(`🔒 ${entry.instanceName} (${maskedKey}): Unauthorized access`);
         instanceSummary.status = 'unauthorized';
       } else {
-        console.log(`❌ ${entry.instanceName}: ${error.message}`);
+        console.log(`❌ ${entry.instanceName} (${maskedKey}): ${error.message}`);
         instanceSummary.errors.push(error.message);
         instanceSummary.status = 'error';
       }
