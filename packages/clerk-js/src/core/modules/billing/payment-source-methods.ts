@@ -9,14 +9,13 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import { BaseResource, BillingInitializedPaymentSource, BillingPaymentSource } from '../../resources/internal';
+import { Billing } from './namespace';
 
 export const initializePaymentSource = async (params: InitializePaymentSourceParams) => {
   const { orgId, ...rest } = params;
   const json = (
     await BaseResource._fetch({
-      path: orgId
-        ? `/organizations/${orgId}/commerce/payment_sources/initialize`
-        : `/me/commerce/payment_sources/initialize`,
+      path: Billing.path(`/payment_sources/initialize`, { orgId }),
       method: 'POST',
       body: rest as any,
     })
@@ -29,7 +28,7 @@ export const addPaymentSource = async (params: AddPaymentSourceParams) => {
 
   const json = (
     await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/payment_sources` : `/me/commerce/payment_sources`,
+      path: Billing.path(`/payment_sources`, { orgId }),
       method: 'POST',
       body: rest as any,
     })
@@ -41,7 +40,7 @@ export const getPaymentSources = async (params: GetPaymentSourcesParams) => {
   const { orgId, ...rest } = params;
 
   return await BaseResource._fetch({
-    path: orgId ? `/organizations/${orgId}/commerce/payment_sources` : `/me/commerce/payment_sources`,
+    path: Billing.path(`/payment_sources`, { orgId }),
     method: 'GET',
     search: convertPageToOffsetSearchParams(rest),
   }).then(res => {
