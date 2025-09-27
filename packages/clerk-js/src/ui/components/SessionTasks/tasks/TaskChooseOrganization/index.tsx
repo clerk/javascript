@@ -33,7 +33,7 @@ const TaskChooseOrganizationInternal = () => {
   const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
   return (
-    <Flow.Root flow='taskChooseOrganization'>
+    <Flow.Part part='taskChooseOrganization'>
       <Card.Root>
         <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
           {isLoading ? (
@@ -80,7 +80,7 @@ const TaskChooseOrganizationInternal = () => {
           </Card.Action>
         </Card.Footer>
       </Card.Root>
-    </Flow.Root>
+    </Flow.Part>
   );
 };
 
