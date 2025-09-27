@@ -360,7 +360,7 @@ jobs:
         run: |
           pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
-          pnpm add @clerk/backend@$BACKEND_VERSION
+          pnpm add @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
