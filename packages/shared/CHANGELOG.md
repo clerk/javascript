@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.27.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Improve error handling when loading clerk-js. ([#6856](https://github.com/clerk/javascript/pull/6856)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Increase sampling for high-signal auth components on mount. ([#6858](https://github.com/clerk/javascript/pull/6858)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4)]:
+  - @clerk/types@4.89.0
+
 ## 3.26.1
 
 ### Patch Changes

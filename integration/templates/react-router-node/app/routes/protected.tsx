@@ -1,7 +1,6 @@
 import { redirect } from 'react-router';
 import { UserProfile } from '@clerk/react-router';
-import { getAuth } from '@clerk/react-router/ssr.server';
-import { createClerkClient } from '@clerk/react-router/api.server';
+import { clerkClient, getAuth } from '@clerk/react-router/server';
 import type { Route } from './+types/profile';
 
 export async function loader(args: Route.LoaderArgs) {
@@ -11,7 +10,7 @@ export async function loader(args: Route.LoaderArgs) {
     return redirect('/sign-in');
   }
 
-  const user = await createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY }).users.getUser(userId);
+  const user = await clerkClient(args).users.getUser(userId);
 
   return {
     firstName: user.firstName,

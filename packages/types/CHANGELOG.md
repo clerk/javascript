@@ -1,5 +1,13 @@
 # Change Log
 
+## 4.89.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add new <UserAvatar /> component ([#6808](https://github.com/clerk/javascript/pull/6808)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.88.0
 
 ### Minor Changes
