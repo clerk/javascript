@@ -1,4 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { isStaging } from '@clerk/shared/utils';
 import { test as setup } from '@playwright/test';
@@ -41,39 +42,68 @@ setup('cleanup instances ', async () => {
       status: 'success' as 'success' | 'error' | 'unauthorized',
     };
 
-    const clerkClient = createClerkClient({ secretKey: entry.secretKey, apiUrl: entry.apiUrl });
-
     try {
-      const { data: usersWithEmail } = await clerkClient.users.getUserList({
-        orderBy: '-created_at',
-        query: 'clerkcookie',
-        limit: 150,
-      });
+      const clerkClient = createClerkClient({ secretKey: entry.secretKey, apiUrl: entry.apiUrl });
 
-      const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
-        orderBy: '-created_at',
-        query: '55501',
-        limit: 150,
-      });
-
-      const allUsersMap = new Map();
-      [...usersWithEmail, ...usersWithPhoneNumber].forEach(user => {
-        allUsersMap.set(user.id, user);
-      });
-      const users = Array.from(allUsersMap.values());
-
-      const { data: orgs } = await clerkClient.organizations
-        .getOrganizationList({
+      // Get users with error handling
+      let users: any[] = [];
+      try {
+        const { data: usersWithEmail } = await clerkClient.users.getUserList({
+          orderBy: '-created_at',
+          query: 'clerkcookie',
           limit: 150,
-        })
-        .catch(() => ({ data: [] }));
+        });
+
+        const { data: usersWithPhoneNumber } = await clerkClient.users.getUserList({
+          orderBy: '-created_at',
+          query: '55501',
+          limit: 150,
+        });
+
+        // Deduplicate users by ID
+        const allUsersMap = new Map();
+        [...usersWithEmail, ...usersWithPhoneNumber].forEach(user => {
+          allUsersMap.set(user.id, user);
+        });
+        users = Array.from(allUsersMap.values());
+      } catch (error) {
+        instanceSummary.errors.push(`Failed to get users: ${error.message}`);
+        console.error(`Error getting users for ${entry.instanceName}:`, error);
+        users = []; // Continue with empty users list
+      }
+
+      // Get organizations with error handling
+      let orgs: any[] = [];
+      try {
+        const { data: orgsData } = await clerkClient.organizations.getOrganizationList({
+          limit: 150,
+        });
+        orgs = orgsData;
+      } catch (error) {
+        // Treat 404 (not found) and 403 (forbidden) as "no orgs"
+        // 404 = no organizations exist, 403 = no permission to access organizations
+        if (isClerkAPIResponseError(error) && (error.status === 404 || error.status === 403)) {
+          orgs = [];
+        } else {
+          instanceSummary.errors.push(`Failed to get organizations: ${error.message}`);
+          console.error(`Error getting organizations for ${entry.instanceName}:`, error);
+          orgs = []; // Continue with empty orgs list
+        }
+      }
 
       const usersToDelete = batchElements(skipObjectsThatWereCreatedWithinTheLast10Minutes(users), 5);
       const orgsToDelete = batchElements(skipObjectsThatWereCreatedWithinTheLast10Minutes(orgs), 5);
 
+      // Delete users with tracking
       for (const batch of usersToDelete) {
+        console.log(`Starting user deletion batch...`);
         await Promise.all(
           batch.map(user => {
+            console.log(
+              `Cleaning up user ${user.id} (${user.emailAddresses?.[0]?.emailAddress || user.phoneNumbers?.[0]?.phoneNumber}) (${new Date(
+                user.createdAt,
+              ).toISOString()})`,
+            );
             return clerkClient.users
               .deleteUser(user.id)
               .then(() => {
@@ -82,6 +112,7 @@ setup('cleanup instances ', async () => {
               .catch(error => {
                 if (error.status !== 404) {
                   instanceSummary.errors.push(`User ${user.id}: ${error.message}`);
+                  console.error(`Error deleting user ${user.id}:`, error);
                 }
               });
           }),
@@ -89,9 +120,12 @@ setup('cleanup instances ', async () => {
         await new Promise(r => setTimeout(r, 1000));
       }
 
+      // Delete organizations with tracking
       for (const batch of orgsToDelete) {
+        console.log(`Starting organization deletion batch...`);
         await Promise.all(
           batch.map(org => {
+            console.log(`Cleaning up org ${org.id} (${org.name}) (${new Date(org.createdAt).toISOString()})`);
             return clerkClient.organizations
               .deleteOrganization(org.id)
               .then(() => {
@@ -100,6 +134,7 @@ setup('cleanup instances ', async () => {
               .catch(error => {
                 if (error.status !== 404) {
                   instanceSummary.errors.push(`Org ${org.id}: ${error.message}`);
+                  console.error(`Error deleting org ${org.id}:`, error);
                 }
               });
           }),
@@ -107,24 +142,24 @@ setup('cleanup instances ', async () => {
         await new Promise(r => setTimeout(r, 1000));
       }
 
-      const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
+      // Report instance results
       if (instanceSummary.usersDeleted > 0 || instanceSummary.orgsDeleted > 0) {
         console.log(
-          `✅ ${entry.instanceName} (${maskedKey}): ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
+          `✅ ${entry.instanceName}: ${instanceSummary.usersDeleted} users, ${instanceSummary.orgsDeleted} orgs deleted`,
         );
       } else {
-        console.log(`✅ ${entry.instanceName} (${maskedKey}): clean`);
+        console.log(`✅ ${entry.instanceName}: clean`);
       }
+
       if (instanceSummary.errors.length > 0) {
         instanceSummary.status = 'error';
       }
     } catch (error) {
-      const maskedKey = entry.secretKey.replace(/(sk_(test|live)_)(.+)(...)/, '$1***$4');
-      if (error.status === 401 || error.status === 403) {
-        console.log(`🔒 ${entry.instanceName} (${maskedKey}): Unauthorized access`);
+      if (isClerkAPIResponseError(error) && (error.status === 401 || error.status === 403)) {
+        console.log(`🔒 ${entry.instanceName}: Unauthorized access`);
         instanceSummary.status = 'unauthorized';
       } else {
-        console.log(`❌ ${entry.instanceName} (${maskedKey}): ${error.message}`);
+        console.log(`❌ ${entry.instanceName}: ${error.message}`);
         instanceSummary.errors.push(error.message);
         instanceSummary.status = 'error';
       }
@@ -133,6 +168,7 @@ setup('cleanup instances ', async () => {
     cleanupSummary.push(instanceSummary);
   }
 
+  // Final summary
   const totalUsersDeleted = cleanupSummary.reduce((sum, instance) => sum + instance.usersDeleted, 0);
   const totalOrgsDeleted = cleanupSummary.reduce((sum, instance) => sum + instance.orgsDeleted, 0);
   const errorInstances = cleanupSummary.filter(instance => instance.status === 'error').length;
@@ -141,6 +177,20 @@ setup('cleanup instances ', async () => {
   console.log(`\n📊 Summary: ${totalUsersDeleted} users, ${totalOrgsDeleted} orgs deleted`);
   if (errorInstances > 0 || unauthorizedInstances > 0) {
     console.log(`   ${errorInstances} errors, ${unauthorizedInstances} unauthorized`);
+  }
+
+  // Detailed error report
+  const instancesWithErrors = cleanupSummary.filter(instance => instance.errors.length > 0);
+  if (instancesWithErrors.length > 0) {
+    console.log('\n=== DETAILED ERROR REPORT ===');
+    instancesWithErrors.forEach(instance => {
+      console.log(`\n${instance.instanceName}:`);
+      instance.errors.forEach(error => console.log(`  - ${error}`));
+    });
+  }
+
+  if (errorInstances === 0 && unauthorizedInstances === 0) {
+    console.log('\n✅ Cleanup completed successfully with no errors');
   }
 });
 
