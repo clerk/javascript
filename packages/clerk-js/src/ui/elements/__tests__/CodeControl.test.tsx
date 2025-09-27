@@ -5,7 +5,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { bindCreateFixtures } from '../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+
 import { OTPCodeControl, OTPRoot, useFieldOTP } from '../CodeControl';
 import { withCardStateProvider } from '../contexts';
 

@@ -1,10 +1,11 @@
 import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
+import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
+
 import { eventBus } from '../../events';
 import { createFapiClient } from '../../fapiClient';
 import { SessionTokenCache } from '../../tokenCache';
-import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '../../vitest/fixtures';
 import { BaseResource, Organization, Session } from '../internal';
 
 const baseFapiClientOptions = {

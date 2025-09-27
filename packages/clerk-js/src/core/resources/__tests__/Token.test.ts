@@ -1,9 +1,10 @@
 import type { InstanceType } from '@clerk/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
+import { mockFetch, mockNetworkFailedFetch } from '@/test/core-fixtures';
+
 import { SUPPORTED_FAPI_VERSION } from '../../constants';
 import { createFapiClient } from '../../fapiClient';
-import { mockFetch, mockNetworkFailedFetch } from '../../vitest/fixtures';
 import { BaseResource } from '../internal';
 import { Token } from '../Token';
 

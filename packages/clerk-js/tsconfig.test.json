@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "sourceMap": true
-  },
-  "include": ["src/**/*", "./jest.setup-after-env.ts"],
-  "exclude": ["node_modules"]
-}

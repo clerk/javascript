@@ -192,4 +192,4 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
   };
 }
 
-export { createCheckoutManager, type CheckoutKey };
+export { createCheckoutManager, type __experimental_CheckoutCacheState as CheckoutCacheState, type CheckoutKey };
