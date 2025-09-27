@@ -48,10 +48,7 @@ export function getResponseClerkState(requestState: RequestState, additionalStat
       additionalStateOptions.signUpFallbackRedirectUrl || getEnvVariable('CLERK_SIGN_UP_FALLBACK_REDIRECT_URL') || '',
   });
 
-  return {
-    clerkInitialState,
-    headers: requestState.headers,
-  };
+  return clerkInitialState;
 }
 
 /**
