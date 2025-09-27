@@ -348,15 +348,28 @@ jobs:
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
+      # - name: Configure pnpm to ignore minimum release age for @clerk packages
+      #   if: ${{ steps.task-status.outputs.affected == '1' }}
+      #   run: |
+      #     echo "minimum-release-age-exclude=@clerk/*" >> .npmrc
+      #     pnpm config set minimum-release-age-exclude @clerk/*
+
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
-        run: pnpm init && pnpm add @clerk/backend
+        run: |
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
-        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/clerk-js
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
