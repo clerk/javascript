@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.0.1
+
+### Patch Changes
+
+- Set correct minimum `react-router` version in README ([#6866](https://github.com/clerk/javascript/pull/6866)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.0.0
 
 ### Major Changes
