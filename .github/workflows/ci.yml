@@ -358,7 +358,7 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
         run: |
-          pnpm init --yes
+          pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/backend@$BACKEND_VERSION
 
@@ -367,7 +367,7 @@ jobs:
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
-          pnpm init --yes
+          pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/clerk-js
 
