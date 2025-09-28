@@ -64,7 +64,7 @@ export const ptBR: LocalizationResource = {
   badge__requiresAction: 'Requer ação',
   badge__startsAt: "Inicia {{ date | shortDate('pt-BR') }}",
   badge__thisDevice: 'Este dispositivo',
-  badge__trialEndsAt: 'Teste termina em {{ date | shortDate('pt-BR') }}',
+  badge__trialEndsAt: "Teste termina em {{ date | shortDate('pt-BR') }}",
   badge__unverified: 'Não verificado',
   badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
@@ -77,7 +77,7 @@ export const ptBR: LocalizationResource = {
     billedAnnually: 'Cobrança anual',
     billedMonthlyOnly: 'Apenas cobrança mensal',
     cancelFreeTrial: 'Cancelar teste gratuito',
-    cancelFreeTrialAccessUntil: 'Cancelar acesso ao teste gratuito até {{ date | longDate('pt-BR') }}',
+    cancelFreeTrialAccessUntil: "Cancelar acesso ao teste gratuito até {{ date | longDate('pt-BR') }}",
     cancelFreeTrialTitle: 'Cancelar teste gratuito?',
     cancelSubscription: 'Cancelar assinatura',
     cancelSubscriptionAccessUntil:
@@ -885,7 +885,8 @@ export const ptBR: LocalizationResource = {
     organization_minimum_permissions_needed:
       'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
     organization_not_found_or_unauthorized: 'Organização não encontrada ou não autorizada',
-    organization_not_found_or_unauthorized_with_create_organization_disabled: 'Organização não encontrada ou não autorizada, a criação de organizações está desabilitada',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'Organização não encontrada ou não autorizada, a criação de organizações está desabilitada',
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
