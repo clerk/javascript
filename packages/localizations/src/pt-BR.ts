@@ -77,7 +77,7 @@ export const ptBR: LocalizationResource = {
     billedAnnually: 'Cobrança anual',
     billedMonthlyOnly: 'Apenas cobrança mensal',
     cancelFreeTrial: 'Cancelar teste gratuito',
-    cancelFreeTrialAccessUntil: 'Cancelar acesso ao teste gratuito até',
+    cancelFreeTrialAccessUntil: "Cancelar acesso ao teste gratuito até {{ date | longDate('pt-BR') }}",
     cancelFreeTrialTitle: 'Cancelar teste gratuito?',
     cancelSubscription: 'Cancelar assinatura',
     cancelSubscriptionAccessUntil:
