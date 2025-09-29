@@ -476,7 +476,7 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-      const telemetry = this.#options.telemetry as false | { disabled?: boolean } | undefined;
+      const telemetry = this.#options.telemetry;
       const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
 
       const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
@@ -484,7 +484,7 @@ export class Clerk implements ClerkInterface {
       const isProd = this.environment?.isProduction?.() ?? false;
 
       const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
-      const logLevel = isKeyless ? 'error' : undefined;
+      const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
 
       if (shouldEnable) {
         initDebugLogger({
