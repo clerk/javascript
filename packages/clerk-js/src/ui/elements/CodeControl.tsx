@@ -182,21 +182,15 @@ export const OTPCodeControl = () => {
 
   React.useEffect(() => {
     if (isIOS()) {
-      const timer = setTimeout(() => {
+      void new Promise<void>(resolve => {
+        setTimeout(() => resolve(), 50);
+      }).then(() => {
         const focusedInput = document.activeElement as HTMLInputElement;
         if (focusedInput && focusedInput.tagName === 'INPUT') {
-          const syntheticClickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window,
-          });
-          focusedInput.dispatchEvent(syntheticClickEvent);
+          focusedInput.focus();
         }
-      }, 100);
-
-      return () => clearTimeout(timer);
+      });
     }
-    return undefined;
   }, []);
 
   return (
