@@ -2375,10 +2375,16 @@ export class Clerk implements ClerkInterface {
     // 2. clerk-js initializes propA with a default value
     // 3. The customer update propB independently of propA and window.Clerk.updateProps is called
     // 4. If we don't merge the new props with the current options, propA will be reset to undefined
+    const mergedOptions = { ...this.#options, ..._props.options };
+
+    // Update the Clerk instance's internal options
+    this.#options = mergedOptions;
+
     const props = {
       ..._props,
-      options: this.#initOptions({ ...this.#options, ..._props.options }),
+      options: this.#initOptions(mergedOptions),
     };
+
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 

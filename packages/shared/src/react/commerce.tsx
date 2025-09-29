@@ -62,6 +62,21 @@ const useInternalEnvironment = () => {
   return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
 };
 
+const useLocalization = () => {
+  const clerk = useClerk();
+
+  let locale = 'en';
+  try {
+    const localization = clerk.__internal_getOption('localization');
+    locale = localization?.locale || 'en';
+  } catch (_) {}
+
+  // Normalize locale to 2-letter language code for Stripe compatibility
+  const normalizedLocale = locale.split('-')[0];
+
+  return normalizedLocale;
+};
+
 const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const { organization } = useOrganization();
   const { user } = useUser();
@@ -206,6 +221,7 @@ const PaymentElementProvider = ({ children, ...props }: PropsWithChildren<Paymen
 
 const PaymentElementInternalRoot = (props: PropsWithChildren) => {
   const { stripe, externalClientSecret, stripeAppearance } = usePaymentElementContext();
+  const locale = useLocalization();
 
   if (stripe && externalClientSecret) {
     return (
@@ -219,6 +235,7 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
           appearance: {
             variables: stripeAppearance,
           },
+          locale: locale as any,
         }}
       >
         <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
