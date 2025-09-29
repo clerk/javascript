@@ -5,6 +5,7 @@ import type {
   DeletedObjectJSON,
   EmailJSON,
   OrganizationDomainJSON,
+  OrganizationInvitationAcceptedJSON,
   OrganizationInvitationJSON,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -52,8 +53,13 @@ export type OrganizationMembershipWebhookEvent = Webhook<
 >;
 
 export type OrganizationInvitationWebhookEvent = Webhook<
-  'organizationInvitation.accepted' | 'organizationInvitation.created' | 'organizationInvitation.revoked',
+  'organizationInvitation.created' | 'organizationInvitation.revoked',
   OrganizationInvitationJSON
+>;
+
+export type OrganizationInvitationAcceptedWebhookEvent = Webhook<
+  'organizationInvitation.accepted',
+  OrganizationInvitationAcceptedJSON
 >;
 
 export type RoleWebhookEvent = Webhook<'role.created' | 'role.updated' | 'role.deleted', RoleJSON>;
@@ -98,6 +104,7 @@ export type WebhookEvent =
   | OrganizationDomainWebhookEvent
   | OrganizationMembershipWebhookEvent
   | OrganizationInvitationWebhookEvent
+  | OrganizationInvitationAcceptedWebhookEvent
   | RoleWebhookEvent
   | PermissionWebhookEvent
   | WaitlistEntryWebhookEvent
