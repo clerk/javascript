@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 
+import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../commerce';
 import { OptionsContext } from '../contexts';
-import { __experimental_PaymentElementProvider, __experimental_PaymentElement } from '../commerce';
 
 // Mock the Stripe components
 jest.mock('../stripe-react', () => ({
