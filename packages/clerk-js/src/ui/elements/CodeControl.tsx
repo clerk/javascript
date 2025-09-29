@@ -16,6 +16,12 @@ import type { FormControlState } from '../utils/useFormControl';
 import { useFormControl } from '../utils/useFormControl';
 import { TimerButton } from './TimerButton';
 
+const isIOS = () => {
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent))
+  );
+};
+
 type UseCodeInputOptions = {
   length?: number;
 };
@@ -174,13 +180,32 @@ export const OTPCodeControl = () => {
     }
   }, [feedback]);
 
+  React.useEffect(() => {
+    if (isIOS()) {
+      const timer = setTimeout(() => {
+        const focusedInput = document.activeElement as HTMLInputElement;
+        if (focusedInput && focusedInput.tagName === 'INPUT') {
+          const syntheticClickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          });
+          focusedInput.dispatchEvent(syntheticClickEvent);
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, []);
+
   return (
     <Box
       elementDescriptor={descriptors.otpCodeFieldInputContainer}
       sx={{ position: 'relative' }}
     >
       <OTPInput
-        autoFocus
+        autoFocus // eslint-disable-line jsx-a11y/no-autofocus
         aria-label='Enter verification code'
         aria-required
         maxLength={length}
