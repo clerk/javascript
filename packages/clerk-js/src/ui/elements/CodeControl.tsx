@@ -16,12 +16,6 @@ import type { FormControlState } from '../utils/useFormControl';
 import { useFormControl } from '../utils/useFormControl';
 import { TimerButton } from './TimerButton';
 
-const isIOS = () => {
-  return (
-    /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent))
-  );
-};
-
 type UseCodeInputOptions = {
   length?: number;
 };
@@ -179,19 +173,6 @@ export const OTPCodeControl = () => {
       setDisabled(true);
     }
   }, [feedback]);
-
-  React.useEffect(() => {
-    if (isIOS()) {
-      void new Promise<void>(resolve => {
-        setTimeout(() => resolve(), 50);
-      }).then(() => {
-        const focusedInput = document.activeElement as HTMLInputElement;
-        if (focusedInput && focusedInput.tagName === 'INPUT') {
-          focusedInput.focus();
-        }
-      });
-    }
-  }, []);
 
   return (
     <Box
