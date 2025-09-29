@@ -225,7 +225,6 @@ const createBaseCommerceSettings = (): CommerceSettingsJSON => {
     object: 'commerce_settings',
     id: 'commerce_settings_1',
     billing: {
-      enabled: false,
       user: {
         enabled: false,
         has_paid_plans: false,
@@ -234,8 +233,6 @@ const createBaseCommerceSettings = (): CommerceSettingsJSON => {
         enabled: false,
         has_paid_plans: false,
       },
-      has_paid_org_plans: false,
-      has_paid_user_plans: false,
       stripe_publishable_key: '',
     },
   };
