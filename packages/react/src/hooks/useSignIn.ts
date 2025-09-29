@@ -6,7 +6,7 @@ import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
 /**
- * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/custom-flows/overview#sign-in-flow).
+ * The `useSignIn()` hook provides access to the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which allows you to check the current state of a sign-in attempt and manage the sign-in flow. You can use this to create a [custom sign-in flow](https://clerk.com/docs/guides/development/custom-flows/overview#sign-in-flow).
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]
@@ -14,7 +14,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  * @example
  * ### Check the current state of a sign-in
  *
- * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/references/javascript/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
+ * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
  *
  * <Tabs items='React,Next.js'>
  * <Tab>
@@ -45,7 +45,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  * @example
  * ### Create a custom sign-in flow with `useSignIn()`
  *
- * The `useSignIn()` hook can also be used to build fully custom sign-in flows, if Clerk's prebuilt components don't meet your specific needs or if you require more control over the authentication flow. Different sign-in flows include email and password, email and phone codes, email links, and multifactor (MFA). To learn more about using the `useSignIn()` hook to create custom flows, see the [custom flow guides](https://clerk.com/docs/custom-flows/overview).
+ * The `useSignIn()` hook can also be used to build fully custom sign-in flows, if Clerk's prebuilt components don't meet your specific needs or if you require more control over the authentication flow. Different sign-in flows include email and password, email and phone codes, email links, and multifactor (MFA). To learn more about using the `useSignIn()` hook to create custom flows, see the [custom flow guides](https://clerk.com/docs/guides/development/custom-flows/overview).
  *
  * ```empty```
  */

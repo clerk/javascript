@@ -99,7 +99,7 @@ type ClerkMiddlewareOptionsCallback = (req: NextRequest) => ClerkMiddlewareOptio
 
 /**
  * Middleware for Next.js that handles authentication and authorization with Clerk.
- * For more details, please refer to the docs: https://clerk.com/docs/references/nextjs/clerk-middleware
+ * For more details, please refer to the docs: https://clerk.com/docs/reference/nextjs/clerk-middleware
  */
 interface ClerkMiddleware {
   /**

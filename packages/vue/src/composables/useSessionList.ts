@@ -8,7 +8,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSessionList = () => ToComputedRefs<UseSessionListReturn>;
 
 /**
- * Returns an array of [`Session`](https://clerk.com/docs/references/javascript/session) objects that have been
+ * Returns an array of [`Session`](https://clerk.com/docs/reference/javascript/session) objects that have been
  * registered on the client device.
  *
  * @example

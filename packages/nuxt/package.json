@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -75,7 +75,7 @@
     "@clerk/vue": "workspace:^",
     "@nuxt/kit": "^4.1.2",
     "@nuxt/schema": "^4.1.2",
-    "h3": "^1.15.3"
+    "h3": "^1.15.4"
   },
   "devDependencies": {
     "nuxt": "^4.1.2",

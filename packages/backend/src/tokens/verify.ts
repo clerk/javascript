@@ -25,14 +25,14 @@ import { TokenType } from './tokenTypes';
 export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
   Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
     /**
-     * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/backend-requests/manual-jwt).
+     * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
      */
     jwtKey?: string;
   };
 
 /**
  * > [!WARNING]
- * > This is a lower-level method intended for more advanced use-cases. It's recommended to use [`authenticateRequest()`](https://clerk.com/docs/references/backend/authenticate-request), which fully authenticates a token passed from the `request` object.
+ * > This is a lower-level method intended for more advanced use-cases. It's recommended to use [`authenticateRequest()`](https://clerk.com/docs/reference/backend/authenticate-request), which fully authenticates a token passed from the `request` object.
  *
  * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
  *
@@ -40,12 +40,13 @@ export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
  * @param options - Options for verifying the token.
  *
  * @displayFunctionSignature
+ * @hideReturns
  *
  * @paramExtension
  *
  * ### `VerifyTokenOptions`
  *
- * It is recommended to set these options as [environment variables](/docs/deployments/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
+ * It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
  *
  * > [!WARNING]
  * You must provide either `jwtKey` or `secretKey`.
@@ -54,7 +55,7 @@ export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
  *
  * @example
  *
- * The following example demonstrates how to use the [JavaScript Backend SDK](https://clerk.com/docs/references/backend/overview) to verify the token signature.
+ * The following example demonstrates how to use the [JavaScript Backend SDK](https://clerk.com/docs/reference/backend/overview) to verify the token signature.
  *
  * In the following example:
  *

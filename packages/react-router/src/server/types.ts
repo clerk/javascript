@@ -12,7 +12,7 @@ import type { LoaderFunction, LoaderFunctionArgs, UNSAFE_DataWithResponseInit } 
 
 export type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;
 
-export type RootAuthLoaderOptions = {
+export type ClerkMiddlewareOptions = {
   /**
    * Used to override the default VITE_CLERK_PUBLISHABLE_KEY env variable if needed.
    */
@@ -29,6 +29,17 @@ export type RootAuthLoaderOptions = {
    * Used to override the CLERK_MACHINE_SECRET_KEY env variable if needed.
    */
   machineSecretKey?: string;
+  signInUrl?: string;
+  signUpUrl?: string;
+} & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
+  MultiDomainAndOrProxy &
+  SignInForceRedirectUrl &
+  SignInFallbackRedirectUrl &
+  SignUpForceRedirectUrl &
+  SignUpFallbackRedirectUrl &
+  LegacyRedirectProps;
+
+export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
   /**
    * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
    */
@@ -41,15 +52,7 @@ export type RootAuthLoaderOptions = {
    * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
    */
   loadOrganization?: boolean;
-  signInUrl?: string;
-  signUpUrl?: string;
-} & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
-  MultiDomainAndOrProxy &
-  SignInForceRedirectUrl &
-  SignInFallbackRedirectUrl &
-  SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+};
 
 export type RequestStateWithRedirectUrls = RequestState &
   SignInForceRedirectUrl &

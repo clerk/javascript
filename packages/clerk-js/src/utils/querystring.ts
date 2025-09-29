@@ -21,6 +21,7 @@ type StringifyQueryParamsOptions = {
   keyEncoder?: (key: string) => string;
 };
 
+// TODO @userland-errors:
 export const stringifyQueryParams = (
   params:
     | Record<string, string | undefined | null | object | boolean | Array<string | undefined | null>>

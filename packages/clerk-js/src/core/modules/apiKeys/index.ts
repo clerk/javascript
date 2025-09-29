@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type {
   ApiKeyJSON,
   APIKeyResource,
@@ -9,7 +10,7 @@ import type {
 
 import type { FapiRequestInit } from '@/core/fapiClient';
 
-import { APIKey, BaseResource, ClerkRuntimeError } from '../../resources/internal';
+import { APIKey, BaseResource } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
   /**

@@ -1,5 +1,19 @@
 # Change Log
 
+## 4.13.0
+
+### Minor Changes
+
+- Add new <UserAvatar /> component ([#6808](https://github.com/clerk/javascript/pull/6808)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`9cf89cd`](https://github.com/clerk/javascript/commit/9cf89cd3402c278e8d5bfcd8277cee292bc45333), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4), [`b8fbadd`](https://github.com/clerk/javascript/commit/b8fbadd95652b08ecea23fdbc7e352e3e7297b2d), [`5546352`](https://github.com/clerk/javascript/commit/55463527df9a710ef3215c353bab1ef423d1de62)]:
+  - @clerk/backend@2.16.0
+  - @clerk/shared@3.27.0
+  - @clerk/clerk-react@5.49.0
+  - @clerk/types@4.89.0
+
 ## 4.12.2
 
 ### Patch Changes

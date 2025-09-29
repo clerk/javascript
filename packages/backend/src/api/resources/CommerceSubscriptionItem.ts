@@ -4,7 +4,7 @@ import { BillingPlan } from './CommercePlan';
 import type { BillingSubscriptionItemJSON } from './JSON';
 
 /**
- * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](/docs/references/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/subscription_items) and is not directly accessible from the Frontend API.
+ * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](/docs/reference/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/subscription_items) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -46,11 +46,11 @@ export class BillingSubscriptionItem {
     /**
      * The plan associated with this subscription item.
      */
-    readonly plan: BillingPlan,
+    readonly plan: BillingPlan | null,
     /**
      * The plan ID.
      */
-    readonly planId: string,
+    readonly planId: string | null,
     /**
      * Unix timestamp (milliseconds) of when the subscription item was created.
      */
@@ -112,8 +112,8 @@ export class BillingSubscriptionItem {
       data.period_start,
       data.next_payment,
       formatAmountJSON(data.amount),
-      BillingPlan.fromJSON(data.plan),
-      data.plan_id,
+      data.plan ? BillingPlan.fromJSON(data.plan) : null,
+      data.plan_id ?? null,
       data.created_at,
       data.updated_at,
       data.period_end,

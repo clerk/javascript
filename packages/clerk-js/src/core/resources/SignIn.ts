@@ -609,7 +609,8 @@ class SignInFuture implements SignInFutureResource {
   constructor(readonly resource: SignIn) {}
 
   get status() {
-    return this.resource.status;
+    // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
+    return this.resource.status || 'needs_identifier';
   }
 
   get availableStrategies() {
@@ -693,6 +694,7 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return runAsyncResourceTask(this.resource, async () => {
+      // TODO @userland-errors:
       const identifier = params.identifier || params.email || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({

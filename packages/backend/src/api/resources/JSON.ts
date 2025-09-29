@@ -405,7 +405,7 @@ export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
    */
   slug: string;
   /**
-   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
    */
   image_url?: string;
   /**
@@ -880,8 +880,8 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
     date: number;
   } | null;
   amount: BillingMoneyAmountJSON | null;
-  plan: BillingPlanJSON;
-  plan_id: string;
+  plan?: BillingPlanJSON | null;
+  plan_id?: string | null;
 }
 
 /**
@@ -906,7 +906,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
   next_payment_amount: number;
   next_payment_date: number;
   amount: BillingMoneyAmountJSON;
-  plan: {
+  plan?: {
     id: string;
     instance_id: string;
     product_id: string;
@@ -922,8 +922,8 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
     currency: string;
     annual_monthly_amount: number;
     publicly_visible: boolean;
-  };
-  plan_id: string;
+  } | null;
+  plan_id?: string | null;
 }
 
 /**

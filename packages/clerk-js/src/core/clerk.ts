@@ -1,7 +1,14 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { deprecated } from '@clerk/shared/deprecated';
-import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import {
+  ClerkRuntimeError,
+  EmailLinkError,
+  EmailLinkErrorCodeStatus,
+  is4xxError,
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+} from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
@@ -80,6 +87,7 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   UserResource,
@@ -149,15 +157,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
-import {
-  BaseResource,
-  Client,
-  EmailLinkError,
-  Environment,
-  isClerkRuntimeError,
-  Organization,
-  Waitlist,
-} from './resources/internal';
+import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';
@@ -859,6 +859,30 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    const component = 'UserAvatar';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
+      controls.mountComponent({
+        name: component,
+        appearanceKey: 'userAvatar',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountUserAvatar = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({
@@ -2368,6 +2392,7 @@ export class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   };
 
+  // TODO @userland-errors:
   __unstable__updateProps = (_props: any) => {
     // We need to re-init the options here in order to keep the options passed to ClerkProvider
     // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:

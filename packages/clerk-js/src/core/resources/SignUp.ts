@@ -1,4 +1,4 @@
-import { isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -64,7 +64,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource, ClerkRuntimeError, SignUpVerifications } from './internal';
+import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -552,7 +552,8 @@ class SignUpFuture implements SignUpFutureResource {
   constructor(readonly resource: SignUp) {}
 
   get status() {
-    return this.resource.status;
+    // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
+    return this.resource.status || 'missing_requirements';
   }
 
   get unverifiedFields() {
@@ -604,59 +605,22 @@ class SignUpFuture implements SignUpFutureResource {
         captchaToken,
         captchaWidgetType,
         captchaError,
+        ...params,
+        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      if (params.firstName) {
-        body.firstName = params.firstName;
-      }
-
-      if (params.lastName) {
-        body.lastName = params.lastName;
-      }
-
-      if (params.web3Wallet) {
-        body.web3Wallet = params.web3Wallet;
-      }
-
-      if (params.unsafeMetadata) {
-        body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
-      }
-
-      if (typeof params.legalAccepted !== 'undefined') {
-        body.legalAccepted = params.legalAccepted;
-      }
-
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body,
-      });
+      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
     });
   }
 
   async update(params: SignUpFutureUpdateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      const body: Record<string, unknown> = {};
+      const body: Record<string, unknown> = {
+        ...params,
+        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+      };
 
-      if (params.firstName) {
-        body.firstName = params.firstName;
-      }
-
-      if (params.lastName) {
-        body.lastName = params.lastName;
-      }
-
-      if (params.unsafeMetadata) {
-        body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
-      }
-
-      if (typeof params.legalAccepted !== 'undefined') {
-        body.legalAccepted = params.legalAccepted;
-      }
-
-      await this.resource.__internal_basePatch({
-        path: this.resource.pathRoot,
-        body,
-      });
+      await this.resource.__internal_basePatch({ path: this.resource.pathRoot, body });
     });
   }
 
@@ -666,44 +630,14 @@ class SignUpFuture implements SignUpFutureResource {
 
       const body: Record<string, unknown> = {
         strategy: 'password',
-        password: params.password,
         captchaToken,
         captchaWidgetType,
         captchaError,
+        ...params,
+        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      if (params.phoneNumber) {
-        body.phoneNumber = params.phoneNumber;
-      }
-
-      if (params.emailAddress) {
-        body.emailAddress = params.emailAddress;
-      }
-
-      if (params.username) {
-        body.username = params.username;
-      }
-
-      if (params.firstName) {
-        body.firstName = params.firstName;
-      }
-
-      if (params.lastName) {
-        body.lastName = params.lastName;
-      }
-
-      if (params.unsafeMetadata) {
-        body.unsafeMetadata = normalizeUnsafeMetadata(params.unsafeMetadata);
-      }
-
-      if (typeof params.legalAccepted !== 'undefined') {
-        body.legalAccepted = params.legalAccepted;
-      }
-
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body,
-      });
+      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
     });
   }
 

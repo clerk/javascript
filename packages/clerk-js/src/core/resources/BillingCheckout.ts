@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
@@ -12,7 +13,7 @@ import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { BillingPayer } from './BillingPayer';
-import { BaseResource, BillingPaymentSource, BillingPlan, isClerkAPIResponseError } from './internal';
+import { BaseResource, BillingPaymentSource, BillingPlan } from './internal';
 
 export class BillingCheckout extends BaseResource implements BillingCheckoutResource {
   id!: string;
