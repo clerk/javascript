@@ -1,7 +1,7 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
-import { Web3Strategy } from './strategies';
+import type { Web3Strategy } from './strategies';
 
 interface SignUpFutureAdditionalParams {
   firstName?: string;
