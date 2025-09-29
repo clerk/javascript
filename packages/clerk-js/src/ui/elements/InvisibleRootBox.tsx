@@ -18,7 +18,9 @@ const _InvisibleRootBox = React.memo((props: RootBoxProps & { isFlowReady?: bool
     }
 
     parent.setAttribute('class', props.className);
-    parent.setAttribute('data-component-status', props.isFlowReady ? 'ready' : 'awaiting-data');
+    if ('isFlowReady' in props) {
+      parent.setAttribute('data-component-status', props.isFlowReady ? 'ready' : 'awaiting-data');
+    }
   }, [props.className, props.isFlowReady]);
 
   return (
