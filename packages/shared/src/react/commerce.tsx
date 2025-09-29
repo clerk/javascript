@@ -69,7 +69,9 @@ const useLocalization = () => {
   try {
     const localization = clerk.__internal_getOption('localization');
     locale = localization?.locale || 'en';
-  } catch (_) {}
+  } catch {
+    // ignore errors
+  }
 
   // Normalize locale to 2-letter language code for Stripe compatibility
   const normalizedLocale = locale.split('-')[0];
