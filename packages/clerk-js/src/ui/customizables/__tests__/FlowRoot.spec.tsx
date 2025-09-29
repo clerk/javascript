@@ -21,7 +21,7 @@ describe('Flow.Root data-component-status behavior', () => {
     expect(host?.getAttribute('data-component-status')).toBeNull();
   });
 
-  it.only('sets data-component-status="awaiting-data" when isFlowReady=false', async () => {
+  it('sets data-component-status="awaiting-data" when isFlowReady=false', async () => {
     const { container } = render(
       <AppearanceProvider appearanceKey='signIn'>
         <Flow.Root
