@@ -8,6 +8,10 @@ type UsePricingFooterStateParams = {
   hasActiveOrganization: boolean;
 };
 
+/**
+ * Calculates the correct show/hide state for the footer of a card in the `<PricingTableDefault/>` component.
+ * @returns [shouldShowFooter, shouldShowFooterNotice]
+ */
 const valueResolution = (params: UsePricingFooterStateParams): [boolean, boolean] => {
   const { subscription, plan, planPeriod, forOrganizations, hasActiveOrganization } = params;
   const show_with_notice: [boolean, boolean] = [true, true];
