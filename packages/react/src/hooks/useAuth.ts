@@ -37,60 +37,6 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  *
  * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
  *
- * @function
- *
- * @example
- *
- * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
- *
- * <Tabs items='React,Next.js'>
- * <Tab>
- *
- * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
- * import { useAuth } from '@clerk/clerk-react'
- *
- * export default function ExternalDataPage() {
- *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()
- *
- *   const fetchExternalData = async () => {
- *     const token = await getToken()
- *
- *     // Fetch data from an external API
- *     const response = await fetch('https://api.example.com/data', {
- *       headers: {
- *         Authorization: `Bearer ${token}`,
- *       },
- *     })
- *
- *     return response.json()
- *   }
- *
- *   if (!isLoaded) {
- *     return <div>Loading...</div>
- *   }
- *
- *   if (!isSignedIn) {
- *     return <div>Sign in to view this page</div>
- *   }
- *
- *   return (
- *     <div>
- *       <p>
- *         Hello, {userId}! Your current active session is {sessionId}.
- *       </p>
- *       <button onClick={fetchExternalData}>Fetch Data</button>
- *     </div>
- *   )
- * }
- * ```
- *
- * </Tab>
- * <Tab>
- *
- * {@include ../../docs/use-auth.md#nextjs-01}
- *
- * </Tab>
- * </Tabs>
  */
 export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
