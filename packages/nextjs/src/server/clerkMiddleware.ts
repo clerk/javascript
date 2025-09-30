@@ -190,7 +190,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       logger.debug('requestState', () => ({
         status: requestState.status,
-        // @ts-ignore : REMOVE THIS WHEN UPGRADING TO NODE@20. This fails in build, but not an issue in vitest.
         headers: JSON.stringify(Object.fromEntries(requestState.headers)),
         reason: requestState.reason,
       }));

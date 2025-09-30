@@ -392,6 +392,11 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   expires_at: number;
 }
 
+export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitationJSON {
+  status: 'accepted';
+  user_id: string;
+}
+
 /**
  * @interface
  */
