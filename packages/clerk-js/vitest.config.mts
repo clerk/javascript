@@ -32,7 +32,7 @@ export default defineConfig({
   },
   test: {
     coverage: {
-      enabled: true,
+      enabled: false,
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
