@@ -1,8 +1,7 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -188,25 +187,24 @@ describe('CodeControl', () => {
       const Component = createOTPComponent(onCodeEntryFinished);
 
       const { getAllByTestId, getByLabelText } = render(<Component />, { wrapper });
+      const user = userEvent.setup();
 
       const input = getByLabelText(label);
-      const inputDivs = getAllByTestId(testId);
 
-      // Simulate autofill with mixed characters
-      fireEvent.change(input, { target: { value: '1a2b3c' } });
+      await user.click(input);
+      await user.paste('1a2b3c');
 
       await waitFor(() => {
-        expect(inputDivs[0]).toBeEmptyDOMElement();
-        expect(inputDivs[1]).toBeEmptyDOMElement();
-        expect(inputDivs[2]).toBeEmptyDOMElement();
-        expect(inputDivs[3]).toBeEmptyDOMElement();
-        expect(inputDivs[4]).toBeEmptyDOMElement();
-        expect(inputDivs[5]).toBeEmptyDOMElement();
+        expect(input).toHaveValue('');
       });
 
-      // Simulate autofill with expected characters
-      fireEvent.change(input, { target: { value: '123456' } });
+      await user.paste('123456');
 
+      await waitFor(() => {
+        expect(input).toHaveValue('123456');
+      });
+
+      const inputDivs = getAllByTestId(testId);
       await waitFor(() => {
         expect(inputDivs[0]).toHaveTextContent('1');
         expect(inputDivs[1]).toHaveTextContent('2');
