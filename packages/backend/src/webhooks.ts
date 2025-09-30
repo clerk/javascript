@@ -65,6 +65,7 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  * ```ts
  * import { verifyWebhook } from '@clerk/backend/webhooks'
  *
+ * export async function POST(request: Request) {
  * try {
  *   const evt = await verifyWebhook(request)
  *
@@ -82,6 +83,7 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  * } catch (err) {
  *   console.error('Webhook verification failed:', err)
  *   return new Response('Webhook verification failed', { status: 400 })
+ * }
  * }
  * ```
  */
