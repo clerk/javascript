@@ -21,6 +21,7 @@ import {
   SignInContext,
   SignUpContext,
   SubscriberTypeContext,
+  UserAvatarContext,
   UserButtonContext,
   UserProfileContext,
   UserVerificationContext,
@@ -50,6 +51,8 @@ export function ComponentContextProvider({
           {children}
         </UserVerificationContext.Provider>
       );
+    case 'UserAvatar':
+      return <UserAvatarContext.Provider value={{ componentName, ...props }}>{children}</UserAvatarContext.Provider>;
     case 'UserButton':
       return (
         <UserButtonContext.Provider value={{ componentName, ...(props as UserButtonProps) }}>

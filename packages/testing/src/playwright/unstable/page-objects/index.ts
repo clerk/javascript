@@ -15,6 +15,7 @@ import { createSignInComponentPageObject } from './signIn';
 import { createSignUpComponentPageObject } from './signUp';
 import { createSubscriptionDetailsPageObject } from './subscriptionDetails';
 import { createTestingTokenPageObject } from './testingToken';
+import { createUserAvatarPageObject } from './userAvatar';
 import { createUserButtonPageObject } from './userButton';
 import { createUserProfileComponentPageObject } from './userProfile';
 import { createUserVerificationComponentPageObject } from './userVerification';
@@ -45,6 +46,7 @@ export const createPageObjects = ({
     signIn: createSignInComponentPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
     testingToken: createTestingTokenPageObject(testArgs),
+    userAvatar: createUserAvatarPageObject(testArgs),
     userButton: createUserButtonPageObject(testArgs),
     userProfile: createUserProfileComponentPageObject(testArgs),
     userVerification: createUserVerificationComponentPageObject(testArgs),

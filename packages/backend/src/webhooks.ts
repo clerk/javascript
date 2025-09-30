@@ -9,7 +9,7 @@ import type { WebhookEvent } from './api/resources/Webhooks';
  */
 export type VerifyWebhookOptions = {
   /**
-   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#webhooks) instead.
+   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#webhooks) instead.
    */
   signingSecret?: string;
 };
@@ -60,7 +60,7 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  * @hideReturns
  *
  * @example
- * See the [guide on syncing data](https://clerk.com/docs/webhooks/sync-data) for more comprehensive and framework-specific examples that you can copy and paste into your app.
+ * See the [guide on syncing data](https://clerk.com/docs/guides/development/webhooks/syncing) for more comprehensive and framework-specific examples that you can copy and paste into your app.
  *
  * ```ts
  * try {

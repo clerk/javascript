@@ -23,6 +23,7 @@ export {
   SignOutButton,
   SignUpButton,
   TaskChooseOrganization,
+  UserAvatar,
   UserButton,
   Waitlist,
 } from '@clerk/clerk-react';
