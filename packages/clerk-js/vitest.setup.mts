@@ -43,6 +43,7 @@ if (typeof window !== 'undefined') {
     TextEncoder: { value: TextEncoder },
     Response: { value: FakeResponse },
     crypto: { value: crypto.webcrypto },
+    isSecureContext: { value: true, writable: true },
   });
 
   // Mock ResizeObserver
