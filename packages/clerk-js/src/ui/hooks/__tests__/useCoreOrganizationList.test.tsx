@@ -1,13 +1,14 @@
 import { useOrganizationList } from '@clerk/shared/react';
 import { describe, expect, it } from 'vitest';
 
-import { act, renderHook, waitFor } from '../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+
+import { act, renderHook, waitFor } from '../../../test/utils';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
-} from '../../components/OrganizationSwitcher/__tests__/vitestUtils';
-import { bindCreateFixtures } from '../../utils/vitest/createFixtures';
+} from '../../components/OrganizationSwitcher/__tests__/test-utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 

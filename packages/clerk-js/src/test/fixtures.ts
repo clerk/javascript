@@ -1,6 +1,7 @@
 import type {
   AuthConfigJSON,
   ClientJSON,
+  CommerceSettingsJSON,
   DisplayConfigJSON,
   EnvironmentJSON,
   OrganizationSettingsJSON,
@@ -8,7 +9,7 @@ import type {
   UserSettingsJSON,
 } from '@clerk/types';
 
-import { containsAllOfType } from '../containsAllOf';
+import { containsAllOfType } from '../ui/utils/containsAllOf';
 
 export const createBaseEnvironmentJSON = (): EnvironmentJSON => {
   return {
@@ -18,6 +19,7 @@ export const createBaseEnvironmentJSON = (): EnvironmentJSON => {
     display_config: createBaseDisplayConfig(),
     organization_settings: createBaseOrganizationSettings(),
     user_settings: createBaseUserSettings(),
+    commerce_settings: createBaseCommerceSettings(),
     meta: { responseHeaders: { country: 'us' } },
   };
 };
@@ -216,6 +218,24 @@ const createBaseUserSettings = (): UserSettingsJSON => {
 
 export const createBaseClientJSON = (): ClientJSON => {
   return {} as ClientJSON;
+};
+
+const createBaseCommerceSettings = (): CommerceSettingsJSON => {
+  return {
+    object: 'commerce_settings',
+    id: 'commerce_settings_1',
+    billing: {
+      user: {
+        enabled: false,
+        has_paid_plans: false,
+      },
+      organization: {
+        enabled: false,
+        has_paid_plans: false,
+      },
+      stripe_publishable_key: '',
+    },
+  };
 };
 
 export const createUserFixture = (): UserJSON => {

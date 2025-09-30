@@ -1,25 +1,18 @@
-// import { jest } from '@jest/globals';
 import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
-import React from 'react';
 import { vi } from 'vitest';
 
+import { Clerk as ClerkCtor } from '@/core/clerk';
+import { Client, Environment } from '@/core/resources';
+import { ComponentContextProvider, CoreClerkContextWrapper, EnvironmentProvider, OptionsProvider } from '@/ui/contexts';
+import { AppearanceProvider } from '@/ui/customizables';
 import { FlowMetadataProvider } from '@/ui/elements/contexts';
+import { RouteContext } from '@/ui/router';
+import { InternalThemeProvider } from '@/ui/styledSystem';
+import type { AvailableComponentName, AvailableComponentProps } from '@/ui/types';
 
-import { Clerk as ClerkCtor } from '../../../core/clerk';
-import { Client, Environment } from '../../../core/resources';
-import {
-  ComponentContextProvider,
-  CoreClerkContextWrapper,
-  EnvironmentProvider,
-  OptionsProvider,
-} from '../../contexts';
-import { AppearanceProvider } from '../../customizables';
-import { RouteContext } from '../../router';
-import { InternalThemeProvider } from '../../styledSystem';
-import type { AvailableComponentName, AvailableComponentProps } from '../../types';
-import { createClientFixtureHelpers, createEnvironmentFixtureHelpers } from './fixtureHelpers';
+import { createClientFixtureHelpers, createEnvironmentFixtureHelpers } from './fixture-helpers';
 import { createBaseClientJSON, createBaseEnvironmentJSON } from './fixtures';
-import { mockClerkMethods, mockRouteContextValue } from './mockHelpers';
+import { mockClerkMethods, mockRouteContextValue } from './mock-helpers';
 
 const createInitialStateConfigParam = (baseEnvironment: EnvironmentJSON, baseClient: ClientJSON) => {
   return {
@@ -91,7 +84,13 @@ const unboundCreateFixtures = (
     const MockClerkProvider = (props: any) => {
       const { children } = props;
 
-      const componentsWithoutContext = ['UsernameSection', 'UserProfileSection'];
+      const componentsWithoutContext = [
+        'UsernameSection',
+        'UserProfileSection',
+        'SubscriptionDetails',
+        'PlanDetails',
+        'Checkout',
+      ];
       const contextWrappedChildren = !componentsWithoutContext.includes(componentName) ? (
         <ComponentContextProvider
           componentName={componentName}
