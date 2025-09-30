@@ -55,6 +55,14 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
+  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
+  ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
+  ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
+  ['billing-money-amount', '/docs/reference/javascript/types/billing-money-amount'],
+  ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
+  ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
+  ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
 ];
 
 /**
