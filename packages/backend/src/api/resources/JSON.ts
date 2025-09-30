@@ -393,6 +393,7 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
 }
 
 export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitationJSON {
+  status: 'accepted';
   user_id: string;
 }
 
