@@ -63,6 +63,8 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  * See the [guide on syncing data](https://clerk.com/docs/guides/development/webhooks/syncing) for more comprehensive and framework-specific examples that you can copy and paste into your app.
  *
  * ```ts
+ * import { verifyWebhook } from '@clerk/backend/webhooks'
+ *
  * try {
  *   const evt = await verifyWebhook(request)
  *
