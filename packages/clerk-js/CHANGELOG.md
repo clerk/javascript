@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.97.0
+
+### Minor Changes
+
+- [Billing Beta] Drop top level billing flags from environment. Instead, use the payer specific flags. ([#6882](https://github.com/clerk/javascript/pull/6882)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Prevent leaking the `data-component-status` attribute for components other than `<PricingTable/>`. ([#6884](https://github.com/clerk/javascript/pull/6884)) by [@panteliselef](https://github.com/panteliselef)
+
+- Hide CTA for `<PricingTable forOrganization/>` when the user is does not have an active organization selected. ([#6883](https://github.com/clerk/javascript/pull/6883)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+  - @clerk/localizations@3.25.5
+  - @clerk/shared@3.27.1
+
 ## 5.96.0
 
 ### Minor Changes

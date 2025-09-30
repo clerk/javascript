@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.17.0
+
+### Minor Changes
+
+- Add `user_id` field to `organizationInvitation.accepted` webhook events. ([#6887](https://github.com/clerk/javascript/pull/6887)) by [@kduprey](https://github.com/kduprey)
+
+  Creates a new `OrganizationInvitationAcceptedJSON` interface that extends `OrganizationInvitationJSON` with a required `user_id` field, and updates the webhook type system to use this interface specifically for `organizationInvitation`.accepted events.
+
+### Patch Changes
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+  - @clerk/shared@3.27.1
+
 ## 2.16.0
 
 ### Minor Changes
