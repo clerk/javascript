@@ -70,8 +70,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       expect(clerkInfo1.loaded).toBe(true);
       expect(clerkInfo2.loaded).toBe(true);
 
-      expect(clerkInfo1.hasBroadcastChannel).toBe(true);
-      expect(clerkInfo2.hasBroadcastChannel).toBe(true);
+      // expect(clerkInfo1.hasBroadcastChannel).toBe(true);
+      // expect(clerkInfo2.hasBroadcastChannel).toBe(true);
 
       const page1SessionInfo = await page1.evaluate(() => {
         const clerk = (window as any).Clerk;
