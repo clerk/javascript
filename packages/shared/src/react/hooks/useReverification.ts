@@ -11,6 +11,9 @@ import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
 const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
 
+/**
+ *
+ */
 async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
@@ -34,7 +37,7 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 /**
  * @interface
  */
-type NeedsReverificationParameters = {
+export type NeedsReverificationParameters = {
   cancel: () => void;
   complete: () => void;
   level: SessionVerificationLevel | undefined;
@@ -42,16 +45,16 @@ type NeedsReverificationParameters = {
 
 /**
  * The optional options object.
+ *
  * @interface
  */
-type UseReverificationOptions = {
+export type UseReverificationOptions = {
   /**
    * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
    *
    * @param cancel - A function that will cancel the reverification process.
    * @param complete - A function that will retry the original request after reverification.
    * @param level - The level returned with the reverification hint.
-   *
    */
   onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
 };
@@ -59,14 +62,14 @@ type UseReverificationOptions = {
 /**
  * @interface
  */
-type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | undefined> = (
+export type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | undefined> = (
   ...args: Parameters<Fetcher>
 ) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>>;
 
 /**
  * @interface
  */
-type UseReverification = <
+export type UseReverification = <
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions = UseReverificationOptions,
 >(
@@ -79,7 +82,13 @@ type CreateReverificationHandlerParams = UseReverificationOptions & {
   telemetry: Clerk['telemetry'];
 };
 
+/**
+ *
+ */
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
+  /**
+   *
+   */
   function assertReverification<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     fetcher: Fetcher,
   ): (...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>> {
@@ -191,7 +200,6 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   return <button onClick={handleClick}>Update User</button>
  * }
  * ```
- *
  */
 export const useReverification: UseReverification = (fetcher, options) => {
   const { __internal_openReverification, telemetry } = useClerk();

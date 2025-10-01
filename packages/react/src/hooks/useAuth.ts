@@ -18,25 +18,56 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 import { createGetToken, createSignOut } from './utils';
 
 /**
- * @inline
+ * @interface
  */
-type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
+export type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
+/**
+ *
+ * @param initialAuthStateOrOptions - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ */
 
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
  *
- * > [!NOTE]
- * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/reference/backend/types/auth-object).
+ * The following example demonstrates how to use the `useAuth()` hook to access the current auth state, like whether the user is signed in or not. It also includes a basic example for using the `getToken()` method to retrieve a session token for fetching data from an external resource.
  *
- * <If sdk="nextjs">
- * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/guides/development/rendering-modes) for more information, including code examples.
- * </If>
+ * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
+ * import { useAuth } from '@clerk/clerk-react'
  *
- * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
+ * export default function ExternalDataPage() {
+ *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()
  *
- * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ *   const fetchExternalData = async () => {
+ *     const token = await getToken()
  *
+ *     // Fetch data from an external API
+ *     const response = await fetch('https://api.example.com/data', {
+ *       headers: {
+ *         Authorization: `Bearer ${token}`,
+ *       },
+ *     })
+ *
+ *     return response.json()
+ *   }
+ *
+ *   if (!isLoaded) {
+ *     return <div>Loading...</div>
+ *   }
+ *
+ *   if (!isSignedIn) {
+ *     return <div>Sign in to view this page</div>
+ *   }
+ *
+ *   return (
+ *     <div>
+ *       <p>
+ *         Hello, {userId}! Your current active session is {sessionId}.
+ *       </p>
+ *       <button onClick={fetchExternalData}>Fetch Data</button>
+ *     </div>
+ *   )
+ * }
+ * ```
  */
 export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');

@@ -21,7 +21,8 @@ type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  */
 export type UseAuthReturn =
   | {
@@ -166,7 +167,8 @@ export type UseSignUpReturn =
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in"]
  */
 export type UseSessionReturn =
   | {
