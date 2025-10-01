@@ -17,7 +17,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
     enrollment_modes: OrganizationEnrollmentMode[];
     default_role: string | null;
   };
-  slugs: {
+  slug: {
     disabled: boolean;
   };
 }
@@ -34,7 +34,7 @@ export interface OrganizationSettingsResource extends ClerkResource {
     enrollmentModes: OrganizationEnrollmentMode[];
     defaultRole: string | null;
   };
-  slugs: {
+  slug: {
     disabled: boolean;
   };
   __internal_toSnapshot: () => OrganizationSettingsJSONSnapshot;

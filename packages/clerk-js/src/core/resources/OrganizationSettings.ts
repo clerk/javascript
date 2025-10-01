@@ -18,7 +18,7 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     enrollmentModes: [],
     defaultRole: null,
   };
-  slugs: {
+  slug: {
     disabled: boolean;
   } = {
     disabled: false,
@@ -47,8 +47,8 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
       this.domains.defaultRole = this.withDefault(data.domains.default_role, this.domains.defaultRole);
     }
 
-    if (data.slugs) {
-      this.slugs.disabled = this.withDefault(data.slugs.disabled, this.slugs.disabled);
+    if (data.slug) {
+      this.slug.disabled = this.withDefault(data.slug.disabled, this.slug.disabled);
     }
 
     this.enabled = this.withDefault(data.enabled, this.enabled);
