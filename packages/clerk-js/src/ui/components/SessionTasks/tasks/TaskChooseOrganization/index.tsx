@@ -34,7 +34,7 @@ const TaskChooseOrganizationInternal = () => {
 
   return (
     <Flow.Root flow='taskChooseOrganization'>
-      <Flow.Part part={hasExistingResources ? 'chooseOrganization' : 'createOrganization'}>
+      <Flow.Part part='chooseOrganization'>
         <Card.Root>
           <Card.Content sx={t => ({ padding: `${t.space.$8} ${t.space.$none} ${t.space.$none}`, gap: t.space.$7 })}>
             {isLoading ? (
