@@ -4,11 +4,40 @@ import * as crypto from 'node:crypto';
 import { TextDecoder, TextEncoder } from 'node:util';
 
 import { cleanup, configure } from '@testing-library/react';
-import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 
 configure({});
 
-afterEach(cleanup);
+// Track all timers created during tests to clean them up
+const activeTimers = new Set<ReturnType<typeof setTimeout>>();
+const originalSetTimeout = global.setTimeout;
+const originalClearTimeout = global.clearTimeout;
+
+// Wrap setTimeout to track all timers
+global.setTimeout = ((callback: any, delay?: any, ...args: any[]) => {
+  const timerId = originalSetTimeout(callback, delay, ...args);
+  activeTimers.add(timerId);
+  return timerId;
+}) as typeof setTimeout;
+
+// Wrap clearTimeout to remove from tracking
+global.clearTimeout = ((timerId?: ReturnType<typeof setTimeout>) => {
+  if (timerId) {
+    activeTimers.delete(timerId);
+    originalClearTimeout(timerId);
+  }
+}) as typeof clearTimeout;
+
+beforeEach(() => {
+  activeTimers.clear();
+});
+
+afterEach(() => {
+  cleanup();
+  // Clear all tracked timers to prevent post-test execution
+  activeTimers.forEach(timerId => originalClearTimeout(timerId));
+  activeTimers.clear();
+});
 
 // Store the original method
 // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -43,6 +72,7 @@ if (typeof window !== 'undefined') {
     TextEncoder: { value: TextEncoder },
     Response: { value: FakeResponse },
     crypto: { value: crypto.webcrypto },
+    isSecureContext: { value: true, writable: true },
   });
 
   // Mock ResizeObserver

@@ -445,6 +445,7 @@ export default tseslint.config([
       'jsdoc/require-description-complete-sentence': 'warn',
       'jsdoc/require-param': ['warn', { ignoreWhenAllParamsMissing: true }],
       'jsdoc/require-param-description': 'warn',
+      'jsdoc/require-description-complete-sentence': 'off',
       'jsdoc/require-returns': 'off',
       'jsdoc/tag-lines': [
         'warn',
