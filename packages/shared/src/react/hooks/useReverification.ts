@@ -37,7 +37,7 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 /**
  * @interface
  */
-export type NeedsReverificationParameters = {
+type NeedsReverificationParameters = {
   cancel: () => void;
   complete: () => void;
   level: SessionVerificationLevel | undefined;
@@ -48,7 +48,7 @@ export type NeedsReverificationParameters = {
  *
  * @interface
  */
-export type UseReverificationOptions = {
+type UseReverificationOptions = {
   /**
    * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
    *
@@ -62,14 +62,14 @@ export type UseReverificationOptions = {
 /**
  * @interface
  */
-export type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | undefined> = (
+type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | undefined> = (
   ...args: Parameters<Fetcher>
 ) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>>;
 
 /**
  * @interface
  */
-export type UseReverification = <
+type UseReverification = <
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions = UseReverificationOptions,
 >(
@@ -97,7 +97,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 
       if (isReverificationHint(result)) {
         /**
-         * Create a promise
+         * Create a promise.
          */
         const resolvers = createDeferredPromise();
 
@@ -120,7 +120,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
         if (params.onNeedsReverification === undefined) {
           /**
            * On success resolve the pending promise
-           * On cancel reject the pending promise
+           * On cancel reject the pending promise.
            */
           params.openUIComponent?.({
             level: level,
@@ -136,12 +136,12 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
         }
 
         /**
-         * Wait until the promise from above have been resolved or rejected
+         * Wait until the promise from above have been resolved or rejected.
          */
         await resolvers.promise;
 
         /**
-         * After the promise resolved successfully try the original request one more time
+         * After the promise resolved successfully try the original request one more time.
          */
         result = await resolveResult(fetcher(...args));
       }
