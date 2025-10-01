@@ -363,6 +363,7 @@ export interface ClerkAPIErrorJSON {
   code: string;
   message: string;
   long_message?: string;
+  clerk_trace_id?: string;
   meta?: {
     param_name?: string;
     session_id?: string;
