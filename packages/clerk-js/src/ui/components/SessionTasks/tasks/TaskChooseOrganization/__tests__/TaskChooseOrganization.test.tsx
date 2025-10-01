@@ -204,4 +204,38 @@ describe('TaskChooseOrganization', () => {
 
     expect(await findByText(/testuser/)).toBeInTheDocument();
   });
+
+  describe('on create organization form', () => {
+    it("does not display slug field if it's disabled on environment", async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(false);
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      const { queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it("display slug field if it's enabled on environment", async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withOrganizations();
+      f.withOrganizationSlug(true);
+      f.withForceOrganizationSelection();
+      f.withUser({
+        create_organization_enabled: true,
+        tasks: [{ key: 'choose-organization' }],
+      });
+    });
+
+    const { queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+
+    expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
+  });
 });
