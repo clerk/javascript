@@ -393,6 +393,87 @@ describe('TelemetryCollector', () => {
     });
   });
 
+  describe('with in-memory throttling (React Native)', () => {
+    beforeEach(() => {
+      // Mock React Native environment - no window
+      windowSpy.mockImplementation(() => undefined);
+    });
+
+    test('throttles events using in-memory cache when localStorage is not available', () => {
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      const event = 'TEST_EVENT';
+      const payload = { foo: true };
+
+      // First event should go through
+      collector.record({ event, payload });
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+      // Same event should be throttled
+      collector.record({ event, payload });
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+      // Different event should go through
+      collector.record({ event: 'DIFFERENT_EVENT', payload });
+      jest.runAllTimers();
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+    });
+
+    test('allows event after TTL expires in memory cache', () => {
+      const originalDateNow = Date.now;
+      const cacheTtl = 86400000; // 24 hours
+
+      let now = originalDateNow();
+      const dateNowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now);
+
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+        maxBufferSize: 1,
+      });
+
+      const event = 'TEST_EVENT';
+      const payload = { foo: true };
+
+      // First event
+      collector.record({ event, payload });
+
+      // Move time forward beyond the cache TTL
+      now += cacheTtl + 1;
+
+      // Same event should now be allowed
+      collector.record({ event, payload });
+
+      jest.runAllTimers();
+
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+      dateNowSpy.mockRestore();
+    });
+
+    test('clears memory cache when it exceeds size limit', () => {
+      const collector = new TelemetryCollector({
+        publishableKey: TEST_PK,
+      });
+
+      // Generate many different events to exceed the cache size limit
+      for (let i = 0; i < 10001; i++) {
+        collector.record({
+          event: 'TEST_EVENT',
+          payload: { id: i },
+        });
+      }
+
+      jest.runAllTimers();
+
+      // Should have been called for all events since cache was cleared
+      expect(fetchSpy).toHaveBeenCalled();
+    });
+  });
+
   describe('error handling', () => {
     test('record() method does not bubble up errors from internal operations', () => {
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
