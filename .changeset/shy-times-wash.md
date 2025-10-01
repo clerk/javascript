@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Fix TaskChooseOrganization component selector
+Improve appearance selectors for tasks, such as including it within `SignIn/SignUp` components
