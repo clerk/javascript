@@ -119,7 +119,8 @@ export type UseAuthReturn =
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  */
 export type UseSignInReturn =
   | {
@@ -143,7 +144,8 @@ export type UseSignInReturn =
     };
 
 /**
- * @inline
+ *  @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  */
 export type UseSignUpReturn =
   | {
@@ -197,7 +199,8 @@ export type UseSessionReturn =
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  */
 export type UseSessionListReturn =
   | {
@@ -221,7 +224,8 @@ export type UseSessionListReturn =
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in"]
  */
 export type UseUserReturn =
   | {

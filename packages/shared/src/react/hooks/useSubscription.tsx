@@ -1,4 +1,4 @@
-import type { EnvironmentResource, ForPayerType } from '@clerk/types';
+import type { BillingSubscriptionResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
@@ -12,15 +12,64 @@ import {
 
 const hookName = 'useSubscription';
 
-type UseSubscriptionParams = {
+/**
+ * @interface
+ */
+export type UseSubscriptionParams = {
+  /**
+   * Specifies whether to fetch subscription for an organization or user.
+   *
+   * @default 'user'
+   */
   for?: ForPayerType;
   /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched.
+   * If `true`, the previous data will be kept in the cache until new data is fetched. This helps prevent layout shifts.
    *
    * @default false
    */
   keepPreviousData?: boolean;
 };
+
+/**
+ * @interface
+ */
+export type UseSubscriptionReturn =
+  | {
+      /**
+       * A boolean that indicates whether the initial data is still being fetched.
+       */
+      data: null;
+      /**
+       * A boolean that indicates whether the initial data is still being fetched.
+       */
+      isLoaded: false;
+      /**
+       * A boolean that indicates whether any request is still in flight, including background updates.
+       */
+      isFetching: false;
+      /**
+       * Any error that occurred during the data fetch, or `null` if no error occurred.
+       */
+      error: null;
+      /**
+       * Function to manually trigger a refresh of the subscription data.
+       */
+      revalidate: () => Promise<void>;
+    }
+  | {
+      data: BillingSubscriptionResource;
+      isLoaded: true;
+      isFetching: true;
+      error: Error;
+      revalidate: () => Promise<void>;
+    }
+  | {
+      data: BillingSubscriptionResource | null;
+      isLoaded: boolean;
+      isFetching: boolean;
+      error: Error | null;
+      revalidate: () => Promise<void>;
+    };
 
 /**
  * @internal
