@@ -12,7 +12,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  *
  * The following example uses the `useSignIn()` hook to access the [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object, which contains the current sign-in attempt status and methods to create a new sign-in attempt. The `isLoaded` property is used to handle the loading state.
  *
- * ``tsx {{ filename: 'src/pages/SignInPage.tsx' }}
+ * ```tsx {{ filename: 'src/pages/SignInPage.tsx' }}
  * import { useSignIn } from '@clerk/clerk-react'
  *
  * export default function SignInPage() {
