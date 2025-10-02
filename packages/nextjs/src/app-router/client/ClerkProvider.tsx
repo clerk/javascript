@@ -124,6 +124,8 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
     routerPush: push,
     // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
+    // @ts-expect-error Error because of the stricter types of internal `startTransition`
+    __internal_startTransition: startTransition,
   });
 
   return (

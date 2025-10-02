@@ -7,7 +7,7 @@ import {
   UserContext,
 } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
-import React from 'react';
+import React, { useDeferredValue } from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
@@ -24,17 +24,28 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const [updatedState, setState] = React.useState<ClerkContextProviderState | null>(null);
+  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk({
+    ...isomorphicClerkOptions,
+    // __internal_setResources: (resources: Resources) => setState(resources),
+  });
 
-  const [state, setState] = React.useState<ClerkContextProviderState>({
+  const defaultState = {
     client: clerk.client as ClientResource,
     session: clerk.session,
     user: clerk.user,
     organization: clerk.organization,
-  });
+  };
+
+  const state = useDeferredValue(updatedState || defaultState);
+
+  // const state = updatedState || defaultState;
 
   React.useEffect(() => {
-    return clerk.addListener(e => setState({ ...e }));
+    return clerk.addListener(e => {
+      // console.log('[Listener]', e.organization?.id);
+      setState(e);
+    });
   }, []);
 
   const derivedState = deriveState(clerk.loaded, state, initialState);
