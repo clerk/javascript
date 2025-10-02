@@ -24,20 +24,19 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const [updatedState, setState] = React.useState<ClerkContextProviderState | null>(null);
   const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk({
     ...isomorphicClerkOptions,
     // __internal_setResources: (resources: Resources) => setState(resources),
   });
 
-  const defaultState = {
+  const [updatedState, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
     session: clerk.session,
     user: clerk.user,
     organization: clerk.organization,
-  };
+  });
 
-  const state = useDeferredValue(updatedState || defaultState);
+  const state = useDeferredValue(updatedState);
   // const state = updatedState || defaultState;
 
   React.useEffect(() => {
