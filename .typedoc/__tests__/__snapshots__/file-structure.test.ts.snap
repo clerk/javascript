@@ -177,6 +177,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "shared/is-valid-browser.mdx",
   "shared/isomorphic-atob.mdx",
   "shared/load-clerk-js-script.mdx",
+  "shared/local-storage-broadcast-channel.mdx",
   "shared/pages-or-infinite-options.mdx",
   "shared/paginated-hook-config.mdx",
   "shared/paginated-resources.mdx",
