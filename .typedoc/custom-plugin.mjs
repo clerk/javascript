@@ -26,10 +26,12 @@ const FILES_WITHOUT_HEADINGS = [
  * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
+  ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
+  ['sign-in-resource', '/docs/reference/javascript/sign-in'],
   ['sign-up-resource', '/docs/reference/javascript/sign-up'],
   ['user-resource', '/docs/reference/javascript/user'],
   ['session-status-claim', '/docs/reference/javascript/types/session-status'],
