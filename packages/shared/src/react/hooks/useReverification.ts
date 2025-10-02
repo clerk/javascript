@@ -97,7 +97,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 
       if (isReverificationHint(result)) {
         /**
-         * Create a promise.
+         * Create a promise
          */
         const resolvers = createDeferredPromise();
 
@@ -120,7 +120,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
         if (params.onNeedsReverification === undefined) {
           /**
            * On success resolve the pending promise
-           * On cancel reject the pending promise.
+           * On cancel reject the pending promise
            */
           params.openUIComponent?.({
             level: level,
@@ -136,12 +136,12 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
         }
 
         /**
-         * Wait until the promise from above have been resolved or rejected.
+         * Wait until the promise from above have been resolved or rejected
          */
         await resolvers.promise;
 
         /**
-         * After the promise resolved successfully try the original request one more time.
+         * After the promise resolved successfully try the original request one more time
          */
         result = await resolveResult(fetcher(...args));
       }
