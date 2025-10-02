@@ -217,25 +217,27 @@ describe('TaskChooseOrganization', () => {
         });
       });
 
-      const { queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+      const { findByRole, queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
 
+      expect(await findByRole('textbox', { name: /name/i })).toBeInTheDocument();
       expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     });
-  });
 
-  it("display slug field if it's enabled on environment", async () => {
-    const { wrapper } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withOrganizationSlug(true);
-      f.withForceOrganizationSelection();
-      f.withUser({
-        create_organization_enabled: true,
-        tasks: [{ key: 'choose-organization' }],
+    it("display slug field if it's enabled on environment", async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(true);
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+        });
       });
+
+      const { findByRole, queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(await findByRole('textbox', { name: /name/i })).toBeInTheDocument();
+      expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
     });
-
-    const { queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
-
-    expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
   });
 });
