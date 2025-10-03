@@ -1,4 +1,4 @@
-import { useClerk, useSession } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -24,6 +24,7 @@ import {
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
+import { getPricingFooterState } from './utils/pricing-footer-state';
 
 interface PricingTableDefaultProps {
   plans?: BillingPlanResource[] | null;
@@ -103,6 +104,7 @@ function Card(props: CardProps) {
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
@@ -129,35 +131,14 @@ function Card(props: CardProps) {
   );
 
   const hasFeatures = plan.features.length > 0;
-  const showStatusRow = !!subscription;
 
-  let shouldShowFooter = false;
-  let shouldShowFooterNotice = false;
-
-  if (!subscription) {
-    shouldShowFooter = true;
-    shouldShowFooterNotice = false;
-  } else if (subscription.status === 'upcoming') {
-    shouldShowFooter = true;
-    shouldShowFooterNotice = true;
-  } else if (subscription.status === 'active') {
-    if (subscription.canceledAt) {
-      shouldShowFooter = true;
-      shouldShowFooterNotice = false;
-    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyFee.amount > 0) {
-      shouldShowFooter = true;
-      shouldShowFooterNotice = false;
-    } else if (plan.freeTrialEnabled && subscription.isFreeTrial) {
-      shouldShowFooter = true;
-      shouldShowFooterNotice = true;
-    } else {
-      shouldShowFooter = false;
-      shouldShowFooterNotice = false;
-    }
-  } else {
-    shouldShowFooter = false;
-    shouldShowFooterNotice = false;
-  }
+  const { shouldShowFooter, shouldShowFooterNotice } = getPricingFooterState({
+    subscription,
+    plan,
+    planPeriod,
+    forOrganizations: pricingTableProps.forOrganizations,
+    hasActiveOrganization: !!organization,
+  });
 
   return (
     <Box
@@ -185,7 +166,7 @@ function Card(props: CardProps) {
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
         badge={
-          showStatusRow ? (
+          subscription ? (
             <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
           ) : undefined
         }
