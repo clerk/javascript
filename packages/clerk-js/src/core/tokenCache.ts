@@ -132,8 +132,9 @@ interface SessionTokenEvent {
 }
 
 /**
- * Creates an in-memory token cache with BroadcastChannel synchronization across tabs.
+ * Creates an in-memory token cache with optional BroadcastChannel synchronization across tabs.
  * Automatically manages token expiration and cleanup via scheduled timeouts.
+ * BroadcastChannel support is enabled only in the channel build variant.
  */
 const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   const cache = new Map<string, TokenCacheValue>();
@@ -141,6 +142,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   let broadcastChannel: BroadcastChannel | null = null;
 
   const ensureBroadcastChannel = (): BroadcastChannel | null => {
+    if (!__BUILD_VARIANT_CHANNEL__) {
+      return null;
+    }
+
     if (broadcastChannel) {
       return broadcastChannel;
     }

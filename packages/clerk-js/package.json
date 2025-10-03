@@ -26,6 +26,7 @@
   "module": "dist/clerk.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
+    "channel",
     "dist",
     "headless",
     "no-rhc"
@@ -42,6 +43,7 @@
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
+    "dev:channel": "rspack serve --config rspack.config.js --env variant=\"clerk.channel.browser\"",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
