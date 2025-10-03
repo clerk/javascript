@@ -40,7 +40,7 @@ function useFormTextAnimation() {
         transitionTimingFunction: t.transitionTiming.$common,
       });
     },
-    [prefersReducedMotion],
+    [prefersReducedMotion, appearanceAnimations],
   );
 
   return {
@@ -48,17 +48,14 @@ function useFormTextAnimation() {
   };
 }
 
-const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
+const useCalculateErrorTextHeight = ({ feedback: _feedback }: { feedback: string }) => {
   const [height, setHeight] = useState(0);
 
-  const calculateHeight = useCallback(
-    (element: HTMLElement | null) => {
-      if (element) {
-        setHeight(element.scrollHeight + element.offsetTop * 2);
-      }
-    },
-    [feedback],
-  );
+  const calculateHeight = useCallback((element: HTMLElement | null) => {
+    if (element) {
+      setHeight(element.scrollHeight + element.offsetTop * 2);
+    }
+  }, []);
 
   return {
     height,
@@ -143,10 +140,9 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
-      // We only want the id applied when the feedback type is an error
-      // to avoid having multiple elements in the dom with the same id attribute.
-      // We also only have aria-describedby applied to the input when it is an error.
-      id: type === 'error' ? errorMessageId : undefined,
+      // Generate unique IDs for all feedback types to enable aria-describedby
+      // Use errorMessageId for errors to maintain existing behavior, otherwise generate a unique ID
+      id: type === 'error' ? errorMessageId : `${id}-${type}-feedback`,
     };
   };
 
@@ -163,6 +159,13 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const InfoComponentA = FormInfoComponent[feedbacks.a?.feedbackType || 'info'];
   const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
+  // Determine which feedback is currently visible and get its ID
+  const currentFeedbackId = feedbacks.a?.shouldEnter
+    ? getElementProps(feedbacks.a?.feedbackType).id
+    : feedbacks.b?.shouldEnter
+      ? getElementProps(feedbacks.b?.feedbackType).id
+      : undefined;
+
   return (
     <Flex
       style={{
@@ -171,6 +174,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
       }}
       center={center}
       sx={[getFormTextAnimation(!!feedback), sx]}
+      data-current-feedback-id={currentFeedbackId}
     >
       <InfoComponentA
         {...getElementProps(feedbacks.a?.feedbackType)}
