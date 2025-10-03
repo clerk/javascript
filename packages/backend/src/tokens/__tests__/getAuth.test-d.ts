@@ -52,8 +52,8 @@ describe('getAuth() or auth() with request parameter', () => {
 
 describe('getAuth() or auth() without request parameter', () => {
   type SessionAuthWithRedirect = SessionAuthObject & {
-    redirectToSignIn: RedirectFun<void>;
-    redirectToSignUp: RedirectFun<void>;
+    redirectToSignIn: RedirectFun<Response>;
+    redirectToSignUp: RedirectFun<Response>;
   };
 
   // Mimic Next.js auth() helper
