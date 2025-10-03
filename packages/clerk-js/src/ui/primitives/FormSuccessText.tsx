@@ -19,7 +19,7 @@ export const { applyVariants } = createVariants(theme => ({
   variants: {},
 }));
 
-export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & { role?: string }>;
+export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
 export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
   const { children, ...rest } = props;

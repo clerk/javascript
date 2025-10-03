@@ -140,8 +140,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
-      // Generate unique IDs for all feedback types to enable aria-describedby
-      // Use errorMessageId for errors to maintain existing behavior, otherwise generate a unique ID
+      // Generate unique IDs for all feedback types to enable aria-describedby usage.
+      // Use errorMessageId for errors to maintain existing behavior, otherwise generate a unique ID.
       id: type === 'error' ? errorMessageId : `${id}-${type}-feedback`,
     };
   };
@@ -159,7 +159,6 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const InfoComponentA = FormInfoComponent[feedbacks.a?.feedbackType || 'info'];
   const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
-  // Determine which feedback is currently visible and get its ID
   const currentFeedbackId = feedbacks.a?.shouldEnter
     ? getElementProps(feedbacks.a?.feedbackType).id
     : feedbacks.b?.shouldEnter

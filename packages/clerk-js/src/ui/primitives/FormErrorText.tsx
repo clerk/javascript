@@ -20,7 +20,7 @@ const { applyVariants } = createVariants(theme => ({
   variants: {},
 }));
 
-type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & { role?: string }>;
+type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
 export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props, ref) => {
   const { hasError, errorMessageId } = useFormField() || {};
