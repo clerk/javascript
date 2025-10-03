@@ -178,7 +178,6 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     const value = cache.get(cacheKey.toKey());
 
     if (!value) {
-      debugLogger.debug('Token not found in cache', { tokenId: cacheKeyJSON.tokenId }, 'tokenCache');
       return;
     }
 
