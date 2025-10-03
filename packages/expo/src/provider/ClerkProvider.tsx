@@ -1,6 +1,6 @@
 import '../polyfills';
 
-import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
 import type { Without } from '@clerk/types';
 import * as WebBrowser from 'expo-web-browser';
 

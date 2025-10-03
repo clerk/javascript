@@ -1,4 +1,4 @@
-import { setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+import { setErrorThrowerOptions } from '@clerk/react/internal';
 
 export {
   isClerkAPIResponseError,
@@ -6,7 +6,7 @@ export {
   isKnownError,
   isMetamaskError,
   isClerkRuntimeError,
-} from '@clerk/clerk-react/errors';
+} from '@clerk/react/errors';
 
 /**
  * @deprecated Use `getClerkInstance()` instead.

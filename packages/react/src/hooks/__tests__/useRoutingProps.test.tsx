@@ -23,7 +23,7 @@ describe('useRoutingProps()', () => {
 
     expect(() => {
       render(<TestingComponent />);
-    }).toThrowError(/@clerk\/clerk-react: The <TestingComponent\/> component uses path-based routing by default/);
+    }).toThrowError(/@clerk\/react: The <TestingComponent\/> component uses path-based routing by default/);
   });
 
   test('the path option is ignored when "hash" routing prop', () => {
@@ -72,7 +72,7 @@ describe('useRoutingProps()', () => {
         />,
       );
     }).toThrowError(
-      /@clerk\/clerk-react: The `path` prop will only be respected when the Clerk component uses path-based routing/,
+      /@clerk\/react: The `path` prop will only be respected when the Clerk component uses path-based routing/,
     );
   });
 
@@ -90,7 +90,7 @@ describe('useRoutingProps()', () => {
         />,
       );
     }).toThrowError(
-      /@clerk\/clerk-react: The `path` prop will only be respected when the Clerk component uses path-based routing/,
+      /@clerk\/react: The `path` prop will only be respected when the Clerk component uses path-based routing/,
     );
   });
 

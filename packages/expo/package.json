@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "base-64": "^1.0.0",

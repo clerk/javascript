@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useSignUpSignal } from '@clerk/clerk-react/experimental';
+import { useSignUpSignal } from '@clerk/react/experimental';
 import { NavLink, useNavigate } from 'react-router';
 
 export function SignUp({ className, ...props }: React.ComponentProps<'div'>) {

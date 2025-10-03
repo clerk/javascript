@@ -6,4 +6,4 @@ export {
   isReverificationCancelledError,
   EmailLinkErrorCode,
   EmailLinkErrorCodeStatus,
-} from '@clerk/clerk-react/errors';
+} from '@clerk/react/errors';
