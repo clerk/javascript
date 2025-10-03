@@ -19,7 +19,7 @@ export const { applyVariants } = createVariants(theme => ({
   variants: {},
 }));
 
-export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
+export type FormTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants> & { role?: string }>;
 
 export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
   const { children, ...rest } = props;
@@ -28,7 +28,6 @@ export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, re
     <Text
       ref={ref}
       colorScheme='secondary'
-      aria-live='polite'
       {...rest}
       css={applyVariants(props) as any}
     >

@@ -186,6 +186,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
         ]}
         localizationKey={titleize(feedbacks.a?.feedback)}
+        aria-live={feedbacks.a?.shouldEnter ? 'polite' : 'off'}
       />
       <InfoComponentB
         {...getElementProps(feedbacks.b?.feedbackType)}
@@ -197,6 +198,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
         ]}
         localizationKey={titleize(feedbacks.b?.feedback)}
+        aria-live={feedbacks.b?.shouldEnter ? 'polite' : 'off'}
       />
     </Flex>
   );
