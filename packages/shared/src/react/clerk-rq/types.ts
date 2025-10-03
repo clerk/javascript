@@ -24,6 +24,7 @@ export interface UseBaseQueryOptions<
 }
 
 export type AnyUseQueryOptions = UseQueryOptions<any, any, any, any>;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface UseQueryOptions<
   TQueryFnData = unknown,
   TError = DefaultError,
