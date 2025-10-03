@@ -60,6 +60,7 @@ export interface SignUpResource extends ClerkResource {
   createdUserId: string | null;
   abandonAt: number | null;
   legalAcceptedAt: number | null;
+  locale: string | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 

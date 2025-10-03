@@ -8,6 +8,7 @@ interface SignUpFutureAdditionalParams {
   lastName?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
+  locale?: string;
 }
 
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
