@@ -95,7 +95,7 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/types';
-import type { QueryClient } from '@tanstack/query-core';
+import { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -223,7 +223,7 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
-  #queryClient: QueryClient | undefined;
+  #queryClient: QueryClient | undefined = new QueryClient();
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -242,14 +242,19 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
 
-  get __internal_queryClient(): QueryClient | undefined {
-    return this.#queryClient;
+  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
+    return this.#queryClient
+      ? {
+          __tag: 'clerk-rq-client', // make this a symbol
+          client: this.#queryClient,
+        }
+      : undefined;
   }
 
   public async getInternalQueryClient(): Promise<QueryClient> {
-    const QueryClient = await import('./query-core').then(module => module.QueryClient);
+    // const QueryClient = await import('./query-core').then(module => module.QueryClient);
     if (!this.#queryClient) {
-      this.#queryClient = new QueryClient();
+      // this.#queryClient = new QueryClient();
       // @ts-expect-error - queryClientStatus is not typed
       this.#publicEventBus.emit('queryClientStatus', 'ready');
     }

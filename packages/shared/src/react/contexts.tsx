@@ -13,8 +13,8 @@ import type {
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
+import { DataClientProvider } from './providers/DataClientProvider';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
@@ -68,7 +68,7 @@ const OrganizationProvider = ({
   }
 >) => {
   return (
-    <SWRConfig value={swrConfig}>
+    <DataClientProvider>
       <OrganizationContextInternal.Provider
         value={{
           value: { organization },
@@ -76,7 +76,7 @@ const OrganizationProvider = ({
       >
         {children}
       </OrganizationContextInternal.Provider>
-    </SWRConfig>
+    </DataClientProvider>
   );
 };
 
