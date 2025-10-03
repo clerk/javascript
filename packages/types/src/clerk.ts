@@ -1103,6 +1103,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
 
+    __internal_startTransition?: (cb: () => Promise<void> | void) => void;
+
+    __internal_setResources?: (resources: Resources) => void;
+
     /**
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
      * session tasks need to be completed.
