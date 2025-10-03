@@ -45,6 +45,45 @@ export class StateProxy implements State {
         status: 'needs_identifier' as const,
         availableStrategies: [],
         isTransferable: false,
+        get id() {
+          return gateProperty(target, 'id', undefined);
+        },
+        get supportedFirstFactors() {
+          return gateProperty(target, 'supportedFirstFactors', []);
+        },
+        get supportedSecondFactors() {
+          return gateProperty(target, 'supportedSecondFactors', []);
+        },
+        get secondFactorVerification() {
+          return gateProperty(target, 'secondFactorVerification', {
+            status: null,
+            error: null,
+            expireAt: null,
+            externalVerificationRedirectURL: null,
+            nonce: null,
+            attempts: null,
+            message: null,
+            strategy: null,
+            verifiedAtClient: null,
+            verifiedFromTheSameClient: () => false,
+            __internal_toSnapshot: () => {
+              throw new Error('__internal_toSnapshot called before Clerk is loaded');
+            },
+            pathRoot: '',
+            reload: () => {
+              throw new Error('__internal_toSnapshot called before Clerk is loaded');
+            },
+          });
+        },
+        get identifier() {
+          return gateProperty(target, 'identifier', null);
+        },
+        get createdSessionId() {
+          return gateProperty(target, 'createdSessionId', null);
+        },
+        get userData() {
+          return gateProperty(target, 'userData', {});
+        },
         get firstFactorVerification() {
           return gateProperty(target, 'firstFactorVerification', {
             status: null,
@@ -107,6 +146,54 @@ export class StateProxy implements State {
       errors: defaultErrors(),
       fetchStatus: 'idle' as const,
       signUp: {
+        get id() {
+          return gateProperty(target, 'id', undefined);
+        },
+        get requiredFields() {
+          return gateProperty(target, 'requiredFields', []);
+        },
+        get optionalFields() {
+          return gateProperty(target, 'optionalFields', []);
+        },
+        get missingFields() {
+          return gateProperty(target, 'missingFields', []);
+        },
+        get username() {
+          return gateProperty(target, 'username', null);
+        },
+        get firstName() {
+          return gateProperty(target, 'firstName', null);
+        },
+        get lastName() {
+          return gateProperty(target, 'lastName', null);
+        },
+        get emailAddress() {
+          return gateProperty(target, 'emailAddress', null);
+        },
+        get phoneNumber() {
+          return gateProperty(target, 'phoneNumber', null);
+        },
+        get web3Wallet() {
+          return gateProperty(target, 'web3Wallet', null);
+        },
+        get hasPassword() {
+          return gateProperty(target, 'hasPassword', false);
+        },
+        get unsafeMetadata() {
+          return gateProperty(target, 'unsafeMetadata', {});
+        },
+        get createdSessionId() {
+          return gateProperty(target, 'createdSessionId', null);
+        },
+        get createdUserId() {
+          return gateProperty(target, 'createdUserId', null);
+        },
+        get abandonAt() {
+          return gateProperty(target, 'abandonAt', null);
+        },
+        get legalAcceptedAt() {
+          return gateProperty(target, 'legalAcceptedAt', null);
+        },
         get status() {
           return gateProperty(target, 'status', 'missing_requirements');
         },

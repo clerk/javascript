@@ -1,6 +1,6 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
 import type { Web3Strategy } from './strategies';
 
 interface SignUpFutureAdditionalParams {
@@ -72,9 +72,29 @@ export interface SignUpFutureFinalizeParams {
  */
 export interface SignUpFutureResource {
   /**
+   * The unique identifier for the current sign-up attempt.
+   */
+  readonly id?: string;
+
+  /**
    * The status of the current sign-up attempt as a string (for example, `'missing_requirements'`, `'complete'`, `'abandoned'`, etc.)
    */
   readonly status: SignUpStatus;
+
+  /**
+   * The list of required fields for the current sign-up attempt.
+   */
+  readonly requiredFields: SignUpField[];
+
+  /**
+   * The list of optional fields for the current sign-up attempt.
+   */
+  readonly optionalFields: SignUpField[];
+
+  /**
+   * The list of missing fields for the current sign-up attempt.
+   */
+  readonly missingFields: SignUpField[];
 
   /**
    * An array of strings representing unverified fields such as `’email_address’`. Can be used to detect when verification is necessary.
@@ -88,6 +108,30 @@ export interface SignUpFutureResource {
   readonly isTransferable: boolean;
 
   readonly existingSession?: { sessionId: string };
+
+  readonly username: string | null;
+
+  readonly firstName: string | null;
+
+  readonly lastName: string | null;
+
+  readonly emailAddress: string | null;
+
+  readonly phoneNumber: string | null;
+
+  readonly web3Wallet: string | null;
+
+  readonly hasPassword: boolean;
+
+  readonly unsafeMetadata: SignUpUnsafeMetadata;
+
+  readonly createdSessionId: string | null;
+
+  readonly createdUserId: string | null;
+
+  readonly abandonAt: number | null;
+
+  readonly legalAcceptedAt: number | null;
 
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
 
