@@ -1,4 +1,4 @@
-import { OrganizationList } from '@clerk/clerk-react';
+import { OrganizationList } from '@clerk/react';
 
 export default function Page() {
   return (

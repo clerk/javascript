@@ -1,5 +1,5 @@
 'use client';
-import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 import { inBrowser } from '@clerk/shared/browser';
 import { logger } from '@clerk/shared/logger';
 import dynamic from 'next/dynamic';

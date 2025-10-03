@@ -1,6 +1,6 @@
 'use client';
 
-export * from '@clerk/clerk-react/experimental';
+export * from '@clerk/react/experimental';
 
 export type {
   __experimental_CheckoutButtonProps as CheckoutButtonProps,

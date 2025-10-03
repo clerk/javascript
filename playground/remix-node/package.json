@@ -6,11 +6,11 @@
     "dev": "remix dev",
     "start": "remix-serve build",
     "clean": "rm -rf .cache build",
-    "yalc:add": "pnpm yalc add -- @clerk/types @clerk/shared @clerk/backend @clerk/remix @clerk/clerk-react"
+    "yalc:add": "pnpm yalc add -- @clerk/types @clerk/shared @clerk/backend @clerk/remix @clerk/react"
   },
   "dependencies": {
     "@clerk/backend": "file:.yalc/@clerk/backend",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/react": "file:.yalc/@clerk/react",
     "@clerk/remix": "file:.yalc/@clerk/remix",
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",

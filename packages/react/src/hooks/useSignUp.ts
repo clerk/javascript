@@ -20,7 +20,7 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
  * <Tab>
  *
  * ```tsx {{ filename: 'src/pages/SignUpPage.tsx' }}
- * import { useSignUp } from '@clerk/clerk-react'
+ * import { useSignUp } from '@clerk/react'
  *
  * export default function SignUpPage() {
  *   const { isLoaded, signUp } = useSignUp()

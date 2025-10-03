@@ -53,7 +53,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  * This hook allows you to access the Signal-based `SignIn` resource.
  *
  * @example
- * import { useSignInSignal } from "@clerk/clerk-react/experimental";
+ * import { useSignInSignal } from "@clerk/react/experimental";
  *
  * function SignInForm() {
  *   const { signIn, errors, fetchStatus } = useSignInSignal();
@@ -70,7 +70,7 @@ export function useSignInSignal() {
  * This hook allows you to access the Signal-based `SignUp` resource.
  *
  * @example
- * import { useSignUpSignal } from "@clerk/clerk-react/experimental";
+ * import { useSignUpSignal } from "@clerk/react/experimental";
  *
  * function SignUpForm() {
  *   const { signUp, errors, fetchStatus } = useSignUpSignal();

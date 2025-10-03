@@ -1,6 +1,6 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
-import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/clerk-react/internal';
+import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/react/internal';
 import { useRouter } from 'next/router';
 import React from 'react';
 

@@ -391,9 +391,9 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "clerk-react-dev-minor",
+      groupSlug: "react-dev-minor",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -403,13 +403,13 @@
         "minor",
       ],
       automerge: true,
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "[DEV] major dependencies",
-      groupSlug: "clerk-react-dev-major",
+      groupSlug: "react-dev-major",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -417,13 +417,13 @@
       matchUpdateTypes: [
         "major",
       ],
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "minor & patch dependencies",
-      groupSlug: "clerk-react-prod-minor",
+      groupSlug: "react-prod-minor",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -432,13 +432,13 @@
         "patch",
         "minor",
       ],
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "major dependencies",
-      groupSlug: "clerk-react-prod-major",
+      groupSlug: "react-prod-major",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -446,7 +446,7 @@
       matchUpdateTypes: [
         "major",
       ],
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "[DEV] minor & patch dependencies",

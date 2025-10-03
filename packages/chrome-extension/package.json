@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "webextension-polyfill": "~0.12.0"
   },

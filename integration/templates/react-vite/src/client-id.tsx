@@ -1,4 +1,4 @@
-import { useClerk, useSession } from '@clerk/clerk-react';
+import { useClerk, useSession } from '@clerk/react';
 
 export function ClientId() {
   const clerk = useClerk();

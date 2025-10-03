@@ -8,7 +8,7 @@ import {
   UserButton,
   UserProfile,
   useUser,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
 import reactLogo from './assets/react.svg';

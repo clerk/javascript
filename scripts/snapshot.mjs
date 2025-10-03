@@ -14,7 +14,7 @@ const snapshot = `---
 '@clerk/nextjs': patch
 '@clerk/shared': patch
 '@clerk/themes': patch
-'@clerk/clerk-react': patch
+'@clerk/react': patch
 '@clerk/remix': patch
 '@clerk/types': patch
 '@clerk/clerk-expo': patch

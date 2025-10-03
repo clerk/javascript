@@ -1,1 +1,1 @@
-export { useSignInSignal, useSignUpSignal } from '@clerk/clerk-react/experimental';
+export { useSignInSignal, useSignUpSignal } from '@clerk/react/experimental';

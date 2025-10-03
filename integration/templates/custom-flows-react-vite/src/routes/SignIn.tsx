@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUser } from '@clerk/clerk-react';
-import { useSignInSignal } from '@clerk/clerk-react/experimental';
+import { useUser } from '@clerk/react';
+import { useSignInSignal } from '@clerk/react/experimental';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 

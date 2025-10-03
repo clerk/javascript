@@ -1,7 +1,7 @@
 // @ts-ignore
 import React from 'react';
 import './App.css';
-import { SignedIn, SignedOut, SignIn, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignIn, UserButton } from '@clerk/react';
 
 function App() {
   return (

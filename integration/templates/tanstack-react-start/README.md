@@ -11,8 +11,8 @@
   <h1>
     Clerk and TanStack Start Quickstart
   </h1>
-  <a href="https://www.npmjs.com/package/@clerk/clerk-react">
-    <img alt="Downloads" src="https://img.shields.io/npm/dm/@clerk/clerk-react" />
+  <a href="https://www.npmjs.com/package/@clerk/react">
+    <img alt="Downloads" src="https://img.shields.io/npm/dm/@clerk/react" />
   </a>
   <a href="https://discord.com/invite/b5rXHjAg7A">
     <img alt="Discord" src="https://img.shields.io/discord/856971667393609759?color=7389D8&label&logo=discord&logoColor=ffffff" />
