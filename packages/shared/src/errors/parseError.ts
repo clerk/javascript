@@ -19,6 +19,7 @@ export function parseError(error: ClerkAPIErrorJSON): ClerkAPIError {
     code: error.code,
     message: error.message,
     longMessage: error.long_message,
+    clerkTraceId: error.clerk_trace_id,
     meta: {
       paramName: error?.meta?.param_name,
       sessionId: error?.meta?.session_id,

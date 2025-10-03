@@ -15,6 +15,10 @@ export interface ClerkAPIError {
    */
   longMessage?: string;
   /**
+   * A trace ID that can be used to identify the error in the Clerk API logs.
+   */
+  clerkTraceId?: string;
+  /**
    * Additional information about the error.
    */
   meta?: {
