@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import browser from 'webextension-polyfill';
 
 import { BrowserStorageCache, MemoryStorageCache } from '../storage';
@@ -21,7 +22,8 @@ describe('StorageCache', () => {
 
   describe('set', () => {
     test('setting the storage cache', async () => {
-      const setMock = jest.mocked(browser.storage.local.set).mockResolvedValueOnce(_void);
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
+      const setMock = vi.mocked(browser.storage.local.set).mockResolvedValueOnce(_void);
 
       expect(await BrowserStorageCache.set(KEY, VALUE)).toBe(_void);
       expect(setMock).toHaveBeenCalledTimes(1);
@@ -31,7 +33,8 @@ describe('StorageCache', () => {
 
   describe('remove', () => {
     test('removing from the storage cache', async () => {
-      const removeMock = jest.mocked(browser.storage.local.remove).mockResolvedValueOnce(_void);
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
+      const removeMock = vi.mocked(browser.storage.local.remove).mockResolvedValueOnce(_void);
 
       expect(await BrowserStorageCache.remove(KEY)).toBe(_void);
       expect(removeMock).toHaveBeenCalledTimes(1);
@@ -40,8 +43,13 @@ describe('StorageCache', () => {
   });
 
   describe('get', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
     test('value missing', async () => {
-      const getMock = jest.mocked(browser.storage.local.get).mockResolvedValue({});
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
+      const getMock = vi.mocked(browser.storage.local.get).mockResolvedValue({});
 
       expect(await BrowserStorageCache.get(KEY)).toBeUndefined();
       expect(getMock).toHaveBeenCalledTimes(1);
@@ -49,7 +57,8 @@ describe('StorageCache', () => {
     });
 
     test('value exists', async () => {
-      const getMock = jest.mocked(browser.storage.local.get).mockResolvedValue({ [KEY]: VALUE });
+      // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
+      const getMock = vi.mocked(browser.storage.local.get).mockResolvedValue({ [KEY]: VALUE });
 
       expect(await BrowserStorageCache.get(KEY)).toBe(VALUE);
       expect(getMock).toHaveBeenCalledTimes(1);

@@ -2,6 +2,8 @@ packages:
   - 'packages/*'
 
 minimumReleaseAge: 2880
+minimumReleaseAgeExclude:
+  - '@clerk/*'
 
 catalogs:
   # Can be referenced through "catalog:react"
@@ -21,4 +23,4 @@ catalogs:
     tslib: 2.8.1
     tsup: 8.5.0
     typescript: 5.8.3
-    zx: 8.8.1
+    zx: 8.8.3
