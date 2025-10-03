@@ -18,9 +18,10 @@ import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvid
 import { createGetToken, createSignOut } from './utils';
 
 /**
- * @inline
+ * An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ * @includeType initialAuthStateOrOptions
  */
-type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
+export type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | null;
 
 /**
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
