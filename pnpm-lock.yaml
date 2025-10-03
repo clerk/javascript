@@ -472,7 +472,7 @@ importers:
         version: 0.5.17
       '@tanstack/query-core':
         specifier: ^5.87.4
-        version: 5.90.2
+        version: 5.87.4
       '@zxcvbn-ts/core':
         specifier: 3.0.4
         version: 3.0.4
@@ -925,9 +925,6 @@ importers:
       '@clerk/types':
         specifier: workspace:^
         version: link:../types
-      '@tanstack/react-query':
-        specifier: ^5.87.4
-        version: 5.90.2(react@18.3.1)
       dequal:
         specifier: 2.0.3
         version: 2.0.3
@@ -956,6 +953,9 @@ importers:
       '@stripe/stripe-js':
         specifier: 5.6.0
         version: 5.6.0
+      '@tanstack/query-core':
+        specifier: 5.87.4
+        version: 5.87.4
       '@types/glob-to-regexp':
         specifier: 0.4.4
         version: 0.4.4
@@ -2766,7 +2766,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -4889,13 +4889,8 @@ packages:
     resolution: {integrity: sha512-cs1WKawpXIe+vSTeiZUuSBy8JFjEuDgdMKZFRLKwQysKo8y2q6Q1HvS74Yw+m5IhOW1nTZooa6rlgdfXcgFAaw==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.90.2':
-    resolution: {integrity: sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ==}
-
-  '@tanstack/react-query@5.90.2':
-    resolution: {integrity: sha512-CLABiR+h5PYfOWr/z+vWFt5VsOA2ekQeRQBFSKlcoW6Ndx/f8rfyVmq4LbgOM4GG2qtxAxjLYLOpCNTYm4uKzw==}
-    peerDependencies:
-      react: ^18 || ^19
+  '@tanstack/query-core@5.87.4':
+    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
 
   '@tanstack/react-router@1.131.49':
     resolution: {integrity: sha512-WHgWJ053W8VU8lUYh8abSHVPeQdpaCpfaUAbV+3uYXbip2G+qlmI/Gsbh/BBV3bYtIi6l3t5dqx3ffCXNTzB5Q==}
@@ -19663,12 +19658,7 @@ snapshots:
 
   '@tanstack/history@1.131.2': {}
 
-  '@tanstack/query-core@5.90.2': {}
-
-  '@tanstack/react-query@5.90.2(react@18.3.1)':
-    dependencies:
-      '@tanstack/query-core': 5.90.2
-      react: 18.3.1
+  '@tanstack/query-core@5.87.4': {}
 
   '@tanstack/react-router@1.131.49(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

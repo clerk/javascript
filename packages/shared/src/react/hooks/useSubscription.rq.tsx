@@ -1,8 +1,9 @@
 import type { BillingSubscriptionResource, EnvironmentResource } from '@clerk/types';
-import { useQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
+import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
+import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
@@ -15,65 +16,8 @@ const hookName = 'useSubscription';
 
 /**
  * @internal
- */
-export function useDebounce<T>(value: T, delay: number): T {
-  const [throttledValue, setThrottledValue] = useState(value);
-  const lastUpdated = useRef<number | null>(null);
-
-  useEffect(() => {
-    const now = Date.now();
-
-    if (lastUpdated.current && now >= lastUpdated.current + delay) {
-      lastUpdated.current = now;
-      setThrottledValue(value);
-    } else {
-      const id = window.setTimeout(() => {
-        lastUpdated.current = now;
-        setThrottledValue(value);
-      }, delay);
-
-      return () => window.clearTimeout(id);
-    }
-  }, [value, delay]);
-
-  return throttledValue;
-}
-
-const useClerkQueryClient = () => {
-  const clerk = useClerkInstanceContext();
-  // // @ts-expect-error - __internal_queryClient is not typed
-  // console.log('useClerkQueryClient, clerk', clerk.__internal_queryClient);
-  // @ts-expect-error - __internal_queryClient is not typed
-  const [queryStatus, setQueryStatus] = useState('__tag' in clerk.__internal_queryClient ? 'ready' : 'loading');
-  console.log('useClerkQueryClient, queryStatus', queryStatus);
-  useEffect(() => {
-    // @ts-expect-error - queryClientStatus is not typed
-    clerk.on('queryClientStatus', setQueryStatus);
-    return () => {
-      // @ts-expect-error - queryClientStatus is not typed
-      clerk.off('queryClientStatus', setQueryStatus);
-    };
-  }, [clerk]);
-
-  const queryClient = useMemo(() => {
-    // @ts-expect-error - __internal_queryClient is not typed
-    console.log('useClerkQueryClient, clerk.__internal_queryClient', clerk.__internal_queryClient);
-    // @ts-expect-error - __internal_queryClient is not typed
-    return clerk.__internal_queryClient;
-    // @ts-expect-error - __internal_queryClient is not typed
-  }, [queryStatus, clerk.status, clerk.__internal_queryClient]);
-
-  const debouncedQueryStatus = useDebounce(
-    '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client' ? 'ready' : queryStatus,
-    5_000,
-  );
-  console.log('useClerkQueryClient, debouncedQueryStatus', debouncedQueryStatus);
-
-  return [queryClient.client, debouncedQueryStatus];
-};
-
-/**
- *
+ * This is the new implementation of useSubscription using React Query.
+ * It is exported only if the package is build with the `CLERK_USE_RQ` environment variable set to `true`.
  */
 export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult<BillingSubscriptionResource> {
   useAssertWrappedByClerkProvider(hookName);
@@ -92,7 +36,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
 
-  const [queryClient, queryStatus] = useClerkQueryClient();
+  const queryClient = useClerkQueryClient();
 
   const queryKey = useMemo(() => {
     return [
@@ -104,21 +48,15 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     ];
   }, [user?.id, isOrganization, organization?.id]);
 
-  console.log('enabled', Boolean(user?.id && billingEnabled) && clerk.status === 'ready' && queryStatus === 'ready');
-
-  const query = useQuery(
-    {
-      queryKey,
-      queryFn: ({ queryKey }) => {
-        const obj = queryKey[1] as { args: { orgId?: string } };
-        console.log('queryFn, obj', obj);
-        return clerk.billing.getSubscription(obj.args);
-      },
-      staleTime: 1_000 * 60,
-      enabled: Boolean(user?.id && billingEnabled) && clerk.status === 'ready' && queryStatus === 'ready',
+  const query = useClerkQuery({
+    queryKey,
+    queryFn: ({ queryKey }) => {
+      const obj = queryKey[1] as { args: { orgId?: string } };
+      return clerk.billing.getSubscription(obj.args);
     },
-    queryClient,
-  );
+    staleTime: 1_000 * 60,
+    enabled: Boolean(user?.id && billingEnabled),
+  });
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
 

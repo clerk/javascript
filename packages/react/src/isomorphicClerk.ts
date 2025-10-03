@@ -115,66 +115,6 @@ type IsomorphicLoadedClerk = Without<
   apiKeys: APIKeysNamespace | undefined;
 };
 
-export type RecursiveMock = {
-  (...args: unknown[]): RecursiveMock;
-} & {
-  readonly [key in string | symbol]: RecursiveMock;
-};
-
-/**
- * Creates a recursively self-referential Proxy that safely handles:
- * - Arbitrary property access (e.g., obj.any.prop.path)
- * - Function calls at any level (e.g., obj.a().b.c())
- * - Construction (e.g., new obj.a.b())
- *
- * Always returns itself to allow infinite chaining without throwing.
- */
-function createRecursiveProxy(label: string = 'Mock'): RecursiveMock {
-  // The callable target for the proxy so that `apply` works
-  const callableTarget = function noop(): void {};
-
-  // eslint-disable-next-line prefer-const
-  let self: RecursiveMock;
-  const handler: ProxyHandler<typeof callableTarget> = {
-    get(_target, prop) {
-      // Avoid being treated as a Promise/thenable by test runners or frameworks
-      if (prop === 'then') {
-        return undefined;
-      }
-      if (prop === 'toString') {
-        return () => `[${label}]`;
-      }
-      if (prop === Symbol.toPrimitive) {
-        return () => 0;
-      }
-      return self;
-    },
-    apply() {
-      return self;
-    },
-    construct() {
-      return self as unknown as object;
-    },
-    has() {
-      return true;
-    },
-    set() {
-      return true;
-    },
-  };
-
-  self = new Proxy(callableTarget, handler) as unknown as RecursiveMock;
-  return self;
-}
-
-/**
- * Returns a permissive mock compatible with `QueryClient` usage in tests.
- * It accepts any chain of property accesses and calls without throwing.
- */
-export function createMockQueryClient(): RecursiveMock {
-  return createRecursiveProxy('MockQueryClient') as unknown as RecursiveMock;
-}
-
 export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private readonly mode: 'browser' | 'server';
   private readonly options: IsomorphicClerkOptions;
@@ -224,7 +164,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #publishableKey: string;
   #eventBus = createClerkEventBus();
   #stateProxy: StateProxy;
-  #__internal_queryClient = createMockQueryClient();
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -348,14 +287,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get __internal_queryClient() {
     // @ts-expect-error - __internal_queryClient is not typed
-    if (!this.clerkjs?.__internal_queryClient) {
-      // @ts-expect-error - __internal_queryClient is not typed
-      void this.clerkjs?.getInternalQueryClient?.();
-      this.prefetchQueryClientStatus = true;
-    }
-
-    // @ts-expect-error - __internal_queryClient is not typed
-    return this.clerkjs?.__internal_queryClient || this.#__internal_queryClient;
+    return this.clerkjs?.__internal_queryClient;
   }
 
   get isSatellite() {
@@ -693,10 +625,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openWaitlist(this.preOpenWaitlist);
     }
 
-    if (this.prefetchQueryClientStatus) {
-      // @ts-expect-error - queryClientStatus is not typed
-      this.clerkjs.getInternalQueryClient?.();
-    }
+    // if (this.prefetchQueryClientStatus) {
+    //   // @ts-expect-error - queryClientStatus is not typed
+    //   this.clerkjs.getInternalQueryClient?.();
+    // }
 
     this.premountSignInNodes.forEach((props, node) => {
       clerkjs.mountSignIn(node, props);

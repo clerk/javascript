@@ -88,26 +88,6 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return { value };
   }, [orgId, organization]);
 
-  // const [queryStatus, setQueryStatus] = React.useState('loading');
-
-  // React.useEffect(() => {
-  //   // @ts-expect-error - queryClientStatus is not typed
-  //   clerk.on('queryClientStatus', (e)=>{
-  //     console.log('on queryClientStatus', e);
-  //     setQueryStatus(e);
-  //   });
-  //   return () => {
-  //     // @ts-expect-error - queryClientStatus is not typed
-  //     clerk.off('queryClientStatus', setQueryStatus);
-  //   };
-  // }, [clerk]);
-
-  // const queryClient = React.useMemo(() => {
-  //   return clerk.__internal_queryClient;
-  // }, [queryStatus, clerkStatus]);
-
-  // console.log('queryStatus', queryStatus, queryClient);
-
   return (
     // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
     <IsomorphicClerkContext.Provider value={clerkCtx}>

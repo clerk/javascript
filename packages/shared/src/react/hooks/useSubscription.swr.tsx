@@ -15,10 +15,11 @@ const hookName = 'useSubscription';
 
 /**
  * @internal
+ * This is the existing implementation of useSubscription using SWR.
+ * It is kept here for backwards compatibility until our next major version.
  */
 export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult<BillingSubscriptionResource> {
   useAssertWrappedByClerkProvider(hookName);
-  console.log('useSubscription SWR');
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();

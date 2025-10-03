@@ -14,7 +14,7 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { createContextAndHook } from './hooks/createContextAndHook';
-import { DataClientProvider } from './providers/DataClientProvider';
+import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
@@ -59,16 +59,14 @@ const OrganizationProvider = ({
   children,
   organization,
   swrConfig,
-  // queryClient,
 }: PropsWithChildren<
   OrganizationContextProps & {
     // Exporting inferred types  directly from SWR will result in error while building declarations
     swrConfig?: any;
-    // queryClient?: QueryClient;
   }
 >) => {
   return (
-    <DataClientProvider>
+    <SWRConfigCompat swrConfig={swrConfig}>
       <OrganizationContextInternal.Provider
         value={{
           value: { organization },
@@ -76,7 +74,7 @@ const OrganizationProvider = ({
       >
         {children}
       </OrganizationContextInternal.Provider>
-    </DataClientProvider>
+    </SWRConfigCompat>
   );
 };
 

@@ -146,7 +146,6 @@
   },
   "dependencies": {
     "@clerk/types": "workspace:^",
-    "@tanstack/react-query": "^5.87.4",
     "dequal": "2.0.3",
     "glob-to-regexp": "0.4.1",
     "js-cookie": "3.0.5",
@@ -156,6 +155,7 @@
   "devDependencies": {
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
+    "@tanstack/query-core": "5.87.4",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.1.0",
