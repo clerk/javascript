@@ -52,8 +52,6 @@ export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JS
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationProvider
-            // // @ts-expect-error - __internal_queryClient is not typed
-            // queryClient={clerk.__internal_queryClient}
             {...organizationCtx.value}
             swrConfig={props.swrConfig}
           >

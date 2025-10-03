@@ -146,7 +146,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
-  private prefetchQueryClientStatus = false;
 
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
@@ -576,7 +575,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     // @ts-expect-error - queryClientStatus is not typed
     this.#eventBus.internal.retrieveListeners('queryClientStatus')?.forEach(listener => {
-      // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
+      // Since clerkjs exists it will call `this.clerkjs.on('queryClientStatus', listener)`
       // @ts-expect-error - queryClientStatus is not typed
       this.on('queryClientStatus', listener, { notify: true });
     });
@@ -624,11 +623,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.preOpenWaitlist !== null) {
       clerkjs.openWaitlist(this.preOpenWaitlist);
     }
-
-    // if (this.prefetchQueryClientStatus) {
-    //   // @ts-expect-error - queryClientStatus is not typed
-    //   this.clerkjs.getInternalQueryClient?.();
-    // }
 
     this.premountSignInNodes.forEach((props, node) => {
       clerkjs.mountSignIn(node, props);

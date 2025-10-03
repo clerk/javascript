@@ -96,7 +96,6 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
           <OrganizationProvider
             // key={clerkStatus + queryStatus}
             {...organizationCtx.value}
-            // queryClient={queryClient}
           >
             <AuthContext.Provider value={authCtx}>
               <UserContext.Provider value={userCtx}>
