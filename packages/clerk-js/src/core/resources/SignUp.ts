@@ -46,6 +46,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getBrowserLocale,
   getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
@@ -95,6 +96,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+  locale: string | null = null;
 
   /**
    * The current status of the sign-up process.
@@ -153,6 +155,11 @@ export class SignUp extends BaseResource implements SignUpResource {
     debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
 
     let finalParams = { ...params };
+
+    // Inject browser locale if not already provided
+    if (!finalParams.locale) {
+      finalParams.locale = getBrowserLocale();
+    }
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -600,12 +607,16 @@ class SignUpFuture implements SignUpFutureResource {
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
+      // Inject browser locale if not already provided
+      const locale = params.locale || getBrowserLocale();
+
       const body: Record<string, unknown> = {
         transfer: params.transfer,
         captchaToken,
         captchaWidgetType,
         captchaError,
         ...params,
+        locale,
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
