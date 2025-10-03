@@ -261,6 +261,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   creator_role: string;
   admin_delete_enabled: boolean;
   domains_enabled: boolean;
+  slug_disabled: boolean;
   domains_enrollment_modes: Array<DomainsEnrollmentModes>;
   domains_default_role: string;
 }
