@@ -1561,8 +1561,9 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   appearance?: CreateOrganizationTheme;
   /**
-   * Hides the optional "slug" field in the organization creation screen.
-   * @default false
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
@@ -1721,8 +1722,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * Hides the optional "slug" field in the organization creation screen.
-     * @default false
+     * @deprecated
+     * This prop will be removed in a future version.
+     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
      */
     hideSlug?: boolean;
     /**
@@ -1781,8 +1783,9 @@ export type OrganizationListProps = {
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
   /**
-   * Hides the optional "slug" field in the organization creation screen.
-   * @default false
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };

@@ -85,6 +85,7 @@ describe('OrganizationList', () => {
     it('hides the personal account with no data to list', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
+        f.withOrganizationSlug(true);
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', id: '1', role: 'admin' }],
@@ -210,6 +211,7 @@ describe('OrganizationList', () => {
     it('display CreateOrganization within OrganizationList', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
+        f.withOrganizationSlug(true);
         f.withUser({
           email_addresses: ['test@clerk.com'],
           create_organization_enabled: true,
