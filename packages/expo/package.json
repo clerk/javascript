@@ -51,6 +51,10 @@
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
     }
   },
   "main": "./dist/index.js",
