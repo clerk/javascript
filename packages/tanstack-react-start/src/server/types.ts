@@ -8,7 +8,7 @@ import type {
   SignUpForceRedirectUrl,
 } from '@clerk/types';
 
-export type LoaderOptions = {
+export type ClerkMiddlewareOptions = {
   publishableKey?: string;
   jwtKey?: string;
   secretKey?: string;
@@ -22,6 +22,8 @@ export type LoaderOptions = {
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps;
+
+export type LoaderOptions = ClerkMiddlewareOptions;
 
 export type AdditionalStateOptions = SignInFallbackRedirectUrl &
   SignUpFallbackRedirectUrl &
