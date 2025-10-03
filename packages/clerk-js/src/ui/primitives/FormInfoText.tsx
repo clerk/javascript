@@ -16,7 +16,6 @@ export const FormInfoText = forwardRef<HTMLElement, FormTextProps>((props, ref) 
     <Text
       ref={ref}
       colorScheme='secondary'
-      aria-live='polite'
       id={errorMessageId}
       {...props}
       css={applyVariants(props)}

@@ -40,7 +40,7 @@ function useFormTextAnimation() {
         transitionTimingFunction: t.transitionTiming.$common,
       });
     },
-    [prefersReducedMotion],
+    [prefersReducedMotion, appearanceAnimations],
   );
 
   return {
@@ -143,10 +143,9 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
-      // We only want the id applied when the feedback type is an error
-      // to avoid having multiple elements in the dom with the same id attribute.
-      // We also only have aria-describedby applied to the input when it is an error.
-      id: type === 'error' ? errorMessageId : undefined,
+      // Generate unique IDs for all feedback types to enable aria-describedby usage.
+      // Use errorMessageId for errors to maintain existing behavior, otherwise generate a unique ID.
+      id: type === 'error' ? errorMessageId : `${id}-${type}-feedback`,
     };
   };
 
@@ -182,6 +181,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
         ]}
         localizationKey={titleize(feedbacks.a?.feedback)}
+        aria-live={feedbacks.a?.shouldEnter ? 'polite' : 'off'}
       />
       <InfoComponentB
         {...getElementProps(feedbacks.b?.feedbackType)}
@@ -193,6 +193,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
         ]}
         localizationKey={titleize(feedbacks.b?.feedback)}
+        aria-live={feedbacks.b?.shouldEnter ? 'polite' : 'off'}
       />
     </Flex>
   );

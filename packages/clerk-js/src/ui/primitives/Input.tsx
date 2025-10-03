@@ -63,11 +63,9 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
-  // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
-  const { errorMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
-    fieldControl,
-    ['errorMessageId', 'ignorePasswordManager', 'feedbackType'],
-  );
+  // @ts-expect-error Typescript is complaining that `errorMessageId` and `feedbackMessageId` do not exist. We are clearly passing them from above.
+  const { errorMessageId, feedbackMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } =
+    sanitizeInputProps(fieldControl, ['errorMessageId', 'feedbackMessageId', 'ignorePasswordManager', 'feedbackType']);
 
   const propsWithoutVariants = filterProps({
     ...props,
@@ -106,7 +104,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       required={_required}
       id={props.id || fieldControlProps.id}
       aria-invalid={_hasError}
-      aria-describedby={errorMessageId ? errorMessageId : undefined}
+      aria-describedby={[errorMessageId, feedbackMessageId].filter(Boolean).join(' ') || undefined}
       aria-required={_required}
       aria-disabled={_disabled}
       data-feedback={feedbackType}

@@ -35,7 +35,6 @@ export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props,
     <Text
       ref={ref}
       colorScheme='danger'
-      aria-live='polite'
       id={errorMessageId}
       {...rest}
       css={applyVariants(props)}
