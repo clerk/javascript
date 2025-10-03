@@ -249,6 +249,34 @@ describe('SessionTokenCache', () => {
       expect(cachedEntry).toBeDefined();
       expect(cachedEntry?.tokenId).toBe('session_123');
     });
+
+    it('does not re-broadcast when receiving a broadcast message', async () => {
+      // Clear any previous postMessage calls from setup
+      mockBroadcastChannel.postMessage.mockClear();
+
+      const event: MessageEvent<SessionTokenEvent> = {
+        data: {
+          organizationId: null,
+          sessionId: 'session_123',
+          template: undefined,
+          tokenId: 'session_123',
+          tokenRaw: mockJwt,
+          traceId: 'test_trace_10',
+        },
+      } as MessageEvent<SessionTokenEvent>;
+
+      broadcastListener(event);
+
+      // Flush microtasks to let the tokenResolver promise settle without advancing timers
+      await Promise.resolve();
+
+      // Verify cache was updated
+      const cachedEntry = SessionTokenCache.get({ tokenId: 'session_123' });
+      expect(cachedEntry).toBeDefined();
+
+      // Critical: postMessage should NOT be called when handling a broadcast
+      expect(mockBroadcastChannel.postMessage).not.toHaveBeenCalled();
+    });
   });
 
   describe('token expiration with absolute time', () => {

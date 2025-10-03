@@ -86,6 +86,9 @@ const LEEWAY = 10;
 // This value should have the same value as the INTERVAL_IN_MS in SessionCookiePoller
 const SYNC_LEEWAY = 5;
 
+const BROADCAST = { broadcast: true };
+const NO_BROADCAST = { broadcast: false };
+
 /**
  * Converts between cache key objects and string representations.
  * Format: `prefix::tokenId::audience`
@@ -271,25 +274,30 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       'tokenCache',
     );
 
-    setInternal({
-      createdAt: iat,
-      tokenId: data.tokenId,
-      tokenResolver: Promise.resolve(token),
-    });
+    setInternal(
+      {
+        createdAt: iat,
+        tokenId: data.tokenId,
+        tokenResolver: Promise.resolve(token),
+      },
+      NO_BROADCAST,
+    );
   };
 
   const set = (entry: TokenCacheEntry) => {
     ensureBroadcastChannel();
 
-    setInternal(entry);
+    setInternal(entry, BROADCAST);
   };
 
   /**
    * Internal cache setter that stores an entry and schedules expiration cleanup.
    * Resolves the token promise to extract expiration claims and set a deletion timeout.
-   * Automatically broadcasts to other tabs when the token resolves.
+   *
+   * @param entry - The token cache entry to store
+   * @param options - Configuration for cache behavior; broadcast controls whether to notify other tabs
    */
-  const setInternal = (entry: TokenCacheEntry) => {
+  const setInternal = (entry: TokenCacheEntry, options: { broadcast: boolean } = BROADCAST) => {
     const cacheKey = new TokenCacheKey(prefix, {
       audience: entry.audience,
       tokenId: entry.tokenId,
@@ -334,7 +342,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         }
 
         const channel = broadcastChannel;
-        if (channel) {
+        if (channel && options.broadcast) {
           const tokenRaw = newToken.getRawString();
           if (tokenRaw && claims.sid) {
             const sessionId = claims.sid;
