@@ -56,43 +56,44 @@ describe('getAuth() or auth() without request parameter', () => {
     redirectToSignUp: RedirectFun<void>;
   };
 
-  const getAuth: GetAuthFnNoRequest<SessionAuthWithRedirect> = (_options: any) => {
+  // Mimic Next.js auth() helper
+  const auth: GetAuthFnNoRequest<SessionAuthWithRedirect, true> = (_options: any) => {
     return {} as any;
   };
 
-  test('infers the correct AuthObject type for each accepted token type', () => {
+  test('infers the correct AuthObject type for each accepted token type', async () => {
     // Session token by default
-    expectTypeOf(getAuth()).toExtend<SessionAuthWithRedirect>();
+    expectTypeOf(await auth()).toExtend<SessionAuthWithRedirect>();
 
     // Individual token types
-    expectTypeOf(getAuth({ acceptsToken: 'session_token' })).toExtend<SessionAuthWithRedirect>();
-    expectTypeOf(getAuth({ acceptsToken: 'api_key' })).toExtend<MachineAuthObject<'api_key'>>();
-    expectTypeOf(getAuth({ acceptsToken: 'm2m_token' })).toExtend<MachineAuthObject<'m2m_token'>>();
-    expectTypeOf(getAuth({ acceptsToken: 'oauth_token' })).toExtend<MachineAuthObject<'oauth_token'>>();
+    expectTypeOf(await auth({ acceptsToken: 'session_token' })).toExtend<SessionAuthWithRedirect>();
+    expectTypeOf(await auth({ acceptsToken: 'api_key' })).toExtend<MachineAuthObject<'api_key'>>();
+    expectTypeOf(await auth({ acceptsToken: 'm2m_token' })).toExtend<MachineAuthObject<'m2m_token'>>();
+    expectTypeOf(await auth({ acceptsToken: 'oauth_token' })).toExtend<MachineAuthObject<'oauth_token'>>();
 
     // Array of token types
-    expectTypeOf(getAuth({ acceptsToken: ['session_token', 'm2m_token'] })).toExtend<
+    expectTypeOf(await auth({ acceptsToken: ['session_token', 'm2m_token'] })).toExtend<
       SessionAuthWithRedirect | MachineAuthObject<'m2m_token'> | InvalidTokenAuthObject
     >();
-    expectTypeOf(getAuth({ acceptsToken: ['m2m_token', 'oauth_token'] })).toExtend<
+    expectTypeOf(await auth({ acceptsToken: ['m2m_token', 'oauth_token'] })).toExtend<
       MachineAuthObject<'m2m_token' | 'oauth_token'> | InvalidTokenAuthObject
     >();
 
     // Any token type
-    expectTypeOf(getAuth({ acceptsToken: 'any' })).toExtend<AuthObject>();
+    expectTypeOf(await auth({ acceptsToken: 'any' })).toExtend<AuthObject>();
   });
 
-  test('verifies discriminated union works correctly with acceptsToken: any', () => {
-    const auth = getAuth({ acceptsToken: 'any' });
+  test('verifies discriminated union works correctly with acceptsToken: any', async () => {
+    const authObject = await auth({ acceptsToken: 'any' });
 
-    if (auth.tokenType === 'session_token') {
-      expectTypeOf(auth).toExtend<SessionAuthWithRedirect>();
-    } else if (auth.tokenType === 'api_key') {
-      expectTypeOf(auth).toExtend<MachineAuthObject<'api_key'>>();
-    } else if (auth.tokenType === 'm2m_token') {
-      expectTypeOf(auth).toExtend<MachineAuthObject<'m2m_token'>>();
-    } else if (auth.tokenType === 'oauth_token') {
-      expectTypeOf(auth).toExtend<MachineAuthObject<'oauth_token'>>();
+    if (authObject.tokenType === 'session_token') {
+      expectTypeOf(authObject).toExtend<SessionAuthWithRedirect>();
+    } else if (authObject.tokenType === 'api_key') {
+      expectTypeOf(authObject).toExtend<MachineAuthObject<'api_key'>>();
+    } else if (authObject.tokenType === 'm2m_token') {
+      expectTypeOf(authObject).toExtend<MachineAuthObject<'m2m_token'>>();
+    } else if (authObject.tokenType === 'oauth_token') {
+      expectTypeOf(authObject).toExtend<MachineAuthObject<'oauth_token'>>();
     }
   });
 });
