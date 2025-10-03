@@ -2,15 +2,15 @@ import type {
   BillingMoneyAmount,
   BillingPaymentChargeType,
   BillingPaymentJSON,
+  BillingPaymentMethodResource,
   BillingPaymentResource,
-  BillingPaymentSourceResource,
   BillingPaymentStatus,
   BillingSubscriptionItemResource,
 } from '@clerk/types';
 
 import { billingMoneyAmountFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, BillingPaymentSource, BillingSubscriptionItem } from './internal';
+import { BaseResource, BillingPaymentMethod, BillingSubscriptionItem } from './internal';
 
 export class BillingPayment extends BaseResource implements BillingPaymentResource {
   id!: string;
@@ -18,7 +18,7 @@ export class BillingPayment extends BaseResource implements BillingPaymentResour
   failedAt?: Date;
   paidAt?: Date;
   updatedAt!: Date;
-  paymentSource!: BillingPaymentSourceResource;
+  paymentMethod!: BillingPaymentMethodResource;
   subscriptionItem!: BillingSubscriptionItemResource;
   chargeType!: BillingPaymentChargeType;
   status!: BillingPaymentStatus;
@@ -38,7 +38,7 @@ export class BillingPayment extends BaseResource implements BillingPaymentResour
     this.paidAt = data.paid_at ? unixEpochToDate(data.paid_at) : undefined;
     this.failedAt = data.failed_at ? unixEpochToDate(data.failed_at) : undefined;
     this.updatedAt = unixEpochToDate(data.updated_at);
-    this.paymentSource = new BillingPaymentSource(data.payment_source);
+    this.paymentMethod = new BillingPaymentMethod(data.payment_method);
     this.subscriptionItem = new BillingSubscriptionItem(data.subscription_item);
     this.chargeType = data.charge_type;
     this.status = data.status;

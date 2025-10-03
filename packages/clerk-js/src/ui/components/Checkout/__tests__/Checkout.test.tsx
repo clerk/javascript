@@ -530,10 +530,10 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: {
+      paymentMethod: {
         id: 'pm_test_visa',
         last4: '4242',
-        paymentMethod: 'card',
+        paymentType: 'card',
         cardType: 'visa',
         isDefault: true,
         isRemovable: true,
@@ -622,10 +622,10 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: {
+      paymentMethod: {
         id: 'pm_test_visa',
         last4: '4242',
-        paymentMethod: 'card',
+        paymentType: 'card',
         cardType: 'visa',
         isDefault: true,
         isRemovable: true,
@@ -665,12 +665,12 @@ describe('Checkout', () => {
         f.withBilling();
       });
 
-      fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
         data: [
           {
             id: 'pm_test_visa',
             last4: '4242',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'visa',
             isDefault: true,
             isRemovable: true,
@@ -684,7 +684,7 @@ describe('Checkout', () => {
           {
             id: 'pm_test_mastercard',
             last4: '5555',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'mastercard',
             isDefault: false,
             isRemovable: true,
@@ -791,7 +791,7 @@ describe('Checkout', () => {
         expect(defaultBadge).toBeVisible();
 
         // Verify the hidden input contains the correct payment source id
-        const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
         expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
@@ -804,12 +804,12 @@ describe('Checkout', () => {
         f.withBilling();
       });
 
-      fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
         data: [
           {
             id: 'pm_test_visa',
             last4: '4242',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'visa',
             isDefault: true,
             isRemovable: true,
@@ -823,7 +823,7 @@ describe('Checkout', () => {
           {
             id: 'pm_test_mastercard',
             last4: '5555',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'mastercard',
             isDefault: false,
             isRemovable: true,
@@ -930,7 +930,7 @@ describe('Checkout', () => {
         expect(defaultBadge).toBeVisible();
 
         // Verify the hidden input contains the correct payment source id
-        const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
         expect(getByRole('button', { name: 'Pay $10.00' })).toBeInTheDocument();
@@ -943,12 +943,12 @@ describe('Checkout', () => {
         f.withBilling();
       });
 
-      fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
         data: [
           {
             id: 'pm_test_visa',
             last4: '4242',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'visa',
             isDefault: true,
             isRemovable: true,
@@ -962,7 +962,7 @@ describe('Checkout', () => {
           {
             id: 'pm_test_mastercard',
             last4: '5555',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'mastercard',
             isDefault: false,
             isRemovable: true,
@@ -1065,7 +1065,7 @@ describe('Checkout', () => {
         ).toBeInTheDocument();
 
         // Verify the hidden input contains the correct payment source id
-        const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
         expect(queryByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
