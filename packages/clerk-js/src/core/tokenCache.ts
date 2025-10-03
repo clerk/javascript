@@ -38,7 +38,6 @@ type Seconds = number;
 interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
-  expiresAt?: Seconds;
   expiresIn?: Seconds;
   timeoutId?: ReturnType<typeof setTimeout>;
 }
@@ -176,12 +175,12 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
 
     const nowSeconds = Math.floor(Date.now() / 1000);
-    const remainingSeconds = value.expiresAt !== undefined ? value.expiresAt - nowSeconds : 0;
+    const elapsed = nowSeconds - value.createdAt;
 
     // Include poller interval as part of the leeway to ensure the cache value
     // will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
-    const threshold = (leeway ?? 0) + SYNC_LEEWAY;
-    const expiresSoon = value.expiresAt !== undefined && remainingSeconds < threshold;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const expiresSoon = value.expiresIn! - elapsed < (leeway || 1) + SYNC_LEEWAY;
 
     if (expiresSoon) {
       if (value.timeoutId !== undefined) {
@@ -300,7 +299,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const createdAt = entry.createdAt ?? nowSeconds;
-    const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined, expiresAt: undefined };
+    const value: TokenCacheValue = { createdAt, entry, expiresIn: undefined };
 
     const deleteKey = () => {
       const cachedValue = cache.get(key);
@@ -315,21 +314,17 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     entry.tokenResolver
       .then(newToken => {
         const claims = newToken.jwt?.claims;
-        if (!claims || typeof claims.exp !== 'number') {
+        if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
           return deleteKey();
         }
 
         const expiresAt = claims.exp;
-        value.expiresAt = expiresAt;
+        const issuedAt = claims.iat;
+        const expiresIn: Seconds = expiresAt - issuedAt;
 
-        // Keep expiresIn for backward-compatible logging, but it is no longer used for validity.
-        if (typeof claims.iat === 'number') {
-          value.expiresIn = expiresAt - claims.iat;
-        }
+        value.expiresIn = expiresIn;
 
-        const now = Math.floor(Date.now() / 1000);
-        const remainingMs = Math.max(0, (expiresAt - now) * 1000);
-        const timeoutId = setTimeout(deleteKey, remainingMs);
+        const timeoutId = setTimeout(deleteKey, expiresIn * 1000);
         value.timeoutId = timeoutId;
 
         // Teach ClerkJS not to block the exit of the event loop when used in Node environments.

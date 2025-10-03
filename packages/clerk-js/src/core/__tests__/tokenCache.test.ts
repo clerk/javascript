@@ -273,18 +273,18 @@ describe('SessionTokenCache', () => {
       expect(cachedEntry?.tokenId).toBe('future_token');
     });
 
-    it('removes token when expiresAt is in the past', async () => {
-      const pastExp = Math.floor(Date.now() / 1000) - 60; // 60 seconds ago
-      const pastJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(
-        JSON.stringify({ iat: Math.floor(Date.now() / 1000) - 120, exp: pastExp }),
-      )}.signature`;
+    it('removes token when it has already expired based on duration', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const iat = nowSeconds - 120;
+      const exp = iat + 60;
+      const pastJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ iat, exp }))}.signature`;
 
       const tokenResolver = Promise.resolve({
         getRawString: () => pastJwt,
-        jwt: { claims: { exp: pastExp, iat: Math.floor(Date.now() / 1000) - 120 } },
+        jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ tokenId: 'expired_token', tokenResolver });
+      SessionTokenCache.set({ createdAt: nowSeconds - 70, tokenId: 'expired_token', tokenResolver });
 
       await tokenResolver;
 
@@ -293,19 +293,18 @@ describe('SessionTokenCache', () => {
     });
 
     it('removes token when it expires within the leeway threshold', async () => {
-      const soonExp = Math.floor(Date.now() / 1000) + 8; // 8 seconds from now (less than LEEWAY + SYNC_LEEWAY = 15)
-      const soonJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(
-        JSON.stringify({ iat: Math.floor(Date.now() / 1000) - 10, exp: soonExp }),
-      )}.signature`;
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const iat = nowSeconds;
+      const exp = iat + 20;
+      const soonJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ iat, exp }))}.signature`;
 
       const tokenResolver = Promise.resolve({
         getRawString: () => soonJwt,
-        jwt: { claims: { exp: soonExp, iat: Math.floor(Date.now() / 1000) - 10 } },
+        jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ tokenId: 'soon_expired_token', tokenResolver });
+      SessionTokenCache.set({ createdAt: nowSeconds - 13, tokenId: 'soon_expired_token', tokenResolver });
 
-      // Wait for promise to resolve
       await tokenResolver;
 
       const cachedEntry = SessionTokenCache.get({ tokenId: 'soon_expired_token' });
