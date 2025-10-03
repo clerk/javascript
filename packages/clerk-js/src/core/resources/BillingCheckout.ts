@@ -12,6 +12,7 @@ import type {
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
+import { lazyQueryController } from '../lazy-query-client';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentSource, BillingPlan } from './internal';
 
@@ -54,11 +55,11 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     return this;
   }
 
-  confirm = (params: ConfirmCheckoutParams): Promise<this> => {
+  confirm = async (params: ConfirmCheckoutParams): Promise<this> => {
     // Retry confirmation in case of a 500 error
     // This will retry up to 3 times with an increasing delay
     // It retries at 2s, 4s, 6s and 8s
-    return retry(
+    const result = await retry(
       () =>
         this._basePatch({
           path: this.payer.organizationId
@@ -85,5 +86,9 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
         },
       },
     );
+
+    // TODO: We can use the public bus instead.
+    lazyQueryController.invalidate({ queryKey: ['commerce-subscription'] });
+    return result;
   };
 }

@@ -13,6 +13,7 @@ import type {
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingMoneyAmountFromJSON } from '../../utils';
+import { lazyQueryController } from '../lazy-query-client';
 import { BaseResource, BillingPlan, DeletedObject } from './internal';
 
 export class BillingSubscription extends BaseResource implements BillingSubscriptionResource {
@@ -117,6 +118,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
       })
     )?.response as unknown as DeletedObjectJSON;
 
+    lazyQueryController.invalidate({ queryKey: ['commerce-subscription'] });
     return new DeletedObject(json);
   }
 }
