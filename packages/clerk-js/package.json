@@ -26,7 +26,6 @@
   "module": "dist/clerk.mjs",
   "types": "dist/types/index.d.ts",
   "files": [
-    "channel",
     "dist",
     "headless",
     "no-rhc"
