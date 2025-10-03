@@ -1563,7 +1563,7 @@ export type CreateOrganizationProps = RoutingOptions & {
   /**
    * @deprecated
    * This prop will be removed in a future version.
-   * Configure whether organization slug is required via the Clerk Dashboard under Organization Settings.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
@@ -1724,7 +1724,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * @deprecated
      * This prop will be removed in a future version.
-     * Configure whether organization slug is required via the Clerk Dashboard under Organization Settings.
+     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
      */
     hideSlug?: boolean;
     /**
@@ -1785,7 +1785,7 @@ export type OrganizationListProps = {
   /**
    * @deprecated
    * This prop will be removed in a future version.
-   * Configure whether organization slug is required via the Clerk Dashboard under Organization Settings.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
