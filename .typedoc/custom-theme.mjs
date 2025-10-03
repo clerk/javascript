@@ -296,10 +296,33 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * This hides the "Type parameters" section, the declaration title, and the "Type declaration" heading from the output
+       * Unless the @includeType tag is present, in which case it shows the type in a parameter table format
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number, nested?: boolean }} options
        */
       declaration: (model, options = { headingLevel: 2, nested: false }) => {
+        // Check if @includeType tag is present
+        const showTypeTag = model.comment?.getTag('@includeType');
+
+        if (showTypeTag) {
+          // If a name has been provided, use it, otherwise use the type name
+          const name = showTypeTag.content[0].text ?? model.name;
+
+          // Generate parameter table format for types with @includeType
+          let typeStr = model.type ? this.partials.someType(model.type) : '';
+
+          const description = model.comment?.summary ? this.helpers.getCommentParts(model.comment.summary) : '';
+
+          // Create the markdown table
+          const md = [
+            '| Parameter | Type | Description |',
+            '| --------- | ---- | ----------- |',
+            `| \`${name}?\` | ${typeStr} | ${description} |`,
+          ].join('\n');
+
+          return md;
+        }
+
         // Create a local override
         const localPartials = {
           ...this.partials,
@@ -498,6 +521,17 @@ ${tabs}
         const summary = model.getSignature?.comment?.summary ?? model.comment?.summary;
         const description = Array.isArray(summary) ? summary.reduce((acc, curr) => acc + (curr.text || ''), '') : '';
         return '| ' + '`' + escapeChars(name) + '`' + ' | ' + typeStr + ' | ' + description + ' |';
+      },
+      /**
+       * @param {import('typedoc').ReferenceType} model
+       */
+      referenceType: model => {
+        // If @unionInline tag is present, we grab the type itself and return it, instead of a link to the type
+        if (model.reflection && model.reflection.isDeclaration() && model.reflection.comment?.getTag('@unionInline')) {
+          return superPartials.declarationType(model.reflection);
+        }
+
+        return superPartials.referenceType(model);
       },
     };
   }

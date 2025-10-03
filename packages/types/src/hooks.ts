@@ -1,16 +1,15 @@
-import type { SetActive, SignOut } from './clerk';
-import type { ActClaim, JwtPayload } from './jwtv2';
-import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type { SetActiveParams, SignOutCallback, SignOutOptions } from './clerk';
+import type { JwtPayload } from './jwtv2';
 import type {
+  CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
-  GetToken,
+  GetTokenOptions,
   SessionResource,
   SignedInSessionResource,
 } from './session';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
-
 /**
  * @inline
  */
@@ -21,7 +20,8 @@ type CheckAuthorizationSignedOut = undefined;
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  */
 export type UseAuthReturn =
   | {
@@ -68,11 +68,14 @@ export type UseAuthReturn =
       /**
        * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#sign-out).
        */
-      signOut: SignOut;
+      signOut: {
+        (options?: SignOutOptions): Promise<void>;
+        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
+      };
       /**
        * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/javascript/session#get-token).
        */
-      getToken: GetToken;
+      getToken: (options?: GetTokenOptions) => Promise<string | null>;
     }
   | {
       isLoaded: true;
@@ -85,8 +88,11 @@ export type UseAuthReturn =
       orgRole: null;
       orgSlug: null;
       has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: SignOut;
-      getToken: GetToken;
+      signOut: {
+        (options?: SignOutOptions): Promise<void>;
+        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
+      };
+      getToken: (options?: GetTokenOptions) => Promise<string | null>;
     }
   | {
       isLoaded: true;
@@ -94,13 +100,16 @@ export type UseAuthReturn =
       userId: string;
       sessionId: string;
       sessionClaims: JwtPayload;
-      actor: ActClaim | null;
+      actor: { [x: string]: unknown; sub: string } | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
+      has: (isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions) => boolean;
+      signOut: {
+        (options?: SignOutOptions): Promise<void>;
+        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
+      };
+      getToken: (options?: GetTokenOptions) => Promise<string | null>;
     }
   | {
       isLoaded: true;
@@ -108,17 +117,21 @@ export type UseAuthReturn =
       userId: string;
       sessionId: string;
       sessionClaims: JwtPayload;
-      actor: ActClaim | null;
+      actor: { [x: string]: unknown; sub: string } | null;
       orgId: string;
-      orgRole: OrganizationCustomRoleKey;
+      orgRole: string;
       orgSlug: string | null;
-      has: CheckAuthorizationWithCustomPermissions;
-      signOut: SignOut;
-      getToken: GetToken;
+      has: (isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions) => boolean;
+      signOut: {
+        (options?: SignOutOptions): Promise<void>;
+        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
+      };
+      getToken: (options?: GetTokenOptions) => Promise<string | null>;
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  */
 export type UseSignInReturn =
   | {
@@ -138,11 +151,12 @@ export type UseSignInReturn =
   | {
       isLoaded: true;
       signIn: SignInResource;
-      setActive: SetActive;
+      setActive: (setActiveParams: SetActiveParams) => Promise<void>;
     };
 
 /**
- * @inline
+ *  @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  */
 export type UseSignUpReturn =
   | {
@@ -162,11 +176,12 @@ export type UseSignUpReturn =
   | {
       isLoaded: true;
       signUp: SignUpResource;
-      setActive: SetActive;
+      setActive: (setActiveParams: SetActiveParams) => Promise<void>;
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in"]
  */
 export type UseSessionReturn =
   | {
@@ -195,7 +210,8 @@ export type UseSessionReturn =
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Loaded"]
  */
 export type UseSessionListReturn =
   | {
@@ -215,11 +231,12 @@ export type UseSessionListReturn =
   | {
       isLoaded: true;
       sessions: SessionResource[];
-      setActive: SetActive;
+      setActive: (setActiveParams: SetActiveParams) => Promise<void>;
     };
 
 /**
- * @inline
+ * @unionReturnHeadings
+ * ["Initialization", "Signed out", "Signed in"]
  */
 export type UseUserReturn =
   | {

@@ -9,6 +9,8 @@ const CUSTOM_BLOCK_TAGS = [
   '@paramExtension',
   '@experimental',
   '@hideReturns',
+  '@includeType',
+  '@unionInline',
 ];
 
 /**
