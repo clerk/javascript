@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.27.2
+
+### Patch Changes
+
+- Bump target/lib for `@clerk/shared` to ES2022 ([#6892](https://github.com/clerk/javascript/pull/6892)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update telemetry throttling to work in native environments ([#6842](https://github.com/clerk/javascript/pull/6842)) by [@mwickett](https://github.com/mwickett)
+
+- Updated dependencies [[`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a)]:
+  - @clerk/types@4.91.0
+
 ## 3.27.1
 
 ### Patch Changes
