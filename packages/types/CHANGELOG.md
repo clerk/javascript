@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.90.0
+
+### Minor Changes
+
+- [Billing Beta] Drop top level billing flags from environment. Instead, use the payer specific flags. ([#6882](https://github.com/clerk/javascript/pull/6882)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.89.0
 
 ### Minor Changes

@@ -26,10 +26,12 @@ const FILES_WITHOUT_HEADINGS = [
  * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
+  ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
+  ['sign-in-resource', '/docs/reference/javascript/sign-in'],
   ['sign-up-resource', '/docs/reference/javascript/sign-up'],
   ['user-resource', '/docs/reference/javascript/user'],
   ['session-status-claim', '/docs/reference/javascript/types/session-status'],
@@ -55,6 +57,14 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
+  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
+  ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
+  ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
+  ['billing-money-amount', '/docs/reference/javascript/types/billing-money-amount'],
+  ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
+  ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
+  ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
 ];
 
 /**

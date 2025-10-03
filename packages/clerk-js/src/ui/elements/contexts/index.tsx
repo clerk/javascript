@@ -100,7 +100,7 @@ export type FlowMetadata = {
     | 'apiKeys'
     | 'oauthConsent'
     | 'subscriptionDetails'
-    | 'subscriptionDetails'
+    | 'tasks'
     | 'taskChooseOrganization';
   part?:
     | 'start'
@@ -122,7 +122,8 @@ export type FlowMetadata = {
     | 'popupCallback'
     | 'popover'
     | 'complete'
-    | 'accountSwitcher';
+    | 'accountSwitcher'
+    | 'chooseOrganization';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

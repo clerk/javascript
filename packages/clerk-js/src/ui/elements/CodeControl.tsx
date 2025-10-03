@@ -180,6 +180,7 @@ export const OTPCodeControl = () => {
       sx={{ position: 'relative' }}
     >
       <OTPInput
+        autoFocus // eslint-disable-line jsx-a11y/no-autofocus
         aria-label='Enter verification code'
         aria-required
         maxLength={length}
