@@ -470,6 +470,9 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.17
+      '@tanstack/query-core':
+        specifier: ^5.87.4
+        version: 5.87.4
       '@zxcvbn-ts/core':
         specifier: 3.0.4
         version: 3.0.4
@@ -950,6 +953,9 @@ importers:
       '@stripe/stripe-js':
         specifier: 5.6.0
         version: 5.6.0
+      '@tanstack/query-core':
+        specifier: 5.87.4
+        version: 5.87.4
       '@types/glob-to-regexp':
         specifier: 0.4.4
         version: 0.4.4
@@ -4882,6 +4888,9 @@ packages:
   '@tanstack/history@1.131.2':
     resolution: {integrity: sha512-cs1WKawpXIe+vSTeiZUuSBy8JFjEuDgdMKZFRLKwQysKo8y2q6Q1HvS74Yw+m5IhOW1nTZooa6rlgdfXcgFAaw==}
     engines: {node: '>=12'}
+
+  '@tanstack/query-core@5.87.4':
+    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
 
   '@tanstack/react-router@1.131.49':
     resolution: {integrity: sha512-WHgWJ053W8VU8lUYh8abSHVPeQdpaCpfaUAbV+3uYXbip2G+qlmI/Gsbh/BBV3bYtIi6l3t5dqx3ffCXNTzB5Q==}
@@ -19648,6 +19657,8 @@ snapshots:
       - supports-color
 
   '@tanstack/history@1.131.2': {}
+
+  '@tanstack/query-core@5.87.4': {}
 
   '@tanstack/react-router@1.131.49(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
