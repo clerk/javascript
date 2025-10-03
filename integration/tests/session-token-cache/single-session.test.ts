@@ -11,7 +11,7 @@ import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
  * token fetches in one tab are automatically broadcast and cached in other tabs,
  * eliminating redundant network requests.
  */
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withBroadcastChannel] })(
   'MemoryTokenCache Multi-Tab Integration @generic',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });

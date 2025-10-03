@@ -27,8 +27,8 @@ const variantToSourceFile = {
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
-  [variants.clerkCHIPS]: './src/index.chips.browser.ts',
-  [variants.clerkChannelBrowser]: './src/index.channel.browser.ts',
+  [variants.clerkCHIPS]: './src/index.browser.ts',
+  [variants.clerkChannelBrowser]: './src/index.browser.ts',
 };
 
 /**
