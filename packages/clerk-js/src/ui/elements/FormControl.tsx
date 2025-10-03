@@ -48,14 +48,17 @@ function useFormTextAnimation() {
   };
 }
 
-const useCalculateErrorTextHeight = ({ feedback: _feedback }: { feedback: string }) => {
+const useCalculateErrorTextHeight = ({ feedback }: { feedback: string }) => {
   const [height, setHeight] = useState(0);
 
-  const calculateHeight = useCallback((element: HTMLElement | null) => {
-    if (element) {
-      setHeight(element.scrollHeight + element.offsetTop * 2);
-    }
-  }, []);
+  const calculateHeight = useCallback(
+    (element: HTMLElement | null) => {
+      if (element) {
+        setHeight(element.scrollHeight + element.offsetTop * 2);
+      }
+    },
+    [feedback],
+  );
 
   return {
     height,
@@ -159,12 +162,6 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const InfoComponentA = FormInfoComponent[feedbacks.a?.feedbackType || 'info'];
   const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
-  const currentFeedbackId = feedbacks.a?.shouldEnter
-    ? getElementProps(feedbacks.a?.feedbackType).id
-    : feedbacks.b?.shouldEnter
-      ? getElementProps(feedbacks.b?.feedbackType).id
-      : undefined;
-
   return (
     <Flex
       style={{
@@ -173,7 +170,6 @@ export const FormFeedback = (props: FormFeedbackProps) => {
       }}
       center={center}
       sx={[getFormTextAnimation(!!feedback), sx]}
-      data-current-feedback-id={currentFeedbackId}
     >
       <InfoComponentA
         {...getElementProps(feedbacks.a?.feedbackType)}
