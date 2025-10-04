@@ -1,6 +1,7 @@
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
+import pluginTreeShaking from '@clerk/eslint-plugin-tree-shaking';
 import pluginImport from 'eslint-plugin-import';
 import pluginJest from 'eslint-plugin-jest';
 import pluginJsDoc from 'eslint-plugin-jsdoc';
@@ -404,6 +405,14 @@ export default tseslint.config([
       'import/no-unresolved': ['error', { ignore: ['^#', '^~', '@inkjs/ui', '^ink'] }],
       'react/no-unescaped-entities': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
+    },
+  },
+  {
+    name: 'packages/react',
+    files: ['packages/react/src/**/*'],
+    ...pluginTreeShaking.configs.recommended,
+    rules: {
+      'tree-shaking/no-side-effects-in-initialization': 'warn',
     },
   },
   {

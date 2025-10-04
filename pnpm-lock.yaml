@@ -67,6 +67,9 @@ importers:
       '@clerk/backend':
         specifier: workspace:*
         version: link:packages/backend
+      '@clerk/eslint-plugin-tree-shaking':
+        specifier: workspace:*
+        version: link:packages/eslint-plugin-tree-shaking
       '@clerk/shared':
         specifier: workspace:*
         version: link:packages/shared
@@ -622,6 +625,18 @@ importers:
       next:
         specifier: 14.2.33
         version: 14.2.33(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(@playwright/test@1.54.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+
+  packages/eslint-plugin-tree-shaking:
+    devDependencies:
+      '@types/estree':
+        specifier: ^1.0.8
+        version: 1.0.8
+      '@types/estree-jsx':
+        specifier: ^1.0.5
+        version: 1.0.5
+      eslint:
+        specifier: 9.31.0
+        version: 9.31.0(jiti@2.5.1)
 
   packages/expo:
     dependencies:
@@ -2760,7 +2775,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -5154,6 +5169,9 @@ packages:
 
   '@types/diff-match-patch@1.0.36':
     resolution: {integrity: sha512-xFdR6tkm0MWvBfO8xXCSsinYxHcqkQUlcHeSpMC2ukzOb6lwQAfDmW+Qt0AvlGd8HpsS28qKsB+oPeJn9I39jg==}
+
+  '@types/estree-jsx@1.0.5':
+    resolution: {integrity: sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -20122,6 +20140,10 @@ snapshots:
   '@types/deep-eql@4.0.2': {}
 
   '@types/diff-match-patch@1.0.36': {}
+
+  '@types/estree-jsx@1.0.5':
+    dependencies:
+      '@types/estree': 1.0.8
 
   '@types/estree@1.0.5': {}
 
