@@ -25,12 +25,15 @@ import type {
   UserResource,
 } from '@clerk/types';
 
-import { unixEpochToDate } from '../../utils/date';
+import { unixEpochToDate } from '@/utils/date';
+import { debugLogger } from '@/utils/debug';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '../../utils/passkeys';
+} from '@/utils/passkeys';
+import { TokenId } from '@/utils/tokenId';
+
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
@@ -142,7 +145,7 @@ export class Session extends BaseResource implements SessionResource {
   #getCacheId(template?: string, organizationId?: string | null) {
     const resolvedOrganizationId =
       typeof organizationId === 'undefined' ? this.lastActiveOrganizationId : organizationId;
-    return [this.id, template, resolvedOrganizationId, this.updatedAt.getTime()].filter(Boolean).join('-');
+    return TokenId.build(this.id, template, resolvedOrganizationId);
   }
 
   startVerification = async ({ level }: SessionVerifyCreateParams): Promise<SessionVerificationResource> => {
@@ -351,12 +354,20 @@ export class Session extends BaseResource implements SessionResource {
     }
 
     const tokenId = this.#getCacheId(template, organizationId);
+
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
+      debugLogger.debug(
+        'Using cached token (no fetch needed)',
+        {
+          tokenId,
+        },
+        'session',
+      );
       const cachedToken = await cachedEntry.tokenResolver;
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
@@ -364,12 +375,25 @@ export class Session extends BaseResource implements SessionResource {
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
     }
+
+    debugLogger.info(
+      'Fetching new token from API',
+      {
+        organizationId,
+        template,
+        tokenId,
+      },
+      'session',
+    );
+
     const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
 
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
     const tokenResolver = Token.create(path, params);
+
+    // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
     SessionTokenCache.set({ tokenId, tokenResolver });
 
     return tokenResolver.then(token => {
@@ -382,6 +406,7 @@ export class Session extends BaseResource implements SessionResource {
           eventBus.emit(events.SessionTokenResolved, null);
         }
       }
+
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;
     });
