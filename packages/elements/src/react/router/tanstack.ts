@@ -24,12 +24,10 @@ export const useTanStackRouter = (): ClerkHostRouter => {
     mode: 'path',
     name: 'TanStackRouter',
     push: (path: string) => router.navigate({ to: path }),
-    replace: (path: string) =>
-      canUseHistoryAPIs ? window.history.replaceState(null, '', path) : router.navigate({ to: path, replace: true }),
+    replace: (path: string) => router.history.replace(path),
     shallowPush: (path: string) =>
-      // In TanStack Router, all navigations are "shallow" by default (no full reload, preserves state).
-      // Use standard push; if you need to avoid re-fetching data, integrate with TanStack Query's stale-while-revalidate or disable refetch.
-      canUseHistoryAPIs ? window.history.pushState(null, '', path) : router.navigate({ to: path }),
+      // In TanStack Router, all navigations are already shallow; reuse the standard history push.
+      router.history.push(path),
     pathname: () => pathname,
     searchParams: () => getSearchParams(),
     inferredBasePath: () => inferredBasePath,
