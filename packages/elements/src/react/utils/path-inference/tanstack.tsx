@@ -15,31 +15,19 @@ import { removeOptionalCatchAllSegment } from './utils';
  */
 export const usePathnameWithoutCatchAll = (): string => {
   const router = useRouter();
-  const pathname = router?.location.pathname || ''; // Equivalent to usePathname()
 
-  // Early return for no router (SSR initial or error)
-  if (!pathname) {
-    return '/';
-  }
-
-  // Equivalent to useParams() – gets params for the current (leaf) route, which includes catch-alls
-  const params = useParams() as Record<string, string | string[] | undefined>; // Typed as needed
+  const pathname = router?.location.pathname || '';
+  const params = useParams() as Record<string, string | string[] | undefined>;
 
   return React.useMemo(() => {
-    // Apply optional catch-all heuristic first (mirrors Next.js fallback)
     const processedPath = removeOptionalCatchAllSegment(pathname);
-
-    // For resolved pathnames in TanStack: Split into parts (exclude leading /)
     const pathParts = processedPath.split('/').filter(Boolean);
-
-    // Identify catch-all params: Those that are arrays (splats like [...rest])
     const catchAllParams = Object.values(params || {})
       .filter((v): v is string[] => Array.isArray(v))
-      .flat(Infinity); // Flatten all (handles multiple/nested, though rare)
+      .flat(Infinity);
 
-    // If no catch-all segments, return full path
-    if (catchAllParams.length === 0) {
-      return pathname.replace(/\/$/, '') || '/'; // Normalize trailing slash
+    if (!pathname || catchAllParams.length === 0) {
+      return pathname.replace(/\/$/, '') || '/';
     }
 
     // Slice off the trailing segments matching the catch-all length
@@ -47,7 +35,6 @@ export const usePathnameWithoutCatchAll = (): string => {
     const baseParts = pathParts.slice(0, pathParts.length - catchAllParams.length);
     const basePath = `/${baseParts.join('/')}`;
 
-    // Normalize: Ensure absolute and no trailing slash unless root
     return basePath.replace(/\/$/, '') || '/';
-  }, [pathname, params]); // Dependencies: Recompute on navigation or param changes
+  }, [pathname, params]);
 };
