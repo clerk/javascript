@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.91.0
+
+### Minor Changes
+
+- [Experimental] Add Signal support for Web3 APIs ([#6840](https://github.com/clerk/javascript/pull/6840)) by [@dstaley](https://github.com/dstaley)
+
 ## 4.90.0
 
 ### Minor Changes
