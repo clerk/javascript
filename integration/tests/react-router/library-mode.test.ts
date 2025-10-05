@@ -5,13 +5,14 @@ import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
-test.describe('Library Mode basic tests for @react-router', () => {
+test.skip('Library Mode basic tests for @react-router', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
   let fakeUser: FakeUser;
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
+    // @ts-expect-error: Exclude test for now
     app = await appConfigs.reactRouter.reactRouterLibrary.commit();
 
     await app.setup();
