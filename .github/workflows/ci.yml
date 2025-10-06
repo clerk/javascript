@@ -208,7 +208,7 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - node-version: 18
+          - node-version: 20
             test-filter: '--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo'
           - node-version: 22
             test-filter: '**'
@@ -224,7 +224,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
