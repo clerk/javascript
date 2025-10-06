@@ -760,12 +760,20 @@ class SignUpFuture implements SignUpFutureResource {
     const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      let redirectUrlComplete = redirectUrl;
+      try {
+        new URL(redirectUrl);
+      } catch {
+        redirectUrlComplete = window.location.origin + redirectUrl;
+      }
+
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: {
           strategy,
           redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          redirectUrlComplete: redirectUrl,
+          redirectUrlComplete,
           captchaToken,
           captchaWidgetType,
           captchaError,

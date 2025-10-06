@@ -884,13 +884,18 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('modal flow is not supported yet');
       }
 
-      if (!this.resource.id) {
-        await this._create({
-          strategy,
-          redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          actionCompleteRedirectUrl: redirectUrl,
-        });
+      let actionCompleteRedirectUrl = redirectUrl;
+      try {
+        new URL(redirectUrl);
+      } catch {
+        actionCompleteRedirectUrl = window.location.origin + redirectUrl;
       }
+
+      await this._create({
+        strategy,
+        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
+        actionCompleteRedirectUrl,
+      });
 
       const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
 
