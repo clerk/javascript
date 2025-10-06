@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-[Experimental] Add Signal support for Web3 APIs
+[Experimental] Add support for additional properties to Signal SignIn/SignUp
