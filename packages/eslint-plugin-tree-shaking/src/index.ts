@@ -1,5 +1,5 @@
 import type { ESLint } from 'eslint';
-import { noSideEffectsInInitialization } from './rules/no-side-effects-in-initialization.js';
+import { noSideEffectsInInitialization } from './rules/no-side-effects-in-initialization.ts';
 
 const plugin: ESLint.Plugin = {
   meta: {

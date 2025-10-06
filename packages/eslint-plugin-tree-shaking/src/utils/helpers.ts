@@ -1,7 +1,7 @@
 const TREE_SHAKING_COMMENT_ID = 'tree-shaking';
 
 import type { Node, Comment } from 'estree';
-import { pureFunctions } from '../utils/pure-functions.js';
+import { pureFunctions } from '../utils/pure-functions.ts';
 import type { Scope, Rule } from 'eslint';
 
 const getRootNode = (node: Node): Node => {

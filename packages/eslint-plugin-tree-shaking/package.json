@@ -4,13 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
-  "scripts": {
-    "build": "tsc"
+    ".": "./src/index.ts"
   },
   "devDependencies": {
     "@types/estree": "^1.0.8",

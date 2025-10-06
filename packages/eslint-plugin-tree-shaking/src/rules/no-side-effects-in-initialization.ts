@@ -5,8 +5,8 @@
 //       https://npmdoc.github.io/node-npmdoc-escope/build/apidoc.html
 
 /// <reference types="estree-jsx" />
-import { Rule, Scope } from 'eslint';
-import { Program, Node, BinaryOperator, LogicalOperator, UnaryOperator } from 'estree';
+import type { Rule, Scope } from 'eslint';
+import type { Program, Node, BinaryOperator, LogicalOperator, UnaryOperator } from 'estree';
 import {
   getChildScopeForNodeIfExists,
   isLocalVariableAWhitelistedModule,
@@ -18,8 +18,8 @@ import {
   isFunctionSideEffectFree,
   noEffects,
   hasPureNotation,
-} from '../utils/helpers.js';
-import { Value } from '../utils/value.js';
+} from '../utils/helpers.ts';
+import { Value } from '../utils/value.ts';
 
 type ListenerArgs<T, K> = [
   node: T extends { type: K } ? T : never,

@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
+    "noEmit": true,
     "strict": true,
     "target": "ES2019",
     "moduleResolution": "NodeNext",
-    "module": "NodeNext"
+    "module": "NodeNext",
+    "allowImportingTsExtensions": true
   },
   "include": ["src"]
 }

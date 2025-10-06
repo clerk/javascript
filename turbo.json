@@ -102,7 +102,7 @@
       "cache": false
     },
     "lint": {
-      "dependsOn": ["@clerk/eslint-plugin-tree-shaking#build", "^build"],
+      "dependsOn": ["^build"],
       "inputs": [
         "**/*.js",
         "**/*.jsx",
