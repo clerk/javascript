@@ -36,7 +36,9 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
     const loadedOptions = loadOptions(args, options);
     const { audience, authorizedParties } = loadedOptions;
     const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = loadedOptions;
+    const { organizationSyncOptions } = loadedOptions;
     const requestState = await clerkClient(args).authenticateRequest(clerkRequest, {
+      organizationSyncOptions,
       audience,
       authorizedParties,
       signInUrl,
