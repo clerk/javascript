@@ -789,7 +789,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (emailAddress) {
-        await this.create({ identifier: emailAddress });
+        await this._create({ identifier: emailAddress });
       }
 
       const emailLinkFactor = this.selectFirstFactor({ strategy: 'email_link', emailAddressId });
@@ -852,7 +852,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (phoneNumber) {
-        await this.create({ identifier: phoneNumber });
+        await this._create({ identifier: phoneNumber });
       }
 
       const phoneCodeFactor = this.selectFirstFactor({ strategy: 'phone_code', phoneNumberId });
@@ -885,7 +885,7 @@ class SignInFuture implements SignInFutureResource {
       }
 
       if (!this.resource.id) {
-        await this.create({
+        await this._create({
           strategy,
           redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
           actionCompleteRedirectUrl: redirectUrl,
@@ -928,7 +928,7 @@ class SignInFuture implements SignInFutureResource {
           throw new Error(`Unsupported Web3 provider: ${provider}`);
       }
 
-      await this.create({ identifier });
+      await this._create({ identifier });
 
       const web3FirstFactor = this.resource.supportedFirstFactors?.find(
         f => f.strategy === strategy,
