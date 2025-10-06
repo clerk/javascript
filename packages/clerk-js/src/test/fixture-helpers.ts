@@ -342,13 +342,22 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
   const withForceOrganizationSelection = () => {
     os.force_organization_selection = true;
   };
+  const withOrganizationSlug = (enabled = false) => {
+    os.slug.disabled = !enabled;
+  };
 
   const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'manual_invitation'];
     os.domains.default_role = defaultRole ?? null;
   };
-  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withForceOrganizationSelection };
+  return {
+    withOrganizations,
+    withMaxAllowedMemberships,
+    withOrganizationDomains,
+    withForceOrganizationSelection,
+    withOrganizationSlug,
+  };
 };
 
 const createBillingSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
