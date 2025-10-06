@@ -15,14 +15,14 @@ export interface SignInFutureCreateParams {
 
 export type SignInFuturePasswordParams =
   | {
-      identifier: string;
       password: string;
-      email?: never;
+      identifier: string;
+      emailAddress?: never;
       phoneNumber?: never;
     }
   | {
       password: string;
-      email: string;
+      emailAddress: string;
       identifier?: never;
       phoneNumber?: never;
     }
@@ -30,13 +30,13 @@ export type SignInFuturePasswordParams =
       password: string;
       phoneNumber: string;
       identifier?: never;
-      email?: never;
+      emailAddress?: never;
     }
   | {
       password: string;
       phoneNumber?: never;
       identifier?: never;
-      email?: never;
+      emailAddress?: never;
     };
 
 export type SignInFutureEmailCodeSendParams =
