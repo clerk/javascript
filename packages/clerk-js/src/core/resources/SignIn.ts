@@ -717,13 +717,13 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async password(params: SignInFuturePasswordParams): Promise<{ error: unknown }> {
-    if ([params.identifier, params.email, params.phoneNumber].filter(Boolean).length > 1) {
-      throw new Error('Only one of identifier, email, or phoneNumber can be provided');
+    if ([params.identifier, params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
+      throw new Error('Only one of identifier, emailAddress, or phoneNumber can be provided');
     }
 
     return runAsyncResourceTask(this.resource, async () => {
       // TODO @userland-errors:
-      const identifier = params.identifier || params.email || params.phoneNumber;
+      const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
