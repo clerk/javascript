@@ -27,6 +27,7 @@ import type {
   SignUpFutureSSOParams,
   SignUpFutureTicketParams,
   SignUpFutureUpdateParams,
+  SignUpFutureWeb3Params,
   SignUpIdentificationField,
   SignUpJSON,
   SignUpJSONSnapshot,
@@ -550,9 +551,73 @@ class SignUpFuture implements SignUpFutureResource {
 
   constructor(readonly resource: SignUp) {}
 
+  get id() {
+    return this.resource.id;
+  }
+
+  get requiredFields() {
+    return this.resource.requiredFields;
+  }
+
+  get optionalFields() {
+    return this.resource.optionalFields;
+  }
+
+  get missingFields() {
+    return this.resource.missingFields;
+  }
+
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
     return this.resource.status || 'missing_requirements';
+  }
+
+  get username() {
+    return this.resource.username;
+  }
+
+  get firstName() {
+    return this.resource.firstName;
+  }
+
+  get lastName() {
+    return this.resource.lastName;
+  }
+
+  get emailAddress() {
+    return this.resource.emailAddress;
+  }
+
+  get phoneNumber() {
+    return this.resource.phoneNumber;
+  }
+
+  get web3Wallet() {
+    return this.resource.web3wallet;
+  }
+
+  get hasPassword() {
+    return this.resource.hasPassword;
+  }
+
+  get unsafeMetadata() {
+    return this.resource.unsafeMetadata;
+  }
+
+  get createdSessionId() {
+    return this.resource.createdSessionId;
+  }
+
+  get createdUserId() {
+    return this.resource.createdUserId;
+  }
+
+  get abandonAt() {
+    return this.resource.abandonAt;
+  }
+
+  get legalAcceptedAt() {
+    return this.resource.legalAcceptedAt;
   }
 
   get unverifiedFields() {
@@ -595,20 +660,24 @@ class SignUpFuture implements SignUpFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
+  private async _create(params: SignUpFutureCreateParams): Promise<void> {
+    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+    const body: Record<string, unknown> = {
+      transfer: params.transfer,
+      captchaToken,
+      captchaWidgetType,
+      captchaError,
+      ...params,
+      unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+    };
+
+    await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+  }
+
   async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
-
-      const body: Record<string, unknown> = {
-        transfer: params.transfer,
-        captchaToken,
-        captchaWidgetType,
-        captchaError,
-        ...params,
-        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
-      };
-
-      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+      await this._create(params);
     });
   }
 
@@ -691,12 +760,20 @@ class SignUpFuture implements SignUpFutureResource {
     const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      let redirectUrlComplete = redirectUrl;
+      try {
+        new URL(redirectUrl);
+      } catch {
+        redirectUrlComplete = window.location.origin + redirectUrl;
+      }
+
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: {
           strategy,
           redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          redirectUrlComplete: redirectUrl,
+          redirectUrlComplete,
           captchaToken,
           captchaWidgetType,
           captchaError,
@@ -710,6 +787,72 @@ class SignUpFuture implements SignUpFutureResource {
       } else {
         clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
       }
+    });
+  }
+
+  async web3(params: SignUpFutureWeb3Params): Promise<{ error: unknown }> {
+    const { strategy, unsafeMetadata, legalAccepted } = params;
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
+    return runAsyncResourceTask(this.resource, async () => {
+      let identifier;
+      let generateSignature;
+      switch (provider) {
+        case 'metamask':
+          identifier = await getMetamaskIdentifier();
+          generateSignature = generateSignatureWithMetamask;
+          break;
+        case 'coinbase_wallet':
+          identifier = await getCoinbaseWalletIdentifier();
+          generateSignature = generateSignatureWithCoinbaseWallet;
+          break;
+        case 'base':
+          identifier = await getBaseIdentifier();
+          generateSignature = generateSignatureWithBase;
+          break;
+        case 'okx_wallet':
+          identifier = await getOKXWalletIdentifier();
+          generateSignature = generateSignatureWithOKXWallet;
+          break;
+        default:
+          throw new Error(`Unsupported Web3 provider: ${provider}`);
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const web3Wallet = identifier || this.resource.web3wallet!;
+      await this._create({ web3Wallet, unsafeMetadata, legalAccepted });
+      await this.resource.__internal_basePost({
+        body: { strategy },
+        action: 'prepare_verification',
+      });
+
+      const { message } = this.resource.verifications.web3Wallet;
+      if (!message) {
+        clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
+      }
+
+      let signature: string;
+      try {
+        signature = await generateSignature({ identifier, nonce: message });
+      } catch (err) {
+        // There is a chance that as a first time visitor when you try to setup and use the
+        // Coinbase Wallet from scratch in order to authenticate, the initial generate
+        // signature request to be rejected. For this reason we retry the request once more
+        // in order for the flow to be able to be completed successfully.
+        //
+        // error code 4001 means the user rejected the request
+        // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
+        if (provider === 'coinbase_wallet' && err.code === 4001) {
+          signature = await generateSignature({ identifier, nonce: message });
+        } else {
+          throw err;
+        }
+      }
+
+      await this.resource.__internal_basePost({
+        body: { signature, strategy },
+        action: 'attempt_verification',
+      });
     });
   }
 

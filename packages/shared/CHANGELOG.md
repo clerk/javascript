@@ -1,5 +1,45 @@
 # Change Log
 
+## 3.27.3
+
+### Patch Changes
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+
+## 3.27.2
+
+### Patch Changes
+
+- Bump target/lib for `@clerk/shared` to ES2022 ([#6892](https://github.com/clerk/javascript/pull/6892)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Update telemetry throttling to work in native environments ([#6842](https://github.com/clerk/javascript/pull/6842)) by [@mwickett](https://github.com/mwickett)
+
+- Updated dependencies [[`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a)]:
+  - @clerk/types@4.91.0
+
+## 3.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+
+## 3.27.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Improve error handling when loading clerk-js. ([#6856](https://github.com/clerk/javascript/pull/6856)) by [@brkalow](https://github.com/brkalow)
+
+### Patch Changes
+
+- Increase sampling for high-signal auth components on mount. ([#6858](https://github.com/clerk/javascript/pull/6858)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4)]:
+  - @clerk/types@4.89.0
+
 ## 3.26.1
 
 ### Patch Changes

@@ -1,6 +1,7 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
+import type { Web3Strategy } from './strategies';
 
 interface SignUpFutureAdditionalParams {
   firstName?: string;
@@ -10,8 +11,12 @@ interface SignUpFutureAdditionalParams {
 }
 
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
+  emailAddress?: string;
+  phoneNumber?: string;
+  username?: string;
   transfer?: boolean;
   ticket?: string;
+  web3Wallet?: string;
 }
 
 // This will likely get more properties
@@ -55,6 +60,12 @@ export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
   ticket: string;
 }
 
+export interface SignUpFutureWeb3Params {
+  strategy: Web3Strategy;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
+}
+
 export interface SignUpFutureFinalizeParams {
   navigate?: SetActiveNavigate;
 }
@@ -64,9 +75,29 @@ export interface SignUpFutureFinalizeParams {
  */
 export interface SignUpFutureResource {
   /**
+   * The unique identifier for the current sign-up attempt.
+   */
+  readonly id?: string;
+
+  /**
    * The status of the current sign-up attempt as a string (for example, `'missing_requirements'`, `'complete'`, `'abandoned'`, etc.)
    */
   readonly status: SignUpStatus;
+
+  /**
+   * The list of required fields for the current sign-up attempt.
+   */
+  readonly requiredFields: SignUpField[];
+
+  /**
+   * The list of optional fields for the current sign-up attempt.
+   */
+  readonly optionalFields: SignUpField[];
+
+  /**
+   * The list of missing fields for the current sign-up attempt.
+   */
+  readonly missingFields: SignUpField[];
 
   /**
    * An array of strings representing unverified fields such as `’email_address’`. Can be used to detect when verification is necessary.
@@ -80,6 +111,30 @@ export interface SignUpFutureResource {
   readonly isTransferable: boolean;
 
   readonly existingSession?: { sessionId: string };
+
+  readonly username: string | null;
+
+  readonly firstName: string | null;
+
+  readonly lastName: string | null;
+
+  readonly emailAddress: string | null;
+
+  readonly phoneNumber: string | null;
+
+  readonly web3Wallet: string | null;
+
+  readonly hasPassword: boolean;
+
+  readonly unsafeMetadata: SignUpUnsafeMetadata;
+
+  readonly createdSessionId: string | null;
+
+  readonly createdUserId: string | null;
+
+  readonly abandonAt: number | null;
+
+  readonly legalAcceptedAt: number | null;
 
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
 
@@ -124,6 +179,11 @@ export interface SignUpFutureResource {
    * Used to perform a ticket-based sign-up.
    */
   ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+
+  /**
+   * Used to perform a Web3-based sign-up.
+   */
+  web3: (params: SignUpFutureWeb3Params) => Promise<{ error: unknown }>;
 
   /**
    * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the

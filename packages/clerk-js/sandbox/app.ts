@@ -26,6 +26,7 @@ const AVAILABLE_COMPONENTS = [
   'clerk', // While not a component, we want to support passing options to the Clerk class.
   'signIn',
   'signUp',
+  'userAvatar',
   'userButton',
   'userProfile',
   'createOrganization',
@@ -87,6 +88,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   clerk: buildComponentControls('clerk'),
   signIn: buildComponentControls('signIn'),
   signUp: buildComponentControls('signUp'),
+  userAvatar: buildComponentControls('userAvatar'),
   userButton: buildComponentControls('userButton'),
   userProfile: buildComponentControls('userProfile'),
   createOrganization: buildComponentControls('createOrganization'),
@@ -294,6 +296,9 @@ void (async () => {
     },
     '/sign-up': () => {
       Clerk.mountSignUp(app, componentControls.signUp.getProps() ?? {});
+    },
+    '/user-avatar': () => {
+      Clerk.mountUserAvatar(app, componentControls.userAvatar.getProps() ?? {});
     },
     '/user-button': () => {
       Clerk.mountUserButton(app, componentControls.userButton.getProps() ?? {});

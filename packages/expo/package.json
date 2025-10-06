@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.15.2",
+  "version": "2.16.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -51,6 +51,10 @@
     "./resource-cache": {
       "types": "./dist/resource-cache/index.d.ts",
       "default": "./dist/resource-cache/index.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
     }
   },
   "main": "./dist/index.js",

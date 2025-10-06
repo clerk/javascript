@@ -46,6 +46,7 @@ import type {
   SignInFutureSSOParams,
   SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
+  SignInFutureWeb3Params,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
@@ -607,13 +608,33 @@ class SignInFuture implements SignInFutureResource {
 
   constructor(readonly resource: SignIn) {}
 
+  get id() {
+    return this.resource.id;
+  }
+
+  get identifier() {
+    return this.resource.identifier;
+  }
+
+  get createdSessionId() {
+    return this.resource.createdSessionId;
+  }
+
+  get userData() {
+    return this.resource.userData;
+  }
+
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
     return this.resource.status || 'needs_identifier';
   }
 
-  get availableStrategies() {
+  get supportedFirstFactors() {
     return this.resource.supportedFirstFactors ?? [];
+  }
+
+  get supportedSecondFactors() {
+    return this.resource.supportedSecondFactors ?? [];
   }
 
   get isTransferable() {
@@ -634,6 +655,10 @@ class SignInFuture implements SignInFutureResource {
 
   get firstFactorVerification() {
     return this.resource.firstFactorVerification;
+  }
+
+  get secondFactorVerification() {
+    return this.resource.secondFactorVerification;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
@@ -678,23 +703,27 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  private async _create(params: SignInFutureCreateParams): Promise<void> {
+    await this.resource.__internal_basePost({
+      path: this.resource.pathRoot,
+      body: params,
+    });
+  }
+
   async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body: params,
-      });
+      await this._create(params);
     });
   }
 
   async password(params: SignInFuturePasswordParams): Promise<{ error: unknown }> {
-    if ([params.identifier, params.email, params.phoneNumber].filter(Boolean).length > 1) {
-      throw new Error('Only one of identifier, email, or phoneNumber can be provided');
+    if ([params.identifier, params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
+      throw new Error('Only one of identifier, emailAddress, or phoneNumber can be provided');
     }
 
     return runAsyncResourceTask(this.resource, async () => {
       // TODO @userland-errors:
-      const identifier = params.identifier || params.email || params.phoneNumber;
+      const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
@@ -719,7 +748,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (emailAddress) {
-        await this.create({ identifier: emailAddress });
+        await this._create({ identifier: emailAddress });
       }
 
       const emailCodeFactor = this.selectFirstFactor({ strategy: 'email_code', emailAddressId });
@@ -760,7 +789,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (emailAddress) {
-        await this.create({ identifier: emailAddress });
+        await this._create({ identifier: emailAddress });
       }
 
       const emailLinkFactor = this.selectFirstFactor({ strategy: 'email_link', emailAddressId });
@@ -823,7 +852,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (phoneNumber) {
-        await this.create({ identifier: phoneNumber });
+        await this._create({ identifier: phoneNumber });
       }
 
       const phoneCodeFactor = this.selectFirstFactor({ strategy: 'phone_code', phoneNumberId });
@@ -855,19 +884,95 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('modal flow is not supported yet');
       }
 
-      if (!this.resource.id) {
-        await this.create({
-          strategy,
-          redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          actionCompleteRedirectUrl: redirectUrl,
-        });
+      let actionCompleteRedirectUrl = redirectUrl;
+      try {
+        new URL(redirectUrl);
+      } catch {
+        actionCompleteRedirectUrl = window.location.origin + redirectUrl;
       }
+
+      await this._create({
+        strategy,
+        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
+        actionCompleteRedirectUrl,
+      });
 
       const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
 
       if (status === 'unverified' && externalVerificationRedirectURL) {
         windowNavigate(externalVerificationRedirectURL);
       }
+    });
+  }
+
+  async web3(params: SignInFutureWeb3Params): Promise<{ error: unknown }> {
+    const { strategy } = params;
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
+    return runAsyncResourceTask(this.resource, async () => {
+      let identifier;
+      let generateSignature;
+      switch (provider) {
+        case 'metamask':
+          identifier = await getMetamaskIdentifier();
+          generateSignature = generateSignatureWithMetamask;
+          break;
+        case 'coinbase_wallet':
+          identifier = await getCoinbaseWalletIdentifier();
+          generateSignature = generateSignatureWithCoinbaseWallet;
+          break;
+        case 'base':
+          identifier = await getBaseIdentifier();
+          generateSignature = generateSignatureWithBase;
+          break;
+        case 'okx_wallet':
+          identifier = await getOKXWalletIdentifier();
+          generateSignature = generateSignatureWithOKXWallet;
+          break;
+        default:
+          throw new Error(`Unsupported Web3 provider: ${provider}`);
+      }
+
+      await this._create({ identifier });
+
+      const web3FirstFactor = this.resource.supportedFirstFactors?.find(
+        f => f.strategy === strategy,
+      ) as Web3SignatureFactor;
+      if (!web3FirstFactor) {
+        throw new Error('Web3 first factor not found');
+      }
+
+      await this.resource.__internal_basePost({
+        body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
+        action: 'prepare_first_factor',
+      });
+
+      const { message } = this.firstFactorVerification;
+      if (!message) {
+        throw new Error('Web3 nonce not found');
+      }
+
+      let signature: string;
+      try {
+        signature = await generateSignature({ identifier, nonce: message });
+      } catch (err) {
+        // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
+        // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
+        // reason we retry the request once more in order for the flow to be able to be completed successfully.
+        //
+        // error code 4001 means the user rejected the request
+        // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
+        if (provider === 'coinbase_wallet' && err.code === 4001) {
+          signature = await generateSignature({ identifier, nonce: message });
+        } else {
+          throw err;
+        }
+      }
+
+      await this.resource.__internal_basePost({
+        body: { signature, strategy },
+        action: 'attempt_first_factor',
+      });
     });
   }
 

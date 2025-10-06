@@ -160,7 +160,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  * The following example demonstrates how to handle scenarios where a user cancels the reverification flow, such as closing the modal, which might result in `myData` being `null`.
  *
- * In the following example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/reverification) for more information.
+ * In the following example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/secure/reverification) for more information.
  *
  * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
  * import { useReverification } from '@clerk/clerk-react'

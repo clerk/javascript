@@ -261,6 +261,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   creator_role: string;
   admin_delete_enabled: boolean;
   domains_enabled: boolean;
+  slug_disabled: boolean;
   domains_enrollment_modes: Array<DomainsEnrollmentModes>;
   domains_default_role: string;
 }
@@ -392,6 +393,11 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   expires_at: number;
 }
 
+export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitationJSON {
+  status: 'accepted';
+  user_id: string;
+}
+
 /**
  * @interface
  */
@@ -405,7 +411,7 @@ export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
    */
   slug: string;
   /**
-   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
    */
   image_url?: string;
   /**

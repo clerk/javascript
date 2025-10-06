@@ -3,6 +3,7 @@ import { lazy } from 'react';
 const componentImportPaths = {
   SignIn: () => import(/* webpackChunkName: "signin" */ './../components/SignIn'),
   SignUp: () => import(/* webpackChunkName: "signup" */ './../components/SignUp'),
+  UserAvatar: () => import(/* webpackChunkName: "useravatar" */ './../components/UserAvatar'),
   UserButton: () => import(/* webpackChunkName: "userbutton" */ './../components/UserButton'),
   UserProfile: () => import(/* webpackChunkName: "userprofile" */ './../components/UserProfile'),
   CreateOrganization: () => import(/* webpackChunkName: "createorganization" */ './../components/CreateOrganization'),
@@ -47,15 +48,22 @@ export const SignUp = lazy(() => componentImportPaths.SignUp().then(module => ({
 
 export const SignUpModal = lazy(() => componentImportPaths.SignUp().then(module => ({ default: module.SignUpModal })));
 
+export const UserAvatar = lazy(() =>
+  componentImportPaths.UserAvatar().then(module => ({ default: module.UserAvatar })),
+);
+
 export const UserButton = lazy(() =>
   componentImportPaths.UserButton().then(module => ({ default: module.UserButton })),
 );
+
 export const UserProfile = lazy(() =>
   componentImportPaths.UserProfile().then(module => ({ default: module.UserProfile })),
 );
+
 export const UserProfileModal = lazy(() =>
   componentImportPaths.UserProfile().then(module => ({ default: module.UserProfileModal })),
 );
+
 export const CreateOrganization = lazy(() =>
   componentImportPaths.CreateOrganization().then(module => ({ default: module.CreateOrganization })),
 );
@@ -132,6 +140,7 @@ export const preloadComponent = async (component: unknown) => {
 export const ClerkComponents = {
   SignIn,
   SignUp,
+  UserAvatar,
   UserButton,
   UserProfile,
   UserVerification,

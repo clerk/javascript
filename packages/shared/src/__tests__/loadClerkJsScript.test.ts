@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '../error';
 import {
   buildClerkJsScriptAttributes,
   clerkJsScriptUrl,
@@ -86,8 +87,8 @@ describe('loadClerkJsScript(options)', () => {
       rejectedWith = error;
     }
 
-    expect(rejectedWith).toBeInstanceOf(Error);
-    expect(rejectedWith.message).toBe('Clerk: Failed to load Clerk');
+    expect(rejectedWith).toBeInstanceOf(ClerkRuntimeError);
+    expect(rejectedWith.message).toContain('Clerk: Failed to load Clerk');
     expect((window as any).Clerk).toBeUndefined();
   });
 
@@ -137,8 +138,8 @@ describe('loadClerkJsScript(options)', () => {
       await loadPromise;
       fail('Should have thrown error');
     } catch (error) {
-      expect(error).toBeInstanceOf(Error);
-      expect((error as Error).message).toBe('Clerk: Failed to load Clerk');
+      expect(error).toBeInstanceOf(ClerkRuntimeError);
+      expect((error as Error).message).toContain('Clerk: Failed to load Clerk');
       // The malformed Clerk object should still be there since it was set
       expect((window as any).Clerk).toEqual({ status: 'ready' });
     }

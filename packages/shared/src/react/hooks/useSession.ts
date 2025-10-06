@@ -7,7 +7,7 @@ type UseSession = () => UseSessionReturn;
 
 const hookName = `useSession`;
 /**
- * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/references/javascript/session) object, as well as helpers for setting the active session.
+ * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/reference/javascript/session) object, as well as helpers for setting the active session.
  *
  * @unionReturnHeadings
  * ["Initialization", "Signed out", "Signed in"]

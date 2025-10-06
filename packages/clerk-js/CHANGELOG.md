@@ -1,5 +1,77 @@
 # Change Log
 
+## 5.99.0
+
+### Minor Changes
+
+- [Experimental] Add support for additional properties to Signal SignIn/SignUp ([#6897](https://github.com/clerk/javascript/pull/6897)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Display organization slug based on environment settings ([#6903](https://github.com/clerk/javascript/pull/6903)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/localizations@3.25.7
+  - @clerk/shared@3.27.3
+
+## 5.98.0
+
+### Minor Changes
+
+- Adding /oauth/oauth/end_session to frontendApiRedirectPathsNoUserInput ([#6890](https://github.com/clerk/javascript/pull/6890)) by [@Ben2W](https://github.com/Ben2W)
+
+- [Experimental] Add Signal support for Web3 APIs ([#6840](https://github.com/clerk/javascript/pull/6840)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add auto focus behavior to otp input to enable pasting codes immediately ([#6863](https://github.com/clerk/javascript/pull/6863)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(clerk-js): Enable debugLogger for Next.js keyless applications. ([#6886](https://github.com/clerk/javascript/pull/6886)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Ensure the back navigation within SignUpVerificationCode returns to the appropriate step within combined flow. ([#6909](https://github.com/clerk/javascript/pull/6909)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve appearance selectors for tasks, such as including it within `SignIn/SignUp` components ([#6861](https://github.com/clerk/javascript/pull/6861)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a), [`8777f35`](https://github.com/clerk/javascript/commit/8777f350f5fb51413609a53d9de05b2e5d1d7cfe), [`2c0128b`](https://github.com/clerk/javascript/commit/2c0128b05ecf48748f27f10f0b0215a279ba6cc1)]:
+  - @clerk/types@4.91.0
+  - @clerk/shared@3.27.2
+  - @clerk/localizations@3.25.6
+
+## 5.97.0
+
+### Minor Changes
+
+- [Billing Beta] Drop top level billing flags from environment. Instead, use the payer specific flags. ([#6882](https://github.com/clerk/javascript/pull/6882)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Prevent leaking the `data-component-status` attribute for components other than `<PricingTable/>`. ([#6884](https://github.com/clerk/javascript/pull/6884)) by [@panteliselef](https://github.com/panteliselef)
+
+- Hide CTA for `<PricingTable forOrganization/>` when the user is does not have an active organization selected. ([#6883](https://github.com/clerk/javascript/pull/6883)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+  - @clerk/localizations@3.25.5
+  - @clerk/shared@3.27.1
+
+## 5.96.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add new <UserAvatar /> component ([#6808](https://github.com/clerk/javascript/pull/6808)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Update active context cookie to properly set `Secure` attribute. ([#6851](https://github.com/clerk/javascript/pull/6851)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`9cf89cd`](https://github.com/clerk/javascript/commit/9cf89cd3402c278e8d5bfcd8277cee292bc45333), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4), [`5546352`](https://github.com/clerk/javascript/commit/55463527df9a710ef3215c353bab1ef423d1de62)]:
+  - @clerk/shared@3.27.0
+  - @clerk/types@4.89.0
+  - @clerk/localizations@3.25.4
+
 ## 5.95.0
 
 ### Minor Changes

@@ -27,7 +27,7 @@ type UseOrganizationReturn =
 type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
 
 /**
- * Returns the current [`Organization`](https://clerk.com/docs/references/javascript/organization/organization) object
+ * Returns the current [`Organization`](https://clerk.com/docs/reference/javascript/organization/organization) object
  * along with loading states and membership information.
  *
  * @example

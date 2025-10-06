@@ -1,5 +1,51 @@
 # Change Log
 
+## 2.17.2
+
+### Patch Changes
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/shared@3.27.3
+
+## 2.17.1
+
+### Patch Changes
+
+- Add `slug_disabled` field on organization settings ([#6902](https://github.com/clerk/javascript/pull/6902)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a), [`8777f35`](https://github.com/clerk/javascript/commit/8777f350f5fb51413609a53d9de05b2e5d1d7cfe), [`2c0128b`](https://github.com/clerk/javascript/commit/2c0128b05ecf48748f27f10f0b0215a279ba6cc1)]:
+  - @clerk/types@4.91.0
+  - @clerk/shared@3.27.2
+
+## 2.17.0
+
+### Minor Changes
+
+- Add `user_id` field to `organizationInvitation.accepted` webhook events. ([#6887](https://github.com/clerk/javascript/pull/6887)) by [@kduprey](https://github.com/kduprey)
+
+  Creates a new `OrganizationInvitationAcceptedJSON` interface that extends `OrganizationInvitationJSON` with a required `user_id` field, and updates the webhook type system to use this interface specifically for `organizationInvitation`.accepted events.
+
+### Patch Changes
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+  - @clerk/shared@3.27.1
+
+## 2.16.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- [Billing Beta] Update subscription item `plan` and `planId` properties to be `null`. ([#6839](https://github.com/clerk/javascript/pull/6839)) by [@paddycarver](https://github.com/paddycarver)
+
+### Patch Changes
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`9cf89cd`](https://github.com/clerk/javascript/commit/9cf89cd3402c278e8d5bfcd8277cee292bc45333), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4), [`5546352`](https://github.com/clerk/javascript/commit/55463527df9a710ef3215c353bab1ef423d1de62)]:
+  - @clerk/shared@3.27.0
+  - @clerk/types@4.89.0
+
 ## 2.15.0
 
 ### Minor Changes

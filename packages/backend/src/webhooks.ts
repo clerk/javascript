@@ -9,7 +9,7 @@ import type { WebhookEvent } from './api/resources/Webhooks';
  */
 export type VerifyWebhookOptions = {
   /**
-   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#webhooks) instead.
+   * The signing secret for the webhook. It's recommended to use the [`CLERK_WEBHOOK_SIGNING_SECRET` environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#webhooks) instead.
    */
   signingSecret?: string;
 };
@@ -60,26 +60,30 @@ function createStandardWebhookHeaders(request: Request): Record<string, string> 
  * @hideReturns
  *
  * @example
- * See the [guide on syncing data](https://clerk.com/docs/webhooks/sync-data) for more comprehensive and framework-specific examples that you can copy and paste into your app.
+ * See the [guide on syncing data](https://clerk.com/docs/guides/development/webhooks/syncing) for more comprehensive and framework-specific examples that you can copy and paste into your app.
  *
  * ```ts
- * try {
- *   const evt = await verifyWebhook(request)
+ * import { verifyWebhook } from '@clerk/backend/webhooks'
  *
- *   // Access the event data
- *   const { id } = evt.data
- *   const eventType = evt.type
+ * export async function POST(request: Request) {
+ *   try {
+ *     const evt = await verifyWebhook(request)
  *
- *   // Handle specific event types
- *   if (evt.type === 'user.created') {
- *     console.log('New user created:', evt.data.id)
- *     // Handle user creation
+ *     // Access the event data
+ *     const { id } = evt.data
+ *     const eventType = evt.type
+ *
+ *     // Handle specific event types
+ *     if (evt.type === 'user.created') {
+ *       console.log('New user created:', evt.data.id)
+ *       // Handle user creation
+ *     }
+ *
+ *     return new Response('Success', { status: 200 })
+ *   } catch (err) {
+ *     console.error('Webhook verification failed:', err)
+ *     return new Response('Webhook verification failed', { status: 400 })
  *   }
- *
- *   return new Response('Success', { status: 200 })
- * } catch (err) {
- *   console.error('Webhook verification failed:', err)
- *   return new Response('Webhook verification failed', { status: 400 })
  * }
  * ```
  */

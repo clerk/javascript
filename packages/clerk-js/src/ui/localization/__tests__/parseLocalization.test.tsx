@@ -1,10 +1,11 @@
 import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { renderHook } from '../../../testUtils';
-import { OptionsProvider } from '../../contexts';
-import { localizationKeys, useLocalizations } from '../../customizables';
-import { bindCreateFixtures } from '../../utils/test/createFixtures';
-import { defaultResource } from '../defaultEnglishResource';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { renderHook } from '@/test/utils';
+import { OptionsProvider } from '@/ui/contexts';
+import { localizationKeys, useLocalizations } from '@/ui/customizables';
+import { defaultResource } from '@/ui/localization/defaultEnglishResource';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

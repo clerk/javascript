@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.92.0
+
+### Minor Changes
+
+- [Experimental] Add support for additional properties to Signal SignIn/SignUp ([#6897](https://github.com/clerk/javascript/pull/6897)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Display organization slug based on environment settings ([#6903](https://github.com/clerk/javascript/pull/6903)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+## 4.91.0
+
+### Minor Changes
+
+- [Experimental] Add Signal support for Web3 APIs ([#6840](https://github.com/clerk/javascript/pull/6840)) by [@dstaley](https://github.com/dstaley)
+
+## 4.90.0
+
+### Minor Changes
+
+- [Billing Beta] Drop top level billing flags from environment. Instead, use the payer specific flags. ([#6882](https://github.com/clerk/javascript/pull/6882)) by [@panteliselef](https://github.com/panteliselef)
+
+## 4.89.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add new <UserAvatar /> component ([#6808](https://github.com/clerk/javascript/pull/6808)) by [@tmilewski](https://github.com/tmilewski)
+
 ## 4.88.0
 
 ### Minor Changes

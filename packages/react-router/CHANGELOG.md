@@ -1,5 +1,124 @@
 # Change Log
 
+## 2.1.0
+
+### Minor Changes
+
+- Added `organizationSyncOptions` option to `clerkMiddleware()`. It's used to activate a specific organization or personal account based on URL path parameters. ([#6927](https://github.com/clerk/javascript/pull/6927)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  // app/root.tsx
+  export const middleware: Route.MiddlewareFunction[] = [
+    clerkMiddleware({
+      organizationSyncOptions: {
+        organizationPatterns: [
+          '/orgs/:slug', // Match the org slug
+          '/orgs/:slug/(.*)', // Wildcard match for optional trailing path segments
+        ],
+      },
+    }),
+  ];
+  ```
+
+  To learn more about best practices for using organization slugs to manage the active organization, check out this [guide](https://clerk.com/docs/organizations/org-slugs-in-urls).
+
+### Patch Changes
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/clerk-react@5.51.0
+  - @clerk/backend@2.17.2
+  - @clerk/shared@3.27.3
+
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`04cba7d`](https://github.com/clerk/javascript/commit/04cba7d34f91dc28f9c957bba8231c6942f657e3), [`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a), [`8777f35`](https://github.com/clerk/javascript/commit/8777f350f5fb51413609a53d9de05b2e5d1d7cfe), [`2c0128b`](https://github.com/clerk/javascript/commit/2c0128b05ecf48748f27f10f0b0215a279ba6cc1)]:
+  - @clerk/backend@2.17.1
+  - @clerk/clerk-react@5.50.0
+  - @clerk/types@4.91.0
+  - @clerk/shared@3.27.2
+
+## 2.0.1
+
+### Patch Changes
+
+- Set correct minimum `react-router` version in README ([#6866](https://github.com/clerk/javascript/pull/6866)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`ea2bc26`](https://github.com/clerk/javascript/commit/ea2bc260fadac8fd7480cd476046f5a06c0d917d), [`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/backend@2.17.0
+  - @clerk/types@4.90.0
+  - @clerk/clerk-react@5.49.1
+  - @clerk/shared@3.27.1
+
+## 2.0.0
+
+### Major Changes
+
+- Introduce [React Router middleware](https://reactrouter.com/how-to/middleware) support with `clerkMiddleware()` for improved performance and streaming capabilities. ([#6660](https://github.com/clerk/javascript/pull/6660)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage of `rootAuthLoader` without the `clerkMiddleware()` installed is now deprecated and will be removed in the next major version.
+
+  **Before (Deprecated - will be removed):**
+
+  ```tsx
+  import { rootAuthLoader } from '@clerk/react-router/ssr.server';
+
+  export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
+  ```
+
+  **After (Recommended):**
+
+  1. Enable the `v8_middleware` future flag:
+
+  ```ts
+  // react-router.config.ts
+  export default {
+    future: {
+      v8_middleware: true,
+    },
+  } satisfies Config;
+  ```
+
+  2. Use the middleware in your app:
+
+  ```tsx
+  import { clerkMiddleware, rootAuthLoader } from '@clerk/react-router/server';
+
+  export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
+
+  export const loader = (args: Route.LoaderArgs) => rootAuthLoader(args);
+  ```
+
+  **Streaming Support (with middleware):**
+
+  ```tsx
+  export const middleware: Route.MiddlewareFunction[] = [clerkMiddleware()];
+
+  export const loader = (args: Route.LoaderArgs) => {
+    const nonCriticalData = new Promise(res => setTimeout(() => res('non-critical'), 5000));
+
+    return rootAuthLoader(args, () => ({
+      nonCriticalData,
+    }));
+  };
+  ```
+
+### Minor Changes
+
+- Add new <UserAvatar /> component ([#6808](https://github.com/clerk/javascript/pull/6808)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`9cf89cd`](https://github.com/clerk/javascript/commit/9cf89cd3402c278e8d5bfcd8277cee292bc45333), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4), [`b8fbadd`](https://github.com/clerk/javascript/commit/b8fbadd95652b08ecea23fdbc7e352e3e7297b2d), [`5546352`](https://github.com/clerk/javascript/commit/55463527df9a710ef3215c353bab1ef423d1de62)]:
+  - @clerk/backend@2.16.0
+  - @clerk/shared@3.27.0
+  - @clerk/clerk-react@5.49.0
+  - @clerk/types@4.89.0
+
 ## 1.10.2
 
 ### Patch Changes
