@@ -703,12 +703,16 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  private async _create(params: SignInFutureCreateParams): Promise<void> {
+    await this.resource.__internal_basePost({
+      path: this.resource.pathRoot,
+      body: params,
+    });
+  }
+
   async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body: params,
-      });
+      await this._create(params);
     });
   }
 
@@ -744,7 +748,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (emailAddress) {
-        await this.create({ identifier: emailAddress });
+        await this._create({ identifier: emailAddress });
       }
 
       const emailCodeFactor = this.selectFirstFactor({ strategy: 'email_code', emailAddressId });
