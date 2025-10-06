@@ -1,5 +1,37 @@
 # Change Log
 
+## 2.1.0
+
+### Minor Changes
+
+- Added `organizationSyncOptions` option to `clerkMiddleware()`. It's used to activate a specific organization or personal account based on URL path parameters. ([#6927](https://github.com/clerk/javascript/pull/6927)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  // app/root.tsx
+  export const middleware: Route.MiddlewareFunction[] = [
+    clerkMiddleware({
+      organizationSyncOptions: {
+        organizationPatterns: [
+          '/orgs/:slug', // Match the org slug
+          '/orgs/:slug/(.*)', // Wildcard match for optional trailing path segments
+        ],
+      },
+    }),
+  ];
+  ```
+
+  To learn more about best practices for using organization slugs to manage the active organization, check out this [guide](https://clerk.com/docs/organizations/org-slugs-in-urls).
+
+### Patch Changes
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/clerk-react@5.51.0
+  - @clerk/backend@2.17.2
+  - @clerk/shared@3.27.3
+
 ## 2.0.2
 
 ### Patch Changes
