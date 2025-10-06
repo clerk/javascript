@@ -608,13 +608,33 @@ class SignInFuture implements SignInFutureResource {
 
   constructor(readonly resource: SignIn) {}
 
+  get id() {
+    return this.resource.id;
+  }
+
+  get identifier() {
+    return this.resource.identifier;
+  }
+
+  get createdSessionId() {
+    return this.resource.createdSessionId;
+  }
+
+  get userData() {
+    return this.resource.userData;
+  }
+
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
     return this.resource.status || 'needs_identifier';
   }
 
-  get availableStrategies() {
+  get supportedFirstFactors() {
     return this.resource.supportedFirstFactors ?? [];
+  }
+
+  get supportedSecondFactors() {
+    return this.resource.supportedSecondFactors ?? [];
   }
 
   get isTransferable() {
@@ -635,6 +655,10 @@ class SignInFuture implements SignInFutureResource {
 
   get firstFactorVerification() {
     return this.resource.firstFactorVerification;
+  }
+
+  get secondFactorVerification() {
+    return this.resource.secondFactorVerification;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
