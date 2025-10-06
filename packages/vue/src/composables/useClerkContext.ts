@@ -8,7 +8,7 @@ export function useClerkContext(source: string) {
 
   if (!ctx) {
     return errorThrower.throw(
-      `${source} can only be used when the Vue plugin is installed. Learn more: https://clerk.com/docs/references/vue/clerk-plugin`,
+      `${source} can only be used when the Vue plugin is installed. Learn more: https://clerk.com/docs/reference/vue/clerk-plugin`,
     );
   }
 

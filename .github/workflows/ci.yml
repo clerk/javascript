@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - release/v4
+      - vincent-and-the-doctor
 
 permissions:
   contents: read
@@ -285,6 +286,9 @@ jobs:
             'elements',
             'localhost',
             'sessions',
+            'sessions:staging',
+            'handshake',
+            'handshake:staging',
             'astro',
             'expo-web',
             'tanstack-react-start',
@@ -348,12 +352,19 @@ jobs:
       - name: Install @clerk/backend in /integration
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ./integration
-        run: pnpm init && pnpm add @clerk/backend
+        run: |
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/backend
 
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
-        run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
+        run: |
+          mkdir clerk-js && cd clerk-js
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/clerk-js
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}

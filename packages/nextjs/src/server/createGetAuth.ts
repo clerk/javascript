@@ -97,12 +97,12 @@ export const createSyncGetAuth = ({
  * The `getAuth()` helper retrieves authentication state from the request object.
  *
  * > [!NOTE]
- * > If you are using App Router, use the [`auth()` helper](https://clerk.com/docs/references/nextjs/auth) instead.
+ * > If you are using App Router, use the [`auth()` helper](https://clerk.com/docs/reference/nextjs/app-router/auth) instead.
  *
  * @param req - The Next.js request object.
  * @param [options] - An optional object that can be used to configure the behavior of the `getAuth()` function.
  * @param [options.secretKey] - A string that represents the Secret Key used to sign the session token. If not provided, the Secret Key is retrieved from the environment variable `CLERK_SECRET_KEY`.
- * @returns The `Auth` object. See the [Auth reference](https://clerk.com/docs/references/backend/types/auth-object) for more information.
+ * @returns The `Auth` object. See the [Auth reference](https://clerk.com/docs/reference/backend/types/auth-object) for more information.
  *
  * @example
  * ### Protect API routes
@@ -129,7 +129,7 @@ export const createSyncGetAuth = ({
  * @example
  * ### Usage with `getToken()`
  *
- * `getAuth()` returns [`getToken()`](https://clerk.com/docs/references/backend/types/auth-object#get-token), which is a method that returns the current user's session token or a custom JWT template.
+ * `getAuth()` returns [`getToken()`](https://clerk.com/docs/reference/backend/types/auth-object#get-token), which is a method that returns the current user's session token or a custom JWT template.
  *
  * ```tsx {{ filename: 'app/api/example/route.ts' }}
  * import { getAuth } from '@clerk/nextjs/server'
@@ -150,7 +150,7 @@ export const createSyncGetAuth = ({
  * @example
  * ### Usage with `clerkClient`
  *
- * `clerkClient` is used to access the [Backend SDK](https://clerk.com/docs/references/backend/overview), which exposes Clerk's Backend API resources. You can use `getAuth()` to pass authentication information that many of the Backend SDK methods require, like the user's ID.
+ * `clerkClient` is used to access the [Backend SDK](https://clerk.com/docs/reference/backend/overview), which exposes Clerk's Backend API resources. You can use `getAuth()` to pass authentication information that many of the Backend SDK methods require, like the user's ID.
  *
  * ```tsx {{ filename: 'app/api/example/route.ts' }}
  * import { clerkClient, getAuth } from '@clerk/nextjs/server'

@@ -26,34 +26,45 @@ const FILES_WITHOUT_HEADINGS = [
  * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
-  ['clerk-paginated-response', '/docs/references/javascript/types/clerk-paginated-response'],
+  ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
+  ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
-  ['session-resource', '/docs/references/javascript/session'],
-  ['signed-in-session-resource', '/docs/references/javascript/session'],
-  ['sign-up-resource', '/docs/references/javascript/sign-up'],
-  ['user-resource', '/docs/references/javascript/user'],
-  ['session-status-claim', '/docs/references/javascript/types/session-status'],
-  ['user-organization-invitation-resource', '/docs/references/javascript/types/user-organization-invitation'],
-  ['organization-membership-resource', '/docs/references/javascript/types/organization-membership'],
-  ['organization-suggestion-resource', '/docs/references/javascript/types/organization-suggestion'],
-  ['organization-resource', '/docs/references/javascript/organization'],
-  ['organization-domain-resource', '/docs/references/javascript/types/organization-domain'],
-  ['organization-invitation-resource', '/docs/references/javascript/types/organization-invitation'],
-  ['organization-membership-request-resource', '/docs/references/javascript/types/organization-membership-request'],
-  ['session', '/docs/references/backend/types/backend-session'],
-  ['session-activity', '/docs/references/backend/types/backend-session-activity'],
-  ['organization', '/docs/references/backend/types/backend-organization'],
+  ['session-resource', '/docs/reference/javascript/session'],
+  ['signed-in-session-resource', '/docs/reference/javascript/session'],
+  ['sign-in-resource', '/docs/reference/javascript/sign-in'],
+  ['sign-up-resource', '/docs/reference/javascript/sign-up'],
+  ['user-resource', '/docs/reference/javascript/user'],
+  ['session-status-claim', '/docs/reference/javascript/types/session-status'],
+  ['user-organization-invitation-resource', '/docs/reference/javascript/types/user-organization-invitation'],
+  ['organization-membership-resource', '/docs/reference/javascript/types/organization-membership'],
+  ['organization-suggestion-resource', '/docs/reference/javascript/types/organization-suggestion'],
+  ['organization-resource', '/docs/reference/javascript/organization'],
+  ['organization-domain-resource', '/docs/reference/javascript/types/organization-domain'],
+  ['organization-invitation-resource', '/docs/reference/javascript/types/organization-invitation'],
+  ['organization-membership-request-resource', '/docs/reference/javascript/types/organization-membership-request'],
+  ['session', '/docs/reference/backend/types/backend-session'],
+  ['session-activity', '/docs/reference/backend/types/backend-session-activity'],
+  ['organization', '/docs/reference/backend/types/backend-organization'],
   ['public-organization-data-json', '#public-organization-data-json'],
   ['organization-membership-public-user-data', '#organization-membership-public-user-data'],
-  ['identification-link', '/docs/references/backend/types/backend-identification-link'],
-  ['verification', '/docs/references/backend/types/backend-verification'],
-  ['email-address', '/docs/references/backend/types/backend-email-address'],
-  ['external-account', '/docs/references/backend/types/backend-external-account'],
-  ['phone-number', '/docs/references/backend/types/backend-phone-number'],
-  ['saml-account', '/docs/references/backend/types/backend-saml-account'],
-  ['web3-wallet', '/docs/references/backend/types/backend-web3-wallet'],
+  ['identification-link', '/docs/reference/backend/types/backend-identification-link'],
+  ['verification', '/docs/reference/backend/types/backend-verification'],
+  ['email-address', '/docs/reference/backend/types/backend-email-address'],
+  ['external-account', '/docs/reference/backend/types/backend-external-account'],
+  ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
+  ['saml-account', '/docs/reference/backend/types/backend-saml-account'],
+  ['web3-wallet', '/docs/reference/backend/types/backend-web3-wallet'],
   ['verify-token-options', '#verify-token-options'],
-  ['localization-resource', '/docs/customization/localization'],
+  ['localization-resource', '/docs/guides/customizing-clerk/localization'],
+  ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
+  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
+  ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
+  ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
+  ['billing-money-amount', '/docs/reference/javascript/types/billing-money-amount'],
+  ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
+  ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
+  ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
 ];
 
 /**
@@ -84,11 +95,11 @@ function getCatchAllReplacements() {
   return [
     {
       pattern: /\(setActiveParams\)/g,
-      replace: '([setActiveParams](/docs/references/javascript/types/set-active-params))',
+      replace: '([setActiveParams](/docs/reference/javascript/types/set-active-params))',
     },
     {
       pattern: /`LoadedClerk`/g,
-      replace: '[Clerk](/docs/references/javascript/clerk)',
+      replace: '[Clerk](/docs/reference/javascript/clerk)',
     },
     {
       pattern: /\(CreateOrganizationParams\)/g,
@@ -96,36 +107,36 @@ function getCatchAllReplacements() {
     },
     {
       pattern: /\| `SignInResource` \|/,
-      replace: '| [SignInResource](/docs/references/javascript/sign-in) |',
+      replace: '| [SignInResource](/docs/reference/javascript/sign-in) |',
     },
     {
       pattern: /`OrganizationPrivateMetadata`/g,
       replace:
-        '[`OrganizationPrivateMetadata`](/docs/references/javascript/types/metadata#organization-private-metadata)',
+        '[`OrganizationPrivateMetadata`](/docs/reference/javascript/types/metadata#organization-private-metadata)',
     },
     {
       pattern: /OrganizationPublicMetadata/g,
-      replace: '[OrganizationPublicMetadata](/docs/references/javascript/types/metadata#organization-public-metadata)',
+      replace: '[OrganizationPublicMetadata](/docs/reference/javascript/types/metadata#organization-public-metadata)',
     },
     {
       pattern: /`OrganizationInvitationPrivateMetadata`/g,
       replace:
-        '[`OrganizationInvitationPrivateMetadata`](/docs/references/javascript/types/metadata#organization-invitation-private-metadata)',
+        '[`OrganizationInvitationPrivateMetadata`](/docs/reference/javascript/types/metadata#organization-invitation-private-metadata)',
     },
     {
       pattern: /`OrganizationInvitationPublicMetadata`/g,
       replace:
-        '[`OrganizationInvitationPublicMetadata`](/docs/references/javascript/types/metadata#organization-invitation-public-metadata)',
+        '[`OrganizationInvitationPublicMetadata`](/docs/reference/javascript/types/metadata#organization-invitation-public-metadata)',
     },
     {
       pattern: /`OrganizationMembershipPrivateMetadata`/g,
       replace:
-        '[`OrganizationMembershipPrivateMetadata`](/docs/references/javascript/types/metadata#organization-membership-private-metadata)',
+        '[`OrganizationMembershipPrivateMetadata`](/docs/reference/javascript/types/metadata#organization-membership-private-metadata)',
     },
     {
       pattern: /`OrganizationMembershipPublicMetadata`/g,
       replace:
-        '[`OrganizationMembershipPublicMetadata`](/docs/references/javascript/types/metadata#organization-membership-public-metadata)',
+        '[`OrganizationMembershipPublicMetadata`](/docs/reference/javascript/types/metadata#organization-membership-public-metadata)',
     },
     {
       /**

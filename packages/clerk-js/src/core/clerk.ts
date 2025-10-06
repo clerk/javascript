@@ -87,6 +87,7 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   UserResource,
@@ -475,10 +476,21 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-      if (this.environment?.clientDebugMode) {
+      const telemetry = this.#options.telemetry;
+      const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
+
+      const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
+      const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
+      const isProd = this.environment?.isProduction?.() ?? false;
+
+      const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
+      const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
+
+      if (shouldEnable) {
         initDebugLogger({
           enabled: true,
-          telemetryCollector: this.telemetry,
+          ...(logLevel ? { logLevel } : {}),
+          ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
       debugLogger.info('load() complete', {}, 'clerk');
@@ -858,6 +870,30 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
+  public mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    const component = 'UserAvatar';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
+      controls.mountComponent({
+        name: component,
+        appearanceKey: 'userAvatar',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountUserAvatar = (node: HTMLDivElement): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls =>
       controls.unmountComponent({

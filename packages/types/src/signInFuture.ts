@@ -1,7 +1,7 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInStatus } from './signInCommon';
-import type { OAuthStrategy } from './strategies';
+import type { OAuthStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 
 export interface SignInFutureCreateParams {
@@ -113,6 +113,10 @@ export interface SignInFutureBackupCodeVerifyParams {
 
 export interface SignInFutureTicketParams {
   ticket: string;
+}
+
+export interface SignInFutureWeb3Params {
+  strategy: Web3Strategy;
 }
 
 export interface SignInFutureFinalizeParams {
@@ -274,6 +278,11 @@ export interface SignInFutureResource {
    * Used to perform a ticket-based sign-in.
    */
   ticket: (params?: SignInFutureTicketParams) => Promise<{ error: unknown }>;
+
+  /**
+   * Used to perform a Web3-based sign-in.
+   */
+  web3: (params: SignInFutureWeb3Params) => Promise<{ error: unknown }>;
 
   /**
    * Used to convert a sign-in with `status === 'complete'` into an active session. Will cause anything observing the
