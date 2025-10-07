@@ -1038,7 +1038,7 @@ export const skSK: LocalizationResource = {
       actionDescription: 'Pre pokračovanie napíšte "Zmazať účet".',
       confirm: 'Zmazať účet',
       messageLine1:
-        'Ste si istý, že chcete zmazať svoj účet z Clerk? Kontaktujte prosím vlastníka aplikácie na vymazanie vašich informácií z ich aplikácie a iných služieb.',
+        'Naozaj chcete odstrániť svoj účet? Niektoré súvisiace údaje môžu zostať zachované. Ak chcete požiadať o úplné vymazanie údajov, obráťte sa na podporu.',
       messageLine2: 'Táto akcia je trvalá a nemôže byť vrátená späť.',
       title: 'Zmazať účet',
     },

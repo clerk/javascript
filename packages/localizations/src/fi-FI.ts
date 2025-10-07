@@ -1033,7 +1033,7 @@ export const fiFI: LocalizationResource = {
       actionDescription: 'Kirjoita "Poista tili" poistaaksesi tilisi.',
       confirm: 'Poista tili',
       messageLine1:
-        'Oletko varma, että haluat poistaa tilisi Clerkistä? Ota yhteyttä sovelluksen omistajaan poistaaksesi tietosi heidän sovelluksestaan ja muista palveluista.',
+        'Haluatko varmasti poistaa tilisi? Joitakin liittyviä tietoja saatetaan säilyttää. Pyydä täydellistä tietojen poistamista ottamalla yhteyttä tukeen.',
       messageLine2: 'Tämä toiminto on pysyvä ja peruuttamaton.',
       title: 'Poista tili',
     },

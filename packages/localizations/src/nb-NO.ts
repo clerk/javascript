@@ -1032,7 +1032,7 @@ export const nbNO: LocalizationResource = {
       actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
       messageLine1:
-        'Er du sikker på at du vil slette kontoen din fra Clerk? Vennligst kontakt applikasjonseieren for å slette informasjonen din fra deres applikasjon og andre tjenester.',
+        'Er du sikker på at du vil slette kontoen din? Noen tilknyttede data kan beholdes. For å be om full sletting av data, vennligst kontakt kundestøtte.',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',
       title: 'Slett konto',
     },

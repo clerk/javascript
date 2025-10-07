@@ -1036,7 +1036,7 @@ export const isIS: LocalizationResource = {
       actionDescription: 'Sláðu inn "Eyða reikningi" hér að neðan til að halda áfram.',
       confirm: 'Eyða reikningi',
       messageLine1:
-        'Ertu viss um að þú viljir eyða reikningnum þínum úr Clerk? Vinsamlegast hafðu samband við eiganda forritsins til að eyða upplýsingum þínum úr forriti þeirra og öðrum þjónustum.',
+        'Ertu viss um að þú viljir eyða reikningnum þínum? Sum tengd gögn kunna að verða varðveitt. Til að biðja um fullkomna eyðingu gagna, vinsamlegast hafðu samband við þjónustuver.',
       messageLine2: 'Þessi aðgerð er varanleg og óafturkræf.',
       title: 'Eyða reikningi',
     },
