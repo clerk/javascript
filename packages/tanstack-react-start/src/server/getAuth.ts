@@ -1,10 +1,12 @@
+import type { SessionAuthObject } from '@clerk/backend';
 import type { AuthOptions, GetAuthFnNoRequest } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { getGlobalStartContext } from '@tanstack/react-start';
 
-import { clerkMiddlewareNotConfigured, noFetchFnCtxPassedInGetAuth } from '../utils/errors';
+import { errorThrower } from '../utils';
+import { clerkMiddlewareNotConfigured } from '../utils/errors';
 
-export const getAuth: GetAuthFnNoRequest<{}, true> = (async (opts?: AuthOptions) => {
+export const getAuth: GetAuthFnNoRequest<SessionAuthObject, true> = (async (opts?: AuthOptions) => {
   // @ts-expect-error: Untyped internal Clerk start context
   const authObjectFn = getGlobalStartContext().auth;
 
@@ -16,4 +18,4 @@ export const getAuth: GetAuthFnNoRequest<{}, true> = (async (opts?: AuthOptions)
   const authObject = await Promise.resolve(authObjectFn({ treatPendingAsSignedOut: opts?.treatPendingAsSignedOut }));
 
   return getAuthObjectForAcceptedToken({ authObject, acceptsToken: opts?.acceptsToken });
-}) as GetAuthFn<Request, true>;
+}) as GetAuthFnNoRequest<SessionAuthObject, true>;
