@@ -606,6 +606,9 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
   legal_accepted_at: number | null;
+  /**
+   * The locale of the user in BCP-47 format.
+   */
   locale: string | null;
 }
 

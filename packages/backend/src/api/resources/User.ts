@@ -146,7 +146,7 @@ export class User {
     readonly legalAcceptedAt: number | null,
 
     /**
-     * The locale of the user.
+     * The locale of the user in BCP-47 format.
      */
     readonly locale: string | null,
   ) {}
