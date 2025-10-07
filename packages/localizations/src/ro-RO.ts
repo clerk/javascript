@@ -1047,7 +1047,7 @@ export const roRO: LocalizationResource = {
       actionDescription: 'Tastează „Șterge contul” mai jos pentru a continua.',
       confirm: 'Șterge contul',
       messageLine1:
-        'Sigur doriți să vă ștergeți contul? Este posibil ca unele date asociate să fie păstrate. Pentru a solicita ștergerea completă a datelor, vă rugăm să contactați asistența.',
+        'Sigur vrei să-ți ștergi contul? Este posibil ca unele date asociate să fie păstrate. Pentru a solicita ștergerea completă a datelor, te rugăm să contactezi suportul.',
       messageLine2: 'Această acțiune este permanentă și ireversibilă.',
       title: 'Șterge contul',
     },

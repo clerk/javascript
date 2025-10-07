@@ -1043,7 +1043,7 @@ export const esUY: LocalizationResource = {
       actionDescription: 'Escribí "Eliminar cuenta" abajo para continuar.',
       confirm: 'Eliminar cuenta',
       messageLine1:
-        '¿Está seguro de que desea eliminar su cuenta? Es posible que se conserven algunos datos asociados. Para solicitar la eliminación completa de datos, comuníquese con el soporte.',
+        '¿Estás seguro de que querés eliminar tu cuenta? Es posible que se conserven algunos datos asociados. Para solicitar la eliminación completa de datos, contactá al soporte.',
       messageLine2: 'Esta acción es permanente e irreversible.',
       title: 'Eliminar cuenta',
     },
