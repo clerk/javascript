@@ -171,6 +171,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             as='span'
             localizationKey={subtitle || identifier}
             colorScheme='secondary'
+            variant='caption'
           />
         )}
       </Flex>
