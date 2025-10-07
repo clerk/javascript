@@ -1043,7 +1043,7 @@ export const esUY: LocalizationResource = {
       actionDescription: 'Escribí "Eliminar cuenta" abajo para continuar.',
       confirm: 'Eliminar cuenta',
       messageLine1:
-        '¿Estás seguro de que querés eliminar tu cuenta de Clerk? Por favor, contacta al propietario de la aplicación para eliminar tu información de su aplicación y otros servicios.',
+        '¿Está seguro de que desea eliminar su cuenta? Es posible que se conserven algunos datos asociados. Para solicitar la eliminación completa de datos, comuníquese con el soporte.',
       messageLine2: 'Esta acción es permanente e irreversible.',
       title: 'Eliminar cuenta',
     },

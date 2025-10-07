@@ -1047,7 +1047,7 @@ export const roRO: LocalizationResource = {
       actionDescription: 'Tastează „Șterge contul” mai jos pentru a continua.',
       confirm: 'Șterge contul',
       messageLine1:
-        'Sigur vrei să îți ștergi contul din Clerk? Te rugăm să contactezi proprietarul aplicației pentru a-ți șterge informațiile din aplicația lor și din alte servicii.',
+        'Sigur doriți să vă ștergeți contul? Este posibil ca unele date asociate să fie păstrate. Pentru a solicita ștergerea completă a datelor, vă rugăm să contactați asistența.',
       messageLine2: 'Această acțiune este permanentă și ireversibilă.',
       title: 'Șterge contul',
     },

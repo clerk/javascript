@@ -1060,7 +1060,7 @@ export const deDE: LocalizationResource = {
       actionDescription: 'Geben Sie "Konto löschen" ein, um fortzufahren.',
       confirm: 'Konto löschen',
       messageLine1:
-        'Sind Sie sicher, dass Sie Ihr Konto bei Clerk löschen möchten? Bitte kontaktieren Sie den Anwendungsbesitzer, um Ihre Informationen aus deren Anwendung und anderen Diensten zu löschen.',
+        'Möchten Sie Ihr Konto wirklich löschen? Einige zugehörige Daten können gespeichert bleiben. Um die vollständige Löschung der Daten anzufordern, wenden Sie sich bitte an den Support.',
       messageLine2: 'Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.',
       title: 'Konto löschen',
     },
