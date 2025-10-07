@@ -21,4 +21,4 @@ export const noFetchFnCtxPassedInGetAuth = createErrorMessage(`
 export const clerkMiddlewareNotConfigured = createErrorMessage(`
 It looks like you're trying to use Clerk without configuring the middleware.
 
-To fix this, make sure you have the \`clerkMiddleware()\` configured in your \`createStart()\` function in your \`src/start.ts()\` file.`);
+To fix this, make sure you have the \`clerkMiddleware()\` configured in your \`createStart()\` function in your \`src/start.ts\` file.`);
