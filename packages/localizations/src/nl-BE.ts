@@ -1032,7 +1032,7 @@ export const nlBE: LocalizationResource = {
       actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
       confirm: 'Account verwijderen',
       messageLine1:
-        'Weet u zeker dat u uw account wilt verwijderen? Sommige bijbehorende gegevens kunnen bewaard blijven. Neem contact op met de ondersteuning om volledige gegevensverwijdering aan te vragen.',
+        'Weet je zeker dat je je account wilt verwijderen? Sommige bijbehorende gegevens kunnen bewaard blijven. Neem contact op met de ondersteuning om volledige gegevensverwijdering aan te vragen.',
       messageLine2: 'Deze actie is permanent en onherroepelijk.',
       title: 'Account verwijderen',
     },
