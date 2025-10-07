@@ -94,7 +94,6 @@ export class User extends BaseResource implements UserResource {
   deleteSelfEnabled = false;
   lastSignInAt: Date | null = null;
   legalAcceptedAt: Date | null = null;
-  locale: string | null = null;
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
@@ -429,7 +428,6 @@ export class User extends BaseResource implements UserResource {
       profile_image_id: this.imageUrl,
       last_sign_in_at: this.lastSignInAt?.getTime() || null,
       legal_accepted_at: this.legalAcceptedAt?.getTime() || null,
-      locale: this.locale,
       updated_at: this.updatedAt?.getTime() || null,
       created_at: this.createdAt?.getTime() || null,
     };

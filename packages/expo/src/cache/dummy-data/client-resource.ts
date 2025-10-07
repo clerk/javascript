@@ -85,7 +85,6 @@ export const DUMMY_CLERK_CLIENT_RESOURCE = {
     abandon_at: null,
     web3_wallet: null,
     legal_accepted_at: null,
-    locale: null,
   },
   sign_in: {
     object: 'sign_in',
