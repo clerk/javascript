@@ -549,6 +549,9 @@ importers:
       minimatch:
         specifier: ^10.0.3
         version: 10.0.3
+      msw:
+        specifier: ^2.0.0
+        version: 2.11.3(@types/node@22.18.6)(typescript@5.8.3)
       webpack-merge:
         specifier: ^5.10.0
         version: 5.10.0
@@ -17428,7 +17431,6 @@ snapshots:
       '@inquirer/type': 3.0.7(@types/node@22.18.6)
     optionalDependencies:
       '@types/node': 22.18.6
-    optional: true
 
   '@inquirer/confirm@5.1.13(@types/node@24.3.1)':
     dependencies:
@@ -17449,7 +17451,6 @@ snapshots:
       yoctocolors-cjs: 2.1.2
     optionalDependencies:
       '@types/node': 22.18.6
-    optional: true
 
   '@inquirer/core@10.1.14(@types/node@24.3.1)':
     dependencies:
@@ -17469,7 +17470,6 @@ snapshots:
   '@inquirer/type@3.0.7(@types/node@22.18.6)':
     optionalDependencies:
       '@types/node': 22.18.6
-    optional: true
 
   '@inquirer/type@3.0.7(@types/node@24.3.1)':
     optionalDependencies:
@@ -27472,7 +27472,6 @@ snapshots:
       typescript: 5.8.3
     transitivePeerDependencies:
       - '@types/node'
-    optional: true
 
   msw@2.11.3(@types/node@24.3.1)(typescript@5.8.3):
     dependencies:
