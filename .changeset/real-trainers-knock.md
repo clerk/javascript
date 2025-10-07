@@ -8,4 +8,4 @@
 "@clerk/tanstack-react-start": patch
 ---
 
-Added internal helper type for auth functions that don't require a request or context parameter
+Added internal helper type for `auth` and `getAuth()` functions that don't require a request or context parameter
