@@ -1265,6 +1265,7 @@ export type SetActiveParams = {
 
 /**
  * @inline
+ * @embedType
  */
 export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 

@@ -1,4 +1,4 @@
-import type { SetActiveParams, SignOut } from './clerk';
+import type { SetActive, SignOut } from './clerk';
 import type { JwtPayload } from './jwtv2';
 import type {
   CheckAuthorizationWithCustomPermissions,
@@ -140,7 +140,7 @@ export type UseSignInReturn =
   | {
       isLoaded: true;
       signIn: SignInResource;
-      setActive: (setActiveParams: SetActiveParams) => Promise<void>;
+      setActive: SetActive;
     };
 
 /**
@@ -165,7 +165,7 @@ export type UseSignUpReturn =
   | {
       isLoaded: true;
       signUp: SignUpResource;
-      setActive: (setActiveParams: SetActiveParams) => Promise<void>;
+      setActive: SetActive;
     };
 
 /**
@@ -220,7 +220,7 @@ export type UseSessionListReturn =
   | {
       isLoaded: true;
       sessions: SessionResource[];
-      setActive: (setActiveParams: SetActiveParams) => Promise<void>;
+      setActive: SetActive;
     };
 
 /**
