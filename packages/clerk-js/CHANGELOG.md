@@ -1,5 +1,20 @@
 # Change Log
 
+## 5.99.0
+
+### Minor Changes
+
+- [Experimental] Add support for additional properties to Signal SignIn/SignUp ([#6897](https://github.com/clerk/javascript/pull/6897)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Display organization slug based on environment settings ([#6903](https://github.com/clerk/javascript/pull/6903)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/localizations@3.25.7
+  - @clerk/shared@3.27.3
+
 ## 5.98.0
 
 ### Minor Changes
