@@ -1041,7 +1041,7 @@ export const plPL: LocalizationResource = {
       actionDescription: 'Wpisz "Usuń konto" poniżej aby kontynuować.',
       confirm: 'Usuń konto',
       messageLine1:
-        'Czy na pewno chcesz usunąć swoje konto z Clerk? Skontaktuj się z właścicielem aplikacji, aby usunąć swoje informacje z ich aplikacji i innych usług.',
+        'Czy na pewno chcesz usunąć swoje konto? Niektóre powiązane dane mogą zostać zachowane. Aby poprosić o całkowite usunięcie danych, skontaktuj się z pomocą techniczną.',
       messageLine2: 'Ta operacja jest nieodwracalna i nie można jej cofnąć.',
       title: 'Usuń konto',
     },

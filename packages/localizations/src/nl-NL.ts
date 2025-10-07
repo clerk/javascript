@@ -1032,7 +1032,7 @@ export const nlNL: LocalizationResource = {
       actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
       confirm: 'Account verwijderen',
       messageLine1:
-        'Weet je zeker dat je je account van Clerk wilt verwijderen? Neem contact op met de eigenaar van de applicatie om je informatie uit hun applicatie en andere services te verwijderen.',
+        'Weet je zeker dat je je account wilt verwijderen? Sommige bijbehorende gegevens kunnen bewaard blijven. Neem contact op met de ondersteuning om volledige gegevensverwijdering aan te vragen.',
       messageLine2: 'Deze actie is permanent en onherroepelijk.',
       title: 'Account verwijderen',
     },
