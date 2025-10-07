@@ -1048,7 +1048,7 @@ export const msMY: LocalizationResource = {
       actionDescription: 'Taip "Delete account" di bawah untuk meneruskan.',
       confirm: 'Padam akaun',
       messageLine1:
-        'Adakah anda pasti mahu memadam akaun anda dari Clerk? Sila hubungi pemilik aplikasi untuk memadam maklumat anda dari aplikasi mereka dan perkhidmatan lain.',
+        'Adakah anda pasti mahu memadamkan akaun anda? Sesetengah data yang berkaitan mungkin disimpan. Untuk meminta pemadaman data sepenuhnya, sila hubungi sokongan.',
       messageLine2: 'Tindakan ini adalah kekal dan tidak boleh dibatalkan.',
       title: 'Padam akaun',
     },
