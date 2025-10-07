@@ -11,6 +11,9 @@ interface SignUpFutureAdditionalParams {
 }
 
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
+  emailAddress?: string;
+  phoneNumber?: string;
+  username?: string;
   transfer?: boolean;
   ticket?: string;
   web3Wallet?: string;
