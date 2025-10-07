@@ -1031,7 +1031,7 @@ export const ptPT: LocalizationResource = {
       actionDescription: 'Escreva Excluir conta abaixo para continuar.',
       confirm: 'Excluir conta',
       messageLine1:
-        'Tem certeza de que deseja excluir a sua conta do Clerk? Entre em contacto com o proprietário da aplicação para excluir as suas informações da sua aplicação e outros serviços.',
+        'Tem a certeza de que pretende eliminar a sua conta? Alguns dados associados poderão ser retidos. Para solicitar a eliminação completa de dados, contacte o suporte.',
       messageLine2: 'Esta ação é permanente e irreversível.',
       title: 'Excluir conta',
     },

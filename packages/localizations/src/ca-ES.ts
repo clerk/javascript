@@ -1034,7 +1034,7 @@ export const caES: LocalizationResource = {
       actionDescription: 'Escriu "Elimina compte" a continuació per continuar.',
       confirm: 'Elimina compte',
       messageLine1:
-        "Estàs segur que vols eliminar el teu compte de Clerk? Si us plau, contacta amb el propietari de l'aplicació per eliminar la teva informació de la seva aplicació i altres serveis.",
+        "Esteu segur que voleu suprimir el vostre compte? És possible que es conservin algunes dades associades. Per sol·licitar la supressió completa de les dades, poseu-vos en contacte amb l'assistència.",
       messageLine2: 'Aquesta acció és permanent i irreversible.',
       title: 'Elimina compte',
     },
