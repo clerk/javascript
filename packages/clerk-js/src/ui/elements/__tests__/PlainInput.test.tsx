@@ -143,8 +143,7 @@ describe('PlainInput', () => {
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
-    // The input should have both error IDs in aria-describedby
-    expect(input).toHaveAttribute('aria-describedby', 'error-firstname firstname-error-feedback');
+    expect(input).toHaveAttribute('aria-describedby', 'error-firstname');
 
     // Verify the error message element has the correct ID
     const errorElement = container.querySelector('#error-firstname');
@@ -207,8 +206,7 @@ describe('PlainInput', () => {
 
     let input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
-    // Error includes both IDs for backwards compatibility and new behavior
-    expect(input).toHaveAttribute('aria-describedby', 'error-firstname firstname-error-feedback');
+    expect(input).toHaveAttribute('aria-describedby', 'error-firstname');
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
@@ -251,9 +249,8 @@ describe('PlainInput', () => {
     expect(successElement).toHaveAttribute('aria-live', 'polite');
 
     // The previous error message should now have aria-live="off" (though it might still exist in DOM but hidden)
-    // We can verify the currently visible element has aria-live="polite"
+    // Verify exactly one element has aria-live="polite" at a time
     const allAriaLivePolite = container.querySelectorAll('[aria-live="polite"]');
-    // At least the success message should have aria-live="polite"
-    expect(allAriaLivePolite.length).toBeGreaterThanOrEqual(1);
+    expect(allAriaLivePolite.length).toBe(1);
   });
 });

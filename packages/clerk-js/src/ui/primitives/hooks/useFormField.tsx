@@ -10,7 +10,6 @@ type FormFieldProviderProps = ReturnType<typeof useFormControlUtil<FieldId>>['pr
 };
 
 type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
-  errorMessageId?: string;
   feedbackMessageId?: string;
   id?: string;
   fieldId?: FieldId;
@@ -52,8 +51,12 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
 
   // Track whether any feedback message has been rendered.
   // We use this to append its id the `aria-describedby` of the `input`.
-  const errorMessageId = hasError ? `error-${propsId}` : '';
-  const feedbackMessageId = debounced.feedback ? `${propsId}-${debounced.feedbackType}-feedback` : '';
+  // Use legacy pattern for errors (backwards compatible), new pattern for other types
+  const feedbackMessageId = debounced.feedback
+    ? debounced.feedbackType === 'error'
+      ? `error-${propsId}`
+      : `${propsId}-${debounced.feedbackType}-feedback`
+    : '';
   const value = React.useMemo(
     () => ({
       isRequired,
@@ -61,7 +64,6 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       hasError,
       id,
       fieldId: propsId,
-      errorMessageId,
       feedbackMessageId,
       setError,
       setSuccess,
@@ -78,7 +80,6 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       hasError,
       id,
       propsId,
-      errorMessageId,
       feedbackMessageId,
       isDisabled,
       setError,
@@ -132,7 +133,6 @@ export const sanitizeInputProps = (
     setSuccess,
     setError,
     setInfo,
-    errorMessageId,
     feedbackMessageId,
     fieldId,
     label,
