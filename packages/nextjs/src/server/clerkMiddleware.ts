@@ -69,7 +69,7 @@ export type ClerkMiddlewareSessionAuthObject = (SignedInAuthObject | SignedOutAu
  */
 export type ClerkMiddlewareAuthObject = ClerkMiddlewareSessionAuthObject;
 
-export type ClerkMiddlewareAuth = AuthFn<Response>;
+export type ClerkMiddlewareAuth = AuthFn;
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,
