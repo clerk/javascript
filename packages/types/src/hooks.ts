@@ -1,9 +1,8 @@
-import type { SetActiveParams, SignOutCallback, SignOutOptions } from './clerk';
+import type { SetActiveParams, SignOut } from './clerk';
 import type { JwtPayload } from './jwtv2';
 import type {
-  CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
-  GetTokenOptions,
+  GetToken,
   SessionResource,
   SignedInSessionResource,
 } from './session';
@@ -12,10 +11,12 @@ import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 /**
  * @inline
+ * @embedType
  */
 type CheckAuthorizationSignedOut = undefined;
 /**
  * @inline
+ * @embedType
  */
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
@@ -68,14 +69,11 @@ export type UseAuthReturn =
       /**
        * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#sign-out).
        */
-      signOut: {
-        (options?: SignOutOptions): Promise<void>;
-        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
-      };
+      signOut: SignOut;
       /**
        * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/javascript/session#get-token).
        */
-      getToken: (options?: GetTokenOptions) => Promise<string | null>;
+      getToken: GetToken;
     }
   | {
       isLoaded: true;
@@ -88,11 +86,8 @@ export type UseAuthReturn =
       orgRole: null;
       orgSlug: null;
       has: CheckAuthorizationWithoutOrgOrUser;
-      signOut: {
-        (options?: SignOutOptions): Promise<void>;
-        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
-      };
-      getToken: (options?: GetTokenOptions) => Promise<string | null>;
+      signOut: SignOut;
+      getToken: GetToken;
     }
   | {
       isLoaded: true;
@@ -104,12 +99,9 @@ export type UseAuthReturn =
       orgId: null;
       orgRole: null;
       orgSlug: null;
-      has: (isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions) => boolean;
-      signOut: {
-        (options?: SignOutOptions): Promise<void>;
-        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
-      };
-      getToken: (options?: GetTokenOptions) => Promise<string | null>;
+      has: CheckAuthorizationWithCustomPermissions;
+      signOut: SignOut;
+      getToken: GetToken;
     }
   | {
       isLoaded: true;
@@ -121,12 +113,9 @@ export type UseAuthReturn =
       orgId: string;
       orgRole: string;
       orgSlug: string | null;
-      has: (isAuthorizedParams: CheckAuthorizationParamsWithCustomPermissions) => boolean;
-      signOut: {
-        (options?: SignOutOptions): Promise<void>;
-        (signOutCallback?: SignOutCallback, options?: SignOutOptions): Promise<void>;
-      };
-      getToken: (options?: GetTokenOptions) => Promise<string | null>;
+      has: CheckAuthorizationWithCustomPermissions;
+      signOut: SignOut;
+      getToken: GetToken;
     };
 
 /**

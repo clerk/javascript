@@ -139,6 +139,7 @@ export type SignOutOptions = {
 
 /**
  * @inline
+ * @embedType
  */
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;

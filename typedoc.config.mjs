@@ -10,7 +10,6 @@ const CUSTOM_BLOCK_TAGS = [
   '@experimental',
   '@hideReturns',
   '@includeType',
-  '@unionInline',
 ];
 
 /**
@@ -111,7 +110,7 @@ const config = {
     excludeNotDocumented: true,
     gitRevision: 'main',
     blockTags: [...OptionDefaults.blockTags, ...CUSTOM_BLOCK_TAGS],
-    modifierTags: [...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental')],
+    modifierTags: [...OptionDefaults.modifierTags.filter(tag => tag !== '@experimental'), '@embedType'],
     exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     readme: 'none',
     disableGit: true,

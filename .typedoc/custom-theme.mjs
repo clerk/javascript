@@ -526,9 +526,34 @@ ${tabs}
        * @param {import('typedoc').ReferenceType} model
        */
       referenceType: model => {
-        // If @unionInline tag is present, we grab the type itself and return it, instead of a link to the type
-        if (model.reflection && model.reflection.isDeclaration() && model.reflection.comment?.getTag('@unionInline')) {
-          return superPartials.declarationType(model.reflection);
+        if (
+          model.reflection &&
+          model.reflection.isDeclaration() &&
+          model.reflection.comment?.modifierTags?.has('@embedType')
+        ) {
+          // Case 1: Callable interfaces with signatures directly on the reflection (e.g., SignOut)
+          // Structure: signatures array exists, no type property
+          if (model.reflection.signatures && !model.reflection.type) {
+            return this.partials.functionType(model.reflection.signatures);
+          }
+
+          // Case 2: Object types with children (e.g., PendingSessionOptions)
+          // Structure: children array exists, no type property
+          if (model.reflection.children && !model.reflection.type) {
+            return superPartials.declarationType(model.reflection);
+          }
+
+          // Case 3: Function type aliases with nested signatures (e.g., GetToken, CheckAuthorizationFn)
+          // Structure: type.type === 'reflection' with type.declaration.signatures
+          if (model.reflection.type?.type === 'reflection' && model.reflection.type.declaration?.signatures) {
+            return this.partials.functionType(model.reflection.type.declaration.signatures);
+          }
+
+          // Case 4: Other type aliases with a type property
+          // Fallback for any other type structure
+          if (model.reflection.type) {
+            return this.partials.someType(model.reflection.type);
+          }
         }
 
         return superPartials.referenceType(model);

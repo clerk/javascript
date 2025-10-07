@@ -30,7 +30,7 @@ import type { Autocomplete } from './utils';
 
 /**
  * @inline
- * @unionInline
+ * @embedType
  */
 export type PendingSessionOptions = {
   /**
@@ -44,10 +44,16 @@ type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSyst
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;
 
-/** @inline */
+/**
+ * @inline
+ * @embedType
+ */
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
-/** @inline */
+/**
+ * @inline
+ * @embedType
+ */
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
@@ -345,6 +351,7 @@ export type GetTokenOptions = {
 };
 /**
  * @inline
+ * @embedType
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
