@@ -551,9 +551,73 @@ class SignUpFuture implements SignUpFutureResource {
 
   constructor(readonly resource: SignUp) {}
 
+  get id() {
+    return this.resource.id;
+  }
+
+  get requiredFields() {
+    return this.resource.requiredFields;
+  }
+
+  get optionalFields() {
+    return this.resource.optionalFields;
+  }
+
+  get missingFields() {
+    return this.resource.missingFields;
+  }
+
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
     return this.resource.status || 'missing_requirements';
+  }
+
+  get username() {
+    return this.resource.username;
+  }
+
+  get firstName() {
+    return this.resource.firstName;
+  }
+
+  get lastName() {
+    return this.resource.lastName;
+  }
+
+  get emailAddress() {
+    return this.resource.emailAddress;
+  }
+
+  get phoneNumber() {
+    return this.resource.phoneNumber;
+  }
+
+  get web3Wallet() {
+    return this.resource.web3wallet;
+  }
+
+  get hasPassword() {
+    return this.resource.hasPassword;
+  }
+
+  get unsafeMetadata() {
+    return this.resource.unsafeMetadata;
+  }
+
+  get createdSessionId() {
+    return this.resource.createdSessionId;
+  }
+
+  get createdUserId() {
+    return this.resource.createdUserId;
+  }
+
+  get abandonAt() {
+    return this.resource.abandonAt;
+  }
+
+  get legalAcceptedAt() {
+    return this.resource.legalAcceptedAt;
   }
 
   get unverifiedFields() {
@@ -596,20 +660,24 @@ class SignUpFuture implements SignUpFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
+  private async _create(params: SignUpFutureCreateParams): Promise<void> {
+    const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+    const body: Record<string, unknown> = {
+      transfer: params.transfer,
+      captchaToken,
+      captchaWidgetType,
+      captchaError,
+      ...params,
+      unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+    };
+
+    await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+  }
+
   async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
-
-      const body: Record<string, unknown> = {
-        transfer: params.transfer,
-        captchaToken,
-        captchaWidgetType,
-        captchaError,
-        ...params,
-        unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
-      };
-
-      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+      await this._create(params);
     });
   }
 
@@ -692,12 +760,20 @@ class SignUpFuture implements SignUpFutureResource {
     const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
+
+      let redirectUrlComplete = redirectUrl;
+      try {
+        new URL(redirectUrl);
+      } catch {
+        redirectUrlComplete = window.location.origin + redirectUrl;
+      }
+
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: {
           strategy,
           redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          redirectUrlComplete: redirectUrl,
+          redirectUrlComplete,
           captchaToken,
           captchaWidgetType,
           captchaError,
@@ -744,7 +820,7 @@ class SignUpFuture implements SignUpFutureResource {
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const web3Wallet = identifier || this.resource.web3wallet!;
-      await this.create({ web3Wallet, unsafeMetadata, legalAccepted });
+      await this._create({ web3Wallet, unsafeMetadata, legalAccepted });
       await this.resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
