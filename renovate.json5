@@ -275,7 +275,7 @@
       groupName: "[DEV] minor & patch dependencies",
       groupSlug: "clerk-expo-dev-minor",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -291,7 +291,7 @@
       groupName: "[DEV] major dependencies",
       groupSlug: "clerk-expo-dev-major",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -305,7 +305,7 @@
       groupName: "minor & patch dependencies",
       groupSlug: "clerk-expo-prod-minor",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -320,7 +320,7 @@
       groupName: "major dependencies",
       groupSlug: "clerk-expo-prod-major",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "dependencies",

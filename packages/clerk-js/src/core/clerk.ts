@@ -2715,7 +2715,7 @@ export class Clerk implements ClerkInterface {
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
 
-  // This is used by @clerk/clerk-expo
+  // This is used by @clerk/expo
   __internal_reloadInitialResources = async (): Promise<void> => {
     const [environment, client] = await Promise.all([
       Environment.getInstance().fetch({ touch: false, fetchMaxTries: 1 }),

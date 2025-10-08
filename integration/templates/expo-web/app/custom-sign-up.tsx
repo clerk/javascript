@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TextInput, Button, View } from 'react-native';
-import { useSignUp } from '@clerk/clerk-expo';
+import { useSignUp } from '@clerk/expo';
 import { useRouter } from 'expo-router';
 
 export default function SignUpScreen() {

@@ -1,5 +1,5 @@
 import { Stack, useRouter } from 'expo-router';
-import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
+import { ClerkLoaded, ClerkProvider } from '@clerk/expo';
 
 export default function RootLayout() {
   const router = useRouter();
