@@ -10,6 +10,7 @@ import type {
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
+
 /**
  * @inline
  */
