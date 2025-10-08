@@ -33,6 +33,7 @@ import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
 import { SignInStart } from './SignInStart';
+import { SignInChooseEnterpriseConnection } from './SignInChooseEnterpriseConnection';
 
 function RedirectToSignIn() {
   const clerk = useClerk();
@@ -145,6 +146,9 @@ function SignInRoutes(): JSX.Element {
         )}
         <Route path='tasks'>
           <LazySessionTasks redirectUrlComplete={signInContext.afterSignInUrl} />
+        </Route>
+        <Route path='choose-enterprise-connection'>
+          <SignInChooseEnterpriseConnection />
         </Route>
         <Route index>
           <SignInStart />
