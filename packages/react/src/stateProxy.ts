@@ -194,6 +194,9 @@ export class StateProxy implements State {
         get legalAcceptedAt() {
           return gateProperty(target, 'legalAcceptedAt', null);
         },
+        get locale() {
+          return gateProperty(target, 'locale', null);
+        },
         get status() {
           return gateProperty(target, 'status', 'missing_requirements');
         },
