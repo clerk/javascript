@@ -136,6 +136,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   created_user_id: string | null;
   abandon_at: number | null;
   legal_accepted_at: number | null;
+  locale: string | null;
   verifications: SignUpVerificationsJSON | null;
 }
 

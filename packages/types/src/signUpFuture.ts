@@ -137,6 +137,8 @@ export interface SignUpFutureResource {
 
   readonly legalAcceptedAt: number | null;
 
+  readonly locale: string | null;
+
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
 
   update: (params: SignUpFutureUpdateParams) => Promise<{ error: unknown }>;

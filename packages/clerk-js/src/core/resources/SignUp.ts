@@ -158,7 +158,10 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     // Inject browser locale if not already provided
     if (!finalParams.locale) {
-      finalParams.locale = getBrowserLocale();
+      const browserLocale = getBrowserLocale();
+      if (browserLocale) {
+        finalParams.locale = browserLocale;
+      }
     }
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
@@ -484,6 +487,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
+      this.locale = data.locale;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -512,6 +516,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       abandon_at: this.abandonAt,
       web3_wallet: this.web3wallet,
       legal_accepted_at: this.legalAcceptedAt,
+      locale: this.locale,
       external_account: this.externalAccount,
       external_account_strategy: this.externalAccount?.strategy,
     };
@@ -627,6 +632,10 @@ class SignUpFuture implements SignUpFutureResource {
     return this.resource.legalAcceptedAt;
   }
 
+  get locale() {
+    return this.resource.locale;
+  }
+
   get unverifiedFields() {
     return this.resource.unverifiedFields;
   }
@@ -685,7 +694,7 @@ class SignUpFuture implements SignUpFutureResource {
   async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       // Inject browser locale if not already provided
-      const locale = params.locale || getBrowserLocale();
+      const locale = params.locale || getBrowserLocale() || undefined;
       await this._create({ ...params, locale });
     });
   }

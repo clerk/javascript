@@ -1,14 +1,14 @@
 import { inBrowser } from '@clerk/shared/browser';
 
-const DEFAULT_LOCALE = 'en-US';
+const DEFAULT_LOCALE = null;
 
 /**
  * Detects the user's preferred locale from the browser.
- * Falls back to 'en-US' if locale cannot be determined.
+ * Falls back to null if locale cannot be determined.
  *
- * @returns The detected locale string in BCP 47 format (e.g., 'en-US', 'es-ES')
+ * @returns The detected locale string in BCP 47 format (e.g., 'en-US', 'es-ES') or null if locale cannot be determined.
  */
-export function getBrowserLocale(): string {
+export function getBrowserLocale(): string | null {
   if (!inBrowser()) {
     return DEFAULT_LOCALE;
   }
