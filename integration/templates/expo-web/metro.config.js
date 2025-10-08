@@ -8,10 +8,10 @@ const path = require('node:path');
 
 /** @type {() => string | undefined} */
 const getClerkExpoPath = () => {
-  const clerkExpoPath = packageJson.dependencies['@clerk/clerk-expo'];
+  const clerkExpoPath = packageJson.dependencies['@clerk/expo'];
 
   if (clerkExpoPath?.startsWith('*')) {
-    const pathToModule = require.resolve('@clerk/clerk-expo');
+    const pathToModule = require.resolve('@clerk/expo');
     return pathToModule.replace('dist/index.js', '');
   }
 
