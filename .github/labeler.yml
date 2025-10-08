@@ -39,9 +39,6 @@ react:
 react-router:
   - packages/react-router/**
 
-remix:
-  - packages/remix/**
-
 tanstack:
   - packages/tanstack-react-start/**
 
