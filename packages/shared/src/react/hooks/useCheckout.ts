@@ -6,7 +6,7 @@ import type {
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
 
-import type { ClerkAPIResponseError } from '../..';
+import type { ClerkAPIResponseError } from '../../error';
 import type { __experimental_CheckoutProvider } from '../contexts';
 import { useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';
