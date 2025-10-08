@@ -407,6 +407,11 @@ function SignInStartInternal(): JSX.Element {
   };
 
   const authenticateWithEnterpriseSSO = async () => {
+    if (signIn.firstFactorVerification.enterpriseConnections) {
+      void navigate('../choose-enterprise-connection');
+      return;
+    }
+
     const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
