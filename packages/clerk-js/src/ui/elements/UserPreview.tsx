@@ -25,6 +25,7 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'el
   mainIdentifierVariant?: PropsOfComponent<typeof Text>['variant'];
   title?: LocalizationKey | string;
   subtitle?: LocalizationKey | string;
+  subtitleProps?: PropsOfComponent<typeof Text>;
   showAvatar?: boolean;
 } & (
     | {
@@ -63,6 +64,7 @@ export const UserPreview = (props: UserPreviewProps) => {
     avatarSx,
     mainIdentifierSx,
     mainIdentifierVariant,
+    subtitleProps,
     ...rest
   } = props;
   const { t } = useLocalizations();
@@ -171,7 +173,7 @@ export const UserPreview = (props: UserPreviewProps) => {
             as='span'
             localizationKey={subtitle || identifier}
             colorScheme='secondary'
-            variant='caption'
+            {...subtitleProps}
           />
         )}
       </Flex>
