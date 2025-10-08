@@ -30,7 +30,6 @@ import type { Autocomplete } from './utils';
 
 /**
  * @inline
- * @embedType
  */
 export type PendingSessionOptions = {
   /**

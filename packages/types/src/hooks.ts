@@ -1,6 +1,6 @@
 import type { SetActive, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
-import { OrganizationCustomRoleKey } from './organizationMembership';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -117,8 +117,7 @@ export type UseAuthReturn =
     };
 
 /**
- * @unionReturnHeadings
- * ["Initialization", "Loaded"]
+ * @inline
  */
 export type UseSignInReturn =
   | {
@@ -142,8 +141,7 @@ export type UseSignInReturn =
     };
 
 /**
- *  @unionReturnHeadings
- * ["Initialization", "Loaded"]
+ *  @inline
  */
 export type UseSignUpReturn =
   | {
@@ -167,8 +165,7 @@ export type UseSignUpReturn =
     };
 
 /**
- * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in"]
+ * @inline
  */
 export type UseSessionReturn =
   | {
@@ -197,8 +194,7 @@ export type UseSessionReturn =
     };
 
 /**
- * @unionReturnHeadings
- * ["Initialization", "Loaded"]
+ * @inline
  */
 export type UseSessionListReturn =
   | {
@@ -222,8 +218,7 @@ export type UseSessionListReturn =
     };
 
 /**
- * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in"]
+ * @inline
  */
 export type UseUserReturn =
   | {
