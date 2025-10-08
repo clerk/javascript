@@ -515,6 +515,10 @@ export type __internal_LocalizationResource = {
       action__addAccount: LocalizationValue;
       action__signOutAll: LocalizationValue;
     };
+    chooseEnterpriseConnection: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   reverification: {
     password: {

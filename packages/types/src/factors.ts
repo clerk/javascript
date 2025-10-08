@@ -63,6 +63,7 @@ export type SamlFactor = {
 
 export type EnterpriseSSOFactor = {
   strategy: EnterpriseSSOStrategy;
+  enterpriseConnections?: [{ id: string; name: string }];
 };
 
 export type TOTPFactor = {
