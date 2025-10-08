@@ -1042,7 +1042,7 @@ export const idID: LocalizationResource = {
       actionDescription: 'Ketik "Delete account" di bawah untuk melanjutkan.',
       confirm: 'Hapus akun',
       messageLine1:
-        'Anda yakin ingin menghapus akun Anda dari Clerk? Silakan hubungi pemilik aplikasi untuk menghapus informasi Anda dari aplikasi mereka dan layanan lainnya.',
+        'Apakah Anda yakin ingin menghapus akun Anda? Beberapa data terkait mungkin tetap disimpan. Untuk meminta penghapusan data lengkap, silakan hubungi dukungan.',
       messageLine2: 'Tindakan ini permanen dan tidak dapat dibatalkan.',
       title: 'Hapus akun',
     },

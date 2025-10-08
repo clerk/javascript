@@ -1,14 +1,11 @@
-import type { AuthenticateRequestOptions, GetAuthFn } from '@clerk/backend/internal';
+import type { AuthOptions, GetAuthFn } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
-import type { PendingSessionOptions } from '@clerk/types';
 import { getContext } from '@tanstack/react-start/server';
 
 import { errorThrower } from '../utils';
 import { clerkHandlerNotConfigured, noFetchFnCtxPassedInGetAuth } from '../utils/errors';
 
-type GetAuthOptions = PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'>;
-
-export const getAuth: GetAuthFn<Request, true> = (async (request: Request, opts?: GetAuthOptions) => {
+export const getAuth: GetAuthFn<Request, true> = (async (request: Request, opts?: AuthOptions) => {
   if (!request) {
     return errorThrower.throw(noFetchFnCtxPassedInGetAuth);
   }
