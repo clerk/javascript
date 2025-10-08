@@ -139,7 +139,6 @@ export type SignOutOptions = {
 
 /**
  * @inline
- * @embedType
  */
 export interface SignOut {
   (options?: SignOutOptions): Promise<void>;
@@ -1265,7 +1264,6 @@ export type SetActiveParams = {
 
 /**
  * @inline
- * @embedType
  */
 export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 

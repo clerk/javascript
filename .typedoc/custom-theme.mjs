@@ -301,28 +301,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
        * @param {{ headingLevel: number, nested?: boolean }} options
        */
       declaration: (model, options = { headingLevel: 2, nested: false }) => {
-        // Check if @includeType tag is present
-        const showTypeTag = model.comment?.getTag('@includeType');
-
-        if (showTypeTag) {
-          // If a name has been provided, use it, otherwise use the type name
-          const name = showTypeTag.content[0].text ?? model.name;
-
-          // Generate parameter table format for types with @includeType
-          let typeStr = model.type ? this.partials.someType(model.type) : '';
-
-          const description = model.comment?.summary ? this.helpers.getCommentParts(model.comment.summary) : '';
-
-          // Create the markdown table
-          const md = [
-            '| Parameter | Type | Description |',
-            '| --------- | ---- | ----------- |',
-            `| \`${name}?\` | ${typeStr} | ${description} |`,
-          ].join('\n');
-
-          return md;
-        }
-
         // Create a local override
         const localPartials = {
           ...this.partials,
@@ -521,42 +499,6 @@ ${tabs}
         const summary = model.getSignature?.comment?.summary ?? model.comment?.summary;
         const description = Array.isArray(summary) ? summary.reduce((acc, curr) => acc + (curr.text || ''), '') : '';
         return '| ' + '`' + escapeChars(name) + '`' + ' | ' + typeStr + ' | ' + description + ' |';
-      },
-      /**
-       * @param {import('typedoc').ReferenceType} model
-       */
-      referenceType: model => {
-        if (
-          model.reflection &&
-          model.reflection.isDeclaration() &&
-          model.reflection.comment?.modifierTags?.has('@embedType')
-        ) {
-          // Case 1: Callable interfaces with signatures directly on the reflection (e.g., SignOut)
-          // Structure: signatures array exists, no type property
-          if (model.reflection.signatures && !model.reflection.type) {
-            return this.partials.functionType(model.reflection.signatures);
-          }
-
-          // Case 2: Object types with children (e.g., PendingSessionOptions)
-          // Structure: children array exists, no type property
-          if (model.reflection.children && !model.reflection.type) {
-            return superPartials.declarationType(model.reflection);
-          }
-
-          // Case 3: Function type aliases with nested signatures (e.g., GetToken, CheckAuthorizationFn)
-          // Structure: type.type === 'reflection' with type.declaration.signatures
-          if (model.reflection.type?.type === 'reflection' && model.reflection.type.declaration?.signatures) {
-            return this.partials.functionType(model.reflection.type.declaration.signatures);
-          }
-
-          // Case 4: Other type aliases with a type property
-          // Fallback for any other type structure
-          if (model.reflection.type) {
-            return this.partials.someType(model.reflection.type);
-          }
-        }
-
-        return superPartials.referenceType(model);
       },
     };
   }

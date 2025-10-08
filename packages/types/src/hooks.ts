@@ -1,5 +1,6 @@
 import type { SetActive, SignOut } from './clerk';
-import type { JwtPayload } from './jwtv2';
+import type { ActClaim, JwtPayload } from './jwtv2';
+import { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
@@ -11,18 +12,15 @@ import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 /**
  * @inline
- * @embedType
  */
 type CheckAuthorizationSignedOut = undefined;
 /**
  * @inline
- * @embedType
  */
 type CheckAuthorizationWithoutOrgOrUser = (params: Parameters<CheckAuthorizationWithCustomPermissions>[0]) => false;
 
 /**
- * @unionReturnHeadings
- * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
+ * @inline
  */
 export type UseAuthReturn =
   | {
@@ -95,7 +93,7 @@ export type UseAuthReturn =
       userId: string;
       sessionId: string;
       sessionClaims: JwtPayload;
-      actor: { [x: string]: unknown; sub: string } | null;
+      actor: ActClaim | null;
       orgId: null;
       orgRole: null;
       orgSlug: null;
@@ -109,9 +107,9 @@ export type UseAuthReturn =
       userId: string;
       sessionId: string;
       sessionClaims: JwtPayload;
-      actor: { [x: string]: unknown; sub: string } | null;
+      actor: ActClaim | null;
       orgId: string;
-      orgRole: string;
+      orgRole: OrganizationCustomRoleKey;
       orgSlug: string | null;
       has: CheckAuthorizationWithCustomPermissions;
       signOut: SignOut;

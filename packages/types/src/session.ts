@@ -46,13 +46,11 @@ type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSyst
 
 /**
  * @inline
- * @embedType
  */
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
 /**
  * @inline
- * @embedType
  */
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
@@ -351,7 +349,6 @@ export type GetTokenOptions = {
 };
 /**
  * @inline
- * @embedType
  */
 export type GetToken = (options?: GetTokenOptions) => Promise<string | null>;
 
