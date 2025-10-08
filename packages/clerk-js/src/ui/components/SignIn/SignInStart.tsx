@@ -39,7 +39,7 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { useHandleAuthenticateWithPasskey } from './shared';
+import { getEnterpriseSSOFlowType, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -224,12 +224,14 @@ function SignInStartInternal(): JSX.Element {
       })
       .then(res => {
         switch (res.status) {
-          case 'needs_first_factor':
-            if (hasOnlyEnterpriseSSOFirstFactors(res)) {
+          case 'needs_first_factor': {
+            const enterpriseSSOFlowType = getEnterpriseSSOFlowType(res);
+            if (enterpriseSSOFlowType?.type === 'redirect') {
               return authenticateWithEnterpriseSSO();
             }
 
             return navigate('factor-one');
+          }
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
@@ -253,7 +255,7 @@ function SignInStartInternal(): JSX.Element {
         // Keep the card in loading state during SSO redirect to prevent UI flicker
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
-        const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
+        const isRedirectingToSSOProvider = !!getEnterpriseSSOFlowType(signIn);
         if (isRedirectingToSSOProvider) {
           return;
         }
@@ -381,12 +383,14 @@ function SignInStartInternal(): JSX.Element {
             await authenticateWithEnterpriseSSO();
           }
           break;
-        case 'needs_first_factor':
-          if (hasOnlyEnterpriseSSOFirstFactors(res)) {
+        case 'needs_first_factor': {
+          const enterpriseSSOFlowType = getEnterpriseSSOFlowType(res);
+          if (enterpriseSSOFlowType?.type === 'redirect') {
             await authenticateWithEnterpriseSSO();
             break;
           }
           return navigate('factor-one');
+        }
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':
@@ -637,14 +641,6 @@ function SignInStartInternal(): JSX.Element {
     </Flow.Part>
   );
 }
-
-const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
-  if (!signIn.supportedFirstFactors?.length) {
-    return false;
-  }
-
-  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
-};
 
 const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> }) => {
   const [autofilled, setAutofilled] = useState(false);

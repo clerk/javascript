@@ -1,5 +1,6 @@
 import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
+import type { SignInResource } from '@clerk/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -62,4 +63,44 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
   }, []);
 }
 
-export { useHandleAuthenticateWithPasskey };
+/**
+ * Analyzes the sign-in's supported first factors to determine whether the user
+ * should be redirected directly to a single enterprise SSO provider or presented
+ * with a choice between multiple enterprise connections.
+ *
+ * @example
+ * ```typescript
+ * const flowType = getEnterpriseSSOFlowType(signIn);
+ * if (flowType?.type === 'redirect') {
+ *   // Redirect user directly to SSO provider
+ * } else if (flowType?.type === 'choose') {
+ *   // Show enterprise connection selection UI
+ * }
+ * ```
+ */
+function getEnterpriseSSOFlowType(signIn: SignInResource): { type: 'redirect' | 'choose' } | undefined {
+  if (!signIn.supportedFirstFactors?.length) {
+    return;
+  }
+
+  let hasEnterpriseConnectionsToChoose = false;
+  const hasEnterpriseSSOFactors = signIn.supportedFirstFactors.every(ff => {
+    if ('enterpriseConnection' in ff) {
+      hasEnterpriseConnectionsToChoose = true;
+    }
+
+    return ff.strategy === 'enterprise_sso';
+  });
+
+  if (!hasEnterpriseSSOFactors) {
+    return;
+  }
+
+  if (hasEnterpriseConnectionsToChoose) {
+    return { type: 'choose' };
+  }
+
+  return { type: 'redirect' };
+}
+
+export { getEnterpriseSSOFlowType, useHandleAuthenticateWithPasskey };
