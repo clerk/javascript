@@ -6,7 +6,7 @@ const DEFAULT_LOCALE = null;
  * Detects the user's preferred locale from the browser.
  * Falls back to null if locale cannot be determined.
  *
- * @returns The detected locale string in BCP 47 format (e.g., 'en-US', 'es-ES') or null if locale cannot be determined.
+ * @returns The browser's reported locale string (typically BCP 47 format like 'en-US', 'es-ES') or null if locale cannot be determined.
  */
 export function getBrowserLocale(): string | null {
   if (!inBrowser()) {

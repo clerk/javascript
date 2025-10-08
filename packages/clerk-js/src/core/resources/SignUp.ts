@@ -694,8 +694,14 @@ class SignUpFuture implements SignUpFutureResource {
   async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       // Inject browser locale if not already provided
-      const locale = params.locale || getBrowserLocale() || undefined;
-      await this._create({ ...params, locale });
+      const createParams = { ...params };
+      if (!createParams.locale) {
+        const browserLocale = getBrowserLocale();
+        if (browserLocale) {
+          createParams.locale = browserLocale;
+        }
+      }
+      await this._create(createParams);
     });
   }
 
