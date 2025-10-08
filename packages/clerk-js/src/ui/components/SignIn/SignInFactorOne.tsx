@@ -12,6 +12,8 @@ import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { getEnterpriseSSOFlowType } from './shared';
+import { SignInChooseEnterpriseConnection } from './SignInChooseEnterpriseConnection';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -122,6 +124,11 @@ function SignInFactorOneInternal(): JSX.Element {
       prevCurrentFactor: prev.currentFactor,
     }));
   };
+
+  if (getEnterpriseSSOFlowType(signIn)?.type === 'choose') {
+    return <SignInChooseEnterpriseConnection />;
+  }
+
   if (showAllStrategies || showForgotPasswordStrategies) {
     const canGoBack = factorHasLocalStrategy(currentFactor);
 
