@@ -1,6 +1,6 @@
 import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { SignInResource } from '@clerk/types';
+import type { EnterpriseSSOFactor, SignInFirstFactor } from '@clerk/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -25,82 +25,76 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
     };
   }, []);
 
-  return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
-    try {
-      const res = await authenticateWithPasskey(...args);
-      switch (res.status) {
-        case 'complete':
-          return setActive({
-            session: res.createdSessionId,
-            navigate: async ({ session }) => {
-              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
-            },
-          });
-        case 'needs_second_factor':
-          return onSecondFactor();
-        default:
-          return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-      }
-    } catch (err) {
-      const { flow } = args[0] || {};
-
-      if (isClerkRuntimeError(err)) {
-        // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
-        if (err.code === 'passkey_operation_aborted') {
-          return;
+  return useCallback(
+    async (...args: Parameters<typeof authenticateWithPasskey>) => {
+      try {
+        const res = await authenticateWithPasskey(...args);
+        switch (res.status) {
+          case 'complete':
+            return setActive({
+              session: res.createdSessionId,
+              navigate: async ({ session }) => {
+                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              },
+            });
+          case 'needs_second_factor':
+            return onSecondFactor();
+          default:
+            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }
-        // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
-        if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
-          return;
-        }
-      }
+      } catch (err) {
+        const { flow } = args[0] || {};
 
-      if (isUserLockedError(err)) {
-        return __internal_navigateWithError('..', err.errors[0]);
+        if (isClerkRuntimeError(err)) {
+          // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
+          if (err.code === 'passkey_operation_aborted') {
+            return;
+          }
+          // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
+          if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
+            return;
+          }
+        }
+
+        if (isUserLockedError(err)) {
+          return __internal_navigateWithError('..', err.errors[0]);
+        }
+        handleError(err, [], card.setError);
       }
-      handleError(err, [], card.setError);
-    }
-  }, []);
+    },
+    [
+      authenticateWithPasskey,
+      setActive,
+      navigateOnSetActive,
+      afterSignInUrl,
+      onSecondFactor,
+      supportEmail,
+      __internal_navigateWithError,
+      card.setError,
+    ],
+  );
 }
 
 /**
- * Analyzes the sign-in's supported first factors to determine whether the user
- * should be redirected directly to a single enterprise SSO provider or presented
- * with a choice between multiple enterprise connections.
- *
- * @example
- * ```typescript
- * const flowType = getEnterpriseSSOFlowType(signIn);
- * if (flowType?.type === 'redirect') {
- *   // Redirect user directly to SSO provider
- * } else if (flowType?.type === 'choose') {
- *   // Show enterprise connection selection UI
- * }
- * ```
+ * Type guard that checks if all factors in the array are enterprise SSO factors
+ * with both `enterpriseConnectionId` and `enterpriseConnectionName` properties.
+ * This is used to determine if the user should be presented with a choice
+ * between multiple enterprise connections.
+ * @experimental
  */
-function getEnterpriseSSOFlowType(signIn: SignInResource): { type: 'redirect' | 'choose' } | undefined {
-  if (!signIn.supportedFirstFactors?.length) {
-    return;
+function hasMultipleEnterpriseConnections(
+  factors: SignInFirstFactor[] | null,
+): factors is Array<EnterpriseSSOFactor & { enterpriseConnectionId: string; enterpriseConnectionName: string }> {
+  if (!factors?.length) {
+    return false;
   }
 
-  let hasEnterpriseConnectionsToChoose = false;
-  const hasEnterpriseSSOFactors = signIn.supportedFirstFactors.every(ff => {
-    if ('enterpriseConnection' in ff) {
-      hasEnterpriseConnectionsToChoose = true;
-    }
-
-    return ff.strategy === 'enterprise_sso';
-  });
-
-  if (!hasEnterpriseSSOFactors) {
-    return;
-  }
-
-  if (hasEnterpriseConnectionsToChoose) {
-    return { type: 'choose' };
-  }
-
-  return { type: 'redirect' };
+  return factors.every(
+    factor =>
+      factor.strategy === 'enterprise_sso' &&
+      'enterpriseConnectionId' in factor &&
+      'enterpriseConnectionName' in factor,
+  );
 }
 
-export { getEnterpriseSSOFlowType, useHandleAuthenticateWithPasskey };
+export { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };

@@ -1,15 +1,37 @@
-import type { Button } from '@/ui/customizables';
+import type { ComponentType } from 'react';
+
+import { withRedirect } from '@/ui/common';
+import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
 import { descriptors, Flex, Flow, Grid, localizationKeys, SimpleButton, Spinner, Text } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
-import type { PropsOfComponent } from '@/ui/styledSystem';
+import type { InternalTheme, PropsOfComponent } from '@/ui/styledSystem';
+import type { AvailableComponentProps } from '@/ui/types';
 
-export const SignInChooseEnterpriseConnection = () => {
+import { hasMultipleEnterpriseConnections } from './shared';
+
+/**
+ * @experimental
+ */
+const SignInChooseEnterpriseConnectionInternal = () => {
+  const signIn = useCoreSignIn();
+
   const card = useCardState();
 
-  const handleEnterpriseSSO = () => {
+  if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
+    // This should not happen due to the HOC guard, but provides type safety
+    return null;
+  }
+
+  const enterpriseConnections = signIn.supportedFirstFactors.map(ff => ({
+    id: ff.enterpriseConnectionId,
+    name: ff.enterpriseConnectionName,
+  }));
+
+  const handleEnterpriseSSO = (connectionId: string) => {
     // TODO - Post sign-in with enterprise connection ID
+    console.log('Signing in with enterprise connection:', connectionId);
   };
 
   return (
@@ -23,16 +45,16 @@ export const SignInChooseEnterpriseConnection = () => {
           <Card.Alert>{card.error}</Card.Alert>
 
           <Grid
-            elementDescriptor={descriptors.chooseEnterpriseConnections}
+            elementDescriptor={descriptors.socialButtonsRoot}
             gap={2}
           >
-            {mockEnterpriseConnections.map(({ id, name }) => (
+            {enterpriseConnections.map(({ id, name }) => (
               <ChooseEnterpriseConnectionButton
                 key={id}
                 id={id}
                 label={name}
-                onClick={handleEnterpriseSSO}
-                isDisabled={card.isLoading}
+                onClick={() => handleEnterpriseSSO(id)}
+                isLoading={card.isLoading}
               />
             ))}
           </Grid>
@@ -44,31 +66,32 @@ export const SignInChooseEnterpriseConnection = () => {
   );
 };
 
-type ChooseEnterpriseConnectionButtonProps = PropsOfComponent<typeof Button> & {
-  icon: React.ReactElement;
+type ChooseEnterpriseConnectionButtonProps = PropsOfComponent<typeof SimpleButton> & {
   id: string;
   label?: string;
   isLoading: boolean;
+  onClick: () => void;
 };
 
 const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButtonProps): JSX.Element => {
-  const { icon, isLoading, label } = props;
+  const { isLoading, label, onClick, ...rest } = props;
 
   return (
     <SimpleButton
       elementDescriptor={descriptors.chooseEnterpriseConnectionButton}
-      elementId={descriptors.chooseEnterpriseConnectionButton}
       variant='outline'
       block
       isLoading={isLoading}
       hoverAsFocus
-      sx={theme => [
+      onClick={onClick}
+      {...rest}
+      sx={(theme: InternalTheme) => [
         {
           gap: theme.space.$4,
           position: 'relative',
           justifyContent: 'flex-start',
         },
-        props.sx,
+        (rest as any).sx,
       ]}
     >
       <Flex
@@ -81,23 +104,20 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
           overflow: 'hidden',
         }}
       >
-        {(isLoading || icon) && (
+        {isLoading && (
           <Flex
             as='span'
             center
-            sx={theme => ({ flex: `0 0 ${theme.space.$4}` })}
+            sx={(theme: InternalTheme) => ({ flex: `0 0 ${theme.space.$4}` })}
           >
-            {isLoading && (
-              <Spinner
-                size='sm'
-                elementDescriptor={descriptors.spinner}
-              />
-            )}
+            <Spinner
+              size='sm'
+              elementDescriptor={descriptors.spinner}
+            />
           </Flex>
         )}
         <Text
           elementDescriptor={descriptors.chooseEnterpriseConnectionButtonText}
-          elementId={descriptors.chooseEnterpriseConnectionButtonText}
           as='span'
           truncate
           variant='buttonLarge'
@@ -109,14 +129,27 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
   );
 };
 
-// TODO - Replace with API response
-const mockEnterpriseConnections = [
-  {
-    id: 1,
-    name: 'Foo Corp 1',
-  },
-  {
-    id: 2,
-    name: 'Foo Corp 2',
-  },
-];
+const withEnterpriseConnectionsGuard = <P extends AvailableComponentProps>(Component: ComponentType<P>) => {
+  const displayName = Component.displayName || Component.name || 'Component';
+  Component.displayName = displayName;
+
+  const HOC = (props: P) => {
+    const signIn = useCoreSignIn();
+    const signInCtx = useSignInContext();
+
+    return withRedirect(
+      Component,
+      () => !hasMultipleEnterpriseConnections(signIn.supportedFirstFactors),
+      ({ clerk }) => signInCtx.signInUrl || clerk.buildSignInUrl(),
+      'There are no enterprise connections available to sign-in. Clerk is redirecting to the `signInUrl` URL instead.',
+    )(props);
+  };
+
+  HOC.displayName = `withEnterpriseConnectionsGuard(${displayName})`;
+
+  return HOC;
+};
+
+export const SignInChooseEnterpriseConnection = withEnterpriseConnectionsGuard(
+  SignInChooseEnterpriseConnectionInternal,
+);

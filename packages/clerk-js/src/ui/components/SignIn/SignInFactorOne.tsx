@@ -12,7 +12,7 @@ import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
-import { getEnterpriseSSOFlowType } from './shared';
+import { hasMultipleEnterpriseConnections } from './shared';
 import { SignInChooseEnterpriseConnection } from './SignInChooseEnterpriseConnection';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
@@ -125,7 +125,11 @@ function SignInFactorOneInternal(): JSX.Element {
     }));
   };
 
-  if (getEnterpriseSSOFlowType(signIn)?.type === 'choose') {
+  /**
+   * Prompt to choose between a list of enterprise connections as supported first factors
+   * @experimental
+   */
+  if (hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
     return <SignInChooseEnterpriseConnection />;
   }
 
