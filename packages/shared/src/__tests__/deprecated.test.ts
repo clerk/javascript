@@ -191,7 +191,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
 
   test('deprecate class property shows warning', () => {
     class Example {
-      someProp: string;
+      declare someProp: string;
       constructor(someProp: string) {
         this.someProp = someProp;
       }
@@ -234,7 +234,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
 
   test('deprecate class readonly property shows warning', () => {
     class Example {
-      readonly someReadOnlyProp: string;
+      declare readonly someReadOnlyProp: string;
       constructor(someReadOnlyProp: string) {
         this.someReadOnlyProp = someReadOnlyProp;
       }
@@ -265,7 +265,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
 
     test('deprecate class readonly property does not show warning', () => {
       class Example {
-        readonly someReadOnlyPropInProd: string;
+        declare readonly someReadOnlyPropInProd: string;
         constructor(someReadOnlyPropInProd: string) {
           this.someReadOnlyPropInProd = someReadOnlyPropInProd;
         }
@@ -293,7 +293,7 @@ describe('deprecatedProperty(cls, propName, warning, isStatic = false)', () => {
 
     test('deprecate class readonly property does not show warning', () => {
       class Example {
-        readonly someReadOnlyPropInProd: string;
+        declare readonly someReadOnlyPropInProd: string;
         constructor(someReadOnlyPropInProd: string) {
           this.someReadOnlyPropInProd = someReadOnlyPropInProd;
         }

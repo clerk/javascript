@@ -261,6 +261,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   creator_role: string;
   admin_delete_enabled: boolean;
   domains_enabled: boolean;
+  slug_disabled: boolean;
   domains_enrollment_modes: Array<DomainsEnrollmentModes>;
   domains_default_role: string;
 }
@@ -390,6 +391,11 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
   expires_at: number;
+}
+
+export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitationJSON {
+  status: 'accepted';
+  user_id: string;
 }
 
 /**

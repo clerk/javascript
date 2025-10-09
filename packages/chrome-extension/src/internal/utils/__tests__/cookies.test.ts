@@ -1,3 +1,4 @@
+import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import browser from 'webextension-polyfill';
 
 import { getClientCookie } from '../cookies';
@@ -24,7 +25,8 @@ describe('Cookies', () => {
   const name = '__client';
   const cookie = createCookie({ name, value: 'foo', domain });
 
-  const getMock = jest.mocked(browser.cookies.get);
+  // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
+  const getMock = vi.mocked(browser.cookies.get);
 
   afterEach(() => getMock.mockReset());
   afterAll(() => getMock.mockRestore());

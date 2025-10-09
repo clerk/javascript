@@ -46,6 +46,7 @@ import type {
   SignInFutureSSOParams,
   SignInFutureTicketParams,
   SignInFutureTOTPVerifyParams,
+  SignInFutureWeb3Params,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,
@@ -868,6 +869,77 @@ class SignInFuture implements SignInFutureResource {
       if (status === 'unverified' && externalVerificationRedirectURL) {
         windowNavigate(externalVerificationRedirectURL);
       }
+    });
+  }
+
+  async web3(params: SignInFutureWeb3Params): Promise<{ error: unknown }> {
+    const { strategy } = params;
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+
+    return runAsyncResourceTask(this.resource, async () => {
+      let identifier;
+      let generateSignature;
+      switch (provider) {
+        case 'metamask':
+          identifier = await getMetamaskIdentifier();
+          generateSignature = generateSignatureWithMetamask;
+          break;
+        case 'coinbase_wallet':
+          identifier = await getCoinbaseWalletIdentifier();
+          generateSignature = generateSignatureWithCoinbaseWallet;
+          break;
+        case 'base':
+          identifier = await getBaseIdentifier();
+          generateSignature = generateSignatureWithBase;
+          break;
+        case 'okx_wallet':
+          identifier = await getOKXWalletIdentifier();
+          generateSignature = generateSignatureWithOKXWallet;
+          break;
+        default:
+          throw new Error(`Unsupported Web3 provider: ${provider}`);
+      }
+
+      await this.create({ identifier });
+
+      const web3FirstFactor = this.resource.supportedFirstFactors?.find(
+        f => f.strategy === strategy,
+      ) as Web3SignatureFactor;
+      if (!web3FirstFactor) {
+        throw new Error('Web3 first factor not found');
+      }
+
+      await this.resource.__internal_basePost({
+        body: { web3WalletId: web3FirstFactor.web3WalletId, strategy },
+        action: 'prepare_first_factor',
+      });
+
+      const { message } = this.firstFactorVerification;
+      if (!message) {
+        throw new Error('Web3 nonce not found');
+      }
+
+      let signature: string;
+      try {
+        signature = await generateSignature({ identifier, nonce: message });
+      } catch (err) {
+        // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
+        // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
+        // reason we retry the request once more in order for the flow to be able to be completed successfully.
+        //
+        // error code 4001 means the user rejected the request
+        // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
+        if (provider === 'coinbase_wallet' && err.code === 4001) {
+          signature = await generateSignature({ identifier, nonce: message });
+        } else {
+          throw err;
+        }
+      }
+
+      await this.resource.__internal_basePost({
+        body: { signature, strategy },
+        action: 'attempt_first_factor',
+      });
     });
   }
 

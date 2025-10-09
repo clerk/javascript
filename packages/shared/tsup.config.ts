@@ -24,7 +24,7 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     dts: true,
-    target: 'es2020',
+    target: 'es2022',
     external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],
     define: {

@@ -335,6 +335,8 @@ export default tseslint.config([
       jest: pluginJest,
     },
     rules: {
+      '@typescript-eslint/await-thenable': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/unbound-method': 'off',
       'jest/unbound-method': 'error',
     },
@@ -365,7 +367,7 @@ export default tseslint.config([
   },
   {
     name: 'packages/clerk-js - vitest',
-    files: ['packages/clerk-js/src/**/*.spec.{ts,tsx}'],
+    files: ['packages/clerk-js/src/**/*.test.{ts,tsx}'],
     rules: {
       'jest/unbound-method': 'off',
       '@typescript-eslint/unbound-method': 'off',
@@ -443,6 +445,7 @@ export default tseslint.config([
       'jsdoc/require-description-complete-sentence': 'warn',
       'jsdoc/require-param': ['warn', { ignoreWhenAllParamsMissing: true }],
       'jsdoc/require-param-description': 'warn',
+      'jsdoc/require-description-complete-sentence': 'off',
       'jsdoc/require-returns': 'off',
       'jsdoc/tag-lines': [
         'warn',
