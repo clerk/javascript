@@ -1,4 +1,5 @@
 import type { VerifyTokenOptions } from '@clerk/backend';
+import type { OrganizationSyncOptions } from '@clerk/backend/internal';
 import type {
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
@@ -15,6 +16,7 @@ export type ClerkMiddlewareOptions = {
   machineSecretKey?: string;
   signInUrl?: string;
   signUpUrl?: string;
+  organizationSyncOptions?: OrganizationSyncOptions;
 } & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
   MultiDomainAndOrProxy &
   SignInForceRedirectUrl &
