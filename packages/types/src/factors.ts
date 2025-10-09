@@ -116,6 +116,8 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
   oidcPrompt?: string;
+  emailAddressId?: string;
+  enterpriseConnectionId?: string;
 };
 
 export type PhoneCodeSecondFactorConfig = {
