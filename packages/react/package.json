@@ -80,7 +80,8 @@
     "dist",
     "internal",
     "errors",
-    "experimental"
+    "experimental",
+    "legacy"
   ],
   "scripts": {
     "build": "tsup",
