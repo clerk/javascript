@@ -13,13 +13,16 @@ export function getBrowserLocale(): string | null {
     return DEFAULT_LOCALE;
   }
 
-  // Get locale from the browser
-  const locale = navigator?.language;
+  try {
+    // Get locale from the browser
+    const locale = navigator?.language;
 
-  // Validate that we got a non-empty string
-  if (!locale || typeof locale !== 'string' || locale.trim() === '') {
+    // Validate that we got a non-empty string
+    if (!locale || typeof locale !== 'string' || locale.trim() === '') {
+      return DEFAULT_LOCALE;
+    }
+    return locale;
+  } catch {
     return DEFAULT_LOCALE;
   }
-
-  return locale;
 }
