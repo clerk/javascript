@@ -3,7 +3,7 @@
 ```tsx {{ filename: 'app/sign-up/page.tsx' }}
 'use client';
 
-import { useSignUp } from '@clerk/nextjs';
+import { useSignUp } from '@clerk/nextjs/legacy';
 
 export default function SignUpPage() {
   const { isLoaded, signUp } = useSignUp();
