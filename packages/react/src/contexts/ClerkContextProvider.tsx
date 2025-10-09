@@ -93,7 +93,10 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     <IsomorphicClerkContext.Provider value={clerkCtx}>
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
-          <OrganizationProvider {...organizationCtx.value}>
+          <OrganizationProvider
+            // key={clerkStatus + queryStatus}
+            {...organizationCtx.value}
+          >
             <AuthContext.Provider value={authCtx}>
               <UserContext.Provider value={userCtx}>
                 <CheckoutProvider
