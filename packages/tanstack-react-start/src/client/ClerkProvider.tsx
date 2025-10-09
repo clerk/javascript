@@ -1,5 +1,6 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
-import { ScriptOnce, useRouteContext } from '@tanstack/react-router';
+import { ScriptOnce } from '@tanstack/react-router';
+import { getGlobalStartContext } from '@tanstack/react-start';
 import { useEffect } from 'react';
 
 import { isClient } from '../utils';
@@ -19,15 +20,14 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
 
 export function ClerkProvider({ children, ...providerProps }: TanstackStartClerkProviderProps): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
-  const routerContext = useRouteContext({
-    strict: false,
-  });
+  // @ts-expect-error: Untyped internal Clerk initial state
+  const clerkInitialState = getGlobalStartContext()?.clerkInitialState ?? {};
 
   useEffect(() => {
     awaitableNavigateRef.current = awaitableNavigate;
   }, [awaitableNavigate]);
 
-  const clerkInitState = isClient() ? (window as any).__clerk_init_state : routerContext?.clerkInitialState;
+  const clerkInitState = isClient() ? (window as any).__clerk_init_state : clerkInitialState;
 
   const { clerkSsrState, ...restInitState } = pickFromClerkInitState(clerkInitState?.__internal_clerk_state);
 
@@ -38,7 +38,7 @@ export function ClerkProvider({ children, ...providerProps }: TanstackStartClerk
 
   return (
     <>
-      <ScriptOnce>{`window.__clerk_init_state = ${JSON.stringify(routerContext?.clerkInitialState)};`}</ScriptOnce>
+      <ScriptOnce>{`window.__clerk_init_state = ${JSON.stringify(clerkInitialState)};`}</ScriptOnce>
       <ClerkOptionsProvider options={mergedProps}>
         <ReactClerkProvider
           initialState={clerkSsrState}
