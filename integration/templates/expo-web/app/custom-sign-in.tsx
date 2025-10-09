@@ -11,6 +11,7 @@ export default function Page() {
   const [password, setPassword] = React.useState('');
 
   const onSignInPress = React.useCallback(async () => {
+    console.log('onSignInPress', { emailAddress, password });
     await signIn.password({ emailAddress, password });
     if (signIn.status === 'complete') {
       await signIn.finalize({
