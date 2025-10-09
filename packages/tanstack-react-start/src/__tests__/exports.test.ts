@@ -1,8 +1,8 @@
 import * as errorsExports from '../errors';
 import * as publicExports from '../index';
+import * as legacyExports from '../legacy';
 import * as serverExports from '../server/index';
 import * as webhooksExports from '../webhooks';
-import * as legacyExports from '../legacy';
 
 describe('root public exports', () => {
   it('should not change unexpectedly', () => {
