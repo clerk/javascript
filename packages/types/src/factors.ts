@@ -124,6 +124,10 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
   oidcPrompt?: string;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionId?: string;
 };
 
 export type PhoneCodeSecondFactorConfig = {

@@ -1,30 +1,28 @@
+import { useClerk } from '@clerk/shared/react/index';
+
+import { withRedirectToAfterSignUp } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
-import { useCoreSignUp, useSignUpContext } from '@/ui/contexts';
+import { useSignUpContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { useFetch } from '@/ui/hooks';
 
-/**
- * @experimental
- */
-export const SignUpChooseEnterpriseConnection = () => {
-  const signUp = useCoreSignUp();
+const SignUpChooseEnterpriseConnectionInternal = () => {
+  const clerk = useClerk();
   const ctx = useSignUpContext();
+
+  const signUp = clerk.client.signUp;
   const { data: enterpriseConnections, isLoading } = useFetch(signUp?.__experimental_getEnterpriseConnections, {
     signUpId: signUp.id,
   });
 
   const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
-    if (!signUp.emailAddress) {
-      return;
-    }
-
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
     void signUp.authenticateWithRedirect({
       strategy: 'enterprise_sso',
-      identifier: signUp.emailAddress,
       redirectUrl,
       redirectUrlComplete,
       continueSignUp: true,
@@ -51,3 +49,10 @@ export const SignUpChooseEnterpriseConnection = () => {
     </Flow.Part>
   );
 };
+
+/**
+ * @experimental
+ */
+export const SignUpChooseEnterpriseConnection = withRedirectToAfterSignUp(
+  withCardStateProvider(SignUpChooseEnterpriseConnectionInternal),
+);

@@ -1,3 +1,4 @@
+import { useClerk } from '@clerk/shared/react/index';
 import type { ComponentType } from 'react';
 
 import { buildSSOCallbackURL, withRedirect } from '@/ui/common';
@@ -12,9 +13,11 @@ import { hasMultipleEnterpriseConnections } from './shared';
  * @experimental
  */
 const SignInChooseEnterpriseConnectionInternal = () => {
-  const signIn = useCoreSignIn();
   const ctx = useSignInContext();
   const { displayConfig } = useEnvironment();
+
+  const clerk = useClerk();
+  const signIn = clerk.client.signIn;
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
     // This should not happen due to the HOC guard, but provides type safety

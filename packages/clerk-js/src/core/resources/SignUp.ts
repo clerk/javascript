@@ -387,6 +387,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       emailAddress,
       legalAccepted,
       oidcPrompt,
+      enterpriseConnectionId,
     } = params;
 
     const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
@@ -400,6 +401,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         emailAddress,
         legalAccepted,
         oidcPrompt,
+        enterpriseConnectionId,
       };
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
     };
@@ -554,7 +556,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return false;
   }
 
-  public __experimental_getEnterpriseConnections(): Promise<SignUpEnterpriseConnectionResource[]> {
+  __experimental_getEnterpriseConnections = (): Promise<SignUpEnterpriseConnectionResource[]> => {
     return BaseResource._fetch({
       path: `/client/sign_ups/${this.id}/enterprise_connections`,
       method: 'GET',
@@ -563,7 +565,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
       return enterpriseConnections.map(enterpriseConnection => new SignUpEnterpriseConnection(enterpriseConnection));
     });
-  }
+  };
 }
 
 class SignUpFuture implements SignUpFutureResource {
