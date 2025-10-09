@@ -14,7 +14,7 @@ test.describe('appearance prop', () => {
       .addFile(
         'src/App.tsx',
         ({ tsx }) => tsx`
-            import { SignIn, SignUp } from '@clerk/clerk-react';
+            import { SignIn, SignUp } from '@clerk/react';
             import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
             const themes = { shadesOfPurple, neobrutalism, dark };
 

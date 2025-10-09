@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.51.0
+
+### Minor Changes
+
+- [Experimental] Add support for additional properties to Signal SignIn/SignUp ([#6897](https://github.com/clerk/javascript/pull/6897)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/shared@3.27.3
+
 ## 5.50.0
 
 ### Minor Changes

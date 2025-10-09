@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/clerk-expo",
-  "version": "2.16.0",
+  "name": "@clerk/expo",
+  "version": "2.16.1",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -84,7 +84,7 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "base-64": "^1.0.0",

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/types",
-  "version": "4.91.0",
+  "version": "4.92.0",
   "description": "Typings for Clerk libraries.",
   "keywords": [
     "clerk",
@@ -45,7 +45,7 @@
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

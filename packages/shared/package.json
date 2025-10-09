@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.27.2",
+  "version": "3.27.3",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -173,7 +173,7 @@
     }
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

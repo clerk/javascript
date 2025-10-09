@@ -1,6 +1,6 @@
 {
   "name": "@clerk/elements",
-  "version": "0.23.68",
+  "version": "0.23.69",
   "description": "Clerk Elements",
   "keywords": [
     "clerk",
@@ -72,7 +72,7 @@
     "test:cache:clear": "jest --clearCache --useStderr"
   },
   "dependencies": {
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "@radix-ui/primitive": "^1.1.3",

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "webextension-polyfill": "~0.12.0"
   },

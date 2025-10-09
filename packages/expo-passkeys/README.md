@@ -38,8 +38,8 @@
 ## Usage
 
 ```tsx
-import { ClerkProvider } from '@clerk/clerk-expo';
-import { passkeys } from '@clerk/clerk-expo/passkeys';
+import { ClerkProvider } from '@clerk/expo';
+import { passkeys } from '@clerk/expo/passkeys';
 
 <ClerkProvider __experimental_passkeys={passkeys}>{/* Your app here */}</ClerkProvider>;
 ```

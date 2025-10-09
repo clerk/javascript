@@ -89,6 +89,9 @@ const createBaseOrganizationSettings = (): OrganizationSettingsJSON => {
       enabled: false,
       enrollment_modes: [],
     },
+    slug: {
+      disabled: true,
+    },
   } as unknown as OrganizationSettingsJSON;
 };
 

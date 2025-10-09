@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/clerk-react",
-  "version": "5.50.0",
+  "name": "@clerk/react",
+  "version": "5.51.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -103,7 +103,7 @@
     "react-dom": "catalog:peer-react"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

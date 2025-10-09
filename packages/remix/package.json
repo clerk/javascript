@@ -1,6 +1,6 @@
 {
   "name": "@clerk/remix",
-  "version": "4.13.2",
+  "version": "4.13.3",
   "description": "Clerk SDK for Remix",
   "keywords": [
     "clerk",
@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
     "cookie": "1.0.2",

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/react';
 
 export const ClientSideWrapper = (props: React.PropsWithChildren) => {
   React.useEffect(() => {});

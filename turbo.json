@@ -200,12 +200,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/backend#build",
-        "@clerk/clerk-react#build"
-      ],
+      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
@@ -216,7 +211,7 @@
         "@clerk/clerk-js#build",
         "@clerk/backend#build",
         "@clerk/express#build",
-        "@clerk/clerk-react#build"
+        "@clerk/react#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
@@ -289,12 +284,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:expo-web": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/clerk-expo#build",
-        "@clerk/clerk-react#build"
-      ],
+      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/expo#build", "@clerk/react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
@@ -304,7 +294,7 @@
         "@clerk/testing#build",
         "@clerk/clerk-js#build",
         "@clerk/tanstack-react-start#build",
-        "@clerk/clerk-react#build"
+        "@clerk/react#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
@@ -315,7 +305,7 @@
         "@clerk/testing#build",
         "@clerk/clerk-js#build",
         "@clerk/tanstack-react-start#build",
-        "@clerk/clerk-react#build"
+        "@clerk/react#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
@@ -345,7 +335,7 @@
         "@clerk/clerk-js#build",
         "@clerk/react-router#build",
         "@clerk/backend#build",
-        "@clerk/clerk-react#build"
+        "@clerk/react#build"
       ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
@@ -376,12 +366,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:custom": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/backend#build",
-        "@clerk/clerk-react#build"
-      ],
+      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/react#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
