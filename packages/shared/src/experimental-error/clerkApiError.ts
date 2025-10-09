@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc */
 import type { ClerkAPIErrorJSON, ClerkApiErrorResponseJSON } from '@clerk/types';
 
-import { parseError } from '../parseError';
+import { parseError } from '../errors/parseError';
 import { ClerkError } from './future';
 
 /**

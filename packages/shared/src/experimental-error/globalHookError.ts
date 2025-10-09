@@ -20,4 +20,4 @@ export function ClerkGlobalHookError(error: ClerkError) {
   return error as ClerkError & typeof predicates;
 }
 
-const ar = ClerkGlobalHookError({} as any);
+export type ClerkGlobalHookError = ReturnType<typeof ClerkGlobalHookError>;

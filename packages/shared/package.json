@@ -70,6 +70,16 @@
         "default": "./dist/dom/index.js"
       }
     },
+    "./experimental-error": {
+      "import": {
+        "types": "./dist/experimental-error/index.d.mts",
+        "default": "./dist/experimental-error/index.mjs"
+      },
+      "require": {
+        "types": "./dist/experimental-error/index.d.ts",
+        "default": "./dist/experimental-error/index.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -87,6 +97,7 @@
     "deriveState",
     "dom",
     "error",
+    "experimental-error",
     "file",
     "globs",
     "handleValueOrFn",
