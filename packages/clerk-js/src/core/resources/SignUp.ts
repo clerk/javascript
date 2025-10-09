@@ -686,6 +686,7 @@ class SignUpFuture implements SignUpFutureResource {
       captchaError,
       ...params,
       unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+      locale: params.locale ?? getBrowserLocale(),
     };
 
     await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
@@ -693,15 +694,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      // Inject browser locale if not already provided
-      const createParams = { ...params };
-      if (!createParams.locale) {
-        const browserLocale = getBrowserLocale();
-        if (browserLocale) {
-          createParams.locale = browserLocale;
-        }
-      }
-      await this._create(createParams);
+      await this._create(params);
     });
   }
 
