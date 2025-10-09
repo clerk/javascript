@@ -262,12 +262,12 @@ export type AddPaymentMethodParams = WithOptionalOrgType<{
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type RemovePaymentSourceParams = WithOptionalOrgType<unknown>;
+export type RemovePaymentMethodParams = WithOptionalOrgType<unknown>;
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type MakeDefaultPaymentSourceParams = WithOptionalOrgType<unknown>;
+export type MakeDefaultPaymentMethodParams = WithOptionalOrgType<unknown>;
 
 /**
  * The `BillingPaymentMethodResource` type represents a payment source for a checkout session.
@@ -317,7 +317,7 @@ export interface BillingPaymentMethodResource extends ClerkResource {
    * @returns A promise that resolves to a `DeletedObjectResource` object.
    */
   // TODO: orgId should be implied by the payment method
-  remove: (params?: RemovePaymentSourceParams) => Promise<DeletedObjectResource>;
+  remove: (params?: RemovePaymentMethodParams) => Promise<DeletedObjectResource>;
   /**
    * A function that sets this payment source as the default for the account. Accepts the following parameters:
    * <ul>
@@ -328,7 +328,7 @@ export interface BillingPaymentMethodResource extends ClerkResource {
    * @returns A promise that resolves to `null`.
    */
   // TODO: orgId should be implied by the payment method
-  makeDefault: (params?: MakeDefaultPaymentSourceParams) => Promise<null>;
+  makeDefault: (params?: MakeDefaultPaymentMethodParams) => Promise<null>;
 }
 
 /**

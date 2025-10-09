@@ -408,7 +408,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
       >
         {showPaymentMethods ? (
           <Select
-            elementId='paymentSource'
+            elementId='paymentMethod'
             options={options}
             value={selectedPaymentMethod?.id || null}
             onChange={option => {

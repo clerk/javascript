@@ -5,8 +5,8 @@ import type {
   BillingPaymentMethodResource,
   BillingPaymentMethodStatus,
   DeletedObjectJSON,
-  MakeDefaultPaymentSourceParams,
-  RemovePaymentSourceParams,
+  MakeDefaultPaymentMethodParams,
+  RemovePaymentMethodParams,
 } from '@clerk/types';
 
 import { BaseResource, DeletedObject } from './internal';
@@ -43,7 +43,7 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
     return this;
   }
 
-  public async remove(params?: RemovePaymentSourceParams) {
+  public async remove(params?: RemovePaymentMethodParams) {
     const { orgId } = params ?? {};
     const json = (
       await BaseResource._fetch({
@@ -57,7 +57,7 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
     return new DeletedObject(json);
   }
 
-  public async makeDefault(params?: MakeDefaultPaymentSourceParams) {
+  public async makeDefault(params?: MakeDefaultPaymentMethodParams) {
     const { orgId } = params ?? {};
     await BaseResource._fetch({
       path: orgId
