@@ -695,10 +695,10 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 }>;
 
 /**
- * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**
+ * The `confirm()` method accepts the following parameters. **Only one of `paymentSourceId`, `paymentToken`, or `useTestCard` should be provided.**
  *
  * @unionReturnHeadings
- * ["paymentMethodId", "paymentToken", "useTestCard"]
+ * ["paymentSourceId", "paymentToken", "useTestCard"]
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -707,7 +707,7 @@ export type ConfirmCheckoutParams =
       /**
        * The ID of a saved payment source to use for this checkout.
        */
-      paymentMethodId?: string;
+      paymentSourceId?: string;
     }
   | {
       /**

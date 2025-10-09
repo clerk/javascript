@@ -161,18 +161,18 @@ const useCheckoutMutations = () => {
     card.setIdle();
   };
 
-  const payWithExistingPaymentSource = (e: React.FormEvent<HTMLFormElement>) => {
+  const payWithExistingPaymentMethod = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    const paymentMethodId = data.get(HIDDEN_INPUT_NAME) as string;
+    const paymentSourceId = data.get(HIDDEN_INPUT_NAME) as string;
 
     return confirmCheckout({
-      paymentMethodId,
+      paymentSourceId,
     });
   };
 
-  const addPaymentSourceAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
+  const addPaymentMethodAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
 
   const payWithTestCard = () =>
     confirmCheckout({
@@ -181,8 +181,8 @@ const useCheckoutMutations = () => {
     });
 
   return {
-    payWithExistingPaymentSource,
-    addPaymentSourceAndPay,
+    payWithExistingPaymentMethod,
+    addPaymentMethodAndPay,
     payWithTestCard,
   };
 };
@@ -345,13 +345,13 @@ const useSubmitLabel = () => {
 };
 
 const AddPaymentSourceForCheckout = withCardStateProvider(() => {
-  const { addPaymentSourceAndPay } = useCheckoutMutations();
+  const { addPaymentMethodAndPay } = useCheckoutMutations();
   const submitLabel = useSubmitLabel();
   const { checkout } = useCheckout();
 
   return (
     <AddPaymentSource.Root
-      onSuccess={addPaymentSourceAndPay}
+      onSuccess={addPaymentMethodAndPay}
       checkout={checkout}
     >
       <DevOnly>
@@ -375,9 +375,9 @@ const ExistingPaymentSourceForm = withCardStateProvider(
     const { checkout } = useCheckout();
     const { paymentMethod, isImmediatePlanChange, freeTrialEndsAt } = checkout;
 
-    const { payWithExistingPaymentSource } = useCheckoutMutations();
+    const { payWithExistingPaymentMethod } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<BillingPaymentMethodResource | undefined>(
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<BillingPaymentMethodResource | undefined>(
       paymentMethod || paymentSources.find(p => p.isDefault),
     );
 
@@ -399,7 +399,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
 
     return (
       <Form
-        onSubmit={payWithExistingPaymentSource}
+        onSubmit={payWithExistingPaymentMethod}
         sx={t => ({
           display: 'flex',
           flexDirection: 'column',
@@ -410,10 +410,10 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           <Select
             elementId='paymentSource'
             options={options}
-            value={selectedPaymentSource?.id || null}
+            value={selectedPaymentMethod?.id || null}
             onChange={option => {
               const paymentSource = paymentSources.find(source => source.id === option.value);
-              setSelectedPaymentSource(paymentSource);
+              setSelectedPaymentMethod(paymentSource);
             }}
             portal
           >
@@ -421,7 +421,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
             <input
               name={HIDDEN_INPUT_NAME}
               type='hidden'
-              value={selectedPaymentSource?.id}
+              value={selectedPaymentMethod?.id}
             />
             <SelectButton
               icon={ChevronUpDown}
@@ -430,7 +430,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
                 backgroundColor: t.colors.$colorBackground,
               })}
             >
-              {selectedPaymentSource && <PaymentSourceRow paymentSource={selectedPaymentSource} />}
+              {selectedPaymentMethod && <PaymentSourceRow paymentSource={selectedPaymentMethod} />}
             </SelectButton>
             <SelectOptionList
               sx={t => ({
@@ -443,7 +443,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           <input
             name={HIDDEN_INPUT_NAME}
             type='hidden'
-            value={selectedPaymentSource?.id}
+            value={selectedPaymentMethod?.id}
           />
         )}
         <Card.Alert>{card.error}</Card.Alert>
