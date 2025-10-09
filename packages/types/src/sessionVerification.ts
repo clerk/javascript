@@ -1,6 +1,7 @@
 import type {
   BackupCodeFactor,
   EmailCodeFactor,
+  EnterpriseSSOFactor,
   PasskeyFactor,
   PasswordFactor,
   PhoneCodeFactor,
@@ -49,5 +50,10 @@ export type ReverificationConfig =
 export type SessionVerificationLevel = 'first_factor' | 'second_factor' | 'multi_factor';
 export type SessionVerificationAfterMinutes = number;
 
-export type SessionVerificationFirstFactor = EmailCodeFactor | PhoneCodeFactor | PasswordFactor | PasskeyFactor;
+export type SessionVerificationFirstFactor =
+  | EmailCodeFactor
+  | PhoneCodeFactor
+  | PasswordFactor
+  | PasskeyFactor
+  | EnterpriseSSOFactor;
 export type SessionVerificationSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
