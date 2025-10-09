@@ -1,6 +1,7 @@
+import type { ClerkGlobalHookError } from '@clerk/shared/errors-future';
+
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
-
 /**
  * Represents an error on a specific field.
  */
@@ -80,7 +81,7 @@ export interface Errors {
   /**
    * Parsed errors that are not related to any specific field.
    */
-  global: unknown[] | null; // does not include any errors that could be parsed as a field error
+  global: ClerkGlobalHookError[] | null; // does not include any errors that could be parsed as a field error
 }
 
 /**
