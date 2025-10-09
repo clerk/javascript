@@ -1,4 +1,5 @@
 import { isClerkApiResponseError } from './clerkApiError';
+import { isClerkRuntimeError } from './clerkRuntimeError';
 import type { ClerkError } from './future';
 
 /**
@@ -9,6 +10,7 @@ import type { ClerkError } from './future';
 export function ClerkGlobalHookError(error: ClerkError) {
   const predicates = {
     isClerkApiResponseError,
+    isClerkRuntimeError,
   } as const;
 
   for (const [name, fn] of Object.entries(predicates)) {
@@ -19,8 +21,3 @@ export function ClerkGlobalHookError(error: ClerkError) {
 }
 
 const ar = ClerkGlobalHookError({} as any);
-
-console.log(ar.retryAfter);
-if (ar.isClerkApiResponseError()) {
-  console.log(ar.retryAfter);
-}
