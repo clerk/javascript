@@ -3,6 +3,7 @@ import { vi } from 'vitest';
 
 import * as publicExports from '../index';
 import * as serverExports from '../server/index';
+import * as legacyExports from '../legacy';
 
 describe('root public exports', () => {
   it('should not change unexpectedly', () => {
@@ -23,5 +24,11 @@ describe('deprecated ssr public exports', () => {
     expect(Object.keys(ssrExports).sort()).toMatchSnapshot();
     expect(warnOnceSpy).toHaveBeenCalled();
     warnOnceSpy.mockRestore();
+  });
+});
+
+describe('legacy public exports', () => {
+  it('should not change unexpectedly', () => {
+    expect(Object.keys(legacyExports).sort()).toMatchSnapshot();
   });
 });
