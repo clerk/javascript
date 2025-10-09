@@ -53,6 +53,7 @@ export * from './router';
 /**
  * TODO @revamp-hooks: Drop this in the next major release.
  */
+export * from './errors';
 export * from './runtime-values';
 export * from './saml';
 export * from './samlAccount';

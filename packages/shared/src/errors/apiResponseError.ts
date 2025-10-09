@@ -6,7 +6,7 @@ import type {
 
 import { parseErrors } from './parseError';
 
-interface ClerkAPIResponseOptions {
+export interface ClerkAPIResponseOptions {
   data: ClerkAPIErrorJSON[];
   status: number;
   clerkTraceId?: string;
