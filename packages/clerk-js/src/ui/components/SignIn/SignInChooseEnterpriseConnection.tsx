@@ -67,7 +67,7 @@ const withEnterpriseConnectionsGuard = <P extends AvailableComponentProps>(Compo
       Component,
       () => !hasMultipleEnterpriseConnections(signIn.supportedFirstFactors),
       ({ clerk }) => signInCtx.signInUrl || clerk.buildSignInUrl(),
-      'There are no enterprise connections available to sign-in. Clerk is redirecting to the `signInUrl` URL instead.',
+      'There are no enterprise connections available to sign-in. Clerk is redirecting to the `signInUrl` instead.',
     )(props);
   };
 

@@ -79,12 +79,6 @@ export interface SignInResource extends ClerkResource {
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;
 
   validatePassword: (password: string, callbacks?: ValidatePasswordCallbacks) => void;
-
-  /**
-   * @experimental
-   */
-  __experimental_getEnterpriseConnections: () => Promise<SignInEnterpriseConnectionResource[]>;
-
   /**
    * @internal
    */
@@ -111,9 +105,4 @@ export interface SignInJSON extends ClerkResourceJSON {
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;
-}
-
-export interface SignInEnterpriseConnectionResource {
-  id: string;
-  name: string;
 }

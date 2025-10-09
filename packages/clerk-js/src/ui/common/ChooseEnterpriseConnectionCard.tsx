@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import type { LocalizationKey } from '@/ui/customizables';
 import { descriptors, Flex, Grid, SimpleButton, Spinner, Text } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
@@ -8,7 +10,7 @@ import type { InternalTheme, PropsOfComponent } from '@/ui/styledSystem';
 type ChooseEnterpriseConnectionCardProps = {
   title: LocalizationKey;
   subtitle: LocalizationKey;
-  onClick: (id: string) => void;
+  onClick: (id: string) => Promise<void>;
   enterpriseConnections: Array<{ id: string; name: string }>;
 };
 
@@ -41,8 +43,7 @@ export const ChooseEnterpriseConnectionCard = ({
               key={id}
               id={id}
               label={name}
-              onClick={() => onClick(id)}
-              isLoading={card.isLoading}
+              onClick={onClick}
             />
           ))}
         </Grid>
@@ -53,15 +54,20 @@ export const ChooseEnterpriseConnectionCard = ({
   );
 };
 
-type ChooseEnterpriseConnectionButtonProps = PropsOfComponent<typeof SimpleButton> & {
+type ChooseEnterpriseConnectionButtonProps = Omit<PropsOfComponent<typeof SimpleButton>, 'onClick'> & {
   id: string;
   label?: string;
-  isLoading: boolean;
-  onClick: () => void;
+  onClick: (id: string) => Promise<void>;
 };
 
 const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButtonProps): JSX.Element => {
-  const { isLoading, label, onClick, ...rest } = props;
+  const { label, onClick, ...rest } = props;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = () => {
+    setIsLoading(true);
+    void onClick(props.id).catch(() => setIsLoading(false));
+  };
 
   return (
     <SimpleButton
@@ -70,7 +76,7 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
       block
       isLoading={isLoading}
       hoverAsFocus
-      onClick={onClick}
+      onClick={handleClick}
       {...rest}
       sx={(theme: InternalTheme) => [
         {

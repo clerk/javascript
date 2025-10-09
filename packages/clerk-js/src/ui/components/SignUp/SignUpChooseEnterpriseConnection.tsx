@@ -21,7 +21,7 @@ const SignUpChooseEnterpriseConnectionInternal = () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignUpUrl || '/';
 
-    void signUp.authenticateWithRedirect({
+    return signUp.authenticateWithRedirect({
       strategy: 'enterprise_sso',
       redirectUrl,
       redirectUrlComplete,
