@@ -43,7 +43,7 @@ export type ProfileSectionId =
   | 'organizationDomains'
   | 'manageVerifiedDomains'
   | 'subscriptionsList'
-  | 'paymentSources';
+  | 'paymentMethods';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';

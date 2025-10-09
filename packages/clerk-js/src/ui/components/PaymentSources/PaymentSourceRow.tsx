@@ -9,17 +9,17 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaym
       sx={{ overflow: 'hidden' }}
       gap={2}
       align='baseline'
-      elementDescriptor={descriptors.paymentSourceRow}
+      elementDescriptor={descriptors.paymentMethodRow}
     >
       <Icon
         icon={paymentSource.paymentType === 'card' ? CreditCard : GenericPayment}
         sx={t => ({ alignSelf: 'center', color: t.colors.$colorMutedForeground })}
-        elementDescriptor={descriptors.paymentSourceRowIcon}
+        elementDescriptor={descriptors.paymentMethodRowIcon}
       />
       <Text
         sx={t => ({ color: t.colors.$colorForeground, textTransform: 'capitalize' })}
         truncate
-        elementDescriptor={descriptors.paymentSourceRowType}
+        elementDescriptor={descriptors.paymentMethodRowType}
       >
         {/* TODO(@COMMERCE): Localize this */}
         {paymentSource.paymentType === 'card' ? paymentSource.cardType : paymentSource.paymentType}
@@ -28,21 +28,21 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaym
         sx={t => ({ color: t.colors.$colorMutedForeground })}
         variant='caption'
         truncate
-        elementDescriptor={descriptors.paymentSourceRowValue}
+        elementDescriptor={descriptors.paymentMethodRowValue}
       >
         {paymentSource.paymentType === 'card' ? `⋯ ${paymentSource.last4}` : null}
       </Text>
       {paymentSource.isDefault && (
         <Badge
-          elementDescriptor={descriptors.paymentSourceRowBadge}
-          elementId={descriptors.paymentSourceRowBadge.setId('default')}
+          elementDescriptor={descriptors.paymentMethodRowBadge}
+          elementId={descriptors.paymentMethodRowBadge.setId('default')}
           localizationKey={localizationKeys('badge__default')}
         />
       )}
       {paymentSource.status === 'expired' && (
         <Badge
-          elementDescriptor={descriptors.paymentSourceRowBadge}
-          elementId={descriptors.paymentSourceRowBadge.setId('expired')}
+          elementDescriptor={descriptors.paymentMethodRowBadge}
+          elementId={descriptors.paymentMethodRowBadge.setId('expired')}
           colorScheme='danger'
           localizationKey={localizationKeys('badge__expired')}
         />

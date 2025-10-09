@@ -129,7 +129,7 @@ export const PaymentSources = withCardStateProvider(() => {
     <ProfileSection.Root
       title={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.title`)}
       centered={false}
-      id='paymentSources'
+      id='paymentMethods'
       sx={t => ({
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,
@@ -139,7 +139,7 @@ export const PaymentSources = withCardStateProvider(() => {
     >
       <Action.Root>
         <ProfileSection.ItemList
-          id='paymentSources'
+          id='paymentMethods'
           disableAnimation
         >
           {isLoading ? (
@@ -148,7 +148,7 @@ export const PaymentSources = withCardStateProvider(() => {
             <>
               {sortedPaymentSources.map(paymentSource => (
                 <Fragment key={paymentSource.id}>
-                  <ProfileSection.Item id='paymentSources'>
+                  <ProfileSection.Item id='paymentMethods'>
                     <PaymentSourceRow paymentSource={paymentSource} />
                     <PaymentSourceMenu
                       paymentSource={paymentSource}
@@ -170,7 +170,7 @@ export const PaymentSources = withCardStateProvider(() => {
                 <>
                   <Action.Trigger value='add'>
                     <ProfileSection.ArrowButton
-                      id='paymentSources'
+                      id='paymentMethods'
                       localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
                     />
                   </Action.Trigger>
