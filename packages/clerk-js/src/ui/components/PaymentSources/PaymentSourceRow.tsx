@@ -1,9 +1,9 @@
-import type { BillingPaymentSourceResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { CreditCard, GenericPayment } from '../../icons';
 
-export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaymentSourceResource }) => {
+export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaymentMethodResource }) => {
   return (
     <Flex
       sx={{ overflow: 'hidden' }}
@@ -12,7 +12,7 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaym
       elementDescriptor={descriptors.paymentSourceRow}
     >
       <Icon
-        icon={paymentSource.paymentMethod === 'card' ? CreditCard : GenericPayment}
+        icon={paymentSource.paymentType === 'card' ? CreditCard : GenericPayment}
         sx={t => ({ alignSelf: 'center', color: t.colors.$colorMutedForeground })}
         elementDescriptor={descriptors.paymentSourceRowIcon}
       />
@@ -21,7 +21,8 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaym
         truncate
         elementDescriptor={descriptors.paymentSourceRowType}
       >
-        {paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod}
+        {/* TODO(@COMMERCE): Localize this */}
+        {paymentSource.paymentType === 'card' ? paymentSource.cardType : paymentSource.paymentType}
       </Text>
       <Text
         sx={t => ({ color: t.colors.$colorMutedForeground })}
@@ -29,7 +30,7 @@ export const PaymentSourceRow = ({ paymentSource }: { paymentSource: BillingPaym
         truncate
         elementDescriptor={descriptors.paymentSourceRowValue}
       >
-        {paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : null}
+        {paymentSource.paymentType === 'card' ? `⋯ ${paymentSource.last4}` : null}
       </Text>
       {paymentSource.isDefault && (
         <Badge

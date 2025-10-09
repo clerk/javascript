@@ -64,4 +64,4 @@ export type CardActionId =
   | 'signOut';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
-export type SelectId = 'countryCode' | 'role' | 'paymentSource' | 'apiKeyExpiration';
+export type SelectId = 'countryCode' | 'role' | 'paymentMethod' | 'apiKeyExpiration';
