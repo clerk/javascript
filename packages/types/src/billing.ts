@@ -270,7 +270,7 @@ export type RemovePaymentMethodParams = WithOptionalOrgType<unknown>;
 export type MakeDefaultPaymentMethodParams = WithOptionalOrgType<unknown>;
 
 /**
- * The `BillingPaymentMethodResource` type represents a payment source for a checkout session.
+ * The `BillingPaymentMethodResource` type represents a payment method for a checkout session.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
