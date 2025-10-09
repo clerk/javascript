@@ -23,6 +23,7 @@ export * from './props';
 export * from './queryStateParams';
 export * from './querystring';
 export * from './runtime';
+export * from './tokenId';
 export * from './url';
 export * from './web3';
 export * from './windowNavigate';
