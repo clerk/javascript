@@ -26,8 +26,14 @@ const [SessionContext, useSessionContext] = createContextAndHook<SignedInSession
 const OptionsContext = React.createContext<ClerkOptions>({});
 
 type UseCheckoutOptions = {
+  /**
+   */
   for?: ForPayerType;
+  /**
+   */
   planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   */
   planId: string;
 };
 

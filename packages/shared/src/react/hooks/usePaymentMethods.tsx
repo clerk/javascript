@@ -4,7 +4,7 @@ import { useOrganizationContext, useUserContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
- * @internal
+ *
  */
 export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentSourceResource, GetPaymentSourcesParams>({
   hookName: 'usePaymentMethods',
@@ -19,3 +19,8 @@ export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentSource
     return user?.getPaymentSources;
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePaymentMethodsReturn = ReturnType<typeof usePaymentMethods>;

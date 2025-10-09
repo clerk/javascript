@@ -36,13 +36,13 @@ export type UseSubscriptionParams = {
 export type UseSubscriptionReturn =
   | {
       /**
-       * A boolean that indicates whether the initial data is still being fetched.
+       * The subscription object, or `null` if the data hasn't been loaded yet.
        */
       data: null;
       /**
        * A boolean that indicates whether the initial data is still being fetched.
        */
-      isLoaded: false;
+      isLoading: false;
       /**
        * A boolean that indicates whether any request is still in flight, including background updates.
        */
@@ -58,21 +58,20 @@ export type UseSubscriptionReturn =
     }
   | {
       data: BillingSubscriptionResource;
-      isLoaded: true;
+      isLoading: true;
       isFetching: true;
       error: Error;
       revalidate: () => Promise<void>;
     }
   | {
       data: BillingSubscriptionResource | null;
-      isLoaded: boolean;
+      isLoading: boolean;
       isFetching: boolean;
       error: Error | null;
       revalidate: () => Promise<void>;
     };
 
 /**
- * @internal
  *
  * Fetches subscription data for the current user or organization.
  *

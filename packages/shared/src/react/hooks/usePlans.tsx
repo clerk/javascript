@@ -4,7 +4,7 @@ import { useClerkInstanceContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
- * @internal
+ *
  */
 export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlansParams>({
   hookName: 'usePlans',
@@ -23,3 +23,8 @@ export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlans
     unauthenticated: true,
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePlansReturn = ReturnType<typeof usePlans>;
