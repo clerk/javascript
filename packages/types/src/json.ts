@@ -140,6 +140,15 @@ export interface SignUpJSON extends ClerkResourceJSON {
   verifications: SignUpVerificationsJSON | null;
 }
 
+/**
+ * @experimental
+ */
+export interface SignUpEnterpriseConnectionJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
+  logo_public_url: string | null;
+}
+
 export interface SessionJSON extends ClerkResourceJSON {
   object: 'session';
   id: string;

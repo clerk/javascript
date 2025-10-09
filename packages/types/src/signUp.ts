@@ -114,3 +114,12 @@ export interface SignUpResource extends ClerkResource {
    */
   __internal_future: SignUpFutureResource;
 }
+
+/**
+ * @experimental
+ */
+export interface SignUpEnterpriseConnectionResource extends ClerkResource {
+  id: string;
+  name: string;
+  logoPublicUrl: string | null;
+}

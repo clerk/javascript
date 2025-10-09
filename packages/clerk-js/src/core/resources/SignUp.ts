@@ -16,6 +16,8 @@ import type {
   PrepareWeb3WalletVerificationParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
+  SignUpEnterpriseConnectionJSON,
+  SignUpEnterpriseConnectionResource,
   SignUpField,
   SignUpFutureCreateParams,
   SignUpFutureEmailCodeVerifyParams,
@@ -551,6 +553,17 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     return false;
   }
+
+  public __experimental_getEnterpriseConnections(): Promise<SignUpEnterpriseConnectionResource[]> {
+    return BaseResource._fetch({
+      path: `/client/sign_ups/${this.id}/enterprise_connections`,
+      method: 'GET',
+    }).then(res => {
+      const enterpriseConnections = res?.response as unknown as SignUpEnterpriseConnectionJSON[];
+
+      return enterpriseConnections.map(enterpriseConnection => new SignUpEnterpriseConnection(enterpriseConnection));
+    });
+  }
 }
 
 class SignUpFuture implements SignUpFutureResource {
@@ -887,5 +900,26 @@ class SignUpFuture implements SignUpFutureResource {
 
       await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
+  }
+}
+
+class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpriseConnectionResource {
+  id!: string;
+  name!: string;
+  logoPublicUrl!: string | null;
+
+  constructor(data: SignUpEnterpriseConnectionJSON) {
+    super();
+    this.fromJSON(data);
+  }
+
+  protected fromJSON(data: SignUpEnterpriseConnectionJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.name = data.name;
+      this.logoPublicUrl = data.logo_public_url;
+    }
+
+    return this;
   }
 }
