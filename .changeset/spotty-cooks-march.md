@@ -45,11 +45,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 }
 ```
 
-The `getAuth()` helper can now be called within server routes and functions, without passing a Request object:
+The `getAuth()` helper is now `auth()` and can now be called within server routes and functions, without passing a Request object:
 
 ```ts
+import { auth } from '@clerk/tanstack-react-start/server'
+
 const authStateFn = createServerFn().handler(async () => {
-  const { userId } = await getAuth()
+  const { userId } = await auth()
 
   if (!userId) {
     throw redirect({

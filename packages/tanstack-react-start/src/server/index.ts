@@ -1,4 +1,4 @@
-export * from './getAuth';
+export { auth } from './auth';
 export { clerkClient } from './clerkClient';
 export { clerkMiddleware } from './clerkMiddleware';
 

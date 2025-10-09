@@ -6,7 +6,7 @@ import { getGlobalStartContext } from '@tanstack/react-start';
 import { errorThrower } from '../utils';
 import { clerkMiddlewareNotConfigured } from '../utils/errors';
 
-export const getAuth: GetAuthFnNoRequest<SessionAuthObject, true> = (async (opts?: AuthOptions) => {
+export const auth: GetAuthFnNoRequest<SessionAuthObject, true> = (async (opts?: AuthOptions) => {
   // @ts-expect-error: Untyped internal Clerk start context
   const authObjectFn = getGlobalStartContext().auth;
 
