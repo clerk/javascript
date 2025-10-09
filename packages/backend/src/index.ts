@@ -100,9 +100,13 @@ export type {
   PaginatedResponseJSON,
   TestingTokenJSON,
   WebhooksSvixJSON,
+  BillingPayerJSON,
   BillingPlanJSON,
   BillingSubscriptionJSON,
   BillingSubscriptionItemJSON,
+  BillingPaymentAttemptWebhookEventJSON,
+  BillingSubscriptionItemWebhookEventJSON,
+  BillingSubscriptionWebhookEventJSON,
 } from './api/resources/JSON';
 
 /**
