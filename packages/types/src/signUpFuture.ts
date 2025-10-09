@@ -8,6 +8,7 @@ interface SignUpFutureAdditionalParams {
   lastName?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
+  locale?: string;
 }
 
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
@@ -135,6 +136,8 @@ export interface SignUpFutureResource {
   readonly abandonAt: number | null;
 
   readonly legalAcceptedAt: number | null;
+
+  readonly locale: string | null;
 
   create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
 

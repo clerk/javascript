@@ -15,6 +15,7 @@ export * from './ignoreEventValue';
 export * from './image';
 export * from './instance';
 export * from './jwt';
+export * from './locale';
 export * from './normalizeRoutingOptions';
 export * from './organization';
 export * from './pageLifecycle';
