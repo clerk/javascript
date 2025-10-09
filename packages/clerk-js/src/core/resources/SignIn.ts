@@ -725,6 +725,12 @@ class SignInFuture implements SignInFutureResource {
       // TODO @userland-errors:
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
+      console.log('signIn.password()', {
+        identifier,
+        previousIdentifier,
+        password: params.password,
+        params,
+      });
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
         body: { identifier: identifier || previousIdentifier, password: params.password },
