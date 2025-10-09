@@ -146,7 +146,6 @@ export interface SignUpJSON extends ClerkResourceJSON {
 export interface SignUpEnterpriseConnectionJSON extends ClerkResourceJSON {
   id: string;
   name: string;
-  logo_public_url: string | null;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {

@@ -361,6 +361,10 @@ export type __internal_LocalizationResource = {
         label__onlyTermsOfService: LocalizationValue<'termsOfServiceLink'>;
       };
     };
+    chooseEnterpriseConnection: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   signIn: {
     start: {

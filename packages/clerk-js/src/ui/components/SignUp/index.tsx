@@ -9,6 +9,7 @@ import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowC
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
+import { SignUpChooseEnterpriseConnection } from './SignUpChooseEnterpriseConnection';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
@@ -81,6 +82,9 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='tasks'>
           <LazySessionTasks redirectUrlComplete={signUpContext.afterSignUpUrl} />
+        </Route>
+        <Route path='choose-enterprise-connection'>
+          <SignUpChooseEnterpriseConnection />
         </Route>
         <Route index>
           <SignUpStart />

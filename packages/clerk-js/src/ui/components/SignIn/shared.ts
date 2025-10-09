@@ -25,54 +25,42 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
     };
   }, []);
 
-  return useCallback(
-    async (...args: Parameters<typeof authenticateWithPasskey>) => {
-      try {
-        const res = await authenticateWithPasskey(...args);
-        switch (res.status) {
-          case 'complete':
-            return setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
-              },
-            });
-          case 'needs_second_factor':
-            return onSecondFactor();
-          default:
-            return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
-        }
-      } catch (err) {
-        const { flow } = args[0] || {};
-
-        if (isClerkRuntimeError(err)) {
-          // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
-          if (err.code === 'passkey_operation_aborted') {
-            return;
-          }
-          // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
-          if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
-            return;
-          }
-        }
-
-        if (isUserLockedError(err)) {
-          return __internal_navigateWithError('..', err.errors[0]);
-        }
-        handleError(err, [], card.setError);
+  return useCallback(async (...args: Parameters<typeof authenticateWithPasskey>) => {
+    try {
+      const res = await authenticateWithPasskey(...args);
+      switch (res.status) {
+        case 'complete':
+          return setActive({
+            session: res.createdSessionId,
+            navigate: async ({ session }) => {
+              await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+            },
+          });
+        case 'needs_second_factor':
+          return onSecondFactor();
+        default:
+          return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }
-    },
-    [
-      authenticateWithPasskey,
-      setActive,
-      navigateOnSetActive,
-      afterSignInUrl,
-      onSecondFactor,
-      supportEmail,
-      __internal_navigateWithError,
-      card.setError,
-    ],
-  );
+    } catch (err) {
+      const { flow } = args[0] || {};
+
+      if (isClerkRuntimeError(err)) {
+        // In any case if the call gets aborted we should skip showing an error. This prevents updating the state of unmounted components.
+        if (err.code === 'passkey_operation_aborted') {
+          return;
+        }
+        // In case of autofill, if retrieval of credentials is cancelled by the user avoid showing errors as it results to pour UX.
+        if (flow === 'autofill' && err.code === 'passkey_retrieval_cancelled') {
+          return;
+        }
+      }
+
+      if (isUserLockedError(err)) {
+        return __internal_navigateWithError('..', err.errors[0]);
+      }
+      handleError(err, [], card.setError);
+    }
+  }, []);
 }
 
 /**
