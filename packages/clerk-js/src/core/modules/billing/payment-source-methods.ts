@@ -46,11 +46,10 @@ export const getPaymentMethods = async (params: GetPaymentMethodsParams) => {
     method: 'GET',
     search: convertPageToOffsetSearchParams(rest),
   }).then(res => {
-    const { data: paymentSources, total_count } =
-      res?.response as unknown as ClerkPaginatedResponse<BillingPaymentMethodJSON>;
+    const { data, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPaymentMethodJSON>;
     return {
       total_count,
-      data: paymentSources.map(paymentMethod => new BillingPaymentMethod(paymentMethod)),
+      data: data.map(paymentMethod => new BillingPaymentMethod(paymentMethod)),
     };
   });
 };

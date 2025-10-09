@@ -123,15 +123,15 @@ export const usePlansContext = () => {
   // Invalidates cache but does not fetch immediately
   const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
 
-  const { revalidate: revalidatePaymentSources } = usePaymentMethods();
+  const { revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
     void revalidateSubscriptions();
     void revalidatePlans();
     void revalidateStatements();
-    void revalidatePaymentSources();
-  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentSources]);
+    void revalidatePaymentMethods();
+  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentMethods]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
