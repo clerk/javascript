@@ -14,9 +14,9 @@ import { usePaymentMethods, useSubscriberTypeContext, useSubscriberTypeLocalizat
 import { localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import * as AddPaymentSource from './AddPaymentSource';
-import { PaymentSourceRow } from './PaymentSourceRow';
-import { TestPaymentSource } from './TestPaymentSource';
+import * as AddPaymentMethod from './AddPaymentMethod';
+import { PaymentMethodRow } from './PaymentMethodRow';
+import { TestPaymentMethod } from './TestPaymentMethod';
 
 const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
@@ -24,7 +24,7 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
-  const onAddPaymentSourceSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
+  const onAddPaymentMethodSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
     const resource = subscriberType === 'organization' ? clerk?.organization : clerk.user;
     await resource?.addPaymentMethod(context);
     onSuccess();
@@ -33,28 +33,28 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   };
 
   return (
-    <AddPaymentSource.Root
-      onSuccess={onAddPaymentSourceSuccess}
+    <AddPaymentMethod.Root
+      onSuccess={onAddPaymentMethodSuccess}
       cancelAction={close}
     >
-      <AddPaymentSource.FormHeader
+      <AddPaymentMethod.FormHeader
         text={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
       />
-      <AddPaymentSource.FormSubtitle
+      <AddPaymentMethod.FormSubtitle
         text={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.addSubtitle`)}
       />
       <DevOnly>
-        <TestPaymentSource />
+        <TestPaymentMethod />
       </DevOnly>
-    </AddPaymentSource.Root>
+    </AddPaymentMethod.Root>
   );
 });
 
 const RemoveScreen = ({
-  paymentSource,
+  paymentMethod,
   revalidate,
 }: {
-  paymentSource: BillingPaymentMethodResource;
+  paymentMethod: BillingPaymentMethodResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -63,15 +63,15 @@ const RemoveScreen = ({
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
-    `${paymentSource.paymentType === 'card' ? paymentSource.cardType : paymentSource.paymentType} ${paymentSource.paymentType === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
+    `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
   );
 
   if (!ref.current) {
     return null;
   }
 
-  const removePaymentSource = async () => {
-    await paymentSource
+  const removePaymentMethod = async () => {
+    await paymentMethod
       .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(revalidate)
       .catch((error: Error) => {
@@ -97,14 +97,14 @@ const RemoveScreen = ({
           paymentSource: ref.current,
         },
       )}
-      deleteResource={removePaymentSource}
+      deleteResource={removePaymentMethod}
       onSuccess={close}
       onReset={close}
     />
   );
 };
 
-export const PaymentSources = withCardStateProvider(() => {
+export const PaymentMethods = withCardStateProvider(() => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
@@ -112,7 +112,7 @@ export const PaymentSources = withCardStateProvider(() => {
 
   const { data: paymentMethods, isLoading, revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
-  const sortedPaymentSources = useMemo(
+  const sortedPaymentMethods = useMemo(
     () => paymentMethods.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
     [paymentMethods],
   );
@@ -121,7 +121,7 @@ export const PaymentSources = withCardStateProvider(() => {
     return null;
   }
 
-  if (__BUILD_DISABLE_RHC__ && sortedPaymentSources.length === 0) {
+  if (__BUILD_DISABLE_RHC__ && sortedPaymentMethods.length === 0) {
     return null;
   }
 
@@ -146,20 +146,20 @@ export const PaymentSources = withCardStateProvider(() => {
             <FullHeightLoader />
           ) : (
             <>
-              {sortedPaymentSources.map(paymentSource => (
-                <Fragment key={paymentSource.id}>
+              {sortedPaymentMethods.map(paymentMethod => (
+                <Fragment key={paymentMethod.id}>
                   <ProfileSection.Item id='paymentMethods'>
-                    <PaymentSourceRow paymentSource={paymentSource} />
-                    <PaymentSourceMenu
-                      paymentSource={paymentSource}
+                    <PaymentMethodRow paymentMethod={paymentMethod} />
+                    <PaymentMethodMenu
+                      paymentMethod={paymentMethod}
                       revalidate={revalidatePaymentMethods}
                     />
                   </ProfileSection.Item>
 
-                  <Action.Open value={`remove-${paymentSource.id}`}>
+                  <Action.Open value={`remove-${paymentMethod.id}`}>
                     <Action.Card variant='destructive'>
                       <RemoveScreen
-                        paymentSource={paymentSource}
+                        paymentMethod={paymentMethod}
                         revalidate={revalidatePaymentMethods}
                       />
                     </Action.Card>
@@ -189,11 +189,11 @@ export const PaymentSources = withCardStateProvider(() => {
   );
 });
 
-const PaymentSourceMenu = ({
-  paymentSource,
+const PaymentMethodMenu = ({
+  paymentMethod,
   revalidate,
 }: {
-  paymentSource: BillingPaymentMethodResource;
+  paymentMethod: BillingPaymentMethodResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();
@@ -206,17 +206,17 @@ const PaymentSourceMenu = ({
     {
       label: localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.actionLabel__remove`),
       isDestructive: true,
-      onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: !paymentSource.isRemovable,
+      onClick: () => open(`remove-${paymentMethod.id}`),
+      isDisabled: !paymentMethod.isRemovable,
     },
   ];
 
-  if (!paymentSource.isDefault) {
+  if (!paymentMethod.isDefault) {
     actions.unshift({
       label: localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.actionLabel__default`),
       isDestructive: false,
       onClick: () => {
-        paymentSource
+        paymentMethod
           .makeDefault({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
           .then(revalidate)
           .catch((error: Error) => {

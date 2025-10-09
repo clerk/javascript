@@ -450,7 +450,7 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
+      paymentMethod: undefined,
       confirm: vi.fn(),
       freeTrialEndsAt,
     } as any);
@@ -747,7 +747,7 @@ describe('Checkout', () => {
           freeTrialDays: 7,
           freeTrialEnabled: true,
         },
-        paymentSource: undefined,
+        paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
       } as any);
@@ -780,17 +780,17 @@ describe('Checkout', () => {
       });
 
       await waitFor(() => {
-        const visaPaymentSource = getByText('visa');
-        expect(visaPaymentSource).toBeVisible();
+        const visaPaymentMethod = getByText('visa');
+        expect(visaPaymentMethod).toBeVisible();
 
         const last4Digits = getByText('⋯ 4242');
         expect(last4Digits).toBeVisible();
 
-        // Verify the default badge is shown for the first payment source
+        // Verify the default badge is shown for the first payment method
         const defaultBadge = getByText('Default');
         expect(defaultBadge).toBeVisible();
 
-        // Verify the hidden input contains the correct payment source id
+        // Verify the hidden input contains the correct payment method id
         const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
@@ -886,7 +886,7 @@ describe('Checkout', () => {
           freeTrialDays: 7,
           freeTrialEnabled: true,
         },
-        paymentSource: undefined,
+        paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: null,
       } as any);
@@ -919,17 +919,17 @@ describe('Checkout', () => {
       });
 
       await waitFor(() => {
-        const visaPaymentSource = getByText('visa');
-        expect(visaPaymentSource).toBeVisible();
+        const visaPaymentMethod = getByText('visa');
+        expect(visaPaymentMethod).toBeVisible();
 
         const last4Digits = getByText('⋯ 4242');
         expect(last4Digits).toBeVisible();
 
-        // Verify the default badge is shown for the first payment source
+        // Verify the default badge is shown for the first payment method
         const defaultBadge = getByText('Default');
         expect(defaultBadge).toBeVisible();
 
-        // Verify the hidden input contains the correct payment source id
+        // Verify the hidden input contains the correct payment method id
         const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
@@ -1025,7 +1025,7 @@ describe('Checkout', () => {
           freeTrialDays: 7,
           freeTrialEnabled: true,
         },
-        paymentSource: undefined,
+        paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: null,
       } as any);
@@ -1055,8 +1055,8 @@ describe('Checkout', () => {
         const addPaymentMethodButton = queryByText('Add payment method');
         expect(addPaymentMethodButton).toBeNull();
 
-        const visaPaymentSource = queryByText('visa');
-        expect(visaPaymentSource).toBeNull();
+        const visaPaymentMethod = queryByText('visa');
+        expect(visaPaymentMethod).toBeNull();
 
         expect(
           getByText(
@@ -1064,7 +1064,7 @@ describe('Checkout', () => {
           ),
         ).toBeInTheDocument();
 
-        // Verify the hidden input contains the correct payment source id
+        // Verify the hidden input contains the correct payment method id
         const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 

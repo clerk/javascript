@@ -2,7 +2,7 @@ import { LineItems } from '@/ui/elements/LineItems';
 
 import { Box, localizationKeys, Text, useLocalizations } from '../../customizables';
 
-export const TestPaymentSource = () => {
+export const TestPaymentMethod = () => {
   const { t } = useLocalizations();
   return (
     <Box
