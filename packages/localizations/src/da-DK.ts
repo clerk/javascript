@@ -1030,7 +1030,7 @@ export const daDK: LocalizationResource = {
       actionDescription: 'Skriv "Slet konto" nedenfor for at fortsætte.',
       confirm: 'Slet konto',
       messageLine1:
-        'Er du sikker på, at du vil slette din konto fra Clerk? Kontakt venligst applikationsejeren for at slette dine oplysninger fra deres applikation og andre tjenester.',
+        'Er du sikker på, at du vil slette din konto? Nogle tilknyttede data kan blive bevaret. For at anmode om fuld datasletning skal du kontakte support.',
       messageLine2: 'Denne handling er permanent og kan ikke fortrydes.',
       title: 'Slet konto',
     },

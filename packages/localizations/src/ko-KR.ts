@@ -1024,7 +1024,7 @@ export const koKR: LocalizationResource = {
       actionDescription: '계속하려면 아래에 계정 삭제를 입력하세요.',
       confirm: '계정 삭제',
       messageLine1:
-        'Clerk에서 계정을 삭제하시겠습니까? 애플리케이션 및 기타 서비스에서 귀하의 정보를 삭제하려면 애플리케이션 소유자에게 문의하시기 바랍니다.',
+        '계정을 삭제하시겠습니까? 일부 관련 데이터가 보관될 수 있습니다. 전체 데이터 삭제를 요청하려면 고객 지원에 문의하세요.',
       messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
       title: '계정 삭제',
     },

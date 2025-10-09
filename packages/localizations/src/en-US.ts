@@ -1033,7 +1033,7 @@ export const enUS: LocalizationResource = {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
       messageLine1:
-        'Are you sure you want to delete your account from Clerk? Please contact the application owner to delete your information from their application and other services.',
+        'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

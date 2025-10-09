@@ -1,6 +1,6 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignInFirstFactor, SignInStatus } from './signInCommon';
+import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { OAuthStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 
@@ -15,14 +15,14 @@ export interface SignInFutureCreateParams {
 
 export type SignInFuturePasswordParams =
   | {
-      identifier: string;
       password: string;
-      email?: never;
+      identifier: string;
+      emailAddress?: never;
       phoneNumber?: never;
     }
   | {
       password: string;
-      email: string;
+      emailAddress: string;
       identifier?: never;
       phoneNumber?: never;
     }
@@ -30,13 +30,13 @@ export type SignInFuturePasswordParams =
       password: string;
       phoneNumber: string;
       identifier?: never;
-      email?: never;
+      emailAddress?: never;
     }
   | {
       password: string;
       phoneNumber?: never;
       identifier?: never;
-      email?: never;
+      emailAddress?: never;
     };
 
 export type SignInFutureEmailCodeSendParams =
@@ -128,9 +128,19 @@ export interface SignInFutureFinalizeParams {
  */
 export interface SignInFutureResource {
   /**
+   * The unique identifier for the current sign-in attempt.
+   */
+  readonly id?: string;
+
+  /**
    * The list of first-factor strategies that are available for the current sign-in attempt.
    */
-  readonly availableStrategies: SignInFirstFactor[];
+  readonly supportedFirstFactors: SignInFirstFactor[];
+
+  /**
+   * The list of second-factor strategies that are available for the current sign-in attempt.
+   */
+  readonly supportedSecondFactors: SignInSecondFactor[];
 
   /**
    * The status of the current sign-in attempt as a string (for example, `'needs_identifier'`, `'needs_first_factor'`,
@@ -147,6 +157,26 @@ export interface SignInFutureResource {
   readonly existingSession?: { sessionId: string };
 
   readonly firstFactorVerification: VerificationResource;
+
+  /**
+   * The second-factor verification for the current sign-in attempt.
+   */
+  readonly secondFactorVerification: VerificationResource;
+
+  /**
+   * The identifier for the current sign-in attempt.
+   */
+  readonly identifier: string | null;
+
+  /**
+   * The created session ID for the current sign-in attempt.
+   */
+  readonly createdSessionId: string | null;
+
+  /**
+   * The user data for the current sign-in attempt.
+   */
+  readonly userData: UserData;
 
   /**
    * Used to supply an identifier for the sign-in attempt. Calling this method will populate data on the sign-in

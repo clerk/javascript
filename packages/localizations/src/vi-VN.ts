@@ -1040,7 +1040,7 @@ export const viVN: LocalizationResource = {
       actionDescription: 'Nhập "Xóa tài khoản" dưới đây để tiếp tục.',
       confirm: 'Xóa tài khoản',
       messageLine1:
-        'Bạn có chắc chắn muốn xóa tài khoản của bạn khỏi Clerk? Vui lòng liên hệ với chủ sở hữu ứng dụng để xóa thông tin của bạn khỏi ứng dụng và các dịch vụ khác của họ.',
+        'Bạn có chắc chắn muốn xóa tài khoản của mình không? Một số dữ liệu liên quan có thể được giữ lại. Để yêu cầu xóa dữ liệu hoàn toàn, vui lòng liên hệ bộ phận hỗ trợ.',
       messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
       title: 'Xóa tài khoản',
     },

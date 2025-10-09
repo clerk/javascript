@@ -1036,7 +1036,7 @@ export const trTR: LocalizationResource = {
       actionDescription: 'Devam etmek için aşağıya “Hesabı sil” yazın.',
       confirm: 'Hesabı sil',
       messageLine1:
-        "Clerk'teki hesabınızı silmek istediğinizden emin misiniz? Bilgilerinizi uygulamalarından ve diğer hizmetlerinden silmek için lütfen uygulama sahibiyle iletişime geçin.",
+        'Hesabınızı silmek istediğinizden emin misiniz? Bazı ilişkili veriler saklanabilir. Tam veri silme talebinde bulunmak için lütfen destek ekibiyle iletişime geçin.',
       messageLine2: 'Bu işlem kalıcıdır ve geri alınamaz.',
       title: 'Hesabı sil',
     },
