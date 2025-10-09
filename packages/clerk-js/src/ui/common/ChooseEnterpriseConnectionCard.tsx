@@ -8,7 +8,7 @@ import type { InternalTheme, PropsOfComponent } from '@/ui/styledSystem';
 type ChooseEnterpriseConnectionCardProps = {
   title: LocalizationKey;
   subtitle: LocalizationKey;
-  onClick: (id: string) => Promise<void>;
+  onClick: (id: string) => void;
   enterpriseConnections: Array<{ id: string; name: string }>;
 };
 
@@ -33,7 +33,7 @@ export const ChooseEnterpriseConnectionCard = ({
         <Card.Alert>{card.error}</Card.Alert>
 
         <Grid
-          elementDescriptor={descriptors.chooseEnterpriseConnectionRoot}
+          elementDescriptor={descriptors.chooseEnterpriseConnectionsRoot}
           gap={2}
         >
           {enterpriseConnections?.map(({ id, name }) => (
@@ -41,7 +41,7 @@ export const ChooseEnterpriseConnectionCard = ({
               key={id}
               id={id}
               label={name}
-              onClick={onClick}
+              onClick={() => onClick(id)}
               isLoading={card.isLoading}
             />
           ))}

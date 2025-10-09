@@ -506,6 +506,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'subscriptionDetailsDetailRowLabel',
   'subscriptionDetailsDetailRowValue',
 
+  'chooseEnterpriseConnectionsRoot',
   'chooseEnterpriseConnectionButton',
   'chooseEnterpriseConnectionButtonText',
 ] as const).map(camelize) as (keyof ElementsConfig)[];

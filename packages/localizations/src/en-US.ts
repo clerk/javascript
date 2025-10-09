@@ -806,6 +806,10 @@ export const enUS: LocalizationResource = {
       title: 'Create your account',
       titleCombined: 'Create your account',
     },
+    chooseEnterpriseConnection: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
+    },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',

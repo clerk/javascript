@@ -1,7 +1,8 @@
 import type { ComponentType } from 'react';
 
-import { withRedirect } from '@/ui/common';
-import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
+import { buildSSOCallbackURL, withRedirect } from '@/ui/common';
+import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
 import type { AvailableComponentProps } from '@/ui/types';
 
@@ -12,6 +13,8 @@ import { hasMultipleEnterpriseConnections } from './shared';
  */
 const SignInChooseEnterpriseConnectionInternal = () => {
   const signIn = useCoreSignIn();
+  const ctx = useSignInContext();
+  const { displayConfig } = useEnvironment();
 
   if (!hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
     // This should not happen due to the HOC guard, but provides type safety
@@ -23,9 +26,18 @@ const SignInChooseEnterpriseConnectionInternal = () => {
     name: ff.enterpriseConnectionName,
   }));
 
-  const handleEnterpriseSSO = (connectionId: string) => {
-    // TODO - Post sign-in with enterprise connection ID
-    console.log('Signing in with enterprise connection:', connectionId);
+  const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
+    const redirectUrl = buildSSOCallbackURL(ctx, displayConfig.signInUrl);
+    const redirectUrlComplete = ctx.afterSignInUrl || '/';
+
+    return signIn.authenticateWithRedirect({
+      strategy: 'enterprise_sso',
+      redirectUrl,
+      redirectUrlComplete,
+      oidcPrompt: ctx.oidcPrompt,
+      continueSignIn: true,
+      enterpriseConnectionId,
+    });
   };
 
   return (
