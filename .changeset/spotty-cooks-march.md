@@ -30,17 +30,17 @@ export const Route = createRootRoute({...})
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <ClerkProvider>
+    <ClerkProvider>
+      <html>
+        <head>
+          <HeadContent />
+        </head>
+        <body>
           {children}
-        </ClerkProvider>
-        <Scripts />
-      </body>
-    </html>
+          <Scripts />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
 ```

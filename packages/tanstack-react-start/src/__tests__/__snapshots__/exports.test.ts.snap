@@ -70,7 +70,7 @@ exports[`server public exports > should not change unexpectedly 1`] = `
 [
   "clerkClient",
   "clerkMiddleware",
-  "getAuth",
+  "auth",
 ]
 `;
 
