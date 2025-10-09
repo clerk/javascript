@@ -28,6 +28,13 @@ import {
 } from '../../resources/internal';
 
 export class Billing implements BillingNamespace {
+  static readonly #pathRoot = '/commerce';
+  static path(subPath: string, param?: { orgId?: string }): string {
+    const { orgId } = param || {};
+    const prefix = orgId ? `/organizations/${orgId}` : '/me';
+    return `${prefix}${Billing.#pathRoot}${subPath}`;
+  }
+
   getPlans = async (params?: GetPlansParams): Promise<ClerkPaginatedResponse<BillingPlanResource>> => {
     const { for: forParam, ...safeParams } = params || {};
     const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };

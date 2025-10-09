@@ -231,6 +231,8 @@ export const createSignUp = (signUpParams: Partial<SignUpJSON> = {}) => {
     first_name: signUpParams.first_name,
     has_password: signUpParams.has_password,
     last_name: signUpParams.last_name,
+    legal_accepted_at: signUpParams.legal_accepted_at,
+    locale: signUpParams.locale,
     missing_fields: signUpParams.missing_fields,
     object: 'sign_up',
     optional_fields: signUpParams.optional_fields,
