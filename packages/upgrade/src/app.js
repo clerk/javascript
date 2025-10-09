@@ -59,7 +59,11 @@ export default function App(props) {
   }, [fromVersion]);
 
   // Handle the individual SDK upgrade
-  if (!fromVersion && !toVersion && sdks[0] === 'nextjs') {
+  if (
+    !fromVersion &&
+    !toVersion &&
+    ['nextjs', 'clerk-react', 'clerk-expo', 'react-router', 'tanstack-react-start'].includes(sdks[0])
+  ) {
     return <SDKWorkflow sdk={sdks[0]} />;
   }
 
