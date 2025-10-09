@@ -31,13 +31,13 @@ export type TSignUpRouterMachine = typeof SignUpRouterMachine;
 
 const isCurrentPath =
   (path: `/${string}`) =>
-  ({ context }: { context: SignUpRouterContext }, _params?: NonReducibleUnknown) =>
-    context.router?.match(path) ?? false;
+    ({ context }: { context: SignUpRouterContext }, _params?: NonReducibleUnknown) =>
+      context.router?.match(path) ?? false;
 
 const needsStatus =
   (status: SignUpStatus) =>
-  ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
-    (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
+    ({ context, event }: { context: SignUpRouterContext; event?: SignUpRouterEvents }, _?: NonReducibleUnknown) =>
+      (event as SignUpRouterNextEvent)?.resource?.status === status || context.clerk?.client?.signUp?.status === status;
 
 export const SignUpRouterMachine = setup({
   actors: {
@@ -116,6 +116,7 @@ export const SignUpRouterMachine = setup({
         case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
         case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
         case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+        case ERROR_CODES.SIGN_UP_RESTRICTED_WAITLIST:
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage!);
           break;
@@ -197,11 +198,10 @@ export const SignUpRouterMachine = setup({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrl: `${context.router?.mode === ROUTING.virtual
+            ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+            : context.router?.basePath
+            }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
             params: context.router?.searchParams(),
           }),
@@ -214,11 +214,10 @@ export const SignUpRouterMachine = setup({
         params: {
           strategy: 'saml',
           emailAddress: context.formRef.getSnapshot().context.fields.get('emailAddress')?.value,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrl: `${context.router?.mode === ROUTING.virtual
+            ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+            : context.router?.basePath
+            }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
             params: context.router?.searchParams(),
           }),
@@ -231,11 +230,10 @@ export const SignUpRouterMachine = setup({
         params: {
           strategy: 'enterprise_sso',
           emailAddress: context.formRef.getSnapshot().context.fields.get('emailAddress')?.value,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrl: `${context.router?.mode === ROUTING.virtual
+            ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
+            : context.router?.basePath
+            }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
             params: context.router?.searchParams(),
           }),
@@ -357,7 +355,6 @@ export const SignUpRouterMachine = setup({
     },
     Start: {
       tags: ['step:start'],
-      exit: 'clearFormErrors',
       invoke: {
         id: 'start',
         src: 'startMachine',
@@ -381,22 +378,22 @@ export const SignUpRouterMachine = setup({
         NEXT: [
           {
             guard: 'isStatusComplete',
-            actions: ['setActive', 'delayedReset'],
+            actions: ['setActive', 'delayedReset', 'clearFormErrors'],
           },
           {
             guard: and(['hasTicket', 'statusNeedsContinue']),
-            actions: { type: 'navigateInternal', params: { path: '/' } },
+            actions: ['clearFormErrors', { type: 'navigateInternal', params: { path: '/' } }],
             target: 'Start',
             reenter: true,
           },
           {
             guard: 'statusNeedsVerification',
             target: 'Verification',
-            actions: { type: 'navigateInternal', params: { path: '/verify' } },
+            actions: ['clearFormErrors', { type: 'navigateInternal', params: { path: '/verify' } }],
           },
           {
             guard: 'statusNeedsContinue',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: ['clearFormErrors', { type: 'navigateInternal', params: { path: '/continue' } }],
             target: 'Continue',
           },
         ],
