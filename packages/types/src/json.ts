@@ -696,7 +696,7 @@ export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingInitializedPaymentMethodJSON extends ClerkResourceJSON {
-  object: 'commerce_payment_source_initialize';
+  object: 'commerce_payment_method_initialize';
   external_client_secret: string;
   external_gateway_id: string;
   payment_method_order: string[];
