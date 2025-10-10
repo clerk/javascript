@@ -46,6 +46,7 @@ const LINK_REPLACEMENTS = [
   ['use-checkout-options', '#use-checkout-options'],
   ['use-reverification-options', '#use-reverification-options'],
   ['needs-reverification-parameters', '#needs-reverification-parameters'],
+  ['create-organization-params', '#create-organization-params'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
   ['sign-in-resource', '/docs/reference/javascript/sign-in'],

@@ -105,12 +105,7 @@ export type UseCheckoutReturn = FetchStatusAndError &
     isConfirming: boolean;
   };
 
-/**
- * @interface
- */
-export type __experimental_UseCheckoutReturn = {
-  /**
-   */
+type __experimental_UseCheckoutReturn = {
   checkout: UseCheckoutReturn;
 };
 
