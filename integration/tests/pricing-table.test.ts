@@ -454,7 +454,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
   test.describe('in UserProfile', () => {
     // test.describe.configure({ mode: 'serial' });
-    test('renders pricing table, subscribes to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+    test('renders pricing table, subscribes to a plan, revalidates payment method on complete and then downgrades to free', async ({
       page,
       context,
     }) => {
@@ -586,7 +586,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
+    test('adds payment method via checkout and resets stripe setup intent after failed payment', async ({
       page,
       context,
     }) => {
