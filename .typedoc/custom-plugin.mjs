@@ -22,10 +22,13 @@ const FILES_WITHOUT_HEADINGS = [
   'use-checkout-return.mdx',
   'use-checkout-params.mdx',
   'use-payment-element-return.mdx',
+  'use-payment-element-return.mdx',
   'use-payment-methods-return.mdx',
   'use-payment-attempts-return.mdx',
   'use-plans-return.mdx',
   'use-statements-return.mdx',
+  'hook-params.mdx',
+  'use-subscription-params.mdx',
   'use-subscription-return.mdx',
 ];
 
