@@ -3,5 +3,5 @@
 '@clerk/types': patch
 ---
 
-- Add `last_authenticated_at` to `SAMLAccount` resource, which represents the date when the SAML account was last authenticated
-- Support `enterprise_sso` as a `strategy` param for `session.prepareFirstFactorVerification`
+- Add experimental property `last_authenticated_at` to `SamlAccount` resource, which represents the date when the SAML account was last authenticated
+- Add experimental support for `enterprise_sso` as a `strategy` param for `session.prepareFirstFactorVerification`
