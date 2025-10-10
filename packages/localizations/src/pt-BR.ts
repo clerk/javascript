@@ -69,8 +69,8 @@ export const ptBR: LocalizationResource = {
   badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
   badge__you: 'Você',
-  commerce: {
-    addPaymentMethod: 'Adicionar método de pagamento',
+  billing: {
+    addPaymentMethod__label: 'Adicionar método de pagamento',
     alwaysFree: 'Gratuito',
     annually: 'Anualmente',
     availableFeatures: 'Recursos disponíveis',
@@ -127,8 +127,8 @@ export const ptBR: LocalizationResource = {
     monthly: 'Mensal',
     pastDue: 'Atrasado',
     pay: 'Pagar {{amount}}',
-    paymentMethods: 'Métodos de pagamento',
-    paymentSource: {
+    paymentMethods__label: 'Métodos de pagamento',
+    paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento anual',
         monthly: 'Pagamento mensal',
@@ -289,7 +289,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -298,11 +298,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',
@@ -979,7 +979,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -988,11 +988,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',
