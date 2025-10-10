@@ -92,6 +92,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
   syncUserAttributes!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
+  enterpriseConnectionId: string | null = '';
 
   constructor(data: EnterpriseAccountConnectionJSON | EnterpriseAccountConnectionJSONSnapshot | null) {
     super();
@@ -112,6 +113,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
       this.disableAdditionalIdentifications = data.disable_additional_identifications;
       this.createdAt = unixEpochToDate(data.created_at);
       this.updatedAt = unixEpochToDate(data.updated_at);
+      this.enterpriseConnectionId = data.enterprise_connection_id;
     }
 
     return this;
@@ -131,6 +133,7 @@ export class EnterpriseAccountConnection extends BaseResource implements Enterpr
       allow_subdomains: this.allowSubdomains,
       allow_idp_initiated: this.allowIdpInitiated,
       disable_additional_identifications: this.disableAdditionalIdentifications,
+      enterprise_connection_id: this.enterpriseConnectionId,
       created_at: this.createdAt.getTime(),
       updated_at: this.updatedAt.getTime(),
     };

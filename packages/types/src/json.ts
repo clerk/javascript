@@ -268,6 +268,7 @@ export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
   sync_user_attributes: boolean;
   created_at: number;
   updated_at: number;
+  enterprise_connection_id: string | null;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -281,6 +282,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   verification?: VerificationJSON;
   saml_connection?: SamlAccountConnectionJSON;
   last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface UserJSON extends ClerkResourceJSON {

@@ -247,6 +247,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   verification: VerificationJSON | null;
   saml_connection: SamlAccountConnectionJSON | null;
   last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
