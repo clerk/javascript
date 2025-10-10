@@ -127,10 +127,13 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   /**
    * @experimental
    */
+<<<<<<< HEAD
   emailAddressId?: string;
   /**
    * @experimental
    */
+=======
+>>>>>>> a66357e8a (feat(clerk-js,types,localizations): Choose enterprise connection on sign-in/sign-up (#6947))
   enterpriseConnectionId?: string;
 };
 
