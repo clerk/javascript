@@ -2,8 +2,8 @@ import { logger } from '@clerk/shared/logger';
 import { vi } from 'vitest';
 
 import * as publicExports from '../index';
-import * as serverExports from '../server/index';
 import * as legacyExports from '../legacy';
+import * as serverExports from '../server/index';
 
 describe('root public exports', () => {
   it('should not change unexpectedly', () => {
