@@ -1,123 +1,6 @@
 import type { FieldId } from './elementIds';
 import type { CamelToSnake, DeepPartial } from './utils';
 
-type BillingPaymentMethodLocalization = {
-  dev: {
-    testCardInfo: LocalizationValue;
-    developmentMode: LocalizationValue;
-    cardNumber: LocalizationValue;
-    expirationDate: LocalizationValue;
-    cvcZip: LocalizationValue;
-    anyNumbers: LocalizationValue;
-  };
-  applePayDescription: {
-    monthly: LocalizationValue;
-    annual: LocalizationValue;
-  };
-};
-
-type BillingLocalizationResource<T extends 'commerce' | 'billing'> = {
-  month: LocalizationValue;
-  year: LocalizationValue;
-  free: LocalizationValue;
-  getStarted: LocalizationValue;
-  manage: LocalizationValue;
-  manageSubscription: LocalizationValue;
-  cancelSubscription: LocalizationValue;
-  keepSubscription: LocalizationValue;
-  reSubscribe: LocalizationValue;
-  subscribe: LocalizationValue;
-  startFreeTrial: LocalizationValue;
-  startFreeTrial__days: LocalizationValue<'days'>;
-  switchPlan: LocalizationValue;
-  switchToMonthly: LocalizationValue;
-  switchToAnnual: LocalizationValue;
-  switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
-  switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
-  billedAnnually: LocalizationValue;
-  billedMonthlyOnly: LocalizationValue;
-  cancelFreeTrial: LocalizationValue<'plan'>;
-  cancelFreeTrialTitle: LocalizationValue<'plan'>;
-  cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
-  keepFreeTrial: LocalizationValue;
-  alwaysFree: LocalizationValue;
-  accountFunds: LocalizationValue;
-  defaultFreePlanActive: LocalizationValue;
-  viewFeatures: LocalizationValue;
-  seeAllFeatures: LocalizationValue;
-  viewPayment: LocalizationValue;
-  availableFeatures: LocalizationValue;
-  subtotal: LocalizationValue;
-  credit: LocalizationValue;
-  creditRemainder: LocalizationValue;
-  totalDue: LocalizationValue;
-  totalDueToday: LocalizationValue;
-  pastDue: LocalizationValue;
-  pay: LocalizationValue<'amount'>;
-  cancelSubscriptionTitle: LocalizationValue<'plan'>;
-  cancelSubscriptionNoCharge: LocalizationValue;
-  cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
-  cancelSubscriptionPastDue: LocalizationValue;
-  popular: LocalizationValue;
-  subscriptionDetails: {
-    title: LocalizationValue;
-    currentBillingCycle: LocalizationValue;
-    nextPaymentOn: LocalizationValue;
-    nextPaymentAmount: LocalizationValue;
-    firstPaymentOn: LocalizationValue;
-    firstPaymentAmount: LocalizationValue;
-    subscribedOn: LocalizationValue;
-    trialStartedOn: LocalizationValue;
-    trialEndsOn: LocalizationValue;
-    endsOn: LocalizationValue;
-    renewsAt: LocalizationValue;
-    beginsOn: LocalizationValue;
-    pastDueAt: LocalizationValue;
-  };
-  monthly: LocalizationValue;
-  annually: LocalizationValue;
-  cannotSubscribeMonthly: LocalizationValue;
-  cannotSubscribeUnrecoverable: LocalizationValue;
-  pricingTable: {
-    billingCycle: LocalizationValue;
-    included: LocalizationValue;
-  };
-
-  checkout: {
-    title: LocalizationValue;
-    title__paymentSuccessful: LocalizationValue;
-    title__subscriptionSuccessful: LocalizationValue;
-    title__trialSuccess: LocalizationValue;
-    description__paymentSuccessful: LocalizationValue;
-    description__subscriptionSuccessful: LocalizationValue;
-    lineItems: {
-      title__totalPaid: LocalizationValue;
-      title__freeTrialEndsAt: LocalizationValue;
-      title__paymentMethod: LocalizationValue;
-      title__statementId: LocalizationValue;
-      title__subscriptionBegins: LocalizationValue;
-    };
-    emailForm: {
-      title: LocalizationValue;
-      subtitle: LocalizationValue;
-    };
-    downgradeNotice: LocalizationValue;
-    pastDueNotice: LocalizationValue;
-    totalDueAfterTrial: LocalizationValue<'days'>;
-    perMonth: LocalizationValue;
-  };
-} & (T extends 'commerce'
-  ? {
-      paymentMethods: LocalizationValue;
-      addPaymentMethod: LocalizationValue;
-      paymentSource: BillingPaymentMethodLocalization;
-    }
-  : {
-      paymentMethods__label: LocalizationValue;
-      addPaymentMethod__label: LocalizationValue;
-      paymentMethod: BillingPaymentMethodLocalization;
-    });
-
 /**
  * @internal
  * @example
@@ -286,11 +169,112 @@ export type __internal_LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  /**
-   * @deprecated Use `billing` instead. Please edit or add keys to the `billing` object.
-   */
-  commerce: BillingLocalizationResource<'commerce'>;
-  billing: BillingLocalizationResource<'billing'>;
+  billing: {
+    month: LocalizationValue;
+    year: LocalizationValue;
+    free: LocalizationValue;
+    getStarted: LocalizationValue;
+    manage: LocalizationValue;
+    manageSubscription: LocalizationValue;
+    cancelSubscription: LocalizationValue;
+    keepSubscription: LocalizationValue;
+    reSubscribe: LocalizationValue;
+    subscribe: LocalizationValue;
+    startFreeTrial: LocalizationValue;
+    startFreeTrial__days: LocalizationValue<'days'>;
+    switchPlan: LocalizationValue;
+    switchToMonthly: LocalizationValue;
+    switchToAnnual: LocalizationValue;
+    switchToMonthlyWithPrice: LocalizationValue<'price' | 'currency'>;
+    switchToAnnualWithAnnualPrice: LocalizationValue<'price' | 'currency'>;
+    billedAnnually: LocalizationValue;
+    billedMonthlyOnly: LocalizationValue;
+    cancelFreeTrial: LocalizationValue<'plan'>;
+    cancelFreeTrialTitle: LocalizationValue<'plan'>;
+    cancelFreeTrialAccessUntil: LocalizationValue<'plan' | 'date'>;
+    keepFreeTrial: LocalizationValue;
+    alwaysFree: LocalizationValue;
+    accountFunds: LocalizationValue;
+    defaultFreePlanActive: LocalizationValue;
+    viewFeatures: LocalizationValue;
+    seeAllFeatures: LocalizationValue;
+    viewPayment: LocalizationValue;
+    availableFeatures: LocalizationValue;
+    subtotal: LocalizationValue;
+    credit: LocalizationValue;
+    creditRemainder: LocalizationValue;
+    totalDue: LocalizationValue;
+    totalDueToday: LocalizationValue;
+    pastDue: LocalizationValue;
+    pay: LocalizationValue<'amount'>;
+    cancelSubscriptionTitle: LocalizationValue<'plan'>;
+    cancelSubscriptionNoCharge: LocalizationValue;
+    cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
+    cancelSubscriptionPastDue: LocalizationValue;
+    popular: LocalizationValue;
+    paymentMethods__label: LocalizationValue;
+    addPaymentMethod__label: LocalizationValue;
+    paymentMethod: {
+      dev: {
+        testCardInfo: LocalizationValue;
+        developmentMode: LocalizationValue;
+        cardNumber: LocalizationValue;
+        expirationDate: LocalizationValue;
+        cvcZip: LocalizationValue;
+        anyNumbers: LocalizationValue;
+      };
+      applePayDescription: {
+        monthly: LocalizationValue;
+        annual: LocalizationValue;
+      };
+    };
+    subscriptionDetails: {
+      title: LocalizationValue;
+      currentBillingCycle: LocalizationValue;
+      nextPaymentOn: LocalizationValue;
+      nextPaymentAmount: LocalizationValue;
+      firstPaymentOn: LocalizationValue;
+      firstPaymentAmount: LocalizationValue;
+      subscribedOn: LocalizationValue;
+      trialStartedOn: LocalizationValue;
+      trialEndsOn: LocalizationValue;
+      endsOn: LocalizationValue;
+      renewsAt: LocalizationValue;
+      beginsOn: LocalizationValue;
+      pastDueAt: LocalizationValue;
+    };
+    monthly: LocalizationValue;
+    annually: LocalizationValue;
+    cannotSubscribeMonthly: LocalizationValue;
+    cannotSubscribeUnrecoverable: LocalizationValue;
+    pricingTable: {
+      billingCycle: LocalizationValue;
+      included: LocalizationValue;
+    };
+    checkout: {
+      title: LocalizationValue;
+      title__paymentSuccessful: LocalizationValue;
+      title__subscriptionSuccessful: LocalizationValue;
+      title__trialSuccess: LocalizationValue;
+      description__paymentSuccessful: LocalizationValue;
+      description__subscriptionSuccessful: LocalizationValue;
+      lineItems: {
+        title__totalPaid: LocalizationValue;
+        title__freeTrialEndsAt: LocalizationValue;
+        title__paymentMethod: LocalizationValue;
+        title__statementId: LocalizationValue;
+        title__subscriptionBegins: LocalizationValue;
+      };
+      emailForm: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      downgradeNotice: LocalizationValue;
+      pastDueNotice: LocalizationValue;
+      totalDueAfterTrial: LocalizationValue<'days'>;
+      perMonth: LocalizationValue;
+    };
+  };
   signUp: {
     start: {
       title: LocalizationValue;
