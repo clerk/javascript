@@ -127,6 +127,10 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   /**
    * @experimental
    */
+  emailAddressId?: string;
+  /**
+   * @experimental
+   */
   enterpriseConnectionId?: string;
 };
 
