@@ -60,7 +60,7 @@ export class SamlAccount {
       data.last_name,
       data.verification && Verification.fromJSON(data.verification),
       data.saml_connection && SamlAccountConnection.fromJSON(data.saml_connection),
-      data.last_authenticated_at ? data.last_authenticated_at : null,
+      data.last_authenticated_at ?? null,
     );
   }
 }

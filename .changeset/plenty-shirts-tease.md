@@ -1,7 +1,5 @@
 ---
-'@clerk/clerk-js': patch
 '@clerk/backend': patch
-'@clerk/types': patch
 ---
 
-Add `enterprise_sso` for session reverification
+Add `last_authenticated_at` to `SAMLAccount` resource, which represents the date when the SAML account was last authenticated
