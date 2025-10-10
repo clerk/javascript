@@ -113,4 +113,17 @@ export interface SignUpResource extends ClerkResource {
    * @internal
    */
   __internal_future: SignUpFutureResource;
+
+  /**
+   * @experimental
+   */
+  __experimental_getEnterpriseConnections: () => Promise<SignUpEnterpriseConnectionResource[]>;
+}
+
+/**
+ * @experimental
+ */
+export interface SignUpEnterpriseConnectionResource extends ClerkResource {
+  id: string;
+  name: string;
 }
