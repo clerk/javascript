@@ -47,7 +47,7 @@ export class SamlAccount {
      * The date when the SAML account was last authenticated.
      */
     readonly lastAuthenticatedAt: number | null,
-  ) { }
+  ) {}
 
   static fromJSON(data: SamlAccountJSON): SamlAccount {
     return new SamlAccount(
