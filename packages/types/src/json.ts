@@ -253,6 +253,7 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   public_metadata: Record<string, unknown>;
   verification: VerificationJSON | null;
   last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {

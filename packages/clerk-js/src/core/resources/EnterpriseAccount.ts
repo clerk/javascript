@@ -25,6 +25,7 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
   verification: VerificationResource | null = null;
   enterpriseConnection: EnterpriseAccountConnectionResource | null = null;
   lastAuthenticatedAt: Date | null = null;
+  enterpriseConnectionId: string | null = null;
 
   public constructor(data: Partial<EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot>, pathRoot: string);
   public constructor(data: EnterpriseAccountJSON | EnterpriseAccountJSONSnapshot, pathRoot: string) {
@@ -48,6 +49,7 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
     this.lastName = data.last_name;
     this.publicMetadata = data.public_metadata;
     this.lastAuthenticatedAt = data.last_authenticated_at ? unixEpochToDate(data.last_authenticated_at) : null;
+    this.enterpriseConnectionId = data.enterprise_connection_id;
     if (data.verification) {
       this.verification = new Verification(data.verification);
     }
@@ -74,6 +76,7 @@ export class EnterpriseAccount extends BaseResource implements EnterpriseAccount
       verification: this.verification?.__internal_toSnapshot() || null,
       enterprise_connection: this.enterpriseConnection?.__internal_toSnapshot() || null,
       last_authenticated_at: this.lastAuthenticatedAt ? this.lastAuthenticatedAt.getTime() : null,
+      enterprise_connection_id: this.enterpriseConnectionId,
     };
   }
 }
