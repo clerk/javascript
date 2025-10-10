@@ -356,7 +356,10 @@ export type SessionVerifyPrepareFirstFactorParams =
   | EmailCodeConfig
   | PhoneCodeConfig
   | PassKeyConfig
-  | EnterpriseSSOConfig;
+  /**
+   * @experimental
+   */
+  | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>;
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt
   | PhoneCodeAttempt

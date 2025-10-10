@@ -185,7 +185,6 @@ export class Session extends BaseResource implements SessionResource {
           emailAddressId: factor.emailAddressId,
           enterpriseConnectionId: factor.enterpriseConnectionId,
           redirectUrl: factor.redirectUrl,
-          actionCompleteRedirectUrl: factor.actionCompleteRedirectUrl,
         } as EnterpriseSSOConfig;
         break;
       default:
