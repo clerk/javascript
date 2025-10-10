@@ -360,12 +360,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'selectOptionsContainer',
   'selectOption',
 
-  'paymentSourceRow',
-  'paymentSourceRowIcon',
-  'paymentSourceRowText',
-  'paymentSourceRowType',
-  'paymentSourceRowValue',
-  'paymentSourceRowBadge',
+  'paymentMethodRow',
+  'paymentMethodRowIcon',
+  'paymentMethodRowText',
+  'paymentMethodRowType',
+  'paymentMethodRowValue',
+  'paymentMethodRowBadge',
 
   'statementRoot',
   'statementHeader',
@@ -505,6 +505,10 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'subscriptionDetailsDetailRow',
   'subscriptionDetailsDetailRowLabel',
   'subscriptionDetailsDetailRowValue',
+
+  'enterpriseConnectionsRoot',
+  'enterpriseConnectionButton',
+  'enterpriseConnectionButtonText',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

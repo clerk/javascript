@@ -10,7 +10,6 @@ import {
   isClerkRuntimeError,
 } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
-import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
@@ -164,8 +163,6 @@ import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
-export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -227,7 +224,7 @@ export class Clerk implements ClerkInterface {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
   #captchaHeartbeat?: CaptchaHeartbeat;
-  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
+  #broadcastChannel: BroadcastChannel | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
@@ -2553,7 +2550,10 @@ export class Clerk implements ClerkInterface {
      */
     this.#pageLifecycle = createPageLifecycle();
 
-    this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.#broadcastChannel = new BroadcastChannel('clerk');
+    }
+
     this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
@@ -2762,10 +2762,10 @@ export class Clerk implements ClerkInterface {
     });
 
     /**
-     * Background tabs get notified of a signout event from active tab.
+     * Background tabs get notified of cross-tab signout events.
      */
-    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
-      if (data.type === 'signout') {
+    this.#broadcastChannel?.addEventListener('message', (event: MessageEvent) => {
+      if (event.data?.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
     });

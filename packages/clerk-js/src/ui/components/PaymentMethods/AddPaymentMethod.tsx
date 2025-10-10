@@ -50,14 +50,14 @@ const useStripeAppearance = (node: HTMLElement | null) => {
   }, [theme, node]);
 };
 
-type AddPaymentSourceProps = {
+type AddPaymentMethodProps = {
   onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
   checkout?: ReturnType<typeof useCheckout>['checkout'];
   cancelAction?: () => void;
 };
 
-const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHook<
-  AddPaymentSourceProps & {
+const [AddPaymentMethodContext, useAddPaymentMethodContext] = createContextAndHook<
+  AddPaymentMethodProps & {
     headerTitle: LocalizationKey | undefined;
     headerSubtitle: LocalizationKey | undefined;
     submitLabel: LocalizationKey | undefined;
@@ -66,9 +66,9 @@ const [AddPaymentSourceContext, useAddPaymentSourceContext] = createContextAndHo
     setSubmitLabel: (label: LocalizationKey) => void;
     onSuccess: (context: { gateway: 'stripe'; paymentToken: string }) => Promise<void>;
   }
->('AddPaymentSourceRoot');
+>('AddPaymentMethodRoot');
 
-const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren<AddPaymentSourceProps>) => {
+const AddPaymentMethodRoot = ({ children, checkout, ...rest }: PropsWithChildren<AddPaymentMethodProps>) => {
   const subscriberType = useSubscriberTypeContext();
   const stripeAppearanceNode = useRef<HTMLDivElement | null>(null);
   const { t } = useLocalizations();
@@ -78,7 +78,7 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
   const stripeAppearance = useStripeAppearance(stripeAppearanceNode.current);
 
   return (
-    <AddPaymentSourceContext.Provider
+    <AddPaymentMethodContext.Provider
       value={{
         value: {
           headerTitle,
@@ -110,11 +110,11 @@ const AddPaymentSourceRoot = ({ children, checkout, ...rest }: PropsWithChildren
       >
         {children}
       </PaymentElementProvider>
-    </AddPaymentSourceContext.Provider>
+    </AddPaymentMethodContext.Provider>
   );
 };
 
-const AddPaymentSourceLoading = (props: PropsWithChildren) => {
+const AddPaymentMethodLoading = (props: PropsWithChildren) => {
   const { isProviderReady } = usePaymentElement();
 
   if (!isProviderReady) {
@@ -124,7 +124,7 @@ const AddPaymentSourceLoading = (props: PropsWithChildren) => {
   return null;
 };
 
-const AddPaymentSourceReady = (props: PropsWithChildren) => {
+const AddPaymentMethodReady = (props: PropsWithChildren) => {
   const { isProviderReady } = usePaymentElement();
 
   if (!isProviderReady) {
@@ -134,12 +134,12 @@ const AddPaymentSourceReady = (props: PropsWithChildren) => {
   return <>{props.children}</>;
 };
 
-const Root = (props: PropsWithChildren<AddPaymentSourceProps>) => {
+const Root = (props: PropsWithChildren<AddPaymentMethodProps>) => {
   const { children, ...rest } = props;
 
   return (
-    <AddPaymentSourceRoot {...rest}>
-      <AddPaymentSourceLoading>
+    <AddPaymentMethodRoot {...rest}>
+      <AddPaymentMethodLoading>
         <Flex
           direction={'row'}
           align={'center'}
@@ -155,12 +155,12 @@ const Root = (props: PropsWithChildren<AddPaymentSourceProps>) => {
             elementDescriptor={descriptors.spinner}
           />
         </Flex>
-      </AddPaymentSourceLoading>
+      </AddPaymentMethodLoading>
 
-      <AddPaymentSourceReady>
-        <AddPaymentSourceForm>{children}</AddPaymentSourceForm>
-      </AddPaymentSourceReady>
-    </AddPaymentSourceRoot>
+      <AddPaymentMethodReady>
+        <AddPaymentMethodForm>{children}</AddPaymentMethodForm>
+      </AddPaymentMethodReady>
+    </AddPaymentMethodRoot>
   );
 };
 
@@ -175,25 +175,25 @@ const useSetAndSync = (text: LocalizationKey, setter: (a: any) => void) => {
 };
 
 const FormHeader = ({ text }: { text: LocalizationKey }) => {
-  const { setHeaderTitle } = useAddPaymentSourceContext();
+  const { setHeaderTitle } = useAddPaymentMethodContext();
   useSetAndSync(text, setHeaderTitle);
   return null;
 };
 
 const FormSubtitle = ({ text }: { text: LocalizationKey }) => {
-  const { setHeaderSubtitle } = useAddPaymentSourceContext();
+  const { setHeaderSubtitle } = useAddPaymentMethodContext();
   useSetAndSync(text, setHeaderSubtitle);
   return null;
 };
 
 const FormButton = ({ text }: { text: LocalizationKey }) => {
-  const { setSubmitLabel } = useAddPaymentSourceContext();
+  const { setSubmitLabel } = useAddPaymentMethodContext();
   useSetAndSync(text, setSubmitLabel);
   return null;
 };
 
-const AddPaymentSourceForm = ({ children }: PropsWithChildren) => {
-  const { headerTitle, headerSubtitle, submitLabel, checkout, onSuccess, cancelAction } = useAddPaymentSourceContext();
+const AddPaymentMethodForm = ({ children }: PropsWithChildren) => {
+  const { headerTitle, headerSubtitle, submitLabel, checkout, onSuccess, cancelAction } = useAddPaymentMethodContext();
   const card = useCardState();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 

@@ -361,6 +361,10 @@ export type __internal_LocalizationResource = {
         label__onlyTermsOfService: LocalizationValue<'termsOfServiceLink'>;
       };
     };
+    enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -514,6 +518,10 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       action__addAccount: LocalizationValue;
       action__signOutAll: LocalizationValue;
+    };
+    enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
   };
   reverification: {

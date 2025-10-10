@@ -144,6 +144,11 @@ export class User {
      * The unix timestamp of when the user accepted the legal requirements. `null` if [**Require express consent to legal documents**](https://clerk.com/docs/guides/secure/legal-compliance) is not enabled.
      */
     readonly legalAcceptedAt: number | null,
+
+    /**
+     * The locale of the user in BCP-47 format.
+     */
+    readonly locale: string | null,
   ) {}
 
   static fromJSON(data: UserJSON): User {
@@ -180,6 +185,7 @@ export class User {
       data.create_organizations_limit,
       data.delete_self_enabled,
       data.legal_accepted_at,
+      data.locale,
     );
     res._raw = data;
     return res;
