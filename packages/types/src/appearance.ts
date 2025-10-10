@@ -640,6 +640,10 @@ export type ElementsConfig = {
   subscriptionDetailsDetailRow: WithOptions;
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;
+
+  enterpriseConnectionsRoot: WithOptions;
+  enterpriseConnectionButton: WithOptions;
+  enterpriseConnectionButtonText: WithOptions;
 };
 
 export type Elements = {

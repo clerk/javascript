@@ -222,6 +222,7 @@ export class SignIn extends BaseResource implements SignInResource {
           redirectUrl: params.redirectUrl,
           actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
           oidcPrompt: params.oidcPrompt,
+          enterpriseConnectionId: params.enterpriseConnectionId,
         } as EnterpriseSSOConfig;
         break;
       default:
@@ -308,7 +309,8 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
+      params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -328,6 +330,7 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        enterpriseConnectionId,
       });
     }
 
