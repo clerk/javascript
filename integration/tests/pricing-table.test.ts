@@ -656,7 +656,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test.only('adds two payment methods and sets the last as default', async ({ page, context }) => {
+    test('adds two payment methods and sets the last as default', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
