@@ -15,7 +15,6 @@ import { UserVerificationFactorOnePasswordCard } from './UserVerificationFactorO
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
 import { sortByPrimaryFactor } from './utils';
 import { UVFactorOneEmailCodeCard } from './UVFactorOneEmailCodeCard';
-import { UVFactorOneEnterpriseSSOCard } from './UVFactorOneEnterpriseSSOCard';
 import { UVFactorOnePasskeysCard } from './UVFactorOnePasskeysCard';
 import { UVFactorOnePhoneCodeCard } from './UVFactorOnePhoneCodeCard';
 
@@ -157,13 +156,6 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
       );
     case 'passkey':
       return <UVFactorOnePasskeysCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
-    case 'enterprise_sso':
-      return (
-        <UVFactorOneEnterpriseSSOCard
-          currentFactor={currentFactor}
-          availableFactors={availableFactors}
-        />
-      );
     default:
       return <LoadingCard />;
   }
