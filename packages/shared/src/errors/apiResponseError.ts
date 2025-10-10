@@ -13,6 +13,9 @@ interface ClerkAPIResponseOptions {
   retryAfter?: number;
 }
 
+/**
+ * Interface representing a Clerk API Response Error.
+ */
 export class ClerkAPIResponseError extends Error implements ClerkAPIResponseErrorInterface {
   clerkError: true;
 

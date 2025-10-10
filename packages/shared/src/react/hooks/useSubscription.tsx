@@ -1,4 +1,4 @@
-import type { EnvironmentResource, ForPayerType } from '@clerk/types';
+import type { BillingSubscriptionResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
@@ -12,10 +12,18 @@ import {
 
 const hookName = 'useSubscription';
 
-type UseSubscriptionParams = {
+/**
+ * @interface
+ */
+export type UseSubscriptionParams = {
+  /**
+   * Specifies whether to fetch subscription for an organization or user.
+   *
+   * @default 'user'
+   */
   for?: ForPayerType;
   /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched.
+   * If `true`, the previous data will be kept in the cache until new data is fetched. This helps prevent layout shifts.
    *
    * @default false
    */
@@ -23,7 +31,51 @@ type UseSubscriptionParams = {
 };
 
 /**
- * @internal
+ * @interface
+ */
+interface BaseSubscriptionReturn {
+  /**
+   * Function to manually trigger a refresh of the subscription data.
+   */
+  revalidate: () => Promise<void>;
+}
+
+/**
+ * @interface
+ */
+export type UseSubscriptionReturn =
+  | (BaseSubscriptionReturn & {
+      /**
+       * The subscription object, or `null` if the data hasn't been loaded yet.
+       */
+      data: null;
+      /**
+       * A boolean that indicates whether the initial data is still being fetched.
+       */
+      isLoading: false;
+      /**
+       * A boolean that indicates whether any request is still in flight, including background updates.
+       */
+      isFetching: false;
+      /**
+       * Any error that occurred during the data fetch, or `null` if no error occurred.
+       */
+      error: null;
+    })
+  | (BaseSubscriptionReturn & {
+      data: BillingSubscriptionResource;
+      isLoading: true;
+      isFetching: true;
+      error: Error;
+    })
+  | (BaseSubscriptionReturn & {
+      data: BillingSubscriptionResource | null;
+      isLoading: boolean;
+      isFetching: boolean;
+      error: Error | null;
+    });
+
+/**
  *
  * Fetches subscription data for the current user or organization.
  *
