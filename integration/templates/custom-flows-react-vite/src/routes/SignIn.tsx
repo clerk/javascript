@@ -5,15 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useUser } from '@clerk/react';
-import { useSignInSignal } from '@clerk/react/experimental';
+import { useSignIn, useUser } from '@clerk/react';
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 
 type AvailableStrategy = 'email_code' | 'phone_code' | 'password' | 'reset_password_email_code';
 
 export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
-  const { signIn, errors, fetchStatus } = useSignInSignal();
+  const { signIn, errors, fetchStatus } = useSignIn();
   const [selectedStrategy, setSelectedStrategy] = useState<AvailableStrategy | null>(null);
   const { isSignedIn } = useUser();
   const navigate = useNavigate();

@@ -17,9 +17,6 @@ folders:
   - path: /packages/react
     exclude:
       - ./**/*.test.ts
-  - path: /packages/remix
-    exclude:
-      - ./**/*.test.ts
   - path: /packages/shared
     exclude:
       - ./**/*.test.ts

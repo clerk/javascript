@@ -981,65 +981,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "remix-dev-minor",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "remix-dev-major",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "remix-prod-minor",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "remix-prod-major",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "shared-dev-minor",
       matchFileNames: [
         "packages/shared/package.json",

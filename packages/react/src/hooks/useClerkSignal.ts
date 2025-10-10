@@ -62,7 +62,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignInSignal() {
+export function useSignIn() {
   return useClerkSignal('signIn');
 }
 
@@ -79,6 +79,6 @@ export function useSignInSignal() {
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignUpSignal() {
+export function useSignUp() {
   return useClerkSignal('signUp');
 }

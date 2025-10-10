@@ -8,6 +8,7 @@ export default function RootLayout() {
     <ClerkProvider
       routerPush={(to: string) => router.push(to)}
       routerReplace={to => router.replace(to)}
+      clerkJSUrl={process.env.EXPO_PUBLIC_CLERK_JS_URL}
     >
       <ClerkLoaded>
         <Stack>

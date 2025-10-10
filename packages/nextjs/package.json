@@ -54,6 +54,11 @@
       "types": "./dist/types/experimental.d.ts",
       "import": "./dist/esm/experimental.js",
       "require": "./dist/cjs/experimental.js"
+    },
+    "./legacy": {
+      "types": "./dist/types/legacy.d.ts",
+      "import": "./dist/esm/legacy.js",
+      "require": "./dist/cjs/legacy.js"
     }
   },
   "types": "./dist/types/index.d.ts",
