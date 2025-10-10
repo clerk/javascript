@@ -61,9 +61,11 @@ type CheckoutPropertiesPerStatus =
       /**
        * @inline
        * The current status of the checkout session. The following statuses are possible:
-       * - `needs_initialization`: The checkout hasn't started but the hook is mounted. Call start() to continue.
-       * - `needs_confirmation`: The checkout has been initialized and is awaiting confirmation. Call confirm() to continue.
-       * - `completed`: The checkout has been successfully confirmed. Call finalize() to complete the checkout.
+       *  <ul>
+       *  <li>`needs_initialization`: The checkout hasn't started but the hook is mounted. Call `start()` to continue.</li>
+       *  <li>`needs_confirmation`: The checkout has been initialized and is awaiting confirmation. Call `confirm()` to continue.</li>
+       *  <li>`completed`: The checkout has been successfully confirmed. Call `finalize()` to complete the checkout.</li>
+       * </ul>
        */
       status: Extract<__experimental_CheckoutCacheState['status'], 'needs_initialization'>;
     } & ForceNull<CheckoutProperties>)

@@ -19,6 +19,14 @@ const FILES_WITHOUT_HEADINGS = [
   'verify-token-options.mdx',
   'public-organization-data-json.mdx',
   'organization-membership-public-user-data.mdx',
+  'use-checkout-return.mdx',
+  'use-checkout-params.mdx',
+  'use-payment-element-return.mdx',
+  'use-payment-methods-return.mdx',
+  'use-payment-attempts-return.mdx',
+  'use-plans-return.mdx',
+  'use-statements-return.mdx',
+  'use-subscription-return.mdx',
 ];
 
 /**
