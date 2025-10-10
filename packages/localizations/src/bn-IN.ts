@@ -296,7 +296,7 @@ export const bnIN: LocalizationResource = {
           messageLine1: '{{identifier}} এই অ্যাকাউন্ট থেকে সরানো হবে।',
           messageLine2:
             'আপনি আর এই পেমেন্ট উৎস ব্যবহার করতে পারবেন না এবং এর উপর নির্ভরশীল যেকোনো আবর্তক সাবস্ক্রিপশন আর কাজ করবে না।',
-          successMessage: '{{paymentSource}} আপনার অ্যাকাউন্ট থেকে সরানো হয়েছে।',
+          successMessage: '{{paymentMethod}} আপনার অ্যাকাউন্ট থেকে সরানো হয়েছে।',
           title: 'পেমেন্ট উৎস সরান',
         },
         title: 'উপলব্ধ বিকল্প',

@@ -294,7 +294,7 @@ export const kkKZ: LocalizationResource = {
         removeMethod: {
           messageLine1: '{{identifier}} есептік жазбадан жойылады.',
           messageLine2: 'Бұл төлем әдісін қолдана алмайсыз және оған тәуелді жазылымдар жұмыс істемейді.',
-          successMessage: '{{paymentSource}} жойылды.',
+          successMessage: '{{paymentMethod}} жойылды.',
           title: 'Төлем әдісін жою',
         },
         title: 'Қолжетімді опциялар',

@@ -303,7 +303,7 @@ export const itIT: LocalizationResource = {
           messageLine1: '{{identifier}} verrà rimosso da questo account.',
           messageLine2:
             'Non potrai più utilizzare questo metodo di pagamento e gli abbonamenti ricorrenti che dipendono da esso non funzioneranno più.',
-          successMessage: '{{paymentSource}} è stato rimosso dal tuo account.',
+          successMessage: '{{paymentMethod}} è stato rimosso dal tuo account.',
           title: 'Rimuovi metodo di pagamento',
         },
         title: 'Metodi di pagamento',

@@ -300,7 +300,7 @@ export const csCZ: LocalizationResource = {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
@@ -987,7 +987,7 @@ export const csCZ: LocalizationResource = {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
