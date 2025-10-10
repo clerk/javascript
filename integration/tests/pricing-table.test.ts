@@ -35,6 +35,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       const u = createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/plan-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Plan details' }).click();
 
       await u.po.planDetails.waitForMounted();
@@ -99,6 +100,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/checkout-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Checkout Now' }).click();
       await u.po.checkout.waitForMounted();
       await u.po.page.getByText(/^Checkout$/).click();
@@ -133,6 +135,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/subscription-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Subscription details' }).click();
 
       await u.po.subscriptionDetails.waitForMounted();
