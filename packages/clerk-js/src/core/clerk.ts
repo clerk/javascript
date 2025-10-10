@@ -20,7 +20,7 @@ import {
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import { allSettled, createDeferredPromise, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
@@ -258,6 +258,21 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnSupported: (() => boolean) | undefined;
   public __internal_isWebAuthnAutofillSupported: (() => Promise<boolean>) | undefined;
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
+  public __internal_startTransition = (cb: () => Promise<void> | void): void => {
+    const sT = this.#options.__internal_startTransition;
+    // console.log('sT', sT);
+    if (sT) {
+      sT(cb);
+    } else {
+      void cb();
+    }
+  };
+  public __internal_setResources: ListenerCallback = (resources: Resources) => {
+    const sR = this.#options.__internal_setResources;
+    if (sR) {
+      sR(resources);
+    }
+  };
 
   public __internal_setActiveInProgress = false;
 
@@ -1397,6 +1412,17 @@ export class Clerk implements ClerkInterface {
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
 
+      const navigatePromise = createDeferredPromise();
+
+      const transitionSafe = async (promise: Promise<unknown> | unknown): Promise<void> => {
+        if (this.#options.__internal_startTransition) {
+          void Promise.resolve(promise).then(navigatePromise.resolve);
+        } else {
+          await promise;
+        }
+      };
+
+      // this.__internal_startTransition(async () => {
       if (!beforeEmit && (redirectUrl || taskUrl || setActiveNavigate)) {
         await tracker.track(async () => {
           if (!this.client) {
@@ -1405,29 +1431,43 @@ export class Clerk implements ClerkInterface {
           }
 
           if (newSession?.status !== 'pending') {
+            // this.__internal_startTransition(() => {
             this.#setTransitiveState();
+            // });
           }
 
           if (taskUrl) {
             const taskUrlWithRedirect = redirectUrl
               ? buildURL({ base: taskUrl, hashSearchParams: { redirectUrl } }, { stringify: true })
               : taskUrl;
+
             await this.navigate(taskUrlWithRedirect);
           } else if (setActiveNavigate && newSession) {
-            await setActiveNavigate({ session: newSession });
+            // this.__internal_startTransition(() => {
+            await transitionSafe(setActiveNavigate({ session: newSession }));
+            // void Promise.resolve(setActiveNavigate({ session: newSession })).then(navigatePromise.resolve);
+            // });
           } else if (redirectUrl) {
+            // if (!this.client) {
+            //   return;
+            // }
             if (this.client.isEligibleForTouch()) {
               const absoluteRedirectUrl = new URL(redirectUrl, window.location.href);
               const redirectUrlWithAuth = this.buildUrlWithAuth(
                 this.client.buildTouchUrl({ redirectUrl: absoluteRedirectUrl }),
               );
-              await this.navigate(redirectUrlWithAuth);
+              await transitionSafe(this.navigate(redirectUrlWithAuth));
+              // void this.navigate(redirectUrlWithAuth).then(navigatePromise.resolve);
             }
-            await this.navigate(redirectUrl);
+            await transitionSafe(this.navigate(redirectUrl));
+            // void this.navigate(redirectUrl).then(navigatePromise.resolve);
           }
         });
+      } else {
+        navigatePromise.resolve();
       }
 
+      // ATTENTION: This breaks for transitions but should be fine.
       //3. Check if hard reloading (onbeforeunload). If not, set the user/session and emit
       if (tracker.isUnloading()) {
         return;
@@ -1436,6 +1476,8 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(newSession);
       this.#emit();
 
+      // Await the navigation and the state update
+      await navigatePromise.promise;
       // Do not revalidate server cache for pending sessions to avoid unmount of `SignIn/SignUp` AIOs when navigating to task
       // newSession can be mutated by the time we get here (org change session touch)
       if (newSession?.status !== 'pending') {
@@ -1444,6 +1486,7 @@ export class Clerk implements ClerkInterface {
     } finally {
       this.__internal_setActiveInProgress = false;
     }
+    console.log('setActive done');
   };
 
   public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
@@ -1503,6 +1546,8 @@ export class Clerk implements ClerkInterface {
 
     const customNavigate =
       options?.replace && this.#options.routerReplace ? this.#options.routerReplace : this.#options.routerPush;
+
+    // console.log('customNavigate', customNavigate);
 
     debugLogger.info(`Clerk is navigating to: ${toURL}`);
     if (this.#options.routerDebug) {
@@ -2810,6 +2855,13 @@ export class Clerk implements ClerkInterface {
           organization: this.organization,
         });
       }
+
+      // this.__internal_setResources?.({
+      //   client: this.client,
+      //   session: this.session,
+      //   user: this.user,
+      //   organization: this.organization,
+      // });
     }
   };
 
@@ -2828,6 +2880,7 @@ export class Clerk implements ClerkInterface {
     this.session = undefined;
     this.organization = undefined;
     this.user = undefined;
+    console.log('setTransitiveState');
     this.#emit();
   };
 
