@@ -39,7 +39,7 @@ export class Billing implements BillingNamespace {
     const { for: forParam, ...safeParams } = params || {};
     const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
     return await BaseResource._fetch({
-      path: Billing.path('/plans'),
+      path: `${Billing.#pathRoot}/plans`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(searchParams),
     }).then(res => {
@@ -55,7 +55,7 @@ export class Billing implements BillingNamespace {
   // Inconsistent API
   getPlan = async (params: { id: string }): Promise<BillingPlanResource> => {
     const plan = (await BaseResource._fetch({
-      path: Billing.path(`/plans/${params.id}`),
+      path: `${Billing.#pathRoot}/plans/${params.id}`,
       method: 'GET',
     })) as unknown as BillingPlanJSON;
     return new BillingPlan(plan);
