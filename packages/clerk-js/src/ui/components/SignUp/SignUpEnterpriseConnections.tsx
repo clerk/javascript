@@ -8,7 +8,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { useFetch } from '@/ui/hooks';
 
-const SignUpChooseEnterpriseConnectionInternal = () => {
+const SignUpEnterpriseConnectionsInternal = () => {
   const clerk = useClerk();
   const ctx = useSignUpContext();
 
@@ -35,11 +35,11 @@ const SignUpChooseEnterpriseConnectionInternal = () => {
   }
 
   return (
-    <Flow.Part part='chooseEnterpriseConnection'>
+    <Flow.Part part='enterpriseConnections'>
       {enterpriseConnections?.length ? (
         <ChooseEnterpriseConnectionCard
-          title={localizationKeys('signUp.chooseEnterpriseConnection.title')}
-          subtitle={localizationKeys('signUp.chooseEnterpriseConnection.subtitle')}
+          title={localizationKeys('signUp.enterpriseConnections.title')}
+          subtitle={localizationKeys('signUp.enterpriseConnections.subtitle')}
           onClick={handleEnterpriseSSO}
           enterpriseConnections={enterpriseConnections}
         />
@@ -53,6 +53,6 @@ const SignUpChooseEnterpriseConnectionInternal = () => {
 /**
  * @experimental
  */
-export const SignUpChooseEnterpriseConnection = withRedirectToAfterSignUp(
-  withCardStateProvider(SignUpChooseEnterpriseConnectionInternal),
+export const SignUpEnterpriseConnections = withRedirectToAfterSignUp(
+  withCardStateProvider(SignUpEnterpriseConnectionsInternal),
 );

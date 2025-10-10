@@ -13,10 +13,10 @@ import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
 import { hasMultipleEnterpriseConnections } from './shared';
-import { SignInChooseEnterpriseConnection } from './SignInChooseEnterpriseConnection';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
+import { SignInFactorOneEnterpriseConnections } from './SignInFactorOneEnterpriseConnections';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
@@ -130,7 +130,7 @@ function SignInFactorOneInternal(): JSX.Element {
    * @experimental
    */
   if (hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
-    return <SignInChooseEnterpriseConnection />;
+    return <SignInFactorOneEnterpriseConnections />;
   }
 
   if (showAllStrategies || showForgotPasswordStrategies) {

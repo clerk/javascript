@@ -5,6 +5,7 @@ import { buildSSOCallbackURL, withRedirect } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
 import { useCoreSignIn, useEnvironment, useSignInContext } from '@/ui/contexts';
 import { Flow, localizationKeys } from '@/ui/customizables';
+import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { AvailableComponentProps } from '@/ui/types';
 
 import { hasMultipleEnterpriseConnections } from './shared';
@@ -12,7 +13,7 @@ import { hasMultipleEnterpriseConnections } from './shared';
 /**
  * @experimental
  */
-const SignInChooseEnterpriseConnectionInternal = () => {
+const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const ctx = useSignInContext();
   const { displayConfig } = useEnvironment();
 
@@ -44,10 +45,10 @@ const SignInChooseEnterpriseConnectionInternal = () => {
   };
 
   return (
-    <Flow.Part part='chooseEnterpriseConnection'>
+    <Flow.Part part='enterpriseConnections'>
       <ChooseEnterpriseConnectionCard
-        title={localizationKeys('signIn.chooseEnterpriseConnection.title')}
-        subtitle={localizationKeys('signIn.chooseEnterpriseConnection.subtitle')}
+        title={localizationKeys('signIn.enterpriseConnections.title')}
+        subtitle={localizationKeys('signIn.enterpriseConnections.subtitle')}
         onClick={handleEnterpriseSSO}
         enterpriseConnections={enterpriseConnections}
       />
@@ -76,6 +77,6 @@ const withEnterpriseConnectionsGuard = <P extends AvailableComponentProps>(Compo
   return HOC;
 };
 
-export const SignInChooseEnterpriseConnection = withEnterpriseConnectionsGuard(
-  SignInChooseEnterpriseConnectionInternal,
+export const SignInFactorOneEnterpriseConnections = withCardStateProvider(
+  withEnterpriseConnectionsGuard(SignInFactorOneEnterpriseConnectionsInternal),
 );

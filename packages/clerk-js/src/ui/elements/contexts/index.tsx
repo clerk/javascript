@@ -124,7 +124,7 @@ export type FlowMetadata = {
     | 'complete'
     | 'accountSwitcher'
     | 'chooseOrganization'
-    | 'chooseEnterpriseConnection';
+    | 'enterpriseConnections';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

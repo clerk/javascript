@@ -506,9 +506,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'subscriptionDetailsDetailRowLabel',
   'subscriptionDetailsDetailRowValue',
 
-  'chooseEnterpriseConnectionsRoot',
-  'chooseEnterpriseConnectionButton',
-  'chooseEnterpriseConnectionButtonText',
+  'enterpriseConnectionsRoot',
+  'enterpriseConnectionButton',
+  'enterpriseConnectionButtonText',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;

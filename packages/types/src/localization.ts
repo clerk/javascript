@@ -361,7 +361,7 @@ export type __internal_LocalizationResource = {
         label__onlyTermsOfService: LocalizationValue<'termsOfServiceLink'>;
       };
     };
-    chooseEnterpriseConnection: {
+    enterpriseConnections: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
@@ -519,7 +519,7 @@ export type __internal_LocalizationResource = {
       action__addAccount: LocalizationValue;
       action__signOutAll: LocalizationValue;
     };
-    chooseEnterpriseConnection: {
+    enterpriseConnections: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };

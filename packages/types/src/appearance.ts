@@ -641,9 +641,9 @@ export type ElementsConfig = {
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;
 
-  chooseEnterpriseConnectionsRoot: WithOptions;
-  chooseEnterpriseConnectionButton: WithOptions;
-  chooseEnterpriseConnectionButtonText: WithOptions;
+  enterpriseConnectionsRoot: WithOptions;
+  enterpriseConnectionButton: WithOptions;
+  enterpriseConnectionButtonText: WithOptions;
 };
 
 export type Elements = {

@@ -35,7 +35,7 @@ export const ChooseEnterpriseConnectionCard = ({
         <Card.Alert>{card.error}</Card.Alert>
 
         <Grid
-          elementDescriptor={descriptors.chooseEnterpriseConnectionsRoot}
+          elementDescriptor={descriptors.enterpriseConnectionsRoot}
           gap={2}
         >
           {enterpriseConnections?.map(({ id, name }) => (
@@ -71,7 +71,7 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
 
   return (
     <SimpleButton
-      elementDescriptor={descriptors.chooseEnterpriseConnectionButton}
+      elementDescriptor={descriptors.enterpriseConnectionButton}
       variant='outline'
       block
       isLoading={isLoading}
@@ -110,7 +110,7 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
           </Flex>
         )}
         <Text
-          elementDescriptor={descriptors.chooseEnterpriseConnectionButtonText}
+          elementDescriptor={descriptors.enterpriseConnectionButtonText}
           as='span'
           truncate
           variant='buttonLarge'

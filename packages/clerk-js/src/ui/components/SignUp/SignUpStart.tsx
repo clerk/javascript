@@ -364,7 +364,7 @@ function SignUpStartInternal(): JSX.Element {
           isClerkAPIResponseError(err) &&
           err.errors?.[0]?.code === 'enterprise_connection_id_is_required_with_multiple_connections'
         ) {
-          return navigate('./choose-enterprise-connection');
+          return navigate('./enterprise-connections');
         }
 
         return handleError(err, fieldsToSubmit, card.setError);
