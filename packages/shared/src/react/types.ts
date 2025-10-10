@@ -115,6 +115,7 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
    * @default undefined
    *
    * @hidden
+   *
    * @experimental
    */
   __experimental_mode?: 'cache';

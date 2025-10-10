@@ -37,18 +37,25 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 /**
  * @interface
  */
-type NeedsReverificationParameters = {
+export type NeedsReverificationParameters = {
+  /**
+   * Marks the reverification process as complete and retries the original request.
+   */
   cancel: () => void;
+  /**
+   * Marks the reverification process as cancelled and rejects the original request.
+   */
   complete: () => void;
+  /**
+   * The verification level required for the reverification process.
+   */
   level: SessionVerificationLevel | undefined;
 };
 
 /**
- * The optional options object.
- *
  * @interface
  */
-type UseReverificationOptions = {
+export type UseReverificationOptions = {
   /**
    * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
    *
@@ -69,11 +76,17 @@ type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | 
 /**
  * @interface
  */
-type UseReverification = <
+export type UseReverificationParams = <
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions = UseReverificationOptions,
 >(
+  /**
+   * A function that returns a promise.
+   */
   fetcher: Fetcher,
+  /**
+   * The optional options object.
+   */
   options?: Options,
 ) => UseReverificationResult<Fetcher>;
 
@@ -83,7 +96,6 @@ type CreateReverificationHandlerParams = UseReverificationOptions & {
 };
 
 /**
- *
  */
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
   /**
@@ -201,7 +213,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * }
  * ```
  */
-export const useReverification: UseReverification = (fetcher, options) => {
+export const useReverification: UseReverificationParams = (fetcher, options) => {
   const { __internal_openReverification, telemetry } = useClerk();
   const fetcherRef = useRef(fetcher);
   const optionsRef = useRef(options);

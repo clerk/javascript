@@ -25,7 +25,10 @@ const [SessionContext, useSessionContext] = createContextAndHook<SignedInSession
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
-type UseCheckoutOptions = {
+/**
+ * @interface
+ */
+export type UseCheckoutOptions = {
   /**
    * Specifies if the checkout is for an organization.
    *

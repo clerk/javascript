@@ -114,11 +114,15 @@ export type __experimental_UseCheckoutReturn = {
   checkout: UseCheckoutReturn;
 };
 
-/**
- * @interface
- */
-export type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];
+type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];
 
+/**
+ * @function
+ *
+ * @param [options] - An object containing the configuration for the checkout flow.
+ *
+ * **Required** if the hook is used without a `<CheckoutProvider />` wrapping the component tree.
+ */
 export const useCheckout = (options?: UseCheckoutParams): __experimental_UseCheckoutReturn => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;

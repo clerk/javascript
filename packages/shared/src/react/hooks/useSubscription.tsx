@@ -33,8 +33,18 @@ export type UseSubscriptionParams = {
 /**
  * @interface
  */
+interface BaseSubscriptionReturn {
+  /**
+   * Function to manually trigger a refresh of the subscription data.
+   */
+  revalidate: () => Promise<void>;
+}
+
+/**
+ * @interface
+ */
 export type UseSubscriptionReturn =
-  | {
+  | (BaseSubscriptionReturn & {
       /**
        * The subscription object, or `null` if the data hasn't been loaded yet.
        */
@@ -51,25 +61,19 @@ export type UseSubscriptionReturn =
        * Any error that occurred during the data fetch, or `null` if no error occurred.
        */
       error: null;
-      /**
-       * Function to manually trigger a refresh of the subscription data.
-       */
-      revalidate: () => Promise<void>;
-    }
-  | {
+    })
+  | (BaseSubscriptionReturn & {
       data: BillingSubscriptionResource;
       isLoading: true;
       isFetching: true;
       error: Error;
-      revalidate: () => Promise<void>;
-    }
-  | {
+    })
+  | (BaseSubscriptionReturn & {
       data: BillingSubscriptionResource | null;
       isLoading: boolean;
       isFetching: boolean;
       error: Error | null;
-      revalidate: () => Promise<void>;
-    };
+    });
 
 /**
  *

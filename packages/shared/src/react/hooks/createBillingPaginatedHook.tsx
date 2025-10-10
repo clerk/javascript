@@ -29,7 +29,7 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
  */
 export type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
   /**
-   * Specifies whether the payment method is being added for a user or an organization.
+   * Specifies whether to fetch for the current user or organization.
    *
    * @default 'user'
    */

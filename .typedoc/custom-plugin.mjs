@@ -20,7 +20,7 @@ const FILES_WITHOUT_HEADINGS = [
   'public-organization-data-json.mdx',
   'organization-membership-public-user-data.mdx',
   'use-checkout-return.mdx',
-  'use-checkout-params.mdx',
+  'use-checkout-options.mdx',
   'use-payment-element-return.mdx',
   'use-payment-element-return.mdx',
   'use-payment-methods-return.mdx',
@@ -30,6 +30,9 @@ const FILES_WITHOUT_HEADINGS = [
   'hook-params.mdx',
   'use-subscription-params.mdx',
   'use-subscription-return.mdx',
+  'needs-reverification-parameters.mdx',
+  'use-reverification-options.mdx',
+  'use-reverification-params,mdx',
 ];
 
 /**
@@ -40,6 +43,9 @@ const LINK_REPLACEMENTS = [
   ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['use-checkout-options', '#use-checkout-options'],
+  ['use-reverification-options', '#use-reverification-options'],
+  ['needs-reverification-parameters', '#needs-reverification-parameters'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
   ['sign-in-resource', '/docs/reference/javascript/sign-in'],
@@ -78,7 +84,9 @@ const LINK_REPLACEMENTS = [
   ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
   ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
+  ['billing-statement-resource', '/docs/reference/javascript/types/billing-statement-resource'],
   ['billing-subscription-resource', '/docs/reference/javascript/types/billing-subscription-resource'],
+  ['clerk-api-response-error', '/docs/reference/javascript/types/clerk-api-response-error'],
 ];
 
 /**

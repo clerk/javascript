@@ -1,6 +1,12 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "entryPoints": ["./src/index.ts", "./src/react/types.ts", "./src/react/hooks/*.{ts,tsx}", "./src/react/commerce.tsx"],
+  "entryPoints": [
+    "./src/index.ts",
+    "./src/react/types.ts",
+    "./src/react/hooks/*.{ts,tsx}",
+    "./src/react/commerce.tsx",
+    "./src/react/contexts.tsx"
+  ],
   "compilerOptions": {
     "noImplicitAny": false
   }
