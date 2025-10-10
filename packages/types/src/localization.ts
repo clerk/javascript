@@ -898,7 +898,7 @@ export type __internal_LocalizationResource = {
         tableHeader__amount: LocalizationValue;
         tableHeader__status: LocalizationValue;
       };
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         title: LocalizationValue;
         add: LocalizationValue;
         addSubtitle: LocalizationValue;
@@ -907,11 +907,11 @@ export type __internal_LocalizationResource = {
         actionLabel__remove: LocalizationValue;
         formButtonPrimary__add: LocalizationValue;
         formButtonPrimary__pay: LocalizationValue;
-        removeResource: {
+        removeMethod: {
           title: LocalizationValue;
           messageLine1: LocalizationValue<'identifier'>;
           messageLine2: LocalizationValue;
-          successMessage: LocalizationValue<'paymentSource'>;
+          successMessage: LocalizationValue<'paymentMethod'>;
         };
         payWithTestCardButton: LocalizationValue;
       };
@@ -1126,28 +1126,6 @@ export type __internal_LocalizationResource = {
         tableHeader__amount: LocalizationValue;
         tableHeader__status: LocalizationValue;
       };
-
-      /**
-       * @deprecated Use `paymentMethodsSection` instead. Please edit or add keys to the `paymentMethodsSection` object.
-       */
-      paymentSourcesSection: {
-        title: LocalizationValue;
-        add: LocalizationValue;
-        addSubtitle: LocalizationValue;
-        cancelButton: LocalizationValue;
-        actionLabel__default: LocalizationValue;
-        actionLabel__remove: LocalizationValue;
-        formButtonPrimary__add: LocalizationValue;
-        formButtonPrimary__pay: LocalizationValue;
-        removeResource: {
-          title: LocalizationValue;
-          messageLine1: LocalizationValue<'identifier'>;
-          messageLine2: LocalizationValue;
-          successMessage: LocalizationValue<'paymentSource'>;
-        };
-        payWithTestCardButton: LocalizationValue;
-      };
-
       paymentMethodsSection: {
         title: LocalizationValue;
         add: LocalizationValue;
@@ -1157,7 +1135,7 @@ export type __internal_LocalizationResource = {
         actionLabel__remove: LocalizationValue;
         formButtonPrimary__add: LocalizationValue;
         formButtonPrimary__pay: LocalizationValue;
-        removeResource: {
+        removeMethod: {
           title: LocalizationValue;
           messageLine1: LocalizationValue<'identifier'>;
           messageLine2: LocalizationValue;

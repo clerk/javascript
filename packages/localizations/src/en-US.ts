@@ -278,7 +278,7 @@ export const enUS: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
         add: 'Add new payment method',
@@ -287,11 +287,11 @@ export const enUS: LocalizationResource = {
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         payWithTestCardButton: 'Pay with test card',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
-            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
+            'You will no longer be able to use this payment method and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentMethod}} has been removed from your account.',
           title: 'Remove payment method',
         },
         title: 'Payment methods',
@@ -971,7 +971,7 @@ export const enUS: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
         add: 'Add new payment method',
@@ -980,11 +980,11 @@ export const enUS: LocalizationResource = {
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         payWithTestCardButton: 'Pay with test card',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
             'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
+          successMessage: '{{paymentMethod}} has been removed from your account.',
           title: 'Remove payment method',
         },
         title: 'Payment methods',

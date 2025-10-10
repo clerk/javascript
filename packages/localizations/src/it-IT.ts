@@ -69,8 +69,8 @@ export const itIT: LocalizationResource = {
   badge__upcomingPlan: 'In arrivo',
   badge__userDevice: 'Dispositivo utente',
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: 'Aggiungi metodo di pagamento',
+  billing: {
+    addPaymentMethod__label: 'Aggiungi metodo di pagamento',
     alwaysFree: 'Sempre gratuito',
     annually: 'Annualmente',
     availableFeatures: 'Funzionalità disponibili',
@@ -127,8 +127,8 @@ export const itIT: LocalizationResource = {
     monthly: 'Mensile',
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
-    paymentMethods: 'Metodi di pagamento',
-    paymentSource: {
+    paymentMethods__label: 'Metodi di pagamento',
+    paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento annuale',
         monthly: 'Pagamento mensile',
@@ -290,7 +290,7 @@ export const itIT: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Stato',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Imposta come predefinito',
         actionLabel__remove: 'Rimuovi',
         add: 'Aggiungi nuovo metodo di pagamento',
@@ -299,7 +299,7 @@ export const itIT: LocalizationResource = {
         formButtonPrimary__add: 'Aggiungi metodo di pagamento',
         formButtonPrimary__pay: 'Paga {{amount}}',
         payWithTestCardButton: 'Paga con carta di prova',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} verrà rimosso da questo account.',
           messageLine2:
             'Non potrai più utilizzare questo metodo di pagamento e gli abbonamenti ricorrenti che dipendono da esso non funzioneranno più.',
@@ -972,7 +972,7 @@ export const itIT: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Stato',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Imposta come predefinito',
         actionLabel__remove: 'Rimuovi',
         add: 'Aggiungi nuovo metodo di pagamento',
@@ -981,11 +981,11 @@ export const itIT: LocalizationResource = {
         formButtonPrimary__add: 'Aggiungi metodo di pagamento',
         formButtonPrimary__pay: 'Paga {{amount}}',
         payWithTestCardButton: 'Paga con carta di prova',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} verrà rimosso da questo account.',
           messageLine2:
             'Non potrai più utilizzare questo metodo di pagamento e gli abbonamenti ricorrenti che dipendono da esso non funzioneranno più.',
-          successMessage: '{{paymentSource}} è stato rimosso dal tuo account.',
+          successMessage: '{{paymentMethod}} è stato rimosso dal tuo account.',
           title: 'Rimuovi metodo di pagamento',
         },
         title: 'Metodi di pagamento',
