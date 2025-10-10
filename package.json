@@ -69,6 +69,7 @@
     "@changesets/cli": "^2.29.4",
     "@changesets/get-github-info": "^0.6.0",
     "@clerk/backend": "workspace:*",
+    "@clerk/eslint-plugin-tree-shaking": "workspace:*",
     "@clerk/shared": "workspace:*",
     "@clerk/testing": "workspace:*",
     "@commitlint/cli": "^19.8.0",
