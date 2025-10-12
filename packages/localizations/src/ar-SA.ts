@@ -16,7 +16,7 @@ export const arSA: LocalizationResource = {
   locale: 'ar-SA',
   apiKeys: {
     action__add: 'أضف مفتاحاً جديداً',
-    action__search: 'إبحث عن مفتاح',
+    action__search: 'ابحث عن مفتاح',
     createdAndExpirationStatus__expiresOn: 
       "أنشأ في {{ createdDate | shortDate('en-US') }} • ينتهي في {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "أنشأ في {{ createdDate | shortDate('en-US') }} • صلاحية دائمة",
