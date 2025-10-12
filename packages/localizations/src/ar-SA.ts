@@ -21,7 +21,7 @@ export const arSA: LocalizationResource = {
       "أنشأ في {{ createdDate | shortDate('en-US') }} • ينتهي في {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "أنشأ في {{ createdDate | shortDate('en-US') }} • صلاحية دائمة",
     detailsTitle__emptyRow: 'لا توجد أي مفاتيح API',
-    formButtonPrimary__add: 'أنشأ مفتاحاً',
+    formButtonPrimary__add: 'أنشئ مفتاحاً',
     formFieldCaption__expiration__expiresOn: 'ينتهي في {{ date }}',
     formFieldCaption__expiration__never: 'هذا المفتاح ذو صلاحية دائمة',
     formFieldOption__expiration__180d: '180 يوماً',
