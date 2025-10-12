@@ -1,6 +1,6 @@
 /* eslint-disable jsdoc/require-jsdoc */
-import type { ClerkErrorParams } from './future';
-import { ClerkError } from './future';
+import type { ClerkErrorParams } from './clerkError';
+import { ClerkError } from './clerkError';
 
 export class ClerkRuntimeError extends ClerkError {
   readonly name = 'ClerkRuntimeError';

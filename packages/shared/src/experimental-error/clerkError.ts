@@ -16,11 +16,6 @@ export interface ClerkErrorParams {
    */
   longMessage?: string;
   /**
-   * A trace ID that can be used to identify the error in the Clerk API logs.
-   */
-  clerkTraceId?: string;
-  kind?: string;
-  /**
    * The cause of the error, typically an `Error` instance that was caught and wrapped by the Clerk error handler.
    */
   cause?: Error;
@@ -41,8 +36,6 @@ export class ClerkError extends Error {
   readonly name: string = 'ClerkError';
   readonly code: string;
   readonly longMessage: string | undefined;
-  readonly clerkTraceId: string | undefined;
-  readonly kind: string;
   readonly docsUrl: string | undefined;
   readonly cause: Error | undefined;
 
@@ -59,7 +52,6 @@ export class ClerkError extends Error {
     Object.setPrototypeOf(this, ClerkError.prototype);
 
     this.code = opts.code;
-    this.kind = opts.kind ?? 'ClerkError';
     this.docsUrl = opts.docsUrl;
   }
 }
