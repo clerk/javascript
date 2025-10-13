@@ -3,4 +3,4 @@
 '@clerk/types': minor
 ---
 
-[Billing Beta] Replace `forOrganizations: true` with `for: "organizations"` in `<PricingTable/>`.
+[Billing Beta] Replace `forOrganizations: true` with `for: "organization"` in `<PricingTable/>`.
