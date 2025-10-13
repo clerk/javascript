@@ -655,5 +655,71 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await fakeUser.deleteIfExists();
     });
+
+    test('adds two payment methods and sets the last as default', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      // Add first payment method
+      await u.po.page.getByText('Add new payment method').click();
+      await u.po.checkout.fillCard({
+        number: '4242424242424242',
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.page.getByRole('button', { name: 'Add Payment Method' }).click();
+
+      await expect(u.po.page.getByText(/visa/i)).toBeVisible();
+      await expect(
+        u.po.page
+          .getByText(/visa/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeVisible();
+
+      // Add second payment method
+      await u.po.page.getByText('Add new payment method').click();
+      await u.po.checkout.fillCard({
+        number: '5555555555554444',
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.page.getByRole('button', { name: 'Add Payment Method' }).click();
+
+      await expect(u.po.page.getByText(/mastercard/i)).toBeVisible();
+
+      // Open menu for the last payment method and make it default
+      await u.po.page.locator('.cl-userProfile-root .cl-menuButtonEllipsis').last().click();
+      await u.po.page.getByText('Make default').click();
+
+      // Verify Mastercard is now default and Visa is not
+      await expect(
+        u.po.page
+          .getByText(/mastercard/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(
+        u.po.page
+          .getByText(/visa/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeHidden();
+
+      await fakeUser.deleteIfExists();
+    });
   });
 });

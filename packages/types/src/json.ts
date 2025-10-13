@@ -252,6 +252,7 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   provider_user_id: string | null;
   public_metadata: Record<string, unknown>;
   verification: VerificationJSON | null;
+  last_authenticated_at: number | null;
 }
 
 export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
@@ -279,6 +280,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   last_name: string;
   verification?: VerificationJSON;
   saml_connection?: SamlAccountConnectionJSON;
+  last_authenticated_at: number | null;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
