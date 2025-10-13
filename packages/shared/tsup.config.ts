@@ -17,6 +17,7 @@ export default defineConfig(overrideOptions => {
       './src/workerTimers/index.ts',
       './src/dom/*.ts',
       './src/experimental-error/index.ts',
+      './src/types/index.ts',
       '!./src/**/*.test.{ts,tsx}',
     ],
     format: ['cjs', 'esm'],

@@ -80,6 +80,14 @@
         "default": "./dist/experimental-error/index.js"
       }
     },
+    "./types": {
+      "import": {
+        "types": "./dist/types/index.d.mts"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -134,7 +142,8 @@
     "eventBus",
     "netlifyCacheHandler",
     "clerkEventBus",
-    "phoneCodeChannel"
+    "phoneCodeChannel",
+    "types"
   ],
   "scripts": {
     "build": "tsup",

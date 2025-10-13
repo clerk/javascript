@@ -1,6 +1,24 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
+import type {
+  SignInFutureBackupCodeVerifyParams,
+  SignInFutureCreateParams,
+  SignInFutureEmailCodeSendParams,
+  SignInFutureEmailCodeVerifyParams,
+  SignInFutureEmailLinkSendParams,
+  SignInFutureFinalizeParams,
+  SignInFutureMFAPhoneCodeVerifyParams,
+  SignInFuturePasswordParams,
+  SignInFuturePhoneCodeSendParams,
+  SignInFuturePhoneCodeVerifyParams,
+  SignInFutureResetPasswordSubmitParams,
+  SignInFutureResource,
+  SignInFutureSSOParams,
+  SignInFutureTicketParams,
+  SignInFutureTOTPVerifyParams,
+  SignInFutureWeb3Params,
+} from '@clerk/shared/types';
 import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
 import {
   isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
@@ -31,22 +49,6 @@ import type {
   SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
-  SignInFutureBackupCodeVerifyParams,
-  SignInFutureCreateParams,
-  SignInFutureEmailCodeSendParams,
-  SignInFutureEmailCodeVerifyParams,
-  SignInFutureEmailLinkSendParams,
-  SignInFutureFinalizeParams,
-  SignInFutureMFAPhoneCodeVerifyParams,
-  SignInFuturePasswordParams,
-  SignInFuturePhoneCodeSendParams,
-  SignInFuturePhoneCodeVerifyParams,
-  SignInFutureResetPasswordSubmitParams,
-  SignInFutureResource,
-  SignInFutureSSOParams,
-  SignInFutureTicketParams,
-  SignInFutureTOTPVerifyParams,
-  SignInFutureWeb3Params,
   SignInIdentifier,
   SignInJSON,
   SignInJSONSnapshot,

@@ -23,7 +23,6 @@ import type {
   SignInStatus,
   UserData,
 } from './signInCommon';
-import type { SignInFutureResource } from './signInFuture';
 import type { SignInJSONSnapshot } from './snapshots';
 import type { CreateEmailLinkFlowReturn, VerificationResource } from './verification';
 import type { AuthenticateWithWeb3Params } from './web3Wallet';
@@ -87,7 +86,7 @@ export interface SignInResource extends ClerkResource {
   /**
    * @internal
    */
-  __internal_future: SignInFutureResource;
+  __internal_future: any;
 }
 
 export interface SignInJSON extends ClerkResourceJSON {

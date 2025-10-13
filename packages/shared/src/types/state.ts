@@ -1,5 +1,8 @@
-import type { SignInFutureResource } from './signInFuture';
-import type { SignUpFutureResource } from './signUpFuture';
+import type { SignUpFutureResource } from '@clerk/types';
+
+import type { ClerkGlobalHookError } from '../experimental-error';
+import type { SignInFutureResource } from './signInResource';
+
 /**
  * Represents an error on a specific field.
  */
@@ -77,10 +80,9 @@ export interface Errors {
    */
   raw: unknown[] | null;
   /**
-   * TOOD @nikos: type this based on shared
    * Parsed errors that are not related to any specific field.
    */
-  global: unknown[] | null; // does not include any errors that could be parsed as a field error
+  global: ClerkGlobalHookError[] | null; // does not include any errors that could be parsed as a field error
 }
 
 /**
@@ -143,7 +145,6 @@ export interface State {
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
-   * @experimental This experimental API is subject to change.
    */
   __internal_effect: (callback: () => void) => () => void;
 
@@ -152,7 +153,6 @@ export interface State {
    * its dependencies change.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
-   * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;
 }

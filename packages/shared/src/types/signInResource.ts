@@ -1,8 +1,14 @@
-import type { SetActiveNavigate } from './clerk';
-import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
-import type { OAuthStrategy, Web3Strategy } from './strategies';
-import type { VerificationResource } from './verification';
+import type {
+  OAuthStrategy,
+  PhoneCodeChannel,
+  SetActiveNavigate,
+  SignInFirstFactor,
+  SignInSecondFactor,
+  SignInStatus,
+  UserData,
+  VerificationResource,
+  Web3Strategy,
+} from '@clerk/types';
 
 export interface SignInFutureCreateParams {
   identifier?: string;
@@ -123,9 +129,6 @@ export interface SignInFutureFinalizeParams {
   navigate?: SetActiveNavigate;
 }
 
-/**
- * The current active `SignIn` instance, for use in custom flows.
- */
 export interface SignInFutureResource {
   /**
    * The unique identifier for the current sign-in attempt.
