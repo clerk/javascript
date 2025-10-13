@@ -252,6 +252,7 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   provider_user_id: string | null;
   public_metadata: Record<string, unknown>;
   verification: VerificationJSON | null;
+  last_authenticated_at: number | null;
 }
 
 export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
@@ -279,6 +280,7 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   last_name: string;
   verification?: VerificationJSON;
   saml_connection?: SamlAccountConnectionJSON;
+  last_authenticated_at: number | null;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -696,7 +698,7 @@ export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingInitializedPaymentMethodJSON extends ClerkResourceJSON {
-  object: 'commerce_payment_source_initialize';
+  object: 'commerce_payment_method_initialize';
   external_client_secret: string;
   external_gateway_id: string;
   payment_method_order: string[];

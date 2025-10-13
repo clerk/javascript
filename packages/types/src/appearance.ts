@@ -230,6 +230,7 @@ export type ElementsConfig = {
   otpCodeFieldInput: WithOptions;
   otpCodeFieldInputContainer: WithOptions;
   otpCodeFieldErrorText: WithOptions;
+  otpCodeFieldSuccessText: WithOptions;
 
   dividerRow: WithOptions;
   dividerColumn: WithOptions;

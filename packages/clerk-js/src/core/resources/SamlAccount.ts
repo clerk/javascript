@@ -23,6 +23,7 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
   lastName = '';
   verification: VerificationResource | null = null;
   samlConnection: SamlAccountConnectionResource | null = null;
+  lastAuthenticatedAt: Date | null = null;
 
   public constructor(data: Partial<SamlAccountJSON | SamlAccountJSONSnapshot>, pathRoot: string);
   public constructor(data: SamlAccountJSON | SamlAccountJSONSnapshot, pathRoot: string) {
@@ -52,6 +53,8 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
       this.samlConnection = new SamlAccountConnection(data.saml_connection);
     }
 
+    this.lastAuthenticatedAt = data.last_authenticated_at ? unixEpochToDate(data.last_authenticated_at) : null;
+
     return this;
   }
 
@@ -67,6 +70,7 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
       last_name: this.lastName,
       verification: this.verification?.__internal_toSnapshot() || null,
       saml_connection: this.samlConnection?.__internal_toSnapshot(),
+      last_authenticated_at: this.lastAuthenticatedAt ? this.lastAuthenticatedAt.getTime() : null,
     };
   }
 }

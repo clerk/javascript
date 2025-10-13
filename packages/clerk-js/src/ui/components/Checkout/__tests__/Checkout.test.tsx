@@ -364,7 +364,7 @@ describe('Checkout', () => {
         freeTrialDays: 14,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
+      paymentMethod: undefined,
       confirm: vi.fn(),
       freeTrialEndsAt,
     } as any);
@@ -756,7 +756,7 @@ describe('Checkout', () => {
           onOpenChange={() => {}}
         >
           <Checkout
-            planId='plan_with_payment_sources'
+            planId='plan_with_payment_methods'
             planPeriod='month'
           />
         </Drawer.Root>,
@@ -895,7 +895,7 @@ describe('Checkout', () => {
           onOpenChange={() => {}}
         >
           <Checkout
-            planId='plan_with_payment_sources'
+            planId='plan_with_payment_methods'
             planPeriod='month'
           />
         </Drawer.Root>,
@@ -1034,7 +1034,7 @@ describe('Checkout', () => {
           onOpenChange={() => {}}
         >
           <Checkout
-            planId='plan_with_payment_sources'
+            planId='plan_with_payment_methods'
             planPeriod='month'
           />
         </Drawer.Root>,
