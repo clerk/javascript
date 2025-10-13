@@ -32,11 +32,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('renders pricing details of a specific plan', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
-
       const u = createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/plan-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Plan details' }).click();
 
       await u.po.planDetails.waitForMounted();
@@ -82,7 +81,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       page,
       context,
     }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -97,12 +95,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/checkout-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Checkout Now' }).click();
       await u.po.checkout.waitForMounted();
       await u.po.page.getByText(/^Checkout$/).click();
@@ -132,12 +130,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('opens subscription details drawer', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/subscription-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Subscription details' }).click();
 
       await u.po.subscriptionDetails.waitForMounted();
