@@ -136,7 +136,7 @@ function Card(props: CardProps) {
     subscription,
     plan,
     planPeriod,
-    forOrganizations: pricingTableProps.forOrganizations,
+    for: pricingTableProps.for,
     hasActiveOrganization: !!organization,
   });
 
