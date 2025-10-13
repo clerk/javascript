@@ -175,7 +175,7 @@ export const PaymentAttemptPage = () => {
           >
             <Text
               variant='h3'
-              localizationKey={localizationKeys('commerce.totalDue')}
+              localizationKey={localizationKeys('billing.totalDue')}
               elementDescriptor={descriptors.paymentAttemptFooterLabel}
             />
             <Span
@@ -236,14 +236,14 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
           borderTop
           variant='tertiary'
         >
-          <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+          <LineItems.Title title={localizationKeys('billing.subtotal')} />
           <LineItems.Description
             text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
           />
         </LineItems.Group>
         {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
           <LineItems.Group variant='tertiary'>
-            <LineItems.Title title={localizationKeys('commerce.credit')} />
+            <LineItems.Title title={localizationKeys('billing.credit')} />
             <LineItems.Description
               text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
             />

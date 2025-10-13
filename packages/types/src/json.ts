@@ -6,7 +6,7 @@ import type { APIKeysSettingsJSON } from './apiKeysSettings';
 import type {
   BillingPayerResourceType,
   BillingPaymentChargeType,
-  BillingPaymentSourceStatus,
+  BillingPaymentMethodStatus,
   BillingPaymentStatus,
   BillingStatementStatus,
   BillingSubscriptionPlanPeriod,
@@ -137,7 +137,16 @@ export interface SignUpJSON extends ClerkResourceJSON {
   created_user_id: string | null;
   abandon_at: number | null;
   legal_accepted_at: number | null;
+  locale: string | null;
   verifications: SignUpVerificationsJSON | null;
+}
+
+/**
+ * @experimental
+ */
+export interface SignUpEnterpriseConnectionJSON extends ClerkResourceJSON {
+  id: string;
+  name: string;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {
@@ -244,6 +253,8 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   provider_user_id: string | null;
   public_metadata: Record<string, unknown>;
   verification: VerificationJSON | null;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
@@ -259,6 +270,7 @@ export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
   sync_user_attributes: boolean;
   created_at: number;
   updated_at: number;
+  enterprise_connection_id: string | null;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -271,6 +283,8 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   last_name: string;
   verification?: VerificationJSON;
   saml_connection?: SamlAccountConnectionJSON;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -646,23 +660,23 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export interface BillingPaymentSourceJSON extends ClerkResourceJSON {
-  object: 'commerce_payment_source';
+export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
+  object: 'commerce_payment_method';
   id: string;
   last4: string;
-  payment_method: string;
+  payment_type: 'card' | 'link';
   card_type: string;
   is_default: boolean;
   is_removable: boolean;
-  status: BillingPaymentSourceStatus;
+  status: BillingPaymentMethodStatus;
   wallet_type: string | null;
 }
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export interface BillingInitializedPaymentSourceJSON extends ClerkResourceJSON {
-  object: 'commerce_payment_source_initialize';
+export interface BillingInitializedPaymentMethodJSON extends ClerkResourceJSON {
+  object: 'commerce_payment_method_initialize';
   external_client_secret: string;
   external_gateway_id: string;
   payment_method_order: string[];
@@ -699,7 +713,7 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   paid_at?: number;
   failed_at?: number;
   updated_at: number;
-  payment_source: BillingPaymentSourceJSON;
+  payment_method: BillingPaymentMethodJSON;
   subscription: BillingSubscriptionItemJSON;
   subscription_item: BillingSubscriptionItemJSON;
   charge_type: BillingPaymentChargeType;
@@ -716,7 +730,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credit?: {
     amount: BillingMoneyAmountJSON;
   };
-  payment_source_id: string;
+  payment_method_id: string;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   status: BillingSubscriptionStatus;
@@ -793,7 +807,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  payment_source?: BillingPaymentSourceJSON;
+  payment_method?: BillingPaymentMethodJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   plan_period_start?: number;

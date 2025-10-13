@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { BillingPaymentSourceResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/types';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -14,9 +14,9 @@ import { usePaymentMethods, useSubscriberTypeContext, useSubscriberTypeLocalizat
 import { localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
-import * as AddPaymentSource from './AddPaymentSource';
-import { PaymentSourceRow } from './PaymentSourceRow';
-import { TestPaymentSource } from './TestPaymentSource';
+import * as AddPaymentMethod from './AddPaymentMethod';
+import { PaymentMethodRow } from './PaymentMethodRow';
+import { TestPaymentMethod } from './TestPaymentMethod';
 
 const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
@@ -24,37 +24,37 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
 
-  const onAddPaymentSourceSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
+  const onAddPaymentMethodSuccess = async (context: { gateway: 'stripe'; paymentToken: string }) => {
     const resource = subscriberType === 'organization' ? clerk?.organization : clerk.user;
-    await resource?.addPaymentSource(context);
+    await resource?.addPaymentMethod(context);
     onSuccess();
     close();
     return Promise.resolve();
   };
 
   return (
-    <AddPaymentSource.Root
-      onSuccess={onAddPaymentSourceSuccess}
+    <AddPaymentMethod.Root
+      onSuccess={onAddPaymentMethodSuccess}
       cancelAction={close}
     >
-      <AddPaymentSource.FormHeader
-        text={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
+      <AddPaymentMethod.FormHeader
+        text={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.add`)}
       />
-      <AddPaymentSource.FormSubtitle
-        text={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.addSubtitle`)}
+      <AddPaymentMethod.FormSubtitle
+        text={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.addSubtitle`)}
       />
       <DevOnly>
-        <TestPaymentSource />
+        <TestPaymentMethod />
       </DevOnly>
-    </AddPaymentSource.Root>
+    </AddPaymentMethod.Root>
   );
 });
 
 const RemoveScreen = ({
-  paymentSource,
+  paymentMethod,
   revalidate,
 }: {
-  paymentSource: BillingPaymentSourceResource;
+  paymentMethod: BillingPaymentMethodResource;
   revalidate: () => void;
 }) => {
   const { close } = useActionContext();
@@ -63,15 +63,15 @@ const RemoveScreen = ({
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
-    `${paymentSource.paymentMethod === 'card' ? paymentSource.cardType : paymentSource.paymentMethod} ${paymentSource.paymentMethod === 'card' ? `⋯ ${paymentSource.last4}` : '-'}`,
+    `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
   );
 
   if (!ref.current) {
     return null;
   }
 
-  const removePaymentSource = async () => {
-    await paymentSource
+  const removePaymentMethod = async () => {
+    await paymentMethod
       .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(revalidate)
       .catch((error: Error) => {
@@ -81,30 +81,28 @@ const RemoveScreen = ({
 
   return (
     <RemoveResourceForm
-      title={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.removeResource.title`)}
+      title={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.title`)}
       messageLine1={localizationKeys(
-        `${localizationRoot}.billingPage.paymentSourcesSection.removeResource.messageLine1`,
+        `${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.messageLine1`,
         {
           identifier: ref.current,
         },
       )}
-      messageLine2={localizationKeys(
-        `${localizationRoot}.billingPage.paymentSourcesSection.removeResource.messageLine2`,
-      )}
+      messageLine2={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.messageLine2`)}
       successMessage={localizationKeys(
-        `${localizationRoot}.billingPage.paymentSourcesSection.removeResource.successMessage`,
+        `${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.successMessage`,
         {
-          paymentSource: ref.current,
+          paymentMethod: ref.current,
         },
       )}
-      deleteResource={removePaymentSource}
+      deleteResource={removePaymentMethod}
       onSuccess={close}
       onReset={close}
     />
   );
 };
 
-export const PaymentSources = withCardStateProvider(() => {
+export const PaymentMethods = withCardStateProvider(() => {
   const clerk = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
@@ -112,7 +110,7 @@ export const PaymentSources = withCardStateProvider(() => {
 
   const { data: paymentMethods, isLoading, revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
-  const sortedPaymentSources = useMemo(
+  const sortedPaymentMethods = useMemo(
     () => paymentMethods.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
     [paymentMethods],
   );
@@ -121,15 +119,15 @@ export const PaymentSources = withCardStateProvider(() => {
     return null;
   }
 
-  if (__BUILD_DISABLE_RHC__ && sortedPaymentSources.length === 0) {
+  if (__BUILD_DISABLE_RHC__ && sortedPaymentMethods.length === 0) {
     return null;
   }
 
   return (
     <ProfileSection.Root
-      title={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.title`)}
+      title={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.title`)}
       centered={false}
-      id='paymentSources'
+      id='paymentMethods'
       sx={t => ({
         flex: 1,
         borderTopWidth: t.borderWidths.$normal,
@@ -139,27 +137,27 @@ export const PaymentSources = withCardStateProvider(() => {
     >
       <Action.Root>
         <ProfileSection.ItemList
-          id='paymentSources'
+          id='paymentMethods'
           disableAnimation
         >
           {isLoading ? (
             <FullHeightLoader />
           ) : (
             <>
-              {sortedPaymentSources.map(paymentSource => (
-                <Fragment key={paymentSource.id}>
-                  <ProfileSection.Item id='paymentSources'>
-                    <PaymentSourceRow paymentSource={paymentSource} />
-                    <PaymentSourceMenu
-                      paymentSource={paymentSource}
+              {sortedPaymentMethods.map(paymentMethod => (
+                <Fragment key={paymentMethod.id}>
+                  <ProfileSection.Item id='paymentMethods'>
+                    <PaymentMethodRow paymentMethod={paymentMethod} />
+                    <PaymentMethodMenu
+                      paymentMethod={paymentMethod}
                       revalidate={revalidatePaymentMethods}
                     />
                   </ProfileSection.Item>
 
-                  <Action.Open value={`remove-${paymentSource.id}`}>
+                  <Action.Open value={`remove-${paymentMethod.id}`}>
                     <Action.Card variant='destructive'>
                       <RemoveScreen
-                        paymentSource={paymentSource}
+                        paymentMethod={paymentMethod}
                         revalidate={revalidatePaymentMethods}
                       />
                     </Action.Card>
@@ -170,8 +168,8 @@ export const PaymentSources = withCardStateProvider(() => {
                 <>
                   <Action.Trigger value='add'>
                     <ProfileSection.ArrowButton
-                      id='paymentSources'
-                      localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
+                      id='paymentMethods'
+                      localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.add`)}
                     />
                   </Action.Trigger>
                   <Action.Open value='add'>
@@ -189,11 +187,11 @@ export const PaymentSources = withCardStateProvider(() => {
   );
 });
 
-const PaymentSourceMenu = ({
-  paymentSource,
+const PaymentMethodMenu = ({
+  paymentMethod,
   revalidate,
 }: {
-  paymentSource: BillingPaymentSourceResource;
+  paymentMethod: BillingPaymentMethodResource;
   revalidate: () => void;
 }) => {
   const { open } = useActionContext();
@@ -204,19 +202,19 @@ const PaymentSourceMenu = ({
 
   const actions = [
     {
-      label: localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.actionLabel__remove`),
+      label: localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.actionLabel__remove`),
       isDestructive: true,
-      onClick: () => open(`remove-${paymentSource.id}`),
-      isDisabled: !paymentSource.isRemovable,
+      onClick: () => open(`remove-${paymentMethod.id}`),
+      isDisabled: !paymentMethod.isRemovable,
     },
   ];
 
-  if (!paymentSource.isDefault) {
+  if (!paymentMethod.isDefault) {
     actions.unshift({
-      label: localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.actionLabel__default`),
+      label: localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.actionLabel__default`),
       isDestructive: false,
       onClick: () => {
-        paymentSource
+        paymentMethod
           .makeDefault({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
           .then(revalidate)
           .catch((error: Error) => {

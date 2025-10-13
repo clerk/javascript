@@ -13,7 +13,9 @@
     "resolveJsonModule": true,
     "jsx": "react",
     "lib": ["ES2022", "DOM", "WebWorker"],
-    "allowJs": true
+    "allowJs": true,
+    "declaration": true,
+    "declarationMap": true
   },
   "exclude": ["node_modules"],
   "include": ["src", "global.d.ts"]

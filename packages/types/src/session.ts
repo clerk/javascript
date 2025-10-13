@@ -2,6 +2,7 @@ import type {
   BackupCodeAttempt,
   EmailCodeAttempt,
   EmailCodeConfig,
+  EnterpriseSSOConfig,
   PasskeyAttempt,
   PassKeyConfig,
   PasswordAttempt,
@@ -351,7 +352,14 @@ export type SessionVerifyCreateParams = {
   level: SessionVerificationLevel;
 };
 
-export type SessionVerifyPrepareFirstFactorParams = EmailCodeConfig | PhoneCodeConfig | PassKeyConfig;
+export type SessionVerifyPrepareFirstFactorParams =
+  | EmailCodeConfig
+  | PhoneCodeConfig
+  | PassKeyConfig
+  /**
+   * @experimental
+   */
+  | Omit<EnterpriseSSOConfig, 'actionCompleteRedirectUrl'>;
 export type SessionVerifyAttemptFirstFactorParams =
   | EmailCodeAttempt
   | PhoneCodeAttempt
