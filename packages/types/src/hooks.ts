@@ -142,7 +142,7 @@ export type UseSignInReturn =
     };
 
 /**
- *  @inline
+ * @inline
  */
 export type UseSignUpReturn =
   | {

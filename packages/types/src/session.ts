@@ -43,14 +43,10 @@ type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSyst
   ? 'System permissions are not included in session claims and cannot be used on the server-side'
   : P;
 
-/**
- * @inline
- */
+/** @inline */
 export type CheckAuthorizationFn<Params> = (isAuthorizedParams: Params) => boolean;
 
-/**
- * @inline
- */
+/** @inline */
 export type CheckAuthorizationWithCustomPermissions =
   CheckAuthorizationFn<CheckAuthorizationParamsWithCustomPermissions>;
 
