@@ -68,8 +68,8 @@ export const zhTW: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '用戶設備',
   badge__you: '您',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const zhTW: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -281,7 +281,7 @@ export const zhTW: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +290,7 @@ export const zhTW: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -945,7 +945,7 @@ export const zhTW: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -954,7 +954,7 @@ export const zhTW: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1012,7 +1012,7 @@ export const zhTW: LocalizationResource = {
     deletePage: {
       actionDescription: '請在下方輸入「Delete account」以繼續。',
       confirm: '刪除帳戶',
-      messageLine1: '您確定要刪除您在 Clerk 的帳戶嗎？請聯絡應用程式擁有者以從他們的應用程式和其他服務中刪除您的資訊。',
+      messageLine1: '您確定要刪除您的帳戶嗎？某些相關資料可能會被保留。如需申請完全刪除資料，請聯絡支援團隊。',
       messageLine2: '此動作將永久生效且無法復原。',
       title: '刪除帳戶',
     },

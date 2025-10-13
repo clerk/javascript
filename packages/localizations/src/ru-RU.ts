@@ -68,8 +68,8 @@ export const ruRU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пользовательское устройство',
   badge__you: 'Вы',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const ruRU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -286,7 +286,7 @@ export const ruRU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -295,7 +295,7 @@ export const ruRU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -978,7 +978,7 @@ export const ruRU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Сделать основной',
         actionLabel__remove: 'Удалить',
         add: 'Добавить новый способ оплаты',
@@ -987,11 +987,11 @@ export const ruRU: LocalizationResource = {
         formButtonPrimary__add: 'Добавить способ оплаты',
         formButtonPrimary__pay: 'Оплатить {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} будет удален из этой учетной записи.',
           messageLine2:
             'Вы больше не сможете использовать этот способ оплаты, и любые зависимые функции больше не будут работать.',
-          successMessage: '{{paymentSource}} был удален из вашей учетной записи.',
+          successMessage: '{{paymentMethod}} был удален из вашей учетной записи.',
           title: 'Удалить способ оплаты',
         },
         title: 'Доступные опции',
@@ -1048,7 +1048,7 @@ export const ruRU: LocalizationResource = {
       actionDescription: 'Введите "Удалить учетную запись" ниже, чтобы продолжить.',
       confirm: 'Удалить учетную запись',
       messageLine1:
-        'Вы уверены, что хотите удалить свою учетную запись из Clerk? Пожалуйста, свяжитесь с владельцем приложения, чтобы удалить вашу информацию из их приложения и других сервисов.',
+        'Вы уверены, что хотите удалить свою учетную запись? Некоторые связанные данные могут быть сохранены. Чтобы запросить полное удаление данных, обратитесь в службу поддержки.',
       messageLine2: 'Это действие является окончательным и необратимым.',
       title: 'Удалить учетную запись',
     },

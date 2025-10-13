@@ -222,6 +222,7 @@ export class SignIn extends BaseResource implements SignInResource {
           redirectUrl: params.redirectUrl,
           actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
           oidcPrompt: params.oidcPrompt,
+          enterpriseConnectionId: params.enterpriseConnectionId,
         } as EnterpriseSSOConfig;
         break;
       default:
@@ -308,7 +309,8 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
+      params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -328,6 +330,7 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        enterpriseConnectionId,
       });
     }
 
@@ -608,13 +611,33 @@ class SignInFuture implements SignInFutureResource {
 
   constructor(readonly resource: SignIn) {}
 
+  get id() {
+    return this.resource.id;
+  }
+
+  get identifier() {
+    return this.resource.identifier;
+  }
+
+  get createdSessionId() {
+    return this.resource.createdSessionId;
+  }
+
+  get userData() {
+    return this.resource.userData;
+  }
+
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
     return this.resource.status || 'needs_identifier';
   }
 
-  get availableStrategies() {
+  get supportedFirstFactors() {
     return this.resource.supportedFirstFactors ?? [];
+  }
+
+  get supportedSecondFactors() {
+    return this.resource.supportedSecondFactors ?? [];
   }
 
   get isTransferable() {
@@ -635,6 +658,10 @@ class SignInFuture implements SignInFutureResource {
 
   get firstFactorVerification() {
     return this.resource.firstFactorVerification;
+  }
+
+  get secondFactorVerification() {
+    return this.resource.secondFactorVerification;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
@@ -679,23 +706,27 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  private async _create(params: SignInFutureCreateParams): Promise<void> {
+    await this.resource.__internal_basePost({
+      path: this.resource.pathRoot,
+      body: params,
+    });
+  }
+
   async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body: params,
-      });
+      await this._create(params);
     });
   }
 
   async password(params: SignInFuturePasswordParams): Promise<{ error: unknown }> {
-    if ([params.identifier, params.email, params.phoneNumber].filter(Boolean).length > 1) {
-      throw new Error('Only one of identifier, email, or phoneNumber can be provided');
+    if ([params.identifier, params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
+      throw new Error('Only one of identifier, emailAddress, or phoneNumber can be provided');
     }
 
     return runAsyncResourceTask(this.resource, async () => {
       // TODO @userland-errors:
-      const identifier = params.identifier || params.email || params.phoneNumber;
+      const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
@@ -720,7 +751,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (emailAddress) {
-        await this.create({ identifier: emailAddress });
+        await this._create({ identifier: emailAddress });
       }
 
       const emailCodeFactor = this.selectFirstFactor({ strategy: 'email_code', emailAddressId });
@@ -761,7 +792,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (emailAddress) {
-        await this.create({ identifier: emailAddress });
+        await this._create({ identifier: emailAddress });
       }
 
       const emailLinkFactor = this.selectFirstFactor({ strategy: 'email_link', emailAddressId });
@@ -824,7 +855,7 @@ class SignInFuture implements SignInFutureResource {
 
     return runAsyncResourceTask(this.resource, async () => {
       if (phoneNumber) {
-        await this.create({ identifier: phoneNumber });
+        await this._create({ identifier: phoneNumber });
       }
 
       const phoneCodeFactor = this.selectFirstFactor({ strategy: 'phone_code', phoneNumberId });
@@ -856,13 +887,18 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('modal flow is not supported yet');
       }
 
-      if (!this.resource.id) {
-        await this.create({
-          strategy,
-          redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          actionCompleteRedirectUrl: redirectUrl,
-        });
+      let actionCompleteRedirectUrl = redirectUrl;
+      try {
+        new URL(redirectUrl);
+      } catch {
+        actionCompleteRedirectUrl = window.location.origin + redirectUrl;
       }
+
+      await this._create({
+        strategy,
+        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
+        actionCompleteRedirectUrl,
+      });
 
       const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
 
@@ -900,7 +936,7 @@ class SignInFuture implements SignInFutureResource {
           throw new Error(`Unsupported Web3 provider: ${provider}`);
       }
 
-      await this.create({ identifier });
+      await this._create({ identifier });
 
       const web3FirstFactor = this.resource.supportedFirstFactors?.find(
         f => f.strategy === strategy,

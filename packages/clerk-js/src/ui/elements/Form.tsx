@@ -295,6 +295,7 @@ const OTPInput = (props: OTPInputProps) => {
               center
               elementDescriptors={{
                 error: descriptors.otpCodeFieldErrorText,
+                success: descriptors.otpCodeFieldSuccessText,
               }}
             />
           </Flex>

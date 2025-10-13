@@ -68,8 +68,8 @@ export const taIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'பயனர் சாதனம்',
   badge__you: 'நீங்கள்',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const taIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const taIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'இயல்புநிலையாக்கு',
         actionLabel__remove: 'நீக்கு',
         add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
@@ -292,11 +292,11 @@ export const taIN: LocalizationResource = {
         formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
         formButtonPrimary__pay: '{{amount}} செலுத்து',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
           messageLine2:
             'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
-          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
+          successMessage: '{{paymentMethod}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
           title: 'கட்டண மூலத்தை நீக்கு',
         },
         title: 'கிடைக்கும் விருப்பங்கள்',
@@ -979,7 +979,7 @@ export const taIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'இயல்புநிலையாக்கு',
         actionLabel__remove: 'நீக்கு',
         add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
@@ -988,11 +988,11 @@ export const taIN: LocalizationResource = {
         formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
         formButtonPrimary__pay: '{{amount}} செலுத்து',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
           messageLine2:
             'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
-          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
+          successMessage: '{{paymentMethod}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
           title: 'கட்டண மூலத்தை நீக்கு',
         },
         title: 'கிடைக்கும் விருப்பங்கள்',
@@ -1049,7 +1049,7 @@ export const taIN: LocalizationResource = {
       actionDescription: 'தொடர கீழே "Delete account" என்று உள்ளிடவும்.',
       confirm: 'கணக்கை நீக்கு',
       messageLine1:
-        'Clerk-லிருந்து உங்கள் கணக்கை நீக்க விரும்புகிறீர்களா? உங்கள் தகவலை அவர்களின் பயன்பாடு மற்றும் பிற சேவைகளில் இருந்து நீக்க, பயன்பாட்டின் உரிமையாளரைத் தொடர்பு கொள்ளவும்.',
+        'உங்கள் கணக்கை நிச்சயமாக நீக்க விரும்புகிறீர்களா? சில தொடர்புடைய தரவு தக்கவைக்கப்படலாம். முழு தரவு நீக்கத்தைக் கோர, தயவுசெய்து ஆதரவைத் தொடர்பு கொள்ளவும்.',
       messageLine2: 'இந்த செயல் நிரந்தரமானது மற்றும் மாற்ற முடியாதது.',
       title: 'கணக்கை நீக்கு',
     },

@@ -68,8 +68,8 @@ export const bnIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ব্যবহারকারীর ডিভাইস',
   badge__you: 'আপনি',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const bnIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const bnIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'ডিফল্ট করুন',
         actionLabel__remove: 'সরান',
         add: 'নতুন পেমেন্ট উৎস যোগ করুন',
@@ -292,11 +292,11 @@ export const bnIN: LocalizationResource = {
         formButtonPrimary__add: 'পেমেন্ট পদ্ধতি যোগ করুন',
         formButtonPrimary__pay: '{{amount}} প্রদান করুন',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} এই অ্যাকাউন্ট থেকে সরানো হবে।',
           messageLine2:
             'আপনি আর এই পেমেন্ট উৎস ব্যবহার করতে পারবেন না এবং এর উপর নির্ভরশীল যেকোনো আবর্তক সাবস্ক্রিপশন আর কাজ করবে না।',
-          successMessage: '{{paymentSource}} আপনার অ্যাকাউন্ট থেকে সরানো হয়েছে।',
+          successMessage: '{{paymentMethod}} আপনার অ্যাকাউন্ট থেকে সরানো হয়েছে।',
           title: 'পেমেন্ট উৎস সরান',
         },
         title: 'উপলব্ধ বিকল্প',
@@ -973,7 +973,7 @@ export const bnIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -982,7 +982,7 @@ export const bnIN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1042,7 +1042,7 @@ export const bnIN: LocalizationResource = {
       actionDescription: 'চালিয়ে যেতে নীচে "Delete account" টাইপ করুন।',
       confirm: 'অ্যাকাউন্ট মুছুন',
       messageLine1:
-        'আপনি কি নিশ্চিত যে আপনি Clerk থেকে আপনার অ্যাকাউন্ট মুছতে চান? আপনার তথ্য তাদের অ্যাপ্লিকেশন এবং অন্যান্য সেবা থেকে মুছে ফেলার জন্য অ্যাপ্লিকেশনের মালিকের সাথে যোগাযোগ করুন।',
+        'আপনি কি নিশ্চিত যে আপনি আপনার অ্যাকাউন্ট মুছে ফেলতে চান? কিছু সংশ্লিষ্ট ডেটা ধরে রাখা হতে পারে। সম্পূর্ণ ডেটা মুছে ফেলার অনুরোধ করতে, অনুগ্রহ করে সহায়তার সাথে যোগাযোগ করুন।',
       messageLine2: 'এই কার্যটি স্থায়ী এবং অপরিবর্তনীয়।',
       title: 'অ্যাকাউন্ট মুছুন',
     },

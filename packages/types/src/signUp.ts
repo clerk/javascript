@@ -60,6 +60,7 @@ export interface SignUpResource extends ClerkResource {
   createdUserId: string | null;
   abandonAt: number | null;
   legalAcceptedAt: number | null;
+  locale: string | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 
@@ -112,4 +113,17 @@ export interface SignUpResource extends ClerkResource {
    * @internal
    */
   __internal_future: SignUpFutureResource;
+
+  /**
+   * @experimental
+   */
+  __experimental_getEnterpriseConnections: () => Promise<SignUpEnterpriseConnectionResource[]>;
+}
+
+/**
+ * @experimental
+ */
+export interface SignUpEnterpriseConnectionResource extends ClerkResource {
+  id: string;
+  name: string;
 }

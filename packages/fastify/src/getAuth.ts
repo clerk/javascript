@@ -1,17 +1,10 @@
-import type {
-  AuthenticateRequestOptions,
-  GetAuthFn,
-  SignedInAuthObject,
-  SignedOutAuthObject,
-} from '@clerk/backend/internal';
+import type { AuthOptions, GetAuthFn, SignedInAuthObject, SignedOutAuthObject } from '@clerk/backend/internal';
 import { getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import type { FastifyRequest } from 'fastify';
 
 import { pluginRegistrationRequired } from './errors';
 
-type GetAuthOptions = { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
-
-export const getAuth: GetAuthFn<FastifyRequest> = ((req: FastifyRequest, options?: GetAuthOptions) => {
+export const getAuth: GetAuthFn<FastifyRequest> = ((req: FastifyRequest, options?: AuthOptions) => {
   const authReq = req as FastifyRequest & { auth: SignedInAuthObject | SignedOutAuthObject };
 
   if (!authReq.auth) {

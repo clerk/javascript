@@ -52,7 +52,7 @@ const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> 
     pathRoot: '',
     reload: vi.fn(),
   },
-  paymentSource: undefined,
+  paymentMethod: undefined,
   confirm: vi.fn(),
   reload: vi.fn(),
   pathRoot: '/checkout',

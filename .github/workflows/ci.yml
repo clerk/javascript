@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - release/v4
+      - vincent-and-the-doctor
 
 permissions:
   contents: read
@@ -291,7 +292,7 @@ jobs:
             'astro',
             'expo-web',
             'tanstack-react-start',
-            'tanstack-react-router',
+            # 'tanstack-react-router',
             'vue',
             'nuxt',
             'react-router',

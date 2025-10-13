@@ -68,8 +68,8 @@ export const daDK: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brugerenhed',
   badge__you: 'Dig',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const daDK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const daDK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +292,7 @@ export const daDK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -961,7 +961,7 @@ export const daDK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -970,7 +970,7 @@ export const daDK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1030,7 +1030,7 @@ export const daDK: LocalizationResource = {
       actionDescription: 'Skriv "Slet konto" nedenfor for at fortsætte.',
       confirm: 'Slet konto',
       messageLine1:
-        'Er du sikker på, at du vil slette din konto fra Clerk? Kontakt venligst applikationsejeren for at slette dine oplysninger fra deres applikation og andre tjenester.',
+        'Er du sikker på, at du vil slette din konto? Nogle tilknyttede data kan blive bevaret. For at anmode om fuld datasletning skal du kontakte support.',
       messageLine2: 'Denne handling er permanent og kan ikke fortrydes.',
       title: 'Slet konto',
     },

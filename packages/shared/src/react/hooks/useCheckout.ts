@@ -162,7 +162,7 @@ export const useCheckout = (options?: UseCheckoutParams): __experimental_UseChec
         isImmediatePlanChange: null,
         planPeriod: null,
         plan: null,
-        paymentSource: null,
+        paymentMethod: null,
         freeTrialEndsAt: null,
         payer: null,
       };

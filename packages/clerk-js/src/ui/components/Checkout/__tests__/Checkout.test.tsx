@@ -35,7 +35,7 @@ describe('Checkout', () => {
     // Mock billing to prevent actual API calls and stay in loading state
     fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
-    const { baseElement } = render(
+    const { baseElement, getByRole } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -53,9 +53,7 @@ describe('Checkout', () => {
       expect(baseElement.querySelector('[role="dialog"]')).toBeVisible();
 
       // Verify the checkout title is displayed
-      const title = baseElement.querySelector('[data-localization-key="commerce.checkout.title"]');
-      expect(title).toBeVisible();
-      expect(title).toHaveTextContent('Checkout');
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
 
       // Verify spinner is shown during initialization
       const spinner = baseElement.querySelector('span[aria-live="polite"]');
@@ -110,7 +108,7 @@ describe('Checkout', () => {
       errors: [{ code: 'unknown_error' }],
     });
 
-    const { baseElement } = render(
+    const { getByRole, baseElement } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -126,7 +124,7 @@ describe('Checkout', () => {
     await waitFor(() => {
       // Component should still render the drawer structure even with errors
       expect(baseElement.querySelector('[role="dialog"]')).toBeVisible();
-      expect(baseElement.querySelector('[data-localization-key="commerce.checkout.title"]')).toBeVisible();
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
     });
   });
 
@@ -171,7 +169,7 @@ describe('Checkout', () => {
 
     fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
-    const { baseElement } = render(
+    const { baseElement, getByRole } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -191,7 +189,7 @@ describe('Checkout', () => {
       expect(dialog).toHaveAttribute('tabindex', '-1');
 
       // Check heading hierarchy
-      const heading = baseElement.querySelector('h2[data-localization-key="commerce.checkout.title"]');
+      const heading = getByRole('heading', { name: 'Checkout' });
       expect(heading).toBeVisible();
 
       // Check focus guards for modal
@@ -366,7 +364,7 @@ describe('Checkout', () => {
         freeTrialDays: 14,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
+      paymentMethod: undefined,
       confirm: vi.fn(),
       freeTrialEndsAt,
     } as any);
@@ -450,7 +448,7 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
+      paymentMethod: undefined,
       confirm: vi.fn(),
       freeTrialEndsAt,
     } as any);
@@ -530,10 +528,10 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: {
+      paymentMethod: {
         id: 'pm_test_visa',
         last4: '4242',
-        paymentMethod: 'card',
+        paymentType: 'card',
         cardType: 'visa',
         isDefault: true,
         isRemovable: true,
@@ -622,10 +620,10 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: {
+      paymentMethod: {
         id: 'pm_test_visa',
         last4: '4242',
-        paymentMethod: 'card',
+        paymentType: 'card',
         cardType: 'visa',
         isDefault: true,
         isRemovable: true,
@@ -665,12 +663,12 @@ describe('Checkout', () => {
         f.withBilling();
       });
 
-      fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
         data: [
           {
             id: 'pm_test_visa',
             last4: '4242',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'visa',
             isDefault: true,
             isRemovable: true,
@@ -684,7 +682,7 @@ describe('Checkout', () => {
           {
             id: 'pm_test_mastercard',
             last4: '5555',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'mastercard',
             isDefault: false,
             isRemovable: true,
@@ -747,7 +745,7 @@ describe('Checkout', () => {
           freeTrialDays: 7,
           freeTrialEnabled: true,
         },
-        paymentSource: undefined,
+        paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
       } as any);
@@ -758,7 +756,7 @@ describe('Checkout', () => {
           onOpenChange={() => {}}
         >
           <Checkout
-            planId='plan_with_payment_sources'
+            planId='plan_with_payment_methods'
             planPeriod='month'
           />
         </Drawer.Root>,
@@ -780,18 +778,18 @@ describe('Checkout', () => {
       });
 
       await waitFor(() => {
-        const visaPaymentSource = getByText('visa');
-        expect(visaPaymentSource).toBeVisible();
+        const visaPaymentMethod = getByText('visa');
+        expect(visaPaymentMethod).toBeVisible();
 
         const last4Digits = getByText('⋯ 4242');
         expect(last4Digits).toBeVisible();
 
-        // Verify the default badge is shown for the first payment source
+        // Verify the default badge is shown for the first payment method
         const defaultBadge = getByText('Default');
         expect(defaultBadge).toBeVisible();
 
-        // Verify the hidden input contains the correct payment source id
-        const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
+        // Verify the hidden input contains the correct payment method id
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
         expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
@@ -804,12 +802,12 @@ describe('Checkout', () => {
         f.withBilling();
       });
 
-      fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
         data: [
           {
             id: 'pm_test_visa',
             last4: '4242',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'visa',
             isDefault: true,
             isRemovable: true,
@@ -823,7 +821,7 @@ describe('Checkout', () => {
           {
             id: 'pm_test_mastercard',
             last4: '5555',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'mastercard',
             isDefault: false,
             isRemovable: true,
@@ -886,7 +884,7 @@ describe('Checkout', () => {
           freeTrialDays: 7,
           freeTrialEnabled: true,
         },
-        paymentSource: undefined,
+        paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: null,
       } as any);
@@ -897,7 +895,7 @@ describe('Checkout', () => {
           onOpenChange={() => {}}
         >
           <Checkout
-            planId='plan_with_payment_sources'
+            planId='plan_with_payment_methods'
             planPeriod='month'
           />
         </Drawer.Root>,
@@ -919,18 +917,18 @@ describe('Checkout', () => {
       });
 
       await waitFor(() => {
-        const visaPaymentSource = getByText('visa');
-        expect(visaPaymentSource).toBeVisible();
+        const visaPaymentMethod = getByText('visa');
+        expect(visaPaymentMethod).toBeVisible();
 
         const last4Digits = getByText('⋯ 4242');
         expect(last4Digits).toBeVisible();
 
-        // Verify the default badge is shown for the first payment source
+        // Verify the default badge is shown for the first payment method
         const defaultBadge = getByText('Default');
         expect(defaultBadge).toBeVisible();
 
-        // Verify the hidden input contains the correct payment source id
-        const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
+        // Verify the hidden input contains the correct payment method id
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
         expect(getByRole('button', { name: 'Pay $10.00' })).toBeInTheDocument();
@@ -943,12 +941,12 @@ describe('Checkout', () => {
         f.withBilling();
       });
 
-      fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
         data: [
           {
             id: 'pm_test_visa',
             last4: '4242',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'visa',
             isDefault: true,
             isRemovable: true,
@@ -962,7 +960,7 @@ describe('Checkout', () => {
           {
             id: 'pm_test_mastercard',
             last4: '5555',
-            paymentMethod: 'card',
+            paymentType: 'card',
             cardType: 'mastercard',
             isDefault: false,
             isRemovable: true,
@@ -1025,7 +1023,7 @@ describe('Checkout', () => {
           freeTrialDays: 7,
           freeTrialEnabled: true,
         },
-        paymentSource: undefined,
+        paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: null,
       } as any);
@@ -1036,7 +1034,7 @@ describe('Checkout', () => {
           onOpenChange={() => {}}
         >
           <Checkout
-            planId='plan_with_payment_sources'
+            planId='plan_with_payment_methods'
             planPeriod='month'
           />
         </Drawer.Root>,
@@ -1055,8 +1053,8 @@ describe('Checkout', () => {
         const addPaymentMethodButton = queryByText('Add payment method');
         expect(addPaymentMethodButton).toBeNull();
 
-        const visaPaymentSource = queryByText('visa');
-        expect(visaPaymentSource).toBeNull();
+        const visaPaymentMethod = queryByText('visa');
+        expect(visaPaymentMethod).toBeNull();
 
         expect(
           getByText(
@@ -1064,8 +1062,8 @@ describe('Checkout', () => {
           ),
         ).toBeInTheDocument();
 
-        // Verify the hidden input contains the correct payment source id
-        const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
+        // Verify the hidden input contains the correct payment method id
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
         expect(queryByRole('button', { name: 'Subscribe' })).toBeInTheDocument();

@@ -67,13 +67,13 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const resource = forResource === 'organization' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
 
-  const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
+  const { data: initializedPaymentMethod, trigger: initializePaymentMethod } = useSWRMutation(
     {
-      key: 'billing-payment-source-initialize',
+      key: 'billing-payment-method-initialize',
       resourceId: resource?.id,
     },
     () => {
-      return resource?.initializePaymentSource({
+      return resource?.initializePaymentMethod({
         gateway: 'stripe',
       });
     },
@@ -85,14 +85,14 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
     if (!resource?.id) {
       return;
     }
-    initializePaymentSource().catch(() => {
+    initializePaymentMethod().catch(() => {
       // ignore errors
     });
   }, [resource?.id]);
 
-  const externalGatewayId = initializedPaymentSource?.externalGatewayId;
-  const externalClientSecret = initializedPaymentSource?.externalClientSecret;
-  const paymentMethodOrder = initializedPaymentSource?.paymentMethodOrder;
+  const externalGatewayId = initializedPaymentMethod?.externalGatewayId;
+  const externalClientSecret = initializedPaymentMethod?.externalClientSecret;
+  const paymentMethodOrder = initializedPaymentMethod?.paymentMethodOrder;
   const stripePublishableKey = environment?.commerceSettings.billing.stripePublishableKey;
 
   const { data: stripe } = useSWR(
@@ -113,7 +113,7 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
 
   return {
     stripe,
-    initializePaymentSource,
+    initializePaymentMethod,
     externalClientSecret,
     paymentMethodOrder,
   };
@@ -362,7 +362,7 @@ export type UsePaymentElementReturn = {
 );
 
 const usePaymentElement = (): UsePaymentElementReturn => {
-  const { isPaymentElementReady, initializePaymentSource } = usePaymentElementContext();
+  const { isPaymentElementReady, initializePaymentMethod } = usePaymentElementContext();
   const { stripe, elements } = useStripeUtilsContext();
   const { externalClientSecret } = usePaymentElementContext();
 
@@ -402,8 +402,8 @@ const usePaymentElement = (): UsePaymentElementReturn => {
       return throwLibsMissingError();
     }
 
-    await initializePaymentSource();
-  }, [stripe, elements, initializePaymentSource]);
+    await initializePaymentMethod();
+  }, [stripe, elements, initializePaymentMethod]);
 
   const isProviderReady = Boolean(stripe && externalClientSecret);
 

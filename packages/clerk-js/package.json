@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.97.0",
+  "version": "5.99.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -42,6 +42,7 @@
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
+    "dev:channel": "rspack serve --config rspack.config.js --env variant=\"clerk.channel.browser\"",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
@@ -92,7 +93,7 @@
     "@rspack/plugin-react-refresh": "^1.5.0",
     "@svgr/webpack": "^6.5.1",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.18.6",
+    "@types/node": "^22.18.8",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "jsdom": "26.1.0",

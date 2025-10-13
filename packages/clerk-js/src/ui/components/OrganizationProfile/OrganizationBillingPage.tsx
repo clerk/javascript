@@ -8,7 +8,7 @@ import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useTabState } from '../../hooks/useTabState';
 import { PaymentAttemptsList } from '../PaymentAttempts';
-import { PaymentSources } from '../PaymentSources';
+import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
@@ -68,7 +68,7 @@ const OrganizationBillingPageInternal = withCardStateProvider(() => {
                 )}
               />
               <Protect condition={has => has({ permission: 'org:sys_billing:manage' })}>
-                <PaymentSources />
+                <PaymentMethods />
               </Protect>
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
