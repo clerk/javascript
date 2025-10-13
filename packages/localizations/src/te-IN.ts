@@ -68,8 +68,8 @@ export const teIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
   badge__you: 'మీరు',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const teIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -282,7 +282,7 @@ export const teIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
         actionLabel__remove: 'తొలగించండి',
         add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
@@ -291,11 +291,11 @@ export const teIN: LocalizationResource = {
         formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
         formButtonPrimary__pay: '{{amount}} చెల్లించండి',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
           messageLine2:
             'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          successMessage: '{{paymentMethod}} మీ ఖాతా నుండి తొలగించబడింది.',
           title: 'చెల్లింపు మూలాన్ని తొలగించండి',
         },
         title: 'అందుబాటులో ఉన్న ఎంపికలు',
@@ -975,7 +975,7 @@ export const teIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
         actionLabel__remove: 'తొలగించండి',
         add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
@@ -984,11 +984,11 @@ export const teIN: LocalizationResource = {
         formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
         formButtonPrimary__pay: '{{amount}} చెల్లించండి',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
           messageLine2:
             'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          successMessage: '{{paymentMethod}} మీ ఖాతా నుండి తొలగించబడింది.',
           title: 'చెల్లింపు మూలాన్ని తొలగించండి',
         },
         title: 'అందుబాటులో ఉన్న ఎంపికలు',

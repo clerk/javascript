@@ -9,6 +9,8 @@ import type {
   RemovePaymentMethodParams,
 } from '@clerk/types';
 
+import { Billing } from '@/core/modules/billing';
+
 import { BaseResource, DeletedObject } from './internal';
 
 export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
@@ -47,9 +49,7 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
     const { orgId } = params ?? {};
     const json = (
       await BaseResource._fetch({
-        path: orgId
-          ? `/organizations/${orgId}/commerce/payment_sources/${this.id}`
-          : `/me/commerce/payment_sources/${this.id}`,
+        path: Billing.path(`/payment_methods/${this.id}`, { orgId }),
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;
@@ -60,11 +60,9 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
   public async makeDefault(params?: MakeDefaultPaymentMethodParams) {
     const { orgId } = params ?? {};
     await BaseResource._fetch({
-      path: orgId
-        ? `/organizations/${orgId}/commerce/payers/default_payment_source`
-        : `/me/commerce/payers/default_payment_source`,
+      path: Billing.path(`/payers/default_payment_method`, { orgId }),
       method: 'PUT',
-      body: { payment_source_id: this.id } as any,
+      body: { payment_method_id: this.id } as any,
     });
 
     return null;
