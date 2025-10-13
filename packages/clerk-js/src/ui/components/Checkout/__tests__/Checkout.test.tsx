@@ -35,7 +35,7 @@ describe('Checkout', () => {
     // Mock billing to prevent actual API calls and stay in loading state
     fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
-    const { baseElement } = render(
+    const { baseElement, getByRole } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -53,9 +53,7 @@ describe('Checkout', () => {
       expect(baseElement.querySelector('[role="dialog"]')).toBeVisible();
 
       // Verify the checkout title is displayed
-      const title = baseElement.querySelector('[data-localization-key="commerce.checkout.title"]');
-      expect(title).toBeVisible();
-      expect(title).toHaveTextContent('Checkout');
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
 
       // Verify spinner is shown during initialization
       const spinner = baseElement.querySelector('span[aria-live="polite"]');
@@ -110,7 +108,7 @@ describe('Checkout', () => {
       errors: [{ code: 'unknown_error' }],
     });
 
-    const { baseElement } = render(
+    const { getByRole, baseElement } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -126,7 +124,7 @@ describe('Checkout', () => {
     await waitFor(() => {
       // Component should still render the drawer structure even with errors
       expect(baseElement.querySelector('[role="dialog"]')).toBeVisible();
-      expect(baseElement.querySelector('[data-localization-key="commerce.checkout.title"]')).toBeVisible();
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
     });
   });
 
@@ -171,7 +169,7 @@ describe('Checkout', () => {
 
     fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
-    const { baseElement } = render(
+    const { baseElement, getByRole } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -191,7 +189,7 @@ describe('Checkout', () => {
       expect(dialog).toHaveAttribute('tabindex', '-1');
 
       // Check heading hierarchy
-      const heading = baseElement.querySelector('h2[data-localization-key="commerce.checkout.title"]');
+      const heading = getByRole('heading', { name: 'Checkout' });
       expect(heading).toBeVisible();
 
       // Check focus guards for modal
