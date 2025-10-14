@@ -13,7 +13,7 @@ interface ClerkAPIResponseOptions extends Omit<ClerkErrorParams, 'message' | 'co
 }
 
 export class ClerkAPIResponseError extends ClerkError implements ClerkAPIResponseErrorInterface {
-  name = 'ClerkAPIResponseError';
+  static name = 'ClerkAPIResponseError';
   status: number;
   clerkTraceId?: string;
   retryAfter?: number;
@@ -22,10 +22,11 @@ export class ClerkAPIResponseError extends ClerkError implements ClerkAPIRespons
   constructor(message: string, options: ClerkAPIResponseOptions) {
     const { data: errorsJson, status, clerkTraceId, retryAfter } = options;
     super({ ...options, message, code: 'api_response_error' });
+    Object.setPrototypeOf(this, ClerkAPIResponseError.prototype);
     this.status = status;
     this.clerkTraceId = clerkTraceId;
     this.retryAfter = retryAfter;
-    this.errors = errorsJson.map(e => new ClerkAPIError(e));
+    this.errors = (errorsJson || []).map(e => new ClerkAPIError(e));
   }
 
   public toString() {
@@ -38,6 +39,11 @@ export class ClerkAPIResponseError extends ClerkError implements ClerkAPIRespons
     }
 
     return message;
+  }
+
+  // Override formatMessage to keep it unformatted for backward compatibility
+  protected static override formatMessage(name: string, msg: string, _: string, __: string | undefined) {
+    return msg;
   }
 }
 

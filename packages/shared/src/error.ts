@@ -1,5 +1,6 @@
 export { errorToJSON, parseError, parseErrors } from './errors/parseError';
 
+export { ClerkAPIError } from './errors/clerkApiError';
 export { ClerkAPIResponseError } from './errors/clerkApiResponseError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';

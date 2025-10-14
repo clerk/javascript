@@ -1,7 +1,6 @@
 import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '@clerk/types';
 
 import { createErrorTypeGuard } from './createErrorTypeGuard';
-import { parseError } from './parseError';
 
 export type ClerkApiErrorMeta = Record<string, unknown>;
 
@@ -16,11 +15,28 @@ export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements Cler
   readonly meta: Meta;
 
   constructor(json: ClerkAPIErrorJSON) {
-    const parsedError = parseError(json);
+    const parsedError = this.parseJsonError(json);
     this.code = parsedError.code;
     this.message = parsedError.message;
     this.longMessage = parsedError.longMessage;
-    this.meta = json.meta as Meta;
+    this.meta = parsedError.meta;
+  }
+
+  private parseJsonError(json: ClerkAPIErrorJSON) {
+    return {
+      code: json.code,
+      message: json.message,
+      longMessage: json.long_message,
+      meta: {
+        paramName: json.meta?.param_name,
+        sessionId: json.meta?.session_id,
+        emailAddresses: json.meta?.email_addresses,
+        identifiers: json.meta?.identifiers,
+        zxcvbn: json.meta?.zxcvbn,
+        plan: json.meta?.plan,
+        isPlanUpgradePossible: json.meta?.is_plan_upgrade_possible,
+      } as unknown as Meta,
+    };
   }
 }
 

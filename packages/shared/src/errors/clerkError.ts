@@ -34,25 +34,20 @@ export interface ClerkErrorParams {
 const __DEV__ = true;
 
 export class ClerkError extends Error {
+  static name = 'ClerkError';
   readonly clerkError = true as const;
-  readonly name: string = 'ClerkError';
   readonly code: string;
   readonly longMessage: string | undefined;
   readonly docsUrl: string | undefined;
   readonly cause: Error | undefined;
 
+  get name() {
+    return this.constructor.name;
+  }
+
   constructor(opts: ClerkErrorParams) {
-    const formatMessage = (msg: string, code: string, docsUrl: string | undefined) => {
-      msg = `${this.name}: ${msg.trim()}\n\n(code="${code}")\n\n`;
-      if (__DEV__) {
-        msg += `\n\nDocs: ${docsUrl}`;
-      }
-      return msg;
-    };
-
-    super(formatMessage(opts.message, opts.code, opts.docsUrl), { cause: opts.cause });
+    super(new.target.formatMessage(new.target.name, opts.message, opts.code, opts.docsUrl), { cause: opts.cause });
     Object.setPrototypeOf(this, ClerkError.prototype);
-
     this.code = opts.code;
     this.docsUrl = opts.docsUrl;
     this.longMessage = opts.longMessage;
@@ -61,6 +56,20 @@ export class ClerkError extends Error {
 
   public toString() {
     return `[${this.name}]\nMessage:${this.message}`;
+  }
+
+  protected static formatMessage(name: string, msg: string, code: string, docsUrl: string | undefined) {
+    // Keeping the Clerk prefix for backward compatibility
+    // msg = `${name}: ${msg.trim()}\n\n(code="${code}")\n\n`;
+    // We can remove the Clerk prefix in the next major version
+    const prefix = 'Clerk:';
+    const regex = new RegExp(prefix.replace(' ', '\\s*'), 'i');
+    msg = msg.replace(regex, '');
+    msg = `${prefix} ${msg.trim()}\n\n(code="${code}")\n\n`;
+    if (__DEV__ && docsUrl) {
+      msg += `\n\nDocs: ${docsUrl}`;
+    }
+    return msg;
   }
 }
 
