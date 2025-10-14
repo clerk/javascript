@@ -77,11 +77,13 @@ function hasMultipleEnterpriseConnections(
     return false;
   }
 
-  return factors.every(
-    factor =>
-      factor.strategy === 'enterprise_sso' &&
-      'enterpriseConnectionId' in factor &&
-      'enterpriseConnectionName' in factor,
+  return (
+    factors.filter(
+      factor =>
+        factor.strategy === 'enterprise_sso' &&
+        'enterpriseConnectionId' in factor &&
+        'enterpriseConnectionName' in factor,
+    ).length > 1
   );
 }
 

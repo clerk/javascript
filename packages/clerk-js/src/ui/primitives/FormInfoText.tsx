@@ -6,7 +6,7 @@ import { useFormField } from './hooks/useFormField';
 import { Text } from './Text';
 
 export const FormInfoText = forwardRef<HTMLElement, FormTextProps>((props, ref) => {
-  const { hasError, errorMessageId } = useFormField() || {};
+  const { hasError } = useFormField() || {};
 
   if (!hasError && !props.children) {
     return null;
@@ -16,8 +16,6 @@ export const FormInfoText = forwardRef<HTMLElement, FormTextProps>((props, ref) 
     <Text
       ref={ref}
       colorScheme='secondary'
-      aria-live='polite'
-      id={errorMessageId}
       {...props}
       css={applyVariants(props)}
     />

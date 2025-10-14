@@ -1,4 +1,4 @@
-import type { ClerkAPIError } from './api';
+import type { ClerkAPIError } from './errors';
 import type { PublicKeyCredentialCreationOptionsWithoutExtensions } from './passkey';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { ClerkResource } from './resource';
