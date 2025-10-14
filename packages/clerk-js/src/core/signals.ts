@@ -1,6 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { createClerkGlobalHookError } from '@clerk/shared/experimental-error';
+import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { Errors, SignInSignal, SignUpSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
@@ -62,7 +63,7 @@ function errorsToParsedErrors(error: unknown): Errors {
 
   if (!isClerkAPIResponseError(error)) {
     parsedErrors.raw = [error];
-    parsedErrors.global = [error];
+    parsedErrors.global = [createClerkGlobalHookError(error)];
     return parsedErrors;
   }
 
@@ -80,9 +81,9 @@ function errorsToParsedErrors(error: unknown): Errors {
     }
 
     if (parsedErrors.global) {
-      parsedErrors.global.push(error);
+      parsedErrors.global.push(createClerkGlobalHookError(error));
     } else {
-      parsedErrors.global = [error];
+      parsedErrors.global = [createClerkGlobalHookError(error)];
     }
   });
 
