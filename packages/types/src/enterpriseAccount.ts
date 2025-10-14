@@ -12,6 +12,7 @@ export interface EnterpriseAccountResource extends ClerkResource {
   active: boolean;
   emailAddress: string;
   enterpriseConnection: EnterpriseAccountConnectionResource | null;
+  enterpriseConnectionId: string | null;
   firstName: string | null;
   lastName: string | null;
   protocol: EnterpriseProtocol;
@@ -19,6 +20,7 @@ export interface EnterpriseAccountResource extends ClerkResource {
   providerUserId: string | null;
   publicMetadata: Record<string, unknown> | null;
   verification: VerificationResource | null;
+  lastAuthenticatedAt: Date | null;
   __internal_toSnapshot: () => EnterpriseAccountJSONSnapshot;
 }
 
@@ -33,5 +35,6 @@ export interface EnterpriseAccountConnectionResource extends ClerkResource {
   protocol: EnterpriseProtocol;
   provider: EnterpriseProvider;
   syncUserAttributes: boolean;
+  enterpriseConnectionId: string | null;
   __internal_toSnapshot: () => EnterpriseAccountConnectionJSONSnapshot;
 }

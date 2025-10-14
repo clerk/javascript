@@ -15,6 +15,7 @@ import type {
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
+import type { ClerkAPIErrorJSON } from './errors';
 import type { EmailAddressIdentifier, UsernameIdentifier } from './identifiers';
 import type { ActClaim } from './jwtv2';
 import type { OAuthProvider } from './oauth';
@@ -252,6 +253,8 @@ export interface EnterpriseAccountJSON extends ClerkResourceJSON {
   provider_user_id: string | null;
   public_metadata: Record<string, unknown>;
   verification: VerificationJSON | null;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
@@ -267,6 +270,7 @@ export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
   sync_user_attributes: boolean;
   created_at: number;
   updated_at: number;
+  enterprise_connection_id: string | null;
 }
 
 export interface SamlAccountJSON extends ClerkResourceJSON {
@@ -279,6 +283,8 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   last_name: string;
   verification?: VerificationJSON;
   saml_connection?: SamlAccountConnectionJSON;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface UserJSON extends ClerkResourceJSON {
@@ -366,32 +372,6 @@ export interface SignUpVerificationJSON extends VerificationJSON {
   next_action: string;
   supported_strategies: string[];
   channel?: PhoneCodeChannel;
-}
-
-export interface ClerkAPIErrorJSON {
-  code: string;
-  message: string;
-  long_message?: string;
-  meta?: {
-    param_name?: string;
-    session_id?: string;
-    email_addresses?: string[];
-    identifiers?: string[];
-    zxcvbn?: {
-      suggestions: {
-        code: string;
-        message: string;
-      }[];
-    };
-    plan?: {
-      amount_formatted: string;
-      annual_monthly_amount_formatted: string;
-      currency_symbol: string;
-      id: string;
-      name: string;
-    };
-    is_plan_upgrade_possible?: boolean;
-  };
 }
 
 export interface TokenJSON extends ClerkResourceJSON {
@@ -696,7 +676,7 @@ export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingInitializedPaymentMethodJSON extends ClerkResourceJSON {
-  object: 'commerce_payment_source_initialize';
+  object: 'commerce_payment_method_initialize';
   external_client_secret: string;
   external_gateway_id: string;
   payment_method_order: string[];

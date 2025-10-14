@@ -10,7 +10,7 @@ import { formatSafeIdentifier } from '@/ui/utils/formatSafeIdentifier';
 import type { LocalizationKey } from '../../customizables';
 import { Col, descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useCardState } from '../../elements/contexts';
-import { ChatAltIcon, Email, Fingerprint, LockClosedIcon } from '../../icons';
+import { ChatAltIcon, Email, Fingerprint, LockClosedIcon, Organization } from '../../icons';
 import { useReverificationAlternativeStrategies } from './useReverificationAlternativeStrategies';
 import { useUserVerificationSession } from './useUserVerificationSession';
 import { withHavingTrouble } from './withHavingTrouble';
@@ -128,6 +128,7 @@ export function getButtonIcon(factor: SessionVerificationFirstFactor) {
     phone_code: ChatAltIcon,
     password: LockClosedIcon,
     passkey: Fingerprint,
+    enterprise_sso: Organization,
   } as const;
 
   return icons[factor.strategy];

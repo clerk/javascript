@@ -1,3 +1,29 @@
+export interface ClerkAPIErrorJSON {
+  code: string;
+  message: string;
+  long_message?: string;
+  meta?: {
+    param_name?: string;
+    session_id?: string;
+    email_addresses?: string[];
+    identifiers?: string[];
+    zxcvbn?: {
+      suggestions: {
+        code: string;
+        message: string;
+      }[];
+    };
+    plan?: {
+      amount_formatted: string;
+      annual_monthly_amount_formatted: string;
+      currency_symbol: string;
+      id: string;
+      name: string;
+    };
+    is_plan_upgrade_possible?: boolean;
+  };
+}
+
 /**
  * An interface that represents an error returned by the Clerk API.
  */
