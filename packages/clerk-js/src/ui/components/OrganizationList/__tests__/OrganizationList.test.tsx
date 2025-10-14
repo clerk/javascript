@@ -116,7 +116,7 @@ describe('OrganizationList', () => {
         });
       });
 
-      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
         Promise.resolve({
           data: [
             createFakeUserOrganizationMembership({
@@ -155,7 +155,7 @@ describe('OrganizationList', () => {
         }),
       );
 
-      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
         Promise.resolve({
           data: [invitation],
           total_count: 1,

@@ -219,7 +219,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
         data: [],
         total_count: 14,
@@ -253,7 +253,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
         data: [],
         total_count: 5,

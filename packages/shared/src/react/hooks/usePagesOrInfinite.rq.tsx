@@ -157,7 +157,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const setData: CacheSetter = value => {
     if (triggerInfinite) {
-      return queryClient.setQueryData(infiniteQueryKey, value) as any;
+      return queryClient.setQueryData(infiniteQueryKey, (prevValue: any) => {
+        return { ...prevValue, pages: typeof value === 'function' ? value(prevValue.pages) : value };
+      }) as any;
     }
     return queryClient.setQueryData(pagesQueryKey, value) as any;
   };
