@@ -289,6 +289,89 @@ describe('usePagesOrInfinite - pagination helpers', () => {
   });
 });
 
+describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () => {
+  it('pagination mode: initial loading/fetching true, hasNextPage toggles, data replaced on next page', async () => {
+    const fetcher = vi.fn(async (p: any) => {
+      if (p.initialPage === 1) {
+        return {
+          data: [{ id: '1' }, { id: '2' }],
+          total_count: 4,
+        };
+      }
+      return {
+        data: [{ id: '3' }, { id: '4' }],
+        total_count: 4,
+      };
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: false, keepPreviousData: false, enabled: true } as const;
+    const cacheKeys = { type: 't-core-like-paginated' } as const;
+
+    const { result } = renderHook(() =>
+      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    );
+
+    // initial
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isFetching).toBe(true);
+    expect(result.current.count).toBe(0);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.count).toBe(4);
+    expect(result.current.page).toBe(1);
+    expect(result.current.hasNextPage).toBe(true);
+    expect(result.current.data).toEqual([{ id: '1' }, { id: '2' }]);
+
+    // trigger next page and assert loading toggles
+    act(() => {
+      result.current.fetchNext();
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.page).toBe(2);
+    expect(result.current.hasNextPage).toBe(false);
+    expect(result.current.data).toEqual([{ id: '3' }, { id: '4' }]);
+  });
+
+  it('infinite mode: isFetching toggles on fetchNext while isLoading stays false after first page', async () => {
+    const deferred = createDeferredPromise();
+    const fetcher = vi.fn(async (p: any) => {
+      if (p.initialPage === 1) {
+        return {
+          data: [{ id: '1' }, { id: '2' }],
+          total_count: 4,
+        };
+      }
+      return deferred.promise.then(() => ({ data: [{ id: '3' }, { id: '4' }], total_count: 4 }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: true, keepPreviousData: false, enabled: true } as const;
+    const cacheKeys = { type: 't-core-like-infinite' } as const;
+
+    const { result } = renderHook(() =>
+      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: '1' }, { id: '2' }]);
+
+    act(() => {
+      result.current.fetchNext();
+    });
+    // after first page loaded, next loads should not set isLoading, only isFetching
+    expect(result.current.isLoading).toBe(false);
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(result.current.data).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }]);
+  });
+});
+
 describe('useWithSafeValues', () => {
   it('returns defaults when params is true or undefined and caches page/pageSize', () => {
     const defaults = { initialPage: 1, pageSize: 10, infinite: false, keepPreviousData: false } as const;
