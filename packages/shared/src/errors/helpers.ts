@@ -1,4 +1,4 @@
-import type { ClerkAPIResponseError } from './apiResponseError';
+import type { ClerkAPIResponseError } from './clerkApiResponseError';
 import type { EmailLinkError } from './emailLinkError';
 import type { MetamaskError } from './metamaskError';
 import type { ClerkRuntimeError } from './runtimeError';
