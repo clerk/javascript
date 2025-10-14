@@ -1829,10 +1829,11 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   /**
-   * Whether to show pricing table for organizations.
-   * @default false
+   * The subscriber type to display plans for.
+   * If `organization`, show plans for the active organization; otherwise for the user.
+   * @default 'user'
    */
-  forOrganizations?: boolean;
+  for?: ForPayerType;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
