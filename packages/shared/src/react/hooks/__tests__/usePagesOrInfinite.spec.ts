@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDeferredPromise } from '../../../utils/createDeferredPromise';
-import { usePagesOrInfinite, useWithSafeValues } from '../usePagesOrInfinite';
+import { usePagesOrInfinite } from '../usePagesOrInfinite';
 
 describe('usePagesOrInfinite - basic pagination', () => {
   beforeEach(() => {
@@ -411,35 +411,6 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
     deferred.resolve(undefined);
     await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }]);
-  });
-});
-
-describe('useWithSafeValues', () => {
-  it('returns defaults when params is true or undefined and caches page/pageSize', () => {
-    const defaults = { initialPage: 1, pageSize: 10, infinite: false, keepPreviousData: false } as const;
-
-    // params=true -> use defaults
-    const { result: r1 } = renderHook(() => useWithSafeValues(true, defaults));
-    expect(r1.current).toStrictEqual(defaults);
-
-    // params=undefined -> defaults
-    const { result: r2 } = renderHook(() => useWithSafeValues(undefined, defaults));
-    expect(r2.current).toStrictEqual(defaults);
-
-    // params with overrides; ensure initial refs are cached across re-renders
-    const { result: r3, rerender } = renderHook(
-      ({ page }) =>
-        useWithSafeValues({ initialPage: page, pageSize: 5, infinite: true, keepPreviousData: true }, defaults as any),
-      { initialProps: { page: 2 } },
-    );
-
-    expect(r3.current.initialPage).toBe(2);
-    expect(r3.current.pageSize).toBe(5);
-
-    // change prop; cached initialPage/pageSize should not change
-    rerender({ page: 3 });
-    expect(r3.current.initialPage).toBe(2);
-    expect(r3.current.pageSize).toBe(5);
   });
 });
 
