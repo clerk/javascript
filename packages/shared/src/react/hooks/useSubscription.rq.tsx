@@ -36,7 +36,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
 
-  const queryClient = useClerkQueryClient();
+  const [queryClient] = useClerkQueryClient();
 
   const queryKey = useMemo(() => {
     return [
@@ -55,7 +55,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
       return clerk.billing.getSubscription(obj.args);
     },
     staleTime: 1_000 * 60,
-    enabled: Boolean(user?.id && billingEnabled),
+    enabled: Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true),
   });
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);

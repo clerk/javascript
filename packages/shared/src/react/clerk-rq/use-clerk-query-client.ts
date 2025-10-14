@@ -57,7 +57,7 @@ function createRecursiveProxy(label: string): RecursiveMock {
 
 const mockQueryClient = createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient;
 
-const useClerkQueryClient = (): QueryClient => {
+const useClerkQueryClient = (): [QueryClient, boolean] => {
   const clerk = useClerkInstanceContext();
 
   // @ts-expect-error - __internal_queryClient is not typed
@@ -76,7 +76,9 @@ const useClerkQueryClient = (): QueryClient => {
     };
   }, [clerk, setQueryClientLoaded]);
 
-  return queryClient?.client || mockQueryClient;
+  const isLoaded = typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client';
+
+  return [queryClient?.client || mockQueryClient, isLoaded];
 };
 
 export { useClerkQueryClient };
