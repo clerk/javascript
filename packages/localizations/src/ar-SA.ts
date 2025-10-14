@@ -17,9 +17,9 @@ export const arSA: LocalizationResource = {
   apiKeys: {
     action__add: 'أضف مفتاحاً جديداً',
     action__search: 'ابحث عن مفتاح',
-    createdAndExpirationStatus__expiresOn: 
-      "أنشأ في {{ createdDate | shortDate('en-US') }} • ينتهي في {{ expiresDate | longDate('en-US') }}",
-    createdAndExpirationStatus__never: "أنشأ في {{ createdDate | shortDate('en-US') }} • صلاحية دائمة",
+    createdAndExpirationStatus__expiresOn:
++      "تم الإنشاء في {{ createdDate | shortDate('en-US') }} • ينتهي في {{ expiresDate | longDate('en-US') }}",
+    createdAndExpirationStatus__never: "تم الإنشاء في {{ createdDate | shortDate('en-US') }} • صلاحية دائمة",
     detailsTitle__emptyRow: 'لا توجد أي مفاتيح API',
     formButtonPrimary__add: 'أنشئ مفتاحاً',
     formFieldCaption__expiration__expiresOn: 'ينتهي في {{ date }}',
@@ -40,18 +40,18 @@ export const arSA: LocalizationResource = {
     lastUsed__months: 'قبل {{months}} شهر',
     lastUsed__seconds: 'قبل {{seconds}} ثانية',
     lastUsed__years: 'قبل {{years}} سنة',
-    menuAction__revoke: 'إلغاء مفتاح',
+    menuAction__revoke: 'إلغاء المفتاح',
     revokeConfirmation: {
       confirmationText: 'إلغاء',
       formButtonPrimary__revoke: 'إلغاء المفتاح',
       formHint: 'هل أنت متأكد أنك تريد حذف هذا المفتاح السري؟',
-      formTitle: 'إلغاء "{{apiKeyName}}" المفتاح السري؟',
+      formTitle: 'إلغاء المفتاح السري "{{apiKeyName}}"؟',
     },
   },
   backButton: 'الرجوع',
   badge__activePlan: 'مفعل',
   badge__canceledEndsAt: 'ملغى • ينتهي في {{ date | shortDate("en-US") }}',
-  badge__currentPlan: 'العرض الحالي',
+  badge__currentPlan: 'الخطة الحالية',
   badge__default: 'الافتراضي',
   badge__endsAt: 'ينتهي في {{ date | shortDate("en-US") }}',
   badge__expired: 'منتهي',
@@ -60,11 +60,11 @@ export const arSA: LocalizationResource = {
   badge__pastDueAt: 'تجاوز موعد الدفع في {{ date | shortDate("en-US") }}',
   badge__pastDuePlan: 'تجاوز موعد الدفع',
   badge__primary: 'الرئيسي',
-  badge__renewsAt: 'تجدد في {{ date | shortDate("en-US") }}',
+  badge__renewsAt: 'يتجدد في {{ date | shortDate("en-US") }}',
   badge__requiresAction: 'مطلوب اتخاذ إجراء',
   badge__startsAt: 'يبدأ في {{ date | shortDate("en-US") }}',
   badge__thisDevice: 'هذا الجهاز',
-  badge__trialEndsAt: 'الفترة التجريبية تنتهي في {{ date | shortDate("en-US") }}',
+  badge__trialEndsAt: 'تنتهي الفترة التجريبية في {{ date | shortDate("en-US") }}',
   badge__unverified: 'لم يتم التحقق منه',
   badge__upcomingPlan: 'القادم',
   badge__userDevice: 'جهاز المستخدم',
@@ -190,7 +190,7 @@ export const arSA: LocalizationResource = {
     sameDay: "اليوم في {{ date | timeString('en-US') }}",
   },
   dividerText: 'أو',
-  footerActionLink__alternativePhoneCodeProvider: 'إرسال الرمز من خلال رسالة نصية بدلاً',
+  footerActionLink__alternativePhoneCodeProvider: 'إرسال الرمز عبر رسالة نصية بدلاً من ذلك',
   footerActionLink__useAnotherMethod: 'اختر طريقة أخرى',
   footerPageLink__help: 'المساعدة',
   footerPageLink__privacy: 'الخصوصية',
@@ -204,8 +204,8 @@ export const arSA: LocalizationResource = {
   formFieldHintText__optional: 'إختياري',
   formFieldHintText__slug:
     '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
-  formFieldInputPlaceholder__apiKeyDescription: 'إشرح لما تود توليد هذا المفتاح',
-  formFieldInputPlaceholder__apiKeyExpirationDate: 'إختر تاريخاً',
+  formFieldInputPlaceholder__apiKeyDescription: 'اشرح لماذا تريد إنشاء هذا المفتاح',
+  formFieldInputPlaceholder__apiKeyExpirationDate: 'اختر تاريخاً',
   formFieldInputPlaceholder__apiKeyName: 'أدخل اسماً لمفتاحك السري',
   formFieldInputPlaceholder__backupCode: 'أدخل الرمز الاحتياطي',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
@@ -239,7 +239,7 @@ export const arSA: LocalizationResource = {
   formFieldLabel__organizationDomainDeletePending: 'حذف الدعوات والأقتراحات المعلقة',
   formFieldLabel__organizationDomainEmailAddress: 'عنوان البريد الإلكتروني للتحقق',
   formFieldLabel__organizationDomainEmailAddressDescription:
-    'أدخل عنوان البريد الإلكتروني الخاص بالنطاق للحصول على  الرمز والتحقق من النطاق',
+    'أدخل عنوان البريد الإلكتروني الخاص بالنطاق للحصول على الرمز والتحقق من النطاق',
   formFieldLabel__organizationName: 'اسم المنظمة',
   formFieldLabel__organizationSlug: 'رابط المنظمة',
   formFieldLabel__passkeyName: 'اسم مفتاح المرور (Passkey)',
@@ -259,8 +259,8 @@ export const arSA: LocalizationResource = {
   membershipRole__guestMember: 'ضيف',
   organizationList: {
     action__createOrganization: 'إنشاء منظمة',
-    action__invitationAccept: 'انضمام',
-    action__suggestionsAccept: 'طلب انضمام',
+    action__invitationAccept: 'قبول الدعوة',
+    action__suggestionsAccept: 'قبول الطلب',
     createOrganization: 'إنشاء منظمة',
     invitationAcceptedLabel: 'تم الانضمام',
     subtitle: 'للمتابعة إلى {{applicationName}}',
@@ -350,7 +350,7 @@ export const arSA: LocalizationResource = {
     },
     membersPage: {
       action__invite: 'دعوة',
-      action__search: 'بحث',
+      action__search: 'ابحث',
       activeMembersTab: {
         menuAction__remove: 'إزالة عضو',
         tableHeader__actions: 'الإجراءات',
@@ -497,7 +497,7 @@ export const arSA: LocalizationResource = {
   },
   paginationButton__next: 'التالي',
   paginationButton__previous: 'السابق',
-  paginationRowText__displaying: 'يتم عرض',
+  paginationRowText__displaying: 'عرض',
   paginationRowText__of: 'من',
   reverification: {
     alternativeMethods: {
@@ -506,7 +506,7 @@ export const arSA: LocalizationResource = {
       blockButton__backupCode: 'استعمل الرمز الاحتياطي',
       blockButton__emailCode: 'إرسال الرمز إلى {{identifier}}',
       blockButton__passkey: 'تسجيل الدخول بمفتاح المرور الخاص بك',
-      blockButton__password: 'تسجيل الدخول بكلمة السر الخاصة بك',
+      blockButton__password: 'تسجيل الدخول بكلمة المرور الخاصة بك',
       blockButton__phoneCode: 'أرسل الرمز عبر رسالة نصية إلى {{identifier}}',
       blockButton__totp: 'استعمل تطبيق المصادقة',
       getHelp: {
@@ -604,7 +604,7 @@ export const arSA: LocalizationResource = {
     },
     emailLink: {
       clientMismatch: {
-        subtitle: 'للمتابعة, قم بفتح رابط التحقق من نفس الجهاز والمتصفح الذي قمت بمحاولة تسجيل الدخول منه',
+        subtitle: 'للمتابعة، افتح رابط التحقق من نفس الجهاز والمتصفح الذي حاولت تسجيل الدخول منه',
         title: 'رابط التحقق غير صالح على هذا الجهاز',
       },
       expired: {
@@ -641,8 +641,8 @@ export const arSA: LocalizationResource = {
       formTitle: 'رمز التحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
       subtitle: 'لإعادة تعيين كلمة المرور',
-      subtitle_email: 'أولاً, قم بإدخال الرمز المرسل إلى البريد الإلكتروني الخاص بك',
-      subtitle_phone: 'أولاً, قم بإدخال الرمز المرسل إلى رقم الهاتف الخاص بك',
+      subtitle_email: 'أولاً، أدخل الرمز المرسل إلى بريدك الإلكتروني',
+      subtitle_phone: 'أولاً، أدخل الرمز المرسل إلى رقم هاتفك',
       title: 'إعادة تعيين كلمة المرور',
     },
     forgotPasswordAlternativeMethods: {
@@ -684,7 +684,7 @@ export const arSA: LocalizationResource = {
       formButtonPrimary: 'إعادة تعيين كلمة المرور',
       requiredMessage:
         'يوجد حساب بالفعل بهذا البريد الإلكتروني لم يتم التحقق منه. الرجاء إعادة تعيين كلمة المرور لتأمين حسابك',
-      successMessage: 'تم تغيير كلمة المرور بنجاح. يتم تسجيل الدخول الرجاء الإنتظار قليلا.',
+      successMessage: 'تم تغيير كلمة المرور بنجاح. جاري تسجيل الدخول، الرجاء الانتظار قليلًا.',
       title: 'إعادة تعيين كلمة المرور',
     },
     resetPasswordMfa: {
@@ -692,7 +692,7 @@ export const arSA: LocalizationResource = {
     },
     start: {
       actionLink: 'إنشاء حساب جديد',
-      actionLink__join_waitlist: 'انضم للائحة الإنتظار',
+      actionLink__join_waitlist: 'انضم للائحة الانتظار',
       actionLink__use_email: 'استعمل البريد الإلكتروني',
       actionLink__use_email_username: 'استعمل البريد الإلكتروني أو اسم المستخدم',
       actionLink__use_passkey: 'استعمل مفتاح المرور بدلاً من ذلك',
@@ -702,7 +702,7 @@ export const arSA: LocalizationResource = {
       actionText__join_waitlist: undefined,
       alternativePhoneCodeProvider: {
         actionLink: 'استعمل طريقة أخرى',
-        label: '{{provider}} رقم الهاتف',
+        label: 'رقم هاتف {{provider}}',
         subtitle: 'استعمل رقم هاتفك ليصلك رمز التحقق على {{provider}}',
         title: 'تسجيل الدخول إلى {{applicationName}} عبر {{provider}}',
       },
