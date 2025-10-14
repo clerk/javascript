@@ -65,15 +65,57 @@ describe('usePagesOrInfinite - basic pagination', () => {
   });
 });
 
+describe('usePagesOrInfinite - request params and getDifferentKeys', () => {
+  it('calls fetcher with merged params and strips cache keys; updates params on page change', async () => {
+    const fetcher = vi.fn((p: any) =>
+      Promise.resolve({
+        data: Array.from({ length: p.pageSize }, (_, i) => ({ id: `row-${p.initialPage}-${i}` })),
+        total_count: 6,
+      }),
+    );
+
+    const params = { initialPage: 2, pageSize: 3, someFilter: 'A' } as const;
+    const cacheKeys = { type: 't-params', userId: 'user_42' } as const;
+    const config = { infinite: false, enabled: true } as const;
+
+    const { result } = renderHook(() =>
+      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    // First call: should include provided params, not include cache keys
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    const first = fetcher.mock.calls[0][0];
+    expect(first).toStrictEqual({ initialPage: 2, pageSize: 3, someFilter: 'A' });
+    expect(first.type).toBeUndefined();
+    expect(first.userId).toBeUndefined();
+
+    // Move to next page: getDifferentKeys should provide updated initialPage to fetcher
+    act(() => {
+      result.current.fetchNext();
+    });
+
+    await waitFor(() => expect(result.current.page).toBe(3));
+    // The next call should have initialPage updated to 3
+    const second = fetcher.mock.calls[1][0];
+    expect(second.initialPage).toBe(3);
+    expect(second.pageSize).toBe(3);
+    expect(second.someFilter).toBe('A');
+    expect(second.type).toBeUndefined();
+    expect(second.userId).toBeUndefined();
+  });
+});
+
 describe('usePagesOrInfinite - infinite mode', () => {
   it('aggregates pages, uses getKey offsets, and maps count to last page total_count', async () => {
-    const fetcher = vi.fn(async (p: any) => {
+    const fetcher = vi.fn((p: any) => {
       // return distinct pages based on initialPage
       const pageNo = p.initialPage;
-      return {
+      return Promise.resolve({
         data: [{ id: `p${pageNo}-a` }, { id: `p${pageNo}-b` }],
         total_count: 9 + pageNo, // varying count, last page should be used
-      };
+      });
     });
 
     const params = { initialPage: 1, pageSize: 2 } as const;
@@ -89,7 +131,7 @@ describe('usePagesOrInfinite - infinite mode', () => {
 
     expect(fetcher).toHaveBeenCalledTimes(1);
     const firstArgs = fetcher.mock.calls[0][0];
-    expect(firstArgs).toMatchObject({ initialPage: 1, pageSize: 2 });
+    expect(firstArgs).toStrictEqual({ initialPage: 1, pageSize: 2 });
     expect(firstArgs.type).toBeUndefined();
     expect(firstArgs.orgId).toBeUndefined();
 
@@ -290,18 +332,18 @@ describe('usePagesOrInfinite - pagination helpers', () => {
 });
 
 describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () => {
-  it('pagination mode: initial loading/fetching true, hasNextPage toggles, data replaced on next page', async () => {
+  it('pagination mode: initial loading/fetching true, hasNextPage toggles, data replaced on next page (Promise-based fetcher)', async () => {
     const fetcher = vi.fn(async (p: any) => {
       if (p.initialPage === 1) {
-        return {
+        return Promise.resolve({
           data: [{ id: '1' }, { id: '2' }],
           total_count: 4,
-        };
+        });
       }
-      return {
+      return Promise.resolve({
         data: [{ id: '3' }, { id: '4' }],
         total_count: 4,
-      };
+      });
     });
 
     const params = { initialPage: 1, pageSize: 2 } as const;
@@ -378,11 +420,11 @@ describe('useWithSafeValues', () => {
 
     // params=true -> use defaults
     const { result: r1 } = renderHook(() => useWithSafeValues(true, defaults));
-    expect(r1.current).toMatchObject(defaults);
+    expect(r1.current).toStrictEqual(defaults);
 
     // params=undefined -> defaults
     const { result: r2 } = renderHook(() => useWithSafeValues(undefined, defaults));
-    expect(r2.current).toMatchObject(defaults);
+    expect(r2.current).toStrictEqual(defaults);
 
     // params with overrides; ensure initial refs are cached across re-renders
     const { result: r3, rerender } = renderHook(
@@ -421,9 +463,7 @@ describe('usePagesOrInfinite - error propagation', () => {
   });
 
   it('sets error and isError in infinite mode when fetcher throws', async () => {
-    const fetcher = vi.fn(async () => {
-      throw new Error('boom2');
-    });
+    const fetcher = vi.fn(() => Promise.reject(new Error('boom2')));
 
     const params = { initialPage: 1, pageSize: 2 } as const;
     const config = { infinite: true, enabled: true } as const;
