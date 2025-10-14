@@ -76,7 +76,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
             splitOutput = swap(splitOutput, 0, 2);
           }
 
-          //
           if (paramExtensionTag) {
             const stuff = this.helpers.getCommentParts(paramExtensionTag.content);
 
