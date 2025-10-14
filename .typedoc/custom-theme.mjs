@@ -296,7 +296,6 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
       },
       /**
        * This hides the "Type parameters" section, the declaration title, and the "Type declaration" heading from the output
-       * Unless the @includeType tag is present, in which case it shows the type in a parameter table format
        * @param {import('typedoc').DeclarationReflection} model
        * @param {{ headingLevel: number, nested?: boolean }} options
        */
