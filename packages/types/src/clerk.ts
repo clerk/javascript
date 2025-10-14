@@ -1496,6 +1496,7 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the user profile modal will open.
+   * @example __experimental_startPath: '/members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1527,6 +1528,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the organization profile modal will open.
+   * @example __experimental_startPath: '/organization-members'
    * @experimental
    **/
   __experimental_startPath?: string;
