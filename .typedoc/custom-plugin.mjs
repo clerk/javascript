@@ -76,7 +76,7 @@ const LINK_REPLACEMENTS = [
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
-  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payment-method-resource', '/docs/reference/javascript/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
   ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
