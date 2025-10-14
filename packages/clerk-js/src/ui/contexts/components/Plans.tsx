@@ -115,7 +115,7 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { subscriptionItems, data: topLevelSubscription } = useSubscription();
+  const { subscriptionItems, revalidate: revalidateSubscriptions, data: topLevelSubscription } = useSubscription();
 
   // Invalidates cache but does not fetch immediately
   const { data: plans, revalidate: revalidatePlans } = usePlans({ mode: 'cache' });
@@ -127,10 +127,11 @@ export const usePlansContext = () => {
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
+    void revalidateSubscriptions();
     void revalidatePlans();
     void revalidateStatements();
     void revalidatePaymentSources();
-  }, [revalidatePlans, revalidateStatements, revalidatePaymentSources]);
+  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentSources]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
