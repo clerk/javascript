@@ -1,4 +1,3 @@
-import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -32,6 +31,7 @@ import type {
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
+import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
