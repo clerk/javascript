@@ -206,8 +206,8 @@ export const arSA: LocalizationResource = {
     '(slug) هو معرف يمكن قراءته بواسطة الإنسان ويجب أن يكون فريدًا. غالبًا ما يتم استخدامه في الروابط الإلكترونية.',
   formFieldInputPlaceholder__apiKeyDescription: 'إشرح لما تود توليد هذا المفتاح',
   formFieldInputPlaceholder__apiKeyExpirationDate: 'إختر تاريخاً',
-  formFieldInputPlaceholder__apiKeyName: 'أدخل إسماً لمفتاحك السري',
-  formFieldInputPlaceholder__backupCode: 'أدخل الرمز الإحتياطي',
+  formFieldInputPlaceholder__apiKeyName: 'أدخل اسماً لمفتاحك السري',
+  formFieldInputPlaceholder__backupCode: 'أدخل الرمز الاحتياطي',
   formFieldInputPlaceholder__confirmDeletionUserAccount: 'حذف الحساب',
   formFieldInputPlaceholder__emailAddress: 'أدخل عنوان البريد الإلكتروني',
   formFieldInputPlaceholder__emailAddress_username: 'اسم المستخدم أو عنوان البريد الإلكتروني',
@@ -225,7 +225,7 @@ export const arSA: LocalizationResource = {
   formFieldLabel__apiKeyExpiration: 'انتهاء الصلاحية',
   formFieldLabel__apiKeyName: 'اسم المفتاح السري',
   formFieldLabel__automaticInvitations: 'تمكين الدعوة التلقائية لهذا النطاق',
-  formFieldLabel__backupCode: 'الرمز الإحتياطي',
+  formFieldLabel__backupCode: 'الرمز الاحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
   formFieldLabel__confirmPassword: 'تأكيد كلمة المرور',
   formFieldLabel__currentPassword: 'كلمة المرور الحالية',
@@ -250,7 +250,7 @@ export const arSA: LocalizationResource = {
   formFieldLabel__username: 'اسم المستخدم',
   impersonationFab: {
     action__signOut: 'تسجيل الخروج',
-    title: 'تسجيل الدخول بإسم {{identifier}}',
+    title: 'تسجيل الدخول باسم {{identifier}}',
   },
   lastAuthenticationStrategy: 'آخر استخدام',
   maintenanceMode: 'نحن نقوم بعمل بعض التعديلات في الوقت الحالي. سوف نعود في غضون دقائق قليلة',
@@ -265,8 +265,8 @@ export const arSA: LocalizationResource = {
     invitationAcceptedLabel: 'تم الانضمام',
     subtitle: 'للمتابعة إلى {{applicationName}}',
     suggestionsAcceptedLabel: 'في انتظار الموافقة',
-    title: 'إختر حسابًا',
-    titleWithoutPersonal: 'إختر منظمة',
+    title: 'اختر حسابًا',
+    titleWithoutPersonal: 'اختر منظمة',
   },
   organizationProfile: {
     apiKeysPage: {
@@ -503,7 +503,7 @@ export const arSA: LocalizationResource = {
     alternativeMethods: {
       actionLink: 'طلب المساعدة',
       actionText: 'لا تملك أيا منها؟',
-      blockButton__backupCode: 'استعمل الرمز الإحتياطي',
+      blockButton__backupCode: 'استعمل الرمز الاحتياطي',
       blockButton__emailCode: 'إرسال الرمز إلى {{identifier}}',
       blockButton__passkey: 'تسجيل الدخول بمفتاح المرور الخاص بك',
       blockButton__password: 'تسجيل الدخول بكلمة السر الخاصة بك',
@@ -570,7 +570,7 @@ export const arSA: LocalizationResource = {
     alternativeMethods: {
       actionLink: 'الحصول على المساعدة',
       actionText: 'لا تملك أيا منها؟',
-      blockButton__backupCode: 'استعمل الرمز الإحتياطي',
+      blockButton__backupCode: 'استعمل الرمز الاحتياطي',
       blockButton__emailCode: 'إرسال الرمز إلى {{identifier}}',
       blockButton__emailLink: 'إرسال الرابط إلى {{identifier}}',
       blockButton__passkey: 'تسجيل الدخول بمفتاح المرور الخاص بك',
@@ -594,7 +594,7 @@ export const arSA: LocalizationResource = {
     },
     backupCodeMfa: {
       subtitle: 'للمتابعة إلى {{applicationName}}',
-      title: 'أدخل الرمز الإحتياطي',
+      title: 'أدخل الرمز الاحتياطي',
     },
     emailCode: {
       formTitle: 'رمز التحقق',
@@ -694,10 +694,10 @@ export const arSA: LocalizationResource = {
       actionLink: 'إنشاء حساب جديد',
       actionLink__join_waitlist: 'انضم للائحة الإنتظار',
       actionLink__use_email: 'استعمل البريد الإلكتروني',
-      actionLink__use_email_username: 'استعمل البريد الإلكتروني أو إسم المستخدم',
+      actionLink__use_email_username: 'استعمل البريد الإلكتروني أو اسم المستخدم',
       actionLink__use_passkey: 'استعمل مفتاح المرور بدلاً من ذلك',
       actionLink__use_phone: 'استعمل رقم الهاتف',
-      actionLink__use_username: 'استعمل إسم المستخدم',
+      actionLink__use_username: 'استعمل اسم المستخدم',
       actionText: 'ليس لديك حساب؟',
       actionText__join_waitlist: undefined,
       alternativePhoneCodeProvider: {
