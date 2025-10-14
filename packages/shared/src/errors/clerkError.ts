@@ -1,3 +1,5 @@
+import { createErrorTypeGuard } from './createErrorTypeGuard';
+
 export interface ClerkErrorParams {
   /**
    * A message that describes the error. This is typically intented to be showed to the developers.
@@ -53,6 +55,8 @@ export class ClerkError extends Error {
 
     this.code = opts.code;
     this.docsUrl = opts.docsUrl;
+    this.longMessage = opts.longMessage;
+    this.cause = opts.cause;
   }
 
   public toString() {
@@ -64,5 +68,7 @@ export class ClerkError extends Error {
  * Type guard to check if a value is a ClerkError instance.
  */
 export function isClerkError(val: unknown): val is ClerkError {
-  return !!val && typeof val === 'object' && 'clerkError' in val && val.clerkError === true;
+  const typeguard = createErrorTypeGuard(ClerkError);
+  // Ths is the base error so we're being more defensive about the type guard
+  return typeguard(val) || (!!val && typeof val === 'object' && 'clerkError' in val && val.clerkError === true);
 }

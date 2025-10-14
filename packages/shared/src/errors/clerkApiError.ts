@@ -1,5 +1,6 @@
 import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '@clerk/types';
 
+import { createErrorTypeGuard } from './createErrorTypeGuard';
 import { parseError } from './parseError';
 
 export type ClerkApiErrorMeta = Record<string, unknown>;
@@ -26,6 +27,4 @@ export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements Cler
 /**
  * Type guard to check if a value is a ClerkApiError instance.
  */
-export function isClerkApiError(error: Error): error is ClerkAPIError {
-  return error instanceof ClerkAPIError;
-}
+export const isClerkApiError = createErrorTypeGuard(ClerkAPIError);

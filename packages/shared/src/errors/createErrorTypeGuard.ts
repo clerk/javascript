@@ -1,5 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc */
 
+type Value = unknown;
+
 /**
  * Creates a type guard function for any error class.
  * The returned function can be called as a standalone function or as a method on an error object.
@@ -16,13 +18,13 @@
  * if (error.isMyError()) { ... }
  * ```
  */
-export function createErrorTypeGuard<T extends new (...args: any[]) => Error>(
+export function createErrorTypeGuard<T extends new (...args: any[]) => Value>(
   ErrorClass: T,
 ): {
-  (error: Error): error is InstanceType<T>;
-  (this: Error): this is InstanceType<T>;
+  (error: Value): error is InstanceType<T>;
+  (this: Value): this is InstanceType<T>;
 } {
-  function typeGuard(this: Error | void, error?: Error): error is InstanceType<T> {
+  function typeGuard(this: Value, error?: Value): error is InstanceType<T> {
     const target = error ?? this;
     if (!target) {
       throw new TypeError(`${ErrorClass.name} type guard requires an error object`);
@@ -31,7 +33,7 @@ export function createErrorTypeGuard<T extends new (...args: any[]) => Error>(
   }
 
   return typeGuard as {
-    (error: Error): error is InstanceType<T>;
-    (this: Error): this is InstanceType<T>;
+    (error: Value): error is InstanceType<T>;
+    (this: Value): this is InstanceType<T>;
   };
 }
