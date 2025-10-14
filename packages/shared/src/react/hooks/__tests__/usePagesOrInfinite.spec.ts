@@ -205,6 +205,20 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
     expect(result.current.data).toEqual([]);
     expect(result.current.count).toBe(0);
   });
+
+  it('does not fetch when isSignedIn=false (infinite mode)', async () => {
+    const fetcher = vi.fn(async () => ({ data: [], total_count: 0 }));
+
+    const params = { initialPage: 1, pageSize: 3 } as const;
+    const config = { infinite: true, enabled: true, isSignedIn: false } as const;
+    const cacheKeys = { type: 't-signedin-false-inf' } as const;
+
+    const { result } = renderHook(() => usePagesOrInfinite(params, fetcher, config, cacheKeys));
+
+    expect(fetcher).toHaveBeenCalledTimes(0);
+    expect(result.current.data).toEqual([]);
+    expect(result.current.count).toBe(0);
+  });
 });
 
 describe('usePagesOrInfinite - cache mode', () => {
@@ -266,6 +280,73 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
     deferred.resolve(undefined);
     await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data).toEqual([{ id: 'p2-a' }, { id: 'p2-b' }]);
+  });
+});
+
+describe('usePagesOrInfinite - sign-out hides previously loaded data', () => {
+  it('pagination mode: data is cleared when isSignedIn switches to false', async () => {
+    const fetcher = vi.fn((p: any) =>
+      Promise.resolve({
+        data: Array.from({ length: p.pageSize }, (_, i) => ({ id: `p${p.initialPage}-${i}` })),
+        total_count: 5,
+      }),
+    );
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const baseConfig = { infinite: false, enabled: true } as const;
+    const cacheKeys = { type: 't-signedout-paginated' } as const;
+
+    const { result, rerender } = renderHook(
+      ({ signedIn }) =>
+        usePagesOrInfinite(
+          params as any,
+          fetcher as any,
+          { ...baseConfig, isSignedIn: signedIn } as any,
+          cacheKeys as any,
+        ),
+      { initialProps: { signedIn: true } },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data.length).toBe(2);
+
+    // simulate sign-out
+    rerender({ signedIn: false });
+    // data should become empty
+    await waitFor(() => expect(result.current.data).toEqual([]));
+    expect(result.current.count).toBe(0);
+  });
+
+  it('infinite mode: data is cleared when isSignedIn switches to false', async () => {
+    const fetcher = vi.fn((p: any) =>
+      Promise.resolve({
+        data: Array.from({ length: p.pageSize }, (_, i) => ({ id: `p${p.initialPage}-${i}` })),
+        total_count: 10,
+      }),
+    );
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const baseConfig = { infinite: true, enabled: true } as const;
+    const cacheKeys = { type: 't-signedout-infinite' } as const;
+
+    const { result, rerender } = renderHook(
+      ({ signedIn }) =>
+        usePagesOrInfinite(
+          params as any,
+          fetcher as any,
+          { ...baseConfig, isSignedIn: signedIn } as any,
+          cacheKeys as any,
+        ),
+      { initialProps: { signedIn: true } },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data.length).toBe(2);
+
+    // simulate sign-out
+    rerender({ signedIn: false });
+    await waitFor(() => expect(result.current.data).toEqual([]));
+    expect(result.current.count).toBe(0);
   });
 });
 

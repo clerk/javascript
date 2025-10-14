@@ -160,7 +160,8 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   // cacheMode being `true` indicates that the cache key is defined, but the fetcher is not.
   // This allows to ready the cache instead of firing a request.
   const shouldFetch = !triggerInfinite && enabled && (!cacheMode ? !!fetcher : true);
-  const swrKey = isSignedIn ? pagesCacheKey : shouldFetch ? pagesCacheKey : null;
+  const swrKey = isSignedIn === false ? null : shouldFetch ? pagesCacheKey : null;
+
   const swrFetcher =
     !cacheMode && !!fetcher
       ? (cacheKeyParams: Record<string, unknown>) => {
@@ -190,7 +191,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     mutate: swrInfiniteMutate,
   } = useSWRInfinite(
     pageIndex => {
-      if (!triggerInfinite || !enabled) {
+      if (!triggerInfinite || !enabled || isSignedIn === false) {
         return null;
       }
 
@@ -202,6 +203,9 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       };
     },
     cacheKeyParams => {
+      if (isSignedIn === false) {
+        return null;
+      }
       // @ts-ignore
       const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
       // @ts-ignore
