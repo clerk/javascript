@@ -56,6 +56,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     },
     staleTime: 1_000 * 60,
     enabled: Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true),
+    // TODO: Add support for keepPreviousData
   });
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);

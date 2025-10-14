@@ -1,7 +1,9 @@
 import type {
   DefaultError,
+  DefinedInfiniteQueryObserverResult,
   DefinedQueryObserverResult,
   InfiniteQueryObserverOptions,
+  InfiniteQueryObserverResult,
   OmitKeyof,
   QueryKey,
   QueryObserverOptions,
@@ -52,3 +54,10 @@ export type UseBaseQueryResult<TData = unknown, TError = DefaultError> = QueryOb
 export type UseQueryResult<TData = unknown, TError = DefaultError> = UseBaseQueryResult<TData, TError>;
 
 export type DefinedUseQueryResult<TData = unknown, TError = DefaultError> = DefinedQueryObserverResult<TData, TError>;
+
+export type UseInfiniteQueryResult<TData = unknown, TError = DefaultError> = InfiniteQueryObserverResult<TData, TError>;
+
+export type DefinedUseInfiniteQueryResult<TData = unknown, TError = DefaultError> = DefinedInfiniteQueryObserverResult<
+  TData,
+  TError
+>;
