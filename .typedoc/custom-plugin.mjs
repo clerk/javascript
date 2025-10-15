@@ -30,7 +30,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-subscription-return.mdx',
   'needs-reverification-parameters.mdx',
   'use-reverification-options.mdx',
-  'use-reverification-params,mdx',
+  'use-reverification-params.mdx',
 ];
 
 /**
