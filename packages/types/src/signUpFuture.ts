@@ -350,6 +350,11 @@ export interface SignUpFutureResource {
   readonly legalAcceptedAt: number | null;
 
   /**
+   * The locale of the user in BCP 47 format.
+   */
+  readonly locale: string | null;
+
+  /**
    * Creates a new `SignUp` instance initialized with the provided parameters. The instance maintains the sign-up
    * lifecycle state through its `status` property, which updates as the authentication flow progresses. Will also
    * deactivate any existing sign-up process the client may already have in progress.
