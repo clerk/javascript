@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { createContextAndHook } from './hooks/createContextAndHook';
+import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';
 import { useOrganization } from './hooks/useOrganization';
 import { useUser } from './hooks/useUser';
@@ -145,7 +146,7 @@ export type PaymentElementProviderProps = {
   /**
    * An optional checkout resource object. When provided, the payment element is scoped to the specific checkout session.
    */
-  checkout?: BillingCheckoutResource;
+  checkout?: BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   /**
    * An optional object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
    */

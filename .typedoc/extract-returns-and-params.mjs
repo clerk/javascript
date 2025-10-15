@@ -45,6 +45,20 @@ function extractReturnsSection(filePath) {
 }
 
 /**
+ * Replaces generic type names in the parameters table with expanded types.
+ * @param {string} content
+ * @returns {string}
+ */
+function replaceGenericTypesInParamsTable(content) {
+  // Replace Fetcher in the parameters table
+  content = content.replace(
+    /(\|\s*`fetcher`\s*\|\s*)`Fetcher`(\s*\|)/g,
+    '$1`Fetcher extends (...args: any[]) => Promise<any>`$2',
+  );
+  return content;
+}
+
+/**
  * Extracts the "## Parameters" section from a markdown file and writes it to a separate file.
  * @param {string} filePath - The path to the markdown file
  * @param {string} dirName - The directory containing the files
@@ -87,6 +101,9 @@ function extractParametersSection(filePath, dirName) {
   // Write to new file
   const newFilePath = path.join(dirName, targetFileName);
   fs.writeFileSync(newFilePath, paramsContent, 'utf-8');
+
+  const processedParams = replaceGenericTypesInParamsTable(fs.readFileSync(newFilePath, 'utf-8'));
+  fs.writeFileSync(newFilePath, processedParams, 'utf-8');
 
   console.log(`[extract-returns] Created ${path.relative(process.cwd(), newFilePath)}`);
   return true;
