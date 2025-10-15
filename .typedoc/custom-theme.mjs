@@ -83,18 +83,13 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
             const parametersIndex = splitOutput.findIndex(item => item.includes('## Parameters'));
 
             if (parametersIndex !== -1) {
-              // Find the immediate next heading after Parameters
-              let nextHeadingIndex = -1;
-              for (let i = parametersIndex + 1; i < splitOutput.length; i++) {
-                const item = splitOutput[i].trim();
-
-                // The next header has to, at a minimum, start with ##
-                // because it comes after '## Parameters'
-                if (item.match(/^##/)) {
-                  nextHeadingIndex = i;
-                  break;
-                }
-              }
+              // Find the immediate next heading after '## Parameters'
+              const nextHeadingIndex = splitOutput.findIndex((item, index) => {
+                // Skip the items before the parameters
+                if (index <= parametersIndex) return false;
+                // Find the next heading
+                return item.startsWith('##') || item.startsWith('\n##');
+              });
 
               // Insert the stuff before the next heading
               // (or at the end of the entire page if no heading found)
