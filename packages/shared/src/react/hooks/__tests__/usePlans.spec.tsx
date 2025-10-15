@@ -65,8 +65,7 @@ describe('usePlans', () => {
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     // ensure correct args passed: for: 'user' and limit/page (rest)
-    expect(getPlansSpy.mock.calls[0][0]).toMatchObject({ for: 'user' });
-    expect(getPlansSpy.mock.calls[0][0].orgId).toBeUndefined();
+    expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'user', initialPage: 1, pageSize: 5 });
     expect(result.current.data.length).toBe(5);
     expect(result.current.count).toBe(25);
   });
@@ -79,9 +78,8 @@ describe('usePlans', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
-    expect(getPlansSpy.mock.calls[0][0]).toMatchObject({ for: 'organization' });
     // orgId must not leak to fetcher
-    expect(getPlansSpy.mock.calls[0][0].orgId).toBeUndefined();
+    expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'organization', initialPage: 1, pageSize: 5 });
     expect(result.current.data.length).toBe(5);
   });
 
@@ -95,7 +93,6 @@ describe('usePlans', () => {
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'user', pageSize: 4, initialPage: 1 });
-    expect(getPlansSpy.mock.calls[0][0].orgId).toBeUndefined();
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data.length).toBe(4);
   });
@@ -111,9 +108,8 @@ describe('usePlans', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(true));
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
+    // orgId must not leak to fetcher
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'organization', pageSize: 3, initialPage: 1 });
-    // orgId should not leak to fetcher
-    expect(getPlansSpy.mock.calls[0][0].orgId).toBeUndefined();
     expect(result.current.data.length).toBe(3);
   });
 });

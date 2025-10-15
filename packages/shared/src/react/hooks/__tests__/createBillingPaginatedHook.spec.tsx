@@ -91,7 +91,9 @@ describe('createBillingPaginatedHook', () => {
     expect(useFetcherMock).toHaveBeenCalledWith('user');
 
     expect(fetcherMock).not.toHaveBeenCalled();
+    // Ensures that SWR does not update the loading state even if the fetcher is not called.
     expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(false);
   });
 
   it('authenticated hook: does not fetch when user is null', () => {
@@ -180,5 +182,221 @@ describe('createBillingPaginatedHook', () => {
     expect(useFetcherMock).toHaveBeenCalledWith('organization');
     expect(fetcherMock).not.toHaveBeenCalled();
     expect(result.current.isLoading).toBe(false);
+  });
+
+  describe('authenticated hook - after sign-out previously loaded data are cleared', () => {
+    it('pagination mode: data is cleared when user signs out', async () => {
+      fetcherMock.mockImplementation((params: any) =>
+        Promise.resolve({
+          data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `p${params.initialPage}-${i}` })),
+          total_count: 5,
+        }),
+      );
+
+      const { result, rerender } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 2 }), {
+        wrapper,
+      });
+
+      await waitFor(() => expect(result.current.isFetching).toBe(true));
+      await waitFor(() => expect(result.current.isFetching).toBe(false));
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(3); // ceil(5/2)
+
+      // Simulate sign-out
+      mockUser = null;
+      rerender();
+
+      // Data should become empty
+      await waitFor(() => expect(result.current.data).toEqual([]));
+      expect(result.current.count).toBe(0);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(0);
+    });
+
+    it('pagination mode: with keepPreviousData=true data is cleared after sign-out', async () => {
+      fetcherMock.mockImplementation((params: any) =>
+        Promise.resolve({
+          data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `item-${params.initialPage}-${i}` })),
+          total_count: 20,
+        }),
+      );
+
+      const { result, rerender } = renderHook(
+        () => useDummyAuth({ initialPage: 1, pageSize: 5, keepPreviousData: true }),
+        {
+          wrapper,
+        },
+      );
+
+      // Wait for initial data load
+      await waitFor(() => expect(result.current.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.data.length).toBe(5);
+      expect(result.current.data).toEqual([
+        { id: 'item-1-0' },
+        { id: 'item-1-1' },
+        { id: 'item-1-2' },
+        { id: 'item-1-3' },
+        { id: 'item-1-4' },
+      ]);
+      expect(result.current.count).toBe(20);
+
+      // Simulate sign-out by setting mockUser to null
+      mockUser = null;
+      rerender();
+
+      // Attention: We are forcing fetcher to be executed instead of setting the key to null
+      // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
+      // This means that SWR will update the loading state to true even if the fetcher is not called,
+      // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
+      await waitFor(() => expect(result.current.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Data should be cleared even with keepPreviousData: true
+      // The key difference here vs usePagesOrInfinite test: userId in cache key changes
+      // from 'user_1' to undefined, which changes the cache key (not just makes it null)
+      await waitFor(() => expect(result.current.data).toEqual([]));
+      expect(result.current.count).toBe(0);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(0);
+    });
+
+    it('infinite mode: data is cleared when user signs out', async () => {
+      fetcherMock.mockImplementation((params: any) =>
+        Promise.resolve({
+          data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `p${params.initialPage}-${i}` })),
+          total_count: 10,
+        }),
+      );
+
+      const { result, rerender } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 2, infinite: true }), {
+        wrapper,
+      });
+
+      await waitFor(() => expect(result.current.isFetching).toBe(true));
+      await waitFor(() => expect(result.current.isFetching).toBe(false));
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(5); // ceil(10/2)
+
+      // Simulate sign-out
+      mockUser = null;
+      rerender();
+
+      await waitFor(() => expect(result.current.data).toEqual([]));
+      expect(result.current.count).toBe(0);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(0);
+    });
+  });
+
+  describe('unauthenticated hook - data persists after sign-out', () => {
+    it('pagination mode: data persists when user signs out', async () => {
+      fetcherMock.mockImplementation((params: any) =>
+        Promise.resolve({
+          data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `p${params.initialPage}-${i}` })),
+          total_count: 5,
+        }),
+      );
+
+      const { result, rerender } = renderHook(() => useDummyUnauth({ initialPage: 1, pageSize: 2 }), {
+        wrapper,
+      });
+
+      await waitFor(() => expect(result.current.isFetching).toBe(true));
+      await waitFor(() => expect(result.current.isFetching).toBe(false));
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(3); // ceil(5/2)
+
+      const originalData = [...result.current.data];
+      const originalCount = result.current.count;
+
+      // Simulate sign-out
+      mockUser = null;
+      rerender();
+
+      // Data should persist for unauthenticated hooks
+      expect(result.current.data).toEqual(originalData);
+      expect(result.current.count).toBe(originalCount);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(3);
+    });
+
+    it('pagination mode: with keepPreviousData=true data persists after sign-out', async () => {
+      fetcherMock.mockImplementation((params: any) =>
+        Promise.resolve({
+          data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `item-${params.initialPage}-${i}` })),
+          total_count: 20,
+        }),
+      );
+
+      const { result, rerender } = renderHook(
+        () => useDummyUnauth({ initialPage: 1, pageSize: 5, keepPreviousData: true }),
+        {
+          wrapper,
+        },
+      );
+
+      // Wait for initial data load
+      await waitFor(() => expect(result.current.isLoading).toBe(true));
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.data.length).toBe(5);
+      expect(result.current.data).toEqual([
+        { id: 'item-1-0' },
+        { id: 'item-1-1' },
+        { id: 'item-1-2' },
+        { id: 'item-1-3' },
+        { id: 'item-1-4' },
+      ]);
+      expect(result.current.count).toBe(20);
+
+      const originalData = [...result.current.data];
+
+      // Simulate sign-out by setting mockUser to null
+      mockUser = null;
+      rerender();
+
+      // Data should persist for unauthenticated hooks even with keepPreviousData: true
+      expect(result.current.data).toEqual(originalData);
+      expect(result.current.count).toBe(20);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(4); // ceil(20/5)
+    });
+
+    it('infinite mode: data persists when user signs out', async () => {
+      fetcherMock.mockImplementation((params: any) =>
+        Promise.resolve({
+          data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `p${params.initialPage}-${i}` })),
+          total_count: 10,
+        }),
+      );
+
+      const { result, rerender } = renderHook(() => useDummyUnauth({ initialPage: 1, pageSize: 2, infinite: true }), {
+        wrapper,
+      });
+
+      await waitFor(() => expect(result.current.isFetching).toBe(true));
+      await waitFor(() => expect(result.current.isFetching).toBe(false));
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(5); // ceil(10/2)
+
+      const originalData = [...result.current.data];
+      const originalCount = result.current.count;
+
+      // Simulate sign-out
+      mockUser = null;
+      rerender();
+
+      // Data should persist for unauthenticated hooks
+      expect(result.current.data).toEqual(originalData);
+      expect(result.current.count).toBe(originalCount);
+      expect(result.current.page).toBe(1);
+      expect(result.current.pageCount).toBe(5);
+    });
   });
 });
