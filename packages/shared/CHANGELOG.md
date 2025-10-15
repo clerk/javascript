@@ -1,5 +1,33 @@
 # Change Log
 
+## 3.28.0
+
+### Minor Changes
+
+- Internal refactor of error handling to improve type safety and error classification. ([#6985](https://github.com/clerk/javascript/pull/6985)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Introduce new `ClerkError` base class for all Clerk errors
+  - Rename internal error files: `apiResponseError.ts` → `clerkApiResponseError.ts`, `runtimeError.ts` → `clerkRuntimeError.ts`
+  - Add `ClerkAPIError` class for individual API errors with improved type safety
+  - Add type guard utilities (`isClerkError`, `isClerkRuntimeError`, `isClerkApiResponseError`) for better error handling
+  - Deprecate `clerkRuntimeError` property in favor of `clerkError` for consistency
+  - Add support for error codes, long messages, and documentation URLs
+
+### Patch Changes
+
+- Fixed JWT public key caching in `verifyToken()` to support multi-instance scenarios. Public keys are now correctly cached per `kid` from the token header instead of using a single shared cache key. ([#6993](https://github.com/clerk/javascript/pull/6993)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  **What was broken:**
+
+  When verifying JWT tokens with the `jwtKey` option (PEM public key), all keys were cached under the same cache key. This caused verification failures in multi-instance scenarios.
+
+  **What's fixed:**
+
+  JWT public keys are now cached using the `kid` value from each token's header.
+
+- Updated dependencies [[`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2)]:
+  - @clerk/types@4.94.0
+
 ## 3.27.4
 
 ### Patch Changes

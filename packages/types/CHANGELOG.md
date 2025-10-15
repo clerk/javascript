@@ -1,5 +1,15 @@
 # Change Log
 
+## 4.94.0
+
+### Minor Changes
+
+- [Experimental] Add support for sign-in with passkey to new APIs ([#6997](https://github.com/clerk/javascript/pull/6997)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add example usage for `__experimental_startPath`. ([#6987](https://github.com/clerk/javascript/pull/6987)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.93.0
 
 ### Minor Changes
