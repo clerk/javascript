@@ -238,7 +238,7 @@ export interface SignInFutureResource {
 
   /**
    * Array of the second factors that are supported in the current sign-in. Each factor contains information about the
-   * verification strategy that can be used. his property is populated only when the first factor is verified.
+   * verification strategy that can be used. This property is populated only when the first factor is verified.
    */
   readonly supportedSecondFactors: SignInSecondFactor[];
 
