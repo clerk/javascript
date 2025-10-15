@@ -81,7 +81,7 @@ export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | 
 
   const newObj: Record<string, unknown> = {};
   for (const key of Object.keys(defaultValues)) {
-    // @ts-ignore
+    // @ts-ignore - defaultValues and params share shape; dynamic index access is safe here
     newObj[key] = shouldUseDefaults ? defaultValues[key] : (params?.[key] ?? defaultValues[key]);
   }
 
@@ -160,7 +160,8 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   // cacheMode being `true` indicates that the cache key is defined, but the fetcher is not.
   // This allows to ready the cache instead of firing a request.
   const shouldFetch = !triggerInfinite && enabled && (!cacheMode ? !!fetcher : true);
-  const swrKey = isSignedIn ? pagesCacheKey : shouldFetch ? pagesCacheKey : null;
+  const swrKey = shouldFetch ? pagesCacheKey : null;
+
   const swrFetcher =
     !cacheMode && !!fetcher
       ? (cacheKeyParams: Record<string, unknown>) => {
@@ -202,9 +203,12 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       };
     },
     cacheKeyParams => {
-      // @ts-ignore
+      if (isSignedIn === false) {
+        return undefined;
+      }
+      // @ts-ignore - remove cache-only keys from request params
       const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
-      // @ts-ignore
+      // @ts-ignore - fetcher expects Params subset; narrowing at call-site
       return fetcher?.(requestParams);
     },
     cachingSWROptions,
@@ -225,12 +229,12 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       }
       return setPaginatedPage(numberOrgFn);
     },
-    [setSize],
+    [setSize, triggerInfinite],
   );
 
   const data = useMemo(() => {
     if (triggerInfinite) {
-      return swrInfiniteData?.map(a => a?.data).flat() ?? [];
+      return (swrInfiniteData ?? []).flatMap(page => page?.data ?? []);
     }
     return swrData?.data ?? [];
   }, [triggerInfinite, swrData, swrInfiniteData]);
