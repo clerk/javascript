@@ -54,7 +54,7 @@ type FetchStatusAndError =
 /**
  * @inline
  * On status === 'needs_initialization', all properties are null.
- * On status === 'needs_confirmation' or 'completed', all properties are defined the same as the CommerceCheckoutResource.
+ * On status === 'needs_confirmation' or 'completed', all properties are defined the same as the BillingCheckoutResource.
  */
 type CheckoutPropertiesPerStatus =
   | ({

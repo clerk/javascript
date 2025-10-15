@@ -39,11 +39,11 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
  */
 export type NeedsReverificationParameters = {
   /**
-   * Marks the reverification process as complete and retries the original request.
+   * Marks the reverification process as cancelled and rejects the original request.
    */
   cancel: () => void;
   /**
-   * Marks the reverification process as cancelled and rejects the original request.
+   * Marks the reverification process as complete and retries the original request.
    */
   complete: () => void;
   /**
