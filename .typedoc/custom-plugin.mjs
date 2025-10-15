@@ -75,7 +75,6 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
-  ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['billing-payment-method-resource', '/docs/reference/javascript/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
@@ -88,6 +87,9 @@ const LINK_REPLACEMENTS = [
   ['billing-statement-resource', '/docs/reference/javascript/types/billing-statement-resource'],
   ['billing-subscription-resource', '/docs/reference/javascript/types/billing-subscription-resource'],
   ['clerk-api-response-error', '/docs/reference/javascript/types/clerk-api-response-error'],
+  ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
+  ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
+  ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
 ];
 
 /**

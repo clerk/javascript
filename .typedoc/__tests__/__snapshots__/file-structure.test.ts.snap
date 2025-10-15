@@ -147,6 +147,7 @@ exports[`Typedoc output > should have a deliberate file structure 1`] = `
   "shared/build-clerk-js-script-attributes.mdx",
   "shared/build-publishable-key.mdx",
   "shared/camel-to-snake.mdx",
+  "shared/clerk-api-error.mdx",
   "shared/clerk-js-script-url.mdx",
   "shared/clerk-runtime-error.mdx",
   "shared/create-dev-or-staging-url-cache.mdx",
