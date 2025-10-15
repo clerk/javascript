@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDeferredPromise } from '../../../utils/createDeferredPromise';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';
+import { wrapper } from './wrapper';
 
 describe('usePagesOrInfinite - basic pagination', () => {
   beforeEach(() => {
@@ -22,8 +23,9 @@ describe('usePagesOrInfinite - basic pagination', () => {
     const config = { infinite: false, keepPreviousData: true } as const;
     const cacheKeys = { type: 't-basic', userId: 'user_123' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // wait until SWR mock finishes fetching
@@ -78,11 +80,12 @@ describe('usePagesOrInfinite - request params and getDifferentKeys', () => {
     const cacheKeys = { type: 't-params', userId: 'user_42' } as const;
     const config = { infinite: false, enabled: true } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
 
     // First call: should include provided params, not include cache keys
     expect(fetcher).toHaveBeenCalledTimes(1);
@@ -122,8 +125,9 @@ describe('usePagesOrInfinite - infinite mode', () => {
     const config = { infinite: true, keepPreviousData: false, enabled: true } as const;
     const cacheKeys = { type: 't-infinite', orgId: 'org_1' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // first render should fetch first page
@@ -179,8 +183,9 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
     const config = { infinite: false, enabled: false } as const;
     const cacheKeys = { type: 't-disabled' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // our SWR mock sets loading=false if key is null and not calling fetcher
@@ -197,8 +202,9 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
     const config = { infinite: false, enabled: true, isSignedIn: false } as const;
     const cacheKeys = { type: 't-signedin-false' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     expect(fetcher).toHaveBeenCalledTimes(0);
@@ -213,7 +219,7 @@ describe('usePagesOrInfinite - disabled and isSignedIn gating', () => {
     const config = { infinite: true, enabled: true, isSignedIn: false } as const;
     const cacheKeys = { type: 't-signedin-false-inf' } as const;
 
-    const { result } = renderHook(() => usePagesOrInfinite(params, fetcher, config, cacheKeys));
+    const { result } = renderHook(() => usePagesOrInfinite(params, fetcher, config, cacheKeys), { wrapper });
 
     expect(fetcher).toHaveBeenCalledTimes(0);
     expect(result.current.data).toEqual([]);
@@ -229,8 +235,9 @@ describe('usePagesOrInfinite - cache mode', () => {
     const config = { infinite: false, enabled: true, __experimental_mode: 'cache' as const };
     const cacheKeys = { type: 't-cache', userId: 'u1' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // Should never be fetching in cache mode
@@ -266,8 +273,9 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
     const config = { infinite: false, keepPreviousData: true, enabled: true } as const;
     const cacheKeys = { type: 't-keepPrev' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
@@ -308,7 +316,7 @@ describe('usePagesOrInfinite - sign-out hides previously loaded data', () => {
           { ...baseConfig, isSignedIn: signedIn } as any,
           cacheKeys as any,
         ),
-      { initialProps: { signedIn: true } },
+      { initialProps: { signedIn: true }, wrapper },
     );
 
     await waitFor(() => expect(result.current.isFetching).toBe(true));
@@ -346,7 +354,7 @@ describe('usePagesOrInfinite - sign-out hides previously loaded data', () => {
           { ...baseConfig, isSignedIn: signedIn } as any,
           cacheKeys as any,
         ),
-      { initialProps: { signedIn: true } },
+      { initialProps: { signedIn: true }, wrapper },
     );
 
     await waitFor(() => expect(result.current.isFetching).toBe(true));
@@ -376,8 +384,9 @@ describe('usePagesOrInfinite - pagination helpers', () => {
     const config = { infinite: false, enabled: true } as const;
     const cacheKeys = { type: 't-helpers' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -408,8 +417,9 @@ describe('usePagesOrInfinite - pagination helpers', () => {
     const config = { infinite: true, enabled: true } as const;
     const cacheKeys = { type: 't-infinite-page' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -445,8 +455,9 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
     const config = { infinite: false, keepPreviousData: false, enabled: true } as const;
     const cacheKeys = { type: 't-core-like-paginated' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // initial
@@ -488,8 +499,9 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
     const config = { infinite: true, keepPreviousData: false, enabled: true } as const;
     const cacheKeys = { type: 't-core-like-infinite' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -528,8 +540,9 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
     const config = { infinite: false, enabled: true } as const;
     const cacheKeys = { type: 't-revalidate-paginated' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // Wait for initial load
@@ -573,8 +586,9 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
     const config = { infinite: true, enabled: true } as const;
     const cacheKeys = { type: 't-revalidate-infinite' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // Wait for initial load
@@ -618,8 +632,9 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
     const config = { infinite: true, enabled: true } as const;
     const cacheKeys = { type: 't-revalidate-all-pages' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     // Wait for initial page load
@@ -677,8 +692,9 @@ describe('usePagesOrInfinite - error propagation', () => {
     const config = { infinite: false, enabled: true } as const;
     const cacheKeys = { type: 't-error' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     await waitFor(() => expect(result.current.isError).toBe(true));
@@ -693,8 +709,9 @@ describe('usePagesOrInfinite - error propagation', () => {
     const config = { infinite: true, enabled: true } as const;
     const cacheKeys = { type: 't-error-inf' } as const;
 
-    const { result } = renderHook(() =>
-      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
     );
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));

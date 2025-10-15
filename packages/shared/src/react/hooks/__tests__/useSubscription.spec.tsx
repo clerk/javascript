@@ -1,9 +1,8 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import React from 'react';
-import { SWRConfig } from 'swr';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSubscription } from '../useSubscription';
+import { wrapper } from './wrapper';
 
 // Dynamic mock state for contexts
 let mockUser: any = { id: 'user_1' };
@@ -14,16 +13,6 @@ let orgBillingEnabled = true;
 // Prepare mock clerk with billing.getSubscription behavior
 const getSubscriptionSpy = vi.fn((args?: { orgId?: string }) =>
   Promise.resolve({ id: args?.orgId ? `sub_org_${args.orgId}` : 'sub_user_user_1' }),
-);
-
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <SWRConfig
-    value={{
-      provider: () => new Map(),
-    }}
-  >
-    {children}
-  </SWRConfig>
 );
 
 const mockClerk = {

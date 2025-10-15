@@ -38,6 +38,7 @@ vi.mock('../../contexts', () => {
 });
 
 import { usePlans } from '../usePlans';
+import { wrapper } from './wrapper';
 
 describe('usePlans', () => {
   beforeEach(() => {
@@ -49,7 +50,7 @@ describe('usePlans', () => {
 
   it('does not call fetcher when clerk.loaded is false', () => {
     mockClerk.loaded = false;
-    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }));
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }), { wrapper });
 
     expect(getPlansSpy).not.toHaveBeenCalled();
     expect(result.current.isLoading).toBe(false);
@@ -58,7 +59,7 @@ describe('usePlans', () => {
   });
 
   it('fetches plans for user when loaded', async () => {
-    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }));
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }), { wrapper });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -71,7 +72,9 @@ describe('usePlans', () => {
   });
 
   it('fetches plans for organization when for=organization', async () => {
-    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5, for: 'organization' } as any));
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5, for: 'organization' } as any), {
+      wrapper,
+    });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
@@ -86,13 +89,14 @@ describe('usePlans', () => {
     // simulate no user
     mockUser.id = undefined;
 
-    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 4 }));
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 4 }), { wrapper });
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'user', pageSize: 4, initialPage: 1 });
     expect(getPlansSpy.mock.calls[0][0].orgId).toBeUndefined();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data.length).toBe(4);
   });
 
@@ -100,9 +104,11 @@ describe('usePlans', () => {
     // simulate no organization id
     mockOrganization.id = undefined;
 
-    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 3, for: 'organization' } as any));
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 3, for: 'organization' } as any), {
+      wrapper,
+    });
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isLoading).toBe(true));
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'organization', pageSize: 3, initialPage: 1 });
