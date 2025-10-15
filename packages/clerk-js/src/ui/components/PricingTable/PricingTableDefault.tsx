@@ -136,7 +136,7 @@ function Card(props: CardProps) {
     subscription,
     plan,
     planPeriod,
-    forOrganizations: pricingTableProps.forOrganizations,
+    for: pricingTableProps.for,
     hasActiveOrganization: !!organization,
   });
 
@@ -371,7 +371,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={localizationKeys('commerce.month')}
+            localizationKey={localizationKeys('billing.month')}
           />
         ) : null}
       </Flex>
@@ -386,7 +386,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           <Switch
             isChecked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('commerce.billedAnnually')}
+            label={localizationKeys('billing.billedAnnually')}
           />
         </Box>
       ) : (
@@ -395,7 +395,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant='caption'
           colorScheme='secondary'
           localizationKey={
-            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
+            plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
           }
           sx={t => ({
             justifySelf: 'flex-start',
@@ -502,7 +502,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             size='md'
             aria-hidden
           />
-          <Span localizationKey={localizationKeys('commerce.seeAllFeatures')} />
+          <Span localizationKey={localizationKeys('billing.seeAllFeatures')} />
         </SimpleButton>
       )}
     </Box>

@@ -38,7 +38,7 @@ export const TestPaymentMethod = () => {
         <Text
           variant='caption'
           colorScheme='body'
-          localizationKey={localizationKeys('commerce.paymentSource.dev.testCardInfo')}
+          localizationKey={localizationKeys('billing.paymentMethod.dev.testCardInfo')}
         />
         <Text
           variant='caption'
@@ -46,21 +46,21 @@ export const TestPaymentMethod = () => {
             color: t.colors.$warning500,
             fontWeight: t.fontWeights.$semibold,
           })}
-          localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+          localizationKey={localizationKeys('billing.paymentMethod.dev.developmentMode')}
         />
       </Box>
       <LineItems.Root>
         <LineItems.Group variant='tertiary'>
-          <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.cardNumber')} />
+          <LineItems.Title title={localizationKeys('billing.paymentMethod.dev.cardNumber')} />
           <LineItems.Description text={'4242 4242 4242 4242'} />
         </LineItems.Group>
         <LineItems.Group variant='tertiary'>
-          <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.expirationDate')} />
+          <LineItems.Title title={localizationKeys('billing.paymentMethod.dev.expirationDate')} />
           <LineItems.Description text={'11/44'} />
         </LineItems.Group>
         <LineItems.Group variant='tertiary'>
-          <LineItems.Title title={localizationKeys('commerce.paymentSource.dev.cvcZip')} />
-          <LineItems.Description text={t(localizationKeys('commerce.paymentSource.dev.anyNumbers'))} />
+          <LineItems.Title title={localizationKeys('billing.paymentMethod.dev.cvcZip')} />
+          <LineItems.Description text={t(localizationKeys('billing.paymentMethod.dev.anyNumbers'))} />
         </LineItems.Group>
       </LineItems.Root>
     </Box>

@@ -23,7 +23,7 @@ const { applyVariants } = createVariants(theme => ({
 type FormErrorTextProps = React.PropsWithChildren<StyleVariants<typeof applyVariants>>;
 
 export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props, ref) => {
-  const { hasError, errorMessageId } = useFormField() || {};
+  const { hasError } = useFormField() || {};
 
   if (!hasError && !props.children) {
     return null;
@@ -35,8 +35,6 @@ export const FormErrorText = forwardRef<HTMLElement, FormErrorTextProps>((props,
     <Text
       ref={ref}
       colorScheme='danger'
-      aria-live='polite'
-      id={errorMessageId}
       {...rest}
       css={applyVariants(props)}
     >

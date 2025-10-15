@@ -55,7 +55,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           <LineItems.Group>
             <LineItems.Title
               title={plan.name}
-              description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+              description={planPeriod === 'annual' ? localizationKeys('billing.billedAnnually') : undefined}
               badge={
                 plan.freeTrialEnabled && freeTrialEndsAt ? (
                   <SubscriptionBadge subscription={{ status: 'free_trial' }} />
@@ -65,19 +65,19 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
               text={`${fee.currencySymbol}${fee.amountFormatted}`}
-              suffix={localizationKeys('commerce.checkout.perMonth')}
+              suffix={localizationKeys('billing.checkout.perMonth')}
             />
           </LineItems.Group>
           <LineItems.Group
             borderTop
             variant='tertiary'
           >
-            <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+            <LineItems.Title title={localizationKeys('billing.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           {showCredits && (
             <LineItems.Group variant='tertiary'>
-              <LineItems.Title title={localizationKeys('commerce.creditRemainder')} />
+              <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
               <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
             </LineItems.Group>
           )}
@@ -86,11 +86,11 @@ export const CheckoutForm = withCardStateProvider(() => {
               <Tooltip.Root>
                 <Tooltip.Trigger>
                   <LineItems.Title
-                    title={localizationKeys('commerce.pastDue')}
+                    title={localizationKeys('billing.pastDue')}
                     icon={InformationCircle}
                   />
                 </Tooltip.Trigger>
-                <Tooltip.Content text={localizationKeys('commerce.checkout.pastDueNotice')} />
+                <Tooltip.Content text={localizationKeys('billing.checkout.pastDueNotice')} />
               </Tooltip.Root>
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
@@ -99,7 +99,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           {!!freeTrialEndsAt && !!plan.freeTrialDays && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
-                title={localizationKeys('commerce.checkout.totalDueAfterTrial', {
+                title={localizationKeys('billing.checkout.totalDueAfterTrial', {
                   days: plan.freeTrialDays,
                 })}
               />
@@ -110,7 +110,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           )}
 
           <LineItems.Group borderTop>
-            <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
+            <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
         </LineItems.Root>
@@ -125,7 +125,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           })}
         >
           <Text
-            localizationKey={localizationKeys('commerce.checkout.downgradeNotice')}
+            localizationKey={localizationKeys('billing.checkout.downgradeNotice')}
             variant='caption'
             colorScheme='secondary'
           />
@@ -243,11 +243,11 @@ const CheckoutFormElementsInternal = () => {
             >
               <SegmentedControl.Button
                 value='existing'
-                text={localizationKeys('commerce.paymentMethods')}
+                text={localizationKeys('billing.paymentMethods__label')}
               />
               <SegmentedControl.Button
                 value='new'
-                text={localizationKeys('commerce.addPaymentMethod')}
+                text={localizationKeys('billing.addPaymentMethod__label')}
               />
             </SegmentedControl.Root>
           )}
@@ -307,13 +307,13 @@ export const PayWithTestPaymentMethod = () => {
             color: t.colors.$warning500,
             fontWeight: t.fontWeights.$semibold,
           })}
-          localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+          localizationKey={localizationKeys('billing.paymentMethod.dev.developmentMode')}
         />
         <Button
           type='button'
           block
           variant='bordered'
-          localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.payWithTestCardButton')}
+          localizationKey={localizationKeys('userProfile.billingPage.paymentMethodsSection.payWithTestCardButton')}
           colorScheme='secondary'
           isLoading={isLoading}
           onClick={payWithTestCard}
@@ -332,16 +332,16 @@ const useSubmitLabel = () => {
   }
 
   if (freeTrialEndsAt) {
-    return localizationKeys('commerce.startFreeTrial');
+    return localizationKeys('billing.startFreeTrial');
   }
 
   if (totals.totalDueNow.amount > 0) {
-    return localizationKeys('commerce.pay', {
+    return localizationKeys('billing.pay', {
       amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
     });
   }
 
-  return localizationKeys('commerce.subscribe');
+  return localizationKeys('billing.subscribe');
 };
 
 const AddPaymentMethodForCheckout = withCardStateProvider(() => {

@@ -29,6 +29,7 @@ const LINK_REPLACEMENTS = [
   ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['create-organization-params', '#create-organization-params'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
   ['sign-in-resource', '/docs/reference/javascript/sign-in'],
@@ -57,7 +58,7 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
-  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payment-method-resource', '/docs/reference/javascript/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
   ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
@@ -65,6 +66,9 @@ const LINK_REPLACEMENTS = [
   ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
   ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
+  ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
+  ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
+  ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
 ];
 
 /**

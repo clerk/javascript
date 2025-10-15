@@ -28,7 +28,6 @@ export const FormSuccessText = forwardRef<HTMLElement, FormTextProps>((props, re
     <Text
       ref={ref}
       colorScheme='secondary'
-      aria-live='polite'
       {...rest}
       css={applyVariants(props) as any}
     >

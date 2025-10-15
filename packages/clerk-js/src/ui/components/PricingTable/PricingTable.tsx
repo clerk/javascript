@@ -68,7 +68,7 @@ const PricingTableRoot = (props: PricingTableProps) => {
     return;
   };
 
-  // Pre-fetch payment sources
+  // Pre-fetch payment methods
   usePaymentMethods();
 
   return (

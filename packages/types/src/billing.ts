@@ -217,7 +217,7 @@ export interface FeatureResource extends ClerkResource {
 }
 
 /**
- * The status of a payment source.
+ * The status of a payment method.
  * @inline
  */
 export type BillingPaymentMethodStatus = 'active' | 'expired' | 'disconnected';
@@ -308,9 +308,9 @@ export interface BillingPaymentMethodResource extends ClerkResource {
    */
   walletType: string | undefined;
   /**
-   * A function that removes this payment source from the account. Accepts the following parameters:
+   * A function that removes this payment method from the account. Accepts the following parameters:
    * <ul>
-   *  <li>`orgId?` (`string`): The ID of the organization to remove the payment source from.</li>
+   *  <li>`orgId?` (`string`): The ID of the organization to remove the payment method from.</li>
    * </ul>
    *
    * @param params - The parameters for the remove operation.
@@ -319,7 +319,7 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   // TODO: orgId should be implied by the payment method
   remove: (params?: RemovePaymentMethodParams) => Promise<DeletedObjectResource>;
   /**
-   * A function that sets this payment source as the default for the account. Accepts the following parameters:
+   * A function that sets this payment method as the default for the account. Accepts the following parameters:
    * <ul>
    *  <li>`orgId?` (`string`): The ID of the organization to set as the default.</li>
    * </ul>
@@ -390,7 +390,7 @@ export interface BillingPaymentResource extends ClerkResource {
    */
   updatedAt: Date;
   /**
-   * The payment source being used for the payment, such as credit card or bank account.
+   * The payment method being used for the payment, such as credit card or bank account.
    */
   paymentMethod: BillingPaymentMethodResource;
   /**
@@ -492,7 +492,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    */
   id: string;
   /**
-   * The unique identifier for the payment source being used for the subscription item.
+   * The unique identifier for the payment method being used for the subscription item.
    */
   //TODO(@COMMERCE): should this be nullable ?
   paymentMethodId: string;
@@ -705,7 +705,7 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 export type ConfirmCheckoutParams =
   | {
       /**
-       * The ID of a saved payment source to use for this checkout.
+       * The ID of a saved payment method to use for this checkout.
        */
       paymentSourceId?: string;
     }

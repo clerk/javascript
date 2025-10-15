@@ -216,8 +216,8 @@ function SubscriptionRow({ subscription, length }: { subscription: BillingSubscr
               })}
               localizationKey={
                 subscription.planPeriod === 'annual'
-                  ? localizationKeys('commerce.year')
-                  : localizationKeys('commerce.month')
+                  ? localizationKeys('billing.year')
+                  : localizationKeys('billing.month')
               }
             />
           )}
