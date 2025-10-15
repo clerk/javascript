@@ -1,5 +1,5 @@
 import type { RequestState } from '@clerk/backend/internal';
-import { AuthStatus, constants } from '@clerk/backend/internal';
+import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import type { PendingSessionOptions } from '@clerk/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
@@ -12,8 +12,9 @@ import { getResponseClerkState } from './utils';
 
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMiddleware => {
   return createMiddleware().server(async args => {
-    const loadedOptions = loadOptions(args.request, options);
-    const requestState = await clerkClient().authenticateRequest(args.request, {
+    const clerkRequest = createClerkRequest(args.request);
+    const loadedOptions = loadOptions(clerkRequest, options);
+    const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,
       acceptsToken: 'any',
     });
