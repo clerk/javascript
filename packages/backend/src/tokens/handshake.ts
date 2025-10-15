@@ -78,7 +78,7 @@ export async function verifyHandshakeToken(
     });
   }
 
-  return await verifyHandshakeJwt(token, { key });
+  return verifyHandshakeJwt(token, { key });
 }
 
 export class HandshakeService {
