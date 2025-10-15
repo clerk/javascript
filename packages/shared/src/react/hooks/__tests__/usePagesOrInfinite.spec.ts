@@ -233,6 +233,10 @@ describe('usePagesOrInfinite - cache mode', () => {
       usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
     );
 
+    // Should never be fetching in cache mode
+    expect(result.current.isFetching).toBe(false);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    // Should not have called fetcher
     expect(fetcher).toHaveBeenCalledTimes(0);
 
     await act(async () => {
@@ -307,14 +311,19 @@ describe('usePagesOrInfinite - sign-out hides previously loaded data', () => {
       { initialProps: { signedIn: true } },
     );
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data.length).toBe(2);
+    expect(result.current.page).toBe(1);
+    expect(result.current.pageCount).toBe(3); // ceil(5/2)
 
     // simulate sign-out
     rerender({ signedIn: false });
     // data should become empty
     await waitFor(() => expect(result.current.data).toEqual([]));
     expect(result.current.count).toBe(0);
+    expect(result.current.page).toBe(1);
+    expect(result.current.pageCount).toBe(0);
   });
 
   it('infinite mode: data is cleared when isSignedIn switches to false', async () => {
@@ -340,13 +349,18 @@ describe('usePagesOrInfinite - sign-out hides previously loaded data', () => {
       { initialProps: { signedIn: true } },
     );
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data.length).toBe(2);
+    expect(result.current.page).toBe(1);
+    expect(result.current.pageCount).toBe(5); // ceil(10/2)
 
     // simulate sign-out
     rerender({ signedIn: false });
     await waitFor(() => expect(result.current.data).toEqual([]));
     expect(result.current.count).toBe(0);
+    expect(result.current.page).toBe(1);
+    expect(result.current.pageCount).toBe(0);
   });
 });
 
@@ -492,6 +506,164 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
     deferred.resolve(undefined);
     await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }]);
+  });
+});
+
+describe('usePagesOrInfinite - revalidate behavior', () => {
+  it('pagination mode: isFetching toggles during revalidate, isLoading stays false after initial load', async () => {
+    const deferred = createDeferredPromise();
+    let callCount = 0;
+    const fetcher = vi.fn(async (_p: any) => {
+      callCount++;
+      if (callCount === 1) {
+        return { data: [{ id: 'initial-1' }, { id: 'initial-2' }], total_count: 4 };
+      }
+      return deferred.promise.then(() => ({
+        data: [{ id: 'revalidated-1' }, { id: 'revalidated-2' }],
+        total_count: 4,
+      }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: false, enabled: true } as const;
+    const cacheKeys = { type: 't-revalidate-paginated' } as const;
+
+    const { result } = renderHook(() =>
+      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    );
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'initial-1' }, { id: 'initial-2' }]);
+
+    // Trigger revalidate
+    act(() => {
+      (result.current as any).revalidate();
+    });
+
+    // isFetching should become true, but isLoading should stay false after initial load
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    expect(result.current.isLoading).toBe(false);
+
+    // Resolve the revalidation
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+    // Data should be updated
+    expect(result.current.data).toEqual([{ id: 'revalidated-1' }, { id: 'revalidated-2' }]);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('infinite mode: isFetching toggles during revalidate, isLoading stays false after initial load', async () => {
+    const deferred = createDeferredPromise();
+    let callCount = 0;
+    const fetcher = vi.fn(async (_p: any) => {
+      callCount++;
+      if (callCount === 1) {
+        return { data: [{ id: 'initial-1' }, { id: 'initial-2' }], total_count: 4 };
+      }
+      return deferred.promise.then(() => ({
+        data: [{ id: 'revalidated-1' }, { id: 'revalidated-2' }],
+        total_count: 4,
+      }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: true, enabled: true } as const;
+    const cacheKeys = { type: 't-revalidate-infinite' } as const;
+
+    const { result } = renderHook(() =>
+      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    );
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'initial-1' }, { id: 'initial-2' }]);
+
+    // Trigger revalidate
+    act(() => {
+      (result.current as any).revalidate();
+    });
+
+    // isFetching should become true, but isLoading should stay false after initial load
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    expect(result.current.isLoading).toBe(false);
+
+    // Resolve the revalidation
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+    // Data should be updated
+    expect(result.current.data).toEqual([{ id: 'revalidated-1' }, { id: 'revalidated-2' }]);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it('infinite mode: revalidate refetches all previously loaded pages', async () => {
+    const fetcherCalls: Array<{ page: number; timestamp: string }> = [];
+    const fetcher = vi.fn(async (p: any) => {
+      const callTime = fetcherCalls.length < 2 ? 'initial' : 'revalidate';
+      fetcherCalls.push({ page: p.initialPage, timestamp: callTime });
+
+      return {
+        data: Array.from({ length: p.pageSize }, (_, i) => ({
+          id: `p${p.initialPage}-${i}-${callTime}`,
+        })),
+        total_count: 8,
+      };
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: true, enabled: true } as const;
+    const cacheKeys = { type: 't-revalidate-all-pages' } as const;
+
+    const { result } = renderHook(() =>
+      usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+    );
+
+    // Wait for initial page load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data.length).toBe(2);
+    expect(result.current.page).toBe(1);
+
+    // Load second page
+    act(() => {
+      result.current.fetchNext();
+    });
+    await waitFor(() => expect(result.current.page).toBe(2));
+    await waitFor(() => expect(result.current.data.length).toBe(4));
+
+    // At this point, we should have 2 initial fetcher calls (page 1 and page 2)
+    const initialCallCount = fetcherCalls.filter(c => c.timestamp === 'initial').length;
+    expect(initialCallCount).toBeGreaterThanOrEqual(2);
+
+    // Clear the array to track revalidation calls
+    const callCountBeforeRevalidate = fetcherCalls.length;
+
+    // Trigger revalidate
+    await act(async () => {
+      await (result.current as any).revalidate();
+    });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+    // After revalidate, we should have additional calls for both pages
+    const revalidateCalls = fetcherCalls.slice(callCountBeforeRevalidate);
+    expect(revalidateCalls.length).toBeGreaterThanOrEqual(2);
+
+    // Verify both pages were revalidated (SWR refetches all pages in infinite mode)
+    const revalidatedPages = revalidateCalls.map(c => c.page);
+    expect(revalidatedPages).toContain(1);
+    expect(revalidatedPages).toContain(2);
+
+    // Data should reflect revalidated content
+    expect(result.current.data).toEqual([
+      { id: 'p1-0-revalidate' },
+      { id: 'p1-1-revalidate' },
+      { id: 'p2-0-revalidate' },
+      { id: 'p2-1-revalidate' },
+    ]);
   });
 });
 
