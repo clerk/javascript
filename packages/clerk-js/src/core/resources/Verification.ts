@@ -1,6 +1,5 @@
-import { errorToJSON, parseError } from '@clerk/shared/error';
+import { ClerkAPIError, errorToJSON } from '@clerk/shared/error';
 import type {
-  ClerkAPIError,
   PasskeyVerificationResource,
   PhoneCodeChannel,
   PublicKeyCredentialCreationOptionsJSON,
@@ -58,7 +57,7 @@ export class Verification extends BaseResource implements VerificationResource {
       }
       this.attempts = data.attempts;
       this.expireAt = unixEpochToDate(data.expire_at || undefined);
-      this.error = data.error ? parseError(data.error) : null;
+      this.error = data.error ? new ClerkAPIError(data.error) : null;
       this.channel = data.channel || undefined;
     }
     return this;
