@@ -1,7 +1,7 @@
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
-import type { OAuthStrategy, Web3Strategy } from './strategies';
+import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
 
 export interface SignInFutureCreateParams {
@@ -14,7 +14,7 @@ export interface SignInFutureCreateParams {
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
    * authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'saml' | 'enterprise_sso';
+  strategy?: OAuthStrategy | 'saml' | 'enterprise_sso' | PasskeyStrategy;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
@@ -213,6 +213,16 @@ export interface SignInFutureWeb3Params {
    * The verification strategy to validate the user's sign-in request.
    */
   strategy: Web3Strategy;
+}
+
+export interface SignInFuturePasskeyParams {
+  /**
+   * The flow to use for the passkey sign-in.
+   *
+   * - `'autofill'`: The client prompts your users to select a passkey before they interact with your app.
+   * - `'discoverable'`: The client requires the user to interact with the client.
+   */
+  flow?: 'autofill' | 'discoverable';
 }
 
 export interface SignInFutureFinalizeParams {
@@ -431,6 +441,14 @@ export interface SignInFutureResource {
    * Used to perform a Web3-based sign-in.
    */
   web3: (params: SignInFutureWeb3Params) => Promise<{ error: unknown }>;
+
+  /**
+   * Initiates a passkey-based authentication flow, enabling users to authenticate using a previously
+   * registered passkey. When called without parameters, this method requires a prior call to
+   * `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in
+   * scenarios where the authentication strategy needs to be determined dynamically at runtime.
+   */
+  passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: unknown }>;
 
   /**
    * Used to convert a sign-in with `status === 'complete'` into an active session. Will cause anything observing the
