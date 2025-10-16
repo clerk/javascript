@@ -94,6 +94,7 @@
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
+    "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
@@ -102,6 +103,7 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
@@ -112,6 +114,9 @@
   },
   "peerDependenciesMeta": {
     "@clerk/expo-passkeys": {
+      "optional": true
+    },
+    "expo-apple-authentication": {
       "optional": true
     },
     "expo-local-authentication": {
