@@ -103,6 +103,13 @@ if (typeof window !== 'undefined') {
     writable: true,
   });
 
+  // Set default navigator.language to empty to prevent auto-locale injection in tests
+  Object.defineProperty(window.navigator, 'language', {
+    writable: true,
+    configurable: true,
+    value: undefined,
+  });
+
   // Mock IntersectionObserver
   //@ts-expect-error - Mocking class
   globalThis.IntersectionObserver = class IntersectionObserver {
