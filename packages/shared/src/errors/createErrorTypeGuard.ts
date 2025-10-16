@@ -19,7 +19,7 @@ type Value = unknown;
  * ```
  */
 export function createErrorTypeGuard<T extends new (...args: any[]) => Value>(
-  ErrorClass: T,
+  ErrorClass: T & { kind?: string },
 ): {
   (error: Value): error is InstanceType<T>;
   (this: Value): this is InstanceType<T>;
@@ -27,7 +27,7 @@ export function createErrorTypeGuard<T extends new (...args: any[]) => Value>(
   function typeGuard(this: Value, error?: Value): error is InstanceType<T> {
     const target = error ?? this;
     if (!target) {
-      throw new TypeError(`${ErrorClass.name} type guard requires an error object`);
+      throw new TypeError(`${ErrorClass.kind || ErrorClass.name} type guard requires an error object`);
     }
     return target instanceof ErrorClass;
   }
