@@ -69,6 +69,21 @@ describe('UserProfile', () => {
       expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
     });
 
+    it('does not include Billing when user billing is disabled even if organization billing has paid plans', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.commerceSettings.billing.user.enabled = false;
+      fixtures.environment.commerceSettings.billing.organization.enabled = true;
+      fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = true;
+
+      render(<UserProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
+      expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
+    });
+
     it('does not include Billing when disabled even if instance has paid plans', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
@@ -149,6 +164,28 @@ describe('UserProfile', () => {
 
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
+
+      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+        id: 'sub_top',
+        subscriptionItems: [],
+      } as any);
+      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+
+      render(<UserProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
+    });
+
+    it('does not include Billing when user has no user-paid plans, no subscription, and no statements even if organization billing has paid plans', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.commerceSettings.billing.user.enabled = true;
+      fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
+      fixtures.environment.commerceSettings.billing.organization.enabled = true;
+      fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = true;
 
       (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
         id: 'sub_top',

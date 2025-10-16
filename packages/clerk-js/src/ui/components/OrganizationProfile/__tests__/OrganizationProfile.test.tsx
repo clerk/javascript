@@ -174,6 +174,30 @@ describe('OrganizationProfile', () => {
       expect(await screen.findByText('Billing')).toBeDefined();
     });
 
+    it('does not include Billing in organization when user billing has paid plans but organization billing is disabled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_billing:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.commerceSettings.billing.organization.enabled = false;
+      fixtures.environment.commerceSettings.billing.user.enabled = true;
+      fixtures.environment.commerceSettings.billing.user.hasPaidPlans = true;
+
+      render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
+      expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
+    });
+
     it('includes Billing when enabled and organization has a non-free subscription', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
@@ -252,6 +276,37 @@ describe('OrganizationProfile', () => {
 
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
+
+      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+        id: 'sub_top',
+        subscriptionItems: [],
+      } as any);
+      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+
+      render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
+    });
+
+    it('does not include Billing in organization when organization has no paid plans, no subscription, and no statements even if user billing has paid plans', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_billing:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.commerceSettings.billing.organization.enabled = true;
+      fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
+      fixtures.environment.commerceSettings.billing.user.enabled = true;
+      fixtures.environment.commerceSettings.billing.user.hasPaidPlans = true;
 
       (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
         id: 'sub_top',
