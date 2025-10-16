@@ -8,10 +8,15 @@ globalThis.PACKAGE_NAME = '@clerk/clerk-react';
 globalThis.PACKAGE_VERSION = '0.0.0-test';
 globalThis.JS_PACKAGE_VERSION = '5.0.0';
 
-// Setup Web Crypto API for tests
+// Setup Web Crypto API for tests (Node.js 18+ compatibility)
 if (!globalThis.crypto) {
+  // @ts-ignore - Node.js 18+ Web Crypto API
+  globalThis.crypto = webcrypto as Crypto;
+}
+// Ensure crypto.subtle is available (needed for Node.js 18)
+if (globalThis.crypto && !globalThis.crypto.subtle) {
   // @ts-ignore
-  globalThis.crypto = webcrypto;
+  globalThis.crypto.subtle = webcrypto.subtle;
 }
 
 afterEach(cleanup);

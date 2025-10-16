@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import type { Color } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor, stringToSameTypeColor } from '../color';
 

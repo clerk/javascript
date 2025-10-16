@@ -1,6 +1,5 @@
-import { describe, expect, it } from 'vitest';
-
 import type { InitialState, Resources } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import { deriveState } from '../deriveState';
 
