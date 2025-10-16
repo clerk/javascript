@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.28.1
+
+### Patch Changes
+
+- Rename static properties from 'name' to 'kind' in ClerkError class ([#7004](https://github.com/clerk/javascript/pull/7004)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
 ## 3.28.0
 
 ### Minor Changes
