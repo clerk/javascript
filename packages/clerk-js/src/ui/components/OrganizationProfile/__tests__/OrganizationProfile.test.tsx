@@ -1,5 +1,5 @@
 import type { CustomPage } from '@clerk/types';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen, waitFor } from '@/test/utils';
@@ -9,8 +9,6 @@ import { OrganizationProfile } from '../';
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
 describe('OrganizationProfile', () => {
-  beforeEach(() => vi.useFakeTimers());
-  afterEach(() => vi.useRealTimers());
   it('includes buttons for the bigger sections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
