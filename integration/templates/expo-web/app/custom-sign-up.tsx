@@ -13,20 +13,6 @@ export default function SignUpScreen() {
   const [code, setCode] = React.useState('');
 
   const onSignUpPress = async () => {
-    // try {
-    //   await signUp.create({
-    //     emailAddress,
-    //     password,
-    //   });
-
-    //   await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
-    //   setPendingVerification(true);
-    // } catch (err: any) {
-    //   // See https://clerk.com/docs/custom-flows/error-handling
-    //   // for more info on error handling
-    //   console.error(JSON.stringify(err, null, 2));
-    // }
     await signUp.password({ emailAddress, password });
     await signUp.verifications.sendEmailCode({ emailAddress });
     setPendingVerification(true);
