@@ -33,47 +33,28 @@ export type UseSubscriptionParams = {
 /**
  * @interface
  */
-interface BaseSubscriptionReturn {
+export type UseSubscriptionReturn = {
+  /**
+   * The subscription object, or `null` if the data hasn't been loaded yet.
+   */
+  data: BillingSubscriptionResource | null;
+  /**
+   * A boolean that indicates whether the initial data is still being fetched.
+   */
+  isLoading: boolean;
+  /**
+   * A boolean that indicates whether any request is still in flight, including background updates.
+   */
+  isFetching: boolean;
+  /**
+   * Any error that occurred during the data fetch, or `null` if no error occurred.
+   */
+  error: Error | null;
   /**
    * Function to manually trigger a refresh of the subscription data.
    */
   revalidate: () => Promise<void>;
-}
-
-/**
- * @interface
- */
-export type UseSubscriptionReturn =
-  | (BaseSubscriptionReturn & {
-      /**
-       * The subscription object, or `null` if the data hasn't been loaded yet.
-       */
-      data: null;
-      /**
-       * A boolean that indicates whether the initial data is still being fetched.
-       */
-      isLoading: false;
-      /**
-       * A boolean that indicates whether any request is still in flight, including background updates.
-       */
-      isFetching: false;
-      /**
-       * Any error that occurred during the data fetch, or `null` if no error occurred.
-       */
-      error: null;
-    })
-  | (BaseSubscriptionReturn & {
-      data: BillingSubscriptionResource;
-      isLoading: true;
-      isFetching: true;
-      error: Error;
-    })
-  | (BaseSubscriptionReturn & {
-      data: BillingSubscriptionResource | null;
-      isLoading: boolean;
-      isFetching: boolean;
-      error: Error | null;
-    });
+};
 
 /**
  *
