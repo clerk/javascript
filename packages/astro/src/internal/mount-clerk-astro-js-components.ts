@@ -12,6 +12,7 @@ const mountAllClerkAstroJSComponents = () => {
     'organization-list': 'mountOrganizationList',
     'organization-profile': 'mountOrganizationProfile',
     'organization-switcher': 'mountOrganizationSwitcher',
+    'user-avatar': 'mountUserAvatar',
     'user-button': 'mountUserButton',
     'user-profile': 'mountUserProfile',
     'sign-in': 'mountSignIn',
