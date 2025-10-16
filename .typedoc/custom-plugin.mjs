@@ -31,6 +31,8 @@ const FILES_WITHOUT_HEADINGS = [
   'needs-reverification-parameters.mdx',
   'use-reverification-options.mdx',
   'use-reverification-params.mdx',
+  'payment-element-provider-props.mdx',
+  'payment-element-props.mdx',
 ];
 
 /**
