@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Add browser locale to sign-in flow
+Add support for automatically sending the browser locale during the sign-in flow
