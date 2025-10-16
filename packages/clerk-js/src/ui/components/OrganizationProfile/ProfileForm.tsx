@@ -47,7 +47,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const updateOrgParams: UpdateOrganizationParams = { name: nameField.value, slug: slugField.value };
+    const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
 
     if (organizationSlugEnabled) {
       updateOrgParams.slug = slugField.value;

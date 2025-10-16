@@ -66,7 +66,7 @@ describe('OrganizationProfileScreen', () => {
     await userEvent.type(getByLabelText(/^name/i), '234');
     expect(getByDisplayValue('Org1234')).toBeDefined();
     await userEvent.click(getByRole('button', { name: /save/i }));
-    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1234', slug: '' });
+    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1234' });
   });
 
   it('updates organization slug on clicking continue', async () => {
@@ -99,21 +99,20 @@ describe('OrganizationProfileScreen', () => {
       f.withOrganizationSlug(false);
       f.withUser({
         email_addresses: ['test@clerk.com'],
-        organization_memberships: [{ name: 'Org1', slug: '', role: 'admin' }],
+        organization_memberships: [{ name: 'Org1', role: 'admin' }],
       });
     });
 
     fixtures.clerk.organization?.update.mockResolvedValue({} as OrganizationResource);
-    const { getByDisplayValue, queryByLabelText, userEvent, getByRole } = render(
+    const { queryByLabelText, userEvent, getByRole } = render(
       <ProfileForm
         onSuccess={vi.fn()}
         onReset={vi.fn()}
       />,
       { wrapper },
     );
-    expect(getByDisplayValue('my-org')).toBeDefined();
     expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
     await userEvent.click(getByRole('button', { name: /save$/i }));
-    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1', slug: 'my-org' });
+    expect(fixtures.clerk.organization?.update).toHaveBeenCalledWith({ name: 'Org1' });
   });
 });
