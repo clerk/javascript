@@ -34,7 +34,7 @@ export interface ClerkErrorParams {
 const __DEV__ = true;
 
 export class ClerkError extends Error {
-  static name = 'ClerkError';
+  static kind = 'ClerkError';
   readonly clerkError = true as const;
   readonly code: string;
   readonly longMessage: string | undefined;
@@ -46,7 +46,7 @@ export class ClerkError extends Error {
   }
 
   constructor(opts: ClerkErrorParams) {
-    super(new.target.formatMessage(new.target.name, opts.message, opts.code, opts.docsUrl), { cause: opts.cause });
+    super(new.target.formatMessage(new.target.kind, opts.message, opts.code, opts.docsUrl), { cause: opts.cause });
     Object.setPrototypeOf(this, ClerkError.prototype);
     this.code = opts.code;
     this.docsUrl = opts.docsUrl;

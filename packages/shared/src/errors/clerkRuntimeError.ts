@@ -13,7 +13,7 @@ type ClerkRuntimeErrorOptions = Omit<ClerkErrorParams, 'message'>;
  *   throw new ClerkRuntimeError('An error occurred', { code: 'password_invalid' });
  */
 export class ClerkRuntimeError extends ClerkError {
-  static name = 'ClerkRuntimeError';
+  static kind = 'ClerkRuntimeError';
   /**
    * @deprecated Use `clerkError` property instead. This property is maintained for backward compatibility.
    */
