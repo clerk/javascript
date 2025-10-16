@@ -119,7 +119,7 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
           {
@@ -144,11 +144,11 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [{}], total_count: 1 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [{}], total_count: 1 } as any);
 
       render(<UserProfile />, { wrapper });
       const billingElements = await screen.findAllByRole('button', { name: /Billing/i });
@@ -165,11 +165,11 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<UserProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
@@ -187,11 +187,11 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = true;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<UserProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
@@ -207,8 +207,8 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue(null);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getSubscription.mockResolvedValue(null);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<UserProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
@@ -224,7 +224,7 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
           {
@@ -233,7 +233,7 @@ describe('UserProfile', () => {
           },
         ],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<UserProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());

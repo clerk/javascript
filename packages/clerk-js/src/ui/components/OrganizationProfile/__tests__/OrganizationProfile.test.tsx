@@ -70,7 +70,7 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
           {
@@ -213,7 +213,7 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
           {
@@ -246,11 +246,11 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [{}], total_count: 1 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [{}], total_count: 1 } as any);
 
       render(<OrganizationProfile />, { wrapper });
       expect(await screen.findByText('Billing')).toBeDefined();
@@ -275,11 +275,11 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
@@ -306,11 +306,11 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = true;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
@@ -361,7 +361,7 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
-      (fixtures.clerk.billing.getSubscription as any).mockResolvedValue({
+      fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
           {
@@ -370,7 +370,7 @@ describe('OrganizationProfile', () => {
           },
         ],
       } as any);
-      (fixtures.clerk.billing.getStatements as any).mockResolvedValue({ data: [], total_count: 0 } as any);
+      fixtures.clerk.billing.getStatements.mockResolvedValue({ data: [], total_count: 0 } as any);
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
