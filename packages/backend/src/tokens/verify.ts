@@ -45,17 +45,6 @@ export type VerifyTokenOptions = Simplify<
  * @displayFunctionSignature
  * @hideReturns
  *
- * @paramExtension
- *
- * ### `VerifyTokenOptions`
- *
- * It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
- *
- * > [!WARNING]
- * You must provide either `jwtKey` or `secretKey`.
- *
- * <Typedoc src="backend/verify-token-options" />
- *
  * @example
  *
  * The following example demonstrates how to use the [JavaScript Backend SDK](https://clerk.com/docs/reference/backend/overview) to verify the token signature.
