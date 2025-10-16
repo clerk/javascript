@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.101.1
+
+### Patch Changes
+
+- Hide slug field on `OrganizationProfile` based on environment settings ([#7001](https://github.com/clerk/javascript/pull/7001)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`d8147fb`](https://github.com/clerk/javascript/commit/d8147fb58bfd6caf9a4f0a36fdc48c630d00387f)]:
+  - @clerk/shared@3.28.1
+
 ## 5.101.0
 
 ### Minor Changes
