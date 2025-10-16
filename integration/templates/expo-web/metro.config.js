@@ -19,6 +19,10 @@ const getClerkExpoPath = () => {
     return clerkExpoPath.replace('file:', '');
   }
 
+  if (clerkExpoPath?.startsWith('link:')) {
+    return clerkExpoPath.replace('link:', '');
+  }
+
   return undefined;
 };
 

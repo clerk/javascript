@@ -55,6 +55,10 @@
     "./experimental": {
       "types": "./dist/experimental.d.ts",
       "default": "./dist/experimental.js"
+    },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "default": "./dist/legacy.js"
     }
   },
   "main": "./dist/index.js",
@@ -67,7 +71,9 @@
     "passkeys",
     "secure-store",
     "resource-cache",
-    "token-cache"
+    "token-cache",
+    "experimental",
+    "legacy"
   ],
   "scripts": {
     "build": "tsup",

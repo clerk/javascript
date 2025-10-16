@@ -63,6 +63,16 @@
         "default": "./dist/experimental.js"
       }
     },
+    "./legacy": {
+      "import": {
+        "types": "./dist/legacy.d.mts",
+        "default": "./dist/legacy.mjs"
+      },
+      "require": {
+        "types": "./dist/legacy.d.ts",
+        "default": "./dist/legacy.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -70,7 +80,8 @@
     "dist",
     "internal",
     "errors",
-    "experimental"
+    "experimental",
+    "legacy"
   ],
   "scripts": {
     "build": "tsup",
