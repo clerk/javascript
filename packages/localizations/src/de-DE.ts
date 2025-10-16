@@ -69,8 +69,8 @@ export const deDE: LocalizationResource = {
   badge__upcomingPlan: 'Bevorstehend',
   badge__userDevice: 'Benutzergerät',
   badge__you: 'Du',
-  commerce: {
-    addPaymentMethod: 'Zahlungsmethode hinzufügen',
+  billing: {
+    addPaymentMethod__label: 'Zahlungsmethode hinzufügen',
     alwaysFree: 'Immer kostenlos',
     annually: 'Jährlich',
     availableFeatures: 'Verfügbare Funktionen',
@@ -127,8 +127,8 @@ export const deDE: LocalizationResource = {
     monthly: 'Monatlich',
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
-    paymentMethods: 'Zahlungsmethoden',
-    paymentSource: {
+    paymentMethods__label: 'Zahlungsmethoden',
+    paymentMethod: {
       applePayDescription: {
         annual: 'Jährlich abgerechnet',
         monthly: 'Monatlich abgerechnet',
@@ -291,7 +291,7 @@ export const deDE: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Als Standard festlegen',
         actionLabel__remove: 'Entfernen',
         add: 'Neue Zahlungsmethode hinzufügen',
@@ -300,11 +300,11 @@ export const deDE: LocalizationResource = {
         formButtonPrimary__add: 'Zahlungsmethode hinzufügen',
         formButtonPrimary__pay: '{{amount}} bezahlen',
         payWithTestCardButton: 'Mit Test-Kreditkarte bezahlen',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} wird von diesem Konto entfernt.',
           messageLine2:
             'In Zukunft können Sie diese Zahlungsmethode nicht mehr verwenden. Alle laufenden Abonnements, die diese Zahlungsmethode verwenden, werden aufhören zu funktionieren.',
-          successMessage: '{{paymentSource}} wurde von diesem Konto entfernt.',
+          successMessage: '{{paymentMethod}} wurde von diesem Konto entfernt.',
           title: 'Zahlungsmethode entfernen',
         },
         title: 'Zahlungsmethoden',
@@ -990,7 +990,7 @@ export const deDE: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Als Standard festlegen',
         actionLabel__remove: 'Entfernen',
         add: 'Neue Zahlungsmethode hinzufügen',
@@ -999,11 +999,11 @@ export const deDE: LocalizationResource = {
         formButtonPrimary__add: 'Zahlungsmethode hinzufügen',
         formButtonPrimary__pay: '{{amount}} bezahlen',
         payWithTestCardButton: 'Mit Test-Kreditkarte bezahlen',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} wird von diesem Konto entfernt.',
           messageLine2:
             'In Zukunft können Sie diese Zahlungsmethode nicht mehr verwenden. Alle laufenden Abonnements, die diese Zahlungsmethode verwenden, werden aufhören zu funktionieren.',
-          successMessage: '{{paymentSource}} wurde von diesem Konto entfernt.',
+          successMessage: '{{paymentMethod}} wurde von diesem Konto entfernt.',
           title: 'Zahlungsmethode entfernen',
         },
         title: 'Zahlungsmethoden',
@@ -1060,7 +1060,7 @@ export const deDE: LocalizationResource = {
       actionDescription: 'Geben Sie "Konto löschen" ein, um fortzufahren.',
       confirm: 'Konto löschen',
       messageLine1:
-        'Sind Sie sicher, dass Sie Ihr Konto bei Clerk löschen möchten? Bitte kontaktieren Sie den Anwendungsbesitzer, um Ihre Informationen aus deren Anwendung und anderen Diensten zu löschen.',
+        'Möchten Sie Ihr Konto wirklich löschen? Einige zugehörige Daten können gespeichert bleiben. Um die vollständige Löschung der Daten anzufordern, wenden Sie sich bitte an den Support.',
       messageLine2: 'Diese Aktion ist endgültig und kann nicht rückgängig gemacht werden.',
       title: 'Konto löschen',
     },

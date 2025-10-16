@@ -68,8 +68,8 @@ export const heIL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
   badge__you: 'אתה',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const heIL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -282,7 +282,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +291,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -952,7 +952,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -961,7 +961,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1020,7 +1020,7 @@ export const heIL: LocalizationResource = {
       actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
       messageLine1:
-        'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך מ-Clerk? אנא צור קשר עם בעל האפליקציה כדי למחוק את המידע שלך מהאפליקציה שלהם ומשירותים אחרים.',
+        'האם אתה בטוח שברצונך למחוק את החשבון שלך? חלק מהנתונים המשויכים עשויים להישמר. כדי לבקש מחיקת נתונים מלאה, אנא צור קשר עם התמיכה.',
       messageLine2: 'פעולה זו היא סופית ובלתי הפיכה.',
       title: 'מחק חשבון',
     },

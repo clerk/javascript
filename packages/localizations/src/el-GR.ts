@@ -68,8 +68,8 @@ export const elGR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const elGR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const elGR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +292,7 @@ export const elGR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -969,7 +969,7 @@ export const elGR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -978,7 +978,7 @@ export const elGR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1038,7 +1038,7 @@ export const elGR: LocalizationResource = {
       actionDescription: 'Πληκτρολογήστε "Διαγραφή λογαριασμού" παρακάτω για να συνεχίσετε.',
       confirm: 'Διαγραφή λογαριασμού',
       messageLine1:
-        'Είστε βέβαιος ότι θέλετε να διαγράψετε τον λογαριασμό σας από το Clerk; Παρακαλώ επικοινωνήστε με τον ιδιοκτήτη της εφαρμογής για να διαγράψετε τις πληροφορίες σας από την εφαρμογή τους και άλλες υπηρεσίες.',
+        'Είστε βέβαιοι ότι θέλετε να διαγράψετε τον λογαριασμό σας; Ορισμένα σχετικά δεδομένα ενδέχεται να διατηρηθούν. Για να ζητήσετε πλήρη διαγραφή δεδομένων, επικοινωνήστε με την υποστήριξη.',
       messageLine2: 'Αυτή η ενέργεια είναι μόνιμη και μη αναστρέψιμη.',
       title: 'Διαγραφή λογαριασμού',
     },

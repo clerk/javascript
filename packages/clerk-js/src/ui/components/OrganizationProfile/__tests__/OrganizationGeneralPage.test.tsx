@@ -246,6 +246,7 @@ describe('OrganizationSettings', () => {
     it('open the profile section', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
+        f.withOrganizationSlug(true);
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', slug: 'Org1' }],

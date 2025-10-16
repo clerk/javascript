@@ -69,8 +69,8 @@ export const roRO: LocalizationResource = {
   badge__upcomingPlan: 'Urmează',
   badge__userDevice: 'Dispozitiv utilizator',
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: 'Adaugă metodă de plată',
+  billing: {
+    addPaymentMethod__label: 'Adaugă metodă de plată',
     alwaysFree: 'Întotdeauna gratuit',
     annually: 'Anual',
     availableFeatures: 'Funcții disponibile',
@@ -127,8 +127,8 @@ export const roRO: LocalizationResource = {
     monthly: 'Lunar',
     pastDue: 'Restanță',
     pay: 'Plătește {{amount}}',
-    paymentMethods: 'Metode de plată',
-    paymentSource: {
+    paymentMethods__label: 'Metode de plată',
+    paymentMethod: {
       applePayDescription: {
         annual: 'Plată anuală',
         monthly: 'Plată lunară',
@@ -289,7 +289,7 @@ export const roRO: LocalizationResource = {
         tableHeader__date: 'Dată',
         tableHeader__status: 'Stare',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Setează ca implicită',
         actionLabel__remove: 'Elimină',
         add: 'Adaugă metodă de plată nouă',
@@ -298,11 +298,11 @@ export const roRO: LocalizationResource = {
         formButtonPrimary__add: 'Adaugă metoda de plată',
         formButtonPrimary__pay: 'Plătește {{amount}}',
         payWithTestCardButton: 'Plătește cu card de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} va fi eliminat(ă) din acest cont.',
           messageLine2:
             'Nu vei mai putea folosi această metodă de plată, iar abonamentele recurente dependente de ea nu vor mai funcționa.',
-          successMessage: '{{paymentSource}} a fost eliminată din contul tău.',
+          successMessage: '{{paymentMethod}} a fost eliminată din contul tău.',
           title: 'Elimină metoda de plată',
         },
         title: 'Metode de plată',
@@ -978,7 +978,7 @@ export const roRO: LocalizationResource = {
         tableHeader__date: 'Dată',
         tableHeader__status: 'Stare',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Setează ca implicită',
         actionLabel__remove: 'Elimină',
         add: 'Adaugă metodă de plată nouă',
@@ -987,11 +987,11 @@ export const roRO: LocalizationResource = {
         formButtonPrimary__add: 'Adaugă metoda de plată',
         formButtonPrimary__pay: 'Plătește {{amount}}',
         payWithTestCardButton: 'Plătește cu card de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} va fi eliminat(ă) din acest cont.',
           messageLine2:
             'Nu vei mai putea utiliza această sursă de plată, iar orice abonamente recurente care depind de ea nu vor mai funcționa.',
-          successMessage: '{{paymentSource}} a fost eliminată din contul tău.',
+          successMessage: '{{paymentMethod}} a fost eliminată din contul tău.',
           title: 'Elimină metoda de plată',
         },
         title: 'Metode de plată',
@@ -1047,7 +1047,7 @@ export const roRO: LocalizationResource = {
       actionDescription: 'Tastează „Șterge contul” mai jos pentru a continua.',
       confirm: 'Șterge contul',
       messageLine1:
-        'Sigur vrei să îți ștergi contul din Clerk? Te rugăm să contactezi proprietarul aplicației pentru a-ți șterge informațiile din aplicația lor și din alte servicii.',
+        'Sigur vrei să-ți ștergi contul? Este posibil ca unele date asociate să fie păstrate. Pentru a solicita ștergerea completă a datelor, te rugăm să contactezi suportul.',
       messageLine2: 'Această acțiune este permanentă și ireversibilă.',
       title: 'Șterge contul',
     },

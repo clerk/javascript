@@ -68,8 +68,8 @@ export const fiFI: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const fiFI: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const fiFI: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +292,7 @@ export const fiFI: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -964,7 +964,7 @@ export const fiFI: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +973,7 @@ export const fiFI: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1033,7 +1033,7 @@ export const fiFI: LocalizationResource = {
       actionDescription: 'Kirjoita "Poista tili" poistaaksesi tilisi.',
       confirm: 'Poista tili',
       messageLine1:
-        'Oletko varma, että haluat poistaa tilisi Clerkistä? Ota yhteyttä sovelluksen omistajaan poistaaksesi tietosi heidän sovelluksestaan ja muista palveluista.',
+        'Haluatko varmasti poistaa tilisi? Joitakin liittyviä tietoja saatetaan säilyttää. Pyydä täydellistä tietojen poistamista ottamalla yhteyttä tukeen.',
       messageLine2: 'Tämä toiminto on pysyvä ja peruuttamaton.',
       title: 'Poista tili',
     },

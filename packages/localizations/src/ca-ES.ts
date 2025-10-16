@@ -68,8 +68,8 @@ export const caES: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: "Dispositiu de l'usuari",
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -122,8 +122,8 @@ export const caES: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const caES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +292,7 @@ export const caES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -965,7 +965,7 @@ export const caES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -974,7 +974,7 @@ export const caES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1034,7 +1034,7 @@ export const caES: LocalizationResource = {
       actionDescription: 'Escriu "Elimina compte" a continuació per continuar.',
       confirm: 'Elimina compte',
       messageLine1:
-        "Estàs segur que vols eliminar el teu compte de Clerk? Si us plau, contacta amb el propietari de l'aplicació per eliminar la teva informació de la seva aplicació i altres serveis.",
+        "Esteu segur que voleu suprimir el vostre compte? És possible que es conservin algunes dades associades. Per sol·licitar la supressió completa de les dades, poseu-vos en contacte amb l'assistència.",
       messageLine2: 'Aquesta acció és permanent i irreversible.',
       title: 'Elimina compte',
     },

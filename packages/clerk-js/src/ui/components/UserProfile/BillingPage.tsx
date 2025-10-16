@@ -7,7 +7,7 @@ import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useTabState } from '../../hooks/useTabState';
 import { PaymentAttemptsList } from '../PaymentAttempts';
-import { PaymentSources } from '../PaymentSources';
+import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
@@ -63,7 +63,7 @@ const BillingPageInternal = withCardStateProvider(() => {
                   'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
                 )}
               />
-              <PaymentSources />
+              <PaymentMethods />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <StatementsList />

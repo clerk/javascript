@@ -68,8 +68,8 @@ export const ukUA: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пристрій користувача',
   badge__you: 'Ви',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const ukUA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const ukUA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +292,7 @@ export const ukUA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -960,7 +960,7 @@ export const ukUA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +969,7 @@ export const ukUA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1029,7 +1029,7 @@ export const ukUA: LocalizationResource = {
       actionDescription: 'Введіть "Видалити акаунт" нижче, щоб продовжити.',
       confirm: 'Видалити акаунт',
       messageLine1:
-        "Ви впевнені, що хочете видалити свій акаунт з Clerk? Будь ласка, зв'яжіться з власником програми, щоб видалити вашу інформацію з їхньої програми та інших сервісів.",
+        "Ви впевнені, що хочете видалити свій обліковий запис? Деякі пов'язані дані можуть бути збережені. Щоб запросити повне видалення даних, зверніться до служби підтримки.",
       messageLine2: 'Ця дія є остаточною та незворотною.',
       title: 'Видалити акаунт',
     },

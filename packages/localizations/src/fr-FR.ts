@@ -68,8 +68,8 @@ export const frFR: LocalizationResource = {
   badge__upcomingPlan: 'À venir',
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
-  commerce: {
-    addPaymentMethod: 'Ajouter une méthode de paiement',
+  billing: {
+    addPaymentMethod__label: 'Ajouter une méthode de paiement',
     alwaysFree: 'Toujours gratuit',
     annually: 'Annuel',
     availableFeatures: 'Fonctionnalités disponibles',
@@ -123,8 +123,8 @@ export const frFR: LocalizationResource = {
     monthly: 'Mensuel',
     pastDue: undefined,
     pay: 'Payer {{amount}}',
-    paymentMethods: 'Méthodes de paiement',
-    paymentSource: {
+    paymentMethods__label: 'Méthodes de paiement',
+    paymentMethod: {
       applePayDescription: {
         annual: 'Paiement annuel',
         monthly: 'Paiement mensuel',
@@ -287,7 +287,7 @@ export const frFR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Rendre par défaut',
         actionLabel__remove: 'Supprimer',
         add: 'Ajouter une nouvelle méthode de paiement',
@@ -296,11 +296,11 @@ export const frFR: LocalizationResource = {
         formButtonPrimary__add: 'Ajouter une méthode de paiement',
         formButtonPrimary__pay: 'Payer {{amount}}',
         payWithTestCardButton: 'Payer avec une carte de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sera supprimé de ce compte.',
           messageLine2:
             'Vous ne pourrez plus utiliser cette méthode de paiement et tous les abonnements récurrents qui en dépendent ne fonctionneront plus.',
-          successMessage: '{{paymentSource}} a été supprimé de votre compte.',
+          successMessage: '{{paymentMethod}} a été supprimé de votre compte.',
           title: 'Supprimer une méthode de paiement',
         },
         title: 'Méthodes de paiement',
@@ -975,7 +975,7 @@ export const frFR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Rendre par défaut',
         actionLabel__remove: 'Supprimer',
         add: 'Ajouter une nouvelle méthode de paiement',
@@ -984,11 +984,11 @@ export const frFR: LocalizationResource = {
         formButtonPrimary__add: 'Ajouter une méthode de paiement',
         formButtonPrimary__pay: 'Payer {{amount}}',
         payWithTestCardButton: 'Payer avec une carte de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sera supprimé de ce compte.',
           messageLine2:
             'Vous ne pourrez plus utiliser cette méthode de paiement et tous les abonnements récurrents qui en dépendent ne fonctionneront plus.',
-          successMessage: '{{paymentSource}} a été supprimé de votre compte.',
+          successMessage: '{{paymentMethod}} a été supprimé de votre compte.',
           title: 'Supprimer une méthode de paiement',
         },
         title: 'Méthodes de paiement',
@@ -1045,7 +1045,7 @@ export const frFR: LocalizationResource = {
       actionDescription: 'Saisissez "Supprimer le compte" ci-dessous pour continuer.',
       confirm: 'Supprimer le compte',
       messageLine1:
-        "Êtes-vous sûr(e) de vouloir supprimer votre compte de Clerk ? Veuillez contacter le propriétaire de l'application pour supprimer vos informations de leur application et d'autres services.",
+        "Êtes-vous sûr de vouloir supprimer votre compte ? Certaines données associées peuvent être conservées. Pour demander la suppression complète des données, veuillez contacter l'assistance.",
       messageLine2: 'Cette action est définitive et irréversible.',
       title: 'Supprimer le compte',
     },

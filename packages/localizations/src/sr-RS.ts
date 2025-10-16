@@ -68,8 +68,8 @@ export const srRS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const srRS: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -282,7 +282,7 @@ export const srRS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +291,7 @@ export const srRS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -963,7 +963,7 @@ export const srRS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +972,7 @@ export const srRS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1031,7 +1031,7 @@ export const srRS: LocalizationResource = {
       actionDescription: 'Upiši "Delete account" ispod da nastaviš.',
       confirm: 'Obriši nalog',
       messageLine1:
-        'Da li si siguran da želiš da obrišeš svoj nalog iz Clerk-a? Molim te kontaktiraj vlasnika aplikacije da obriše tvoje informacije iz njihove aplikacije i drugih usluga.',
+        'Да ли сте сигурни да желите да избришете свој налог? Неки повезани подаци могу бити задржани. За захтев за потпуно брисање података, молимо контактирајте подршку.',
       messageLine2: 'Ova akcija je trajna i nepovratna.',
       title: 'Obriši nalog',
     },

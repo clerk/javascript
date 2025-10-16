@@ -68,8 +68,8 @@ export const huHU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const huHU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -282,7 +282,7 @@ export const huHU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +291,7 @@ export const huHU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -964,7 +964,7 @@ export const huHU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +973,7 @@ export const huHU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1033,7 +1033,7 @@ export const huHU: LocalizationResource = {
       actionDescription: 'Írd be, hogy "Delete account" a folytatáshoz.',
       confirm: 'Fiók törlése',
       messageLine1:
-        'Biztos vagy benne, hogy törölni szeretnéd a fiókod a Clerk-ből? Kérjük, lépj kapcsolatba az alkalmazás tulajdonosával, hogy töröljék az adataidat az alkalmazásukból és más szolgáltatásaikból.',
+        'Biztosan törölni szeretné fiókját? Egyes kapcsolódó adatok megőrzésre kerülhetnek. A teljes adattörlés kéréséhez forduljon az ügyfélszolgálathoz.',
       messageLine2: 'Ez a művelet végleges és visszafordíthatatlan.',
       title: 'Fiók törlése',
     },

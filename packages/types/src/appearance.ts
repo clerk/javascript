@@ -230,6 +230,7 @@ export type ElementsConfig = {
   otpCodeFieldInput: WithOptions;
   otpCodeFieldInputContainer: WithOptions;
   otpCodeFieldErrorText: WithOptions;
+  otpCodeFieldSuccessText: WithOptions;
 
   dividerRow: WithOptions;
   dividerColumn: WithOptions;
@@ -493,12 +494,12 @@ export type ElementsConfig = {
   selectOptionsContainer: WithOptions<SelectId>;
   selectOption: WithOptions<SelectId>;
 
-  paymentSourceRow: WithOptions;
-  paymentSourceRowIcon: WithOptions;
-  paymentSourceRowText: WithOptions;
-  paymentSourceRowType: WithOptions;
-  paymentSourceRowValue: WithOptions;
-  paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
+  paymentMethodRow: WithOptions;
+  paymentMethodRowIcon: WithOptions;
+  paymentMethodRowText: WithOptions;
+  paymentMethodRowType: WithOptions;
+  paymentMethodRowValue: WithOptions;
+  paymentMethodRowBadge: WithOptions<'default' | 'expired'>;
 
   statementRoot: WithOptions;
   statementHeader: WithOptions;
@@ -640,6 +641,10 @@ export type ElementsConfig = {
   subscriptionDetailsDetailRow: WithOptions;
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;
+
+  enterpriseConnectionsRoot: WithOptions;
+  enterpriseConnectionButton: WithOptions;
+  enterpriseConnectionButtonText: WithOptions;
 };
 
 export type Elements = {

@@ -292,7 +292,7 @@ jobs:
             'astro',
             'expo-web',
             'tanstack-react-start',
-            'tanstack-react-router',
+            # 'tanstack-react-router',
             'vue',
             'nuxt',
             'react-router',

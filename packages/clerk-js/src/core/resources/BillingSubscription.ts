@@ -13,6 +13,7 @@ import type {
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingMoneyAmountFromJSON } from '../../utils';
+import { Billing } from '../modules/billing/namespace';
 import { BaseResource, BillingPlan, DeletedObject } from './internal';
 
 export class BillingSubscription extends BaseResource implements BillingSubscriptionResource {
@@ -59,7 +60,7 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
 
 export class BillingSubscriptionItem extends BaseResource implements BillingSubscriptionItemResource {
   id!: string;
-  paymentSourceId!: string;
+  paymentMethodId!: string;
   plan!: BillingPlan;
   planPeriod!: BillingSubscriptionPlanPeriod;
   status!: BillingSubscriptionStatus;
@@ -86,7 +87,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     }
 
     this.id = data.id;
-    this.paymentSourceId = data.payment_source_id;
+    this.paymentMethodId = data.payment_method_id;
     this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;
@@ -110,9 +111,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     const { orgId } = params;
     const json = (
       await BaseResource._fetch({
-        path: orgId
-          ? `/organizations/${orgId}/commerce/subscription_items/${this.id}`
-          : `/me/commerce/subscription_items/${this.id}`,
+        path: Billing.path(`/subscription_items/${this.id}`, { orgId }),
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;

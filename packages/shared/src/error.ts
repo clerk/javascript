@@ -1,6 +1,7 @@
 export { errorToJSON, parseError, parseErrors } from './errors/parseError';
 
-export { ClerkAPIResponseError } from './errors/apiResponseError';
+export { ClerkAPIError } from './errors/clerkApiError';
+export { ClerkAPIResponseError } from './errors/clerkApiResponseError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';
 
@@ -8,7 +9,7 @@ export { EmailLinkError, EmailLinkErrorCode, EmailLinkErrorCodeStatus } from './
 
 export type { MetamaskError } from './errors/metamaskError';
 
-export { ClerkRuntimeError } from './errors/runtimeError';
+export { ClerkRuntimeError } from './errors/clerkRuntimeError';
 
 export { ClerkWebAuthnError } from './errors/webAuthNError';
 

@@ -1,39 +1,41 @@
 import type {
-  BillingInitializedPaymentSourceJSON,
-  BillingInitializedPaymentSourceResource,
-  BillingPaymentSourceJSON,
-  BillingPaymentSourceResource,
-  BillingPaymentSourceStatus,
+  BillingInitializedPaymentMethodJSON,
+  BillingInitializedPaymentMethodResource,
+  BillingPaymentMethodJSON,
+  BillingPaymentMethodResource,
+  BillingPaymentMethodStatus,
   DeletedObjectJSON,
-  MakeDefaultPaymentSourceParams,
-  RemovePaymentSourceParams,
+  MakeDefaultPaymentMethodParams,
+  RemovePaymentMethodParams,
 } from '@clerk/types';
+
+import { Billing } from '@/core/modules/billing';
 
 import { BaseResource, DeletedObject } from './internal';
 
-export class BillingPaymentSource extends BaseResource implements BillingPaymentSourceResource {
+export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
   id!: string;
   last4!: string;
-  paymentMethod!: string;
+  paymentType!: 'card' | 'link';
   cardType!: string;
   isDefault!: boolean;
   isRemovable!: boolean;
-  status!: BillingPaymentSourceStatus;
+  status!: BillingPaymentMethodStatus;
   walletType: string | undefined;
 
-  constructor(data: BillingPaymentSourceJSON) {
+  constructor(data: BillingPaymentMethodJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: BillingPaymentSourceJSON | null): this {
+  protected fromJSON(data: BillingPaymentMethodJSON | null): this {
     if (!data) {
       return this;
     }
 
     this.id = data.id;
     this.last4 = data.last4;
-    this.paymentMethod = data.payment_method;
+    this.paymentType = data.payment_type;
     this.cardType = data.card_type;
     this.isDefault = data.is_default;
     this.isRemovable = data.is_removable;
@@ -43,13 +45,11 @@ export class BillingPaymentSource extends BaseResource implements BillingPayment
     return this;
   }
 
-  public async remove(params?: RemovePaymentSourceParams) {
+  public async remove(params?: RemovePaymentMethodParams) {
     const { orgId } = params ?? {};
     const json = (
       await BaseResource._fetch({
-        path: orgId
-          ? `/organizations/${orgId}/commerce/payment_sources/${this.id}`
-          : `/me/commerce/payment_sources/${this.id}`,
+        path: Billing.path(`/payment_methods/${this.id}`, { orgId }),
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;
@@ -57,31 +57,29 @@ export class BillingPaymentSource extends BaseResource implements BillingPayment
     return new DeletedObject(json);
   }
 
-  public async makeDefault(params?: MakeDefaultPaymentSourceParams) {
+  public async makeDefault(params?: MakeDefaultPaymentMethodParams) {
     const { orgId } = params ?? {};
     await BaseResource._fetch({
-      path: orgId
-        ? `/organizations/${orgId}/commerce/payers/default_payment_source`
-        : `/me/commerce/payers/default_payment_source`,
+      path: Billing.path(`/payers/default_payment_method`, { orgId }),
       method: 'PUT',
-      body: { payment_source_id: this.id } as any,
+      body: { payment_method_id: this.id } as any,
     });
 
     return null;
   }
 }
 
-export class BillingInitializedPaymentSource extends BaseResource implements BillingInitializedPaymentSourceResource {
+export class BillingInitializedPaymentMethod extends BaseResource implements BillingInitializedPaymentMethodResource {
   externalClientSecret!: string;
   externalGatewayId!: string;
   paymentMethodOrder!: string[];
 
-  constructor(data: BillingInitializedPaymentSourceJSON) {
+  constructor(data: BillingInitializedPaymentMethodJSON) {
     super();
     this.fromJSON(data);
   }
 
-  protected fromJSON(data: BillingInitializedPaymentSourceJSON | null): this {
+  protected fromJSON(data: BillingInitializedPaymentMethodJSON | null): this {
     if (!data) {
       return this;
     }

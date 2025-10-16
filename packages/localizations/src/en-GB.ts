@@ -68,8 +68,8 @@ export const enGB: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'User device',
   badge__you: 'You',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const enGB: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const enGB: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +292,7 @@ export const enGB: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -969,7 +969,7 @@ export const enGB: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -978,7 +978,7 @@ export const enGB: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1038,7 +1038,7 @@ export const enGB: LocalizationResource = {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
       messageLine1:
-        'Are you sure you want to delete your account from Clerk? Please contact the application owner to delete your information from their application and other services.',
+        'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

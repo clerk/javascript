@@ -68,8 +68,8 @@ export const msMY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Peranti pengguna',
   badge__you: 'Anda',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,8 @@ export const msMY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethods__label: undefined,
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -283,7 +283,7 @@ export const msMY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Jadikan lalai',
         actionLabel__remove: 'Keluarkan',
         add: 'Tambah sumber pembayaran baharu',
@@ -292,11 +292,11 @@ export const msMY: LocalizationResource = {
         formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
         formButtonPrimary__pay: 'Bayar {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
           messageLine2:
             'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
-          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
+          successMessage: '{{paymentMethod}} telah dikeluarkan dari akaun anda.',
           title: 'Keluarkan sumber pembayaran',
         },
         title: 'Pilihan tersedia',
@@ -978,7 +978,7 @@ export const msMY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Jadikan lalai',
         actionLabel__remove: 'Keluarkan',
         add: 'Tambah sumber pembayaran baharu',
@@ -987,11 +987,11 @@ export const msMY: LocalizationResource = {
         formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
         formButtonPrimary__pay: 'Bayar {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
           messageLine2:
             'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
-          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
+          successMessage: '{{paymentMethod}} telah dikeluarkan dari akaun anda.',
           title: 'Keluarkan sumber pembayaran',
         },
         title: 'Pilihan tersedia',
@@ -1048,7 +1048,7 @@ export const msMY: LocalizationResource = {
       actionDescription: 'Taip "Delete account" di bawah untuk meneruskan.',
       confirm: 'Padam akaun',
       messageLine1:
-        'Adakah anda pasti mahu memadam akaun anda dari Clerk? Sila hubungi pemilik aplikasi untuk memadam maklumat anda dari aplikasi mereka dan perkhidmatan lain.',
+        'Adakah anda pasti mahu memadamkan akaun anda? Sesetengah data yang berkaitan mungkin disimpan. Untuk meminta pemadaman data sepenuhnya, sila hubungi sokongan.',
       messageLine2: 'Tindakan ini adalah kekal dan tidak boleh dibatalkan.',
       title: 'Padam akaun',
     },
