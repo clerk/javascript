@@ -11,6 +11,7 @@ export {
   useReverification,
 } from '@clerk/clerk-react';
 
+export * from './useAppleSignIn';
 export * from './useSSO';
 export * from './useOAuth';
 export * from './useAuth';

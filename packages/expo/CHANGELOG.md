@@ -1,5 +1,15 @@
 # Change Log
 
+## [Unreleased]
+
+### Added
+
+- Native Apple Sign-In support for iOS via the new `useAppleSignIn()` hook. This enables authentication using the native iOS "Sign in with Apple" UI without requiring a web redirect. The hook leverages `expo-apple-authentication` to provide a seamless, platform-native experience. ([#FEA-120](https://linear.app/clerk/issue/FEA-120))
+  - Introduced `AppleIdTokenStrategy` type (`oauth_token_apple`) for ID token-based authentication
+  - Automatic transfer flow handling between SignIn and SignUp
+  - Platform-specific implementation with graceful error handling for non-iOS platforms
+  - Requires `expo-apple-authentication` as an optional peer dependency
+
 ## 2.16.1
 
 ### Patch Changes
