@@ -337,7 +337,7 @@ export const arSA: LocalizationResource = {
     },
     createDomainPage: {
       subtitle:
-        'أضف النطاق للتحقق. المستخدمين الذين لديهم عناوين بريد إلكتروني على هذا النطاق يمكنهم تسجيل الدخول إلى المنظمة بشكل تلقائي أو طلب الانضمام.',
+        'أضف النطاق للتحقق. المستخدمون الذين لديهم عناوين بريد إلكتروني على هذا النطاق يمكنهم تسجيل الدخول إلى المنظمة بشكل تلقائي أو طلب الانضمام.',
       title: 'إضافة نطاق',
     },
     invitePage: {
@@ -408,14 +408,14 @@ export const arSA: LocalizationResource = {
       dangerSection: {
         deleteOrganization: {
           actionDescription: 'اكتب {{organizationName}} بالأسفل للمتابعة.',
-          messageLine1: 'هل أنت متأكد من انك تريد حذف هذه المنظمة',
+          messageLine1: 'هل أنت متأكد من أنك تريد حذف هذه المنظمة',
           messageLine2: 'هذا القرار نهائي ولا يمكن التراجع عنه.',
           successMessage: 'لقد حذفت هذه المنظمة',
           title: 'حذف المنظمة',
         },
         leaveOrganization: {
           actionDescription: 'اكتب {{organizationName}} للمتابعة',
-          messageLine1: 'هل أنت متاكد أنك تريد الخروج من المنظمة؟ سوف تفقد الصلاحيات لهذه المنظمة وجميع تطبيقاتها',
+          messageLine1: 'هل أنت متأكد أنك تريد الخروج من المنظمة؟ سوف تفقد الصلاحيات لهذه المنظمة وجميع تطبيقاتها',
           messageLine2: 'هذا القرار نهائي ولا يمكن التراجع عنه.',
           successMessage: 'لقد غادرت المنظمة',
           title: 'الخروج من المنظمة',
@@ -488,9 +488,9 @@ export const arSA: LocalizationResource = {
   },
   organizationSwitcher: {
     action__createOrganization: 'إنشاء منظمة',
-    action__invitationAccept: 'انضمام',
+    action__invitationAccept: 'قبول الدعوة',
     action__manageOrganization: 'إدارة المنظمة',
-    action__suggestionsAccept: 'طلب انضمام',
+    action__suggestionsAccept: 'قبول الطلب',
     notSelected: 'لم يتم اختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
     suggestionsAcceptedLabel: 'في انتظار الموافقة',
@@ -502,7 +502,7 @@ export const arSA: LocalizationResource = {
   reverification: {
     alternativeMethods: {
       actionLink: 'طلب المساعدة',
-      actionText: 'لا تملك أيا منها؟',
+      actionText: 'لا تملك أي منها؟',
       blockButton__backupCode: 'استعمل الرمز الاحتياطي',
       blockButton__emailCode: 'إرسال الرمز إلى {{identifier}}',
       blockButton__passkey: 'تسجيل الدخول بمفتاح المرور الخاص بك',
@@ -1071,7 +1071,7 @@ export const arSA: LocalizationResource = {
     formButtonReset: 'إلغاء',
     mfaPage: {
       formHint: 'اختر طريقة للإضافة',
-      title: 'اضافة التحقق بخطوتين',
+      title: 'إضافة التحقق بخطوتين',
     },
     mfaPhoneCodePage: {
       backButton: 'استخدم الرقم الموجود',
@@ -1207,7 +1207,7 @@ export const arSA: LocalizationResource = {
           title__regenerate: 'تجديد رموز النسخ الاحتياطي',
         },
         phoneCode: {
-          actionLabel__setDefault: 'تعيين كأفتراضي',
+          actionLabel__setDefault: 'تعيين كإعداد افتراضي',
           destructiveActionLabel: 'حذف رقم الجوال',
         },
         primaryButton: 'إضافة التحقق بخطوتين',
