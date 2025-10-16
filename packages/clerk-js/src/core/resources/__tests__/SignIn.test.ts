@@ -7,6 +7,7 @@ describe('SignIn', () => {
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
+      vi.unstubAllGlobals();
     });
 
     it('includes locale in request body when navigator.language is available', async () => {
