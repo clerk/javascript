@@ -18,8 +18,8 @@ export const arSA: LocalizationResource = {
     action__add: 'أضف مفتاحاً جديداً',
     action__search: 'ابحث عن مفتاح',
     createdAndExpirationStatus__expiresOn:
-+      "تم الإنشاء في {{ createdDate | shortDate('ar-SA') }} • ينتهي في {{ expiresDate | longDate('ar-SA') }}",
-    createdAndExpirationStatus__never: "تم الإنشاء في {{ createdDate | shortDate('ar-SA') }} • صلاحية دائمة",
++      'تم الإنشاء في {{ createdDate | shortDate("ar-SA") }} • ينتهي في {{ expiresDate | longDate("ar-SA") }}',
+    createdAndExpirationStatus__never: 'تم الإنشاء في {{ createdDate | shortDate("ar-SA") }} • صلاحية دائمة',
     detailsTitle__emptyRow: 'لا توجد أي مفاتيح API',
     formButtonPrimary__add: 'أنشئ مفتاحاً',
     formFieldCaption__expiration__expiresOn: 'ينتهي في {{ date }}',
@@ -337,7 +337,7 @@ export const arSA: LocalizationResource = {
     },
     createDomainPage: {
       subtitle:
-        'أضف النطاق للتحقق. المستخدمين الذين لديهم عناوين بريد إلكتروني على هذا النطاق يمكنهم تسجيل الدخول إلى المنظمة بشكل تلقائي أو طلب الأنضمام.',
+        'أضف النطاق للتحقق. المستخدمين الذين لديهم عناوين بريد إلكتروني على هذا النطاق يمكنهم تسجيل الدخول إلى المنظمة بشكل تلقائي أو طلب الانضمام.',
       title: 'إضافة نطاق',
     },
     invitePage: {
@@ -407,14 +407,14 @@ export const arSA: LocalizationResource = {
     profilePage: {
       dangerSection: {
         deleteOrganization: {
-          actionDescription: 'أكتب {{organizationName}} بالأسفل للمتابعة.',
+          actionDescription: 'اكتب {{organizationName}} بالأسفل للمتابعة.',
           messageLine1: 'هل أنت متأكد من انك تريد حذف هذه المنظمة',
           messageLine2: 'هذا القرار نهائي ولا يمكن التراجع عنه.',
           successMessage: 'لقد حذفت هذه المنظمة',
           title: 'حذف المنظمة',
         },
         leaveOrganization: {
-          actionDescription: 'أكتب {{organizationName}} للمتابعة',
+          actionDescription: 'اكتب {{organizationName}} للمتابعة',
           messageLine1: 'هل أنت متاكد أنك تريد الخروج من المنظمة؟ سوف تفقد الصلاحيات لهذه المنظمة وجميع تطبيقاتها',
           messageLine2: 'هذا القرار نهائي ولا يمكن التراجع عنه.',
           successMessage: 'لقد غادرت المنظمة',
@@ -435,7 +435,7 @@ export const arSA: LocalizationResource = {
       title: 'الملف الشخصي للمنظمة',
     },
     removeDomainPage: {
-      messageLine1: 'سيتم حذف نطاق البريد الإلكتروني هذا{{domain}}.',
+      messageLine1: 'سيتم حذف نطاق البريد الإلكتروني هذا {{domain}}.',
       messageLine2: 'لن يتمكن المستخدمون من الانضمام إلى المؤسسة تلقائيًا بعد ذلك.',
       successMessage: 'تم حذف هذا النطاق {{domain}}.',
       title: 'حذف النطاق',
@@ -465,7 +465,7 @@ export const arSA: LocalizationResource = {
         automaticSuggestionOption__label: 'اقتراحات تلقائية',
         calloutInfoLabel: 'إن تغيير وضع التسجيل سيؤثر فقط على المستخدمين الجدد.',
         calloutInvitationCountLabel: 'هناك {{count}} دعوة معلقة مرسلة إلى المستخدمين',
-        calloutSuggestionCountLabel: 'هناك {{count}} أقتراح معلق مرسلة إلى المستخدمين',
+        calloutSuggestionCountLabel: 'هناك {{count}} اقتراح معلق مرسل إلى المستخدمين',
         manualInvitationOption__description: 'يمكن دعوة المستخدمين يدويًا فقط للمؤسسة.',
         manualInvitationOption__label: 'لا يوجد تسجيل تلقائي',
         subtitle: 'اختر كيف يمكن للمستخدمين في هذا النطاق تسجيل الدخول إلى المنظمة',
@@ -474,7 +474,7 @@ export const arSA: LocalizationResource = {
         headerTitle__danger: 'خطر',
         headerTitle__enrollment: 'خيارات التسجيل',
       },
-      subtitle: 'هذا النطاق {{domain}} موثوق الآن. يمكنك المتابعة وأختيار وضع التسجيل.',
+      subtitle: 'هذا النطاق {{domain}} موثوق الآن. يمكنك المتابعة واختيار وضع التسجيل.',
       title: 'تحديث {{domain}}',
     },
     verifyDomainPage: {
@@ -588,7 +588,7 @@ export const arSA: LocalizationResource = {
     },
     alternativePhoneCodeProvider: {
       formTitle: 'رمز التحقق',
-      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تحقق من {{provider}}',
     },
@@ -598,7 +598,7 @@ export const arSA: LocalizationResource = {
     },
     emailCode: {
       formTitle: 'رمز التحقق',
-      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تحقق من البريد الإلكتروني',
     },
@@ -629,7 +629,7 @@ export const arSA: LocalizationResource = {
       },
       verified: {
         subtitle: 'سيتم إعادة توجيهك خلال لحظات',
-        title: 'تم تسجيل الحساب بنجاح',
+        title: 'تم تسجيل الدخول بنجاح',
       },
       verifiedSwitchTab: {
         subtitle: 'ارجع إلى علامة التبويب الرئيسية للمتابعة',
@@ -658,7 +658,7 @@ export const arSA: LocalizationResource = {
     passkey: {
       subtitle:
         'يؤدي استخدام مفتاح المرور الخاص بك إلى تأكيد هويتك. قد يطلب جهازك بصمة الإصبع، أو معرّف الوجه، أو كلمة مرور قفل الشاشة',
-      title: 'إستخدم مفتاح المرور',
+      title: 'استعمل مفتاح المرور',
     },
     password: {
       actionLink: 'استعمل طريقة أخرى',
@@ -841,7 +841,7 @@ export const arSA: LocalizationResource = {
     form_identifier_exists__username: 'تم استخدام اسم المستخدم هذا. يُرجى المحاولة مرة أخرى',
     form_identifier_not_found: 'لم يتم العثور على حساب بهذه التفاصيل',
     form_param_format_invalid: undefined,
-    form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
+    form_param_format_invalid__email_address: 'يجب استعمال بريد إلكتروني صالح',
     form_param_format_invalid__phone_number: 'يجب أن يكون رقم الهاتف بصيغة دولية صحيحة',
     form_param_max_length_exceeded__first_name: 'الاسم الأول يجب ألّا يتجاوز 256 حرفًا',
     form_param_max_length_exceeded__last_name: 'الاسم الأخير يجب ألّا يتجاوز 256 حرفًا',
@@ -854,7 +854,7 @@ export const arSA: LocalizationResource = {
     form_password_incorrect: undefined,
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
-    form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
+    form_password_pwned: 'لا يمكن استخدام كلمة المرور هذه لأنها غير آمنة، يُرجى اختيار كلمة مرور أخرى',
     form_password_pwned__sign_in: 'لا يمكن استخدام كلمة المرور هذه لأنها غير آمنة، يُرجى اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
@@ -896,7 +896,7 @@ export const arSA: LocalizationResource = {
         allUppercase: 'استخدم حروفًا كبيرة لبعض الحروف وليس كلها.',
         anotherWord: 'أضف المزيد من الكلمات الأقل شيوعًا.',
         associatedYears: 'تجنب السنوات المرتبطة بك.',
-        capitalization: 'أستعمل حروف كبيرة لأكثر من حرف غير الحرف الأول',
+        capitalization: 'استعمل حروفًا كبيرة لأكثر من حرف غير الحرف الأول',
         dates: 'تجنب التواريخ والسنوات المرتبطة بك.',
         l33t: 'تجنب بدائل الحروف التي يمكن التنبؤ بها مثل "a" ل "@" ',
         longerKeyboardPattern: 'استخدم أنماطًا أكثر وغيّر اتجاه الكتابة في لوحة المفاتيح عدة مرات',
@@ -909,12 +909,12 @@ export const arSA: LocalizationResource = {
         useWords: 'استخدم كلمات متعددة ، ولكن تجنب العبارات الشائعة.',
       },
       warnings: {
-        common: 'كلمة السر هذه شائعة في الأستخدام',
+        common: 'كلمة المرور هذه شائعة في الاستخدام',
         commonNames: 'من السهل تخمين الأسماء والألقاب الشائعة',
         dates: 'من السهل تخمين التواريخ',
         extendedRepeat: 'من السهل تخمين أنماط الحروف المتكررة مثل "abcabcabc"',
         keyPattern: 'من السهل تخمين أنماط لوحة المفاتيح الصغيرة',
-        namesByThemselves: 'من السهل تخمين الأسم الأول أو اللقب',
+        namesByThemselves: 'من السهل تخمين الاسم الأول أو اللقب',
         pwned: 'تم اختراق كلمة المرور الخاصة بك والكشف عنها على الإنترنت',
         recentYears: 'من السهل تخمين السنوات الحديثة',
         sequences: 'من السهل تخمين أنماط الحروف العامة أو الهجائية مثل "abc" ',
@@ -1014,7 +1014,7 @@ export const arSA: LocalizationResource = {
       title: undefined,
     },
     connectedAccountPage: {
-      formHint: 'أختر موفر خدمة لتوصيل حسابك',
+      formHint: 'اختر موفر خدمة لتوصيل حسابك',
       formHint__noAccounts: 'لا يوجد موفرين خدمة لتوصيل حسابك',
       removeResource: {
         messageLine1: 'سيتم حذف هذا الموفر من حسابك {{identifier}}',
@@ -1027,7 +1027,7 @@ export const arSA: LocalizationResource = {
       title: 'أضف حساب متصل',
     },
     deletePage: {
-      actionDescription: 'أكتب حذف حساب بالأسفل للمتابعة',
+      actionDescription: 'اكتب "حذف حساب" بالأسفل للمتابعة',
       confirm: 'حذف حساب',
       messageLine1:
         'هل أنت متأكد من رغبتك في حذف حسابك؟ قد يتم الاحتفاظ ببعض البيانات المرتبطة. لطلب حذف البيانات بالكامل، يرجى الاتصال بالدعم.',
@@ -1061,7 +1061,7 @@ export const arSA: LocalizationResource = {
         title: 'حذف عنوان البريد الإلكتروني هذا',
       },
       title: 'أضافة البريد الإلكتروني',
-      verifyTitle: 'Verify email address',
+      verifyTitle: 'التحقق من عنوان البريد الإلكتروني',
     },
     formButtonPrimary__add: 'إضافة',
     formButtonPrimary__continue: 'متابعة',
@@ -1077,8 +1077,8 @@ export const arSA: LocalizationResource = {
       backButton: 'استخدم الرقم الموجود',
       primaryButton__addPhoneNumber: 'إضافة رقم جوال',
       removeResource: {
-        messageLine1: 'لن يتم إستلام اي رموز تحقق على {{identifier}} عند تسجيل الدخول',
-        messageLine2: 'قد لا يكون حسابك آمنا. هل أنك متأكد أنك تريد المتابعة؟',
+        messageLine1: 'لن يتم استلام أي رموز تحقق على {{identifier}} عند تسجيل الدخول',
+      messageLine2: 'قد لا يكون حسابك آمنًا. هل أنت متأكد أنك تريد المتابعة؟',
         successMessage: 'تم إلغاء التحقق بخطوتين عن طريق الرسائل النصية لرقم الجوال هذا {{mfaPhoneCode}}',
         title: 'إزالة التحقق بخطوتين',
       },
@@ -1145,7 +1145,7 @@ export const arSA: LocalizationResource = {
       infoText: 'سيتم إرسال رسالة نصية تحتوي على رابط التحقق إلى رقم الهاتف هذا.',
       removeResource: {
         messageLine1: 'سيتم حذف رقم الجوال هذا من حسابك {{identifier}}',
-        messageLine2: 'لن تتمكن من تسجيل الدخول بإستخدام رقم الجوال هذا',
+        messageLine2: 'لن تتمكن من تسجيل الدخول باستخدام رقم الجوال هذا',
         successMessage: 'تم حذف هذا العنوان من حسابك {{phoneNumber}}',
         title: 'حذف رقم الجوال',
       },
@@ -1158,7 +1158,7 @@ export const arSA: LocalizationResource = {
       title: undefined,
     },
     profilePage: {
-      fileDropAreaHint: 'ارفع صورة بصيغة JPG, PNG, GIF أو WEBP أقل من 10 ميغابايت',
+      fileDropAreaHint: 'ارفع صورة بصيغة JPG، PNG، GIF أو WEBP أقل من 10 ميغابايت',
       imageFormDestructiveActionSubtitle: 'حذف صورة الملف الشخصي',
       imageFormSubtitle: 'رفع صورة للملف الشخصي',
       imageFormTitle: 'صورة الملف الشخصي',
@@ -1261,7 +1261,7 @@ export const arSA: LocalizationResource = {
       removeResource: {
         messageLine1: 'سيتم حذف هذه المحفظة من حسابك {{identifier}}',
         messageLine2: 'لن تتمكن من تسجيل الدخول إلى الحساب بإستخدام محفظة web3 هذه',
-        successMessage: 'تم حذف هذه المحفظة من حسابك{{web3Wallet}}',
+        successMessage: 'تم حذف هذه المحفظة من حسابك {{web3Wallet}}',
         title: 'حذف محفظة web3',
       },
       subtitle__availableWallets: 'اختر محفظة web3 لتوصيلها بحسابك',
