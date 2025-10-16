@@ -63,4 +63,15 @@ import { ClerkProvider } from "@clerk/react";
 import { useSignIn, useSignUp } from "@clerk/react/legacy";
 `,
   },
+  {
+    name: 'Maintains up-to-date imports',
+    source: `
+import { ClerkProvider } from "@clerk/clerk-react"
+import { useSignIn, useSignUp } from "@clerk/react/legacy"
+        `,
+    output: `
+import { ClerkProvider } from "@clerk/react"
+import { useSignIn, useSignUp } from "@clerk/react/legacy"
+`,
+  },
 ];
