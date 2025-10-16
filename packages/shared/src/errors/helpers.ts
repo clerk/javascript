@@ -1,4 +1,4 @@
-import type { ClerkAPIResponseError } from './clerkApiResponseError';
+import { type ClerkAPIResponseError, isClerkApiResponseError } from './clerkApiResponseError';
 import type { ClerkRuntimeError } from './clerkRuntimeError';
 import type { EmailLinkError } from './emailLinkError';
 import type { MetamaskError } from './metamaskError';
@@ -61,7 +61,7 @@ export function isKnownError(error: any): error is ClerkAPIResponseError | Clerk
  * @internal
  */
 export function isClerkAPIResponseError(err: any): err is ClerkAPIResponseError {
-  return err && 'clerkError' in err;
+  return isClerkApiResponseError(err);
 }
 
 /**
