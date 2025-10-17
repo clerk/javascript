@@ -7,7 +7,7 @@ import {
   UserContext,
 } from '@clerk/shared/react';
 import type { ClientResource, InitialState, Resources } from '@clerk/types';
-import React from 'react';
+import React, { useDeferredValue } from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
@@ -24,20 +24,30 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk({
+    ...isomorphicClerkOptions,
+    // __internal_setResources: (resources: Resources) => setState(resources),
+  });
 
-  const [state, setState] = React.useState<ClerkContextProviderState>({
+  const [updatedState, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
     session: clerk.session,
     user: clerk.user,
     organization: clerk.organization,
   });
 
+  const state = useDeferredValue(updatedState);
+  // const state = updatedState || defaultState;
+
   React.useEffect(() => {
-    return clerk.addListener(e => setState({ ...e }));
+    return clerk.addListener(e => {
+      console.log('[Listener]', e.organization?.id);
+      setState(e);
+    });
   }, []);
 
-  const derivedState = deriveState(clerk.loaded, state, initialState);
+  const _derivedState = deriveState(clerk.loaded, state, initialState);
+  const derivedState = useDeferredValue(_derivedState);
   const clerkCtx = React.useMemo(
     () => ({ value: clerk }),
     [
@@ -113,7 +123,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 
 const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(options));
-  const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
+  const [_clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
+  const clerkStatus = useDeferredValue(_clerkStatus);
 
   React.useEffect(() => {
     void isomorphicClerkRef.current.__unstable__updateProps({ appearance: options.appearance });
