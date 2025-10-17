@@ -126,7 +126,6 @@ export const faIR: LocalizationResource = {
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
-    paymentMethods__label: 'روش های پرداخت',
     paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
@@ -141,6 +140,7 @@ export const faIR: LocalizationResource = {
         testCardInfo: 'تست اطلاعات کارت',
       },
     },
+    paymentMethods__label: 'روش های پرداخت',
     popular: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
@@ -225,6 +225,7 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',
@@ -647,6 +648,10 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -767,6 +772,10 @@ export const faIR: LocalizationResource = {
         subtitleNewTab: 'برای ادامه به برگه قبلی برگردید',
         title: 'ایمیل با موفقیت تأیید شد',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

@@ -127,7 +127,6 @@ export const deDE: LocalizationResource = {
     monthly: 'Monatlich',
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
-    paymentMethods__label: 'Zahlungsmethoden',
     paymentMethod: {
       applePayDescription: {
         annual: 'Jährlich abgerechnet',
@@ -142,6 +141,7 @@ export const deDE: LocalizationResource = {
         testCardInfo: 'Test-Kreditkarteninformationen',
       },
     },
+    paymentMethods__label: 'Zahlungsmethoden',
     popular: 'Beliebt',
     pricingTable: {
       billingCycle: 'Abrechnungszyklus',
@@ -227,6 +227,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Beschreibung',
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',
@@ -651,6 +652,10 @@ export const deDE: LocalizationResource = {
         titleNewTab: 'In einem anderen Tab angemeldet',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Passwort-Code zurücksetzen',
       resendButton: 'Sie haben keinen Code erhalten? Erneut senden',
@@ -773,6 +778,10 @@ export const deDE: LocalizationResource = {
         subtitleNewTab: 'Kehren Sie zum vorherigen Tab zurück, um fortzufahren',
         title: 'E-Mail erfolgreich verifiziert',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

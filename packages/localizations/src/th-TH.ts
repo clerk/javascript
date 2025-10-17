@@ -125,7 +125,6 @@ export const thTH: LocalizationResource = {
     monthly: 'รายเดือน',
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
-    paymentMethods__label: 'วิธีการชำระเงิน',
     paymentMethod: {
       applePayDescription: {
         annual: 'ชำระรายปี',
@@ -140,6 +139,7 @@ export const thTH: LocalizationResource = {
         testCardInfo: 'ข้อมูลบัตรทดสอบ',
       },
     },
+    paymentMethods__label: 'วิธีการชำระเงิน',
     popular: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
@@ -223,6 +223,7 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__password: 'ใส่รหัสผ่านของคุณ',
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'คำอธิบาย',
   formFieldLabel__apiKeyExpiration: 'วันหมดอายุ',
   formFieldLabel__apiKeyName: 'ชื่อคีย์ลับ',
@@ -640,6 +641,10 @@ export const thTH: LocalizationResource = {
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'รหัสรีเซ็ตรหัสผ่าน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -759,6 +764,10 @@ export const thTH: LocalizationResource = {
         subtitleNewTab: 'กลับไปยังแท็บก่อนหน้าเพื่อดำเนินการต่อ',
         title: 'ยืนยันอีเมลสำเร็จ',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

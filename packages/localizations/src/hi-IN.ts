@@ -121,7 +121,6 @@ export const hiIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const hiIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const hiIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'अपना पासवर्ड दर्ज करें',
   formFieldInputPlaceholder__phoneNumber: 'अपना फोन नंबर दर्ज करें',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -640,6 +641,10 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'पासवर्ड रीसेट कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -761,6 +766,10 @@ export const hiIN: LocalizationResource = {
         subtitleNewTab: 'जारी रखने के लिए पिछले टैब पर वापस जाएं',
         title: 'सफलतापूर्वक ईमेल सत्यापित किया गया',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

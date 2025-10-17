@@ -125,7 +125,6 @@ export const viVN: LocalizationResource = {
     monthly: 'Hàng tháng',
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
-    paymentMethods__label: 'Phương thức thanh toán',
     paymentMethod: {
       applePayDescription: {
         annual: 'Thanh toán hàng năm',
@@ -140,6 +139,7 @@ export const viVN: LocalizationResource = {
         testCardInfo: 'Thông tin thử nghiệm',
       },
     },
+    paymentMethods__label: 'Phương thức thanh toán',
     popular: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
@@ -224,6 +224,7 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Nhập mật khẩu của bạn',
   formFieldInputPlaceholder__phoneNumber: 'Nhập số điện thoại của bạn',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Mô tả',
   formFieldLabel__apiKeyExpiration: 'Hết hạn',
   formFieldLabel__apiKeyName: 'Tên khoá bí mật',
@@ -645,6 +646,10 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -765,6 +770,10 @@ export const viVN: LocalizationResource = {
         subtitleNewTab: 'Quay lại tab trước để tiếp tục',
         title: 'Xác minh email thành công',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

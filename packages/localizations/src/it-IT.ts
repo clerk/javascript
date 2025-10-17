@@ -127,7 +127,6 @@ export const itIT: LocalizationResource = {
     monthly: 'Mensile',
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
-    paymentMethods__label: 'Metodi di pagamento',
     paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento annuale',
@@ -142,6 +141,7 @@ export const itIT: LocalizationResource = {
         testCardInfo: 'Informazioni carta di prova',
       },
     },
+    paymentMethods__label: 'Metodi di pagamento',
     popular: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
@@ -227,6 +227,7 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Inserisci la tua password',
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Descrizione',
   formFieldLabel__apiKeyExpiration: 'Scadenza',
   formFieldLabel__apiKeyName: 'Nome chiave segreta',
@@ -646,6 +647,10 @@ export const itIT: LocalizationResource = {
         titleNewTab: "Accedi da un'altra scheda",
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codice di reset della password',
       resendButton: 'Non hai ricevuto un codice? Reinvia',
@@ -765,6 +770,10 @@ export const itIT: LocalizationResource = {
         subtitleNewTab: 'Ritorna alla tab precedente per continuare',
         title: 'Email verificata con successo',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
