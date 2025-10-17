@@ -1,0 +1,11 @@
+---
+import type { UserAvatarProps } from '@clerk/types';
+type Props = UserAvatarProps;
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
+---
+
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='user-avatar'
+/>
