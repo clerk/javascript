@@ -6,4 +6,3 @@
  * until we drop the package completely with the next major release.
  */
 export type * from '@clerk/shared/types';
-//# sourceMappingURL=index.d.ts.map

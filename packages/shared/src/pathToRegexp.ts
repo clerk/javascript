@@ -32,13 +32,7 @@ type Match<P extends object = object> = false | MatchResult<P>;
  * The match function takes a string and returns whether it matched the path.
  */
 type MatchFunction<P extends object = object> = (path: string) => Match<P>;
-/**
- * Create path match function from `path-to-regexp` spec.
- */
-declare function match<P extends object = object>(
-  str: Path,
-  options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions,
-): MatchFunction<P>;
+
 /**
  * Metadata about a key.
  */
