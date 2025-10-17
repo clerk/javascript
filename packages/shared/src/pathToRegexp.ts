@@ -32,5 +32,3 @@ export function match<P extends object = object>(
     );
   }
 }
-
-export { type Match, type MatchFunction };
