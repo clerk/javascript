@@ -127,6 +127,7 @@ export type __internal_LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: LocalizationValue;
   formFieldInputPlaceholder__apiKeyDescription: LocalizationValue;
   formFieldInputPlaceholder__apiKeyExpirationDate: LocalizationValue;
+  formFieldInput__emailAddress_format: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
