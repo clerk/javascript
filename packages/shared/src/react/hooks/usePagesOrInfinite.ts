@@ -10,6 +10,7 @@ import type {
   PaginatedResources,
   ValueOrSetter,
 } from '../types';
+import { usePreviousValue } from './usePreviousValue';
 
 /**
  * Returns an object containing only the keys from the first object that are not present in the second object.
@@ -122,21 +123,6 @@ type UsePagesOrInfinite = <
 ) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;
 
 /**
- *
- */
-export function usePrevious<T>(value: T) {
-  const [current, setCurrent] = useState(value);
-  const [previous, setPrevious] = useState<T | null>(null);
-
-  if (value !== current) {
-    setPrevious(current);
-    setCurrent(value);
-  }
-
-  return previous;
-}
-
-/**
  * A flexible pagination hook that supports both traditional pagination and infinite loading.
  * It provides a unified API for handling paginated data fetching, with built-in caching through SWR.
  * The hook can operate in two modes:
@@ -172,7 +158,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     pageSize: pageSizeRef.current,
   };
 
-  const previousIsSignedIn = usePrevious(isSignedIn);
+  const previousIsSignedIn = usePreviousValue(isSignedIn);
 
   // cacheMode being `true` indicates that the cache key is defined, but the fetcher is not.
   // This allows to ready the cache instead of firing a request.
