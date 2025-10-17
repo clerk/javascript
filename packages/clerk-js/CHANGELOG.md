@@ -1,5 +1,22 @@
 # Change Log
 
+## 5.102.0
+
+### Minor Changes
+
+- [Billing Beta]: Dropping `paymentMethodId` from subscription item. ([#7017](https://github.com/clerk/javascript/pull/7017)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add support for automatically sending the browser locale during the sign-in flow ([#7011](https://github.com/clerk/javascript/pull/7011)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- [Billing Beta] Extend support of `forOrganizations` prop by a few minors. ([#7021](https://github.com/clerk/javascript/pull/7021)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035)]:
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+  - @clerk/localizations@3.26.2
+
 ## 5.101.1
 
 ### Patch Changes
