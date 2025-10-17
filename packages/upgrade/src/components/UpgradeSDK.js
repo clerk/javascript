@@ -15,14 +15,25 @@ function detectPackageManager() {
   return undefined;
 }
 
-function upgradeCommand(sdk, packageManager) {
+/**
+ *
+ * @param {string} sdk
+ * @param {string} packageManager
+ * @param {boolean} replacePackage
+ * @returns
+ */
+function upgradeCommand(sdk, packageManager, replacePackage = false) {
+  let packageName = `@clerk/${sdk}`;
+  if (replacePackage) {
+    packageName = packageName.replace('clerk-', '');
+  }
   switch (packageManager) {
     case 'yarn':
-      return `yarn add @clerk/${sdk}@latest`;
+      return `yarn add ${packageName}@latest`;
     case 'pnpm':
-      return `pnpm add @clerk/${sdk}@latest`;
+      return `pnpm add ${packageName}@latest`;
     default:
-      return `npm install @clerk/${sdk}@latest`;
+      return `npm install ${packageName}@latest`;
   }
 }
 
@@ -33,12 +44,13 @@ function upgradeCommand(sdk, packageManager) {
  * @param {Object} props
  * @param {Function} props.callback - The callback function to be called after the command execution.
  * @param {string} props.sdk - The SDK for which the upgrade command is run.
+ * @param {boolean} props.replacePackage - Whether to replace legacy `clerk-` packages with their new versions.
  * @returns {JSX.Element} The rendered component.
  *
  * @example
  * <UpgradeCommand sdk="example-sdk" callback={handleUpgrade} />
  */
-export function UpgradeSDK({ callback, sdk }) {
+export function UpgradeSDK({ callback, sdk, replacePackage = false }) {
   const [command, setCommand] = useState();
   const [error, setError] = useState();
   const [packageManager, setPackageManager] = useState(detectPackageManager());
@@ -52,7 +64,7 @@ export function UpgradeSDK({ callback, sdk }) {
       if (previous) {
         return previous;
       }
-      return upgradeCommand(sdk, packageManager);
+      return upgradeCommand(sdk, packageManager, replacePackage);
     });
     if (!command) {
       return;
