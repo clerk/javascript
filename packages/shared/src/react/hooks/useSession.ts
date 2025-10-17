@@ -1,4 +1,4 @@
-import type { UseSessionReturn } from '@clerk/types';
+import type { UseSessionReturn } from '../../types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';

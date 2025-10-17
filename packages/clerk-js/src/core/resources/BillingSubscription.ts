@@ -60,6 +60,7 @@ export class BillingSubscription extends BaseResource implements BillingSubscrip
 
 export class BillingSubscriptionItem extends BaseResource implements BillingSubscriptionItemResource {
   id!: string;
+  paymentMethodId!: string;
   plan!: BillingPlan;
   planPeriod!: BillingSubscriptionPlanPeriod;
   status!: BillingSubscriptionStatus;
@@ -86,6 +87,7 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
     }
 
     this.id = data.id;
+    this.paymentMethodId = data.payment_method_id;
     this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.status = data.status;

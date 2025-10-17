@@ -1,5 +1,5 @@
-import type { Clerk, SessionVerificationLevel } from '@clerk/types';
 import { useCallback, useRef } from 'react';
+import type { Clerk, SessionVerificationLevel } from '../../types';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';

@@ -17,7 +17,7 @@ import type {
   TelemetryEvent,
   TelemetryEventRaw,
   TelemetryLogEntry,
-} from '@clerk/types';
+} from '../types';
 
 import { parsePublishableKey } from '../keys';
 import { isTruthy } from '../underscore';

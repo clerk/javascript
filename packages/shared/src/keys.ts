@@ -1,4 +1,4 @@
-import type { PublishableKey } from '@clerk/types';
+import type { PublishableKey } from './types';
 
 import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';

@@ -9,7 +9,7 @@ import type {
   OrganizationSuggestionResource,
   SetActive,
   UserOrganizationInvitationResource,
-} from '@clerk/types';
+} from '../../types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';

@@ -1,4 +1,4 @@
-import type { ClerkEventPayload } from '@clerk/types';
+import type { ClerkEventPayload } from './types';
 
 import { createEventBus } from './eventBus';
 

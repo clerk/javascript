@@ -1,4 +1,4 @@
-import type { ClerkPaginatedResponse } from '@clerk/types';
+import type { ClerkPaginatedResponse } from '../types';
 
 import type { ClerkAPIResponseError } from '../error';
 

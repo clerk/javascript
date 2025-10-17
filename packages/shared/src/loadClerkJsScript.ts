@@ -1,4 +1,4 @@
-import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
+import type { ClerkOptions, SDKMetadata, Without } from './types';
 
 import { buildErrorThrower, ClerkRuntimeError } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';

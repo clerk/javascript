@@ -1,4 +1,4 @@
-import type { ClerkResource } from '@clerk/types';
+import type { ClerkResource } from '@clerk/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

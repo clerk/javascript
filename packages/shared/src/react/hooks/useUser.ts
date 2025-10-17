@@ -1,4 +1,4 @@
-import type { UseUserReturn } from '@clerk/types';
+import type { UseUserReturn } from '../../types';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';

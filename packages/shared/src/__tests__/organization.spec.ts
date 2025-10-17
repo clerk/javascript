@@ -1,5 +1,5 @@
-import type { OrganizationMembershipResource } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
+import type { OrganizationMembershipResource } from '../types';
 
 import { getCurrentOrganizationMembership } from '../organization';
 

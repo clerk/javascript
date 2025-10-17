@@ -9,7 +9,7 @@ import type {
   OrganizationMembershipRequestResource,
   OrganizationMembershipResource,
   OrganizationResource,
-} from '@clerk/types';
+} from '../../types';
 
 import { getCurrentOrganizationMembership } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
