@@ -1,5 +1,11 @@
 # @clerk/tanstack-react-start
 
+## 0.26.4
+
+### Patch Changes
+
+- Fixed a bug where the `clerkMiddleware()` helper would consume the body of the request ([#7020](https://github.com/clerk/javascript/pull/7020)) by [@p9f](https://github.com/p9f)
+
 ## 0.26.3
 
 ### Patch Changes
