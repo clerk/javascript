@@ -20,7 +20,7 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { common, type PropsOfComponent, type ThemableCssProp } from '../../styledSystem';
+import { type PropsOfComponent, type ThemableCssProp } from '../../styledSystem';
 
 type MembersListTableProps = {
   headers: LocalizationKey[];
@@ -172,14 +172,6 @@ export const RoleSelect = (props: {
         <RolesListItem
           isSelected={isSelected}
           option={option}
-          sx={theme => ({
-            '&:hover': {
-              background: common.mutedBackground(theme),
-            },
-            '&[data-focused="true"]': {
-              background: common.mutedBackground(theme),
-            },
-          })}
         />
       )}
     >
