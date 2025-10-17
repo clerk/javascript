@@ -29,17 +29,17 @@ export default defineConfig(({ watch }) => {
       unbundle: false,
       outDir: './dist/types',
     },
-    // {
-    //   ...common,
-    //   entry: [
-    //     // all files except types
-    //     './src/*.{ts,tsx}',
-    //     './src/*/index.{ts,tsx}',
-    //     // '!./src/types/*.{ts,tsx}',
-    //     '!./src/**/*.{test,spec}.{ts,tsx}',
-    //   ],
-    //   outDir: './dist/runtime',
-    //   unbundle: false,
-    // },
+    {
+      ...common,
+      entry: [
+        // all files except types
+        './src/*.{ts,tsx}',
+        './src/**/index.{ts,tsx}',
+      //  '!./src/types/*.{ts,tsx}',
+        '!./src/**/*.{test,spec}.{ts,tsx}',
+      ],
+      outDir: './dist/runtime',
+      unbundle: false,
+    },
   ];
 });

@@ -1,7 +1,7 @@
-import type { ClerkResource } from '@clerk/shared/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { ClerkResource } from '../../../types';
 import { createBillingPaginatedHook } from '../createBillingPaginatedHook';
 import { wrapper } from './wrapper';
 
