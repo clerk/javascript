@@ -167,8 +167,10 @@ export interface SignInFuturePhoneCodeVerifyParams {
 }
 
 export interface SignInFutureSSOParams {
-  flow?: 'auto' | 'modal';
-  strategy: OAuthStrategy | 'saml' | 'enterprise_sso';
+  /**
+   * The strategy to use for authentication.
+   */
+  strategy: OAuthStrategy | 'enterprise_sso';
   /**
    * The URL to redirect to after the user has completed the SSO flow.
    */
@@ -177,6 +179,30 @@ export interface SignInFutureSSOParams {
    * TODO @revamp-hooks: This should be handled by FAPI instead.
    */
   redirectCallbackUrl: string;
+  /**
+   * If provided, a `Window` to use for the OAuth flow. Useful in instances where you cannot navigate to an
+   * OAuth provider.
+   *
+   * @example
+   * ```ts
+   * const popup = window.open('about:blank', '', 'width=600,height=800');
+   * if (!popup) {
+   *   throw new Error('Failed to open popup');
+   * }
+   * await signIn.sso({ popup, strategy: 'oauth_google', redirectUrl: '/dashboard' });
+   * ```
+   */
+  popup?: { location: { href: string } };
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the
+   * [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.)
+   * in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionId?: string;
 }
 
 export interface SignInFutureMFAPhoneCodeVerifyParams {
