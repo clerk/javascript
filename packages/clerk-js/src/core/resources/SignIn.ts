@@ -38,6 +38,7 @@ import type {
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
   SignInFutureMFAPhoneCodeVerifyParams,
+  SignInFuturePasskeyParams,
   SignInFuturePasswordParams,
   SignInFuturePhoneCodeSendParams,
   SignInFuturePhoneCodeVerifyParams,
@@ -974,6 +975,77 @@ class SignInFuture implements SignInFutureResource {
 
       await this.resource.__internal_basePost({
         body: { signature, strategy },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: unknown }> {
+    const { flow } = params || {};
+
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+    const isWebAuthnAutofillSupported =
+      SignIn.clerk.__internal_isWebAuthnAutofillSupported || isWebAuthnAutofillSupportedOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.resource, async () => {
+      if (flow === 'autofill' || flow === 'discoverable') {
+        await this._create({ strategy: 'passkey' });
+      } else {
+        const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+
+        if (!passKeyFactor) {
+          clerkVerifyPasskeyCalledBeforeCreate();
+        }
+        await this.resource.__internal_basePost({
+          body: { strategy: 'passkey' },
+          action: 'prepare_first_factor',
+        });
+      }
+
+      const { nonce } = this.firstFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+      if (!publicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      let canUseConditionalUI = false;
+
+      if (flow === 'autofill') {
+        /**
+         * If autofill is not supported gracefully handle the result, we don't need to throw.
+         * The caller should always check this before calling this method.
+         */
+        canUseConditionalUI = await isWebAuthnAutofillSupported();
+      }
+
+      // Invoke the navigator.create.get() method.
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: canUseConditionalUI,
+      });
+
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      await this.resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
         action: 'attempt_first_factor',
       });
     });

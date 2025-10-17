@@ -1,5 +1,33 @@
 # Change Log
 
+## 1.7.40
+
+### Patch Changes
+
+- Updated dependencies [[`d8147fb`](https://github.com/clerk/javascript/commit/d8147fb58bfd6caf9a4f0a36fdc48c630d00387f)]:
+  - @clerk/shared@3.28.1
+  - @clerk/backend@2.18.2
+
+## 1.7.39
+
+### Patch Changes
+
+- Updated dependencies [[`305f4ee`](https://github.com/clerk/javascript/commit/305f4eeb825086d55d1b0df198a0c43da8d94993), [`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2), [`1236c74`](https://github.com/clerk/javascript/commit/1236c745fd58020e0972938ca0a9ae697a24af02), [`29201b2`](https://github.com/clerk/javascript/commit/29201b24847b6cdb35a96cb971fa1de958b0410a)]:
+  - @clerk/backend@2.18.1
+  - @clerk/shared@3.28.0
+  - @clerk/types@4.94.0
+
+## 1.7.38
+
+### Patch Changes
+
+- Added internal helper type for `auth` and `getAuth()` functions that don't require a request or context parameter ([#6910](https://github.com/clerk/javascript/pull/6910)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`20c2e29`](https://github.com/clerk/javascript/commit/20c2e291fe32f6038ab9e95aec268e3d98c449f1), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`56a81aa`](https://github.com/clerk/javascript/commit/56a81aaa59e95ee25f8eb49bee78975ee377e1c7), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`348021d`](https://github.com/clerk/javascript/commit/348021d837ba66fd3f510148213f374ae2e969a8), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`9766c4a`](https://github.com/clerk/javascript/commit/9766c4afd26f2841d6f79dbdec2584ef8becd22f), [`fe873dc`](https://github.com/clerk/javascript/commit/fe873dc94c2614e8cc670e3add13e170bcf85338), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342)]:
+  - @clerk/types@4.93.0
+  - @clerk/backend@2.18.0
+  - @clerk/shared@3.27.4
+
 ## 1.7.37
 
 ### Patch Changes

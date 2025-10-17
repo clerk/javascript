@@ -1,7 +1,6 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { waitFor } from '@testing-library/react';
-import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
