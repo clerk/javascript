@@ -69,8 +69,8 @@ export const viVN: LocalizationResource = {
   badge__upcomingPlan: 'Sắp tới',
   badge__userDevice: 'Thiết bị người dùng',
   badge__you: 'Bạn',
-  commerce: {
-    addPaymentMethod: 'Thêm phương thức thanh toán',
+  billing: {
+    addPaymentMethod__label: 'Thêm phương thức thanh toán',
     alwaysFree: 'Miễn phí mãi mãi',
     annually: 'Hàng năm',
     availableFeatures: 'Tính năng có sẵn',
@@ -125,8 +125,8 @@ export const viVN: LocalizationResource = {
     monthly: 'Hàng tháng',
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
-    paymentMethods: 'Phương thức thanh toán',
-    paymentSource: {
+    paymentMethods__label: 'Phương thức thanh toán',
+    paymentMethod: {
       applePayDescription: {
         annual: 'Thanh toán hàng năm',
         monthly: 'Thanh toán hàng tháng',
@@ -287,7 +287,7 @@ export const viVN: LocalizationResource = {
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Làm mặc định',
         actionLabel__remove: 'Xóa',
         add: 'Thêm phương thức thanh toán mới',
@@ -296,11 +296,11 @@ export const viVN: LocalizationResource = {
         formButtonPrimary__add: 'Thêm phương thức thanh toán',
         formButtonPrimary__pay: 'Thanh toán {{amount}}',
         payWithTestCardButton: 'Thanh toán với thẻ thử nghiệm',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
-          successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
+          successMessage: '{{paymentMethod}} đã bị xóa khỏi tài khoản của bạn.',
           title: 'Xóa phương thức thanh toán',
         },
         title: 'Phương thức thanh toán',
@@ -970,7 +970,7 @@ export const viVN: LocalizationResource = {
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Làm mặc định',
         actionLabel__remove: 'Xóa',
         add: 'Thêm phương thức thanh toán mới',
@@ -979,11 +979,11 @@ export const viVN: LocalizationResource = {
         formButtonPrimary__add: 'Thêm phương thức thanh toán',
         formButtonPrimary__pay: 'Thanh toán {{amount}}',
         payWithTestCardButton: 'Thanh toán với thẻ thử',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
-          successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
+          successMessage: '{{paymentMethod}} đã bị xóa khỏi tài khoản của bạn.',
           title: 'Xóa phương thức thanh toán',
         },
         title: 'Phương thức thanh toán',

@@ -170,7 +170,7 @@ export type __internal_LocalizationResource = {
   membershipRole__admin: LocalizationValue;
   membershipRole__basicMember: LocalizationValue;
   membershipRole__guestMember: LocalizationValue;
-  commerce: {
+  billing: {
     month: LocalizationValue;
     year: LocalizationValue;
     free: LocalizationValue;
@@ -207,14 +207,28 @@ export type __internal_LocalizationResource = {
     totalDue: LocalizationValue;
     totalDueToday: LocalizationValue;
     pastDue: LocalizationValue;
-    paymentMethods: LocalizationValue;
-    addPaymentMethod: LocalizationValue;
     pay: LocalizationValue<'amount'>;
     cancelSubscriptionTitle: LocalizationValue<'plan'>;
     cancelSubscriptionNoCharge: LocalizationValue;
     cancelSubscriptionAccessUntil: LocalizationValue<'plan' | 'date'>;
     cancelSubscriptionPastDue: LocalizationValue;
     popular: LocalizationValue;
+    paymentMethods__label: LocalizationValue;
+    addPaymentMethod__label: LocalizationValue;
+    paymentMethod: {
+      dev: {
+        testCardInfo: LocalizationValue;
+        developmentMode: LocalizationValue;
+        cardNumber: LocalizationValue;
+        expirationDate: LocalizationValue;
+        cvcZip: LocalizationValue;
+        anyNumbers: LocalizationValue;
+      };
+      applePayDescription: {
+        monthly: LocalizationValue;
+        annual: LocalizationValue;
+      };
+    };
     subscriptionDetails: {
       title: LocalizationValue;
       currentBillingCycle: LocalizationValue;
@@ -237,20 +251,6 @@ export type __internal_LocalizationResource = {
     pricingTable: {
       billingCycle: LocalizationValue;
       included: LocalizationValue;
-    };
-    paymentSource: {
-      dev: {
-        testCardInfo: LocalizationValue;
-        developmentMode: LocalizationValue;
-        cardNumber: LocalizationValue;
-        expirationDate: LocalizationValue;
-        cvcZip: LocalizationValue;
-        anyNumbers: LocalizationValue;
-      };
-      applePayDescription: {
-        monthly: LocalizationValue;
-        annual: LocalizationValue;
-      };
     };
     checkout: {
       title: LocalizationValue;
@@ -361,6 +361,10 @@ export type __internal_LocalizationResource = {
         label__onlyPrivacyPolicy: LocalizationValue<'privacyPolicyLink'>;
         label__onlyTermsOfService: LocalizationValue<'termsOfServiceLink'>;
       };
+    };
+    enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
   };
   signIn: {
@@ -515,6 +519,10 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       action__addAccount: LocalizationValue;
       action__signOutAll: LocalizationValue;
+    };
+    enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
     };
   };
   reverification: {
@@ -891,7 +899,7 @@ export type __internal_LocalizationResource = {
         tableHeader__amount: LocalizationValue;
         tableHeader__status: LocalizationValue;
       };
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         title: LocalizationValue;
         add: LocalizationValue;
         addSubtitle: LocalizationValue;
@@ -900,11 +908,11 @@ export type __internal_LocalizationResource = {
         actionLabel__remove: LocalizationValue;
         formButtonPrimary__add: LocalizationValue;
         formButtonPrimary__pay: LocalizationValue;
-        removeResource: {
+        removeMethod: {
           title: LocalizationValue;
           messageLine1: LocalizationValue<'identifier'>;
           messageLine2: LocalizationValue;
-          successMessage: LocalizationValue<'paymentSource'>;
+          successMessage: LocalizationValue<'paymentMethod'>;
         };
         payWithTestCardButton: LocalizationValue;
       };
@@ -1119,7 +1127,7 @@ export type __internal_LocalizationResource = {
         tableHeader__amount: LocalizationValue;
         tableHeader__status: LocalizationValue;
       };
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         title: LocalizationValue;
         add: LocalizationValue;
         addSubtitle: LocalizationValue;
@@ -1128,11 +1136,11 @@ export type __internal_LocalizationResource = {
         actionLabel__remove: LocalizationValue;
         formButtonPrimary__add: LocalizationValue;
         formButtonPrimary__pay: LocalizationValue;
-        removeResource: {
+        removeMethod: {
           title: LocalizationValue;
           messageLine1: LocalizationValue<'identifier'>;
           messageLine2: LocalizationValue;
-          successMessage: LocalizationValue<'paymentSource'>;
+          successMessage: LocalizationValue<'paymentMethod'>;
         };
         payWithTestCardButton: LocalizationValue;
       };

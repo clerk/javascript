@@ -69,8 +69,8 @@ export const faIR: LocalizationResource = {
   badge__upcomingPlan: 'به زودی',
   badge__userDevice: 'دستگاه کاربر',
   badge__you: 'شما',
-  commerce: {
-    addPaymentMethod: 'افزودن روش پرداخت',
+  billing: {
+    addPaymentMethod__label: 'افزودن روش پرداخت',
     alwaysFree: 'همیشه رایگان',
     annually: 'سالانه',
     availableFeatures: 'ویژگی ها',
@@ -126,8 +126,8 @@ export const faIR: LocalizationResource = {
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
-    paymentMethods: 'روش های پرداخت',
-    paymentSource: {
+    paymentMethods__label: 'روش های پرداخت',
+    paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
         monthly: 'پرداخت ماهانه',
@@ -288,7 +288,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -297,11 +297,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',
@@ -973,7 +973,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -982,11 +982,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',

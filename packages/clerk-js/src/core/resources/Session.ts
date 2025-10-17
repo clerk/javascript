@@ -6,6 +6,7 @@ import type {
   ActClaim,
   CheckAuthorization,
   EmailCodeConfig,
+  EnterpriseSSOConfig,
   GetToken,
   GetTokenOptions,
   PhoneCodeConfig,
@@ -178,6 +179,13 @@ export class Session extends BaseResource implements SessionResource {
         break;
       case 'passkey':
         config = {};
+        break;
+      case 'enterprise_sso':
+        config = {
+          emailAddressId: factor.emailAddressId,
+          enterpriseConnectionId: factor.enterpriseConnectionId,
+          redirectUrl: factor.redirectUrl,
+        } as EnterpriseSSOConfig;
         break;
       default:
         clerkInvalidStrategy('Session.prepareFirstFactorVerification', (factor as any).strategy);

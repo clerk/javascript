@@ -230,6 +230,7 @@ export type ElementsConfig = {
   otpCodeFieldInput: WithOptions;
   otpCodeFieldInputContainer: WithOptions;
   otpCodeFieldErrorText: WithOptions;
+  otpCodeFieldSuccessText: WithOptions;
 
   dividerRow: WithOptions;
   dividerColumn: WithOptions;
@@ -640,6 +641,10 @@ export type ElementsConfig = {
   subscriptionDetailsDetailRow: WithOptions;
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;
+
+  enterpriseConnectionsRoot: WithOptions;
+  enterpriseConnectionButton: WithOptions;
+  enterpriseConnectionButtonText: WithOptions;
 };
 
 export type Elements = {

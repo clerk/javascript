@@ -95,7 +95,7 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'organization' : 'user'}>
+        <SubscriberTypeContext.Provider value={(props as PricingTableProps).for || 'user'}>
           <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
             {children}
           </PricingTableContext.Provider>

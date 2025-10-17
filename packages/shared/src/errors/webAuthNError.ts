@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from './runtimeError';
+import { ClerkRuntimeError } from './clerkRuntimeError';
 
 type ClerkWebAuthnErrorCode =
   // Generic

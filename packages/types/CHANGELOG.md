@@ -1,5 +1,55 @@
 # Change Log
 
+## 4.94.0
+
+### Minor Changes
+
+- [Experimental] Add support for sign-in with passkey to new APIs ([#6997](https://github.com/clerk/javascript/pull/6997)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add example usage for `__experimental_startPath`. ([#6987](https://github.com/clerk/javascript/pull/6987)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.93.0
+
+### Minor Changes
+
+- [Billing Beta] Rename payment source descriptors to use "payment method". ([#6951](https://github.com/clerk/javascript/pull/6951)) by [@panteliselef](https://github.com/panteliselef)
+
+- Add support for sign up `locale` ([#6915](https://github.com/clerk/javascript/pull/6915)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- [Experimental] Fix `signIn.password` emailAddress parameter name. ([#6932](https://github.com/clerk/javascript/pull/6932)) by [@dstaley](https://github.com/dstaley)
+
+- [Experimental] Fix issue where calling `this.create()` would not correctly propagate errors. ([#6932](https://github.com/clerk/javascript/pull/6932)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Rename payment source to payment method. ([#6865](https://github.com/clerk/javascript/pull/6865)) by [@panteliselef](https://github.com/panteliselef)
+
+  `Clerk.user.initializePaymentSource()` -> `Clerk.user.initializePaymentMethod()`
+  `Clerk.user.addPaymentSource()` -> `Clerk.user.addPaymentMethod()`
+  `Clerk.user.getPaymentSources()` -> `Clerk.user.getPaymentMethods()`
+
+  `Clerk.organization.initializePaymentSource()` -> `Clerk.organization.initializePaymentMethod()`
+  `Clerk.organization.addPaymentSource()` -> `Clerk.organization.addPaymentMethod()`
+  `Clerk.organization.getPaymentSources()` -> `Clerk.organization.getPaymentMethods()`
+
+- [Billing Beta] Rename payment sources to method methods. ([#6959](https://github.com/clerk/javascript/pull/6959)) by [@panteliselef](https://github.com/panteliselef)
+
+  Updates localization keys from `commerce` -> `billing` and `paymentSource` to `paymentMethod`.
+
+- Introduce experimental step to choose enterprise connection on sign-in/sign-up ([#6947](https://github.com/clerk/javascript/pull/6947)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- [Billing Beta] Replace `forOrganizations: true` with `for: "organization"` in `<PricingTable/>`. ([#6978](https://github.com/clerk/javascript/pull/6978)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add `enterpriseConnectionId` to `SamlAccount` and `EnterpriseAccount` resources ([#6961](https://github.com/clerk/javascript/pull/6961)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Add success text descriptor to otp input field. ([#6958](https://github.com/clerk/javascript/pull/6958)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- - Add experimental property `last_authenticated_at` to `SamlAccount` resource, which represents the date when the SAML account was last authenticated ([#6954](https://github.com/clerk/javascript/pull/6954)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  - Add experimental support for `enterprise_sso` as a `strategy` param for `session.prepareFirstFactorVerification`
+
 ## 4.92.0
 
 ### Minor Changes

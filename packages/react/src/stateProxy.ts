@@ -131,6 +131,7 @@ export class StateProxy implements State {
           'verifyBackupCode',
         ] as const),
         ticket: this.gateMethod(target, 'ticket'),
+        passkey: this.gateMethod(target, 'passkey'),
         web3: this.gateMethod(target, 'web3'),
       },
     };
