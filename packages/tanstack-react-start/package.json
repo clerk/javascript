@@ -47,6 +47,10 @@
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
     },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
@@ -55,7 +59,8 @@
     "dist",
     "errors",
     "server",
-    "webhooks"
+    "webhooks",
+    "experimental"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
