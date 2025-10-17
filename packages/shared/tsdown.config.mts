@@ -44,7 +44,7 @@ export default defineConfig(({ watch }) => {
         '!./src/**/*.{test,spec}.{ts,tsx}',
       ],
       outDir: './dist/runtime',
-      unbundle: true,
+      unbundle: false,
     },
   ];
 });
