@@ -1,5 +1,5 @@
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
-import type { DeepPartial, LocalizationResource } from '@clerk/types';
+import type { DeepPartial, LocalizationResource } from '@clerk/shared/types';
 import { dequal as deepEqual } from 'dequal';
 
 import { useOptions } from '../contexts';

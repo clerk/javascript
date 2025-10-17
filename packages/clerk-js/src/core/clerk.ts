@@ -93,7 +93,7 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 

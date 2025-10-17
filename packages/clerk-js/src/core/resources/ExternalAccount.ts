@@ -6,7 +6,7 @@ import type {
   OAuthProvider,
   ReauthorizeExternalAccountParams,
   VerificationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource } from './Base';
 import { Verification } from './Verification';

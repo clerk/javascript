@@ -1,4 +1,4 @@
-import type { MenuId } from '@clerk/types';
+import type { MenuId } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, descriptors, Icon } from '../customizables';

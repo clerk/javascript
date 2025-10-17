@@ -7,7 +7,7 @@ import type {
   PhoneCodeChannelData,
   SignInCreateParams,
   SignInResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';

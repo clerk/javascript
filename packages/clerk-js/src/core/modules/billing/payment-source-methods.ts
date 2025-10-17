@@ -5,7 +5,7 @@ import type {
   ClerkPaginatedResponse,
   GetPaymentMethodsParams,
   InitializePaymentMethodParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import { BaseResource, BillingInitializedPaymentMethod, BillingPaymentMethod } from '../../resources/internal';

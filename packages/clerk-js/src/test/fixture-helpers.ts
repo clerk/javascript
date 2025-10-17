@@ -15,7 +15,7 @@ import type {
   UserJSON,
   UserSettingsJSON,
   VerificationJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';

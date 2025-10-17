@@ -8,7 +8,7 @@ import type {
   BillingSubscriptionStatus,
   CancelSubscriptionParams,
   DeletedObjectJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
 

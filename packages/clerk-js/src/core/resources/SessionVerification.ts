@@ -8,7 +8,7 @@ import type {
   SessionVerificationSecondFactor,
   SessionVerificationStatus,
   VerificationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource, Session, Verification } from './internal';
 

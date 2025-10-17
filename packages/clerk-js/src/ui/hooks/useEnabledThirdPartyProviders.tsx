@@ -9,7 +9,7 @@ import type {
   PhoneCodeProvider,
   Web3Provider,
   Web3Strategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { useEnvironment } from '../contexts/EnvironmentContext';
 import { fromEntries } from '../utils/fromEntries';

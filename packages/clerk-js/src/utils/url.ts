@@ -3,7 +3,7 @@ import { createDevOrStagingUrlCache } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { camelToSnake } from '@clerk/shared/underscore';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
-import type { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/shared/types';
 
 import { joinPaths } from './path';
 import { getQueryParams } from './querystring';

@@ -1,5 +1,5 @@
 import { titleize } from '@clerk/shared/underscore';
-import type { FieldId } from '@clerk/types';
+import type { FieldId } from '@clerk/shared/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {

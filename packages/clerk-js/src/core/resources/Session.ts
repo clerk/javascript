@@ -24,7 +24,7 @@ import type {
   SessionVerifyPrepareSecondFactorParams,
   TokenResource,
   UserResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';

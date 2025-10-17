@@ -1,4 +1,4 @@
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';

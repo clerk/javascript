@@ -7,7 +7,7 @@ import type {
   SignedInSessionResource,
   SignInResource,
   SignUpResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';

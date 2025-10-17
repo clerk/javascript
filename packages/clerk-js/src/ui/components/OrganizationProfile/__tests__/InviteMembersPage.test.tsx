@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { OrganizationInvitationResource } from '@clerk/types';
+import type { OrganizationInvitationResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

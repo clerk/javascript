@@ -59,7 +59,7 @@ import type {
   Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
 

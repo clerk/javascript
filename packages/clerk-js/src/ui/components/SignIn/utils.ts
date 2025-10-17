@@ -6,7 +6,7 @@ import type {
   SignInFactor,
   SignInResource,
   SignInStrategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { getPreferredPhoneCodeChannelByCountry } from '@/ui/utils/phoneUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';
