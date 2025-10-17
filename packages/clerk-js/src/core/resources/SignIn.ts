@@ -168,7 +168,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const locale = getBrowserLocale();
     return this._basePost({
       path: this.pathRoot,
-      body: { ...(locale ? { locale } : {}), ...params },
+      body: locale ? { locale, ...params } : params,
     });
   };
 
@@ -713,7 +713,7 @@ class SignInFuture implements SignInFutureResource {
     const locale = getBrowserLocale();
     await this.resource.__internal_basePost({
       path: this.resource.pathRoot,
-      body: { ...(locale ? { locale } : {}), ...params },
+      body: locale ? { locale, ...params } : params,
     });
   }
 
