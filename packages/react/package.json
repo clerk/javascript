@@ -77,15 +77,10 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist",
-    "internal",
-    "errors",
-    "experimental",
-    "legacy"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
