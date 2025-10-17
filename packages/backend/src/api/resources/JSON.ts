@@ -936,6 +936,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
     publicly_visible: boolean;
   } | null;
   plan_id?: string | null;
+  payer?: BillingPayerJSON;
 }
 
 /**
