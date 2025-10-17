@@ -19,6 +19,9 @@ export const pathToRegexp = (path: string) => {
   }
 };
 
+/**
+ *
+ */
 export function match<P extends object = object>(
   str: Path,
   options?: ParseOptions & TokensToRegexpOptions & RegexpToFunctionOptions,
@@ -32,3 +35,5 @@ export function match<P extends object = object>(
     );
   }
 }
+
+export { type Match, type MatchFunction };

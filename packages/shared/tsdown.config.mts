@@ -25,21 +25,26 @@ export default defineConfig(({ watch }) => {
   return [
     {
       ...common,
-      entry: ['./src/types/index.ts'],
+      entry: [
+        //
+        './src/types/index.ts',
+      ],
       unbundle: false,
       outDir: './dist/types',
     },
     {
       ...common,
       entry: [
-        // all files except types
         './src/*.{ts,tsx}',
-        './src/**/index.{ts,tsx}',
-      //  '!./src/types/*.{ts,tsx}',
+        './src/react/index.ts',
+        './src/utils/index.ts',
+        './src/workerTimers/index.ts',
+        './src/types/index.ts',
+        './src/dom/*.ts',
         '!./src/**/*.{test,spec}.{ts,tsx}',
       ],
       outDir: './dist/runtime',
-      unbundle: false,
+      unbundle: true,
     },
   ];
 });
