@@ -18,6 +18,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
   const runtimeConfig = useRuntimeConfig();
 
+  // @ts-expect-error: Vue plugin type is not properly typed
   nuxtApp.vueApp.use(clerkPlugin, {
     ...(runtimeConfig.public.clerk ?? {}),
     sdkMetadata: {
