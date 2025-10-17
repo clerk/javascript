@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.95.0
+
+### Minor Changes
+
+- [Billing Beta]: Dropping `paymentMethodId` from subscription item. ([#7017](https://github.com/clerk/javascript/pull/7017)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.94.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @clerk/tanstack-react-start
 
+## 0.26.3
+
+### Patch Changes
+
+- Add `@clerk/tanstack-react-start/experimental` export with new `useSignIn` and `useSignUp` hooks. ([#6957](https://github.com/clerk/javascript/pull/6957)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035)]:
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+  - @clerk/backend@2.18.3
+  - @clerk/clerk-react@5.53.2
+
 ## 0.26.2
 
 ### Patch Changes
