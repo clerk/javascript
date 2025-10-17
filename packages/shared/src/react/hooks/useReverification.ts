@@ -34,24 +34,31 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 /**
  * @interface
  */
-type NeedsReverificationParameters = {
+export type NeedsReverificationParameters = {
+  /**
+   * Marks the reverification process as cancelled and rejects the original request.
+   */
   cancel: () => void;
+  /**
+   * Marks the reverification process as complete and retries the original request.
+   */
   complete: () => void;
+  /**
+   * The verification level required for the reverification process.
+   */
   level: SessionVerificationLevel | undefined;
 };
 
 /**
- * The optional options object.
  * @interface
  */
-type UseReverificationOptions = {
+export type UseReverificationOptions = {
   /**
    * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
    *
    * @param cancel - A function that will cancel the reverification process.
    * @param complete - A function that will retry the original request after reverification.
    * @param level - The level returned with the reverification hint.
-   *
    */
   onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
 };
@@ -66,12 +73,15 @@ type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | 
 /**
  * @interface
  */
-type UseReverification = <
-  Fetcher extends (...args: any[]) => Promise<any> | undefined,
-  Options extends UseReverificationOptions = UseReverificationOptions,
->(
+type UseReverification = <Fetcher extends (...args: any[]) => Promise<any> | undefined>(
+  /**
+   * A function that returns a promise.
+   */
   fetcher: Fetcher,
-  options?: Options,
+  /**
+   * The optional options object.
+   */
+  options?: UseReverificationOptions,
 ) => UseReverificationResult<Fetcher>;
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {

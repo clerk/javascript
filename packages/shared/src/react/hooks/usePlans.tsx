@@ -20,3 +20,8 @@ export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlans
     unauthenticated: true,
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePlansReturn = ReturnType<typeof usePlans>;
