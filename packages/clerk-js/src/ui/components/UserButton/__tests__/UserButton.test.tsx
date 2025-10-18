@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
@@ -102,6 +102,30 @@ describe('UserButton', () => {
     expect(fixtures.router.navigate).toHaveBeenCalledWith('/after-sign-out');
   });
 
+  it('calls signOutCallback when "Sign out" is clicked and signOutCallback prop is passed', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({
+        first_name: 'First',
+        last_name: 'Last',
+        username: 'username1',
+        email_addresses: ['test@clerk.com'],
+      });
+    });
+
+    const signOutCallback = vi.fn();
+    fixtures.clerk.signOut.mockImplementation(callback => callback());
+    props.setProps({ signOutCallback });
+
+    const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+    await userEvent.click(getByRole('button', { name: 'Open user button' }));
+    await userEvent.click(getByText('Sign out'));
+
+    expect(fixtures.clerk.signOut).toHaveBeenCalledWith(signOutCallback);
+    expect(signOutCallback).toHaveBeenCalled();
+    // Should not navigate when callback is provided
+    expect(fixtures.router.navigate).not.toHaveBeenCalled();
+  });
+
   it.todo('navigates to sign in url when "Add account" is clicked');
 
   describe('Multi Session Popover', () => {
@@ -175,6 +199,44 @@ describe('UserButton', () => {
       await waitFor(() => {
         expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));
         expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+      });
+    });
+
+    it('calls signOutCallback in multi-session mode when "Sign out of all accounts" is clicked', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(initConfig);
+      const signOutCallback = vi.fn();
+      fixtures.clerk.signOut.mockImplementationOnce(callback => {
+        return Promise.resolve(callback());
+      });
+      props.setProps({ signOutCallback });
+
+      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByText('Sign out of all accounts'));
+      await waitFor(() => {
+        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(signOutCallback);
+        expect(signOutCallback).toHaveBeenCalled();
+        // Should not navigate when callback is provided
+        expect(fixtures.router.navigate).not.toHaveBeenCalled();
+      });
+    });
+
+    it('calls signOutCallback in multi-session mode when signing out of a single session', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(initConfig);
+      const signOutCallback = vi.fn();
+      fixtures.clerk.signOut.mockImplementationOnce(callback => {
+        return Promise.resolve(callback());
+      });
+      props.setProps({ signOutCallback });
+
+      const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
+      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByText('Sign out'));
+      await waitFor(() => {
+        expect(fixtures.clerk.signOut).toHaveBeenCalledWith(signOutCallback, { sessionId: '0' });
+        expect(signOutCallback).toHaveBeenCalled();
+        // Should not navigate when callback is provided
+        expect(fixtures.clerk.redirectWithAuth).not.toHaveBeenCalled();
       });
     });
   });
