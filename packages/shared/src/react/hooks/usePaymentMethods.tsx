@@ -1,5 +1,4 @@
 import type { BillingPaymentMethodResource, GetPaymentMethodsParams } from '../../types';
-
 import { useOrganizationContext, useUserContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 

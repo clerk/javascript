@@ -1,7 +1,6 @@
 import { ALTERNATIVE_PHONE_CODE_PROVIDERS } from '@clerk/shared/alternativePhoneCode';
 import { iconImageUrl } from '@clerk/shared/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 import type {
   OAuthProvider,
   OAuthStrategy,
@@ -10,6 +9,7 @@ import type {
   Web3Provider,
   Web3Strategy,
 } from '@clerk/shared/types';
+import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useEnvironment } from '../contexts/EnvironmentContext';
 import { fromEntries } from '../utils/fromEntries';

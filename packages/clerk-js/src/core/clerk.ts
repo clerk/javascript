@@ -19,8 +19,6 @@ import {
   eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
-import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
@@ -94,6 +92,8 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/shared/types';
+import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
+import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 

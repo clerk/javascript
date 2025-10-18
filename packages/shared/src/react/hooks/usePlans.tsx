@@ -1,5 +1,4 @@
 import type { BillingPlanResource, GetPlansParams } from '../../types';
-
 import { useClerkInstanceContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 

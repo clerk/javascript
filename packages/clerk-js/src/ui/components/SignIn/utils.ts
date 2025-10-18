@@ -1,5 +1,3 @@
-import { titleize } from '@clerk/shared/underscore';
-import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   PhoneCodeChannel,
   PreferredSignInStrategy,
@@ -7,6 +5,8 @@ import type {
   SignInResource,
   SignInStrategy,
 } from '@clerk/shared/types';
+import { titleize } from '@clerk/shared/underscore';
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 import { getPreferredPhoneCodeChannelByCountry } from '@/ui/utils/phoneUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';

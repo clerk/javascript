@@ -1,5 +1,5 @@
-import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type { SignInFactor, SignInFirstFactor, SignInSecondFactor } from '@clerk/shared/types';
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useMemo } from 'react';
 
 import { allStrategiesButtonsComparator } from '@/ui/utils/factorSorting';

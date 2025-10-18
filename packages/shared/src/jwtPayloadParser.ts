@@ -1,11 +1,10 @@
+import { splitByScope } from './authorization';
 import type {
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   SharedSignedInAuthObjectProperties,
 } from './types';
-
-import { splitByScope } from './authorization';
 
 export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) => {
   if (!per || !fpm) {
@@ -31,6 +30,9 @@ export const parsePermissions = ({ per, fpm }: { per?: string; fpm?: string }) =
   return { permissions, featurePermissionMap };
 };
 
+/**
+ *
+ */
 function buildOrgPermissions({
   features,
   permissions,

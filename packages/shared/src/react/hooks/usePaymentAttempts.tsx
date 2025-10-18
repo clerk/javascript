@@ -1,5 +1,4 @@
 import type { BillingPaymentResource, GetPaymentAttemptsParams } from '../../types';
-
 import { useClerkInstanceContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 

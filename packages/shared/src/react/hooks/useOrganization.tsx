@@ -1,3 +1,5 @@
+import { getCurrentOrganizationMembership } from '../../organization';
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   ClerkPaginatedResponse,
   GetDomainsParams,
@@ -10,9 +12,6 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
 } from '../../types';
-
-import { getCurrentOrganizationMembership } from '../../organization';
-import { eventMethodCalled } from '../../telemetry/events/method-called';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,

@@ -1,5 +1,4 @@
 import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '../types';
-
 import { ClerkAPIError } from './clerkApiError';
 
 /**

@@ -2,6 +2,7 @@
 
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+
 import type {
   BillingSubscriptionPlanPeriod,
   ClerkOptions,
@@ -12,7 +13,6 @@ import type {
   SignedInSessionResource,
   UserResource,
 } from '../types';
-
 import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
 

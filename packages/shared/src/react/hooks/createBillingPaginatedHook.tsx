@@ -1,6 +1,5 @@
-import type { ClerkPaginatedResponse, ClerkResource, EnvironmentResource, ForPayerType } from '../../types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { ClerkPaginatedResponse, ClerkResource, EnvironmentResource, ForPayerType } from '../../types';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,

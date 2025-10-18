@@ -1,6 +1,6 @@
 import { isClerkAPIResponseError, isClerkRuntimeError, isKnownError, isMetamaskError } from '@clerk/shared/error';
-import { snakeToCamel } from '@clerk/shared/underscore';
 import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/shared/types';
+import { snakeToCamel } from '@clerk/shared/underscore';
 
 import type { FormControlState } from './useFormControl';
 

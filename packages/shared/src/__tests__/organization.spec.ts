@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { OrganizationMembershipResource } from '../types';
 
 import { getCurrentOrganizationMembership } from '../organization';
+import type { OrganizationMembershipResource } from '../types';
 
 describe('getCurrentOrganizationMembership', () => {
   const mockMemberships: OrganizationMembershipResource[] = [

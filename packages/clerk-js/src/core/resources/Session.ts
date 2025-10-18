@@ -1,7 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
-import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 import type {
   ActClaim,
   CheckAuthorization,
@@ -25,6 +24,7 @@ import type {
   TokenResource,
   UserResource,
 } from '@clerk/shared/types';
+import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';

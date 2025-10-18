@@ -1,3 +1,4 @@
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   ClerkPaginatedResponse,
   CreateOrganizationParams,
@@ -10,8 +11,6 @@ import type {
   SetActive,
   UserOrganizationInvitationResource,
 } from '../../types';
-
-import { eventMethodCalled } from '../../telemetry/events/method-called';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
