@@ -1,8 +1,7 @@
-import type { PublishableKey } from '@clerk/types';
-
 import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
 import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
+import type { PublishableKey } from './types';
 
 /**
  * Configuration options for parsing publishable keys.

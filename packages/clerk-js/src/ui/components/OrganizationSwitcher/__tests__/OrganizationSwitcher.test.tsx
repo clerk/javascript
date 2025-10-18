@@ -1,4 +1,4 @@
-import type { MembershipRole } from '@clerk/types';
+import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 

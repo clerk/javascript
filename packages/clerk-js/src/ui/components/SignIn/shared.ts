@@ -1,6 +1,6 @@
 import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOFactor, SignInFirstFactor } from '@clerk/types';
+import type { EnterpriseSSOFactor, SignInFirstFactor } from '@clerk/shared/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';

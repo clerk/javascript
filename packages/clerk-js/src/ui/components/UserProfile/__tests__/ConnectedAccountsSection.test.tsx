@@ -1,4 +1,4 @@
-import type { ExternalAccountResource } from '@clerk/types';
+import type { ExternalAccountResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 

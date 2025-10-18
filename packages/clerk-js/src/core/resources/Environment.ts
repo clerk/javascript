@@ -7,7 +7,7 @@ import type {
   EnvironmentResource,
   OrganizationSettingsResource,
   UserSettingsResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { eventBus, events } from '../../core/events';
 import { APIKeySettings } from './APIKeySettings';

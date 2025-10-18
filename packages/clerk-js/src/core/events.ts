@@ -1,5 +1,5 @@
 import { createEventBus } from '@clerk/shared/eventBus';
-import type { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/shared/types';
 
 import type { BaseResource } from './resources/Base';
 

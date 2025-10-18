@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { UpdateOrganizationParams } from '@clerk/types';
+import type { UpdateOrganizationParams } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment } from '@/ui/contexts';

@@ -1,6 +1,5 @@
-import type { UseSessionListReturn } from '@clerk/types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { UseSessionListReturn } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
 
 const hookName = 'useSessionList';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
-import type { UserAvatarProps } from '@clerk/types';
+import type { UserAvatarProps } from '@clerk/shared/types';
 import { useClerk } from '../../composables';
 
 const clerk = useClerk();

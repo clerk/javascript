@@ -1,5 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
-import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from '@clerk/types';
+import type { AuthenticateWithPopupParams, AuthenticateWithRedirectParams } from '@clerk/shared/types';
 
 import type { Clerk } from '../core/clerk';
 

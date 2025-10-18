@@ -1,4 +1,4 @@
-import type { SignedInSessionResource } from '@clerk/types';
+import type { SignedInSessionResource } from '@clerk/shared/types';
 
 import { Action, Actions, SmallAction, SmallActions } from '@/ui/elements/Actions';
 import { PreviewButton } from '@/ui/elements/PreviewButton';

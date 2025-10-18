@@ -1,4 +1,4 @@
-import type { BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/types';
+import type { BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/shared/types';
 import type { MockedFunction } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

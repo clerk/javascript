@@ -3,7 +3,7 @@ import type {
   PublicKeyCredentialRequestOptionsJSON,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {

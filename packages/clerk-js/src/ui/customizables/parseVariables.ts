@@ -1,4 +1,4 @@
-import type { Theme } from '@clerk/types';
+import type { Theme } from '@clerk/shared/types';
 
 import { createShadowSet, generateShadow } from '../foundations/shadows';
 import { BORDER_RADIUS_SCALE_RATIOS, spaceScaleKeys } from '../foundations/sizes';

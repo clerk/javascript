@@ -7,7 +7,7 @@ import type {
   DeletedObjectJSON,
   MakeDefaultPaymentMethodParams,
   RemovePaymentMethodParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { Billing } from '@/core/modules/billing';
 

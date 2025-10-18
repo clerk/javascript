@@ -1,5 +1,5 @@
 import { useSession, useUser } from '@clerk/shared/react';
-import type { SignedInSessionResource } from '@clerk/types';
+import type { SignedInSessionResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { PopoverCard } from '@/ui/elements/PopoverCard';

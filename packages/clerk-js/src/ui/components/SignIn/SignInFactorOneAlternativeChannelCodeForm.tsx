@@ -1,6 +1,6 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeFactor, SignInFactor } from '@clerk/types';
+import type { PhoneCodeFactor, SignInFactor } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';

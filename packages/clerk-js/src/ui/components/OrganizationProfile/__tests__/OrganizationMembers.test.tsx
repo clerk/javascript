@@ -1,4 +1,4 @@
-import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/types';
+import type { OrganizationInvitationResource, OrganizationMembershipResource } from '@clerk/shared/types';
 import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

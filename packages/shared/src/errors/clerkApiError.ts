@@ -1,5 +1,4 @@
-import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '@clerk/types';
-
+import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '../types';
 import { createErrorTypeGuard } from './createErrorTypeGuard';
 
 export type ClerkApiErrorMeta = Record<string, unknown>;

@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { GetRolesParams } from '@clerk/types';
+import type { GetRolesParams } from '@clerk/shared/types';
 
 import { useProtect } from '../common';
 import { useLocalizations } from '../localization';

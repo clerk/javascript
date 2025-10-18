@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { APIKeyResource } from '@clerk/types';
+import type { APIKeyResource } from '@clerk/shared/types';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 

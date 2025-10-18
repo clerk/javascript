@@ -4,7 +4,7 @@ import type {
   PhoneNumberResource,
   TOTPResource,
   VerificationJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 

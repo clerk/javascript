@@ -1,4 +1,4 @@
-import type { BillingSubscriptionItemResource } from '@clerk/types';
+import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
 
 import { Badge, localizationKeys } from '@/ui/customizables';
 import type { ElementDescriptor } from '@/ui/customizables/elementDescriptors';

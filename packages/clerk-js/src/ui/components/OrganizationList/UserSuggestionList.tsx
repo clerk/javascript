@@ -1,5 +1,5 @@
 import { useOrganizationList } from '@clerk/shared/react';
-import type { OrganizationSuggestionResource } from '@clerk/types';
+import type { OrganizationSuggestionResource } from '@clerk/shared/types';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';

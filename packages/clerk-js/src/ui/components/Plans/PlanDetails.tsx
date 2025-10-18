@@ -4,7 +4,7 @@ import type {
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
   ClerkAPIResponseError,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';

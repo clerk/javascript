@@ -12,7 +12,7 @@ import type {
   BillingPlanResource,
   BillingSubscriptionItemResource,
   BillingSubscriptionPlanPeriod,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useCallback, useMemo } from 'react';
 
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';

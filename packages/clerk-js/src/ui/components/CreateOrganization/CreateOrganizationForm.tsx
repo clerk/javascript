@@ -1,5 +1,5 @@
 import { useOrganization, useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
+import type { CreateOrganizationParams, OrganizationResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment } from '@/ui/contexts';

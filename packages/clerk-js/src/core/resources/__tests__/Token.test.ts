@@ -1,4 +1,4 @@
-import type { InstanceType } from '@clerk/types';
+import type { InstanceType } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { mockFetch, mockNetworkFailedFetch } from '@/test/core-fixtures';

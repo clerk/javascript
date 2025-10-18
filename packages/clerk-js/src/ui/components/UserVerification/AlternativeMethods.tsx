@@ -1,4 +1,4 @@
-import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
+import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
