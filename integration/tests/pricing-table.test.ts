@@ -117,7 +117,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Visa ⋯ 4242')).toBeVisible();
       await u.po.checkout.confirmAndContinue();
 
       // eslint-disable-next-line playwright/no-conditional-in-test
