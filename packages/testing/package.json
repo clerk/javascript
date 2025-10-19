@@ -77,7 +77,7 @@
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/types": "workspace:^",
-    "dotenv": "17.2.2"
+    "dotenv": "17.2.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.1",
