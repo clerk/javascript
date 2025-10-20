@@ -185,13 +185,17 @@ function SignInStartInternal(): JSX.Element {
    * Redirect to account switcher if user already has active sessions in multi-session mode
    */
   useEffect(() => {
+    if (organizationTicket) {
+      return;
+    }
+
     const hasActiveSessions = (clerk.client?.signedInSessions?.length ?? 0) > 0;
     const isMultiSessionMode = !authConfig.singleSessionMode;
 
     if (hasActiveSessions && isMultiSessionMode) {
       void navigate('choose');
     }
-  }, [clerk.client?.signedInSessions, authConfig.singleSessionMode, navigate]);
+  }, [clerk.client?.signedInSessions, authConfig.singleSessionMode, navigate, organizationTicket]);
 
   // switch to the phone input (if available) if a "+" is entered
   // (either by the browser or the user)

@@ -9,26 +9,19 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
 
-    let fakeUser1: FakeUser;
-    let fakeUser2: FakeUser;
+    let fakeUser: FakeUser;
 
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
-      fakeUser1 = u.services.users.createFakeUser({
+      fakeUser = u.services.users.createFakeUser({
         withPhoneNumber: true,
         withUsername: true,
       });
-      fakeUser2 = u.services.users.createFakeUser({
-        withPhoneNumber: true,
-        withUsername: true,
-      });
-      await u.services.users.createBapiUser(fakeUser1);
-      await u.services.users.createBapiUser(fakeUser2);
+      await u.services.users.createBapiUser(fakeUser);
     });
 
     test.afterAll(async () => {
-      await fakeUser1.deleteIfExists();
-      await fakeUser2.deleteIfExists();
+      await fakeUser.deleteIfExists();
     });
 
     test('redirects to /sign-in/choose when visiting /sign-in with active session in multi-session mode', async ({
@@ -38,7 +31,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       const u = createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
-      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser1.email, password: fakeUser1.password });
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
 
       await u.page.goToAppHome();
@@ -51,7 +44,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       const u = createTestUtils({ app, page, context });
 
       await u.po.signIn.goTo();
-      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser1.email, password: fakeUser1.password });
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
 
       await u.po.signIn.goTo();
