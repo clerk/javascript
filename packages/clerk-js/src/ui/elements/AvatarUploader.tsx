@@ -61,6 +61,10 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     if (f && validFile(f)) {
       await handleFileDrop(f);
     }
+    // Reset the input value so the same file can be selected again
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
   const previewElement = objectUrl
