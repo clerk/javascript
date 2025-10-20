@@ -8,6 +8,7 @@ import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { InformationBox } from '@/ui/elements/InformationBox';
 import { handleError } from '@/ui/utils/errorHandler';
+import { useDeferredImageUpload } from '@/ui/utils/useDeferredImageUpload';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { isDefaultImage } from '../../../utils';
@@ -25,6 +26,19 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   if (!user) {
     return null;
   }
+
+  const {
+    imageChanged,
+    resourceForPreview: userForPreview,
+    handleImageChange,
+    handleImageRemove,
+    handleReset,
+    saveImage,
+    pendingFile,
+  } = useDeferredImageUpload({
+    resource: user,
+    onReset,
+  });
 
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
   const showFirstName = first_name?.enabled;
@@ -47,7 +61,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const userInfoChanged =
     (showFirstName && firstNameField.value !== userFirstName) || (showLastName && lastNameField.value !== userLastName);
-  const optionalFieldsChanged = userInfoChanged;
+  const optionalFieldsChanged = userInfoChanged || imageChanged;
 
   const hasRequiredFields = (showFirstName && first_name.required) || (showLastName && last_name.required);
   const requiredFieldsFilled =
@@ -58,33 +72,19 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    return (
-      userInfoChanged
-        ? user.update({ firstName: firstNameField.value, lastName: lastNameField.value })
-        : Promise.resolve()
-    )
-      .then(onSuccess)
-      .catch(err => {
-        handleError(err, [firstNameField, lastNameField], card.setError);
-      });
-  };
+    try {
+      // Save avatar if changed
+      await saveImage(file => user.setProfileImage({ file }));
 
-  const uploadAvatar = (file: File) => {
-    return user
-      .setProfileImage({ file })
-      .then(() => {
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
-  };
+      // Save name changes if changed
+      if (userInfoChanged) {
+        await user.update({ firstName: firstNameField.value, lastName: lastNameField.value });
+      }
 
-  const onAvatarRemove = () => {
-    void user
-      .setProfileImage({ file: null })
-      .then(() => {
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
+      onSuccess();
+    } catch (err) {
+      handleError(err, [firstNameField, lastNameField], card.setError);
+    }
   };
 
   return (
@@ -96,9 +96,9 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         sx={t => ({ gap: t.space.$6 })}
       >
         <UserProfileAvatarUploader
-          user={user}
-          onAvatarChange={uploadAvatar}
-          onAvatarRemove={isDefaultImage(user.imageUrl) ? null : onAvatarRemove}
+          user={userForPreview}
+          onAvatarChange={handleImageChange}
+          onAvatarRemove={isDefaultImage(user.imageUrl) && !pendingFile ? null : handleImageRemove}
         />
         {(showFirstName || showLastName) && (
           <Form.ControlRow elementId='name'>
@@ -121,7 +121,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
         <FormButtons
           isDisabled={hasRequiredFields ? !requiredFieldsFilled : !optionalFieldsChanged}
-          onReset={onReset}
+          onReset={handleReset}
         />
       </Form.Root>
     </FormContainer>

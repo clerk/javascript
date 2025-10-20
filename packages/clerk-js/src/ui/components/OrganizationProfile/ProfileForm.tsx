@@ -9,6 +9,7 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/ui/utils/errorHandler';
+import { useDeferredImageUpload } from '@/ui/utils/useDeferredImageUpload';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { isDefaultImage } from '../../../utils';
@@ -40,40 +41,45 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return null;
   }
 
-  const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
+  const {
+    imageChanged,
+    resourceForPreview: organizationForPreview,
+    handleImageChange,
+    handleImageRemove,
+    handleReset,
+    saveImage,
+    pendingFile,
+  } = useDeferredImageUpload({
+    resource: organization,
+    onReset,
+  });
+
+  const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value || imageChanged;
   const canSubmit = dataChanged && slugField.feedbackType !== 'error';
   const organizationSlugEnabled = !organizationSettings.slug.disabled;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
+    try {
+      // Save logo if changed
+      await saveImage(file => organization.setLogo({ file }));
 
-    if (organizationSlugEnabled) {
-      updateOrgParams.slug = slugField.value;
-    }
+      // Save organization data if changed
+      if (organization.name !== nameField.value || organization.slug !== slugField.value) {
+        const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
 
-    return (canSubmit ? organization.update(updateOrgParams) : Promise.resolve()).then(onSuccess).catch(err => {
+        if (organizationSlugEnabled) {
+          updateOrgParams.slug = slugField.value;
+        }
+
+        await organization.update(updateOrgParams);
+      }
+
+      onSuccess();
+    } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
-    });
-  };
-
-  const uploadAvatar = (file: File) => {
-    return organization
-      .setLogo({ file })
-      .then(() => {
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  const onAvatarRemove = () => {
-    void organization
-      .setLogo({ file: null })
-      .then(() => {
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
+    }
   };
 
   const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,9 +95,9 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     <FormContainer headerTitle={title}>
       <Form.Root onSubmit={onSubmit}>
         <OrganizationProfileAvatarUploader
-          organization={organization}
-          onAvatarChange={uploadAvatar}
-          onAvatarRemove={isDefaultImage(organization.imageUrl) ? null : onAvatarRemove}
+          organization={organizationForPreview}
+          onAvatarChange={handleImageChange}
+          onAvatarRemove={isDefaultImage(organization.imageUrl) && !pendingFile ? null : handleImageRemove}
         />
         <Form.ControlRow elementId={nameField.id}>
           <Form.PlainInput
@@ -112,7 +118,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         )}
         <FormButtons
           isDisabled={!canSubmit}
-          onReset={onReset}
+          onReset={handleReset}
         />
       </Form.Root>
     </FormContainer>
