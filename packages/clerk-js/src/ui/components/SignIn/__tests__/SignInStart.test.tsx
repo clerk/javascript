@@ -602,13 +602,14 @@ describe('SignInStart', () => {
           });
         });
 
-        fixtures.clerk.client.signedInSessions = [
+        // Mock active sessions using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
           {
             id: 'sess_123',
             user: fixtures.clerk.user,
             status: 'active',
           } as any,
-        ];
+        ]);
 
         render(<SignInStart />, { wrapper });
 
@@ -626,7 +627,8 @@ describe('SignInStart', () => {
           });
         });
 
-        fixtures.clerk.client.signedInSessions = [
+        // Mock multiple active sessions using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
           {
             id: 'sess_123',
             user: fixtures.clerk.user,
@@ -637,7 +639,7 @@ describe('SignInStart', () => {
             user: { id: 'user_456' },
             status: 'active',
           } as any,
-        ];
+        ]);
 
         render(<SignInStart />, { wrapper });
 
@@ -652,7 +654,8 @@ describe('SignInStart', () => {
           f.withMultiSessionMode();
         });
 
-        fixtures.clerk.client.signedInSessions = [];
+        // No active sessions using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([]);
 
         render(<SignInStart />, { wrapper });
 
@@ -676,13 +679,14 @@ describe('SignInStart', () => {
           });
         });
 
-        fixtures.clerk.client.signedInSessions = [
+        // Mock active session in single-session mode using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
           {
             id: 'sess_123',
             user: fixtures.clerk.user,
             status: 'active',
           } as any,
-        ];
+        ]);
 
         fixtures.environment.authConfig.singleSessionMode = true;
 
