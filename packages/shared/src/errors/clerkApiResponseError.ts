@@ -16,7 +16,7 @@ interface ClerkAPIResponseOptions extends Omit<ClerkErrorParams, 'message' | 'co
  * Interface representing a Clerk API Response Error.
  */
 export class ClerkAPIResponseError extends ClerkError implements ClerkAPIResponseErrorInterface {
-  static name = 'ClerkAPIResponseError';
+  static kind = 'ClerkAPIResponseError';
   status: number;
   clerkTraceId?: string;
   retryAfter?: number;
