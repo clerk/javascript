@@ -123,7 +123,6 @@ export const frFR: LocalizationResource = {
     monthly: 'Mensuel',
     pastDue: undefined,
     pay: 'Payer {{amount}}',
-    paymentMethods__label: 'Méthodes de paiement',
     paymentMethod: {
       applePayDescription: {
         annual: 'Paiement annuel',
@@ -138,6 +137,7 @@ export const frFR: LocalizationResource = {
         testCardInfo: 'Informations de carte de test',
       },
     },
+    paymentMethods__label: 'Méthodes de paiement',
     popular: 'Populaire',
     pricingTable: {
       billingCycle: 'Cycle de facturation',
@@ -223,6 +223,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Mot de passe',
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -648,6 +649,10 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Code de réinitialisation du mot de passe',
       resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
@@ -768,6 +773,10 @@ export const frFR: LocalizationResource = {
         subtitleNewTab: "Revenir à l'onglet précédent pour continuer",
         title: 'Courriel vérifié avec succès',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
