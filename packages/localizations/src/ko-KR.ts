@@ -121,7 +121,6 @@ export const koKR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const koKR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -634,6 +635,10 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '비밀번호 재설정 코드',
       resendButton: '코드 재전송',
@@ -753,6 +758,10 @@ export const koKR: LocalizationResource = {
         subtitleNewTab: '계속하려면 이전 탭으로 돌아가기',
         title: '이메일 인증 성공',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

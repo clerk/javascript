@@ -121,7 +121,6 @@ export const mnMN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const mnMN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -639,6 +640,10 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
@@ -759,6 +764,10 @@ export const mnMN: LocalizationResource = {
         subtitleNewTab: 'Үргэлжлүүлэхийн тулд өмнөх таб руу буцна уу',
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
