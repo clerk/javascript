@@ -240,7 +240,13 @@ describe('ProfileSection', () => {
       });
 
       await userEvent.click(getByText(/remove$/i));
-      expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
+
+      // With deferred upload, need to click Save to actually remove
+      await userEvent.click(getByRole('button', { name: /save$/i }));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
+      });
     });
 
     it('"Remove image" is not shown when a default image exists', async () => {
