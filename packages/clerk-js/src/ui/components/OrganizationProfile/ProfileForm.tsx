@@ -35,7 +35,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     pendingFile,
     imageRemoved,
   } = useDeferredImageUpload({
-    resource: organization || { imageUrl: null },
+    resource: organization || { imageUrl: '' },
     onReset,
   });
 
