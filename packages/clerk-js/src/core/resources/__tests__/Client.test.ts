@@ -1,4 +1,4 @@
-import type { ClientJSON, ClientJSONSnapshot } from '@clerk/types';
+import type { ClientJSON, ClientJSONSnapshot } from '@clerk/shared/types';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { createSession, createSignIn, createSignUp, createUser } from '@/test/core-fixtures';

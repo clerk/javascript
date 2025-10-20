@@ -1,9 +1,9 @@
 import { globs } from '@clerk/shared/globs';
 import { createDevOrStagingUrlCache } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
+import type { SignUpResource } from '@clerk/shared/types';
 import { camelToSnake } from '@clerk/shared/underscore';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
-import type { SignUpResource } from '@clerk/types';
 
 import { joinPaths } from './path';
 import { getQueryParams } from './querystring';

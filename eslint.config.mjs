@@ -120,6 +120,7 @@ export default tseslint.config([
       'packages/backend/src/runtime/**/*',
       'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
+      'packages/shared/tsdown.config.mjs',
     ],
   },
   {

@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/types';
+import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
 
 import { navigateIfTaskExists } from '@/core/sessionTasks';
 import { useEnvironment } from '@/ui/contexts';

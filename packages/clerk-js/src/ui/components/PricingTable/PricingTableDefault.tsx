@@ -1,5 +1,5 @@
 import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Switch } from '@/ui/elements/Switch';

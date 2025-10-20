@@ -4,7 +4,7 @@ import type {
   OrganizationDomainResource,
   OrganizationDomainVerificationStatus,
   OrganizationEnrollmentMode,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import React, { useMemo } from 'react';
 
 import { ProfileSection } from '@/ui/elements/Section';

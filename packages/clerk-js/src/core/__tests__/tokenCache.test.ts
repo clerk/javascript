@@ -1,4 +1,4 @@
-import type { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';

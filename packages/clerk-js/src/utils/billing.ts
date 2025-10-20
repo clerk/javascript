@@ -5,7 +5,7 @@ import type {
   BillingMoneyAmountJSON,
   BillingStatementTotals,
   BillingStatementTotalsJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export const billingMoneyAmountFromJSON = (data: BillingMoneyAmountJSON): BillingMoneyAmount => {
   return {

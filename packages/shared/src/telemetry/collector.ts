@@ -10,6 +10,7 @@
  *
  * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry.
  */
+import { parsePublishableKey } from '../keys';
 import type {
   InstanceType,
   SDKMetadata,
@@ -17,9 +18,7 @@ import type {
   TelemetryEvent,
   TelemetryEventRaw,
   TelemetryLogEntry,
-} from '@clerk/types';
-
-import { parsePublishableKey } from '../keys';
+} from '../types';
 import { isTruthy } from '../underscore';
 import { InMemoryThrottlerCache, LocalStorageThrottlerCache, TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions } from './types';

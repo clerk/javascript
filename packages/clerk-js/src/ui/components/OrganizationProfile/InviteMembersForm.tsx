@@ -1,6 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useOrganization } from '@clerk/shared/react';
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/shared/types';
 import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 

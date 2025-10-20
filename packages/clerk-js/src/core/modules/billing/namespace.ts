@@ -15,7 +15,7 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {

@@ -5,7 +5,7 @@ import type {
   SignInStartEmailLinkFlowParams,
   SignUpResource,
   StartEmailLinkFlowParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import React from 'react';
 
 type EmailLinkable = SignUpResource | EmailAddressResource | SignInResource;

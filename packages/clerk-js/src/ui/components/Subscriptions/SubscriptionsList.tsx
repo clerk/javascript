@@ -1,4 +1,4 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';

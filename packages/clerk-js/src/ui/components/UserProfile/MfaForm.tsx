@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { VerificationStrategy } from '@clerk/types';
+import type { VerificationStrategy } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

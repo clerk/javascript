@@ -1,4 +1,4 @@
-import type { PhoneCodeChannelData } from '@clerk/types';
+import type { PhoneCodeChannelData } from '@clerk/shared/types';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';

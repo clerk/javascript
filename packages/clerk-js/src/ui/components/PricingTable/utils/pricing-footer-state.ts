@@ -1,4 +1,8 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
+} from '@clerk/shared/types';
 
 type UsePricingFooterStateParams = {
   subscription: BillingSubscriptionItemResource | undefined;

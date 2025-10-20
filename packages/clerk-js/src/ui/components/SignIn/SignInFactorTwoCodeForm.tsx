@@ -1,6 +1,6 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/types';
+import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';

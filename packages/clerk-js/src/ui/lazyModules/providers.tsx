@@ -1,5 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { Appearance } from '@clerk/types';
+import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';

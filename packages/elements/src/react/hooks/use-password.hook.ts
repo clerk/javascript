@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
+import type { PasswordSettingsData, PasswordValidation } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
-import type { PasswordSettingsData, PasswordValidation } from '@clerk/types';
 import * as React from 'react';
 
 import type { ErrorCodeOrTuple } from '../utils/generate-password-error-text';
@@ -21,6 +21,7 @@ type UsePasswordCallbacks = {
 
 export const usePassword = (callbacks?: UsePasswordCallbacks) => {
   const clerk = useClerk();
+  // @ts-expect-error - ignore error for now
   const passwordSettings = clerk.__unstable__environment?.userSettings.passwordSettings as PasswordSettingsData;
   const { disable_hibp, min_zxcvbn_strength, show_zxcvbn, ...config } = passwordSettings || {};
 

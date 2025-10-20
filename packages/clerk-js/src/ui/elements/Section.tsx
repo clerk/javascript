@@ -1,4 +1,4 @@
-import type { ProfileSectionId } from '@clerk/types';
+import type { ProfileSectionId } from '@clerk/shared/types';
 import { forwardRef, isValidElement, useLayoutEffect, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';

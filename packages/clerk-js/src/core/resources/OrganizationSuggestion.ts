@@ -5,7 +5,7 @@ import type {
   OrganizationSuggestionResource,
   OrganizationSuggestionStatus,
   UserOrganizationInvitationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';

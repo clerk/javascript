@@ -1,4 +1,4 @@
-import type { WaitlistResource } from '@clerk/types';
+import type { WaitlistResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';

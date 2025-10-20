@@ -13,7 +13,7 @@ import type {
   SignedInSessionResource,
   UserResource,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { Component, ComputedRef, ShallowRef, Slot, VNode } from 'vue';
 
 export interface VueClerkInjectionKeyType {

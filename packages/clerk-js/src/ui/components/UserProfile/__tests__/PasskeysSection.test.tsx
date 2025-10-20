@@ -1,4 +1,4 @@
-import type { PasskeyJSON, PasskeyResource } from '@clerk/types';
+import type { PasskeyJSON, PasskeyResource } from '@clerk/shared/types';
 import { act } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 

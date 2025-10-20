@@ -41,6 +41,7 @@ function SignUpFlowProvider({ children, exampleMode, fallback, isRootPath }: Sig
     const cb = () => {
       const evt: SignUpRouterInitEvent = {
         type: 'INIT',
+        // @ts-expect-error - ignore error for now
         clerk,
         exampleMode,
         formRef,

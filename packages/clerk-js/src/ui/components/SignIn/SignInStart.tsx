@@ -1,13 +1,13 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   ClerkAPIError,
   PhoneCodeChannel,
   PhoneCodeChannelData,
   SignInCreateParams,
   SignInResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';

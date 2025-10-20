@@ -1,5 +1,5 @@
 import { useReverification, useSession, useUser } from '@clerk/shared/react';
-import type { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/shared/types';
 import { useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

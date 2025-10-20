@@ -1,4 +1,4 @@
-import type { State as StateInterface } from '@clerk/types';
+import type { State as StateInterface } from '@clerk/shared/types';
 import { computed, effect } from 'alien-signals';
 
 import { eventBus } from './events';

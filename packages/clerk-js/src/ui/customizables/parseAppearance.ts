@@ -1,5 +1,5 @@
+import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/shared/types';
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
-import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/types';
 
 import { baseTheme, getBaseTheme } from '../baseTheme';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';

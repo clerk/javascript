@@ -1,4 +1,4 @@
-import type { ForPayerType } from '@clerk/types';
+import type { ForPayerType } from '@clerk/shared/types';
 import { createContext, useContext } from 'react';
 
 const DEFAUlT = 'user';

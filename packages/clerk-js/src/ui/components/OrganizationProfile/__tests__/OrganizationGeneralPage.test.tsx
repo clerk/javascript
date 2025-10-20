@@ -1,4 +1,8 @@
-import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
+import type {
+  ClerkPaginatedResponse,
+  OrganizationDomainResource,
+  OrganizationMembershipResource,
+} from '@clerk/shared/types';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 

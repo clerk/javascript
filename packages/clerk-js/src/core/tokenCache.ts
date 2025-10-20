@@ -1,4 +1,4 @@
-import type { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';

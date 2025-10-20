@@ -1,4 +1,4 @@
-import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
+import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/shared/types';
 import { vi } from 'vitest';
 
 import { Clerk as ClerkCtor } from '@/core/clerk';

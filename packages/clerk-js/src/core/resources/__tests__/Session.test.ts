@@ -1,4 +1,4 @@
-import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/types';
+import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';

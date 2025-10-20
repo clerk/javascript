@@ -3,8 +3,8 @@ import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import type { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
+import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
-import type { Clerk, InstanceType } from '@clerk/types';
 
 import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';

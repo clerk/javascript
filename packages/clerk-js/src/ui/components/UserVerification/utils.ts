@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/shared/types';
 
 export function sortByPrimaryFactor(a: SignInFactor, b: SignInFactor) {
   if ('primary' in a && a.primary && !('primary' in b && b.primary)) {

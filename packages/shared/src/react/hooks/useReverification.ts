@@ -1,16 +1,19 @@
-import type { Clerk, SessionVerificationLevel } from '@clerk/types';
 import { useCallback, useRef } from 'react';
 
 import { validateReverificationConfig } from '../../authorization';
 import { isReverificationHint, reverificationError } from '../../authorization-errors';
 import { ClerkRuntimeError, isClerkAPIResponseError } from '../../error';
 import { eventMethodCalled } from '../../telemetry';
+import type { Clerk, SessionVerificationLevel } from '../../types';
 import { createDeferredPromise } from '../../utils/createDeferredPromise';
 import { useClerk } from './useClerk';
 import { useSafeLayoutEffect } from './useSafeLayoutEffect';
 
 const CLERK_API_REVERIFICATION_ERROR_CODE = 'session_reverification_required';
 
+/**
+ *
+ */
 async function resolveResult<T>(result: Promise<T> | T): Promise<T | ReturnType<typeof reverificationError>> {
   try {
     const r = await result;
@@ -42,6 +45,7 @@ type NeedsReverificationParameters = {
 
 /**
  * The optional options object.
+ *
  * @interface
  */
 type UseReverificationOptions = {
@@ -51,7 +55,6 @@ type UseReverificationOptions = {
    * @param cancel - A function that will cancel the reverification process.
    * @param complete - A function that will retry the original request after reverification.
    * @param level - The level returned with the reverification hint.
-   *
    */
   onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
 };
@@ -79,7 +82,13 @@ type CreateReverificationHandlerParams = UseReverificationOptions & {
   telemetry: Clerk['telemetry'];
 };
 
+/**
+ *
+ */
 function createReverificationHandler(params: CreateReverificationHandlerParams) {
+  /**
+   *
+   */
   function assertReverification<Fetcher extends (...args: any[]) => Promise<any> | undefined>(
     fetcher: Fetcher,
   ): (...args: Parameters<Fetcher>) => Promise<ExcludeClerkError<Awaited<ReturnType<Fetcher>>>> {
@@ -191,7 +200,6 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *   return <button onClick={handleClick}>Update User</button>
  * }
  * ```
- *
  */
 export const useReverification: UseReverification = (fetcher, options) => {
   const { __internal_openReverification, telemetry } = useClerk();

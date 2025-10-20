@@ -50,6 +50,10 @@ declare global {
   interface UserUnsafeMetadata {
     [k: string]: unknown;
   }
+
+  interface ikosadfas {
+    [k: string]: unknown;
+  }
 }
 
 /**
