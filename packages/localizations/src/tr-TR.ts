@@ -121,7 +121,6 @@ export const trTR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const trTR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Şifrenizi girin',
   formFieldInputPlaceholder__phoneNumber: 'Telefon numaranızı girin',
   formFieldInputPlaceholder__username: 'Kullanıcı adınızı girin',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -639,6 +640,10 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Şifre sıfırlama kodu',
       resendButton: 'Tekrar gönder',
@@ -759,6 +764,10 @@ export const trTR: LocalizationResource = {
         subtitleNewTab: 'Devam etmek için önceki sekmeye dönün',
         title: 'E-posta adresiniz başarıyla doğrulandı',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

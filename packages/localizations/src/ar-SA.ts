@@ -121,7 +121,6 @@ export const arSA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const arSA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -636,6 +637,10 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'رمز تحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
@@ -757,6 +762,10 @@ export const arSA: LocalizationResource = {
         subtitleNewTab: 'ارجع إلى علامة التبويب السابقة للمتابعة',
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
