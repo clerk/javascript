@@ -32,14 +32,16 @@ export const Avatar = (props: AvatarProps) => {
   const [error, setError] = React.useState(false);
 
   const ImgOrFallback =
-    initials && (!imageUrl || error) ? (
-      <InitialsAvatarFallback initials={initials} />
+    !imageUrl || error ? (
+      initials ? (
+        <InitialsAvatarFallback initials={initials} />
+      ) : null
     ) : (
       <Image
         elementDescriptor={[imageElementDescriptor, descriptors.avatarImage]}
         title={title}
         alt={`${title}'s logo`}
-        src={imageUrl || ''}
+        src={imageUrl}
         sx={{ objectFit: 'cover', width: '100%', height: '100%' }}
         onError={() => setError(true)}
         size={imageFetchSize}
