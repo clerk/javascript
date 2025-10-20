@@ -38,7 +38,7 @@ export const setupClerkTestingToken = async ({ context, options, page }: SetupCl
   if (!fapiUrl) {
     throw new Error(ERROR_MISSING_FRONTEND_API_URL);
   }
-  const apiUrl = `https://${fapiUrl}/v1/**/*`;
+  const apiUrl = new RegExp(`^https://${fapiUrl.replace(/\./g, '\\.')}/v1/.*?(\\?.*)?$`);
 
   await browserContext.route(apiUrl, async route => {
     const originalUrl = new URL(route.request().url());
