@@ -137,7 +137,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs shared",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs shared dist/runtime",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:publish": "pnpm dev -- --env.publish",
