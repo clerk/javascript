@@ -111,6 +111,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 sx={t => ({ color: t.colors.$danger500 })}
                 variant='ghost'
                 colorScheme='danger'
+                size='xs'
                 onClick={handleRemove}
               />
             )}
