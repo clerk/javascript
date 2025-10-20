@@ -30,17 +30,12 @@ const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
 const validFile = (f: File) => validType(f) && validSize(f);
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
-  const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const openDialog = () => inputRef.current?.click();
 
   const { onAvatarChange, onAvatarRemove, title, avatarPreview, avatarPreviewPlaceholder, ...rest } = props;
-
-  const toggle = () => {
-    setShowUpload(!showUpload);
-  };
 
   const handleFileDrop = (file: File | null) => {
     if (file === null) {
@@ -51,7 +46,6 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     card.setLoading();
     return onAvatarChange(file)
       .then(() => {
-        toggle();
         card.setIdle();
       })
       .catch(err => handleError(err, [], card.setError));
@@ -105,7 +99,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
               onClick={openDialog}
             />
 
-            {!!onAvatarRemove && !showUpload && (
+            {!!onAvatarRemove && (
               <Button
                 elementDescriptor={descriptors.avatarImageActionsRemove}
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}

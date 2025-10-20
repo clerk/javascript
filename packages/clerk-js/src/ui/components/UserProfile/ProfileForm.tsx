@@ -31,6 +31,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     handleReset,
     saveImage,
     pendingFile,
+    imageRemoved,
   } = useDeferredImageUpload({
     resource: user || { imageUrl: '' },
     onReset,
@@ -94,7 +95,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         <UserProfileAvatarUploader
           user={userForPreview}
           onAvatarChange={handleImageChange}
-          onAvatarRemove={isDefaultImage(user.imageUrl) && !pendingFile ? null : handleImageRemove}
+          onAvatarRemove={pendingFile || (!isDefaultImage(user.imageUrl) && !imageRemoved) ? handleImageRemove : null}
         />
         {(showFirstName || showLastName) && (
           <Form.ControlRow elementId='name'>

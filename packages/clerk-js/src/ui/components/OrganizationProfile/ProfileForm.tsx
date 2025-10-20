@@ -33,6 +33,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     handleReset,
     saveImage,
     pendingFile,
+    imageRemoved,
   } = useDeferredImageUpload({
     resource: organization || { imageUrl: '' },
     onReset,
@@ -91,7 +92,9 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         <OrganizationProfileAvatarUploader
           organization={organizationForPreview}
           onAvatarChange={handleImageChange}
-          onAvatarRemove={isDefaultImage(organization.imageUrl) && !pendingFile ? null : handleImageRemove}
+          onAvatarRemove={
+            pendingFile || (!isDefaultImage(organization.imageUrl) && !imageRemoved) ? handleImageRemove : null
+          }
         />
         <Form.ControlRow elementId={nameField.id}>
           <Form.PlainInput

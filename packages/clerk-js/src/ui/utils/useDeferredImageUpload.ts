@@ -78,11 +78,25 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
   );
 
   const resourceForPreview = React.useMemo(() => {
+    if (pendingFile) {
+      const previewUrl = URL.createObjectURL(pendingFile);
+      return { ...resource, imageUrl: previewUrl };
+    }
     if (imageRemoved) {
       return { ...resource, imageUrl: null };
     }
     return resource;
-  }, [resource, imageRemoved]);
+  }, [resource, imageRemoved, pendingFile]);
+
+  React.useEffect(() => {
+    if (!pendingFile) {
+      return;
+    }
+    const previewUrl = URL.createObjectURL(pendingFile);
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [pendingFile]);
 
   return {
     pendingFile,
