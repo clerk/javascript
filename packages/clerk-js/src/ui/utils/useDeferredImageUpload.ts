@@ -43,11 +43,10 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
   const imageChanged = pendingFile !== null || imageRemoved;
 
   const handleImageChange = React.useCallback(
-    (file: File) => {
+    async (file: File) => {
       setPendingFile(file);
       setImageRemoved(false);
       card.setIdle();
-      return Promise.resolve();
     },
     [card],
   );
