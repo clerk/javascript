@@ -43,6 +43,7 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
   const imageChanged = pendingFile !== null || imageRemoved;
 
   const handleImageChange = React.useCallback(
+    // eslint-disable-next-line @typescript-eslint/require-await -- Async for interface compatibility
     async (file: File) => {
       setPendingFile(file);
       setImageRemoved(false);
