@@ -72,19 +72,15 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      // Save avatar if changed
-      await saveImage(file => user.setProfileImage({ file }));
-
-      // Save name changes if changed
-      if (userInfoChanged) {
-        await user.update({ firstName: firstNameField.value, lastName: lastNameField.value });
-      }
-
-      onSuccess();
-    } catch (err) {
-      handleError(err, [firstNameField, lastNameField], card.setError);
-    }
+    await card
+      .runAsync(async () => {
+        await saveImage(file => user.setProfileImage({ file }));
+        if (userInfoChanged) {
+          await user.update({ firstName: firstNameField.value, lastName: lastNameField.value });
+        }
+      })
+      .then(onSuccess)
+      .catch(err => handleError(err, [firstNameField, lastNameField], card.setError));
   };
 
   return (

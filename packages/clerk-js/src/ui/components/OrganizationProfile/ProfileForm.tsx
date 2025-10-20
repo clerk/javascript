@@ -61,25 +61,19 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      // Save logo if changed
-      await saveImage(file => organization.setLogo({ file }));
-
-      // Save organization data if changed
-      if (organization.name !== nameField.value || organization.slug !== slugField.value) {
-        const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
-
-        if (organizationSlugEnabled) {
-          updateOrgParams.slug = slugField.value;
+    await card
+      .runAsync(async () => {
+        await saveImage(file => organization.setLogo({ file }));
+        if (organization.name !== nameField.value || organization.slug !== slugField.value) {
+          const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
+          if (organizationSlugEnabled) {
+            updateOrgParams.slug = slugField.value;
+          }
+          await organization.update(updateOrgParams);
         }
-
-        await organization.update(updateOrgParams);
-      }
-
-      onSuccess();
-    } catch (err) {
-      handleError(err, [nameField, slugField], card.setError);
-    }
+      })
+      .then(onSuccess)
+      .catch(err => handleError(err, [nameField, slugField], card.setError));
   };
 
   const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {

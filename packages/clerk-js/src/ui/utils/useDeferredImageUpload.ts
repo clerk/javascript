@@ -41,34 +41,41 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
 
   const imageChanged = pendingFile !== null || imageRemoved;
 
-  const handleImageChange = async (file: File) => {
-    setPendingFile(file);
-    setImageRemoved(false);
-    card.setIdle();
-  };
+  const handleImageChange = React.useCallback(
+    (file: File) => {
+      setPendingFile(file);
+      setImageRemoved(false);
+      card.setIdle();
+      return Promise.resolve();
+    },
+    [card],
+  );
 
-  const handleImageRemove = () => {
+  const handleImageRemove = React.useCallback(() => {
     setPendingFile(null);
     setImageRemoved(true);
     card.setIdle();
-  };
+  }, [card]);
 
-  const handleReset = () => {
+  const handleReset = React.useCallback(() => {
     setPendingFile(null);
     setImageRemoved(false);
     onReset?.();
-  };
+  }, [onReset]);
 
-  const saveImage = async (uploadFn: (file: File) => Promise<unknown>) => {
-    if (pendingFile) {
-      await uploadFn(pendingFile);
-    } else if (imageRemoved) {
-      await uploadFn(null as unknown as File);
-    }
+  const saveImage = React.useCallback(
+    async (uploadFn: (file: File) => Promise<unknown>) => {
+      if (pendingFile) {
+        await uploadFn(pendingFile);
+      } else if (imageRemoved) {
+        await uploadFn(null as unknown as File);
+      }
 
-    setPendingFile(null);
-    setImageRemoved(false);
-  };
+      setPendingFile(null);
+      setImageRemoved(false);
+    },
+    [pendingFile, imageRemoved],
+  );
 
   const resourceForPreview = React.useMemo(() => {
     if (imageRemoved) {
