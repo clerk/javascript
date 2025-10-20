@@ -1,15 +1,11 @@
 import { act, renderHook } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { CardStateProvider } from '@/ui/elements/contexts';
+import { bindCreateFixtures } from '@/test/create-fixtures';
 
 import { useDeferredImageUpload } from '../useDeferredImageUpload';
 
-// Helper wrapper to provide CardState context
-const createWrapper = () => {
-  return ({ children }: { children: ReactNode }) => <CardStateProvider>{children}</CardStateProvider>;
-};
+const { createFixtures } = bindCreateFixtures('UserProfile');
 
 describe('useDeferredImageUpload', () => {
   const mockResource = {
@@ -19,9 +15,10 @@ describe('useDeferredImageUpload', () => {
   };
 
   describe('Initial state', () => {
-    it('should initialize with no pending changes', () => {
+    it('should initialize with no pending changes', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       expect(result.current.pendingFile).toBe(null);
@@ -29,9 +26,10 @@ describe('useDeferredImageUpload', () => {
       expect(result.current.imageChanged).toBe(false);
     });
 
-    it('should return the original resource for preview', () => {
+    it('should return the original resource for preview', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       expect(result.current.resourceForPreview).toEqual(mockResource);
@@ -40,8 +38,9 @@ describe('useDeferredImageUpload', () => {
 
   describe('handleImageChange', () => {
     it('should set pending file when a new file is selected', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -56,8 +55,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should clear imageRemoved flag when a new file is selected', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       // First remove the image
@@ -79,9 +79,10 @@ describe('useDeferredImageUpload', () => {
   });
 
   describe('handleImageRemove', () => {
-    it('should set imageRemoved flag', () => {
+    it('should set imageRemoved flag', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       act(() => {
@@ -94,8 +95,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should clear pending file when remove is called', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       // First set a pending file
@@ -115,9 +117,10 @@ describe('useDeferredImageUpload', () => {
       expect(result.current.imageRemoved).toBe(true);
     });
 
-    it('should update resourceForPreview to show empty imageUrl', () => {
+    it('should update resourceForPreview to show empty imageUrl', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       act(() => {
@@ -132,8 +135,9 @@ describe('useDeferredImageUpload', () => {
 
   describe('handleReset', () => {
     it('should clear all pending changes', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       // Set a pending file
@@ -155,9 +159,10 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should call onReset callback when provided', async () => {
+      const { wrapper } = await createFixtures();
       const onReset = vi.fn();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource, onReset }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -172,9 +177,10 @@ describe('useDeferredImageUpload', () => {
       expect(onReset).toHaveBeenCalledTimes(1);
     });
 
-    it('should restore resourceForPreview to original after reset', () => {
+    it('should restore resourceForPreview to original after reset', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       // Remove image
@@ -195,8 +201,9 @@ describe('useDeferredImageUpload', () => {
 
   describe('saveImage', () => {
     it('should call upload function with pending file when file is selected', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -217,8 +224,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should call upload function with null when image is removed', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockUploadFn = vi.fn().mockResolvedValue(undefined);
@@ -238,8 +246,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should not call upload function when no changes are pending', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockUploadFn = vi.fn().mockResolvedValue(undefined);
@@ -253,8 +262,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should reset pending state after successful save', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -278,8 +288,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should reset pending state even when upload function fails', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -304,17 +315,19 @@ describe('useDeferredImageUpload', () => {
   });
 
   describe('imageChanged', () => {
-    it('should be false initially', () => {
+    it('should be false initially', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       expect(result.current.imageChanged).toBe(false);
     });
 
     it('should be true when pending file exists', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -325,9 +338,10 @@ describe('useDeferredImageUpload', () => {
       expect(result.current.imageChanged).toBe(true);
     });
 
-    it('should be true when image is removed', () => {
+    it('should be true when image is removed', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       act(() => {
@@ -338,8 +352,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should be false after reset', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -358,9 +373,10 @@ describe('useDeferredImageUpload', () => {
   });
 
   describe('resourceForPreview', () => {
-    it('should memoize and return same reference when nothing changes', () => {
+    it('should memoize and return same reference when nothing changes', async () => {
+      const { wrapper } = await createFixtures();
       const { result, rerender } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const firstPreview = result.current.resourceForPreview;
@@ -370,10 +386,11 @@ describe('useDeferredImageUpload', () => {
       expect(firstPreview).toBe(secondPreview);
     });
 
-    it('should update when resource changes', () => {
+    it('should update when resource changes', async () => {
+      const { wrapper } = await createFixtures();
       const { result, rerender } = renderHook(({ resource }) => useDeferredImageUpload({ resource }), {
         initialProps: { resource: mockResource },
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const firstPreview = result.current.resourceForPreview;
@@ -387,9 +404,10 @@ describe('useDeferredImageUpload', () => {
       expect(secondPreview.imageUrl).toBe('https://example.com/new-image.jpg');
     });
 
-    it('should show empty imageUrl when imageRemoved is true', () => {
+    it('should show empty imageUrl when imageRemoved is true', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       expect(result.current.resourceForPreview.imageUrl).toBe(mockResource.imageUrl);
@@ -401,7 +419,8 @@ describe('useDeferredImageUpload', () => {
       expect(result.current.resourceForPreview.imageUrl).toBeNull();
     });
 
-    it('should preserve other resource properties when showing empty imageUrl', () => {
+    it('should preserve other resource properties when showing empty imageUrl', async () => {
+      const { wrapper } = await createFixtures();
       const resourceWithMultipleProps = {
         imageUrl: 'https://example.com/image.jpg',
         id: '123',
@@ -412,7 +431,7 @@ describe('useDeferredImageUpload', () => {
       };
 
       const { result } = renderHook(() => useDeferredImageUpload({ resource: resourceWithMultipleProps }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       act(() => {
@@ -428,9 +447,10 @@ describe('useDeferredImageUpload', () => {
 
   describe('Integration scenarios', () => {
     it('should handle complete upload workflow: select, save, reset', async () => {
+      const { wrapper } = await createFixtures();
       const onReset = vi.fn();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource, onReset }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -461,8 +481,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should handle complete removal workflow: remove, save, cancel', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockUploadFn = vi.fn().mockResolvedValue(undefined);
@@ -485,8 +506,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should handle cancel after selecting file', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile = new File(['content'], 'avatar.jpg', { type: 'image/jpeg' });
@@ -509,8 +531,9 @@ describe('useDeferredImageUpload', () => {
     });
 
     it('should handle changing file selection multiple times', async () => {
+      const { wrapper } = await createFixtures();
       const { result } = renderHook(() => useDeferredImageUpload({ resource: mockResource }), {
-        wrapper: createWrapper(),
+        wrapper,
       });
 
       const mockFile1 = new File(['content1'], 'avatar1.jpg', { type: 'image/jpeg' });
