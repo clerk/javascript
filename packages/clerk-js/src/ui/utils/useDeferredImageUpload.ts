@@ -38,6 +38,7 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
   const card = useCardState();
   const [pendingFile, setPendingFile] = React.useState<File | null>(null);
   const [imageRemoved, setImageRemoved] = React.useState(false);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
 
   const imageChanged = pendingFile !== null || imageRemoved;
 
@@ -54,49 +55,56 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
   const handleImageRemove = React.useCallback(() => {
     setPendingFile(null);
     setImageRemoved(true);
+    setPreviewUrl(null);
     card.setIdle();
   }, [card]);
 
   const handleReset = React.useCallback(() => {
     setPendingFile(null);
     setImageRemoved(false);
+    setPreviewUrl(null);
     onReset?.();
   }, [onReset]);
 
   const saveImage = React.useCallback(
     async (uploadFn: (file: File | null) => Promise<unknown>) => {
-      if (pendingFile) {
-        await uploadFn(pendingFile);
-      } else if (imageRemoved) {
-        await uploadFn(null);
+      try {
+        if (pendingFile) {
+          await uploadFn(pendingFile);
+        } else if (imageRemoved) {
+          await uploadFn(null);
+        }
+      } finally {
+        setPendingFile(null);
+        setImageRemoved(false);
+        setPreviewUrl(null);
       }
-
-      setPendingFile(null);
-      setImageRemoved(false);
     },
     [pendingFile, imageRemoved],
   );
 
+  React.useEffect(() => {
+    if (!pendingFile) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(pendingFile);
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+      setPreviewUrl(null);
+    };
+  }, [pendingFile]);
+
   const resourceForPreview = React.useMemo(() => {
-    if (pendingFile) {
-      const previewUrl = URL.createObjectURL(pendingFile);
+    if (previewUrl) {
       return { ...resource, imageUrl: previewUrl };
     }
     if (imageRemoved) {
       return { ...resource, imageUrl: null };
     }
     return resource;
-  }, [resource, imageRemoved, pendingFile]);
-
-  React.useEffect(() => {
-    if (!pendingFile) {
-      return;
-    }
-    const previewUrl = URL.createObjectURL(pendingFile);
-    return () => {
-      URL.revokeObjectURL(previewUrl);
-    };
-  }, [pendingFile]);
+  }, [resource, imageRemoved, previewUrl]);
 
   return {
     pendingFile,

@@ -182,7 +182,7 @@ describe('useDeferredImageUpload', () => {
         result.current.handleImageRemove();
       });
 
-      expect(result.current.resourceForPreview.imageUrl).toBe('');
+      expect(result.current.resourceForPreview.imageUrl).toBeNull();
 
       // Reset
       act(() => {
@@ -473,7 +473,7 @@ describe('useDeferredImageUpload', () => {
       });
 
       expect(result.current.imageChanged).toBe(true);
-      expect(result.current.resourceForPreview.imageUrl).toBe('');
+      expect(result.current.resourceForPreview.imageUrl).toBeNull();
 
       // 2. Save removal
       await act(async () => {
