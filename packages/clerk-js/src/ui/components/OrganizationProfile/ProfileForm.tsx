@@ -25,6 +25,19 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const { organization } = useOrganization();
   const { organizationSettings } = useEnvironment();
 
+  const {
+    imageChanged,
+    resourceForPreview: organizationForPreview,
+    handleImageChange,
+    handleImageRemove,
+    handleReset,
+    saveImage,
+    pendingFile,
+  } = useDeferredImageUpload({
+    resource: organization || { imageUrl: '' },
+    onReset,
+  });
+
   const nameField = useFormControl('name', organization?.name || '', {
     type: 'text',
     label: localizationKeys('formFieldLabel__organizationName'),
@@ -40,19 +53,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   if (!organization) {
     return null;
   }
-
-  const {
-    imageChanged,
-    resourceForPreview: organizationForPreview,
-    handleImageChange,
-    handleImageRemove,
-    handleReset,
-    saveImage,
-    pendingFile,
-  } = useDeferredImageUpload({
-    resource: organization,
-    onReset,
-  });
 
   const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value || imageChanged;
   const canSubmit = dataChanged && slugField.feedbackType !== 'error';

@@ -1,6 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { CardStateProvider } from '@/ui/elements/contexts';
@@ -125,7 +124,7 @@ describe('useDeferredImageUpload', () => {
         result.current.handleImageRemove();
       });
 
-      expect(result.current.resourceForPreview.imageUrl).toBe('');
+      expect(result.current.resourceForPreview.imageUrl).toBeNull();
       expect(result.current.resourceForPreview.id).toBe(mockResource.id);
       expect(result.current.resourceForPreview.name).toBe(mockResource.name);
     });
@@ -399,7 +398,7 @@ describe('useDeferredImageUpload', () => {
         result.current.handleImageRemove();
       });
 
-      expect(result.current.resourceForPreview.imageUrl).toBe('');
+      expect(result.current.resourceForPreview.imageUrl).toBeNull();
     });
 
     it('should preserve other resource properties when showing empty imageUrl', () => {
@@ -422,7 +421,7 @@ describe('useDeferredImageUpload', () => {
 
       expect(result.current.resourceForPreview).toEqual({
         ...resourceWithMultipleProps,
-        imageUrl: '',
+        imageUrl: null,
       });
     });
   });

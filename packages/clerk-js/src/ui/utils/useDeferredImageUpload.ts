@@ -3,7 +3,7 @@ import React from 'react';
 import { useCardState } from '../elements/contexts';
 
 type ResourceWithImage = {
-  imageUrl?: string;
+  imageUrl?: string | null;
 };
 
 type UseDeferredImageUploadOptions<T extends ResourceWithImage> = {
@@ -19,7 +19,7 @@ type UseDeferredImageUploadReturn<T extends ResourceWithImage> = {
   handleImageChange: (file: File) => Promise<void>;
   handleImageRemove: () => void;
   handleReset: () => void;
-  saveImage: (uploadFn: (file: File) => Promise<unknown>) => Promise<void>;
+  saveImage: (uploadFn: (file: File | null) => Promise<unknown>) => Promise<void>;
 };
 
 /**
@@ -64,11 +64,11 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
   }, [onReset]);
 
   const saveImage = React.useCallback(
-    async (uploadFn: (file: File) => Promise<unknown>) => {
+    async (uploadFn: (file: File | null) => Promise<unknown>) => {
       if (pendingFile) {
         await uploadFn(pendingFile);
       } else if (imageRemoved) {
-        await uploadFn(null as unknown as File);
+        await uploadFn(null);
       }
 
       setPendingFile(null);
@@ -79,7 +79,7 @@ export const useDeferredImageUpload = <T extends ResourceWithImage>({
 
   const resourceForPreview = React.useMemo(() => {
     if (imageRemoved) {
-      return { ...resource, imageUrl: '' };
+      return { ...resource, imageUrl: null };
     }
     return resource;
   }, [resource, imageRemoved]);

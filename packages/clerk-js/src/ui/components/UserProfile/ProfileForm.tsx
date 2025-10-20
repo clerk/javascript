@@ -23,10 +23,6 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const card = useCardState();
   const { user } = useUser();
 
-  if (!user) {
-    return null;
-  }
-
   const {
     imageChanged,
     resourceForPreview: userForPreview,
@@ -36,9 +32,13 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     saveImage,
     pendingFile,
   } = useDeferredImageUpload({
-    resource: user,
+    resource: user || { imageUrl: '' },
     onReset,
   });
+
+  if (!user) {
+    return null;
+  }
 
   const { first_name, last_name } = useEnvironment().userSettings.attributes;
   const showFirstName = first_name?.enabled;
