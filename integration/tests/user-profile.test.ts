@@ -379,31 +379,20 @@ export default function Page() {
     await u.po.userProfile.waitForUserProfileModal();
     await u.po.userProfile.clickToUpdateProfile();
 
-    // Upload avatar
     const testAvatarPath = path.join(__dirname, 'fixtures', 'test-avatar.png');
     const fileInput = u.page.locator('input[type="file"]');
     await fileInput.setInputFiles(testAvatarPath);
 
-    // Wait for the file to be processed
     await expect(u.page.getByRole('dialog').locator('.cl-avatarImage')).toBeVisible();
 
-    // Verify Save button becomes enabled
     await expect(u.page.getByRole('button', { name: /save$/i })).toBeEnabled();
 
-    // Click Save
     await u.page.getByRole('button', { name: /save$/i }).click();
 
-    // Wait for the save to complete by checking if the avatar is still visible
     await expect(u.page.getByRole('dialog').locator('.cl-avatarImage')).toBeVisible();
 
-    // Try to wait for the section to close, but don't fail if it doesn't
-    try {
-      await u.po.userProfile.waitForSectionCardClosed('profile');
-    } catch {
-      // Profile section may not close automatically, which is fine
-    }
+    await u.po.userProfile.waitForSectionCardClosed('profile');
 
-    // Verify avatar persists after save
     await expect(u.page.getByRole('dialog').locator('.cl-avatarImage')).toBeVisible();
   });
 
