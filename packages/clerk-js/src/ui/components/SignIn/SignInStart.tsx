@@ -181,6 +181,18 @@ function SignInStartInternal(): JSX.Element {
     setShouldAutofocus(true);
   };
 
+  /**
+   * Redirect to account switcher if user already has active sessions in multi-session mode
+   */
+  useEffect(() => {
+    const hasActiveSessions = (clerk.client?.signedInSessions?.length ?? 0) > 0;
+    const isMultiSessionMode = !authConfig.singleSessionMode;
+
+    if (hasActiveSessions && isMultiSessionMode) {
+      void navigate('choose');
+    }
+  }, [clerk.client?.signedInSessions, authConfig.singleSessionMode, navigate]);
+
   // switch to the phone input (if available) if a "+" is entered
   // (either by the browser or the user)
   // this does not work in chrome as it does not fire the change event and the value is

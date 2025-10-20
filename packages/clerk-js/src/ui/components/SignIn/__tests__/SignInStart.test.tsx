@@ -590,4 +590,120 @@ describe('SignInStart', () => {
       );
     });
   });
+
+  describe('Active session redirect', () => {
+    describe('multi-session mode', () => {
+      it('redirects to /choose when user has active sessions', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMultiSessionMode();
+          f.withUser({
+            email_addresses: ['user@clerk.com'],
+          });
+        });
+
+        // Mock active sessions
+        fixtures.clerk.client.signedInSessions = [
+          {
+            id: 'sess_123',
+            user: fixtures.clerk.user,
+            status: 'active',
+          } as any,
+        ];
+
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith('choose');
+        });
+      });
+
+      it('redirects to /choose when user has multiple active sessions', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMultiSessionMode();
+          f.withUser({
+            email_addresses: ['user@clerk.com'],
+          });
+        });
+
+        // Mock multiple active sessions
+        fixtures.clerk.client.signedInSessions = [
+          {
+            id: 'sess_123',
+            user: fixtures.clerk.user,
+            status: 'active',
+          } as any,
+          {
+            id: 'sess_456',
+            user: { id: 'user_456' },
+            status: 'active',
+          } as any,
+        ];
+
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith('choose');
+        });
+      });
+
+      it('does NOT redirect when user has no active sessions', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMultiSessionMode();
+        });
+
+        // No active sessions
+        fixtures.clerk.client.signedInSessions = [];
+
+        render(<SignInStart />, { wrapper });
+
+        // Wait a bit to ensure no redirect happens
+        await waitFor(
+          () => {
+            expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+          },
+          { timeout: 100 },
+        );
+
+        // Should show the sign-in form
+        screen.getByText(/email address/i);
+      });
+    });
+
+    describe('single-session mode', () => {
+      it('does NOT redirect to /choose when user has active session in single-session mode', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          // Single session mode is the default, no need to call a method
+          f.withUser({
+            email_addresses: ['user@clerk.com'],
+          });
+        });
+
+        // Mock active session in single-session mode
+        fixtures.clerk.client.signedInSessions = [
+          {
+            id: 'sess_123',
+            user: fixtures.clerk.user,
+            status: 'active',
+          } as any,
+        ];
+
+        // Single-session mode
+        fixtures.environment.authConfig.singleSessionMode = true;
+
+        render(<SignInStart />, { wrapper });
+
+        // Should NOT redirect to choose in single-session mode
+        await waitFor(
+          () => {
+            expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+          },
+          { timeout: 100 },
+        );
+      });
+    });
+  });
 });
