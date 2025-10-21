@@ -5,8 +5,8 @@ import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } 
 
 export type AvatarUploaderProps = {
   title: LocalizationKey;
-  avatarPreview: React.ReactElement;
-  onAvatarChange: (file: File) => void;
+  avatarPreview?: React.ReactElement;
+  onAvatarChange: (file: File) => void | Promise<void>;
   onAvatarRemove?: (() => void) | null;
   avatarPreviewPlaceholder?: React.ReactElement | null;
   previewImageUrl?: string | null;
@@ -35,9 +35,13 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     ...rest
   } = props;
 
-  const handleFileChange = (file: File | undefined) => {
+  const handleFileChange = async (file: File | undefined) => {
     if (file && validFile(file)) {
-      onAvatarChange(file);
+      try {
+        await onAvatarChange(file);
+      } catch (error) {
+        console.error('Error in onAvatarChange:', error);
+      }
     }
   };
 
@@ -46,14 +50,21 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   };
 
   const previewElement = React.useMemo(() => {
-    // If we have a preview URL, show it
-    if (previewImageUrl) {
+    if (previewImageUrl && avatarPreview) {
       return React.cloneElement(avatarPreview, { imageUrl: previewImageUrl });
     }
 
-    // Otherwise show the original avatar
-    return avatarPreview;
-  }, [previewImageUrl, avatarPreview]);
+    if (avatarPreview) {
+      return avatarPreview;
+    }
+
+    // If we have a placeholder, clone it and pass the openDialog function
+    if (avatarPreviewPlaceholder) {
+      return React.cloneElement(avatarPreviewPlaceholder, { onClick: openDialog });
+    }
+
+    return null;
+  }, [previewImageUrl, avatarPreview, avatarPreviewPlaceholder, openDialog]);
 
   return (
     <Col gap={4}>

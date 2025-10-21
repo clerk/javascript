@@ -53,6 +53,18 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
   const { organization } = useOrganization();
   const { organizationSettings } = useEnvironment();
   const [file, setFile] = React.useState<File | null>();
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+
+  // Create preview URL when file changes
+  React.useEffect(() => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [file]);
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -154,8 +166,9 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
           <Col>
             <OrganizationProfileAvatarUploader
               organization={{ name: nameField.value }}
-              onAvatarChange={async file => await setFile(file)}
+              onAvatarChange={file => setFile(file)}
               onAvatarRemove={file ? onAvatarRemove : null}
+              previewImageUrl={previewUrl}
               avatarPreviewPlaceholder={
                 <IconButton
                   variant='ghost'

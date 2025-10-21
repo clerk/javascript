@@ -10,10 +10,25 @@ import { localizationKeys } from '../../localization';
 export const OrganizationProfileAvatarUploader = (
   props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & { organization: Partial<OrganizationResource> },
 ) => {
-  const { organization, imageRemoved, previewImageUrl, ...rest } = props;
+  const { organization, imageRemoved, previewImageUrl, avatarPreviewPlaceholder, ...rest } = props;
 
   // Determine which image URL to show
-  const imageUrl = imageRemoved ? undefined : previewImageUrl || organization.imageUrl;
+  // If imageRemoved is provided (deferred upload), use that logic
+  // Otherwise, use immediate upload logic (include previewImageUrl)
+  const imageUrl =
+    imageRemoved !== undefined
+      ? imageRemoved
+        ? undefined
+        : previewImageUrl || organization.imageUrl
+      : previewImageUrl || organization.imageUrl;
+
+  // When image is removed, ensure we have a name for initials
+  const organizationWithFallback =
+    imageRemoved && !organization.name ? { ...organization, name: 'Organization' } : organization;
+
+  // For CreateOrganization: show placeholder when no image, avatar when image exists
+  // For OrganizationProfile: always show avatar (deferred upload)
+  const shouldShowPlaceholder = avatarPreviewPlaceholder && !imageUrl;
 
   return (
     <Col elementDescriptor={descriptors.organizationAvatarUploaderContainer}>
@@ -27,15 +42,18 @@ export const OrganizationProfileAvatarUploader = (
       />
       <AvatarUploader
         {...rest}
-        imageRemoved={imageRemoved}
-        previewImageUrl={previewImageUrl}
+        {...(imageRemoved !== undefined && { imageRemoved })}
+        {...(previewImageUrl !== undefined && { previewImageUrl })}
+        {...(avatarPreviewPlaceholder && { avatarPreviewPlaceholder })}
         title={localizationKeys('userProfile.profilePage.imageFormTitle')}
         avatarPreview={
-          <OrganizationAvatar
-            size={theme => theme.sizes.$16}
-            {...organization}
-            imageUrl={imageUrl}
-          />
+          shouldShowPlaceholder ? undefined : (
+            <OrganizationAvatar
+              size={theme => theme.sizes.$16}
+              {...organizationWithFallback}
+              imageUrl={imageUrl}
+            />
+          )
         }
       />
     </Col>
