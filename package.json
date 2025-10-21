@@ -139,7 +139,6 @@
     "ts-jest": "29.2.5",
     "tsup": "catalog:repo",
     "turbo": "^2.5.4",
-    "turbo-ignore": "^2.5.4",
     "typedoc": "0.28.5",
     "typedoc-plugin-markdown": "4.6.4",
     "typedoc-plugin-replace-text": "4.2.0",
