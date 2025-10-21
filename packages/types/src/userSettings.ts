@@ -86,11 +86,6 @@ export type PasskeySettingsData = {
 export type OAuthProviders = {
   [provider in OAuthStrategy]: OAuthProviderSettings;
 };
-
-export type SamlSettings = {
-  enabled: boolean;
-};
-
 export type EnterpriseSSOSettings = {
   enabled: boolean;
 };
@@ -115,10 +110,6 @@ export interface UserSettingsJSON extends ClerkResourceJSON {
   actions: Actions;
   social: OAuthProviders;
 
-  /**
-   * @deprecated Use `enterprise_sso` instead.
-   */
-  saml: SamlSettings;
   enterprise_sso: EnterpriseSSOSettings;
 
   sign_in: SignInData;
@@ -132,10 +123,6 @@ export interface UserSettingsResource extends ClerkResource {
   id?: undefined;
   social: OAuthProviders;
 
-  /**
-   * @deprecated Use `enterprise_sso` instead.
-   */
-  saml: SamlSettings;
   enterpriseSSO: EnterpriseSSOSettings;
 
   attributes: Attributes;
