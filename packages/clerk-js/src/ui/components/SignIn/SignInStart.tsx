@@ -522,7 +522,7 @@ function SignInStartInternal(): JSX.Element {
   });
 
   // Mark as initialized after first render
-  React.useEffect(() => {
+  useEffect(() => {
     hasInitializedRef.current = true;
   }, []);
 

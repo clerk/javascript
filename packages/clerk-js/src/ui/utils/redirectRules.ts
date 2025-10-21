@@ -1,4 +1,4 @@
-import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/types';
+import type { Clerk, EnvironmentResource } from '@clerk/types';
 
 import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 

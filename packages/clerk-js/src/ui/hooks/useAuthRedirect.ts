@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useEnvironment } from '../contexts';
 import { useRouter } from '../router';
-import type { RedirectResult, RedirectRule } from '../utils/redirectRules';
+import type { RedirectRule } from '../utils/redirectRules';
 import { evaluateRedirectRules, isDevelopmentMode } from '../utils/redirectRules';
 
 export interface UseAuthRedirectOptions {
@@ -56,4 +56,3 @@ export function useAuthRedirect(options: UseAuthRedirectOptions): UseAuthRedirec
 
   return { isRedirecting };
 }
-
