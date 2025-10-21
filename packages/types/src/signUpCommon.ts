@@ -15,7 +15,6 @@ import type {
   GoogleOneTapStrategy,
   OAuthStrategy,
   PhoneCodeStrategy,
-  SamlStrategy,
   TicketStrategy,
   Web3Strategy,
 } from './strategies';
@@ -49,7 +48,7 @@ export type PrepareVerificationParams =
       oidcLoginHint?: string;
     }
   | {
-      strategy: SamlStrategy | EnterpriseSSOStrategy;
+      strategy: EnterpriseSSOStrategy;
       redirectUrl?: string;
       actionCompleteRedirectUrl?: string;
     };
@@ -75,7 +74,7 @@ export type SignUpVerifiableField =
   | Web3WalletIdentifier;
 
 // TODO: Does it make sense that the identification *field* holds a *strategy*?
-export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
+export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | EnterpriseSSOStrategy;
 
 // TODO: Replace with discriminated union type
 export type SignUpCreateParams = Partial<
@@ -83,13 +82,7 @@ export type SignUpCreateParams = Partial<
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
-    strategy:
-      | OAuthStrategy
-      | SamlStrategy
-      | EnterpriseSSOStrategy
-      | TicketStrategy
-      | GoogleOneTapStrategy
-      | PhoneCodeStrategy;
+    strategy: OAuthStrategy | EnterpriseSSOStrategy | TicketStrategy | GoogleOneTapStrategy | PhoneCodeStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;
     transfer: boolean;

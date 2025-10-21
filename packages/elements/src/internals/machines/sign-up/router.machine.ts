@@ -208,23 +208,6 @@ export const SignUpRouterMachine = setup({
         },
       })),
     },
-    'AUTHENTICATE.SAML': {
-      actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
-        type: 'REDIRECT',
-        params: {
-          strategy: 'saml',
-          emailAddress: context.formRef.getSnapshot().context.fields.get('emailAddress')?.value,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signUpUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
-          redirectUrlComplete: context.clerk.buildAfterSignUpUrl({
-            params: context.router?.searchParams(),
-          }),
-        },
-      })),
-    },
     'AUTHENTICATE.ENTERPRISE_SSO': {
       actions: sendTo(ThirdPartyMachineId, ({ context }) => ({
         type: 'REDIRECT',

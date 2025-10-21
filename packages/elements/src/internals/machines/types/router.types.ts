@@ -4,7 +4,6 @@ import type {
   EnterpriseSSOStrategy,
   LoadedClerk,
   OAuthStrategy,
-  SamlStrategy,
   SignInStrategy,
   Web3Strategy,
 } from '@clerk/types';
@@ -46,7 +45,6 @@ export type BaseRouterLoadingEvent<TSteps extends BaseRouterLoadingStep> = (
 ) & { type: 'LOADING'; isLoading: boolean };
 
 export type BaseRouterRedirectOauthEvent = { type: 'AUTHENTICATE.OAUTH'; strategy: OAuthStrategy };
-export type BaseRouterRedirectSamlEvent = { type: 'AUTHENTICATE.SAML'; strategy?: SamlStrategy };
 export type BaseRouterRedirectEnterpriseSSOEvent = {
   type: 'AUTHENTICATE.ENTERPRISE_SSO';
   strategy?: EnterpriseSSOStrategy;
@@ -56,7 +54,6 @@ export type BaseRouterSetClerkEvent = { type: 'CLERK.SET'; clerk: LoadedClerk };
 
 export type BaseRouterRedirectEvent =
   | BaseRouterRedirectOauthEvent
-  | BaseRouterRedirectSamlEvent
   | BaseRouterRedirectWeb3Event
   | BaseRouterRedirectEnterpriseSSOEvent;
 
