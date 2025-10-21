@@ -38,7 +38,6 @@ export const useCreateOrganizationContext = () => {
   return {
     ...ctx,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
-    hideSlug: ctx.hideSlug || false,
     navigateAfterCreateOrganization,
     componentName,
   };
