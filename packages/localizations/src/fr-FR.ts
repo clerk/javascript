@@ -46,7 +46,7 @@ export const frFR: LocalizationResource = {
       formButtonPrimary__revoke: 'Révoquer la clé',
       formHint: 'Êtes-vous sûr de vouloir supprimer cette clé secrète ?',
       formTitle: 'Révoquer la clé secrète « {{apiKeyName}} » ?',
-    }
+    },
   },
   backButton: 'Retour',
   badge__activePlan: 'Actif',
@@ -97,7 +97,8 @@ export const frFR: LocalizationResource = {
       downgradeNotice:
         "Vous conserverez votre abonnement actuel et ses fonctionnalités jusqu'à la fin du cycle de facturation, puis vous passerez à cet abonnement.",
       emailForm: {
-        subtitle: 'Avant de pouvoir finaliser votre achat, vous devez ajouter une adresse e-mail où les reçus seront envoyés.',
+        subtitle:
+          'Avant de pouvoir finaliser votre achat, vous devez ajouter une adresse e-mail où les reçus seront envoyés.',
         title: 'Ajouter une adresse e-mail',
       },
       lineItems: {
@@ -208,7 +209,8 @@ export const frFR: LocalizationResource = {
   formFieldError__notMatchingPasswords: 'Les mots de passe ne correspondent pas.',
   formFieldError__verificationLinkExpired: 'Le lien de vérification a expiré. Merci de demander un nouveau lien.',
   formFieldHintText__optional: 'Optionnel',
-  formFieldHintText__slug: 'Un slug est un identifiant lisible qui doit être unique. Il est souvent utilisé dans les URL.',
+  formFieldHintText__slug:
+    'Un slug est un identifiant lisible qui doit être unique. Il est souvent utilisé dans les URL.',
   formFieldInputPlaceholder__apiKeyDescription: 'Expliquez pourquoi vous générez cette clé',
   formFieldInputPlaceholder__apiKeyExpirationDate: 'Sélectionner une date',
   formFieldInputPlaceholder__apiKeyName: 'Entrez le nom de votre clé secrète',
@@ -409,7 +411,8 @@ export const frFR: LocalizationResource = {
     },
     plansPage: {
       alerts: {
-        noPermissionsToManageBilling: "Vous n'avez pas les permissions pour gérer la facturation de cette organisation.",
+        noPermissionsToManageBilling:
+          "Vous n'avez pas les permissions pour gérer la facturation de cette organisation.",
       },
       title: 'Plans',
     },
@@ -476,7 +479,8 @@ export const frFR: LocalizationResource = {
         calloutInfoLabel: "Changer le mode d'inscription n'affectera que les nouveaux utilisateurs.",
         calloutInvitationCountLabel: 'Invitations en attente envoyées aux utilisateurs : {{count}}',
         calloutSuggestionCountLabel: 'Suggestions en attente envoyées aux utilisateurs : {{count}}',
-        manualInvitationOption__description: "Les utilisateurs peuvent uniquement être invités à l'organisation manuellement.",
+        manualInvitationOption__description:
+          "Les utilisateurs peuvent uniquement être invités à l'organisation manuellement.",
         manualInvitationOption__label: "Pas d'inscription automatique",
         subtitle: "Choisissez comment les utilisateurs de ce domaine peuvent rejoindre l'organisation.",
       },
@@ -492,7 +496,8 @@ export const frFR: LocalizationResource = {
       formTitle: 'Code de vérification',
       resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
       subtitle: 'Le domaine {{domainName}} doit être vérifié par e-mail.',
-      subtitleVerificationCodeScreen: 'Un code de vérification a été envoyé à {{emailAddress}}. Saisissez le code pour continuer.',
+      subtitleVerificationCodeScreen:
+        'Un code de vérification a été envoyé à {{emailAddress}}. Saisissez le code pour continuer.',
       title: 'Vérifier un domaine',
     },
   },
@@ -730,7 +735,7 @@ export const frFR: LocalizationResource = {
       formTitle: 'Le code de vérification',
       subtitle: "Entrez le code de l'application d'authentification.",
       title: 'Vérification en deux étapes',
-    }
+    },
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
   signUp: {
@@ -848,7 +853,7 @@ export const frFR: LocalizationResource = {
     signOut: {
       actionLink: 'Se déconnecter',
       actionText: 'Connecté en tant que {{identifier}}',
-    }
+    },
   },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
@@ -891,8 +896,10 @@ export const frFR: LocalizationResource = {
     organization_domain_exists_for_enterprise_connection: undefined,
     organization_membership_quota_exceeded: "Le quota de membres de l'organisation a été dépassé.",
     organization_minimum_permissions_needed: 'Permissions minimales nécessaires pour accéder à cette organisation.',
-    organization_not_found_or_unauthorized: 'Vous n’êtes plus membre de cette organisation. Veuillez en choisir ou en créer une autre.',
-    organization_not_found_or_unauthorized_with_create_organization_disabled: 'Vous n’êtes plus membre de cette organisation. Veuillez en choisir une autre.',
+    organization_not_found_or_unauthorized:
+      'Vous n’êtes plus membre de cette organisation. Veuillez en choisir ou en créer une autre.',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'Vous n’êtes plus membre de cette organisation. Veuillez en choisir une autre.',
     passkey_already_exists: 'Cette clé de sécurité existe déjà.',
     passkey_not_supported: 'Les clés de sécurité ne sont pas prises en charge sur cet appareil.',
     passkey_pa_not_supported: 'Les clés de sécurité ne sont pas prises en charge dans cet environnement.',
@@ -922,7 +929,8 @@ export const frFR: LocalizationResource = {
         dates: 'Évitez les dates et les années qui vous sont associées. (ex: date ou année de naissance)',
         l33t: "Évitez les substitutions de lettres prévisibles comme '@' pour 'a'.",
         longerKeyboardPattern: 'Utilisez des motifs de clavier plus longs et changez de sens de frappe plusieurs fois.',
-        noNeed: 'Vous pouvez créer des mots de passe forts sans utiliser de symboles, de chiffres ou de lettres majuscules.',
+        noNeed:
+          'Vous pouvez créer des mots de passe forts sans utiliser de symboles, de chiffres ou de lettres majuscules.',
         pwned: 'Si vous utilisez ce mot de passe ailleurs, vous devriez le modifier.',
         recentYears: 'Évitez les dernières années.',
         repeated: 'Évitez les mots et les caractères répétés.',
@@ -1123,7 +1131,8 @@ export const frFR: LocalizationResource = {
         buttonUnableToScan__nonPrimary: 'Vous ne pouvez pas scanner le QR code ?',
         infoText__ableToScan:
           "Configurez une nouvelle méthode de connexion dans votre application d'authentification et scannez le QR code suivant pour le lier à votre compte.",
-        infoText__unableToScan: 'Configurez une nouvelle méthode de connexion dans votre authentificateur et entrez la clé fournie ci-dessous.',
+        infoText__unableToScan:
+          'Configurez une nouvelle méthode de connexion dans votre authentificateur et entrez la clé fournie ci-dessous.',
         inputLabel__unableToScan1:
           'Assurez-vous que les mots de passe basés sur le temps ou à usage unique sont activés, puis terminez la liaison de votre compte.',
         inputLabel__unableToScan2:
@@ -1190,7 +1199,8 @@ export const frFR: LocalizationResource = {
       imageFormDestructiveActionSubtitle: "Supprimer l'image",
       imageFormSubtitle: 'Télécharger une image',
       imageFormTitle: 'Photo de profil',
-      readonly: "Les informations de votre profil ont été fournies par la connexion d'entreprise et ne peuvent pas être modifiées.",
+      readonly:
+        "Les informations de votre profil ont été fournies par la connexion d'entreprise et ne peuvent pas être modifiées.",
       successMessage: 'Votre profil a été mis a jour.',
       title: 'Mettre à jour le profil',
     },
