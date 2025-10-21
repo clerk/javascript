@@ -1,3 +1,4 @@
+export * from './useAuthRedirect';
 export * from './useClerkModalStateParams';
 export * from './useClipboard';
 export * from './useDebounce';

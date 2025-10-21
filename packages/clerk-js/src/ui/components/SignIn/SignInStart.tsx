@@ -10,43 +10,37 @@ import type {
 } from '@clerk/types';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { ERROR_CODES, SIGN_UP_MODES } from '@/core/constants';
+import { clerkInvalidFAPIResponse } from '@/core/errors';
+import type { SignInStartIdentifier } from '@/ui/common';
+import { buildSSOCallbackURL, getIdentifierControlDisplayValues, groupIdentifiers } from '@/ui/common';
+import { handleCombinedFlowTransfer } from '@/ui/components/SignIn/handleCombinedFlowTransfer';
+import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from '@/ui/components/SignIn/shared';
+import { SignInAlternativePhoneCodePhoneNumberCard } from '@/ui/components/SignIn/SignInAlternativePhoneCodePhoneNumberCard';
+import { SignInSocialButtons } from '@/ui/components/SignIn/SignInSocialButtons';
+import {
+  getPreferredAlternativePhoneChannel,
+  getPreferredAlternativePhoneChannelForCombinedFlow,
+  getSignUpAttributeFromIdentifier,
+} from '@/ui/components/SignIn/utils';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '@/ui/contexts';
+import { Col, descriptors, Flow, localizationKeys } from '@/ui/customizables';
+import { CaptchaElement } from '@/ui/elements/CaptchaElement';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { useAuthRedirect, useLoadingStatus } from '@/ui/hooks';
+import { useSupportEmail } from '@/ui/hooks/useSupportEmail';
+import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
+import { signInRedirectRules } from '@/ui/utils/redirectRules';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
-
-import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
-import type { SignInStartIdentifier } from '../../common';
-import {
-  buildSSOCallbackURL,
-  getIdentifierControlDisplayValues,
-  groupIdentifiers,
-  withRedirectToAfterSignIn,
-  withRedirectToSignInTask,
-} from '../../common';
-import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
-import { CaptchaElement } from '../../elements/CaptchaElement';
-import { useLoadingStatus } from '../../hooks';
-import { useSupportEmail } from '../../hooks/useSupportEmail';
-import { useRouter } from '../../router';
-import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
-import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
-import { SignInSocialButtons } from './SignInSocialButtons';
-import {
-  getPreferredAlternativePhoneChannel,
-  getPreferredAlternativePhoneChannelForCombinedFlow,
-  getSignUpAttributeFromIdentifier,
-} from './utils';
+import { getClerkQueryParam, removeClerkQueryParam } from '@/utils';
 
 const useAutoFillPasskey = () => {
   const [isSupported, setIsSupported] = useState(false);
@@ -87,6 +81,7 @@ function SignInStartInternal(): JSX.Element {
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
+
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
@@ -514,7 +509,13 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  if (status.isLoading || clerkStatus === 'sign_up') {
+  // Handle redirect scenarios - must be after all hooks
+  const { isRedirecting } = useAuthRedirect({
+    rules: signInRedirectRules,
+    additionalContext: { afterSignInUrl },
+  });
+
+  if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
     // rendering the sign in flow.
     return <LoadingCard />;
@@ -698,6 +699,4 @@ const InstantPasswordRow = ({ field }: { field?: FormControlState<'password'> })
   );
 };
 
-export const SignInStart = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInStartInternal)),
-);
+export const SignInStart = withCardStateProvider(SignInStartInternal);
