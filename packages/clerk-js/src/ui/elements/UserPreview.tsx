@@ -1,4 +1,4 @@
-import type { ExternalAccountResource, SamlAccountResource, UserPreviewId, UserResource } from '@clerk/types';
+import type { EnterpriseAccountResource, ExternalAccountResource, UserPreviewId, UserResource } from '@clerk/types';
 import React from 'react';
 
 import { getFullName, getIdentifier } from '../../utils/user';
@@ -31,17 +31,17 @@ export type UserPreviewProps = Omit<PropsOfComponent<typeof Flex>, 'title' | 'el
     | {
         user?: Partial<UserResource>;
         externalAccount?: null | undefined;
-        samlAccount?: null | undefined;
+        enterpriseAccount?: null | undefined;
       }
     | {
         user?: null | undefined;
         externalAccount?: Partial<ExternalAccountResource>;
-        samlAccount?: null | undefined;
+        enterpriseAccount?: null | undefined;
       }
     | {
         user?: null | undefined;
         externalAccount?: null | undefined;
-        samlAccount?: Partial<SamlAccountResource>;
+        enterpriseAccount?: Partial<EnterpriseAccountResource>;
       }
   );
 
@@ -49,7 +49,7 @@ export const UserPreview = (props: UserPreviewProps) => {
   const {
     user,
     externalAccount,
-    samlAccount,
+    enterpriseAccount,
     size = 'md',
     showAvatar = true,
     icon,
@@ -68,8 +68,9 @@ export const UserPreview = (props: UserPreviewProps) => {
     ...rest
   } = props;
   const { t } = useLocalizations();
-  const name = getFullName({ ...user }) || getFullName({ ...externalAccount }) || getFullName({ ...samlAccount });
-  const identifier = getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.() || samlAccount?.emailAddress;
+  const name = getFullName({ ...user }) || getFullName({ ...externalAccount }) || getFullName({ ...enterpriseAccount });
+  const identifier =
+    getIdentifier({ ...user }) || externalAccount?.accountIdentifier?.() || enterpriseAccount?.emailAddress;
   const localizedTitle = t(title);
 
   const imageUrl = imageUrlProp || user?.imageUrl || externalAccount?.imageUrl;
@@ -115,7 +116,7 @@ export const UserPreview = (props: UserPreviewProps) => {
               imageElementDescriptor={descriptors.userPreviewAvatarImage}
               {...user}
               {...externalAccount}
-              {...samlAccount}
+              {...enterpriseAccount}
               name={name}
               avatarUrl={imageUrl}
               size={getAvatarSizes}
