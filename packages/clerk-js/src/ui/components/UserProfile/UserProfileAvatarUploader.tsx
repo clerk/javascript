@@ -9,15 +9,22 @@ import { localizationKeys } from '../../localization';
 export const UserProfileAvatarUploader = (
   props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & { user: Partial<UserResource> },
 ) => {
-  const { user, ...rest } = props;
+  const { user, imageRemoved, previewImageUrl, ...rest } = props;
+
+  // Determine which image URL to show
+  const imageUrl = imageRemoved ? undefined : previewImageUrl || user.imageUrl;
+
   return (
     <AvatarUploader
       {...rest}
+      imageRemoved={imageRemoved}
+      previewImageUrl={previewImageUrl}
       title={localizationKeys('userProfile.profilePage.imageFormTitle')}
       avatarPreview={
         <UserAvatar
           size={theme => theme.sizes.$12}
           {...user}
+          imageUrl={imageUrl}
         />
       }
     />

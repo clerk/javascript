@@ -223,7 +223,7 @@ describe('ProfileSection', () => {
       screen.getByRole('img', { name: "F L's logo" });
     });
 
-    it('clicking "Remove image" calls the appropriate function', async () => {
+    it('clicking "Remove image" marks image for removal but does not call setProfileImage until save', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({
           email_addresses: ['test@clerk.com'],
@@ -239,7 +239,12 @@ describe('ProfileSection', () => {
         getByRole('heading', { name: /Update Profile/i });
       });
 
+      // Click remove - this should NOT call setProfileImage yet
       await userEvent.click(getByText(/remove$/i));
+      expect(fixtures.clerk.user?.setProfileImage).not.toHaveBeenCalled();
+
+      // Click save - this should call setProfileImage with null
+      await userEvent.click(getByRole('button', { name: /save/i }));
       expect(fixtures.clerk.user?.setProfileImage).toHaveBeenCalledWith({ file: null });
     });
 

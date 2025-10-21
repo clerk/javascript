@@ -2,24 +2,15 @@ import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } from '../customizables';
-import { handleError } from '../utils/errorHandler';
-import { useCardState } from './contexts';
 
 export type AvatarUploaderProps = {
   title: LocalizationKey;
   avatarPreview: React.ReactElement;
-  onAvatarChange: (file: File) => Promise<unknown>;
+  onAvatarChange: (file: File) => void;
   onAvatarRemove?: (() => void) | null;
   avatarPreviewPlaceholder?: React.ReactElement | null;
-};
-
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
+  previewImageUrl?: string | null;
+  imageRemoved?: boolean;
 };
 
 const MAX_SIZE_BYTES = 10 * 1000 * 1000;
@@ -30,50 +21,39 @@ const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
 const validFile = (f: File) => validType(f) && validSize(f);
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
-  const [showUpload, setShowUpload] = React.useState(false);
-  const [objectUrl, setObjectUrl] = React.useState<string>();
-  const card = useCardState();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const openDialog = () => inputRef.current?.click();
 
-  const { onAvatarChange, onAvatarRemove, title, avatarPreview, avatarPreviewPlaceholder, ...rest } = props;
+  const {
+    onAvatarChange,
+    onAvatarRemove,
+    title,
+    avatarPreview,
+    avatarPreviewPlaceholder,
+    previewImageUrl,
+    imageRemoved,
+    ...rest
+  } = props;
 
-  const toggle = () => {
-    setShowUpload(!showUpload);
-  };
-
-  const handleFileDrop = (file: File | null) => {
-    if (file === null) {
-      return setObjectUrl('');
-    }
-
-    void fileToBase64(file).then(setObjectUrl);
-    card.setLoading();
-    return onAvatarChange(file)
-      .then(() => {
-        toggle();
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  const handleRemove = async () => {
-    card.setLoading();
-    await handleFileDrop(null);
-    return onAvatarRemove?.();
-  };
-
-  const upload = async (f: File | undefined) => {
-    if (f && validFile(f)) {
-      await handleFileDrop(f);
+  const handleFileChange = (file: File | undefined) => {
+    if (file && validFile(file)) {
+      onAvatarChange(file);
     }
   };
 
-  const previewElement = objectUrl
-    ? React.cloneElement(avatarPreview, { imageUrl: objectUrl })
-    : avatarPreviewPlaceholder
-      ? React.cloneElement(avatarPreviewPlaceholder, { onClick: openDialog })
-      : avatarPreview;
+  const handleRemove = () => {
+    onAvatarRemove?.();
+  };
+
+  const previewElement = React.useMemo(() => {
+    // If we have a preview URL, show it
+    if (previewImageUrl) {
+      return React.cloneElement(avatarPreview, { imageUrl: previewImageUrl });
+    }
+
+    // Otherwise show the original avatar
+    return avatarPreview;
+  }, [previewImageUrl, avatarPreview]);
 
   return (
     <Col gap={4}>
@@ -82,7 +62,10 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
         accept={SUPPORTED_MIME_TYPES.join(',')}
         style={{ display: 'none' }}
         ref={inputRef}
-        onChange={e => upload(e.currentTarget.files?.[0])}
+        onChange={e => handleFileChange(e.currentTarget.files?.[0])}
+        onClick={e => {
+          e.currentTarget.value = '';
+        }}
       />
 
       <Flex
@@ -99,18 +82,17 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
             <SimpleButton
               elementDescriptor={descriptors.avatarImageActionsUpload}
               localizationKey={localizationKeys('userProfile.profilePage.imageFormSubtitle')}
-              isDisabled={card.isLoading}
               variant='outline'
               size='xs'
               onClick={openDialog}
             />
 
-            {!!onAvatarRemove && !showUpload && (
+            {!!onAvatarRemove && (
               <Button
                 elementDescriptor={descriptors.avatarImageActionsRemove}
                 localizationKey={localizationKeys('userProfile.profilePage.imageFormDestructiveActionSubtitle')}
-                isDisabled={card.isLoading}
                 sx={t => ({ color: t.colors.$danger500 })}
+                size='xs'
                 variant='ghost'
                 colorScheme='danger'
                 onClick={handleRemove}

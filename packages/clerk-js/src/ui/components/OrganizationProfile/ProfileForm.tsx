@@ -9,6 +9,7 @@ import { FormButtons } from '@/ui/elements/FormButtons';
 import type { FormProps } from '@/ui/elements/FormContainer';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/ui/utils/errorHandler';
+import { useDeferredImageUpload } from '@/ui/utils/useDeferredImageUpload';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { isDefaultImage } from '../../../utils';
@@ -23,6 +24,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const card = useCardState();
   const { organization } = useOrganization();
   const { organizationSettings } = useEnvironment();
+  const imageUpload = useDeferredImageUpload(!isDefaultImage(organization?.imageUrl || ''));
 
   const nameField = useFormControl('name', organization?.name || '', {
     type: 'text',
@@ -40,40 +42,42 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
     return null;
   }
 
-  const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
+  const dataChanged =
+    organization.name !== nameField.value || organization.slug !== slugField.value || imageUpload.hasImageChanges;
   const canSubmit = dataChanged && slugField.feedbackType !== 'error';
   const organizationSlugEnabled = !organizationSettings.slug.disabled;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
+    try {
+      // First handle image upload if there are changes
+      if (imageUpload.hasImageChanges) {
+        await imageUpload.uploadImage(async file => {
+          await organization.setLogo({ file });
+        });
+      }
 
-    if (organizationSlugEnabled) {
-      updateOrgParams.slug = slugField.value;
-    }
+      // Then handle organization data changes
+      if (organization.name !== nameField.value || organization.slug !== slugField.value) {
+        const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
+        if (organizationSlugEnabled) {
+          updateOrgParams.slug = slugField.value;
+        }
+        await organization.update(updateOrgParams);
+      }
 
-    return (canSubmit ? organization.update(updateOrgParams) : Promise.resolve()).then(onSuccess).catch(err => {
+      onSuccess?.();
+    } catch (err) {
       handleError(err, [nameField, slugField], card.setError);
-    });
+    }
   };
 
-  const uploadAvatar = (file: File) => {
-    return organization
-      .setLogo({ file })
-      .then(() => {
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
-  };
-
-  const onAvatarRemove = () => {
-    void organization
-      .setLogo({ file: null })
-      .then(() => {
-        card.setIdle();
-      })
-      .catch(err => handleError(err, [], card.setError));
+  const handleReset = () => {
+    imageUpload.handleReset();
+    nameField.setValue(organization.name || '');
+    slugField.setValue(organization.slug || '');
+    onReset?.();
   };
 
   const onChangeSlug = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,8 +94,10 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       <Form.Root onSubmit={onSubmit}>
         <OrganizationProfileAvatarUploader
           organization={organization}
-          onAvatarChange={uploadAvatar}
-          onAvatarRemove={isDefaultImage(organization.imageUrl) ? null : onAvatarRemove}
+          onAvatarChange={imageUpload.handleImageChange}
+          onAvatarRemove={imageUpload.shouldShowRemoveButton ? imageUpload.handleImageRemove : null}
+          previewImageUrl={imageUpload.previewUrl}
+          imageRemoved={imageUpload.imageRemoved}
         />
         <Form.ControlRow elementId={nameField.id}>
           <Form.PlainInput
@@ -112,7 +118,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
         )}
         <FormButtons
           isDisabled={!canSubmit}
-          onReset={onReset}
+          onReset={handleReset}
         />
       </Form.Root>
     </FormContainer>

@@ -10,7 +10,10 @@ import { localizationKeys } from '../../localization';
 export const OrganizationProfileAvatarUploader = (
   props: Omit<AvatarUploaderProps, 'avatarPreview' | 'title'> & { organization: Partial<OrganizationResource> },
 ) => {
-  const { organization, ...rest } = props;
+  const { organization, imageRemoved, previewImageUrl, ...rest } = props;
+
+  // Determine which image URL to show
+  const imageUrl = imageRemoved ? undefined : previewImageUrl || organization.imageUrl;
 
   return (
     <Col elementDescriptor={descriptors.organizationAvatarUploaderContainer}>
@@ -24,11 +27,14 @@ export const OrganizationProfileAvatarUploader = (
       />
       <AvatarUploader
         {...rest}
+        imageRemoved={imageRemoved}
+        previewImageUrl={previewImageUrl}
         title={localizationKeys('userProfile.profilePage.imageFormTitle')}
         avatarPreview={
           <OrganizationAvatar
             size={theme => theme.sizes.$16}
             {...organization}
+            imageUrl={imageUrl}
           />
         }
       />

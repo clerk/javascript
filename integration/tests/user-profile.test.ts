@@ -363,4 +363,162 @@ export default function Page() {
     const sessionCookieList = (await u.page.context().cookies()).filter(cookie => cookie.name.startsWith('__session'));
     expect(sessionCookieList.length).toBe(0);
   });
+
+  test('can upload and save avatar image with deferred upload', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    // Get initial avatar src
+    const initialAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+
+    // Click profile section to open
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+
+    // Upload image via file input - should NOT upload immediately
+    const filePath = 'integration/tests/fixtures/test-avatar.png';
+    await u.page.locator('input[type="file"]').setInputFiles(filePath);
+
+    // Verify image preview appears but avatar hasn't changed yet
+    await u.page.waitForSelector('.cl-userPreview img[src^="blob:"]');
+    const previewAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(previewAvatar).not.toBe(initialAvatar);
+    expect(previewAvatar).toMatch(/^blob:/);
+
+    // Click Save to actually upload the image
+    await u.page.locator('button[type="submit"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Verify the image was uploaded and persisted
+    const finalAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(finalAvatar).not.toBe(initialAvatar);
+    expect(finalAvatar).not.toMatch(/^blob:/);
+
+    // Reload page and verify image persists
+    await u.page.reload();
+    await u.po.userProfile.waitForMounted();
+    const persistedAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(persistedAvatar).toBe(finalAvatar);
+  });
+
+  test('can cancel avatar upload without saving', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    // Get initial avatar src
+    const initialAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+
+    // Click profile section to open
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+
+    // Upload image via file input
+    const filePath = 'integration/tests/fixtures/test-avatar.png';
+    await u.page.locator('input[type="file"]').setInputFiles(filePath);
+
+    // Verify image preview appears
+    await u.page.waitForSelector('.cl-userPreview img[src^="blob:"]');
+
+    // Click Cancel instead of Save
+    await u.page.locator('button[type="button"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Verify the avatar reverted to original (no upload occurred)
+    const finalAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(finalAvatar).toBe(initialAvatar);
+  });
+
+  test('can remove avatar image before saving', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    // First upload an image
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+    const filePath = 'integration/tests/fixtures/test-avatar.png';
+    await u.page.locator('input[type="file"]').setInputFiles(filePath);
+    await u.page.waitForSelector('.cl-userPreview img[src^="blob:"]');
+    await u.page.locator('button[type="submit"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Get the uploaded avatar
+    const uploadedAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+
+    // Now open profile again and remove the image
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+
+    // Click remove button - should NOT remove immediately
+    await u.page.locator('button:has-text("Remove")').click();
+
+    // Verify image is still there (just marked for removal)
+    const stillThereAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(stillThereAvatar).toBe(uploadedAvatar);
+
+    // Click Save to actually remove the image
+    await u.page.locator('button[type="submit"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Verify the image was removed
+    const finalAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(finalAvatar).not.toBe(uploadedAvatar);
+  });
+
+  test('can upload same image after removing it', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.userProfile.goTo();
+    await u.po.userProfile.waitForMounted();
+
+    // Upload an image
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+    const filePath = 'integration/tests/fixtures/test-avatar.png';
+    await u.page.locator('input[type="file"]').setInputFiles(filePath);
+    await u.page.waitForSelector('.cl-userPreview img[src^="blob:"]');
+    await u.page.locator('button[type="submit"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Remove the image
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+    await u.page.locator('button:has-text("Remove")').click();
+    await u.page.locator('button[type="submit"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Upload the same image again
+    await u.po.userProfile.clickToUpdateProfile();
+    await u.po.userProfile.waitForSectionCardOpened('profile');
+    await u.page.locator('input[type="file"]').setInputFiles(filePath);
+    await u.page.waitForSelector('.cl-userPreview img[src^="blob:"]');
+    await u.page.locator('button[type="submit"]').click();
+    await u.po.userProfile.waitForMounted();
+
+    // Verify the image was uploaded again
+    const finalAvatar = await u.page.locator('.cl-userPreview img').getAttribute('src');
+    expect(finalAvatar).not.toBeNull();
+    expect(finalAvatar).not.toMatch(/^blob:/);
+  });
 });

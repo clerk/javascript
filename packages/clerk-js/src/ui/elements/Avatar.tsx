@@ -32,8 +32,10 @@ export const Avatar = (props: AvatarProps) => {
   const [error, setError] = React.useState(false);
 
   const ImgOrFallback =
-    initials && (!imageUrl || error) ? (
-      <InitialsAvatarFallback initials={initials} />
+    !imageUrl || error ? (
+      initials ? (
+        <InitialsAvatarFallback initials={initials} />
+      ) : null
     ) : (
       <Image
         elementDescriptor={[imageElementDescriptor, descriptors.avatarImage]}
