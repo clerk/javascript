@@ -277,8 +277,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name:
-          [
+        test-name: [
             'generic',
             'express',
             'quickstart',
@@ -334,8 +333,16 @@ jobs:
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          AFFECTED=0
-          (pnpm turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          # Use turbo's built-in --affected flag to detect changes
+          # This automatically uses GITHUB_BASE_REF in GitHub Actions
+          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>&1 | grep -c '"package"' || echo "0")
+
+          if [ "$TASK_COUNT" -gt 0 ]; then
+            AFFECTED=1
+          else
+            AFFECTED=0
+          fi
+
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
