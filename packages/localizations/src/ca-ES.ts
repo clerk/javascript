@@ -122,7 +122,6 @@ export const caES: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -137,6 +136,7 @@ export const caES: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const caES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Contrasenya',
   formFieldInputPlaceholder__phoneNumber: 'Número de telèfon',
   formFieldInputPlaceholder__username: "Nom d'usuari",
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -639,6 +640,10 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codi de restabliment de contrasenya',
       resendButton: 'No has rebut el codi? Reenvia',
@@ -759,6 +764,10 @@ export const caES: LocalizationResource = {
         subtitleNewTab: 'Torna a la pestanya anterior per continuar',
         title: 'Correu electrònic verificat amb èxit',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {

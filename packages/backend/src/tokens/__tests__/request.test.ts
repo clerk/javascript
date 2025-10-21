@@ -810,6 +810,32 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeNull();
   });
 
+  test('cookieToken: primary responds to syncing takes precedence over dev-browser-sync in multi-domain flow', async () => {
+    const sp = new URLSearchParams();
+    sp.set('__clerk_redirect_url', 'http://localhost:3001/dashboard');
+    sp.set('__clerk_db_jwt', mockJwt);
+    const requestUrl = `http://localhost:3000/sign-in?${sp.toString()}`;
+    const requestState = await authenticateRequest(
+      mockRequestWithCookies(
+        { ...defaultHeaders, 'sec-fetch-dest': 'document' },
+        { __client_uat: '12345', __session: mockJwt, __clerk_db_jwt: mockJwt },
+        requestUrl,
+      ),
+      mockOptions({ secretKey: 'sk_test_deadbeef', isSatellite: false }),
+    );
+
+    expect(requestState).toMatchHandshake({
+      reason: AuthErrorReason.PrimaryRespondsToSyncing,
+    });
+    expect(requestState.message).toBe('');
+    expect(requestState.toAuth()).toBeNull();
+
+    const location = requestState.headers.get('location');
+    expect(location).toBeTruthy();
+    expect(location).toContain('localhost:3001/dashboard');
+    expect(location).toContain('__clerk_synced=true');
+  });
+
   test('cookieToken: returns signed out when no cookieToken and no clientUat in production [4y]', async () => {
     const requestState = await authenticateRequest(
       mockRequestWithCookies(),

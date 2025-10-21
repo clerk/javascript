@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.28.2
+
+### Patch Changes
+
+- Bug fix for billing hooks that would sometimes fire requests while the user was signed out. ([#6992](https://github.com/clerk/javascript/pull/6992)) by [@panteliselef](https://github.com/panteliselef)
+
+  Improves the `usePlan` hook has been updated to not fire requests when switching organizations or when users sign in/out.
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764)]:
+  - @clerk/types@4.95.0
+
 ## 3.28.1
 
 ### Patch Changes

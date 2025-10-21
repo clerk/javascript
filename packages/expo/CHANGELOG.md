@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.17.0
+
+### Minor Changes
+
+- Make UserAvatar available to Expo Web ([#7007](https://github.com/clerk/javascript/pull/7007)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`6503405`](https://github.com/clerk/javascript/commit/65034057f7498102df107c16017225304a498ac6), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035), [`fed1d94`](https://github.com/clerk/javascript/commit/fed1d946cee4fb519d099e636b43287b16c3851e)]:
+  - @clerk/clerk-js@5.102.0
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+  - @clerk/clerk-react@5.53.2
+
 ## 2.16.4
 
 ### Patch Changes
