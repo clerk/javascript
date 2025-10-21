@@ -1,10 +1,15 @@
+import type { FakeUser } from '@clerk/testing/playwright';
 import { test } from '@playwright/test';
 
+import type { Application } from '../models/application';
 import { appConfigs } from '../presets';
-import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
+/**
+ * Tests for single-session mode behavior using the withBilling environment
+ * which is configured for single-session mode in the Clerk Dashboard.
+ */
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })(
   'sign in with active session in single-session mode @generic @nextjs',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
@@ -69,7 +74,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.expect.toBeSignedIn();
       await u.page.waitForAppUrl('/');
-      await u.page.signOut();
     });
   },
 );

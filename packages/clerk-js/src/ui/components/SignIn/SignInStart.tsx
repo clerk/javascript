@@ -189,6 +189,17 @@ function SignInStartInternal(): JSX.Element {
       return;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const isAddingAccount = urlParams.has('__clerk_add_account');
+
+    if (isAddingAccount) {
+      urlParams.delete('__clerk_add_account');
+      const newSearch = urlParams.toString();
+      const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
+      window.history.replaceState({}, '', newUrl);
+      return;
+    }
+
     const hasActiveSessions = (clerk.client?.signedInSessions?.length ?? 0) > 0;
     const isMultiSessionMode = !authConfig.singleSessionMode;
 

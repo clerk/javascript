@@ -99,7 +99,9 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   };
 
   const handleAddAccountClicked = () => {
-    windowNavigate(opts.signInUrl || window.location.href);
+    const url = new URL(opts.signInUrl || window.location.href, window.location.origin);
+    url.searchParams.set('__clerk_add_account', '1');
+    windowNavigate(url.toString());
     return sleep(2000);
   };
 

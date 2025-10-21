@@ -63,5 +63,33 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await u.page.waitForSelector('text=/email address|username|phone/i');
       await u.page.waitForURL(/sign-in$/);
     });
+
+    test('clicking "Add account" from /choose shows sign-in form without redirecting back', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.expect.toBeSignedIn();
+
+      await u.po.signIn.goTo();
+      await u.page.waitForURL(/sign-in\/choose/);
+
+      await u.page.getByText('Add account').click();
+      await u.page.waitForURL(/sign-in$/);
+      await u.po.signIn.waitForMounted();
+      await u.page.waitForSelector('text=/email address|username|phone/i');
+
+      await u.page.waitForTimeout(500);
+      const currentUrl = u.page.url();
+      await u.page.waitForTimeout(500);
+      const urlAfterWait = u.page.url();
+
+      if (currentUrl !== urlAfterWait) {
+        throw new Error(`URL changed from ${currentUrl} to ${urlAfterWait}, indicating a redirect loop`);
+      }
+    });
   },
 );

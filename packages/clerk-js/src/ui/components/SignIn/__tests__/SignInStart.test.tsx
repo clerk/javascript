@@ -679,7 +679,6 @@ describe('SignInStart', () => {
           });
         });
 
-        // Mock active session in single-session mode using spyOn
         vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
           {
             id: 'sess_123',
