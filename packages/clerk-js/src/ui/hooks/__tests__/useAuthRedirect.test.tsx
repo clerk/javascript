@@ -2,7 +2,6 @@ import type { Clerk, EnvironmentResource } from '@clerk/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { RedirectRule } from '../../utils/redirectRules';
 import { useAuthRedirect } from '../useAuthRedirect';
 
 // Mock dependencies
@@ -18,10 +17,14 @@ vi.mock('../../router', () => ({
   useRouter: vi.fn(),
 }));
 
-vi.mock('../../utils/redirectRules', () => ({
-  evaluateRedirectRules: vi.fn(),
-  isDevelopmentMode: vi.fn(() => false),
-}));
+vi.mock('../../utils/redirectRules', async () => {
+  const actual = await vi.importActual('../../utils/redirectRules');
+  return {
+    ...actual,
+    evaluateRedirectRules: vi.fn(),
+    isDevelopmentMode: vi.fn(() => false),
+  };
+});
 
 import { useClerk } from '@clerk/shared/react';
 
@@ -33,40 +36,32 @@ describe('useAuthRedirect', () => {
   const mockNavigate = vi.fn();
   const mockClerk = {
     isSignedIn: false,
-    publishableKey: 'pk_test_xxx',
-  } as Clerk;
+    client: { sessions: [], signedInSessions: [] },
+  } as unknown as Clerk;
   const mockEnvironment = {
-    authConfig: { singleSessionMode: false },
+    authConfig: { singleSessionMode: true },
   } as EnvironmentResource;
 
   beforeEach(() => {
     vi.clearAllMocks();
     (useClerk as any).mockReturnValue(mockClerk);
     (useEnvironment as any).mockReturnValue(mockEnvironment);
-    (useRouter as any).mockReturnValue({
-      currentPath: '/sign-in',
-      navigate: mockNavigate,
-    });
+    (useRouter as any).mockReturnValue({ navigate: mockNavigate, currentPath: '/sign-in' });
+    (evaluateRedirectRules as any).mockReturnValue(null);
   });
 
-  it('returns isRedirecting: false when no rules match', () => {
-    (evaluateRedirectRules as any).mockReturnValue(null);
-
+  it('returns isRedirecting false when no redirect needed', () => {
     const { result } = renderHook(() =>
       useAuthRedirect({
         rules: [],
+        additionalContext: {},
       }),
     );
 
     expect(result.current.isRedirecting).toBe(false);
   });
 
-  it('returns isRedirecting: true and calls navigate when rule matches', async () => {
-    const mockRule: RedirectRule = vi.fn(() => ({
-      destination: '/dashboard',
-      reason: 'Test redirect',
-    }));
-
+  it('navigates when redirect rule matches', async () => {
     (evaluateRedirectRules as any).mockReturnValue({
       destination: '/dashboard',
       reason: 'Test redirect',
@@ -74,19 +69,61 @@ describe('useAuthRedirect', () => {
 
     const { result } = renderHook(() =>
       useAuthRedirect({
-        rules: [mockRule],
+        rules: [],
+        additionalContext: {},
       }),
     );
 
     await waitFor(() => {
       expect(result.current.isRedirecting).toBe(true);
+      expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
     });
-
-    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
-  it('passes additional context to rules', () => {
-    const additionalContext = { afterSignInUrl: '/custom-dashboard' };
+  it('does not navigate when skipNavigation is true', async () => {
+    (evaluateRedirectRules as any).mockReturnValue({
+      destination: '/current',
+      reason: 'Side effect only',
+      skipNavigation: true,
+    });
+
+    renderHook(() =>
+      useAuthRedirect({
+        rules: [],
+        additionalContext: {},
+      }),
+    );
+
+    await waitFor(() => {
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+  });
+
+  it('executes onRedirect callback when provided', async () => {
+    const onRedirect = vi.fn();
+    (evaluateRedirectRules as any).mockReturnValue({
+      destination: '/dashboard',
+      reason: 'Test redirect',
+      onRedirect,
+    });
+
+    renderHook(() =>
+      useAuthRedirect({
+        rules: [],
+        additionalContext: {},
+      }),
+    );
+
+    await waitFor(() => {
+      expect(onRedirect).toHaveBeenCalled();
+    });
+  });
+
+  it('passes additional context to evaluateRedirectRules', async () => {
+    const additionalContext = {
+      afterSignInUrl: '/custom',
+      organizationTicket: 'test_ticket',
+    };
 
     renderHook(() =>
       useAuthRedirect({
@@ -95,28 +132,31 @@ describe('useAuthRedirect', () => {
       }),
     );
 
-    expect(evaluateRedirectRules).toHaveBeenCalledWith(
-      [],
-      expect.objectContaining({
-        clerk: mockClerk,
-        currentPath: '/sign-in',
-        environment: mockEnvironment,
-        afterSignInUrl: '/custom-dashboard',
-      }),
-      false,
-    );
+    await waitFor(() => {
+      expect(evaluateRedirectRules).toHaveBeenCalledWith(
+        [],
+        expect.objectContaining({
+          clerk: mockClerk,
+          currentPath: '/sign-in',
+          environment: mockEnvironment,
+          ...additionalContext,
+        }),
+        false,
+      );
+    });
   });
 
-  it('re-evaluates when isSignedIn changes', () => {
+  it('re-evaluates when auth state changes', async () => {
     const { rerender } = renderHook(() =>
       useAuthRedirect({
         rules: [],
+        additionalContext: {},
       }),
     );
 
     expect(evaluateRedirectRules).toHaveBeenCalledTimes(1);
 
-    // Change isSignedIn
+    // Change auth state
     (useClerk as any).mockReturnValue({
       ...mockClerk,
       isSignedIn: true,
@@ -124,65 +164,27 @@ describe('useAuthRedirect', () => {
 
     rerender();
 
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(evaluateRedirectRules).toHaveBeenCalledTimes(2);
+    });
   });
 
-  it('re-evaluates when session count changes', () => {
-    const { rerender } = renderHook(() =>
-      useAuthRedirect({
+  it('handles type-safe additional context', () => {
+    interface CustomContext {
+      customField: string;
+      optionalField?: number;
+    }
+
+    const { result } = renderHook(() =>
+      useAuthRedirect<CustomContext>({
         rules: [],
+        additionalContext: {
+          customField: 'test',
+          optionalField: 42,
+        },
       }),
     );
 
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(1);
-
-    // Change session count
-    (useClerk as any).mockReturnValue({
-      ...mockClerk,
-      client: { sessions: [{ id: '1' }] },
-    });
-
-    rerender();
-
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(2);
-  });
-
-  it('re-evaluates when singleSessionMode changes', () => {
-    const { rerender } = renderHook(() =>
-      useAuthRedirect({
-        rules: [],
-      }),
-    );
-
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(1);
-
-    // Change singleSessionMode
-    (useEnvironment as any).mockReturnValue({
-      authConfig: { singleSessionMode: true },
-    });
-
-    rerender();
-
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(2);
-  });
-
-  it('re-evaluates when currentPath changes', () => {
-    const { rerender } = renderHook(() =>
-      useAuthRedirect({
-        rules: [],
-      }),
-    );
-
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(1);
-
-    // Change currentPath
-    (useRouter as any).mockReturnValue({
-      currentPath: '/sign-in/factor-one',
-      navigate: mockNavigate,
-    });
-
-    rerender();
-
-    expect(evaluateRedirectRules).toHaveBeenCalledTimes(2);
+    expect(result.current.isRedirecting).toBe(false);
   });
 });

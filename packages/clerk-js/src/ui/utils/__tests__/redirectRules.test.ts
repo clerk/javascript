@@ -2,70 +2,135 @@ import type { Clerk, EnvironmentResource } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
 import type { RedirectContext } from '../redirectRules';
-import { evaluateRedirectRules, signInRedirectRules } from '../redirectRules';
+import { evaluateRedirectRules, signInRedirectRules, StopRedirectEvaluation } from '../redirectRules';
 
 describe('evaluateRedirectRules', () => {
   it('returns null when no rules match', () => {
     const context: RedirectContext = {
       clerk: { isSignedIn: false } as Clerk,
       currentPath: '/sign-in',
-      environment: { authConfig: { singleSessionMode: false } } as EnvironmentResource,
+      environment: {
+        authConfig: { singleSessionMode: true },
+      } as EnvironmentResource,
     };
 
     const result = evaluateRedirectRules([], context);
     expect(result).toBeNull();
   });
 
-  it('returns first matching rule result', () => {
+  it('returns the first matching rule', () => {
     const rules = [
       () => null,
-      () => ({ destination: '/page2', reason: 'Rule 2' }),
-      () => ({ destination: '/page3', reason: 'Rule 3' }),
+      () => ({ destination: '/first', reason: 'First rule' }),
+      () => ({ destination: '/second', reason: 'Second rule' }),
     ];
 
     const context: RedirectContext = {
       clerk: {} as Clerk,
-      currentPath: '/test',
+      currentPath: '/sign-in',
       environment: {} as EnvironmentResource,
     };
 
     const result = evaluateRedirectRules(rules, context);
-    expect(result).toEqual({ destination: '/page2', reason: 'Rule 2' });
+    expect(result).toEqual({ destination: '/first', reason: 'First rule' });
   });
 
-  it('evaluates all rules until a match is found', () => {
-    const rules = [() => null, () => null, () => ({ destination: '/match', reason: 'Found' })];
+  it('handles StopRedirectEvaluation exception and returns null', () => {
+    const rules = [
+      () => {
+        throw new StopRedirectEvaluation('Guard triggered');
+      },
+      () => ({ destination: '/should-not-reach', reason: 'Should not execute' }),
+    ];
 
     const context: RedirectContext = {
       clerk: {} as Clerk,
-      currentPath: '/test',
+      currentPath: '/sign-in',
       environment: {} as EnvironmentResource,
     };
 
     const result = evaluateRedirectRules(rules, context);
-    expect(result).toEqual({ destination: '/match', reason: 'Found' });
+    expect(result).toBeNull();
+  });
+
+  it('re-throws unexpected errors', () => {
+    const rules = [
+      () => {
+        throw new Error('Unexpected error');
+      },
+    ];
+
+    const context: RedirectContext = {
+      clerk: {} as Clerk,
+      currentPath: '/sign-in',
+      environment: {} as EnvironmentResource,
+    };
+
+    expect(() => evaluateRedirectRules(rules, context)).toThrow('Unexpected error');
   });
 });
 
 describe('signInRedirectRules', () => {
-  describe('single session mode redirect', () => {
-    it('redirects to afterSignInUrl when already signed in', () => {
+  describe('organization ticket guard', () => {
+    it('stops evaluation when organization ticket is present', () => {
       const context: RedirectContext = {
         clerk: {
-          buildAfterSignInUrl: () => '/default-dashboard',
+          buildAfterSignInUrl: () => '/dashboard',
           isSignedIn: true,
         } as Clerk,
         currentPath: '/sign-in',
         environment: {
           authConfig: { singleSessionMode: true },
         } as EnvironmentResource,
-        afterSignInUrl: '/custom-dashboard',
+        organizationTicket: 'test_ticket',
+        afterSignInUrl: '/custom',
+      };
+
+      const result = evaluateRedirectRules(signInRedirectRules, context);
+      // Should return null because guard stops evaluation
+      expect(result).toBeNull();
+    });
+
+    it('continues evaluation when no organization ticket', () => {
+      const context: RedirectContext = {
+        clerk: {
+          buildAfterSignInUrl: () => '/dashboard',
+          isSignedIn: true,
+        } as Clerk,
+        currentPath: '/sign-in',
+        environment: {
+          authConfig: { singleSessionMode: true },
+        } as EnvironmentResource,
+        afterSignInUrl: '/custom',
+      };
+
+      const result = evaluateRedirectRules(signInRedirectRules, context);
+      // Should match single session rule
+      expect(result).toEqual({
+        destination: '/custom',
+        reason: 'User already signed in (single session mode)',
+      });
+    });
+  });
+
+  describe('single session mode redirect', () => {
+    it('redirects to afterSignInUrl when already signed in', () => {
+      const context: RedirectContext = {
+        clerk: {
+          buildAfterSignInUrl: () => '/default',
+          isSignedIn: true,
+        } as Clerk,
+        currentPath: '/sign-in',
+        environment: {
+          authConfig: { singleSessionMode: true },
+        } as EnvironmentResource,
+        afterSignInUrl: '/dashboard',
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
 
       expect(result).toEqual({
-        destination: '/custom-dashboard',
+        destination: '/dashboard',
         reason: 'User already signed in (single session mode)',
       });
     });
@@ -73,7 +138,7 @@ describe('signInRedirectRules', () => {
     it('uses clerk.buildAfterSignInUrl when afterSignInUrl not provided', () => {
       const context: RedirectContext = {
         clerk: {
-          buildAfterSignInUrl: () => '/default-dashboard',
+          buildAfterSignInUrl: () => '/default',
           isSignedIn: true,
         } as Clerk,
         currentPath: '/sign-in',
@@ -85,7 +150,7 @@ describe('signInRedirectRules', () => {
       const result = evaluateRedirectRules(signInRedirectRules, context);
 
       expect(result).toEqual({
-        destination: '/default-dashboard',
+        destination: '/default',
         reason: 'User already signed in (single session mode)',
       });
     });
@@ -93,7 +158,7 @@ describe('signInRedirectRules', () => {
     it('does not redirect when not signed in', () => {
       const context: RedirectContext = {
         clerk: {
-          buildAfterSignInUrl: () => '/dashboard',
+          buildAfterSignInUrl: () => '/default',
           isSignedIn: false,
         } as Clerk,
         currentPath: '/sign-in',
@@ -109,9 +174,10 @@ describe('signInRedirectRules', () => {
     it('does not redirect in multi-session mode', () => {
       const context: RedirectContext = {
         clerk: {
-          buildAfterSignInUrl: () => '/dashboard',
+          buildAfterSignInUrl: () => '/default',
           isSignedIn: true,
-        } as Clerk,
+          client: { signedInSessions: [] },
+        } as any,
         currentPath: '/sign-in',
         environment: {
           authConfig: { singleSessionMode: false },
@@ -119,6 +185,7 @@ describe('signInRedirectRules', () => {
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
+      // Should not match single session rule, should evaluate other rules
       expect(result).not.toEqual(expect.objectContaining({ reason: 'User already signed in (single session mode)' }));
     });
   });
@@ -193,23 +260,28 @@ describe('signInRedirectRules', () => {
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
+        hasInitialized: false,
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
       expect(result).toBeNull();
     });
+  });
 
-    it('does not redirect in single-session mode', () => {
+  describe('rule priority', () => {
+    it('single session mode takes precedence over multi-session when both conditions met', () => {
       const context: RedirectContext = {
         clerk: {
           buildAfterSignInUrl: () => '/dashboard',
-          client: { sessions: [{ id: '1' }] },
+          client: { sessions: [{ id: '1' }], signedInSessions: [{ id: '1' }] },
           isSignedIn: true,
         } as any,
         currentPath: '/sign-in',
         environment: {
           authConfig: { singleSessionMode: true },
         } as EnvironmentResource,
+        hasInitialized: false,
+        afterSignInUrl: '/custom',
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);

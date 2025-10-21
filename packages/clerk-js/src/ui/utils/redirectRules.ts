@@ -21,29 +21,65 @@ export interface RedirectResult {
 export type RedirectRule = (context: RedirectContext) => RedirectResult | null;
 
 /**
- * Evaluates redirect rules in order, returning the first match
+ * Thrown by rules to stop evaluation without redirecting.
+ * Used for guard conditions that prevent redirects.
+ */
+export class StopRedirectEvaluation extends Error {
+  constructor(public readonly reason: string) {
+    super(reason);
+    this.name = 'StopRedirectEvaluation';
+  }
+}
+
+/**
+ * Evaluates redirect rules in order, returning the first match.
+ * Rules can throw StopRedirectEvaluation to short-circuit without redirecting.
+ *
+ * @param rules - Array of redirect rules to evaluate
+ * @param context - Context containing clerk instance, path, environment, etc.
+ * @param debug - Whether to log debug information (default: false)
+ * @returns The first matching redirect result, or null if no rules match
  */
 export function evaluateRedirectRules(
   rules: RedirectRule[],
   context: RedirectContext,
   debug = false,
 ): RedirectResult | null {
-  for (const rule of rules) {
-    const result = rule(context);
-    if (result) {
-      if (debug) {
-        console.info('[Clerk Redirect]', result.reason, '→', result.destination);
+  try {
+    for (const rule of rules) {
+      const result = rule(context);
+      if (result) {
+        if (debug && isDevelopmentFromPublishableKey(context.clerk.publishableKey)) {
+          console.info('[Clerk Redirect]', result.reason, '→', result.destination);
+        }
+        return result;
       }
-      return result;
     }
+    return null;
+  } catch (error) {
+    if (error instanceof StopRedirectEvaluation) {
+      if (debug && isDevelopmentFromPublishableKey(context.clerk.publishableKey)) {
+        console.info('[Clerk Redirect]', 'Evaluation stopped:', error.reason);
+      }
+      return null;
+    }
+    // Re-throw unexpected errors
+    throw error;
   }
-  return null;
 }
 
 /**
  * Redirect rules for SignIn component
  */
 export const signInRedirectRules: RedirectRule[] = [
+  // Guard: Organization ticket flow is handled separately in component
+  ctx => {
+    if (ctx.organizationTicket) {
+      throw new StopRedirectEvaluation('Organization ticket flow is handled separately');
+    }
+    return null;
+  },
+
   // Rule 1: Single session mode - user already signed in
   ctx => {
     if (ctx.clerk.isSignedIn && ctx.environment.authConfig.singleSessionMode) {
@@ -76,15 +112,7 @@ export const signInRedirectRules: RedirectRule[] = [
     return null;
   },
 
-  // Rule 3: Skip redirect if handling organization ticket
-  ctx => {
-    if (ctx.organizationTicket) {
-      return null;
-    }
-    return null;
-  },
-
-  // Rule 4: Multi-session mode - redirect to account switcher with active sessions
+  // Rule 3: Multi-session mode - redirect to account switcher with active sessions
   ctx => {
     // Only apply on first initialization to prevent redirect loops
     if (ctx.hasInitialized) {
