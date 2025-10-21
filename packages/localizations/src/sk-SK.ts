@@ -68,8 +68,8 @@ export const skSK: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const skSK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const skSK: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadajte heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadajte telefónne číslo',
   formFieldInputPlaceholder__username: 'Zadajte užívateľské meno',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const skSK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const skSK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -640,6 +641,10 @@ export const skSK: LocalizationResource = {
         titleNewTab: 'Prihlásené v inom okne',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Overovací kód pre obnovenie hesla',
       resendButton: 'Znovu poslať kód',
@@ -760,6 +765,10 @@ export const skSK: LocalizationResource = {
         subtitleNewTab: 'Vráťte sa do predchádzajúceho okna pre pokračovanie',
         title: 'Email úspešne overený',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -970,7 +979,7 @@ export const skSK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -979,7 +988,7 @@ export const skSK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

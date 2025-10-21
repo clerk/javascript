@@ -5,6 +5,7 @@ import type {
   BillingCheckoutResource,
   BillingCheckoutTotals,
   BillingPayerResource,
+  BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
 } from '@clerk/types';
@@ -12,14 +13,15 @@ import type {
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
+import { Billing } from '../modules/billing/namespace';
 import { BillingPayer } from './BillingPayer';
-import { BaseResource, BillingPaymentSource, BillingPlan } from './internal';
+import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
 export class BillingCheckout extends BaseResource implements BillingCheckoutResource {
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
-  paymentSource?: BillingPaymentSource;
+  paymentMethod?: BillingPaymentMethodResource;
   plan!: BillingPlan;
   planPeriod!: BillingSubscriptionPlanPeriod;
   planPeriodStart!: number | undefined;
@@ -42,7 +44,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.paymentSource = data.payment_source ? new BillingPaymentSource(data.payment_source) : undefined;
+    this.paymentMethod = data.payment_method ? new BillingPaymentMethod(data.payment_method) : undefined;
     this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.planPeriodStart = data.plan_period_start;
@@ -61,9 +63,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     return retry(
       () =>
         this._basePatch({
-          path: this.payer.organizationId
-            ? `/organizations/${this.payer.organizationId}/commerce/checkouts/${this.id}/confirm`
-            : `/me/commerce/checkouts/${this.id}/confirm`,
+          path: Billing.path(`/checkouts/${this.id}/confirm`, { orgId: this.payer.organizationId }),
           body: params as any,
         }),
       {

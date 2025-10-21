@@ -69,8 +69,8 @@ export const csCZ: LocalizationResource = {
   badge__upcomingPlan: 'Nadcházející',
   badge__userDevice: 'Zařízení uživatele',
   badge__you: 'Vy',
-  commerce: {
-    addPaymentMethod: 'Přidat platební metodu',
+  billing: {
+    addPaymentMethod__label: 'Přidat platební metodu',
     alwaysFree: 'Vždy zdarma',
     annually: 'Ročně',
     availableFeatures: 'Dostupné funkce',
@@ -125,8 +125,7 @@ export const csCZ: LocalizationResource = {
     monthly: 'Měsíčně',
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
-    paymentMethods: 'Platební metody',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Roční platba',
         monthly: 'Měsíční platba',
@@ -140,6 +139,7 @@ export const csCZ: LocalizationResource = {
         testCardInfo: 'Informace o testovací kartě',
       },
     },
+    paymentMethods__label: 'Platební metody',
     popular: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
@@ -224,6 +224,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -287,7 +288,7 @@ export const csCZ: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Stav',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Nastavit jako výchozí',
         actionLabel__remove: 'Odebrat',
         add: 'Přidat novou platební metodu',
@@ -296,11 +297,11 @@ export const csCZ: LocalizationResource = {
         formButtonPrimary__add: 'Přidat platební metodu',
         formButtonPrimary__pay: 'Zaplatit {{amount}}',
         payWithTestCardButton: 'Zaplatit testovací kartou',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
@@ -646,6 +647,10 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -767,6 +772,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na předchozí kartu pro pokračování',
         title: 'E-mail úspěšně ověřen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -974,7 +983,7 @@ export const csCZ: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Stav',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Nastavit jako výchozí',
         actionLabel__remove: 'Odebrat',
         add: 'Přidat novou platební metodu',
@@ -983,11 +992,11 @@ export const csCZ: LocalizationResource = {
         formButtonPrimary__add: 'Přidat platební metodu',
         formButtonPrimary__pay: 'Zaplatit {{amount}}',
         payWithTestCardButton: 'Zaplatit testovací kartou',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',

@@ -1,5 +1,69 @@
 # Change Log
 
+## 3.28.2
+
+### Patch Changes
+
+- Bug fix for billing hooks that would sometimes fire requests while the user was signed out. ([#6992](https://github.com/clerk/javascript/pull/6992)) by [@panteliselef](https://github.com/panteliselef)
+
+  Improves the `usePlan` hook has been updated to not fire requests when switching organizations or when users sign in/out.
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764)]:
+  - @clerk/types@4.95.0
+
+## 3.28.1
+
+### Patch Changes
+
+- Rename static properties from 'name' to 'kind' in ClerkError class ([#7004](https://github.com/clerk/javascript/pull/7004)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 3.28.0
+
+### Minor Changes
+
+- Internal refactor of error handling to improve type safety and error classification. ([#6985](https://github.com/clerk/javascript/pull/6985)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Introduce new `ClerkError` base class for all Clerk errors
+  - Rename internal error files: `apiResponseError.ts` → `clerkApiResponseError.ts`, `runtimeError.ts` → `clerkRuntimeError.ts`
+  - Add `ClerkAPIError` class for individual API errors with improved type safety
+  - Add type guard utilities (`isClerkError`, `isClerkRuntimeError`, `isClerkApiResponseError`) for better error handling
+  - Deprecate `clerkRuntimeError` property in favor of `clerkError` for consistency
+  - Add support for error codes, long messages, and documentation URLs
+
+### Patch Changes
+
+- Fixed JWT public key caching in `verifyToken()` to support multi-instance scenarios. Public keys are now correctly cached per `kid` from the token header instead of using a single shared cache key. ([#6993](https://github.com/clerk/javascript/pull/6993)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  **What was broken:**
+
+  When verifying JWT tokens with the `jwtKey` option (PEM public key), all keys were cached under the same cache key. This caused verification failures in multi-instance scenarios.
+
+  **What's fixed:**
+
+  JWT public keys are now cached using the `kid` value from each token's header.
+
+- Updated dependencies [[`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2)]:
+  - @clerk/types@4.94.0
+
+## 3.27.4
+
+### Patch Changes
+
+- [Billing Beta] Rename payment source to payment method. ([#6865](https://github.com/clerk/javascript/pull/6865)) by [@panteliselef](https://github.com/panteliselef)
+
+  `Clerk.user.initializePaymentSource()` -> `Clerk.user.initializePaymentMethod()`
+  `Clerk.user.addPaymentSource()` -> `Clerk.user.addPaymentMethod()`
+  `Clerk.user.getPaymentSources()` -> `Clerk.user.getPaymentMethods()`
+
+  `Clerk.organization.initializePaymentSource()` -> `Clerk.organization.initializePaymentMethod()`
+  `Clerk.organization.addPaymentSource()` -> `Clerk.organization.addPaymentMethod()`
+  `Clerk.organization.getPaymentSources()` -> `Clerk.organization.getPaymentMethods()`
+
+- Introduce deprecation warning for LocalStorageBroadcastChannel ([#6891](https://github.com/clerk/javascript/pull/6891)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342)]:
+  - @clerk/types@4.93.0
+
 ## 3.27.3
 
 ### Patch Changes

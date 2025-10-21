@@ -68,8 +68,8 @@ export const isIS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Notendatæki',
   badge__you: 'Þú',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const isIS: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const isIS: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const isIS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const isIS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const isIS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -640,6 +641,10 @@ export const isIS: LocalizationResource = {
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Endurstilla lykilorð kóða',
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
@@ -761,6 +766,10 @@ export const isIS: LocalizationResource = {
         subtitleNewTab: 'Farðu aftur í fyrri flipann til að halda áfram',
         title: 'Tókst að staðfesta netfang',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -967,7 +976,7 @@ export const isIS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -976,7 +985,7 @@ export const isIS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

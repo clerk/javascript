@@ -16,6 +16,8 @@ import type {
   PrepareWeb3WalletVerificationParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
+  SignUpEnterpriseConnectionJSON,
+  SignUpEnterpriseConnectionResource,
   SignUpField,
   SignUpFutureCreateParams,
   SignUpFutureEmailCodeVerifyParams,
@@ -46,6 +48,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getBrowserLocale,
   getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
@@ -95,6 +98,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   createdUserId: string | null = null;
   abandonAt: number | null = null;
   legalAcceptedAt: number | null = null;
+  locale: string | null = null;
 
   /**
    * The current status of the sign-up process.
@@ -153,6 +157,14 @@ export class SignUp extends BaseResource implements SignUpResource {
     debugLogger.debug('SignUp.create', { id: this.id, strategy: params.strategy });
 
     let finalParams = { ...params };
+
+    // Inject browser locale if not already provided
+    if (!finalParams.locale) {
+      const browserLocale = getBrowserLocale();
+      if (browserLocale) {
+        finalParams.locale = browserLocale;
+      }
+    }
 
     if (!__BUILD_DISABLE_RHC__ && !this.clientBypass() && !this.shouldBypassCaptchaForAttempt(params)) {
       const captchaChallenge = new CaptchaChallenge(SignUp.clerk);
@@ -375,6 +387,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       emailAddress,
       legalAccepted,
       oidcPrompt,
+      enterpriseConnectionId,
     } = params;
 
     const redirectUrlWithAuthToken = SignUp.clerk.buildUrlWithAuth(redirectUrl);
@@ -388,6 +401,7 @@ export class SignUp extends BaseResource implements SignUpResource {
         emailAddress,
         legalAccepted,
         oidcPrompt,
+        enterpriseConnectionId,
       };
       return continueSignUp && this.id ? this.update(authParams) : this.create(authParams);
     };
@@ -477,6 +491,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       this.abandonAt = data.abandon_at;
       this.web3wallet = data.web3_wallet;
       this.legalAcceptedAt = data.legal_accepted_at;
+      this.locale = data.locale;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -505,6 +520,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       abandon_at: this.abandonAt,
       web3_wallet: this.web3wallet,
       legal_accepted_at: this.legalAcceptedAt,
+      locale: this.locale,
       external_account: this.externalAccount,
       external_account_strategy: this.externalAccount?.strategy,
     };
@@ -539,6 +555,17 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     return false;
   }
+
+  __experimental_getEnterpriseConnections = (): Promise<SignUpEnterpriseConnectionResource[]> => {
+    return BaseResource._fetch({
+      path: `/client/sign_ups/${this.id}/enterprise_connections`,
+      method: 'GET',
+    }).then(res => {
+      const enterpriseConnections = res?.response as unknown as SignUpEnterpriseConnectionJSON[];
+
+      return enterpriseConnections.map(enterpriseConnection => new SignUpEnterpriseConnection(enterpriseConnection));
+    });
+  };
 }
 
 class SignUpFuture implements SignUpFutureResource {
@@ -620,6 +647,10 @@ class SignUpFuture implements SignUpFutureResource {
     return this.resource.legalAcceptedAt;
   }
 
+  get locale() {
+    return this.resource.locale;
+  }
+
   get unverifiedFields() {
     return this.resource.unverifiedFields;
   }
@@ -670,6 +701,7 @@ class SignUpFuture implements SignUpFutureResource {
       captchaError,
       ...params,
       unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
+      locale: params.locale ?? getBrowserLocale(),
     };
 
     await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
@@ -870,5 +902,24 @@ class SignUpFuture implements SignUpFutureResource {
 
       await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
+  }
+}
+
+class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpriseConnectionResource {
+  id!: string;
+  name!: string;
+
+  constructor(data: SignUpEnterpriseConnectionJSON) {
+    super();
+    this.fromJSON(data);
+  }
+
+  protected fromJSON(data: SignUpEnterpriseConnectionJSON | null): this {
+    if (data) {
+      this.id = data.id;
+      this.name = data.name;
+    }
+
+    return this;
   }
 }

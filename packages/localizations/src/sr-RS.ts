@@ -68,8 +68,8 @@ export const srRS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const srRS: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const srRS: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const srRS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -282,7 +283,7 @@ export const srRS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +292,7 @@ export const srRS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -637,6 +638,10 @@ export const srRS: LocalizationResource = {
         titleNewTab: 'Prijavljen na drugom tabu',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod za resetovanje lozinke',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
@@ -757,6 +762,10 @@ export const srRS: LocalizationResource = {
         subtitleNewTab: 'Vrati se na prethodni tab da nastaviš',
         title: 'Uspešno verifikovan e-mail',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -963,7 +972,7 @@ export const srRS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +981,7 @@ export const srRS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

@@ -69,8 +69,8 @@ export const roRO: LocalizationResource = {
   badge__upcomingPlan: 'Urmează',
   badge__userDevice: 'Dispozitiv utilizator',
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: 'Adaugă metodă de plată',
+  billing: {
+    addPaymentMethod__label: 'Adaugă metodă de plată',
     alwaysFree: 'Întotdeauna gratuit',
     annually: 'Anual',
     availableFeatures: 'Funcții disponibile',
@@ -127,8 +127,7 @@ export const roRO: LocalizationResource = {
     monthly: 'Lunar',
     pastDue: 'Restanță',
     pay: 'Plătește {{amount}}',
-    paymentMethods: 'Metode de plată',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Plată anuală',
         monthly: 'Plată lunară',
@@ -142,6 +141,7 @@ export const roRO: LocalizationResource = {
         testCardInfo: 'Informații card de test',
       },
     },
+    paymentMethods__label: 'Metode de plată',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
@@ -226,6 +226,7 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Introdu parola',
   formFieldInputPlaceholder__phoneNumber: 'Introdu numărul de telefon',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Descriere',
   formFieldLabel__apiKeyExpiration: 'Expirare',
   formFieldLabel__apiKeyName: 'Numele cheii secrete',
@@ -289,7 +290,7 @@ export const roRO: LocalizationResource = {
         tableHeader__date: 'Dată',
         tableHeader__status: 'Stare',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Setează ca implicită',
         actionLabel__remove: 'Elimină',
         add: 'Adaugă metodă de plată nouă',
@@ -298,11 +299,11 @@ export const roRO: LocalizationResource = {
         formButtonPrimary__add: 'Adaugă metoda de plată',
         formButtonPrimary__pay: 'Plătește {{amount}}',
         payWithTestCardButton: 'Plătește cu card de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} va fi eliminat(ă) din acest cont.',
           messageLine2:
             'Nu vei mai putea folosi această metodă de plată, iar abonamentele recurente dependente de ea nu vor mai funcționa.',
-          successMessage: '{{paymentSource}} a fost eliminată din contul tău.',
+          successMessage: '{{paymentMethod}} a fost eliminată din contul tău.',
           title: 'Elimină metoda de plată',
         },
         title: 'Metode de plată',
@@ -649,6 +650,10 @@ export const roRO: LocalizationResource = {
         titleNewTab: 'Autentificat în altă filă',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Cod pentru resetarea parolei',
       resendButton: 'Nu ai primit un cod? Retrimite',
@@ -770,6 +775,10 @@ export const roRO: LocalizationResource = {
         subtitleNewTab: 'Revino în fila precedentă pentru a continua',
         title: 'Email verificat cu succes',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -978,7 +987,7 @@ export const roRO: LocalizationResource = {
         tableHeader__date: 'Dată',
         tableHeader__status: 'Stare',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Setează ca implicită',
         actionLabel__remove: 'Elimină',
         add: 'Adaugă metodă de plată nouă',
@@ -987,11 +996,11 @@ export const roRO: LocalizationResource = {
         formButtonPrimary__add: 'Adaugă metoda de plată',
         formButtonPrimary__pay: 'Plătește {{amount}}',
         payWithTestCardButton: 'Plătește cu card de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} va fi eliminat(ă) din acest cont.',
           messageLine2:
             'Nu vei mai putea utiliza această sursă de plată, iar orice abonamente recurente care depind de ea nu vor mai funcționa.',
-          successMessage: '{{paymentSource}} a fost eliminată din contul tău.',
+          successMessage: '{{paymentMethod}} a fost eliminată din contul tău.',
           title: 'Elimină metoda de plată',
         },
         title: 'Metode de plată',

@@ -68,8 +68,8 @@ export const arSA: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'جهاز المستخدم',
   badge__you: 'أنت',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const arSA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const arSA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const arSA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const arSA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -636,6 +637,10 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'رمز تحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
@@ -757,6 +762,10 @@ export const arSA: LocalizationResource = {
         subtitleNewTab: 'ارجع إلى علامة التبويب السابقة للمتابعة',
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -961,7 +970,7 @@ export const arSA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -970,7 +979,7 @@ export const arSA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

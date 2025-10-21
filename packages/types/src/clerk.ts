@@ -1,4 +1,3 @@
-import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -32,6 +31,7 @@ import type {
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
+import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
@@ -1496,6 +1496,7 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the user profile modal will open.
+   * @example __experimental_startPath: '/members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1527,6 +1528,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the organization profile modal will open.
+   * @example __experimental_startPath: '/organization-members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1829,10 +1831,11 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   /**
-   * Whether to show pricing table for organizations.
-   * @default false
+   * The subscriber type to display plans for.
+   * If `organization`, show plans for the active organization; otherwise for the user.
+   * @default 'user'
    */
-  forOrganizations?: boolean;
+  for?: ForPayerType;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

@@ -68,8 +68,8 @@ export const esMX: LocalizationResource = {
   badge__upcomingPlan: 'Próximo plan',
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -122,8 +122,7 @@ export const esMX: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -137,6 +136,7 @@ export const esMX: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -222,6 +222,7 @@ export const esMX: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresa tu contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingresa tu número de teléfono',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -285,7 +286,7 @@ export const esMX: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -294,7 +295,7 @@ export const esMX: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -644,6 +645,10 @@ export const esMX: LocalizationResource = {
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código para restablecer contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -766,6 +771,10 @@ export const esMX: LocalizationResource = {
         subtitleNewTab: 'Regresa a la pestaña anterior para continuar',
         title: 'Correo electrónico verificado con éxito',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -974,7 +983,7 @@ export const esMX: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Predeterminado',
         actionLabel__remove: 'Eliminar',
         add: 'Agregar un nuevo método de pago',
@@ -983,11 +992,11 @@ export const esMX: LocalizationResource = {
         formButtonPrimary__add: 'Agregar Método de Pago',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será eliminado de esta cuenta.',
           messageLine2:
             'No podrás utilizar este método de pago para ninguna suscripción actual y estas ya no funcionarán.',
-          successMessage: '{{paymentSource}} ha sido eliminada de tu cuenta.',
+          successMessage: '{{paymentMethod}} ha sido eliminada de tu cuenta.',
           title: 'Eliminar método de pago',
         },
         title: 'Opciones disponibles',

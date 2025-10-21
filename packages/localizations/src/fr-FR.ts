@@ -69,8 +69,8 @@ export const frFR: LocalizationResource = {
   badge__upcomingPlan: 'À venir',
   badge__userDevice: 'Appareil utilisateur',
   badge__you: 'Vous',
-  commerce: {
-    addPaymentMethod: 'Ajouter une méthode de paiement',
+  billing: {
+    addPaymentMethod__label: 'Ajouter une méthode de paiement',
     alwaysFree: 'Toujours gratuit',
     annually: 'Annuel',
     availableFeatures: 'Fonctionnalités disponibles',
@@ -128,8 +128,7 @@ export const frFR: LocalizationResource = {
     monthly: 'Mensuel',
     pastDue: 'En retard',
     pay: 'Payer {{amount}}',
-    paymentMethods: 'Méthodes de paiement',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Paiement annuel',
         monthly: 'Paiement mensuel',
@@ -143,6 +142,7 @@ export const frFR: LocalizationResource = {
         testCardInfo: 'Informations de carte de test',
       },
     },
+    paymentMethods__label: 'Méthodes de paiement',
     popular: 'Populaire',
     pricingTable: {
       billingCycle: 'Cycle de facturation',
@@ -226,6 +226,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Mot de passe',
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Nom de la clé secrète',
@@ -290,7 +291,7 @@ export const frFR: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Statut',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Rendre par défaut',
         actionLabel__remove: 'Supprimer',
         add: 'Ajouter une nouvelle méthode de paiement',
@@ -299,11 +300,11 @@ export const frFR: LocalizationResource = {
         formButtonPrimary__add: 'Ajouter une méthode de paiement',
         formButtonPrimary__pay: 'Payer {{amount}}',
         payWithTestCardButton: 'Payer avec une carte de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sera supprimé de ce compte.',
           messageLine2:
             'Vous ne pourrez plus utiliser cette méthode de paiement et tous les abonnements récurrents qui en dépendent ne fonctionneront plus.',
-          successMessage: '{{paymentSource}} a été supprimé de votre compte.',
+          successMessage: '{{paymentMethod}} a été supprimé de votre compte.',
           title: 'Supprimer une méthode de paiement',
         },
         title: 'Méthodes de paiement',
@@ -648,6 +649,10 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Code de réinitialisation du mot de passe',
       resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
@@ -769,6 +774,10 @@ export const frFR: LocalizationResource = {
         subtitleNewTab: "Revenir à l'onglet précédent pour continuer",
         title: 'Courriel vérifié avec succès',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -975,7 +984,7 @@ export const frFR: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Statut',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Rendre par défaut',
         actionLabel__remove: 'Supprimer',
         add: 'Ajouter une nouvelle méthode de paiement',
@@ -984,11 +993,11 @@ export const frFR: LocalizationResource = {
         formButtonPrimary__add: 'Ajouter une méthode de paiement',
         formButtonPrimary__pay: 'Payer {{amount}}',
         payWithTestCardButton: 'Payer avec une carte de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sera supprimé de ce compte.',
           messageLine2:
             'Vous ne pourrez plus utiliser cette méthode de paiement et tous les abonnements récurrents qui en dépendent ne fonctionneront plus.',
-          successMessage: '{{paymentSource}} a été supprimé de votre compte.',
+          successMessage: '{{paymentMethod}} a été supprimé de votre compte.',
           title: 'Supprimer une méthode de paiement',
         },
         title: 'Méthodes de paiement',

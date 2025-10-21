@@ -68,8 +68,8 @@ export const mnMN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
   badge__you: 'Чи',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const mnMN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const mnMN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const mnMN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const mnMN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -639,6 +640,10 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
@@ -759,6 +764,10 @@ export const mnMN: LocalizationResource = {
         subtitleNewTab: 'Үргэлжлүүлэхийн тулд өмнөх таб руу буцна уу',
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -964,7 +973,7 @@ export const mnMN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +982,7 @@ export const mnMN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

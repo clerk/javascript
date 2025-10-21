@@ -30,7 +30,6 @@ const makeSub = (overrides: Partial<BillingSubscriptionItemResource>): BillingSu
   planPeriod: 'month',
   status: 'active',
   createdAt: new Date('2021-01-01'),
-  paymentSourceId: 'src_1',
   pastDueAt: null,
   periodStart: new Date('2021-01-01'),
   periodEnd: new Date('2021-01-31'),
@@ -46,25 +45,25 @@ const run = (args: {
   subscription?: BillingSubscriptionItemResource;
   plan?: BillingPlanResource;
   planPeriod?: BillingSubscriptionPlanPeriod;
-  forOrganizations?: boolean;
+  for?: 'user' | 'organization';
   hasActiveOrganization?: boolean;
 }) =>
   getPricingFooterState({
     subscription: args.subscription,
     plan: args.plan ?? basePlan,
     planPeriod: args.planPeriod ?? 'month',
-    forOrganizations: args.forOrganizations,
+    for: args.for,
     hasActiveOrganization: args.hasActiveOrganization ?? false,
   });
 
 describe('usePricingFooterState', () => {
   it('hides footer when org plans and no active org', () => {
-    const res = run({ subscription: undefined, forOrganizations: true, hasActiveOrganization: false });
+    const res = run({ subscription: undefined, for: 'organization', hasActiveOrganization: false });
     expect(res).toEqual({ shouldShowFooter: false, shouldShowFooterNotice: false });
   });
 
   it('shows footer when no subscription and user plans', () => {
-    const res = run({ subscription: undefined, forOrganizations: false });
+    const res = run({ subscription: undefined, for: 'user' });
     expect(res).toEqual({ shouldShowFooter: true, shouldShowFooterNotice: false });
   });
 

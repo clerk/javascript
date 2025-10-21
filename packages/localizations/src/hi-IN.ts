@@ -68,8 +68,8 @@ export const hiIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'उपयोगकर्ता उपकरण',
   badge__you: 'आप',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const hiIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const hiIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const hiIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'अपना पासवर्ड दर्ज करें',
   formFieldInputPlaceholder__phoneNumber: 'अपना फोन नंबर दर्ज करें',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const hiIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'डिफ़ॉल्ट बनाएं',
         actionLabel__remove: 'हटाएं',
         add: 'नया भुगतान स्रोत जोड़ें',
@@ -292,11 +293,11 @@ export const hiIN: LocalizationResource = {
         formButtonPrimary__add: 'भुगतान विधि जोड़ें',
         formButtonPrimary__pay: '{{amount}} का भुगतान करें',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} को इस खाते से हटा दिया जाएगा।',
           messageLine2:
             'आप अब इस भुगतान स्रोत का उपयोग नहीं कर पाएंगे और इस पर निर्भर कोई भी आवर्ती सदस्यता अब काम नहीं करेगी।',
-          successMessage: '{{paymentSource}} को आपके खाते से हटा दिया गया है।',
+          successMessage: '{{paymentMethod}} को आपके खाते से हटा दिया गया है।',
           title: 'भुगतान स्रोत हटाएं',
         },
         title: 'उपलब्ध विकल्प',
@@ -640,6 +641,10 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'पासवर्ड रीसेट कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -761,6 +766,10 @@ export const hiIN: LocalizationResource = {
         subtitleNewTab: 'जारी रखने के लिए पिछले टैब पर वापस जाएं',
         title: 'सफलतापूर्वक ईमेल सत्यापित किया गया',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -974,7 +983,7 @@ export const hiIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -983,7 +992,7 @@ export const hiIN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

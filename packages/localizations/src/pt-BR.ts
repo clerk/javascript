@@ -69,8 +69,8 @@ export const ptBR: LocalizationResource = {
   badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
   badge__you: 'Você',
-  commerce: {
-    addPaymentMethod: 'Adicionar método de pagamento',
+  billing: {
+    addPaymentMethod__label: 'Adicionar método de pagamento',
     alwaysFree: 'Gratuito',
     annually: 'Anualmente',
     availableFeatures: 'Recursos disponíveis',
@@ -127,8 +127,7 @@ export const ptBR: LocalizationResource = {
     monthly: 'Mensal',
     pastDue: 'Atrasado',
     pay: 'Pagar {{amount}}',
-    paymentMethods: 'Métodos de pagamento',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento anual',
         monthly: 'Pagamento mensal',
@@ -142,6 +141,7 @@ export const ptBR: LocalizationResource = {
         testCardInfo: 'Informações do cartão de teste',
       },
     },
+    paymentMethods__label: 'Métodos de pagamento',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturamento',
@@ -226,6 +226,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',
@@ -289,7 +290,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -298,11 +299,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',
@@ -647,6 +648,10 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -768,6 +773,10 @@ export const ptBR: LocalizationResource = {
         subtitleNewTab: 'Retorne para a aba anterior para continuar',
         title: 'E-mail verificado com sucesso',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -979,7 +988,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -988,11 +997,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',

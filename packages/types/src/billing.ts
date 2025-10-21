@@ -85,23 +85,23 @@ export type BillingSubscriptionPlanPeriod = 'month' | 'annual';
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export interface BillingPaymentSourceMethods {
+export interface BillingPayerMethods {
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  initializePaymentSource: (
-    params: Exclude<InitializePaymentSourceParams, 'orgId'>,
-  ) => Promise<BillingInitializedPaymentSourceResource>;
+  initializePaymentMethod: (
+    params: Exclude<InitializePaymentMethodParams, 'orgId'>,
+  ) => Promise<BillingInitializedPaymentMethodResource>;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  addPaymentSource: (params: Exclude<AddPaymentSourceParams, 'orgId'>) => Promise<BillingPaymentSourceResource>;
+  addPaymentMethod: (params: Exclude<AddPaymentMethodParams, 'orgId'>) => Promise<BillingPaymentMethodResource>;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  getPaymentSources: (
-    params: Exclude<GetPaymentSourcesParams, 'orgId'>,
-  ) => Promise<ClerkPaginatedResponse<BillingPaymentSourceResource>>;
+  getPaymentMethods: (
+    params: Exclude<GetPaymentMethodsParams, 'orgId'>,
+  ) => Promise<ClerkPaginatedResponse<BillingPaymentMethodResource>>;
 }
 
 /**
@@ -217,15 +217,16 @@ export interface FeatureResource extends ClerkResource {
 }
 
 /**
- * The status of a payment source.
+ * The status of a payment method.
  * @inline
  */
-export type BillingPaymentSourceStatus = 'active' | 'expired' | 'disconnected';
+export type BillingPaymentMethodStatus = 'active' | 'expired' | 'disconnected';
+// TODO(@COMMERCE): Is expired returned from FAPI ?
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type GetPaymentSourcesParams = WithOptionalOrgType<ClerkPaginationParams>;
+export type GetPaymentMethodsParams = WithOptionalOrgType<ClerkPaginationParams>;
 
 /**
  * @inline
@@ -237,7 +238,7 @@ export type PaymentGateway = 'stripe' | 'paypal';
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type InitializePaymentSourceParams = WithOptionalOrgType<{
+export type InitializePaymentMethodParams = WithOptionalOrgType<{
   /**
    * The payment gateway to use.
    */
@@ -247,7 +248,7 @@ export type InitializePaymentSourceParams = WithOptionalOrgType<{
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type AddPaymentSourceParams = WithOptionalOrgType<{
+export type AddPaymentMethodParams = WithOptionalOrgType<{
   /**
    * The payment gateway to use.
    */
@@ -261,19 +262,19 @@ export type AddPaymentSourceParams = WithOptionalOrgType<{
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type RemovePaymentSourceParams = WithOptionalOrgType<unknown>;
+export type RemovePaymentMethodParams = WithOptionalOrgType<unknown>;
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type MakeDefaultPaymentSourceParams = WithOptionalOrgType<unknown>;
+export type MakeDefaultPaymentMethodParams = WithOptionalOrgType<unknown>;
 
 /**
- * The `BillingPaymentSourceResource` type represents a payment source for a checkout session.
+ * The `BillingPaymentMethodResource` type represents a payment method for a checkout session.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export interface BillingPaymentSourceResource extends ClerkResource {
+export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * The unique identifier for the payment method.
    */
@@ -283,9 +284,9 @@ export interface BillingPaymentSourceResource extends ClerkResource {
    */
   last4: string;
   /**
-   * The type of payment method. For example, `'card'` or `'bank_account'`.
+   * The type of payment method. For example, `'card'` or `'link'`.
    */
-  paymentMethod: string;
+  paymentType: 'card' | 'link';
   /**
    * The brand or type of card. For example, `'visa'` or `'mastercard'`.
    */
@@ -301,23 +302,24 @@ export interface BillingPaymentSourceResource extends ClerkResource {
   /**
    * The current status of the payment method.
    */
-  status: BillingPaymentSourceStatus;
+  status: BillingPaymentMethodStatus;
   /**
    * The type of digital wallet, if applicable. For example, `'apple_pay'`, or `'google_pay'`.
    */
   walletType: string | undefined;
   /**
-   * A function that removes this payment source from the account. Accepts the following parameters:
+   * A function that removes this payment method from the account. Accepts the following parameters:
    * <ul>
-   *  <li>`orgId?` (`string`): The ID of the organization to remove the payment source from.</li>
+   *  <li>`orgId?` (`string`): The ID of the organization to remove the payment method from.</li>
    * </ul>
    *
    * @param params - The parameters for the remove operation.
    * @returns A promise that resolves to a `DeletedObjectResource` object.
    */
-  remove: (params?: RemovePaymentSourceParams) => Promise<DeletedObjectResource>;
+  // TODO: orgId should be implied by the payment method
+  remove: (params?: RemovePaymentMethodParams) => Promise<DeletedObjectResource>;
   /**
-   * A function that sets this payment source as the default for the account. Accepts the following parameters:
+   * A function that sets this payment method as the default for the account. Accepts the following parameters:
    * <ul>
    *  <li>`orgId?` (`string`): The ID of the organization to set as the default.</li>
    * </ul>
@@ -325,13 +327,14 @@ export interface BillingPaymentSourceResource extends ClerkResource {
    * @param params - The parameters for the make default operation.
    * @returns A promise that resolves to `null`.
    */
-  makeDefault: (params?: MakeDefaultPaymentSourceParams) => Promise<null>;
+  // TODO: orgId should be implied by the payment method
+  makeDefault: (params?: MakeDefaultPaymentMethodParams) => Promise<null>;
 }
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export interface BillingInitializedPaymentSourceResource extends ClerkResource {
+export interface BillingInitializedPaymentMethodResource extends ClerkResource {
   /**
    * A client secret from an external payment provider (such as Stripe) used to complete the payment on the client-side.
    */
@@ -387,9 +390,9 @@ export interface BillingPaymentResource extends ClerkResource {
    */
   updatedAt: Date;
   /**
-   * The payment source being used for the payment, such as credit card or bank account.
+   * The payment method being used for the payment, such as credit card or bank account.
    */
-  paymentSource: BillingPaymentSourceResource;
+  paymentMethod: BillingPaymentMethodResource;
   /**
    * The subscription item being paid for.
    */
@@ -488,11 +491,6 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The unique identifier for the subscription item.
    */
   id: string;
-  /**
-   * The unique identifier for the payment source being used for the subscription item.
-   */
-  //TODO(@COMMERCE): should this be nullable ?
-  paymentSourceId: string;
   /**
    * The plan associated with the subscription item.
    */
@@ -702,7 +700,7 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 export type ConfirmCheckoutParams =
   | {
       /**
-       * The ID of a saved payment source to use for this checkout.
+       * The ID of a saved payment method to use for this checkout.
        */
       paymentSourceId?: string;
     }
@@ -746,9 +744,9 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   externalGatewayId: string;
   /**
-   * The payment source being used for the checkout, such as a credit card or bank account.
+   * The payment method being used for the checkout, such as a credit card or bank account.
    */
-  paymentSource?: BillingPaymentSourceResource;
+  paymentMethod?: BillingPaymentMethodResource;
   /**
    * The subscription plan details for the checkout.
    */

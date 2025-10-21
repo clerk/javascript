@@ -80,7 +80,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
         : ({
             initialPage: safeValues.initialPage,
             pageSize: safeValues.pageSize,
-            ...(_for === 'organization' ? { orgId: organization?.id } : {}),
+            ...(options?.unauthenticated ? {} : _for === 'organization' ? { orgId: organization?.id } : {}),
           } as TParams);
 
     const isOrganization = _for === 'organization';
@@ -102,8 +102,13 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
       },
       {
         type: resourceType,
-        userId: user?.id,
-        ...(_for === 'organization' ? { orgId: organization?.id } : {}),
+        // userId: user?.id,
+        ...(options?.unauthenticated
+          ? {}
+          : {
+              userId: user?.id,
+              ...(_for === 'organization' ? { orgId: organization?.id } : {}),
+            }),
       },
     );
 
