@@ -82,7 +82,7 @@ export const frFR: LocalizationResource = {
     cancelFreeTrialTitle: 'Annuler l’essai gratuit du plan {{plan}} ?',
     cancelSubscription: 'Annuler la souscription',
     cancelSubscriptionAccessUntil:
-      "Souscription annulée. Vous pouvez continuer à utiliser les fonctionnalités de '{{plan}}' jusqu'au {{ date | longDate('en-US') }}, après quoi vous n'aurez plus accès.",
+      "Souscription annulée. Vous pouvez continuer à utiliser les fonctionnalités de '{{plan}}' jusqu'au {{ date | longDate('fr-FR') }}, après quoi vous n'aurez plus accès.",
     cancelSubscriptionNoCharge: 'Pas de charge',
     cancelSubscriptionPastDue:
       'Votre abonnement prendra fin immédiatement et vous perdrez l’accès à toutes les fonctionnalités du plan. Le montant dû sera demandé lors de votre prochaine souscription.',
