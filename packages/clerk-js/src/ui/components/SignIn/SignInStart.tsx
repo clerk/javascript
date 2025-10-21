@@ -109,6 +109,7 @@ function SignInStartInternal(): JSX.Element {
     shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
   );
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
+  const isAddingAccountRef = useRef(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const clerkStatus = getClerkQueryParam('__clerk_status') || '';
@@ -193,10 +194,15 @@ function SignInStartInternal(): JSX.Element {
     const isAddingAccount = urlParams.has('__clerk_add_account');
 
     if (isAddingAccount) {
+      isAddingAccountRef.current = true;
       urlParams.delete('__clerk_add_account');
       const newSearch = urlParams.toString();
       const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
       window.history.replaceState({}, '', newUrl);
+      return;
+    }
+
+    if (isAddingAccountRef.current) {
       return;
     }
 
