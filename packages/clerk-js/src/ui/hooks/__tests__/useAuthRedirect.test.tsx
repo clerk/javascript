@@ -1,7 +1,6 @@
+import type { Clerk, EnvironmentResource } from '@clerk/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-import type { Clerk, EnvironmentResource } from '@clerk/types';
 
 import type { RedirectRule } from '../../utils/redirectRules';
 import { useAuthRedirect } from '../useAuthRedirect';

@@ -6,9 +6,9 @@ import { useRouter } from '../router';
 import type { RedirectRule } from '../utils/redirectRules';
 import { evaluateRedirectRules, isDevelopmentMode } from '../utils/redirectRules';
 
-export interface UseAuthRedirectOptions {
+export interface UseAuthRedirectOptions<C extends Record<string, unknown> = Record<string, unknown>> {
   rules: RedirectRule[];
-  additionalContext?: Record<string, any>;
+  additionalContext?: C;
 }
 
 export interface UseAuthRedirectReturn {
@@ -17,8 +17,12 @@ export interface UseAuthRedirectReturn {
 
 /**
  * Hook to handle authentication redirects based on rules
+ *
+ * @template C - The type of additional context to pass to redirect rules
  */
-export function useAuthRedirect(options: UseAuthRedirectOptions): UseAuthRedirectReturn {
+export function useAuthRedirect<C extends Record<string, unknown> = Record<string, unknown>>(
+  options: UseAuthRedirectOptions<C>,
+): UseAuthRedirectReturn {
   const clerk = useClerk();
   const environment = useEnvironment();
   const { navigate, currentPath } = useRouter();

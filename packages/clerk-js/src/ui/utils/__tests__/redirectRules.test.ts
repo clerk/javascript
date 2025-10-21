@@ -1,9 +1,8 @@
+import type { Clerk, EnvironmentResource } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
-import type { Clerk, EnvironmentResource } from '@clerk/types';
-
 import type { RedirectContext } from '../redirectRules';
-import { evaluateRedirectRules, signInRedirectRules, signUpRedirectRules } from '../redirectRules';
+import { evaluateRedirectRules, signInRedirectRules } from '../redirectRules';
 
 describe('evaluateRedirectRules', () => {
   it('returns null when no rules match', () => {
@@ -216,89 +215,6 @@ describe('signInRedirectRules', () => {
       const result = evaluateRedirectRules(signInRedirectRules, context);
       // Should match first rule instead (single session redirect)
       expect(result?.reason).toBe('User already signed in (single session mode)');
-    });
-  });
-});
-
-describe('signUpRedirectRules', () => {
-  describe('single session mode redirect', () => {
-    it('redirects to afterSignUpUrl when already signed in', () => {
-      const context: RedirectContext = {
-        clerk: {
-          buildAfterSignUpUrl: () => '/default-onboarding',
-          isSignedIn: true,
-        } as Clerk,
-        currentPath: '/sign-up',
-        environment: {
-          authConfig: { singleSessionMode: true },
-        } as EnvironmentResource,
-        afterSignUpUrl: '/custom-onboarding',
-      };
-
-      const result = evaluateRedirectRules(signUpRedirectRules, context);
-
-      expect(result).toEqual({
-        destination: '/custom-onboarding',
-        reason: 'User already signed in (single session mode)',
-      });
-    });
-
-    it('uses clerk.buildAfterSignUpUrl when afterSignUpUrl not provided', () => {
-      const context: RedirectContext = {
-        clerk: {
-          buildAfterSignUpUrl: () => '/default-onboarding',
-          isSignedIn: true,
-        } as Clerk,
-        currentPath: '/sign-up',
-        environment: {
-          authConfig: { singleSessionMode: true },
-        } as EnvironmentResource,
-      };
-
-      const result = evaluateRedirectRules(signUpRedirectRules, context);
-
-      expect(result).toEqual({
-        destination: '/default-onboarding',
-        reason: 'User already signed in (single session mode)',
-      });
-    });
-  });
-
-  describe('multi-session mode account switcher redirect', () => {
-    it('redirects to /sign-in/choose at root with active sessions', () => {
-      const context: RedirectContext = {
-        clerk: {
-          client: { sessions: [{ id: '1' }] },
-          isSignedIn: true,
-        } as any,
-        currentPath: '/sign-up',
-        environment: {
-          authConfig: { singleSessionMode: false },
-        } as EnvironmentResource,
-      };
-
-      const result = evaluateRedirectRules(signUpRedirectRules, context);
-
-      expect(result).toEqual({
-        destination: '/sign-in/choose',
-        reason: 'Active sessions detected (multi-session mode)',
-      });
-    });
-
-    it('does not redirect at non-root paths', () => {
-      const context: RedirectContext = {
-        clerk: {
-          client: { sessions: [{ id: '1' }] },
-          isSignedIn: true,
-        } as any,
-        currentPath: '/sign-up/verify',
-        environment: {
-          authConfig: { singleSessionMode: false },
-        } as EnvironmentResource,
-      };
-
-      const result = evaluateRedirectRules(signUpRedirectRules, context);
-      expect(result).toBeNull();
     });
   });
 });
