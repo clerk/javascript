@@ -324,6 +324,15 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
+      - name: Verify jq is installed
+        shell: bash
+        run: |
+          if ! command -v jq &> /dev/null; then
+            echo "jq not found, installing..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --version
+
       - name: Task Status
         id: task-status
         env:
@@ -335,7 +344,7 @@ jobs:
         run: |
           # Use turbo's built-in --affected flag to detect changes
           # This automatically uses GITHUB_BASE_REF in GitHub Actions
-          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>&1 | grep -c '"package"' || echo "0")
+          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
 
           if [ "$TASK_COUNT" -gt 0 ]; then
             AFFECTED=1
