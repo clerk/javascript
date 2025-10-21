@@ -35,12 +35,24 @@ export function useAuthRedirect(options: UseAuthRedirectOptions): UseAuthRedirec
     const result = evaluateRedirectRules(options.rules, context, isDevelopmentMode(clerk));
 
     if (result) {
-      setIsRedirecting(true);
-      void navigate(result.destination);
+      // Execute any side effects
+      result.onRedirect?.();
+
+      // Only navigate if not explicitly skipped
+      if (!result.skipNavigation) {
+        setIsRedirecting(true);
+        void navigate(result.destination);
+      }
     } else {
       setIsRedirecting(false);
     }
-  }, [clerk.isSignedIn, clerk.client?.sessions?.length, environment.authConfig.singleSessionMode, currentPath]);
+  }, [
+    clerk.isSignedIn,
+    clerk.client?.sessions?.length,
+    clerk.client?.signedInSessions?.length,
+    environment.authConfig.singleSessionMode,
+    currentPath,
+  ]);
 
   return { isRedirecting };
 }

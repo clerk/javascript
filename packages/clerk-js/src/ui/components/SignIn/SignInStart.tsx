@@ -104,6 +104,7 @@ function SignInStartInternal(): JSX.Element {
     shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
   );
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
+  const hasInitializedRef = useRef(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const clerkStatus = getClerkQueryParam('__clerk_status') || '';
@@ -512,8 +513,18 @@ function SignInStartInternal(): JSX.Element {
   // Handle redirect scenarios - must be after all hooks
   const { isRedirecting } = useAuthRedirect({
     rules: signInRedirectRules,
-    additionalContext: { afterSignInUrl },
+    additionalContext: {
+      afterSignInUrl,
+      hasInitialized: hasInitializedRef.current,
+      organizationTicket,
+      queryParams: new URLSearchParams(window.location.search),
+    },
   });
+
+  // Mark as initialized after first render
+  React.useEffect(() => {
+    hasInitializedRef.current = true;
+  }, []);
 
   if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of

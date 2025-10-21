@@ -128,19 +128,20 @@ describe('signInRedirectRules', () => {
     it('redirects to /sign-in/choose at root with active sessions', () => {
       const context: RedirectContext = {
         clerk: {
-          client: { sessions: [{ id: '1' }, { id: '2' }] },
+          client: { sessions: [{ id: '1' }, { id: '2' }], signedInSessions: [{ id: '1' }, { id: '2' }] },
           isSignedIn: true,
         } as any,
         currentPath: '/sign-in',
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
+        hasInitialized: false,
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
 
       expect(result).toEqual({
-        destination: '/sign-in/choose',
+        destination: 'choose',
         reason: 'Active sessions detected (multi-session mode)',
       });
     });
@@ -148,33 +149,35 @@ describe('signInRedirectRules', () => {
     it('redirects to /sign-in/choose at root with trailing slash', () => {
       const context: RedirectContext = {
         clerk: {
-          client: { sessions: [{ id: '1' }] },
+          client: { sessions: [{ id: '1' }], signedInSessions: [{ id: '1' }] },
           isSignedIn: true,
         } as any,
         currentPath: '/sign-in/',
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
+        hasInitialized: false,
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
 
       expect(result).toEqual({
-        destination: '/sign-in/choose',
+        destination: 'choose',
         reason: 'Active sessions detected (multi-session mode)',
       });
     });
 
-    it('does not redirect at non-root paths', () => {
+    it('does not redirect when already initialized', () => {
       const context: RedirectContext = {
         clerk: {
-          client: { sessions: [{ id: '1' }] },
+          client: { sessions: [{ id: '1' }], signedInSessions: [{ id: '1' }] },
           isSignedIn: true,
         } as any,
-        currentPath: '/sign-in/factor-one',
+        currentPath: '/sign-in',
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
+        hasInitialized: true,
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
