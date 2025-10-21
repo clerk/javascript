@@ -145,4 +145,3 @@ export const signUpRedirectRules: RedirectRule[] = [
 export function isDevelopmentMode(clerk: Clerk): boolean {
   return isDevelopmentFromPublishableKey(clerk.publishableKey);
 }
-
