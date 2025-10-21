@@ -8,7 +8,6 @@ import type {
   EnvironmentResource,
   OAuthProvider,
   OAuthStrategy,
-  SamlStrategy,
   Web3Provider,
   Web3Strategy,
 } from '@clerk/types';
@@ -22,7 +21,7 @@ export type ThirdPartyStrategy =
       name: string;
     }
   | {
-      strategy: SamlStrategy | EnterpriseSSOStrategy;
+      strategy: EnterpriseSSOStrategy;
       iconUrl?: never;
       name: string;
     };
@@ -34,7 +33,7 @@ export type ThirdPartyProvider =
       name: string;
     }
   | {
-      strategy: SamlStrategy | EnterpriseSSOStrategy;
+      strategy: EnterpriseSSOStrategy;
       iconUrl?: never;
       name: string;
     };
@@ -68,10 +67,6 @@ const strategyToDisplayData: ThirdPartyStrategyToDataMap = fromEntries(
     return [p.strategy, { iconUrl: iconImageUrl(p.provider), id: p.provider, name: p.name }];
   }),
 ) as ThirdPartyStrategyToDataMap;
-
-export function isSamlStrategy(strategy: any): strategy is SamlStrategy {
-  return strategy === 'saml';
-}
 
 export function isEnterpriseSSOStrategy(strategy: any): strategy is EnterpriseSSOStrategy {
   return strategy === 'enterprise_sso';

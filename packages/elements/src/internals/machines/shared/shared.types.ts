@@ -1,11 +1,5 @@
-import type {
-  AuthenticateWithRedirectParams,
-  LoadedClerk,
-  OAuthStrategy,
-  SamlStrategy,
-  SignInStrategy,
-} from '@clerk/types';
-import type { SetRequired, Simplify } from 'type-fest';
+import type { AuthenticateWithRedirectParams, LoadedClerk, OAuthStrategy, SignInStrategy } from '@clerk/types';
+import type { Simplify } from 'type-fest';
 import type { ActorRefFrom } from 'xstate';
 
 import type { FormMachine } from '../form';
@@ -26,11 +20,6 @@ type SamlOnlyKeys = 'identifier' | 'emailAddress';
 
 export type AuthenticateWithRedirectOAuthParams = Simplify<
   Omit<AuthenticateWithRedirectParams, SamlOnlyKeys> & { strategy: OAuthStrategy }
->;
-export type AuthenticateWithRedirectSamlParams = Simplify<
-  SetRequired<AuthenticateWithRedirectParams, SamlOnlyKeys> & {
-    strategy: SamlStrategy;
-  }
 >;
 
 // ================= Strategies ================= //

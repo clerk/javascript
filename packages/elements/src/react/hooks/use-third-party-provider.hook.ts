@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, Web3Provider } from '@clerk/types';
 import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef } from 'xstate';
@@ -12,14 +12,11 @@ import {
   getEnabledThirdPartyProviders,
   isAuthenticatableOauthStrategy,
   isEnterpriseSSOStrategy,
-  isSamlStrategy,
   isWeb3Strategy,
   providerToDisplayData,
 } from '~/utils/third-party-strategies';
 
-const useIsProviderEnabled = (
-  provider: OAuthProvider | Web3Provider | SamlStrategy | EnterpriseSSOStrategy,
-): boolean | null => {
+const useIsProviderEnabled = (provider: OAuthProvider | Web3Provider | EnterpriseSSOStrategy): boolean | null => {
   const clerk = useClerk();
 
   // null indicates we don't know for sure
@@ -27,12 +24,8 @@ const useIsProviderEnabled = (
     return null;
   }
 
-  if (provider === 'saml' || provider === 'enterprise_sso') {
-    return (
-      clerk.__unstable__environment?.userSettings.saml.enabled ??
-      clerk.__unstable__environment?.userSettings.enterpriseSSO.enabled ??
-      false
-    );
+  if (provider === 'enterprise_sso') {
+    return clerk.__unstable__environment?.userSettings.enterpriseSSO.enabled ?? false;
   }
 
   const data = getEnabledThirdPartyProviders(clerk.__unstable__environment);
@@ -47,18 +40,16 @@ export const useThirdPartyProvider = <
   TActor extends ActorRef<any, SignInRouterEvents> | ActorRef<any, SignUpRouterEvents>,
 >(
   ref: TActor,
-  provider: OAuthProvider | Web3Provider | SamlStrategy | EnterpriseSSOStrategy,
+  provider: OAuthProvider | Web3Provider | EnterpriseSSOStrategy,
 ): UseThirdPartyProviderReturn => {
   const isProviderEnabled = useIsProviderEnabled(provider);
-  const isSaml = isSamlStrategy(provider);
   const isEnterpriseSSO = isEnterpriseSSOStrategy(provider);
-  const details =
-    isEnterpriseSSO || isSaml
-      ? {
-          name: 'SSO',
-          strategy: provider,
-        }
-      : providerToDisplayData[provider];
+  const details = isEnterpriseSSO
+    ? {
+        name: 'SSO',
+        strategy: provider,
+      }
+    : providerToDisplayData[provider];
 
   const authenticate = useCallback(
     (event: React.MouseEvent<Element>) => {
@@ -67,10 +58,6 @@ export const useThirdPartyProvider = <
       }
 
       event.preventDefault();
-
-      if (isSaml) {
-        return ref.send({ type: 'AUTHENTICATE.SAML' });
-      }
 
       if (isEnterpriseSSO) {
         return ref.send({ type: 'AUTHENTICATE.ENTERPRISE_SSO' });
