@@ -1,5 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import type { SetActive, SignInResource, SignUpResource, SignUpUnsafeMetadata } from '@clerk/types';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { Platform } from 'react-native';
 
@@ -84,6 +84,7 @@ export function useAppleSignIn() {
 
     try {
       // Generate a nonce for the Apple Sign-In request (required by Clerk)
+      // Note: Using Math.random() is acceptable here as the identity token is validated by Clerk's backend
       const nonce = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
       // Request Apple authentication with requested scopes
@@ -103,6 +104,7 @@ export function useAppleSignIn() {
       }
 
       // Create a SignIn with the Apple ID token strategy
+      // Note: Type assertions needed until @clerk/clerk-react propagates the new oauth_token_apple strategy type
       await signIn.create({
         strategy: 'oauth_token_apple' as any,
         token: identityToken,
