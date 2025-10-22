@@ -121,6 +121,9 @@
     "expo-apple-authentication": {
       "optional": true
     },
+    "expo-crypto": {
+      "optional": true
+    },
     "expo-local-authentication": {
       "optional": true
     },
