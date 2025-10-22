@@ -527,10 +527,10 @@ function SignInStartInternal(): JSX.Element {
     additionalContext: redirectAdditionalContext,
   });
 
-  // Mark as initialized after first render, reset when path changes back to root
+  // Mark as initialized after first render
   useEffect(() => {
     hasInitializedRef.current = true;
-  }, [currentPath]);
+  }, []);
 
   if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
