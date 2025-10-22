@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => {
     useSignUp: vi.fn(),
     signInAsync: vi.fn(),
     isAvailableAsync: vi.fn(),
+    randomUUID: vi.fn(),
   };
 });
 
@@ -27,6 +28,12 @@ vi.mock('expo-apple-authentication', () => {
       FULL_NAME: 0,
       EMAIL: 1,
     },
+  };
+});
+
+vi.mock('expo-crypto', () => {
+  return {
+    randomUUID: mocks.randomUUID,
   };
 });
 
@@ -69,6 +76,7 @@ describe('useAppleSignIn', () => {
     });
 
     mocks.isAvailableAsync.mockResolvedValue(true);
+    mocks.randomUUID.mockReturnValue('test-nonce-uuid');
   });
 
   afterEach(() => {
@@ -98,10 +106,11 @@ describe('useAppleSignIn', () => {
       const response = await result.current.startAppleSignInFlow();
 
       expect(mocks.isAvailableAsync).toHaveBeenCalled();
+      expect(mocks.randomUUID).toHaveBeenCalled();
       expect(mocks.signInAsync).toHaveBeenCalledWith(
         expect.objectContaining({
           requestedScopes: expect.any(Array),
-          nonce: expect.any(String),
+          nonce: 'test-nonce-uuid',
         }),
       );
       expect(mockSignIn.create).toHaveBeenCalledWith({

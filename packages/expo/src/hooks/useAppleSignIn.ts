@@ -1,6 +1,7 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource, SignUpUnsafeMetadata } from '@clerk/types';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
@@ -83,9 +84,8 @@ export function useAppleSignIn() {
     }
 
     try {
-      // Generate a nonce for the Apple Sign-In request (required by Clerk)
-      // Note: Using Math.random() is acceptable here as the identity token is validated by Clerk's backend
-      const nonce = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      // Generate a cryptographically secure nonce for the Apple Sign-In request (required by Clerk)
+      const nonce = Crypto.randomUUID();
 
       // Request Apple authentication with requested scopes
       const credential = await AppleAuthentication.signInAsync({
