@@ -76,9 +76,7 @@ export const createColorScales = (theme: Theme) => {
     colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
     colorRing: variables.colorRing ? colors.toHslaString(variables.colorRing) : undefined,
     colorShadow: variables.colorShadow ? colors.toHslaString(variables.colorShadow) : undefined,
-    colorModalBackdrop: variables.colorModalBackdrop
-      ? colors.makeTransparent(colors.toHslaString(variables.colorModalBackdrop), 0.27)
-      : undefined,
+    colorModalBackdrop: variables.colorModalBackdrop ? colors.toHslaString(variables.colorModalBackdrop) : undefined,
     avatarBackground: neutralAlphaScale?.neutralAlpha400
       ? colors.toHslaString(neutralAlphaScale.neutralAlpha400)
       : undefined,
