@@ -289,4 +289,48 @@ describe('signInRedirectRules', () => {
       expect(result?.reason).toBe('User already signed in (single session mode)');
     });
   });
+
+  describe('add account flow', () => {
+    it('returns skip navigation when __clerk_add_account query param is present', () => {
+      const context: RedirectContext = {
+        clerk: {
+          client: { sessions: [], signedInSessions: [] },
+          isSignedIn: false,
+        } as any,
+        currentPath: '/sign-in',
+        environment: {
+          authConfig: { singleSessionMode: false },
+        } as EnvironmentResource,
+        queryParams: {
+          __clerk_add_account: 'true',
+        },
+      };
+
+      const result = evaluateRedirectRules(signInRedirectRules, context);
+      expect(result).toMatchObject({
+        destination: '/sign-in',
+        reason: 'User is adding account',
+        skipNavigation: true,
+      });
+      expect(result?.onRedirect).toBeDefined();
+    });
+
+    it('does not skip navigation when __clerk_add_account query param is absent', () => {
+      const context: RedirectContext = {
+        clerk: {
+          client: { sessions: [], signedInSessions: [] },
+          isSignedIn: false,
+        } as any,
+        currentPath: '/sign-in',
+        environment: {
+          authConfig: { singleSessionMode: false },
+        } as EnvironmentResource,
+        queryParams: {},
+      };
+
+      const result = evaluateRedirectRules(signInRedirectRules, context);
+      // Should evaluate other rules
+      expect(result?.reason).not.toBe('User is adding account');
+    });
+  });
 });

@@ -1,13 +1,15 @@
-import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type { Clerk, EnvironmentResource } from '@clerk/types';
 
+import { debugLogger } from '../../utils/debug';
+
 export interface RedirectContext {
+  readonly afterSignInUrl?: string;
   readonly clerk: Clerk;
   readonly currentPath: string;
   readonly environment: EnvironmentResource;
   readonly hasInitialized?: boolean;
   readonly organizationTicket?: string;
-  readonly queryParams?: URLSearchParams;
+  readonly queryParams?: Record<string, string>;
   readonly [key: string]: any;
 }
 
@@ -37,30 +39,28 @@ export class StopRedirectEvaluation extends Error {
  *
  * @param rules - Array of redirect rules to evaluate
  * @param context - Context containing clerk instance, path, environment, etc.
- * @param debug - Whether to log debug information (default: false)
  * @returns The first matching redirect result, or null if no rules match
  */
-export function evaluateRedirectRules(
-  rules: RedirectRule[],
-  context: RedirectContext,
-  debug = false,
-): RedirectResult | null {
+export function evaluateRedirectRules(rules: RedirectRule[], context: RedirectContext): RedirectResult | null {
   try {
     for (const rule of rules) {
       const result = rule(context);
       if (result) {
-        if (debug && isDevelopmentFromPublishableKey(context.clerk.publishableKey)) {
-          console.info('[Clerk Redirect]', result.reason, '→', result.destination);
-        }
+        debugLogger.info(
+          'Redirect rule matched',
+          {
+            destination: result.destination,
+            reason: result.reason,
+          },
+          'redirect',
+        );
         return result;
       }
     }
     return null;
   } catch (error) {
     if (error instanceof StopRedirectEvaluation) {
-      if (debug && isDevelopmentFromPublishableKey(context.clerk.publishableKey)) {
-        console.info('[Clerk Redirect]', 'Evaluation stopped:', error.reason);
-      }
+      debugLogger.info('Redirect evaluation stopped', { reason: error.reason }, 'redirect');
       return null;
     }
     // Re-throw unexpected errors
@@ -94,18 +94,21 @@ export const signInRedirectRules: RedirectRule[] = [
 
   // Rule 2: Skip redirect if adding account (preserves add account flow)
   ctx => {
-    const isAddingAccount = ctx.queryParams?.has('__clerk_add_account');
+    const isAddingAccount = ctx.queryParams?.['__clerk_add_account'];
     if (isAddingAccount) {
       return {
         destination: ctx.currentPath,
         reason: 'User is adding account',
         skipNavigation: true,
         onRedirect: () => {
-          // Clean up query param
-          ctx.queryParams?.delete('__clerk_add_account');
-          const newSearch = ctx.queryParams?.toString();
-          const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
-          window.history.replaceState({}, '', newUrl);
+          // Clean up query param (platform-specific)
+          if (typeof window !== 'undefined' && window.history) {
+            const params = new URLSearchParams(window.location.search);
+            params.delete('__clerk_add_account');
+            const newSearch = params.toString();
+            const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
+            window.history.replaceState({}, '', newUrl);
+          }
         },
       };
     }
@@ -131,10 +134,3 @@ export const signInRedirectRules: RedirectRule[] = [
     return null;
   },
 ];
-
-/**
- * Helper to check if we're in development mode
- */
-export function isDevelopmentMode(clerk: Clerk): boolean {
-  return isDevelopmentFromPublishableKey(clerk.publishableKey);
-}

@@ -141,7 +141,6 @@ describe('useAuthRedirect', () => {
           environment: mockEnvironment,
           ...additionalContext,
         }),
-        false,
       );
     });
   });

@@ -4,7 +4,7 @@ import React from 'react';
 import { useEnvironment } from '../contexts';
 import { useRouter } from '../router';
 import type { RedirectRule } from '../utils/redirectRules';
-import { evaluateRedirectRules, isDevelopmentMode } from '../utils/redirectRules';
+import { evaluateRedirectRules } from '../utils/redirectRules';
 
 export interface UseAuthRedirectOptions<C extends Record<string, unknown> = Record<string, unknown>> {
   rules: RedirectRule[];
@@ -36,7 +36,7 @@ export function useAuthRedirect<C extends Record<string, unknown> = Record<strin
       ...options.additionalContext,
     };
 
-    const result = evaluateRedirectRules(options.rules, context, isDevelopmentMode(clerk));
+    const result = evaluateRedirectRules(options.rules, context);
 
     if (result) {
       // Execute any side effects

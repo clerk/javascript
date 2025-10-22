@@ -77,7 +77,7 @@ function SignInStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const { displayConfig, userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
-  const { navigate } = useRouter();
+  const { navigate, currentPath, queryParams } = useRouter();
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
@@ -517,14 +517,14 @@ function SignInStartInternal(): JSX.Element {
       afterSignInUrl,
       hasInitialized: hasInitializedRef.current,
       organizationTicket,
-      queryParams: new URLSearchParams(window.location.search),
+      queryParams,
     },
   });
 
-  // Mark as initialized after first render
+  // Mark as initialized after first render, reset when path changes back to root
   useEffect(() => {
     hasInitializedRef.current = true;
-  }, []);
+  }, [currentPath]);
 
   if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of
