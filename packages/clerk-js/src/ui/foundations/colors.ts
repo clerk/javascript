@@ -96,9 +96,10 @@ const colors = Object.freeze({
   colorForeground,
   colorMutedForeground,
   colorMuted: undefined,
-  colorRing:
-    colorUtils.makeTransparent(clerkCssVar('color-ring', defaultColorNeutral), 0.85) ||
-    neutralAlphaScale.neutralAlpha200,
+  colorRing: clerkCssVar(
+    'color-ring',
+    colorUtils.makeTransparent(defaultColorNeutral, 0.85) || neutralAlphaScale.neutralAlpha200,
+  ),
   colorInputForeground: clerkCssVar('color-input-foreground', '#131316'),
   colorPrimaryForeground: clerkCssVar('color-primary-foreground', 'white'),
   colorShimmer: clerkCssVar('color-shimmer', 'rgba(255, 255, 255, 0.36)'),
