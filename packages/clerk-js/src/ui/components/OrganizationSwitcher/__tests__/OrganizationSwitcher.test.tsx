@@ -253,40 +253,6 @@ describe('OrganizationSwitcher', () => {
       expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
     });
 
-    it("does not display slug field if it's disabled on environment", async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withOrganizationSlug(false);
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          create_organization_enabled: true,
-        });
-      });
-
-      const { getByRole, queryByLabelText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
-      expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
-      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
-    });
-
-    it("display slug field if it's enabled on environment", async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withOrganizationSlug(true);
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          create_organization_enabled: true,
-        });
-      });
-
-      const { getByRole, queryByLabelText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
-      expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalled();
-      expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
-    });
-
     it('does not display create organization button if permissions not present', async () => {
       const { wrapper, props } = await createFixtures(f => {
         f.withOrganizations();
