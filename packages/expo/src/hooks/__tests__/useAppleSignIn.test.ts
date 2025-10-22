@@ -33,6 +33,9 @@ vi.mock('expo-apple-authentication', () => {
 
 vi.mock('expo-crypto', () => {
   return {
+    default: {
+      randomUUID: mocks.randomUUID,
+    },
     randomUUID: mocks.randomUUID,
   };
 });
