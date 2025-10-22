@@ -1,5 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { SetActive, SignInResource, SignUpResource, SignUpUnsafeMetadata } from '@clerk/types';
+import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
@@ -135,9 +135,9 @@ export function useAppleSignIn() {
         signIn,
         signUp,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle Apple Authentication errors
-      if (error?.code === 'ERR_REQUEST_CANCELED') {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ERR_REQUEST_CANCELED') {
         // User canceled the sign-in flow
         return {
           createdSessionId: null,
