@@ -1,7 +1,6 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
@@ -85,6 +84,8 @@ export function useAppleSignIn() {
 
     try {
       // Generate a cryptographically secure nonce for the Apple Sign-In request (required by Clerk)
+      // Lazy load expo-crypto to avoid import issues on web
+      const Crypto = await import('expo-crypto');
       const nonce = Crypto.randomUUID();
 
       // Request Apple authentication with requested scopes
