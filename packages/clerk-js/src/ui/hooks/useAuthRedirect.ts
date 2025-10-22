@@ -16,7 +16,9 @@ export interface UseAuthRedirectReturn {
 }
 
 /**
- * Hook to handle authentication redirects based on rules
+ * Hook to handle authentication redirects based on rules.
+ *
+ * **Important**: The `additionalContext` object should be memoized by the caller
  *
  * @template C - The type of additional context to pass to redirect rules
  */
@@ -51,11 +53,16 @@ export function useAuthRedirect<C extends Record<string, unknown> = Record<strin
       setIsRedirecting(false);
     }
   }, [
+    clerk,
     clerk.isSignedIn,
     clerk.client?.sessions?.length,
     clerk.client?.signedInSessions?.length,
-    environment.authConfig.singleSessionMode,
     currentPath,
+    environment,
+    environment.authConfig.singleSessionMode,
+    navigate,
+    options.additionalContext,
+    options.rules,
   ]);
 
   return { isRedirecting };

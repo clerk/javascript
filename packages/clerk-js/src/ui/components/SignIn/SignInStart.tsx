@@ -510,15 +510,21 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  // Handle redirect scenarios - must be after all hooks
-  const { isRedirecting } = useAuthRedirect({
-    rules: signInRedirectRules,
-    additionalContext: {
+  // Memoize additional context to prevent unnecessary re-evaluations
+  const redirectAdditionalContext = useMemo(
+    () => ({
       afterSignInUrl,
       hasInitialized: hasInitializedRef.current,
       organizationTicket,
       queryParams,
-    },
+    }),
+    [afterSignInUrl, organizationTicket, queryParams],
+  );
+
+  // Handle redirect scenarios - must be after all hooks
+  const { isRedirecting } = useAuthRedirect({
+    rules: signInRedirectRules,
+    additionalContext: redirectAdditionalContext,
   });
 
   // Mark as initialized after first render, reset when path changes back to root
