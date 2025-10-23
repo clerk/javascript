@@ -28,7 +28,6 @@ import type {
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
-  SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureBackupCodeVerifyParams,
@@ -212,12 +211,6 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'reset_password_email_code':
         config = { emailAddressId: params.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
         break;
-      case 'saml':
-        config = {
-          redirectUrl: params.redirectUrl,
-          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
-        } as SamlConfig;
-        break;
       case 'enterprise_sso':
         config = {
           redirectUrl: params.redirectUrl,
@@ -325,7 +318,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (strategy === 'saml' || strategy === 'enterprise_sso') {
+    if (strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
         redirectUrl,

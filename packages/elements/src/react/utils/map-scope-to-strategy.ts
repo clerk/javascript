@@ -1,6 +1,6 @@
-import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, SignInStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SignInStrategy, Web3Provider } from '@clerk/types';
 
-type Strategy = OAuthProvider | SamlStrategy | EnterpriseSSOStrategy | Web3Provider;
+type Strategy = OAuthProvider | EnterpriseSSOStrategy | Web3Provider;
 
 export function isProviderStrategyScope(value: string): value is Strategy {
   return value.startsWith('provider:');
