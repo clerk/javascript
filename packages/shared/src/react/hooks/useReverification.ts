@@ -56,9 +56,10 @@ export type UseReverificationOptions = {
   /**
    * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
    *
-   * @param cancel - A function that will cancel the reverification process.
-   * @param complete - A function that will retry the original request after reverification.
-   * @param level - The level returned with the reverification hint.
+   * @param properties - Callbacks and info to control the reverification flow.
+   * @param properties.cancel - A function that will cancel the reverification process.
+   * @param properties.complete - A function that will retry the original request after reverification.
+   * @param properties.level - The level returned with the reverification hint.
    */
   onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
 };
