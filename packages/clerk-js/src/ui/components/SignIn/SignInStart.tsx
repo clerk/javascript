@@ -77,7 +77,7 @@ function SignInStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const { displayConfig, userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
-  const { navigate, currentPath, queryParams } = useRouter();
+  const { navigate, queryParams } = useRouter();
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
@@ -104,7 +104,7 @@ function SignInStartInternal(): JSX.Element {
     shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
   );
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
-  const hasInitializedRef = useRef(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const clerkStatus = getClerkQueryParam('__clerk_status') || '';
@@ -514,11 +514,11 @@ function SignInStartInternal(): JSX.Element {
   const redirectAdditionalContext = useMemo(
     () => ({
       afterSignInUrl,
-      hasInitialized: hasInitializedRef.current,
+      hasInitialized,
       organizationTicket,
       queryParams,
     }),
-    [afterSignInUrl, organizationTicket, queryParams],
+    [afterSignInUrl, hasInitialized, organizationTicket, queryParams],
   );
 
   // Handle redirect scenarios - must be after all hooks
@@ -529,7 +529,7 @@ function SignInStartInternal(): JSX.Element {
 
   // Mark as initialized after first render
   useEffect(() => {
-    hasInitializedRef.current = true;
+    setHasInitialized(true);
   }, []);
 
   if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
