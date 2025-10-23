@@ -47,8 +47,18 @@ class ClerkRequest extends Request {
    */
   private deriveUrlFromHeaders(req: Request) {
     const initialUrl = new URL(req.url);
-    const forwardedProto = req.headers.get(constants.Headers.ForwardedProto);
-    const forwardedHost = req.headers.get(constants.Headers.ForwardedHost);
+
+    // When Clerk is served behind a proxy, it determines the protocol and host of the request
+    // by looking at the request headers.
+    // The default values are "X-Forwarded-Proto" and "X-Forwarded-Host" respectively, but the
+    // header names can be overwritten via env vars.
+    const forwardedProto = req.headers.get(
+      process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER ?? constants.Headers.ForwardedProto,
+    );
+    const forwardedHost = req.headers.get(
+      process.env.CLERK_PROXY_FORWARDED_HOST_HEADER ?? constants.Headers.ForwardedHost,
+    );
+
     const host = req.headers.get(constants.Headers.Host);
     const protocol = initialUrl.protocol;
 
