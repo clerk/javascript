@@ -44,6 +44,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
     const superPartials = this.partials;
 
+    this._insideFunctionSignature = false;
+
     this.partials = {
       ...superPartials,
       /**
@@ -143,14 +145,16 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           );
         }
 
+        const prevInsideParams = this._insideFunctionSignature;
         this._insideFunctionSignature = true;
         md.push(this.partials.signatureParameters(model.parameters || []));
-        this._insideFunctionSignature = false;
+        this._insideFunctionSignature = prevInsideParams;
 
         if (model.type) {
+          const prevInsideType = this._insideFunctionSignature;
           this._insideFunctionSignature = true;
           const typeOutput = this.partials.someType(model.type);
-          this._insideFunctionSignature = false;
+          this._insideFunctionSignature = prevInsideType;
           md.push(`: ${typeOutput}`);
         }
 
