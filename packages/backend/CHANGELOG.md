@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.19.0
+
+### Minor Changes
+
+- Add missing payer field to BillingSubscriptionItemWebhookEventJSON ([#7024](https://github.com/clerk/javascript/pull/7024)) by [@Wendrowiec13](https://github.com/Wendrowiec13)
+
+### Patch Changes
+
+- Fix infinite redirect loop in multi-domain development flows by reordering authentication checks to prioritize satellite sync requests over dev-browser-sync handshakes. ([#7018](https://github.com/clerk/javascript/pull/7018)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911)]:
+  - @clerk/types@4.95.1
+  - @clerk/shared@3.28.3
+
 ## 2.18.3
 
 ### Patch Changes

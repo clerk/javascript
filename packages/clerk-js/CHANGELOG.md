@@ -1,5 +1,24 @@
 # Change Log
 
+## 5.102.1
+
+### Patch Changes
+
+- Add title attribute to email address field with the recommended format. ([#6956](https://github.com/clerk/javascript/pull/6956)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue in SelectOption where the focus styles were not being properly applied when the option is focused. ([#6999](https://github.com/clerk/javascript/pull/6999)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Increases SelectOption touch area to remove any dead spots between items.
+
+- Make avatar remove button size xs to be consistent with upload button sizing. ([#7041](https://github.com/clerk/javascript/pull/7041)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve avatar upload and removal UX to auto collapse the profile section upon successful save. ([#7044](https://github.com/clerk/javascript/pull/7044)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911), [`1217b87`](https://github.com/clerk/javascript/commit/1217b87c5a4810c521fd83dac8b4828ea98cdb9a)]:
+  - @clerk/localizations@3.26.3
+  - @clerk/types@4.95.1
+  - @clerk/shared@3.28.3
+
 ## 5.102.0
 
 ### Minor Changes

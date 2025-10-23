@@ -1,5 +1,19 @@
 # Change Log
 
+## 6.34.0
+
+### Minor Changes
+
+- Added support for Next.js 16. See the [Next.js 16 blog post](https://nextjs.org/blog/next-16) for more details. ([#7055](https://github.com/clerk/javascript/pull/7055)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911), [`a42a015`](https://github.com/clerk/javascript/commit/a42a0157d3142dca32713f7749ffce7b4e7bb3ac), [`8ebbf1e`](https://github.com/clerk/javascript/commit/8ebbf1e6e31251b7d0c3bb5d54249572adc96b7e)]:
+  - @clerk/types@4.95.1
+  - @clerk/backend@2.19.0
+  - @clerk/clerk-react@5.53.3
+  - @clerk/shared@3.28.3
+
 ## 6.33.7
 
 ### Patch Changes
