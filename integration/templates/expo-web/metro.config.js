@@ -19,6 +19,10 @@ const getClerkExpoPath = () => {
     return clerkExpoPath.replace('file:', '');
   }
 
+  if (clerkExpoPath?.startsWith('link:')) {
+    return clerkExpoPath.replace('link:', '');
+  }
+
   return undefined;
 };
 
@@ -26,25 +30,45 @@ const clerkExpoPath = getClerkExpoPath();
 const clerkMonorepoPath = clerkExpoPath?.replace(/\/packages\/expo$/, '');
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = {
-  ...getDefaultConfig(__dirname),
-  watchFolders: [clerkMonorepoPath],
-  resolver: {
-    sourceExts: ['js', 'json', 'ts', 'tsx', 'cjs', 'mjs'],
-    nodeModulesPaths: [
-      path.resolve(__dirname, 'node_modules'),
-      clerkExpoPath && `${clerkMonorepoPath}/node_modules`,
-      clerkExpoPath && `${clerkExpoPath}/node_modules`,
-    ],
-    // This is a workaround for a to prevent multiple versions of react and react-native from being loaded.
-    // https://github.com/expo/expo/pull/26209
-    blockList: [
-      clerkExpoPath && new RegExp(`${clerkMonorepoPath}/node_modules/react`),
-      clerkExpoPath && new RegExp(`${clerkMonorepoPath}/node_modules/react-native`),
-    ],
-  },
-};
+const config = getDefaultConfig(__dirname);
 
-module.exports = {
-  ...config,
-};
+// Only customize Metro config when running from monorepo
+if (clerkMonorepoPath) {
+  config.watchFolders = [clerkMonorepoPath];
+
+  // Prioritize local node_modules over monorepo node_modules
+  config.resolver.nodeModulesPaths = [path.resolve(__dirname, 'node_modules'), `${clerkMonorepoPath}/node_modules`];
+
+  // Explicitly map @clerk packages to their source locations
+  // Point to the root of the package so Metro can properly resolve subpath exports
+  config.resolver.extraNodeModules = {
+    '@clerk/clerk-react': path.resolve(clerkMonorepoPath, 'packages/react'),
+    '@clerk/clerk-expo': path.resolve(clerkMonorepoPath, 'packages/expo'),
+    '@clerk/shared': path.resolve(clerkMonorepoPath, 'packages/shared'),
+    '@clerk/types': path.resolve(clerkMonorepoPath, 'packages/types'),
+  };
+
+  // This is a workaround to prevent multiple versions of react and react-native from being loaded.
+  // Block React/React-Native in both monorepo root and all package node_modules
+  // Use word boundaries to avoid blocking clerk-react
+  // https://github.com/expo/expo/pull/26209
+  const escapedPath = clerkMonorepoPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  config.resolver.blockList = [
+    // Block monorepo root node_modules for react/react-native (exact match)
+    new RegExp(`${escapedPath}/node_modules/react/`),
+    new RegExp(`${escapedPath}/node_modules/react$`),
+    new RegExp(`${escapedPath}/node_modules/react-dom/`),
+    new RegExp(`${escapedPath}/node_modules/react-dom$`),
+    new RegExp(`${escapedPath}/node_modules/react-native/`),
+    new RegExp(`${escapedPath}/node_modules/react-native$`),
+    // Block react/react-native/react-dom in all package node_modules (exact match)
+    new RegExp(`${escapedPath}/packages/.*/node_modules/react/`),
+    new RegExp(`${escapedPath}/packages/.*/node_modules/react$`),
+    new RegExp(`${escapedPath}/packages/.*/node_modules/react-dom/`),
+    new RegExp(`${escapedPath}/packages/.*/node_modules/react-dom$`),
+    new RegExp(`${escapedPath}/packages/.*/node_modules/react-native/`),
+    new RegExp(`${escapedPath}/packages/.*/node_modules/react-native$`),
+  ];
+}
+
+module.exports = config;
