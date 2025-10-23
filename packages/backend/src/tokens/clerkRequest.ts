@@ -53,10 +53,10 @@ class ClerkRequest extends Request {
     // The default values are "X-Forwarded-Proto" and "X-Forwarded-Host" respectively, but the
     // header names can be overwritten via env vars.
     const forwardedProto = req.headers.get(
-      process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER ?? constants.Headers.ForwardedProto,
+      process.env.CLERK_PROXY_FORWARDED_PROTO_HEADER || constants.Headers.ForwardedProto,
     );
     const forwardedHost = req.headers.get(
-      process.env.CLERK_PROXY_FORWARDED_HOST_HEADER ?? constants.Headers.ForwardedHost,
+      process.env.CLERK_PROXY_FORWARDED_HOST_HEADER || constants.Headers.ForwardedHost,
     );
 
     const host = req.headers.get(constants.Headers.Host);
