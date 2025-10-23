@@ -55,7 +55,6 @@ export * from './router';
  */
 export * from './runtime-values';
 export * from './saml';
-export * from './samlAccount';
 export * from './samlConnection';
 export * from './session';
 export * from './sessionVerification';

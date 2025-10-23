@@ -8,7 +8,6 @@ export * from './ExternalAccount';
 export * from './IdentificationLink';
 export * from './Image';
 export * from './PhoneNumber';
-export * from './SamlAccount';
 export * from './Session';
 export * from './SessionWithActivities';
 export * from './SignIn';
@@ -18,4 +17,3 @@ export * from './User';
 export * from './Verification';
 export * from './Waitlist';
 export * from './Web3Wallet';
-
