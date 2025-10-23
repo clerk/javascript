@@ -24,12 +24,20 @@ export function SafeLock(key: string) {
         });
     }
 
-    if (await lock.acquireLock(key, 5000)) {
-      try {
-        return await cb();
-      } finally {
-        await lock.releaseLock(key);
+    try {
+      if (await lock.acquireLock(key, 5000)) {
+        try {
+          return await cb();
+        } finally {
+          try {
+            await lock.releaseLock(key);
+          } catch {
+            // Silently handle localStorage access errors during lock release
+          }
+        }
       }
+    } catch {
+      // Silently handle localStorage access errors during lock acquisition
     }
   };
 
