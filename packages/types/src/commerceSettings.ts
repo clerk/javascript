@@ -5,7 +5,7 @@ import type { CommerceSettingsJSONSnapshot } from './snapshots';
 export interface CommerceSettingsJSON extends ClerkResourceJSON {
   billing: {
     stripe_publishable_key: string;
-    free_trial_requires_payment_method?: boolean;
+    free_trial_requires_payment_method: boolean;
     organization: {
       enabled: boolean;
       has_paid_plans: boolean;
