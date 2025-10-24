@@ -88,7 +88,7 @@ export const application = (
         // Dump logs early to help diagnose startup issues
         try {
           const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
-          console.log(`[${name}:dev] ===== EARLY STDOUT (${stdoutContent.length} bytes) =====`);
+          console.log(`[${name}:dev] ===== EARLY STDOUT @5s (${stdoutContent.length} bytes) =====`);
           console.log(stdoutContent || '(empty)');
           console.log(`[${name}:dev] ===== END EARLY STDOUT =====`);
         } catch (e) {
@@ -97,12 +97,33 @@ export const application = (
 
         try {
           const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
-          console.log(`[${name}:dev] ===== EARLY STDERR (${stderrContent.length} bytes) =====`);
+          console.log(`[${name}:dev] ===== EARLY STDERR @5s (${stderrContent.length} bytes) =====`);
           console.log(stderrContent || '(empty)');
           console.log(`[${name}:dev] ===== END EARLY STDERR =====`);
         } catch (e) {
           console.log(`[${name}:dev] No stderr yet: ${e.message}`);
         }
+
+        // Schedule another dump after 30 seconds to see if Metro ever finishes bundling
+        setTimeout(async () => {
+          try {
+            const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
+            console.log(`[${name}:dev] ===== LATE STDOUT @30s (${stdoutContent.length} bytes) =====`);
+            console.log(stdoutContent || '(empty)');
+            console.log(`[${name}:dev] ===== END LATE STDOUT =====`);
+          } catch (e) {
+            console.log(`[${name}:dev] Could not read late stdout: ${e.message}`);
+          }
+
+          try {
+            const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
+            console.log(`[${name}:dev] ===== LATE STDERR @30s (${stderrContent.length} bytes) =====`);
+            console.log(stderrContent || '(empty)');
+            console.log(`[${name}:dev] ===== END LATE STDERR =====`);
+          } catch (e) {
+            console.log(`[${name}:dev] Could not read late stderr: ${e.message}`);
+          }
+        }, 25000).unref(); // 25 more seconds = 30 total
       }
 
       const shouldExit = () => {
