@@ -1,4 +1,4 @@
-import type { EnvironmentResource, ForPayerType } from '@clerk/types';
+import type { BillingSubscriptionResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
@@ -12,14 +12,48 @@ import {
 
 const hookName = 'useSubscription';
 
-type UseSubscriptionParams = {
+/**
+ * @interface
+ */
+export type UseSubscriptionParams = {
+  /**
+   * Specifies whether to fetch subscription for an organization or user.
+   *
+   * @default 'user'
+   */
   for?: ForPayerType;
   /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched.
+   * If `true`, the previous data will be kept in the cache until new data is fetched. This helps prevent layout shifts.
    *
    * @default false
    */
   keepPreviousData?: boolean;
+};
+
+/**
+ * @interface
+ */
+export type UseSubscriptionReturn = {
+  /**
+   * The subscription object, `undefined` before the first fetch, or `null` if no subscription exists.
+   */
+  data: BillingSubscriptionResource | null | undefined;
+  /**
+   * A boolean that indicates whether the initial data is still being fetched.
+   */
+  isLoading: boolean;
+  /**
+   * A boolean that indicates whether any request is still in flight, including background updates.
+   */
+  isFetching: boolean;
+  /**
+   * Any error that occurred during the data fetch, or `undefined` if no error occurred.
+   */
+  error: Error | undefined;
+  /**
+   * Function to manually trigger a refresh of the subscription data.
+   */
+  revalidate: () => Promise<BillingSubscriptionResource | null | undefined>;
 };
 
 /**
@@ -29,7 +63,7 @@ type UseSubscriptionParams = {
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export const useSubscription = (params?: UseSubscriptionParams) => {
+export function useSubscription(params?: UseSubscriptionParams): UseSubscriptionReturn {
   useAssertWrappedByClerkProvider(hookName);
 
   const clerk = useClerkInstanceContext();
@@ -77,4 +111,4 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     isFetching: swr.isValidating,
     revalidate,
   };
-};
+}
