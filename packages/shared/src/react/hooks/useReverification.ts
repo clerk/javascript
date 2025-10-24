@@ -54,7 +54,7 @@ export type NeedsReverificationParameters = {
  */
 export type UseReverificationOptions = {
   /**
-   * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
+   * Handler for the reverification process. Opts out of using the default UI. Use this to build a custom UI.
    *
    * @param properties - Callbacks and info to control the reverification flow.
    * @param properties.cancel - A function that will cancel the reverification process.
