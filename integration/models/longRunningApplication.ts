@@ -59,7 +59,9 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
       // will be called by global.setup.ts and by the test runner
       // the first time this is called, the app starts and the state is persisted in the state file
       init: async () => {
+        console.log(`[${id}] Starting init...`);
         try {
+          console.log(`[${id}] Setting up testing tokens...`);
           const publishableKey = params.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
           const secretKey = params.env.privateVariables.get('CLERK_SECRET_KEY');
           const apiUrl = params.env.privateVariables.get('CLERK_API_URL');
@@ -77,31 +79,41 @@ export const longRunningApplication = (params: LongRunningApplicationParams) => 
               dotenv: false,
             });
           }
+          console.log(`[${id}] Testing tokens setup complete`);
         } catch (error) {
           console.error('Error setting up testing tokens:', error);
           throw error;
         }
         try {
+          console.log(`[${id}] Committing config (copying template files)...`);
           app = await config.commit();
+          console.log(`[${id}] Config committed to ${app.appDir}`);
         } catch (error) {
           console.error('Error committing config:', error);
           throw error;
         }
         try {
+          console.log(`[${id}] Writing environment variables...`);
           await app.withEnv(params.env);
+          console.log(`[${id}] Environment variables written`);
         } catch (error) {
           console.error('Error setting up environment:', error);
           throw error;
         }
         try {
+          console.log(`[${id}] Running app setup (pnpm install)...`);
           await app.setup();
+          console.log(`[${id}] App setup complete`);
         } catch (error) {
           console.error('Error during app setup:', error);
           throw error;
         }
         try {
+          console.log(`[${id}] Starting dev server...`);
           const { port, serverUrl, pid } = await app.dev({ detached: true });
+          console.log(`[${id}] Dev server started at ${serverUrl} with pid ${pid}`);
           stateFile.addLongRunningApp({ port, serverUrl, pid, id, appDir: app.appDir, env: params.env.toJson() });
+          console.log(`[${id}] Init complete!`);
         } catch (error) {
           console.error('Error during app dev:', error);
           throw error;
