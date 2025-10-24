@@ -1,4 +1,4 @@
-import type { Attribute } from '@clerk/types';
+import type { Attribute, LastAuthenticationStrategy } from '@clerk/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';
@@ -8,6 +8,7 @@ type FirstFactorConfig = {
   type: string;
   placeholder: string | LocalizationKey;
   action?: string | LocalizationKey;
+  validLastAuthenticationStrategies: ReadonlySet<LastAuthenticationStrategy>;
 };
 const FirstFactorConfigs = Object.freeze({
   email_address_username: {
@@ -15,30 +16,46 @@ const FirstFactorConfigs = Object.freeze({
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress_username'),
     type: 'text',
     action: localizationKeys('signIn.start.actionLink__use_email_username'),
+    validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>([
+      'email_code',
+      'email_link',
+      'email_address',
+      'username',
+      'password',
+    ]),
   },
   email_address: {
     label: localizationKeys('formFieldLabel__emailAddress'),
     placeholder: localizationKeys('formFieldInputPlaceholder__emailAddress'),
     type: 'email',
     action: localizationKeys('signIn.start.actionLink__use_email'),
+    validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>([
+      'email_code',
+      'email_link',
+      'email_address',
+      'password',
+    ]),
   },
   phone_number: {
     label: localizationKeys('formFieldLabel__phoneNumber'),
     placeholder: localizationKeys('formFieldInputPlaceholder__phoneNumber'),
     type: 'tel',
     action: localizationKeys('signIn.start.actionLink__use_phone'),
+    validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(['phone_code', 'password']),
   },
   username: {
     label: localizationKeys('formFieldLabel__username'),
     placeholder: localizationKeys('formFieldInputPlaceholder__username'),
     type: 'text',
     action: localizationKeys('signIn.start.actionLink__use_username'),
+    validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(['username', 'password']),
   },
   default: {
     label: '',
     placeholder: '',
     type: 'text',
     action: '',
+    validLastAuthenticationStrategies: new Set<LastAuthenticationStrategy>(),
   },
 } as Record<SignInStartIdentifier | 'default', FirstFactorConfig>);
 

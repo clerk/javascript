@@ -21,7 +21,7 @@ export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promis
   }
 
   const identifiers = await ethereum.request({ method: 'eth_requestAccounts' });
-  // @ts-ignore
+  // @ts-ignore -- Provider SDKs may return unknown shape; use first address if present
   return (identifiers && identifiers[0]) || '';
 }
 
@@ -58,6 +58,10 @@ export async function getOKXWalletIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'okx_wallet' });
 }
 
+export async function getBaseIdentifier(): Promise<string> {
+  return await getWeb3Identifier({ provider: 'base' });
+}
+
 type GenerateSignatureParams = {
   identifier: string;
   nonce: string;
@@ -75,6 +79,10 @@ export async function generateSignatureWithOKXWallet(params: GenerateSignaturePa
   return await generateWeb3Signature({ ...params, provider: 'okx_wallet' });
 }
 
+export async function generateSignatureWithBase(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'base' });
+}
+
 async function getEthereumProvider(provider: Web3Provider) {
   if (provider === 'coinbase_wallet') {
     if (__BUILD_DISABLE_RHC__) {
@@ -90,7 +98,27 @@ async function getEthereumProvider(provider: Web3Provider) {
     });
     return sdk.getProvider();
   }
+  if (provider === 'base') {
+    if (__BUILD_DISABLE_RHC__) {
+      clerkUnsupportedEnvironmentWarning('Base');
+      return null;
+    }
 
-  const injectedWeb3Providers = getInjectedWeb3Providers();
-  return injectedWeb3Providers.get(provider);
+    try {
+      const createBaseAccountSDK = await import('@base-org/account').then(mod => mod.createBaseAccountSDK);
+
+      const sdk = createBaseAccountSDK({
+        appName:
+          (typeof window !== 'undefined' &&
+            (window.Clerk as any)?.__unstable__environment?.displayConfig?.applicationName) ||
+          (typeof document !== 'undefined' && document.title) ||
+          'Web3 Application',
+      });
+      return sdk.getProvider();
+    } catch {
+      return null;
+    }
+  }
+
+  return getInjectedWeb3Providers().get(provider);
 }

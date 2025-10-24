@@ -24,7 +24,9 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Lint Pull Request Title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           npm init --scope=clerk --yes
           npm i --save-dev @commitlint/config-conventional @commitlint/cli globby --audit=false --fund=false
-          echo '${{ github.event.pull_request.title }}' | npm exec @commitlint/cli -- --config commitlint.config.ts
+          echo "$PR_TITLE" | npm exec @commitlint/cli -- --config commitlint.config.ts

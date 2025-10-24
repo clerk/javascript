@@ -1,9 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import type {
   __internal_PlanDetailsProps,
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
   ClerkAPIResponseError,
-  CommercePlanResource,
-  CommerceSubscriptionPlanPeriod,
 } from '@clerk/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
@@ -80,13 +80,13 @@ const PlanDetailsInternal = ({
   initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
   const clerk = useClerk();
-  const [planPeriod, setPlanPeriod] = useState<CommerceSubscriptionPlanPeriod>(initialPlanPeriod);
+  const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(initialPlanPeriod);
 
   const {
     data: plan,
     isLoading,
     error,
-  } = useSWR<CommercePlanResource, ClerkAPIResponseError>(
+  } = useSWR<BillingPlanResource, ClerkAPIResponseError>(
     planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
     // @ts-expect-error we are handling it above
     () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
@@ -143,7 +143,7 @@ const PlanDetailsInternal = ({
           <Text
             elementDescriptor={descriptors.planDetailCaption}
             variant={'caption'}
-            localizationKey={localizationKeys('commerce.availableFeatures')}
+            localizationKey={localizationKeys('billing.availableFeatures')}
             colorScheme='secondary'
             sx={t => ({
               padding: t.space.$4,
@@ -217,9 +217,9 @@ const PlanDetailsInternal = ({
  * -----------------------------------------------------------------------------------------------*/
 
 interface HeaderProps {
-  plan: CommercePlanResource;
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
+  plan: BillingPlanResource;
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
   closeSlot?: React.ReactNode;
 }
 
@@ -328,7 +328,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                 marginInlineEnd: t.space.$1,
               },
             })}
-            localizationKey={localizationKeys('commerce.month')}
+            localizationKey={localizationKeys('billing.month')}
           />
         </>
       </Flex>
@@ -344,7 +344,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           <Switch
             isChecked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('commerce.billedAnnually')}
+            label={localizationKeys('billing.billedAnnually')}
           />
         </Box>
       ) : (
@@ -353,7 +353,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           variant='caption'
           colorScheme='secondary'
           localizationKey={
-            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
+            plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
           }
           sx={t => ({
             justifySelf: 'flex-start',

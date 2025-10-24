@@ -1,13 +1,14 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { OrganizationInvitationResource } from '@clerk/types';
-import { describe } from '@jest/globals';
-import { waitFor } from '@testing-library/dom';
+import { waitFor } from '@testing-library/react';
 import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
-import { render } from '../../../../testUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+
 import { Action } from '../../../elements/Action';
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { InviteMembersScreen } from '../InviteMembersScreen';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -60,7 +61,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -71,7 +72,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -82,7 +83,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: defaultRole,
             key: defaultRole,
             name: defaultRole,
@@ -119,7 +120,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -156,7 +157,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -167,7 +168,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'admin',
@@ -207,7 +208,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -218,7 +219,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -229,7 +230,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: defaultRole,
             key: defaultRole,
             name: defaultRole,
@@ -270,7 +271,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -281,7 +282,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -324,7 +325,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -335,7 +336,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -381,7 +382,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -392,7 +393,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -441,7 +442,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -452,7 +453,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -497,7 +498,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -508,7 +509,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -567,7 +568,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -578,7 +579,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -633,7 +634,7 @@ describe('InviteMembersPage', () => {
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -644,7 +645,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',

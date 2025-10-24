@@ -5,7 +5,10 @@ import type { SignInProps } from '@clerk/types';
 
 const clerk = useClerk();
 
-const props = defineProps<SignInProps>();
+const props = withDefaults(defineProps<SignInProps>(), {
+  transferable: undefined,
+  withSignUp: undefined,
+});
 </script>
 
 <template>

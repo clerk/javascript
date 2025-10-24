@@ -1,9 +1,9 @@
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
+  BillingCheckoutResource,
+  BillingSubscriptionPlanPeriod,
   ClerkAPIResponseError,
-  CommerceCheckoutResource,
-  CommerceSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
   SetActiveNavigate,
 } from '@clerk/types';
@@ -24,7 +24,7 @@ describe('useCheckout type tests', () => {
       type ValidOptions = {
         for: 'organization';
         planId: string;
-        planPeriod: CommerceSubscriptionPlanPeriod;
+        planPeriod: BillingSubscriptionPlanPeriod;
       };
       expectTypeOf<ValidOptions>().toMatchTypeOf<UseCheckoutParameters>();
     });
@@ -33,7 +33,7 @@ describe('useCheckout type tests', () => {
       type InvalidOptions = {
         for: 'invalid';
         planId: string;
-        planPeriod: CommerceSubscriptionPlanPeriod;
+        planPeriod: BillingSubscriptionPlanPeriod;
       };
       expectTypeOf<UseCheckoutParameters>().not.toEqualTypeOf<InvalidOptions>();
     });
@@ -51,7 +51,7 @@ describe('useCheckout type tests', () => {
       type InvalidOptions = {
         for: 'organization';
         planId: string;
-        planPeriod: CommerceSubscriptionPlanPeriod;
+        planPeriod: BillingSubscriptionPlanPeriod;
         invalidProp: boolean;
       };
       expectTypeOf<UseCheckoutParameters>().not.toEqualTypeOf<InvalidOptions>();
@@ -78,7 +78,7 @@ describe('useCheckout type tests', () => {
 
         type CheckoutResult =
           | {
-              data: CommerceCheckoutResource;
+              data: BillingCheckoutResource;
               error: null;
             }
           | {
@@ -101,7 +101,7 @@ describe('useCheckout type tests', () => {
 
         type CheckoutResult =
           | {
-              data: CommerceCheckoutResource;
+              data: BillingCheckoutResource;
               error: null;
             }
           | {
@@ -144,7 +144,7 @@ describe('useCheckout type tests', () => {
           | 'isImmediatePlanChange'
           | 'planPeriod'
           | 'plan'
-          | 'paymentSource'
+          | 'paymentMethod'
         >;
 
         type PropNames = keyof CheckoutProps;
@@ -156,7 +156,7 @@ describe('useCheckout type tests', () => {
           | 'isImmediatePlanChange'
           | 'planPeriod'
           | 'plan'
-          | 'paymentSource'
+          | 'paymentMethod'
         >();
       });
     });
@@ -201,7 +201,7 @@ describe('useCheckout type tests', () => {
           expectTypeOf<InitializationState['isImmediatePlanChange']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['planPeriod']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['plan']>().toEqualTypeOf<null>();
-          expectTypeOf<InitializationState['paymentSource']>().toEqualTypeOf<null | undefined>();
+          expectTypeOf<InitializationState['paymentMethod']>().toEqualTypeOf<null | undefined>();
 
           // Test that the status property is correctly typed
           expectTypeOf<InitializationState['status']>().toEqualTypeOf<'needs_initialization'>();

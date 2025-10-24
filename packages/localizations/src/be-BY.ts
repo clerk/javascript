@@ -68,8 +68,8 @@ export const beBY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Карыстальніцкая прылада',
   badge__you: 'Вы',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const beBY: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const beBY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const beBY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +221,7 @@ export const beBY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Увядзіце ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Увядзіце ваш нумар тэлефона',
   formFieldInputPlaceholder__username: 'Увядзіце імя карыстальніка',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -251,6 +253,7 @@ export const beBY: LocalizationResource = {
     action__signOut: 'Выйсці',
     title: 'Вы ўвайшлі як {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Апошняе выкарыстанне',
   maintenanceMode: 'Рэжым тэхнічнага абслугоўвання',
   membershipRole__admin: 'Адміністратар',
   membershipRole__basicMember: 'Удзельнік',
@@ -282,7 +285,7 @@ export const beBY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +294,7 @@ export const beBY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -317,6 +320,7 @@ export const beBY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -640,6 +644,10 @@ export const beBY: LocalizationResource = {
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код аднаўлення пароля',
       resendButton: 'Адправіць код яшчэ раз',
@@ -759,6 +767,10 @@ export const beBY: LocalizationResource = {
         subtitleNewTab: 'Вярніцеся на папярэднюю ўкладку, каб працягнуць',
         title: 'Пошта верыфікавана',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -967,7 +979,7 @@ export const beBY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -976,7 +988,7 @@ export const beBY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1002,6 +1014,7 @@ export const beBY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1034,7 +1047,8 @@ export const beBY: LocalizationResource = {
     deletePage: {
       actionDescription: "Увядзіце 'Выдаліць уліковы запіс' ніжэй, каб працягнуць.",
       confirm: 'Выдаліць уліковы запіс',
-      messageLine1: 'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс?',
+      messageLine1:
+        'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс? Некаторыя звязаныя дадзеныя могуць быць захаваны. Каб запытаць поўнае выдаленне дадзеных, звярніцеся ў службу падтрымкі.',
       messageLine2: "Гэта дзеянне з'яўляецца бессрочным і неабратным.",
       title: 'Выдаліць уліковы запіс',
     },

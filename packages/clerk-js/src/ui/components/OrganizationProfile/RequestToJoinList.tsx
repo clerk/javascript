@@ -84,6 +84,7 @@ const RequestRow = withCardStateProvider(
             sx={{ maxWidth: '30ch' }}
             showAvatar={false}
             user={{ primaryEmailAddress: { emailAddress: request.publicUserData.identifier } } as any}
+            subtitleProps={{ variant: 'caption' }}
           />
         </Td>
         <Td>

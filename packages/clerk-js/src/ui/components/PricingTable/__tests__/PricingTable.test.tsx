@@ -1,5 +1,8 @@
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { describe, expect, it, vi } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
+
 import { PricingTable } from '..';
 
 const { createFixtures } = bindCreateFixtures('PricingTable');
@@ -37,13 +40,14 @@ describe('PricingTable - trial info', () => {
     features: [] as any[],
     freeTrialEnabled: true,
     freeTrialDays: 14,
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   } as const;
 
   it('shows footer notice with trial end date when active subscription is in free trial', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
 
@@ -64,7 +68,6 @@ describe('PricingTable - trial info', () => {
           id: 'si_1',
           plan: trialPlan,
           createdAt: new Date('2021-01-01'),
-          paymentSourceId: 'src_1',
           pastDueAt: null,
           canceledAt: null,
           periodStart: new Date('2021-01-01'),
@@ -72,13 +75,13 @@ describe('PricingTable - trial info', () => {
           planPeriod: 'month' as const,
           status: 'active' as const,
           isFreeTrial: true,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { findByRole, getByText, userEvent } = render(<PricingTable />, { wrapper });
@@ -93,12 +96,18 @@ describe('PricingTable - trial info', () => {
     await waitFor(() => {
       // Trial footer notice uses badge__trialEndsAt localization (short date format)
       expect(getByText('Trial ends Jan 15, 2021')).toBeVisible();
+      // Ensure API args: user flow
+      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(
+        expect.objectContaining({ orgId: undefined }),
+      );
     });
   });
 
   it('shows CTA "Start N-day free trial" when eligible and plan has trial', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -117,7 +126,7 @@ describe('PricingTable - trial info', () => {
       // No subscription items for the trial plan yet
       subscriptionItems: [],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByRole, getByText } = render(<PricingTable />, { wrapper });
@@ -126,11 +135,18 @@ describe('PricingTable - trial info', () => {
       expect(getByRole('heading', { name: 'Pro' })).toBeVisible();
       // Button text from Plans.buttonPropsForPlan via freeTrialOr
       expect(getByText('Start 14-day free trial')).toBeVisible();
+      // Ensure API args: user flow
+      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(
+        expect.objectContaining({ orgId: undefined }),
+      );
     });
   });
 
   it('shows CTA "Start N-day free trial" when user is signed out and plan has trial', async () => {
-    const { wrapper, fixtures, props } = await createFixtures();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
 
     // Provide empty props to the PricingTable context
     props.setProps({});
@@ -145,11 +161,15 @@ describe('PricingTable - trial info', () => {
       expect(getByRole('heading', { name: 'Pro' })).toBeVisible();
       // Signed out users should see free trial CTA when plan has trial enabled
       expect(getByText('Start 14-day free trial')).toBeVisible();
+      // Ensure API args for signed-out flow: getPlans uses user context
+      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
     });
   });
 
   it('shows CTA "Subscribe" when user is signed out and plan has no trial', async () => {
-    const { wrapper, fixtures, props } = await createFixtures();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
 
     const nonTrialPlan = {
       ...trialPlan,
@@ -178,6 +198,7 @@ describe('PricingTable - trial info', () => {
   it('shows footer notice with "starts at" when subscription is upcoming and not a free trial', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -203,7 +224,6 @@ describe('PricingTable - trial info', () => {
           id: 'si_1',
           plan: nonTrialPlan,
           createdAt: new Date('2021-01-01'),
-          paymentSourceId: 'src_1',
           pastDueAt: null,
           canceledAt: null,
           periodStart: new Date('2021-02-01'),
@@ -211,13 +231,13 @@ describe('PricingTable - trial info', () => {
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
           isFreeTrial: false,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { findByRole, getByText, userEvent } = render(<PricingTable />, { wrapper });
@@ -269,9 +289,9 @@ describe('PricingTable - plans visibility', () => {
     features: [] as any[],
     freeTrialEnabled: false,
     freeTrialDays: 0,
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   } as const;
 
   it('shows no plans when user is signed in but has no subscription', async () => {
@@ -287,7 +307,7 @@ describe('PricingTable - plans visibility', () => {
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       subscriptionItems: [],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     } as any);
 
     const { queryByRole } = render(<PricingTable />, { wrapper });
@@ -301,6 +321,7 @@ describe('PricingTable - plans visibility', () => {
   it('shows plans when user is signed in and has a subscription', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -321,7 +342,6 @@ describe('PricingTable - plans visibility', () => {
           id: 'si_active',
           plan: testPlan,
           createdAt: new Date('2021-01-01'),
-          paymentSourceId: 'src_1',
           pastDueAt: null,
           canceledAt: null,
           periodStart: new Date('2021-01-01'),
@@ -329,13 +349,13 @@ describe('PricingTable - plans visibility', () => {
           planPeriod: 'month' as const,
           status: 'active' as const,
           isFreeTrial: false,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByRole } = render(<PricingTable />, { wrapper });
@@ -347,7 +367,9 @@ describe('PricingTable - plans visibility', () => {
   });
 
   it('shows plans when user is signed out', async () => {
-    const { wrapper, fixtures, props } = await createFixtures();
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+    });
 
     // Provide empty props to the PricingTable context
     props.setProps({});
@@ -367,6 +389,7 @@ describe('PricingTable - plans visibility', () => {
   it('shows no plans when user is signed in but subscription is null', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -387,6 +410,7 @@ describe('PricingTable - plans visibility', () => {
   it('shows no plans when user is signed in but subscription is undefined', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -407,6 +431,7 @@ describe('PricingTable - plans visibility', () => {
   it('prevents flicker by not showing plans while subscription is loading', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Provide empty props to the PricingTable context
@@ -442,7 +467,6 @@ describe('PricingTable - plans visibility', () => {
           id: 'si_active',
           plan: testPlan,
           createdAt: new Date('2021-01-01'),
-          paymentSourceId: 'src_1',
           pastDueAt: null,
           canceledAt: null,
           periodStart: new Date('2021-01-01'),
@@ -450,16 +474,176 @@ describe('PricingTable - plans visibility', () => {
           planPeriod: 'month' as const,
           status: 'active' as const,
           isFreeTrial: false,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     // Assert the plan heading appears after subscription resolves
     await findByRole('heading', { name: 'Test Plan' });
+  });
+
+  it('fetches organization plans and renders when using legacy forOrganizations: true', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+    });
+
+    // Set legacy prop via context provider
+    props.setProps({ forOrganizations: true } as any);
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_org_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active_org',
+          plan: { ...testPlan, forPayerType: 'organization' },
+          createdAt: new Date('2021-01-01'),
+          paymentMethodId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: vi.fn(),
+          pathRoot: '',
+          reload: vi.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: vi.fn(),
+    });
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Ensure plans rendered
+      expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
+      // Ensure API args reflect org context
+      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'organization' }));
+      // Ensure subscription called with active org
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'Org1' }));
+    });
+  });
+
+  it('fetches organization plans and renders when using for: organization', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withBilling();
+      f.withOrganizations();
+      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+    });
+
+    // Set new prop via context provider
+    props.setProps({ for: 'organization' } as any);
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_org_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active_org',
+          plan: { ...testPlan, forPayerType: 'organization' },
+          createdAt: new Date('2021-01-01'),
+          paymentMethodId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: vi.fn(),
+          pathRoot: '',
+          reload: vi.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: vi.fn(),
+    });
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Ensure plans rendered
+      expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
+      // Ensure getPlans was called with organization filter
+      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'organization' }));
+      // Ensure subscription called with active org
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'Org1' }));
+    });
+  });
+
+  it('fetches user plans and renders when using for: user', async () => {
+    const { wrapper, fixtures, props } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
+    });
+
+    // Set new prop via context provider
+    props.setProps({ for: 'user' } as any);
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
+    fixtures.clerk.billing.getSubscription.mockResolvedValue({
+      id: 'sub_active',
+      status: 'active',
+      activeAt: new Date('2021-01-01'),
+      createdAt: new Date('2021-01-01'),
+      nextPayment: null,
+      pastDueAt: null,
+      updatedAt: null,
+      subscriptionItems: [
+        {
+          id: 'si_active',
+          plan: testPlan,
+          createdAt: new Date('2021-01-01'),
+          paymentMethodId: 'src_1',
+          pastDueAt: null,
+          canceledAt: null,
+          periodStart: new Date('2021-01-01'),
+          periodEnd: new Date('2021-01-31'),
+          planPeriod: 'month' as const,
+          status: 'active' as const,
+          isFreeTrial: false,
+          cancel: vi.fn(),
+          pathRoot: '',
+          reload: vi.fn(),
+        },
+      ],
+      pathRoot: '',
+      reload: vi.fn(),
+    });
+
+    const { getByRole } = render(<PricingTable />, { wrapper });
+
+    await waitFor(() => {
+      // Should show plans when signed in and has subscription
+      expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
+      // Ensure getPlans was called with user filter
+      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
+      // Ensure subscription call is for user (no org)
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(
+        expect.objectContaining({ orgId: undefined }),
+      );
+    });
   });
 });

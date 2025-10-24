@@ -68,8 +68,8 @@ export const heIL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
   badge__you: 'אתה',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const heIL: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const heIL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const heIL: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const heIL: LocalizationResource = {
     action__signOut: 'התנתק',
     title: 'מחובר כ{{identifier}}',
   },
+  lastAuthenticationStrategy: 'בשימוש אחרון',
   maintenanceMode: undefined,
   membershipRole__admin: 'מנהל',
   membershipRole__basicMember: 'חבר',
@@ -280,7 +283,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -289,7 +292,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -315,6 +318,7 @@ export const heIL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -629,6 +633,10 @@ export const heIL: LocalizationResource = {
         titleNewTab: 'נכנס בכרטיסייה אחרת',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'אפס קוד הסיסמה',
       resendButton: 'שלח קוד שוב',
@@ -748,6 +756,10 @@ export const heIL: LocalizationResource = {
         subtitleNewTab: 'חזור לכרטיסייה הקודמת להמשיך',
         title: 'אימות דוא"ל הצליח',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -949,7 +961,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -958,7 +970,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -984,6 +996,7 @@ export const heIL: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1015,7 +1028,8 @@ export const heIL: LocalizationResource = {
     deletePage: {
       actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
-      messageLine1: 'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך?',
+      messageLine1:
+        'האם אתה בטוח שברצונך למחוק את החשבון שלך? חלק מהנתונים המשויכים עשויים להישמר. כדי לבקש מחיקת נתונים מלאה, אנא צור קשר עם התמיכה.',
       messageLine2: 'פעולה זו היא סופית ובלתי הפיכה.',
       title: 'מחק חשבון',
     },

@@ -5,7 +5,11 @@ import type { GoogleOneTapProps } from '@clerk/types';
 
 const clerk = useClerk();
 
-const props = defineProps<GoogleOneTapProps>();
+const props = withDefaults(defineProps<GoogleOneTapProps>(), {
+  cancelOnTapOutside: true,
+  itpSupport: true,
+  fedCmSupport: true,
+});
 </script>
 
 <template>

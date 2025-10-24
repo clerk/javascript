@@ -28,8 +28,11 @@ await Promise.allSettled([
   asyncSearchRHC('Turnstile', 'cloudflare.com/turnstile/v0/api.js'),
   asyncSearchRHC('clerk-js Hotloading', '/npm/@clerk/clerk-js'),
   asyncSearchRHC('Google One Tap', 'accounts.google.com/gsi/client'),
+  asyncSearchRHC('Coinbase', 'coinbase.com'),
+  asyncSearchRHC('Coinbase Wallet import', 'import\s*"@coinbase/wallet-sdk', true), // eslint-disable-line no-useless-escape
   asyncSearchRHC('Stripe', 'js.stripe.com'),
   asyncSearchRHC('Stripe import', 'import\s*"@stripe/stripe-js', true), // eslint-disable-line no-useless-escape
+  asyncSearchRHC('Base import', 'import\s*"@base-org/account', true), // eslint-disable-line no-useless-escape
 ]).then(results => {
   const errors = results.filter(result => result.status === 'rejected').map(result => result.reason.message);
 

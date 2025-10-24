@@ -68,8 +68,8 @@ export const esUY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo del usuario',
   badge__you: 'Vos',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const esUY: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const esUY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const esUY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +221,7 @@ export const esUY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresá tu contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingresá tu número de teléfono',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -251,6 +253,7 @@ export const esUY: LocalizationResource = {
     action__signOut: 'Cerrar sesión',
     title: 'Conectado como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Actualmente estamos en mantenimiento, pero no te preocupes, no tomará más que unos minutos.',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Miembro',
@@ -282,7 +285,7 @@ export const esUY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +294,7 @@ export const esUY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -317,6 +320,7 @@ export const esUY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -639,6 +643,10 @@ export const esUY: LocalizationResource = {
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código para restablecer la contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -760,6 +768,10 @@ export const esUY: LocalizationResource = {
         subtitleNewTab: 'Volvé a la pestaña anterior para continuar',
         title: 'Correo verificado con éxito',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -972,7 +984,7 @@ export const esUY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -981,7 +993,7 @@ export const esUY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1007,6 +1019,7 @@ export const esUY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1038,7 +1051,8 @@ export const esUY: LocalizationResource = {
     deletePage: {
       actionDescription: 'Escribí "Eliminar cuenta" abajo para continuar.',
       confirm: 'Eliminar cuenta',
-      messageLine1: '¿Estás seguro de que querés eliminar tu cuenta?',
+      messageLine1:
+        '¿Estás seguro de que querés eliminar tu cuenta? Es posible que se conserven algunos datos asociados. Para solicitar la eliminación completa de datos, contactá al soporte.',
       messageLine2: 'Esta acción es permanente e irreversible.',
       title: 'Eliminar cuenta',
     },

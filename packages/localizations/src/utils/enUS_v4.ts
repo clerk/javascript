@@ -516,7 +516,8 @@ export const enUS_v4: any = {
     },
     deletePage: {
       title: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
+      messageLine1:
+        'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
       messageLine2: 'This action is permanent and irreversible.',
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',

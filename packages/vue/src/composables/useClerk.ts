@@ -1,7 +1,7 @@
 import { useClerkContext } from './useClerkContext';
 
 /**
- * Returns the [`Clerk`](https://clerk.com/docs/references/javascript/clerk/clerk) instance which provides
+ * Returns the [`Clerk`](https://clerk.com/docs/reference/javascript/clerk/clerk) instance which provides
  * low-level access to Clerk's functionality, enabling custom authentication UI and flows.
  *
  * @example
@@ -18,7 +18,7 @@ import { useClerkContext } from './useClerkContext';
  * </template>
  */
 export const useClerk = () => {
-  const { clerk } = useClerkContext();
+  const { clerk } = useClerkContext('useClerk');
 
   return clerk;
 };

@@ -7,7 +7,7 @@ import { SubscriberTypeContext } from '../../contexts';
 import { Col, descriptors, localizationKeys } from '../../customizables';
 import { useTabState } from '../../hooks/useTabState';
 import { PaymentAttemptsList } from '../PaymentAttempts';
-import { PaymentSources } from '../PaymentSources';
+import { PaymentMethods } from '../PaymentMethods';
 import { StatementsList } from '../Statements';
 import { SubscriptionsList } from '../Subscriptions';
 
@@ -53,14 +53,17 @@ const BillingPageInternal = withCardStateProvider(() => {
             <TabPanel sx={_ => ({ width: '100%', flexDirection: 'column' })}>
               <SubscriptionsList
                 title={localizationKeys('userProfile.billingPage.subscriptionsListSection.title')}
-                arrowButtonText={localizationKeys(
+                switchPlansLabel={localizationKeys(
                   'userProfile.billingPage.subscriptionsListSection.actionLabel__switchPlan',
                 )}
-                arrowButtonEmptyText={localizationKeys(
+                newSubscriptionLabel={localizationKeys(
                   'userProfile.billingPage.subscriptionsListSection.actionLabel__newSubscription',
                 )}
+                manageSubscriptionLabel={localizationKeys(
+                  'userProfile.billingPage.subscriptionsListSection.actionLabel__manageSubscription',
+                )}
               />
-              <PaymentSources />
+              <PaymentMethods />
             </TabPanel>
             <TabPanel sx={{ width: '100%' }}>
               <StatementsList />

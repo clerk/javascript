@@ -1,16 +1,19 @@
-import type { CommerceStatementResource, GetStatementsParams } from '@clerk/types';
+import type { BillingStatementResource, GetStatementsParams } from '@clerk/types';
 
 import { useClerkInstanceContext } from '../contexts';
-import { createCommercePaginatedHook } from './createCommerceHook';
+import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
  * @internal
  */
-export const useStatements = createCommercePaginatedHook<CommerceStatementResource, GetStatementsParams>({
+export const useStatements = createBillingPaginatedHook<BillingStatementResource, GetStatementsParams>({
   hookName: 'useStatements',
-  resourceType: 'commerce-statements',
+  resourceType: 'billing-statements',
   useFetcher: () => {
     const clerk = useClerkInstanceContext();
-    return clerk.billing.getStatements;
+    if (clerk.loaded) {
+      return clerk.billing.getStatements;
+    }
+    return undefined;
   },
 });

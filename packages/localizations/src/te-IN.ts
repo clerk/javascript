@@ -68,8 +68,8 @@ export const teIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
   badge__you: 'మీరు',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const teIN: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const teIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const teIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const teIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__phoneNumber: 'మీ ఫోన్ నంబర్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const teIN: LocalizationResource = {
     action__signOut: 'సైన్ అవుట్',
     title: '{{identifier}} గా సైన్ ఇన్ చేసారు',
   },
+  lastAuthenticationStrategy: 'చివరిగా ఉపయోగించినది',
   maintenanceMode: 'మేము ప్రస్తుతం నిర్వహణలో ఉన్నాము, కానీ చింతించకండి, ఇది కొన్ని నిమిషాల కంటే ఎక్కువ సమయం తీసుకోదు.',
   membershipRole__admin: 'నిర్వాహకుడు',
   membershipRole__basicMember: 'సభ్యుడు',
@@ -280,7 +283,7 @@ export const teIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
         actionLabel__remove: 'తొలగించండి',
         add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
@@ -289,11 +292,11 @@ export const teIN: LocalizationResource = {
         formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
         formButtonPrimary__pay: '{{amount}} చెల్లించండి',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
           messageLine2:
             'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          successMessage: '{{paymentMethod}} మీ ఖాతా నుండి తొలగించబడింది.',
           title: 'చెల్లింపు మూలాన్ని తొలగించండి',
         },
         title: 'అందుబాటులో ఉన్న ఎంపికలు',
@@ -316,6 +319,7 @@ export const teIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -639,6 +643,10 @@ export const teIN: LocalizationResource = {
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'పాస్‌వర్డ్ రీసెట్ కోడ్',
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
@@ -760,6 +768,10 @@ export const teIN: LocalizationResource = {
         subtitleNewTab: 'కొనసాగించడానికి మునుపటి ట్యాబ్‌కి తిరిగి వెళ్ళండి',
         title: 'విజయవంతంగా ఇమెయిల్ ధృవీకరించబడింది',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -972,7 +984,7 @@ export const teIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
         actionLabel__remove: 'తొలగించండి',
         add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
@@ -981,11 +993,11 @@ export const teIN: LocalizationResource = {
         formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
         formButtonPrimary__pay: '{{amount}} చెల్లించండి',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
           messageLine2:
             'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          successMessage: '{{paymentMethod}} మీ ఖాతా నుండి తొలగించబడింది.',
           title: 'చెల్లింపు మూలాన్ని తొలగించండి',
         },
         title: 'అందుబాటులో ఉన్న ఎంపికలు',
@@ -1008,6 +1020,7 @@ export const teIN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1039,7 +1052,8 @@ export const teIN: LocalizationResource = {
     deletePage: {
       actionDescription: 'కొనసాగించడానికి క్రింద "Delete account" అని టైప్ చేయండి.',
       confirm: 'ఖాతాను తొలగించండి',
-      messageLine1: 'మీరు ఖచ్చితంగా మీ ఖాతాను తొలగించాలనుకుంటున్నారా?',
+      messageLine1:
+        'మీరు ఖచ్చితంగా మీ ఖాతాను తొలగించాలనుకుంటున్నారా? కొన్ని సంబంధిత డేటా ఉంచబడవచ్చు. పూర్తి డేటా తొలగింపును అభ్యర్థించడానికి, దయచేసి మద్దతును సంప్రదించండి.',
       messageLine2: 'ఈ చర్య శాశ్వతం మరియు తిరగదీయలేనిది.',
       title: 'ఖాతాను తొలగించండి',
     },

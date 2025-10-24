@@ -21,12 +21,14 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
       }
 
       if (!document || !document.body) {
-        reject(NO_DOCUMENT_ERROR);
+        reject(new Error(NO_DOCUMENT_ERROR));
       }
 
       const script = document.createElement('script');
 
-      if (crossOrigin) script.setAttribute('crossorigin', crossOrigin);
+      if (crossOrigin) {
+        script.setAttribute('crossorigin', crossOrigin);
+      }
       script.async = async || false;
       script.defer = defer || false;
 
@@ -35,9 +37,9 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
         resolve(script);
       });
 
-      script.addEventListener('error', () => {
+      script.addEventListener('error', event => {
         script.remove();
-        reject();
+        reject(event.error ?? new Error(`failed to load script: ${src}`));
       });
 
       script.src = src;

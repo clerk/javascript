@@ -68,8 +68,8 @@ export const nbNO: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brukerens enhet',
   badge__you: 'Du',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const nbNO: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const nbNO: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const nbNO: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +220,7 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -250,6 +252,7 @@ export const nbNO: LocalizationResource = {
     action__signOut: 'Logg ut',
     title: 'Logget inn som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Sist brukt',
   maintenanceMode: undefined,
   membershipRole__admin: 'Administrator',
   membershipRole__basicMember: 'Medlem',
@@ -281,7 +284,7 @@ export const nbNO: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +293,7 @@ export const nbNO: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -316,6 +319,7 @@ export const nbNO: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -635,6 +639,10 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Tilbakestill passord-kode',
       resendButton: 'Send kode på nytt',
@@ -755,6 +763,10 @@ export const nbNO: LocalizationResource = {
         subtitleNewTab: 'Gå tilbake til forrige fane for å fortsette',
         title: 'E-posten ble verifisert',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -960,7 +972,7 @@ export const nbNO: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +981,7 @@ export const nbNO: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -995,6 +1007,7 @@ export const nbNO: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1027,7 +1040,8 @@ export const nbNO: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv inn "Slett konto" under for å fortsette.',
       confirm: 'Slett konto',
-      messageLine1: 'Er du sikker på at du vil slette kontoen din?',
+      messageLine1:
+        'Er du sikker på at du vil slette kontoen din? Noen tilknyttede data kan beholdes. For å be om full sletting av data, vennligst kontakt kundestøtte.',
       messageLine2: 'Denne handlingen er permanent og kan ikke reverseres.',
       title: 'Slett konto',
     },

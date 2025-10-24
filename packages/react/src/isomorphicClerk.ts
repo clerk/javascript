@@ -11,16 +11,17 @@ import type {
   __internal_UserVerificationProps,
   APIKeysNamespace,
   APIKeysProps,
+  AuthenticateWithBaseParams,
   AuthenticateWithCoinbaseWalletParams,
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  BillingNamespace,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
   ClerkOptions,
   ClerkStatus,
   ClientResource,
-  CommerceBillingNamespace,
   CreateOrganizationParams,
   CreateOrganizationProps,
   DomainOrProxyUrl,
@@ -47,6 +48,7 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -56,6 +58,7 @@ import type {
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
+import { StateProxy } from './stateProxy';
 import type {
   BrowserClerk,
   BrowserClerkConstructor,
@@ -108,7 +111,7 @@ type IsomorphicLoadedClerk = Without<
   | '__internal_setActiveInProgress'
 > & {
   client: ClientResource | undefined;
-  billing: CommerceBillingNamespace | undefined;
+  billing: BillingNamespace | undefined;
   apiKeys: APIKeysNamespace | undefined;
 };
 
@@ -130,6 +133,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps | undefined>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps | undefined>();
+  private premountUserAvatarNodes = new Map<HTMLDivElement, UserAvatarProps | undefined>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps | undefined>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps | undefined>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps | undefined>();
@@ -157,6 +161,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #publishableKey: string;
   #eventBus = createClerkEventBus();
+  #stateProxy: StateProxy;
 
   get publishableKey(): string {
     return this.#publishableKey;
@@ -249,6 +254,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.options = options;
     this.Clerk = Clerk;
     this.mode = inBrowser() ? 'browser' : 'server';
+    this.#stateProxy = new StateProxy(this);
 
     if (!this.options.sdkMetadata) {
       this.options.sdkMetadata = SDK_METADATA;
@@ -617,6 +623,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountUserProfile(node, props);
     });
 
+    this.premountUserAvatarNodes.forEach((props, node) => {
+      clerkjs.mountUserAvatar(node, props);
+    });
+
     this.premountUserButtonNodes.forEach((props, node) => {
       clerkjs.mountUserButton(node, props);
     });
@@ -718,12 +728,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get billing(): CommerceBillingNamespace | undefined {
+  get billing(): BillingNamespace | undefined {
     return this.clerkjs?.billing;
   }
 
-  get __internal_state(): State | undefined {
-    return this.clerkjs?.__internal_state;
+  get __internal_state(): State {
+    return this.loaded && this.clerkjs ? this.clerkjs.__internal_state : this.#stateProxy;
   }
 
   get apiKeys(): APIKeysNamespace | undefined {
@@ -742,6 +752,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
+  // TODO @userland-errors:
   __unstable__updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
@@ -966,6 +977,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignUp(node);
     } else {
       this.premountSignUpNodes.delete(node);
+    }
+  };
+
+  mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountUserAvatar(node, props);
+    } else {
+      this.premountUserAvatarNodes.set(node, props);
+    }
+  };
+
+  unmountUserAvatar = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountUserAvatar(node);
+    } else {
+      this.premountUserAvatarNodes.delete(node);
     }
   };
 
@@ -1347,6 +1374,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithCoinbaseWallet', callback);
+    }
+  };
+
+  authenticateWithBase = async (params?: AuthenticateWithBaseParams) => {
+    const callback = () => this.clerkjs?.authenticateWithBase(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithBase', callback);
     }
   };
 

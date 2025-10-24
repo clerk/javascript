@@ -68,8 +68,8 @@ export const enGB: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'User device',
   badge__you: 'You',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const enGB: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const enGB: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const enGB: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -205,7 +206,7 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: 'Enter backup code',
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Confirm account deletion',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
   formFieldInputPlaceholder__emailAddress: 'Enter your email address',
   formFieldInputPlaceholder__emailAddress_username: 'Enter email or username',
   formFieldInputPlaceholder__emailAddresses: 'example@email.com, example2@email.com',
@@ -218,6 +219,7 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const enGB: LocalizationResource = {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Last used',
   maintenanceMode:
     "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
@@ -281,7 +284,7 @@ export const enGB: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +293,7 @@ export const enGB: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -316,6 +319,7 @@ export const enGB: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -637,6 +641,10 @@ export const enGB: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -757,6 +765,10 @@ export const enGB: LocalizationResource = {
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -966,7 +978,7 @@ export const enGB: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -975,7 +987,7 @@ export const enGB: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1001,6 +1013,7 @@ export const enGB: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1033,7 +1046,8 @@ export const enGB: LocalizationResource = {
     deletePage: {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
+      messageLine1:
+        'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

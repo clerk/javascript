@@ -1,5 +1,8 @@
 import type { MachineScopeJSON } from './JSON';
 
+/**
+ * The Backend `MachineScope` object holds information about a machine scope.
+ */
 export class MachineScope {
   constructor(
     readonly fromMachineId: string,

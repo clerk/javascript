@@ -2,15 +2,12 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
-  CommerceSubscriptionItemJSON,
-  CommerceSubscriptionItemResource,
   CreateOrganizationParams,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
   GetMemberships,
   GetRolesParams,
-  GetSubscriptionsParams,
   InviteMemberParams,
   InviteMembersParams,
   OrganizationDomainJSON,
@@ -31,8 +28,8 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/commerce';
-import { BaseResource, CommerceSubscriptionItem, OrganizationInvitation, OrganizationMembership } from './internal';
+import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
+import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
@@ -233,24 +230,6 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new OrganizationMembership(res?.response as OrganizationMembershipJSON));
   };
 
-  getSubscriptions = async (
-    getSubscriptionsParams?: GetSubscriptionsParams,
-  ): Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>> => {
-    return await BaseResource._fetch({
-      path: `/organizations/${this.id}/commerce/subscriptions`,
-      method: 'GET',
-      search: convertPageToOffsetSearchParams(getSubscriptionsParams),
-    }).then(res => {
-      const { data: subscriptions, total_count } =
-        res?.response as unknown as ClerkPaginatedResponse<CommerceSubscriptionItemJSON>;
-
-      return {
-        total_count,
-        data: subscriptions.map(subscription => new CommerceSubscriptionItem(subscription)),
-      };
-    });
-  };
-
   destroy = async (): Promise<void> => {
     return this._baseDelete();
   };
@@ -283,22 +262,22 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 
-  initializePaymentSource: typeof initializePaymentSource = params => {
-    return initializePaymentSource({
+  initializePaymentMethod: typeof initializePaymentMethod = params => {
+    return initializePaymentMethod({
       ...params,
       orgId: this.id,
     });
   };
 
-  addPaymentSource: typeof addPaymentSource = params => {
-    return addPaymentSource({
+  addPaymentMethod: typeof addPaymentMethod = params => {
+    return addPaymentMethod({
       ...params,
       orgId: this.id,
     });
   };
 
-  getPaymentSources: typeof getPaymentSources = params => {
-    return getPaymentSources({
+  getPaymentMethods: typeof getPaymentMethods = params => {
+    return getPaymentMethods({
       ...params,
       orgId: this.id,
     });

@@ -68,8 +68,8 @@ export const jaJP: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const jaJP: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const jaJP: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const jaJP: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +220,7 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__password: 'パスワード',
   formFieldInputPlaceholder__phoneNumber: '電話番号',
   formFieldInputPlaceholder__username: 'ユーザー名',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -250,6 +252,7 @@ export const jaJP: LocalizationResource = {
     action__signOut: 'サインアウト',
     title: '{{identifier}}としてサインイン中',
   },
+  lastAuthenticationStrategy: '最後に使用したもの',
   maintenanceMode: undefined,
   membershipRole__admin: '管理者',
   membershipRole__basicMember: 'メンバー',
@@ -281,7 +284,7 @@ export const jaJP: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +293,7 @@ export const jaJP: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -316,6 +319,7 @@ export const jaJP: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -635,6 +639,10 @@ export const jaJP: LocalizationResource = {
         titleNewTab: '他のタブでサインイン済み',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'パスワードリセットコード',
       resendButton: 'コードを再送信',
@@ -756,6 +764,10 @@ export const jaJP: LocalizationResource = {
         title: 'メールアドレスが正常に確認されました',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: '{{privacyPolicyLink || link("個人情報保護方針")}}に同意します',
@@ -776,13 +788,15 @@ export const jaJP: LocalizationResource = {
       title: '電話番号を確認',
     },
     restrictedAccess: {
-      actionLink: undefined,
-      actionText: undefined,
-      blockButton__emailSupport: undefined,
-      blockButton__joinWaitlist: undefined,
-      subtitle: undefined,
-      subtitleWaitlist: undefined,
-      title: undefined,
+      actionLink: 'サインイン',
+      actionText: '既にアカウントをお持ちですか？',
+      blockButton__emailSupport: 'サポートに連絡',
+      blockButton__joinWaitlist: '待機リストに参加',
+      subtitle:
+        '現在サインアップは無効になっています。アクセス権限があると思われる場合は、サポートまでご連絡ください。',
+      subtitleWaitlist:
+        '現在サインアップは無効になっています。リリース時に最初に通知を受け取るには、待機リストにご参加ください。',
+      title: 'アクセス制限',
     },
     start: {
       actionLink: 'サインイン',
@@ -960,7 +974,7 @@ export const jaJP: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +983,7 @@ export const jaJP: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -995,6 +1009,7 @@ export const jaJP: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1026,7 +1041,8 @@ export const jaJP: LocalizationResource = {
     deletePage: {
       actionDescription: '続行するには下記に「Delete account」を入力してください。',
       confirm: 'アカウント削除',
-      messageLine1: 'アカウントを削除してもよろしいですか？',
+      messageLine1:
+        'アカウントを削除してもよろしいですか？一部の関連データが保持される場合があります。完全なデータ削除をリクエストするには、サポートにお問い合わせください。',
       messageLine2: 'この操作は永久的で取り消すことはできません。',
       title: 'アカウントの削除',
     },
@@ -1270,16 +1286,16 @@ export const jaJP: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'サインイン',
+      actionText: '既にアクセス権をお持ちですか？',
+      formButton: '待機リストに参加',
+      subtitle: 'メールアドレスを入力していただければ、準備が整い次第お知らせいたします',
+      title: '待機リストに参加',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '間もなくリダイレクトされます...',
+      subtitle: '準備が整い次第ご連絡いたします',
+      title: '待機リストへの参加ありがとうございます！',
     },
   },
 } as const;

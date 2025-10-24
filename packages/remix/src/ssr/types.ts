@@ -18,10 +18,6 @@ export type RootAuthLoaderOptions = {
   jwtKey?: string;
   secretKey?: string;
   /**
-   * Used to override the CLERK_MACHINE_SECRET_KEY env variable if needed.
-   */
-  machineSecretKey?: string;
-  /**
    * @deprecated Use [session token claims](https://clerk.com/docs/backend-requests/making/custom-session-token) instead.
    */
   loadUser?: boolean;

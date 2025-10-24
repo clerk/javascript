@@ -1,25 +1,21 @@
-import { Feature } from './Feature';
-import type { CommercePlanJSON } from './JSON';
+import type { BillingMoneyAmount } from '@clerk/types';
 
-type CommerceMoneyAmount = {
-  amount: number;
-  amountFormatted: string;
-  currency: string;
-  currencySymbol: string;
-};
+import { Feature } from './Feature';
+import type { BillingPlanJSON } from './JSON';
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * It is advised to pin the SDK version to avoid breaking changes.
+ * The `BillingPlan` object is similar to the [`BillingPlanResource`](/docs/reference/javascript/types/billing-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `BillingPlan` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/plans) and is not directly accessible from the Frontend API.
+ *
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export class CommercePlan {
+export class BillingPlan {
   constructor(
     /**
      * The unique identifier for the plan.
      */
     readonly id: string,
     /**
-     * The id of the product the plan belongs to.
+     * The ID of the product the plan belongs to.
      */
     readonly productId: string,
     /**
@@ -53,15 +49,15 @@ export class CommercePlan {
     /**
      * The monthly fee of the plan.
      */
-    readonly fee: CommerceMoneyAmount,
+    readonly fee: BillingMoneyAmount,
     /**
      * The annual fee of the plan.
      */
-    readonly annualFee: CommerceMoneyAmount,
+    readonly annualFee: BillingMoneyAmount,
     /**
      * The annual fee of the plan on a monthly basis.
      */
-    readonly annualMonthlyFee: CommerceMoneyAmount,
+    readonly annualMonthlyFee: BillingMoneyAmount,
     /**
      * The type of payer for the plan.
      */
@@ -72,8 +68,8 @@ export class CommercePlan {
     readonly features: Feature[],
   ) {}
 
-  static fromJSON(data: CommercePlanJSON): CommercePlan {
-    const formatAmountJSON = (fee: CommercePlanJSON['fee']) => {
+  static fromJSON(data: BillingPlanJSON): BillingPlan {
+    const formatAmountJSON = (fee: BillingPlanJSON['fee']) => {
       return {
         amount: fee.amount,
         amountFormatted: fee.amount_formatted,
@@ -81,7 +77,7 @@ export class CommercePlan {
         currencySymbol: fee.currency_symbol,
       };
     };
-    return new CommercePlan(
+    return new BillingPlan(
       data.id,
       data.product_id,
       data.name,

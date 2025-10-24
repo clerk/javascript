@@ -24,7 +24,6 @@ const LEVEL_COLORS = {
   debug: COLORS.green,
   error: COLORS.red,
   info: COLORS.blue,
-  trace: COLORS.magenta,
   warn: COLORS.yellow,
 } as const;
 
@@ -70,9 +69,6 @@ export class ConsoleTransport implements DebugTransport {
         break;
       case 'debug':
         console.debug(message);
-        break;
-      case 'trace':
-        console.trace(message);
         break;
       default:
         console.log(message);

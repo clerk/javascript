@@ -1,8 +1,4 @@
-import type {
-  CommercePaymentSourceMethods,
-  CommerceSubscriptionItemResource,
-  GetSubscriptionsParams,
-} from './commerce';
+import type { BillingPayerMethods } from './billing';
 import type { OrganizationDomainResource, OrganizationEnrollmentMode } from './organizationDomain';
 import type { OrganizationInvitationResource, OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationCustomRoleKey, OrganizationMembershipResource } from './organizationMembership';
@@ -35,11 +31,11 @@ declare global {
 /**
  * The `Organization` object holds information about an organization, as well as methods for managing it.
  *
- * To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/organizations/overview#enable-organizations-in-your-application).
+ * To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/guides/organizations/overview#enable-organizations-in-your-application).
  *
  * @interface
  */
-export interface OrganizationResource extends ClerkResource, CommercePaymentSourceMethods {
+export interface OrganizationResource extends ClerkResource, BillingPayerMethods {
   id: string;
   name: string;
   slug: string | null;
@@ -60,12 +56,6 @@ export interface OrganizationResource extends ClerkResource, CommercePaymentSour
   getMembershipRequests: (
     params?: GetMembershipRequestParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationMembershipRequestResource>>;
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   */
-  getSubscriptions: (
-    params?: GetSubscriptionsParams,
-  ) => Promise<ClerkPaginatedResponse<CommerceSubscriptionItemResource>>;
   addMember: (params: AddMemberParams) => Promise<OrganizationMembershipResource>;
   inviteMember: (params: InviteMemberParams) => Promise<OrganizationInvitationResource>;
   inviteMembers: (params: InviteMembersParams) => Promise<OrganizationInvitationResource[]>;

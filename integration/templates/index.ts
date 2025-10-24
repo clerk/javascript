@@ -14,11 +14,11 @@ export const templates = {
   'astro-hybrid': resolve(__dirname, './astro-hybrid'),
   'expo-web': resolve(__dirname, './expo-web'),
   'tanstack-react-start': resolve(__dirname, './tanstack-react-start'),
-  'tanstack-react-router': resolve(__dirname, './tanstack-react-router'),
   'vue-vite': resolve(__dirname, './vue-vite'),
   'nuxt-node': resolve(__dirname, './nuxt-node'),
   'react-router-node': resolve(__dirname, './react-router-node'),
   'react-router-library': resolve(__dirname, './react-router-library'),
+  'custom-flows-react-vite': resolve(__dirname, './custom-flows-react-vite'),
 } as const;
 
 if (new Set([...Object.values(templates)]).size !== Object.values(templates).length) {

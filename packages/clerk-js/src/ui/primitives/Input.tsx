@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { localizationKeys, useLocalizations } from '../localization';
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
 import { sanitizeInputProps, useFormField } from './hooks/useFormField';
@@ -63,10 +64,11 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
-  // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
-  const { errorMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
+  const { t } = useLocalizations();
+  // @ts-expect-error Typescript is complaining that `feedbackMessageId` does not exist. We are clearly passing them from above.
+  const { feedbackMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
     fieldControl,
-    ['errorMessageId', 'ignorePasswordManager', 'feedbackType'],
+    ['feedbackMessageId', 'ignorePasswordManager', 'feedbackType'],
   );
 
   const propsWithoutVariants = filterProps({
@@ -86,7 +88,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
 
   const typeProps =
     type === 'email'
-      ? { type: 'text' as const, pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputMode: 'email' as const }
+      ? {
+          type: 'text' as const,
+          pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$',
+          inputMode: 'email' as const,
+          title: t(localizationKeys('formFieldInput__emailAddress_format')),
+        }
       : { type: type || ('text' as const) };
 
   const passwordManagerProps = ignorePasswordManager
@@ -106,11 +113,42 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       required={_required}
       id={props.id || fieldControlProps.id}
       aria-invalid={_hasError}
-      aria-describedby={errorMessageId ? errorMessageId : undefined}
+      aria-describedby={feedbackMessageId || undefined}
       aria-required={_required}
       aria-disabled={_disabled}
       data-feedback={feedbackType}
       data-variant={props.variant || 'default'}
+      css={applyVariants(props)}
+    />
+  );
+});
+
+/**
+ * This is to allow for the creation of "fake" input elements that are not actually inputs.
+ * This is used to create the OTPInputSegment component.
+ */
+export type DivInputProps = PrimitiveProps<'div'> & StyleVariants<typeof applyVariants> & OwnProps & RequiredProp;
+
+export const DivInput = React.forwardRef<HTMLDivElement, DivInputProps>((props, ref) => {
+  const fieldControl = useFormField() || {};
+  // @ts-expect-error Typescript is complaining that `errorMessageId` does not exist. We are clearly passing them from above.
+  const { feedbackType } = sanitizeInputProps(fieldControl, ['feedbackType', 'data-active']);
+
+  const propsWithoutVariants = filterProps({
+    ...props,
+    hasError: props.hasError,
+  });
+  const { isDisabled, hasError, focusRing, isRequired, ...rest } = propsWithoutVariants;
+
+  return (
+    <div
+      {...rest}
+      ref={ref}
+      id={props.id}
+      aria-invalid={hasError}
+      data-feedback={feedbackType}
+      data-variant={props.variant || 'default'}
+      data-focus-within={focusRing}
       css={applyVariants(props)}
     />
   );

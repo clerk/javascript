@@ -1,3 +1,5 @@
+import type { SessionAuthObject } from '@clerk/backend';
+import type { GetAuthFnNoRequest, RedirectFun } from '@clerk/backend/internal';
 import type { APIContext } from 'astro';
 
 /**
@@ -15,3 +17,9 @@ export type AstroMiddleware = MiddlewareHandler;
 export type AstroMiddlewareContextParam = APIContext;
 export type AstroMiddlewareNextParam = MiddlewareNext;
 export type AstroMiddlewareReturn = Response | Promise<Response>;
+
+export type SessionAuthObjectWithRedirect = SessionAuthObject & {
+  redirectToSignIn: RedirectFun<Response>;
+};
+
+export type AuthFn = GetAuthFnNoRequest<SessionAuthObjectWithRedirect>;

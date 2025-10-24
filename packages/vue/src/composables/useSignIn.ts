@@ -9,7 +9,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
 
 /**
- * Returns the current [`SignIn`](https://clerk.com/docs/references/javascript/sign-in) object which provides
+ * Returns the current [`SignIn`](https://clerk.com/docs/reference/javascript/sign-in) object which provides
  * methods and state for managing the sign-in flow.
  *
  * @example
@@ -30,7 +30,7 @@ type UseSignIn = () => ToComputedRefs<UseSignInReturn>;
  * </template>
  */
 export const useSignIn: UseSignIn = () => {
-  const { clerk, clientCtx } = useClerkContext();
+  const { clerk, clientCtx } = useClerkContext('useSignIn');
 
   const unwatch = watch(clerk, value => {
     if (value) {

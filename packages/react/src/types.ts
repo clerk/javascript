@@ -29,7 +29,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   clerkJSUrl?: string;
   /**
-   * If your web application only uses [Control Components](https://clerk.com/docs/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
+   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
    */
   clerkJSVariant?: 'headless' | '';
   /**
@@ -41,7 +41,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   publishableKey: string;
   /**
-   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/security/clerk-csp#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/guides/secure/best-practices/csp-headers#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
    */
   nonce?: string;
 } & MultiDomainAndOrProxy;
@@ -52,7 +52,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
 export type ClerkProviderProps = IsomorphicClerkOptions & {
   children: React.ReactNode;
   /**
-   * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
+   * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
   initialState?: InitialState;
   /**

@@ -204,6 +204,8 @@ export type ElementsConfig = {
   socialButtonsProviderIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
   socialButtonsProviderInitialIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel, LoadingState>;
 
+  lastAuthenticationStrategyBadge: WithOptions;
+
   enterpriseButtonsProviderIcon: WithOptions<EnterpriseProvider, LoadingState>;
 
   providerIcon: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel | SamlIdpSlug, LoadingState>;
@@ -228,6 +230,7 @@ export type ElementsConfig = {
   otpCodeFieldInput: WithOptions;
   otpCodeFieldInputContainer: WithOptions;
   otpCodeFieldErrorText: WithOptions;
+  otpCodeFieldSuccessText: WithOptions;
 
   dividerRow: WithOptions;
   dividerColumn: WithOptions;
@@ -355,6 +358,9 @@ export type ElementsConfig = {
   taskChooseOrganizationPreviewItems: WithOptions;
   taskChooseOrganizationCreateOrganizationActionButton: WithOptions;
   taskChooseOrganizationPreviewButton: WithOptions;
+
+  userAvatarBox: WithOptions;
+  userAvatarImage: WithOptions;
 
   // TODO: Test this idea. Instead of userButtonUserPreview, have a userPreview__userButton instead
   // Same for other repeated selectors, eg avatar
@@ -488,12 +494,12 @@ export type ElementsConfig = {
   selectOptionsContainer: WithOptions<SelectId>;
   selectOption: WithOptions<SelectId>;
 
-  paymentSourceRow: WithOptions;
-  paymentSourceRowIcon: WithOptions;
-  paymentSourceRowText: WithOptions;
-  paymentSourceRowType: WithOptions;
-  paymentSourceRowValue: WithOptions;
-  paymentSourceRowBadge: WithOptions<'default' | 'expired'>;
+  paymentMethodRow: WithOptions;
+  paymentMethodRowIcon: WithOptions;
+  paymentMethodRowText: WithOptions;
+  paymentMethodRowType: WithOptions;
+  paymentMethodRowValue: WithOptions;
+  paymentMethodRowBadge: WithOptions<'default' | 'expired'>;
 
   statementRoot: WithOptions;
   statementHeader: WithOptions;
@@ -557,6 +563,7 @@ export type ElementsConfig = {
   profileSectionSubtitleText: WithOptions<ProfileSectionId>;
   profileSectionContent: WithOptions<ProfileSectionId>;
   profileSectionPrimaryButton: WithOptions<ProfileSectionId>;
+  profileSectionButtonGroup: WithOptions<ProfileSectionId>;
   profilePage: WithOptions<ProfilePageId>;
 
   // TODO: review
@@ -634,6 +641,10 @@ export type ElementsConfig = {
   subscriptionDetailsDetailRow: WithOptions;
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;
+
+  enterpriseConnectionsRoot: WithOptions;
+  enterpriseConnectionButton: WithOptions;
+  enterpriseConnectionButtonText: WithOptions;
 };
 
 export type Elements = {
@@ -964,6 +975,7 @@ export type CaptchaAppearanceOptions = {
 export type SignInTheme = Theme;
 export type SignUpTheme = Theme;
 export type UserButtonTheme = Theme;
+export type UserAvatarTheme = Theme;
 export type UserProfileTheme = Theme;
 export type OrganizationSwitcherTheme = Theme;
 export type OrganizationListTheme = Theme;
@@ -998,6 +1010,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<SignUp/>` component
      */
     signUp?: T;
+    /**
+     * Theme overrides that only apply to the `<UserAvatar/>` component
+     */
+    userAvatar?: T;
     /**
      * Theme overrides that only apply to the `<UserButton/>` component
      */

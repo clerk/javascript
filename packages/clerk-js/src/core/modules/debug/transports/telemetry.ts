@@ -1,6 +1,6 @@
-import type { TelemetryCollector } from '@clerk/shared/telemetry';
+import type { TelemetryCollector } from '@clerk/types';
 
-import type { DebugLogEntry, DebugLogFilter, DebugLogLevel, DebugTransport } from '../types';
+import type { DebugLogEntry, DebugLogLevel, DebugTransport } from '../types';
 
 /**
  * Options for configuring a telemetry-backed transport.
@@ -10,7 +10,6 @@ import type { DebugLogEntry, DebugLogFilter, DebugLogLevel, DebugTransport } fro
 export interface TelemetryLoggerOptions {
   endpoint?: string;
   logLevel?: DebugLogLevel;
-  filters?: DebugLogFilter[];
 }
 
 /**

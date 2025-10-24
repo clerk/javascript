@@ -69,8 +69,8 @@ export const faIR: LocalizationResource = {
   badge__upcomingPlan: 'به زودی',
   badge__userDevice: 'دستگاه کاربر',
   badge__you: 'شما',
-  commerce: {
-    addPaymentMethod: 'افزودن روش پرداخت',
+  billing: {
+    addPaymentMethod__label: 'افزودن روش پرداخت',
     alwaysFree: 'همیشه رایگان',
     annually: 'سالانه',
     availableFeatures: 'ویژگی ها',
@@ -83,6 +83,7 @@ export const faIR: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "شما می‌توانید تا تاریخ {{ date | longDate('en-US') }} از ویژگی‌های '{{plan}}' استفاده کنید، پس از آن دیگر دسترسی نخواهید داشت.",
     cancelSubscriptionNoCharge: 'برای این اشتراک هیچ هزینه‌ای از شما دریافت نخواهد شد.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'اشتراک {{plan}} لغو شود؟',
     cannotSubscribeMonthly:
       'شما نمی‌توانید با پرداخت ماهانه در این طرح مشترک شوید. برای عضویت در این طرح، باید پرداخت سالانه را انتخاب کنید.',
@@ -125,8 +126,7 @@ export const faIR: LocalizationResource = {
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
-    paymentMethods: 'روش های پرداخت',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
         monthly: 'پرداخت ماهانه',
@@ -140,6 +140,7 @@ export const faIR: LocalizationResource = {
         testCardInfo: 'تست اطلاعات کارت',
       },
     },
+    paymentMethods__label: 'روش های پرداخت',
     popular: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
@@ -224,6 +225,7 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',
@@ -255,6 +257,7 @@ export const faIR: LocalizationResource = {
     action__signOut: 'خروج',
     title: 'با نام کاربری {{identifier}} وارد سیستم شدم',
   },
+  lastAuthenticationStrategy: 'آخرین استفاده',
   maintenanceMode: 'در حال حاضر در حال تعمیر و نگهداری هستیم، اما نگران نباشید، نباید بیشتر از چند دقیقه طول بکشد.',
   membershipRole__admin: 'مدیر',
   membershipRole__basicMember: 'عضو',
@@ -286,7 +289,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -295,11 +298,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',
@@ -322,6 +325,7 @@ export const faIR: LocalizationResource = {
         totalPaid: 'کل پرداختی',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: undefined,
@@ -644,6 +648,10 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -764,6 +772,10 @@ export const faIR: LocalizationResource = {
         subtitleNewTab: 'برای ادامه به برگه قبلی برگردید',
         title: 'ایمیل با موفقیت تأیید شد',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -970,7 +982,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -979,11 +991,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',
@@ -1006,6 +1018,7 @@ export const faIR: LocalizationResource = {
         totalPaid: 'کل پرداختی',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'در یک طرح مشترک شوید',
         actionLabel__switchPlan: 'تغییر طرح',
         tableHeader__edit: 'ویرایش',
@@ -1038,7 +1051,8 @@ export const faIR: LocalizationResource = {
     deletePage: {
       actionDescription: 'برای ادامه، عبارت "Delete account" را در زیر تایپ کنید.',
       confirm: 'حذف حساب',
-      messageLine1: 'آیا مطمئن هستید که می‌خواهید حساب کاربری خود را حذف کنید؟',
+      messageLine1:
+        'آیا مطمئن هستید که می‌خواهید حساب خود را حذف کنید؟ برخی از داده‌های مرتبط ممکن است حفظ شوند. برای درخواست حذف کامل داده‌ها، لطفاً با پشتیبانی تماس بگیرید.',
       messageLine2: 'این اقدام دائمی و غیرقابل برگشت است.',
       title: 'حذف حساب',
     },

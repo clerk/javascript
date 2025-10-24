@@ -13,7 +13,7 @@ export type CacheSetter<CData = any> = (
  */
 export type PaginatedResources<T = unknown, Infinite = false> = {
   /**
-   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/references/javascript/types/organization-membership) objects.
+   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/reference/javascript/types/organization-membership) objects.
    */
   data: T[];
   /**
@@ -110,12 +110,21 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
    */
   enabled?: boolean;
   /**
-   * @experimental
    * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
    *
    * @default undefined
+   *
+   * @hidden
+   * @experimental
    */
   __experimental_mode?: 'cache';
+
+  /**
+   * @experimental
+   *
+   * @hidden
+   */
+  isSignedIn?: boolean;
 }>;
 
 /**
@@ -135,10 +144,13 @@ export type PagesOrInfiniteOptions = {
    */
   pageSize?: number;
   /**
-   * @experimental
    * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
    *
    * @default undefined
+   *
+   * @hidden
+   *
+   * @experimental
    */
   __experimental_mode?: 'cache';
 };

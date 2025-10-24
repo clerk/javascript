@@ -38,7 +38,7 @@ const SDK_METADATA = {
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
   install(app, pluginOptions) {
-    const { initialState } = pluginOptions;
+    const { initialState } = pluginOptions || {};
 
     const loaded = shallowRef(false);
     const clerk = shallowRef<Clerk | null>(null);

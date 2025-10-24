@@ -57,8 +57,8 @@ export const enUS: LocalizationResource = {
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
-  commerce: {
-    addPaymentMethod: 'Add payment method',
+  billing: {
+    addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',
     annually: 'Annually',
     availableFeatures: 'Available features',
@@ -66,12 +66,14 @@ export const enUS: LocalizationResource = {
     billedMonthlyOnly: 'Only billed monthly',
     cancelFreeTrial: 'Cancel free trial',
     cancelFreeTrialAccessUntil:
-      "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be changed.",
+      "Your trial will stay active until {{ date | longDate('en-US') }}. After that, you'll lose access to trial features. You won't be charged.",
     cancelFreeTrialTitle: 'Cancel free trial for {{plan}} plan?',
     cancelSubscription: 'Cancel subscription',
     cancelSubscriptionAccessUntil:
       "You can keep using '{{plan}}' features until {{ date | longDate('en-US') }}, after which you will no longer have access.",
     cancelSubscriptionNoCharge: 'You will not be charged for this subscription.',
+    cancelSubscriptionPastDue:
+      'Your subscription will end immediately and you will lose access to all plan features. You will be asked to pay the past due amount on your next subscription.',
     cancelSubscriptionTitle: 'Cancel {{plan}} Subscription?',
     cannotSubscribeMonthly:
       'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
@@ -114,8 +116,7 @@ export const enUS: LocalizationResource = {
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
-    paymentMethods: 'Payment Methods',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Annual payment',
         monthly: 'Monthly payment',
@@ -129,6 +130,7 @@ export const enUS: LocalizationResource = {
         testCardInfo: 'Test card information',
       },
     },
+    paymentMethods__label: 'Payment Methods',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
@@ -212,6 +214,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: 'Example format: name@example.com',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Secret key name',
@@ -243,6 +246,7 @@ export const enUS: LocalizationResource = {
     action__signOut: 'Sign out',
     title: 'Signed in as {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Last used',
   maintenanceMode:
     "We are currently undergoing maintenance, but don't worry, it shouldn't take more than a few minutes.",
   membershipRole__admin: 'Admin',
@@ -275,7 +279,7 @@ export const enUS: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
         add: 'Add new payment method',
@@ -284,11 +288,11 @@ export const enUS: LocalizationResource = {
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         payWithTestCardButton: 'Pay with test card',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
-            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
+            'You will no longer be able to use this payment method and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentMethod}} has been removed from your account.',
           title: 'Remove payment method',
         },
         title: 'Payment methods',
@@ -311,6 +315,7 @@ export const enUS: LocalizationResource = {
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',
@@ -633,6 +638,10 @@ export const enUS: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -753,6 +762,10 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
     },
     legalConsent: {
       checkbox: {
@@ -959,7 +972,7 @@ export const enUS: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
         add: 'Add new payment method',
@@ -968,11 +981,11 @@ export const enUS: LocalizationResource = {
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         payWithTestCardButton: 'Pay with test card',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
             'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
+          successMessage: '{{paymentMethod}} has been removed from your account.',
           title: 'Remove payment method',
         },
         title: 'Payment methods',
@@ -995,6 +1008,7 @@ export const enUS: LocalizationResource = {
         totalPaid: 'Total paid',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: 'Manage',
         actionLabel__newSubscription: 'Subscribe to a plan',
         actionLabel__switchPlan: 'Switch plans',
         tableHeader__edit: 'Edit',
@@ -1027,7 +1041,8 @@ export const enUS: LocalizationResource = {
     deletePage: {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
+      messageLine1:
+        'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

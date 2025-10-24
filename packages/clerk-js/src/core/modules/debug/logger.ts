@@ -1,4 +1,4 @@
-import type { DebugLogEntry, DebugLogFilter, DebugLogLevel, DebugTransport } from './types';
+import type { DebugLogEntry, DebugLogLevel, DebugTransport } from './types';
 
 /**
  * Default log level for debug logging
@@ -11,7 +11,6 @@ const DEFAULT_LOG_LEVEL: DebugLogLevel = 'debug';
  * @public
  */
 export class DebugLogger {
-  private readonly filters?: DebugLogFilter[];
   private readonly logLevel: DebugLogLevel;
   private readonly transport: DebugTransport;
 
@@ -20,12 +19,10 @@ export class DebugLogger {
    *
    * @param transport - Transport used to send log entries
    * @param logLevel - Minimum log level to record. Defaults to `'debug'`
-   * @param filters - Optional list of filters to include or exclude messages
    */
-  constructor(transport: DebugTransport, logLevel?: DebugLogLevel, filters?: DebugLogFilter[]) {
+  constructor(transport: DebugTransport, logLevel?: DebugLogLevel) {
     this.transport = transport;
     this.logLevel = logLevel ?? DEFAULT_LOG_LEVEL;
-    this.filters = filters;
   }
 
   /**
@@ -61,16 +58,7 @@ export class DebugLogger {
     this.log('info', message, context, source);
   }
 
-  /**
-   * Log a trace message.
-   *
-   * @param message - Text description of the event
-   * @param context - Optional structured context to attach
-   * @param source - Optional logical source identifier
-   */
-  trace(message: string, context?: Record<string, unknown>, source?: string): void {
-    this.log('trace', message, context, source);
-  }
+  // trace level removed
 
   /**
    * Log a warning message.
@@ -88,10 +76,6 @@ export class DebugLogger {
       return;
     }
 
-    if (!this.shouldLogFilters(level, message, source)) {
-      return;
-    }
-
     const entry: DebugLogEntry = {
       timestamp: Date.now(),
       level,
@@ -106,77 +90,9 @@ export class DebugLogger {
   }
 
   private shouldLogLevel(level: DebugLogLevel): boolean {
-    const levels: DebugLogLevel[] = ['error', 'warn', 'info', 'debug', 'trace'];
+    const levels: DebugLogLevel[] = ['error', 'warn', 'info', 'debug'];
     const currentLevelIndex = levels.indexOf(this.logLevel);
     const messageLevelIndex = levels.indexOf(level);
     return messageLevelIndex <= currentLevelIndex;
-  }
-
-  private shouldLogFilters(level: DebugLogLevel, message: string, source?: string): boolean {
-    if (!this.filters || this.filters.length === 0) {
-      return true;
-    }
-
-    return this.filters.every(filter => {
-      if (filter.level && filter.level !== level) {
-        return false;
-      }
-
-      if (filter.source && !this.matchesSource(filter.source, source)) {
-        return false;
-      }
-
-      if (
-        filter.includePatterns &&
-        filter.includePatterns.length > 0 &&
-        !this.shouldInclude(message, filter.includePatterns)
-      ) {
-        return false;
-      }
-
-      if (
-        filter.excludePatterns &&
-        filter.excludePatterns.length > 0 &&
-        this.shouldExclude(message, filter.excludePatterns)
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-  }
-
-  /**
-   * Checks if a source matches the given pattern (string or RegExp)
-   */
-  private matchesSource(pattern: string | RegExp, source?: string): boolean {
-    if (typeof pattern === 'string') {
-      return source === pattern;
-    }
-    return source !== undefined && pattern.test(source);
-  }
-
-  /**
-   * Checks if a message should be included based on the given patterns
-   */
-  private shouldInclude(message: string, patterns: (string | RegExp)[]): boolean {
-    return patterns.some(pattern => this.matchesPattern(message, pattern));
-  }
-
-  /**
-   * Checks if a message should be excluded based on the given patterns
-   */
-  private shouldExclude(message: string, patterns: (string | RegExp)[]): boolean {
-    return patterns.some(pattern => this.matchesPattern(message, pattern));
-  }
-
-  /**
-   * Checks if a message matches a given pattern (string or RegExp)
-   */
-  private matchesPattern(message: string, pattern: string | RegExp): boolean {
-    if (typeof pattern === 'string') {
-      return message.includes(pattern);
-    }
-    return pattern.test(message);
   }
 }

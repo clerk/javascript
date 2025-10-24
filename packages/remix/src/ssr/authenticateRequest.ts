@@ -8,12 +8,12 @@ import { patchRequest } from './utils';
 
 export async function authenticateRequest(
   args: LoaderFunctionArgs,
-  opts: AuthenticateRequestOptions,
+  opts: Omit<AuthenticateRequestOptions, 'machineSecretKey'>,
 ): Promise<SignedInState | SignedOutState> {
   const { request } = args;
   const { audience, authorizedParties } = opts;
 
-  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, machineSecretKey } = opts;
+  const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey } = opts;
   const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
 
   const requestState = await createClerkClient({
@@ -32,7 +32,6 @@ export async function authenticateRequest(
     signUpUrl,
     afterSignInUrl,
     afterSignUpUrl,
-    machineSecretKey,
   });
 
   const locationHeader = requestState.headers.get(constants.Headers.Location);

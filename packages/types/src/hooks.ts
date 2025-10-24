@@ -1,14 +1,13 @@
-import type { OrganizationCustomRoleKey } from 'organizationMembership';
-import type { SignInResource } from 'signIn';
-
 import type { SetActive, SignOut } from './clerk';
 import type { ActClaim, JwtPayload } from './jwtv2';
+import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type {
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   SessionResource,
   SignedInSessionResource,
 } from './session';
+import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { UserResource } from './user';
 
@@ -43,11 +42,11 @@ export type UseAuthReturn =
        */
       sessionId: undefined;
       /**
-       * The current user's [session claims](https://clerk.com/docs/backend-requests/resources/session-tokens).
+       * The current user's [session claims](https://clerk.com/docs/guides/sessions/session-tokens).
        */
       sessionClaims: undefined;
       /**
-       * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
+       * The JWT actor for the session. Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
        */
       actor: undefined;
       /**
@@ -63,15 +62,15 @@ export type UseAuthReturn =
        */
       orgSlug: undefined;
       /**
-       * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/references/backend/types/auth-object#has).
+       * A function that checks if the user has specific permissions or roles. See the [reference doc](https://clerk.com/docs/reference/backend/types/auth-object#has).
        */
       has: CheckAuthorizationSignedOut;
       /**
-       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/references/javascript/clerk#sign-out).
+       * A function that signs out the current user. Returns a promise that resolves when complete. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#sign-out).
        */
       signOut: SignOut;
       /**
-       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/references/javascript/session#get-token).
+       * A function that retrieves the current user's session token or a custom JWT template. Returns a promise that resolves to the token. See the [reference doc](https://clerk.com/docs/reference/javascript/session#get-token).
        */
       getToken: GetToken;
     }
@@ -132,7 +131,7 @@ export type UseSignInReturn =
        */
       signIn: undefined;
       /**
-       * A function that sets the active session.
+       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
        */
       setActive: undefined;
     }
@@ -156,7 +155,7 @@ export type UseSignUpReturn =
        */
       signUp: undefined;
       /**
-       * A function that sets the active session.
+       * A function that sets the active session. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
        */
       setActive: undefined;
     }
@@ -209,7 +208,7 @@ export type UseSessionListReturn =
        */
       sessions: undefined;
       /**
-       * A function that sets the active session and/or organization.
+       * A function that sets the active session and/or organization. See the [reference doc](https://clerk.com/docs/reference/javascript/clerk#set-active).
        */
       setActive: undefined;
     }

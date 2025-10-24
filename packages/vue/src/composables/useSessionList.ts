@@ -8,7 +8,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSessionList = () => ToComputedRefs<UseSessionListReturn>;
 
 /**
- * Returns an array of [`Session`](https://clerk.com/docs/references/javascript/session) objects that have been
+ * Returns an array of [`Session`](https://clerk.com/docs/reference/javascript/session) objects that have been
  * registered on the client device.
  *
  * @example
@@ -32,7 +32,7 @@ type UseSessionList = () => ToComputedRefs<UseSessionListReturn>;
  * </template>
  */
 export const useSessionList: UseSessionList = () => {
-  const { clerk, clientCtx } = useClerkContext();
+  const { clerk, clientCtx } = useClerkContext('useSessionList');
 
   const result = computed<UseSessionListReturn>(() => {
     if (!clientCtx.value) {

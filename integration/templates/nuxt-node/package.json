@@ -10,7 +10,7 @@
     "preview": "nuxt preview --port $PORT"
   },
   "dependencies": {
-    "nuxt": "^3.15.0",
+    "nuxt": "4.1.2",
     "vue": "^3.5.13",
     "vue-router": "^4.4.5"
   }

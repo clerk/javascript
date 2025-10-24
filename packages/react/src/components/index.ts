@@ -9,6 +9,7 @@ export {
   SignIn,
   SignUp,
   TaskChooseOrganization,
+  UserAvatar,
   UserButton,
   UserProfile,
   Waitlist,

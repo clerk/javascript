@@ -141,6 +141,7 @@ export default defineNuxtModule<ModuleOptions>({
       // Authentication Components
       'SignIn',
       'SignUp',
+      'GoogleOneTap',
       // Unstyled Components
       'SignInButton',
       'SignOutButton',
@@ -154,6 +155,8 @@ export default defineNuxtModule<ModuleOptions>({
       'OrganizationProfile',
       'OrganizationSwitcher',
       'OrganizationList',
+      // Billing Components
+      'PricingTable',
       // Control Components
       'ClerkLoaded',
       'ClerkLoading',
@@ -166,7 +169,6 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
-      'PricingTable',
     ];
     components.forEach(component => {
       void addComponent({

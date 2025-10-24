@@ -1,7 +1,6 @@
-import type { ClerkPaginationParams } from 'pagination';
-
 import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
+import type { ClerkPaginationParams } from './pagination';
 import type {
   APIKeysTheme,
   Appearance,
@@ -17,22 +16,24 @@ import type {
   SignUpTheme,
   SubscriptionDetailsTheme,
   TaskChooseOrganizationTheme,
+  UserAvatarTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
   WaitlistTheme,
 } from './appearance';
-import type { ClientResource } from './client';
 import type {
-  CommerceBillingNamespace,
-  CommerceCheckoutResource,
-  CommercePlanResource,
-  CommerceSubscriptionPlanPeriod,
+  BillingCheckoutResource,
+  BillingNamespace,
+  BillingPlanResource,
+  BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
   ForPayerType,
-} from './commerce';
+} from './billing';
+import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
+import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
@@ -69,20 +70,20 @@ export type __experimental_CheckoutCacheState = Readonly<{
   isStarting: boolean;
   isConfirming: boolean;
   error: ClerkAPIResponseError | null;
-  checkout: CommerceCheckoutResource | null;
+  checkout: BillingCheckoutResource | null;
   fetchStatus: 'idle' | 'fetching' | 'error';
   status: __experimental_CheckoutStatus;
 }>;
 
 export type __experimental_CheckoutOptions = {
   for?: ForPayerType;
-  planPeriod: CommerceSubscriptionPlanPeriod;
+  planPeriod: BillingSubscriptionPlanPeriod;
   planId: string;
 };
 
 type CheckoutResult =
   | {
-      data: CommerceCheckoutResource;
+      data: BillingCheckoutResource;
       error: null;
     }
   | {
@@ -122,7 +123,7 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
 export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => Promise<unknown>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
 
@@ -232,24 +233,17 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /**
-   * @experimental This experimental API is subject to change.
-   *
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
+   *
+   * @experimental This experimental API is subject to change.
    */
-  __internal_state: State | undefined;
+  __internal_state: State;
 
   /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * @see https://clerk.com/docs/billing/overview
-   *
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  billing: CommerceBillingNamespace;
+  billing: BillingNamespace;
 
   telemetry: TelemetryCollector | undefined;
 
@@ -417,6 +411,21 @@ export interface Clerk {
   unmountSignUp: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a user avatar component at the target element.
+   *
+   * @param targetNode Target node to mount the UserAvatar component.
+   */
+  mountUserAvatar: (targetNode: HTMLDivElement, userAvatarProps?: UserAvatarProps) => void;
+
+  /**
+   * Unmount a user avatar component at the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the UserAvatar component from.
+   */
+  unmountUserAvatar: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mount a user button component at the target element.
    *
    * @param targetNode Target node to mount the UserButton component.
@@ -490,8 +499,8 @@ export interface Clerk {
   /**
    * Prefetches the data displayed by an organization switcher.
    * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
-   * This API is still under active development and may change at any moment.
-   * @experimental
+   *
+   * @experimental This experimental API is subject to change.
    * @param props Optional user verification configuration parameters.
    */
   __experimental_prefetchOrganizationSwitcher: () => void;
@@ -819,6 +828,11 @@ export interface Clerk {
   authenticateWithOKXWallet: (params?: AuthenticateWithOKXWalletParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using Base Account SDK
+   */
+  authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
@@ -958,21 +972,36 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkOptionsLegacyRedirectProps = {
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
+   */
+  afterSignInUrl?: string | null;
+  /**
+   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
+   */
+  afterSignUpUrl?: string | null;
+  /**
+   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
+   */
+  redirectUrl?: string | null;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  LegacyRedirectProps &
+  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -985,7 +1014,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
     supportEmail?: string;
     /**
@@ -993,11 +1022,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     touchSession?: boolean;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signInUrl?: string;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signUpUrl?: string;
     /**
@@ -1013,7 +1042,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
     telemetry?:
       | false
@@ -1023,14 +1052,19 @@ export type ClerkOptions = ClerkOptionsNavigation &
            * Telemetry events are only logged to the console and not sent to Clerk
            */
           debug?: boolean;
+          /**
+           * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
+           * @default true
+           */
+          perEventSampling?: boolean;
         };
 
     /**
-     * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
+     * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
      */
     sdkMetadata?: SDKMetadata;
     /**
-     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/account-portal/overview#waitlist).
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/customizing-clerk/account-portal#waitlist).
      */
     waitlistUrl?: string;
     /**
@@ -1075,7 +1109,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * Customize the URL paths users are redirected to after sign-in or sign-up when specific
      * session tasks need to be completed.
      *
-     * @default undefined - Uses Clerk's default task flow URLs
+     * When `undefined`, it uses Clerk's default task flow URLs.
+     * @default undefined
      */
     taskUrls?: Record<SessionTask['key'], string>;
   };
@@ -1463,6 +1498,7 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the user profile modal will open.
+   * @example __experimental_startPath: '/members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1494,6 +1530,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the organization profile modal will open.
+   * @example __experimental_startPath: '/organization-members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1528,8 +1565,9 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   appearance?: CreateOrganizationTheme;
   /**
-   * Hides the optional "slug" field in the organization creation screen.
-   * @default false
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
@@ -1560,9 +1598,9 @@ export type UserButtonProps = UserButtonProfileMode & {
   /**
    * If true the `<UserButton />` will only render the popover.
    * Enables developers to implement a custom dialog.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
    * @default undefined
+   * @experimental This API is experimental and may change at any moment.
    */
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
@@ -1606,6 +1644,11 @@ export type UserButtonProps = UserButtonProfileMode & {
   customMenuItems?: CustomMenuItem[];
 };
 
+export type UserAvatarProps = {
+  appearance?: UserAvatarTheme;
+  rounded?: boolean;
+};
+
 type PrimitiveKeys<T> = {
   [K in keyof T]: T[K] extends string | boolean | number | null ? K : never;
 }[keyof T];
@@ -1630,9 +1673,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * If true, `<OrganizationSwitcher />` will only render the popover.
      * Enables developers to implement a custom dialog.
-     * This API is experimental and may change at any moment.
-     * @experimental
+     *
      * @default undefined
+     * @experimental This API is experimental and may change at any moment.
      */
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
@@ -1683,8 +1726,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * Hides the optional "slug" field in the organization creation screen.
-     * @default false
+     * @deprecated
+     * This prop will be removed in a future version.
+     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
      */
     hideSlug?: boolean;
     /**
@@ -1743,8 +1787,9 @@ export type OrganizationListProps = {
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
   /**
-   * Hides the optional "slug" field in the organization creation screen.
-   * @default false
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
@@ -1788,10 +1833,11 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   /**
-   * Whether to show pricing table for organizations.
-   * @default false
+   * The subscriber type to display plans for.
+   * If `organization`, show plans for the active organization; otherwise for the user.
+   * @default 'user'
    */
-  forOrganizations?: boolean;
+  for?: ForPayerType;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`
@@ -1852,19 +1898,12 @@ export type RevokeAPIKeyParams = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_CheckoutProps = {
   appearance?: CheckoutTheme;
   planId?: string;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   portalId?: string;
@@ -1878,18 +1917,11 @@ export type __internal_CheckoutProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_CheckoutButtonProps = {
   planId: string;
-  planPeriod?: CommerceSubscriptionPlanPeriod;
+  planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
@@ -1906,14 +1938,7 @@ export type __experimental_CheckoutButtonProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_PlanDetailsProps = (
   | {
@@ -1924,25 +1949,18 @@ export type __internal_PlanDetailsProps = (
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
-      plan: CommercePlanResource;
+      plan: BillingPlanResource;
       planId?: never;
     }
 ) & {
   appearance?: PlanDetailTheme;
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_PlanDetailsButtonProps = (
   | {
@@ -1953,11 +1971,11 @@ export type __experimental_PlanDetailsButtonProps = (
       /**
        * The plan object will be used as initial data until the plan is fetched from the server.
        */
-      plan: CommercePlanResource;
+      plan: BillingPlanResource;
       planId?: never;
     }
 ) & {
-  initialPlanPeriod?: CommerceSubscriptionPlanPeriod;
+  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   planDetailsProps?: {
     appearance?: PlanDetailTheme;
     portalId?: string;
@@ -1966,14 +1984,7 @@ export type __experimental_PlanDetailsButtonProps = (
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_SubscriptionDetailsProps = {
   /**
@@ -1989,14 +2000,7 @@ export type __internal_SubscriptionDetailsProps = {
 };
 
 /**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
- * @see https://clerk.com/docs/billing/overview
- *
- * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
- * @example
- * ```tsx
- * <ClerkProvider clerkJsVersion="x.x.x" />
- * ```
+ * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**
@@ -2177,6 +2181,14 @@ export interface AuthenticateWithOKXWalletParams {
 
 export interface AuthenticateWithGoogleOneTapParams {
   token: string;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
 

@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { CommerceCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
+import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import type { Stripe, StripeElements } from '@stripe/stripe-js';
-import { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import React from 'react';
+import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -69,13 +68,13 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const resource = forResource === 'organization' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
 
-  const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
+  const { data: initializedPaymentMethod, trigger: initializePaymentMethod } = useSWRMutation(
     {
-      key: 'commerce-payment-source-initialize',
+      key: 'billing-payment-method-initialize',
       resourceId: resource?.id,
     },
     () => {
-      return resource?.initializePaymentSource({
+      return resource?.initializePaymentMethod({
         gateway: 'stripe',
       });
     },
@@ -84,15 +83,17 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const environment = useInternalEnvironment();
 
   useEffect(() => {
-    if (!resource?.id) return;
-    initializePaymentSource().catch(() => {
+    if (!resource?.id) {
+      return;
+    }
+    initializePaymentMethod().catch(() => {
       // ignore errors
     });
   }, [resource?.id]);
 
-  const externalGatewayId = initializedPaymentSource?.externalGatewayId;
-  const externalClientSecret = initializedPaymentSource?.externalClientSecret;
-  const paymentMethodOrder = initializedPaymentSource?.paymentMethodOrder;
+  const externalGatewayId = initializedPaymentMethod?.externalGatewayId;
+  const externalClientSecret = initializedPaymentMethod?.externalClientSecret;
+  const paymentMethodOrder = initializedPaymentMethod?.paymentMethodOrder;
   const stripePublishableKey = environment?.commerceSettings.billing.stripePublishableKey;
 
   const { data: stripe } = useSWR(
@@ -113,7 +114,7 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
 
   return {
     stripe,
-    initializePaymentSource,
+    initializePaymentMethod,
     externalClientSecret,
     paymentMethodOrder,
   };
@@ -139,7 +140,7 @@ type internalStripeAppearance = {
 };
 
 type PaymentElementProviderProps = {
-  checkout?: CommerceCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  checkout?: BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   stripeAppearance?: internalStripeAppearance;
   /**
    * Default to `user` if not provided.
@@ -322,7 +323,7 @@ type UsePaymentElementReturn = {
 );
 
 const usePaymentElement = (): UsePaymentElementReturn => {
-  const { isPaymentElementReady, initializePaymentSource } = usePaymentElementContext();
+  const { isPaymentElementReady, initializePaymentMethod } = usePaymentElementContext();
   const { stripe, elements } = useStripeUtilsContext();
   const { externalClientSecret } = usePaymentElementContext();
 
@@ -362,8 +363,8 @@ const usePaymentElement = (): UsePaymentElementReturn => {
       return throwLibsMissingError();
     }
 
-    await initializePaymentSource();
-  }, [stripe, elements, initializePaymentSource]);
+    await initializePaymentMethod();
+  }, [stripe, elements, initializePaymentMethod]);
 
   const isProviderReady = Boolean(stripe && externalClientSecret);
 
@@ -388,7 +389,7 @@ const usePaymentElement = (): UsePaymentElementReturn => {
 };
 
 export {
-  PaymentElementProvider as __experimental_PaymentElementProvider,
   PaymentElement as __experimental_PaymentElement,
+  PaymentElementProvider as __experimental_PaymentElementProvider,
   usePaymentElement as __experimental_usePaymentElement,
 };

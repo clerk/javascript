@@ -41,11 +41,32 @@ const routes = [
     path: '/pricing-table',
     component: () => import('./views/PricingTable.vue'),
   },
+  {
+    name: 'UserAvatar',
+    path: '/user-avatar',
+    component: () => import('./views/UserAvatar.vue'),
+  },
   // This was added for billing tests
   {
     name: 'User',
     path: '/user',
     component: () => import('./views/Profile.vue'),
+  },
+  // Billing button routes
+  {
+    name: 'CheckoutBtn',
+    path: '/billing/checkout-btn',
+    component: () => import('./views/billing/CheckoutBtn.vue'),
+  },
+  {
+    name: 'PlanDetailsBtn',
+    path: '/billing/plan-details-btn',
+    component: () => import('./views/billing/PlanDetailsBtn.vue'),
+  },
+  {
+    name: 'SubscriptionDetailsBtn',
+    path: '/billing/subscription-details-btn',
+    component: () => import('./views/billing/SubscriptionDetailsBtn.vue'),
   },
 ];
 
@@ -56,7 +77,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const { isSignedIn, isLoaded } = useAuth();
-  const authenticatedPages = ['Profile', 'Admin', 'CustomUserProfile', 'CustomOrganizationProfile'];
+  const authenticatedPages = ['Profile', 'Admin', 'CustomUserProfile', 'CustomOrganizationProfile', 'UserAvatar'];
 
   if (!isLoaded.value) {
     await waitForClerkJsLoaded(isLoaded);

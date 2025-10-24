@@ -1,4 +1,5 @@
 import { astro } from './astro';
+import { customFlows } from './custom-flows';
 import { elements } from './elements';
 import { envs, instanceKeys } from './envs';
 import { expo } from './expo';
@@ -12,6 +13,7 @@ import { tanstack } from './tanstack';
 import { vue } from './vue';
 
 export const appConfigs = {
+  customFlows,
   envs,
   express,
   longRunningApps: createLongRunningApps(),

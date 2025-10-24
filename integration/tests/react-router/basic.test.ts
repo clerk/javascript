@@ -5,7 +5,7 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes], withPattern: ['react-router.node'] })(
-  'basic tests for @react-router',
+  'basic tests for @react-router with middleware',
   ({ app }) => {
     test.describe.configure({ mode: 'parallel' });
 

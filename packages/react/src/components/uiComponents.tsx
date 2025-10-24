@@ -10,6 +10,7 @@ import type {
   SignInProps,
   SignUpProps,
   TaskChooseOrganizationProps,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -81,8 +82,8 @@ type UserButtonPropsWithoutCustomPages = Without<
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
   __experimental_asProvider?: boolean;
@@ -99,6 +100,7 @@ type OrganizationSwitcherExportType = typeof _OrganizationSwitcher & {
   /**
    * The `<Outlet />` component can be used in conjunction with `asProvider` in order to control rendering
    * of the `<OrganizationSwitcher />` without affecting its configuration or any custom pages that could be mounted
+   *
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_Outlet: typeof OrganizationSwitcherOutlet;
@@ -111,8 +113,8 @@ type OrganizationSwitcherPropsWithoutCustomPages = Without<
   organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
-   * This API is experimental and may change at any moment.
-   * @experimental
+   *
+   * @experimental This API is experimental and may change at any moment.
    * @default undefined
    */
   __experimental_asProvider?: boolean;
@@ -256,7 +258,9 @@ const _UserButton = withClerk(
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
     const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
-    const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children);
+    const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children, {
+      allowForAnyChildren: !!props.__experimental_asProvider,
+    });
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
@@ -577,7 +581,10 @@ export const Waitlist = withClerk(
 
 export const PricingTable = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<PricingTableProps & FallbackProp>) => {
-    const mountingStatus = useWaitForComponentMount(component);
+    const mountingStatus = useWaitForComponentMount(component, {
+      // This attribute is added to the PricingTable root element after we've successfully fetched the plans asynchronously.
+      selector: '[data-component-status="ready"]',
+    });
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
     const rendererRootProps = {
@@ -604,8 +611,7 @@ export const PricingTable = withClerk(
 );
 
 /**
- * @experimental
- * This component is in early access and may change in future releases.
+ * @experimental This component is in early access and may change in future releases.
  */
 export const APIKeys = withClerk(
   ({ clerk, component, fallback, ...props }: WithClerkProp<APIKeysProps & FallbackProp>) => {
@@ -633,6 +639,34 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+export const UserAvatar = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<UserAvatarProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountUserAvatar}
+            unmount={clerk.unmountUserAvatar}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'UserAvatar', renderWhileLoading: true },
 );
 
 export const TaskChooseOrganization = withClerk(

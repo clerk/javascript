@@ -174,6 +174,13 @@ export function toURL(url: string | URL): URL {
  * @returns {string} Returns the URL href without the origin
  */
 export function stripOrigin(url: URL | string): string {
+  // In non-browser environments `window.location.origin` might not be available
+  // if not polyfilled, so we can't construct a URL object with the `url` string
+  // note: in that case, we can't easily strip the origin, so we return the original string
+  if (typeof window.location === 'undefined' && typeof url === 'string') {
+    return url;
+  }
+
   url = toURL(url);
   return url.href.replace(url.origin, '');
 }
@@ -200,11 +207,6 @@ export const trimTrailingSlash = (path: string): string => {
  */
 export const trimLeadingSlash = (path: string): string => {
   return (path || '').replace(/^\/+/, '');
-};
-
-export const stripSameOrigin = (url: URL, baseUrl: URL): string => {
-  const sameOrigin = baseUrl.origin === url.origin;
-  return sameOrigin ? stripOrigin(url) : `${url}`;
 };
 
 export const hasExternalAccountSignUpError = (signUp: SignUpResource): boolean => {
@@ -403,6 +405,7 @@ const frontendApiRedirectPathsNoUserInput: string[] = [
   '/v1/verify', // magic links
   '/v1/tickets/accept', // ticket flow
   '/oauth/authorize-with-immediate-redirect', // OAuth 2 identity provider
+  '/oauth/end_session', // OIDC logout
 ];
 
 export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl: string): boolean {

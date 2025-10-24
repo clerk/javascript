@@ -68,8 +68,8 @@ export const ptPT: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo do utilizador',
   badge__you: 'O utilizador',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const ptPT: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const ptPT: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const ptPT: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const ptPT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Insira a sua palavra-passe',
   formFieldInputPlaceholder__phoneNumber: 'Insira o seu número de telefone',
   formFieldInputPlaceholder__username: 'Insira o seu nome de utilizador',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const ptPT: LocalizationResource = {
     action__signOut: 'Terminar sessão',
     title: 'Sessão iniciada como {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Último uso',
   maintenanceMode: 'Modo de Manutenção',
   membershipRole__admin: 'Administrador',
   membershipRole__basicMember: 'Membro',
@@ -280,7 +283,7 @@ export const ptPT: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -289,7 +292,7 @@ export const ptPT: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -315,6 +318,7 @@ export const ptPT: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -634,6 +638,10 @@ export const ptPT: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de palavra-passe',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -753,6 +761,10 @@ export const ptPT: LocalizationResource = {
         subtitleNewTab: 'Volte para a aba anterior para continuar',
         title: 'E-mail verificado com sucesso',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -960,7 +972,7 @@ export const ptPT: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +981,7 @@ export const ptPT: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -995,6 +1007,7 @@ export const ptPT: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1026,7 +1039,8 @@ export const ptPT: LocalizationResource = {
     deletePage: {
       actionDescription: 'Escreva Excluir conta abaixo para continuar.',
       confirm: 'Excluir conta',
-      messageLine1: 'Tem certeza de que deseja excluir a sua conta?',
+      messageLine1:
+        'Tem a certeza de que pretende eliminar a sua conta? Alguns dados associados poderão ser retidos. Para solicitar a eliminação completa de dados, contacte o suporte.',
       messageLine2: 'Esta ação é permanente e irreversível.',
       title: 'Excluir conta',
     },

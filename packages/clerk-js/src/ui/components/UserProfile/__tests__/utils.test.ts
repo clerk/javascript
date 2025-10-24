@@ -1,4 +1,5 @@
 import type { VerificationJSON } from '@clerk/types';
+import { describe, expect, it } from 'vitest';
 
 import { EmailAddress, PhoneNumber } from '../../../../core/resources';
 import { sortIdentificationBasedOnVerification } from '../utils';

@@ -3,7 +3,7 @@ import type { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
 
 /**
- * The Backend `OrganizationMembership` object is similar to the [`OrganizationMembership`](https://clerk.com/docs/references/javascript/types/organization-membership) object as it's the model around an organization membership entity and describes the relationship between users and organizations. However, the Backend `OrganizationMembership` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/CreateOrganizationMembership){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `OrganizationMembership` object is similar to the [`OrganizationMembership`](https://clerk.com/docs/reference/javascript/types/organization-membership) object as it's the model around an organization membership entity and describes the relationship between users and organizations. However, the Backend `OrganizationMembership` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/CreateOrganizationMembership){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class OrganizationMembership {
   private _raw: OrganizationMembershipJSON | null = null;
@@ -74,7 +74,7 @@ export class OrganizationMembership {
 export class OrganizationMembershipPublicUserData {
   constructor(
     /**
-     * The [identifier](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#identifiers) of the user.
+     * The identifier of the user.
      */
     readonly identifier: string,
     /**
@@ -86,7 +86,7 @@ export class OrganizationMembershipPublicUserData {
      */
     readonly lastName: string | null,
     /**
-     * Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/image-optimization).
+     * Holds the default avatar or user's uploaded profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
      */
     readonly imageUrl: string,
     /**

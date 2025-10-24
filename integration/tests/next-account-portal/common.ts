@@ -107,7 +107,8 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
 
   // Sign up with email and password
   await u.po.signUp.signUpWithEmailAndPassword({ email: tempUser.email, password: tempUser.password });
-  await u.po.signUp.enterOtpCode('424242');
+
+  await u.po.signUp.enterTestOtpCode();
 
   // Navigate back to localhost
   await u.page.waitForAppUrl('/');

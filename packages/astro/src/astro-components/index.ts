@@ -12,12 +12,16 @@ export { default as AuthenticateWithRedirectCallback } from './control/Authentic
 export { default as SignInButton } from './unstyled/SignInButton.astro';
 export { default as SignUpButton } from './unstyled/SignUpButton.astro';
 export { default as SignOutButton } from './unstyled/SignOutButton.astro';
+export { default as __experimental_SubscriptionDetailsButton } from './unstyled/SubscriptionDetailsButton.astro';
+export { default as __experimental_CheckoutButton } from './unstyled/CheckoutButton.astro';
+export { default as PlanDetailsButton } from './unstyled/PlanDetailsButton.astro';
 
 /**
  * UI Components
  */
 export { default as SignIn } from './interactive/SignIn.astro';
 export { default as SignUp } from './interactive/SignUp.astro';
+export { default as UserAvatar } from './interactive/UserAvatar.astro';
 export { UserButton } from './interactive/UserButton';
 export { UserProfile } from './interactive/UserProfile';
 export { OrganizationProfile } from './interactive/OrganizationProfile';

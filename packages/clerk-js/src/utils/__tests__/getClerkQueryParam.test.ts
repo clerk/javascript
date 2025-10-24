@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { CLERK_SYNCED } from '../../core/constants';
 import { forwardClerkQueryParams, getClerkQueryParam, removeClerkQueryParam } from '../getClerkQueryParam';
 
@@ -62,7 +64,7 @@ describe('removeClerkQueryParam', () => {
       writable: true,
     });
 
-    const mockReplaceState = jest.fn();
+    const mockReplaceState = vi.fn();
     Object.defineProperty(window.history, 'replaceState', {
       value: mockReplaceState,
       writable: true,
@@ -78,7 +80,7 @@ describe('removeClerkQueryParam', () => {
   });
 
   it('does nothing when parameter is not present', () => {
-    const mockReplaceState = jest.fn();
+    const mockReplaceState = vi.fn();
     Object.defineProperty(window.history, 'replaceState', {
       value: mockReplaceState,
       writable: true,

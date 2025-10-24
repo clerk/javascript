@@ -39,7 +39,7 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { useHandleAuthenticateWithPasskey } from './shared';
+import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -224,12 +224,13 @@ function SignInStartInternal(): JSX.Element {
       })
       .then(res => {
         switch (res.status) {
-          case 'needs_first_factor':
-            if (hasOnlyEnterpriseSSOFirstFactors(res)) {
-              return authenticateWithEnterpriseSSO();
+          case 'needs_first_factor': {
+            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+              return navigate('factor-one');
             }
 
-            return navigate('factor-one');
+            return authenticateWithEnterpriseSSO();
+          }
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
@@ -253,8 +254,10 @@ function SignInStartInternal(): JSX.Element {
         // Keep the card in loading state during SSO redirect to prevent UI flicker
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
-        const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
-        if (isRedirectingToSSOProvider) return;
+        const isRedirectingToSSOProvider = !!hasOnlyEnterpriseSSOFirstFactors(signIn);
+        if (isRedirectingToSSOProvider) {
+          return;
+        }
 
         status.setIdle();
         card.setIdle();
@@ -289,6 +292,7 @@ function SignInStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
+          case ERROR_CODES.USER_BANNED:
             card.setError(error);
             break;
           default:
@@ -378,12 +382,13 @@ function SignInStartInternal(): JSX.Element {
             await authenticateWithEnterpriseSSO();
           }
           break;
-        case 'needs_first_factor':
-          if (hasOnlyEnterpriseSSOFirstFactors(res)) {
-            await authenticateWithEnterpriseSSO();
-            break;
+        case 'needs_first_factor': {
+          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            return navigate('factor-one');
           }
-          return navigate('factor-one');
+
+          return authenticateWithEnterpriseSSO();
+        }
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':
@@ -516,7 +521,13 @@ function SignInStartInternal(): JSX.Element {
   }
 
   // @ts-expect-error `action` is not typed
-  const { action, ...identifierFieldProps } = identifierField.props;
+  const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
+
+  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
+  const isIdentifierLastAuthenticationStrategy = lastAuthenticationStrategy
+    ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
+    : false;
+
   return (
     <Flow.Part part='start'>
       {!alternativePhoneCodeProvider ? (
@@ -571,6 +582,7 @@ function SignInStartInternal(): JSX.Element {
                           {...identifierFieldProps}
                           autoFocus={shouldAutofocus}
                           autoComplete={isWebAuthnAutofillSupported ? 'webauthn' : undefined}
+                          isLastAuthenticationStrategy={isIdentifierLastAuthenticationStrategy}
                         />
                       </Form.ControlRow>
                       <InstantPasswordRow field={passwordBasedInstance ? instantPasswordField : undefined} />

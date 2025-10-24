@@ -22,29 +22,25 @@ export interface APIKeyResource extends ClerkResource {
 
 export interface APIKeysNamespace {
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Retrieves a paginated list of API keys for the current user or organization.
    */
   getAll(params?: GetAPIKeysParams): Promise<ClerkPaginatedResponse<APIKeyResource>>;
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Retrieves the secret for a given API key ID.
    */
   getSecret(id: string): Promise<string>;
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Creates a new API key.
    */
   create(params: CreateAPIKeyParams): Promise<APIKeyResource>;
   /**
-   * @experimental
-   * This API is in early access and may change in future releases.
+   * @experimental This API is in early access and may change in future releases.
    *
    * Revokes a given API key by ID.
    */

@@ -68,8 +68,8 @@ export const zhCN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '用户设备',
   badge__you: '您',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const zhCN: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const zhCN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const zhCN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -206,7 +207,7 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '删除账户',
-  formFieldInputPlaceholder__emailAddress: undefined,
+  formFieldInputPlaceholder__emailAddress: '请输入您的电子邮件地址',
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses: '输入或粘贴一个或多个电子邮件地址，用空格或逗号分隔',
   formFieldInputPlaceholder__firstName: undefined,
@@ -218,6 +219,7 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -248,6 +250,7 @@ export const zhCN: LocalizationResource = {
     action__signOut: '退出登录',
     title: '以 {{identifier}} 登录',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理员',
   membershipRole__basicMember: '成员',
@@ -279,7 +282,7 @@ export const zhCN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -288,7 +291,7 @@ export const zhCN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -314,6 +317,7 @@ export const zhCN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -625,6 +629,10 @@ export const zhCN: LocalizationResource = {
         titleNewTab: '在其他标签页上登录',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重置密码代码',
       resendButton: '重新发送代码',
@@ -692,10 +700,10 @@ export const zhCN: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: '继续使用 {{applicationName}}',
+      subtitle: '欢迎回来！请登录您的账户以继续。',
       subtitleCombined: undefined,
-      title: '登录',
-      titleCombined: undefined,
+      title: '登录 {{applicationName}}',
+      titleCombined: '继续使用 {{applicationName}}',
     },
     totpMfa: {
       formTitle: '验证码',
@@ -744,6 +752,10 @@ export const zhCN: LocalizationResource = {
         subtitleNewTab: '返回上一个标签页继续',
         title: '成功验证电子邮件',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -943,7 +955,7 @@ export const zhCN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -952,7 +964,7 @@ export const zhCN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -978,6 +990,7 @@ export const zhCN: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1009,7 +1022,7 @@ export const zhCN: LocalizationResource = {
     deletePage: {
       actionDescription: '在下方输入 "删除账户" 以继续。',
       confirm: '删除账户',
-      messageLine1: '您确定要删除您的账户吗？',
+      messageLine1: '您确定要删除您的账户吗？某些关联数据可能会被保留。要请求完全删除数据，请联系支持团队。',
       messageLine2: '此操作是永久且不可逆的。',
       title: '删除账户',
     },
@@ -1032,7 +1045,7 @@ export const zhCN: LocalizationResource = {
         formButton: undefined,
         formSubtitle: undefined,
       },
-      formHint: undefined,
+      formHint: '这个电子邮件地址必须在验证之后才能被添加到您的账户。',
       removeResource: {
         messageLine1: '{{identifier}} 将从此账户中被移除。',
         messageLine2: '您将无法使用这个电子邮件地址登录。',
@@ -1040,7 +1053,7 @@ export const zhCN: LocalizationResource = {
         title: '移除电子邮件地址',
       },
       title: '添加电子邮件地址',
-      verifyTitle: 'Verify email address',
+      verifyTitle: '验证电子邮件地址',
     },
     formButtonPrimary__add: '添加',
     formButtonPrimary__continue: '继续',

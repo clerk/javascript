@@ -1,5 +1,6 @@
 /**
  * Pagination params in request
+ * @interface
  */
 export type ClerkPaginationRequest<T = object> = {
   /**

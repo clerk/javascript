@@ -17,6 +17,7 @@ test.describe('machine-to-machine auth @machine', () => {
   let analyticsServerM2MToken: M2MToken;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
     const fakeCompanyName = faker.company.name();
 
     // Create primary machine using instance secret key

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "target": "ES2022",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
@@ -12,7 +12,7 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "jsx": "react",
-    "lib": ["ES6", "DOM", "WebWorker"],
+    "lib": ["ES2022", "DOM", "WebWorker"],
     "allowJs": true
   },
   "exclude": ["node_modules"],

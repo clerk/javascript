@@ -1,12 +1,18 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
+
 import { clearCache, cssSupports } from '../cssSupports';
 
 // Mock CSS.supports
 const originalCSSSupports = CSS.supports;
 
 beforeAll(() => {
-  CSS.supports = jest.fn(feature => {
-    if (feature === 'color: hsl(from white h s l)') return true;
-    if (feature === 'color: color-mix(in srgb, white, black)') return false;
+  CSS.supports = vi.fn(feature => {
+    if (feature === 'color: hsl(from white h s l)') {
+      return true;
+    }
+    if (feature === 'color: color-mix(in srgb, white, black)') {
+      return false;
+    }
     return false;
   });
 });
@@ -17,7 +23,7 @@ afterAll(() => {
 
 beforeEach(() => {
   clearCache();
-  (CSS.supports as jest.Mock).mockClear();
+  vi.mocked(CSS.supports).mockClear();
 });
 
 describe('cssSupports', () => {

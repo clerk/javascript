@@ -6,7 +6,7 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
   const self = {
     ...common(testArgs),
     waitForMounted: (selector = '.cl-checkout-root') => {
-      return page.waitForSelector(selector, { state: 'attached' });
+      return page.waitForSelector(selector, { state: 'attached', timeout: 20000 });
     },
     closeDrawer: () => {
       return page.locator('.cl-drawerClose').click();
@@ -21,6 +21,7 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       });
     },
     fillCard: async (card: { number: string; expiration: string; cvc: string; country: string; zip: string }) => {
+      await self.waitForStripeElements({ state: 'visible' });
       const frame = page.frameLocator('iframe[src*="elements-inner-payment"]');
       await frame.getByLabel('Card number').fill(card.number);
       await frame.getByLabel('Expiration date').fill(card.expiration);
@@ -29,10 +30,22 @@ export const createCheckoutPageObject = (testArgs: { page: EnhancedPage }) => {
       await frame.getByLabel('ZIP code').fill(card.zip);
     },
     waitForStripeElements: async ({ state = 'visible' }: { state?: 'visible' | 'hidden' } = {}) => {
-      return page.frameLocator('iframe[src*="elements-inner-payment"]').getByLabel('Card number').waitFor({ state });
+      const iframe = page.locator('iframe[src*="elements-inner-payment"]');
+      if (state === 'visible') {
+        await iframe.waitFor({ state: 'attached', timeout: 20000 });
+        await page.frameLocator('iframe[src*="elements-inner-payment"]').getByLabel('Card number').waitFor({
+          state: 'visible',
+          timeout: 20000,
+        });
+      } else {
+        await page.frameLocator('iframe[src*="elements-inner-payment"]').getByLabel('Card number').waitFor({
+          state: 'hidden',
+          timeout: 20000,
+        });
+      }
     },
     clickPayOrSubscribe: async () => {
-      await self.root.getByRole('button', { name: /subscribe|pay\s\$/i }).click();
+      await self.root.getByRole('button', { name: /subscribe|pay\s\$|start/i }).click();
     },
     waitForSubscribeButton: async () => {
       await self.root.getByRole('button', { name: /^subscribe$/i }).waitFor({ state: 'visible' });

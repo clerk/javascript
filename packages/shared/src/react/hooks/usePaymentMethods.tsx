@@ -1,12 +1,12 @@
-import type { CommercePaymentSourceResource, GetPaymentSourcesParams } from '@clerk/types';
+import type { BillingPaymentMethodResource, GetPaymentMethodsParams } from '@clerk/types';
 
 import { useOrganizationContext, useUserContext } from '../contexts';
-import { createCommercePaginatedHook } from './createCommerceHook';
+import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
  * @internal
  */
-export const usePaymentMethods = createCommercePaginatedHook<CommercePaymentSourceResource, GetPaymentSourcesParams>({
+export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentMethodResource, GetPaymentMethodsParams>({
   hookName: 'usePaymentMethods',
   resourceType: 'commerce-payment-methods',
   useFetcher: resource => {
@@ -14,8 +14,8 @@ export const usePaymentMethods = createCommercePaginatedHook<CommercePaymentSour
     const user = useUserContext();
 
     if (resource === 'organization') {
-      return organization?.getPaymentSources;
+      return organization?.getPaymentMethods;
     }
-    return user?.getPaymentSources;
+    return user?.getPaymentMethods;
   },
 });

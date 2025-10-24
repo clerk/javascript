@@ -13,7 +13,7 @@ export default defineConfig({
       CLERK_SECRET_KEY: 'TEST_SECRET_KEY',
     },
     environment: 'jsdom',
-    include: ['**/*.spec.{js,ts,jsx,tsx}'],
+    include: ['**/*.{spec,test}.{js,ts,jsx,tsx}'],
     setupFiles: './vitest.setup.mts',
   },
 });

@@ -16,6 +16,7 @@ export default defineConfig(overrideOptions => {
       './src/utils/index.ts',
       './src/workerTimers/index.ts',
       './src/dom/*.ts',
+      './src/types/*.ts',
       '!./src/**/*.test.{ts,tsx}',
     ],
     format: ['cjs', 'esm'],
@@ -24,7 +25,7 @@ export default defineConfig(overrideOptions => {
     minify: false,
     sourcemap: true,
     dts: true,
-    target: 'es2020',
+    target: 'es2022',
     external: ['react', 'react-dom'],
     esbuildPlugins: [WebWorkerMinifyPlugin as any],
     define: {

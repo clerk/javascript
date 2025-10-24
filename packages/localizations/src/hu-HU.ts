@@ -68,8 +68,8 @@ export const huHU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const huHU: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const huHU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const huHU: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const huHU: LocalizationResource = {
     action__signOut: 'Kijelentkezés',
     title: 'Bejelntkezve mint {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Legutóbb használt',
   maintenanceMode: 'Jelenleg karbantartás alatt állunk, de ne aggódj, ez nem tart tovább pár percnél!',
   membershipRole__admin: 'Adminisztrátor',
   membershipRole__basicMember: 'Tag',
@@ -280,7 +283,7 @@ export const huHU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -289,7 +292,7 @@ export const huHU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -315,6 +318,7 @@ export const huHU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -635,6 +639,10 @@ export const huHU: LocalizationResource = {
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Jelszó visszaállító kód',
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
@@ -755,6 +763,10 @@ export const huHU: LocalizationResource = {
         subtitleNewTab: 'Menj vissza az előző lapra a folytatáshoz',
         title: 'Sikeresen megerősítetted az email címed',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -961,7 +973,7 @@ export const huHU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -970,7 +982,7 @@ export const huHU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -996,6 +1008,7 @@ export const huHU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1028,7 +1041,8 @@ export const huHU: LocalizationResource = {
     deletePage: {
       actionDescription: 'Írd be, hogy "Delete account" a folytatáshoz.',
       confirm: 'Fiók törlése',
-      messageLine1: 'Biztos vagy benne, hogy törölni szeretnéd a fiókod?',
+      messageLine1:
+        'Biztosan törölni szeretné fiókját? Egyes kapcsolódó adatok megőrzésre kerülhetnek. A teljes adattörlés kéréséhez forduljon az ügyfélszolgálathoz.',
       messageLine2: 'Ez a művelet végleges és visszafordíthatatlan.',
       title: 'Fiók törlése',
     },

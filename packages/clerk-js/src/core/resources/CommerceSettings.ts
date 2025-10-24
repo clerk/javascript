@@ -8,9 +8,6 @@ import { BaseResource } from './internal';
 export class CommerceSettings extends BaseResource implements CommerceSettingsResource {
   billing: CommerceSettingsResource['billing'] = {
     stripePublishableKey: '',
-    enabled: false,
-    hasPaidUserPlans: false,
-    hasPaidOrgPlans: false,
     organization: {
       enabled: false,
       hasPaidPlans: false,
@@ -32,9 +29,6 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
     }
 
     this.billing.stripePublishableKey = data.billing.stripe_publishable_key || '';
-    this.billing.enabled = data.billing.enabled || false;
-    this.billing.hasPaidUserPlans = data.billing.has_paid_user_plans || false;
-    this.billing.hasPaidOrgPlans = data.billing.has_paid_org_plans || false;
     this.billing.organization.enabled = data.billing.organization.enabled || false;
     this.billing.organization.hasPaidPlans = data.billing.organization.has_paid_plans || false;
     this.billing.user.enabled = data.billing.user.enabled || false;
@@ -47,9 +41,6 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
     return {
       billing: {
         stripe_publishable_key: this.billing.stripePublishableKey,
-        enabled: this.billing.enabled,
-        has_paid_user_plans: this.billing.hasPaidUserPlans,
-        has_paid_org_plans: this.billing.hasPaidOrgPlans,
         organization: {
           enabled: this.billing.organization.enabled,
           has_paid_plans: this.billing.organization.hasPaidPlans,

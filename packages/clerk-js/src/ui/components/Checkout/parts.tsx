@@ -76,12 +76,12 @@ export const InvalidPlanScreen = () => {
             <LineItems.Group>
               <LineItems.Title
                 title={planFromError.name}
-                description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+                description={planPeriod === 'annual' ? localizationKeys('billing.billedAnnually') : undefined}
               />
               <LineItems.Description
                 prefix={planPeriod === 'annual' ? 'x12' : undefined}
                 text={`${planFromError.currency_symbol}${planPeriod === 'month' ? planFromError.amount_formatted : planFromError.annual_monthly_amount_formatted}`}
-                suffix={localizationKeys('commerce.checkout.perMonth')}
+                suffix={localizationKeys('billing.checkout.perMonth')}
               />
             </LineItems.Group>
           </LineItems.Root>
@@ -92,8 +92,8 @@ export const InvalidPlanScreen = () => {
             colorScheme='info'
             title={
               isPlanUpgradePossible
-                ? localizationKeys('commerce.cannotSubscribeMonthly')
-                : localizationKeys('commerce.cannotSubscribeUnrecoverable')
+                ? localizationKeys('billing.cannotSubscribeMonthly')
+                : localizationKeys('billing.cannotSubscribeUnrecoverable')
             }
           />
         </Box>
@@ -113,8 +113,8 @@ export const AddEmailForm = () => {
         })}
       >
         <EmailForm
-          title={localizationKeys('commerce.checkout.emailForm.title')}
-          subtitle={localizationKeys('commerce.checkout.emailForm.subtitle')}
+          title={localizationKeys('billing.checkout.emailForm.title')}
+          subtitle={localizationKeys('billing.checkout.emailForm.subtitle')}
           onSuccess={() => void checkout.start()}
           onReset={() => setIsOpen(false)}
           disableAutoFocus

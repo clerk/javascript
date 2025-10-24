@@ -245,10 +245,14 @@ function getTraceId(data: unknown, headers?: Headers): string {
 
 function getRetryAfter(headers?: Headers): number | undefined {
   const retryAfter = headers?.get('Retry-After');
-  if (!retryAfter) return;
+  if (!retryAfter) {
+    return;
+  }
 
   const value = parseInt(retryAfter, 10);
-  if (isNaN(value)) return;
+  if (isNaN(value)) {
+    return;
+  }
 
   return value;
 }

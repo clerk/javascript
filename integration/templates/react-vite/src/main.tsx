@@ -15,6 +15,7 @@ import UserButtonCustomDynamicLabelsAndCustomPages from './custom-user-button/wi
 import UserButtonCustomTrigger from './custom-user-button-trigger';
 import UserButtonCustomDynamicItems from './custom-user-button/with-dynamic-items.tsx';
 import UserButton from './user-button';
+import UserAvatar from './user-avatar';
 import Waitlist from './waitlist';
 import OrganizationProfile from './organization-profile';
 import OrganizationList from './organization-list';
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: '/user-button',
         element: <UserButton />,
+      },
+      {
+        path: '/user-avatar',
+        element: <UserAvatar />,
       },
       {
         path: '/protected',

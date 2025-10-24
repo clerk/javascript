@@ -68,8 +68,8 @@ export const zhTW: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '用戶設備',
   badge__you: '您',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const zhTW: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const zhTW: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const zhTW: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -248,6 +250,7 @@ export const zhTW: LocalizationResource = {
     action__signOut: '登出',
     title: '以 {{identifier}} 身份登入',
   },
+  lastAuthenticationStrategy: '上次使用',
   maintenanceMode: undefined,
   membershipRole__admin: '管理員',
   membershipRole__basicMember: '成員',
@@ -279,7 +282,7 @@ export const zhTW: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -288,7 +291,7 @@ export const zhTW: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -314,6 +317,7 @@ export const zhTW: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -625,6 +629,10 @@ export const zhTW: LocalizationResource = {
         titleNewTab: '已在其他分頁登入',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重設密碼代碼',
       resendButton: '重新傳送代碼',
@@ -695,7 +703,7 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       subtitleCombined: undefined,
       title: '登入',
-      titleCombined: undefined,
+      titleCombined: '繼續前往 {{applicationName}}',
     },
     totpMfa: {
       formTitle: '驗證碼',
@@ -744,6 +752,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回上一個分頁以繼續',
         title: '電子郵件驗證成功',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -942,7 +954,7 @@ export const zhTW: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -951,7 +963,7 @@ export const zhTW: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -977,6 +989,7 @@ export const zhTW: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1008,7 +1021,7 @@ export const zhTW: LocalizationResource = {
     deletePage: {
       actionDescription: '請在下方輸入「Delete account」以繼續。',
       confirm: '刪除帳戶',
-      messageLine1: '您確定要刪除您的帳戶嗎？',
+      messageLine1: '您確定要刪除您的帳戶嗎？某些相關資料可能會被保留。如需申請完全刪除資料，請聯絡支援團隊。',
       messageLine2: '此動作將永久生效且無法復原。',
       title: '刪除帳戶',
     },

@@ -68,8 +68,8 @@ export const svSE: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Användarens enhet',
   badge__you: 'Du',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const svSE: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const svSE: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const svSE: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +220,7 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ange ditt lösenord',
   formFieldInputPlaceholder__phoneNumber: 'Ange ditt telefonnummer',
   formFieldInputPlaceholder__username: 'Ange ditt användarnamn',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -250,6 +252,7 @@ export const svSE: LocalizationResource = {
     action__signOut: 'Logga ut',
     title: 'Inloggad som {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Senast använd',
   maintenanceMode: 'Vi genomför för närvarande underhåll, men oroa dig inte, det bör inte ta mer än några minuter.',
   membershipRole__admin: 'Admin',
   membershipRole__basicMember: 'Medlem',
@@ -281,7 +284,7 @@ export const svSE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +293,7 @@ export const svSE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -316,6 +319,7 @@ export const svSE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -637,6 +641,10 @@ export const svSE: LocalizationResource = {
         titleNewTab: 'Loggade in på annan flik',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Återställ lösenordskod',
       resendButton: 'Fick du inte en kod? Skicka igen',
@@ -758,6 +766,10 @@ export const svSE: LocalizationResource = {
         subtitleNewTab: 'Återgå till föregående flik för att fortsätta',
         title: 'E-posten har verifierats',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -963,7 +975,7 @@ export const svSE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +984,7 @@ export const svSE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -998,6 +1010,7 @@ export const svSE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1030,7 +1043,8 @@ export const svSE: LocalizationResource = {
     deletePage: {
       actionDescription: 'Skriv "Radera konto" nedan för att fortsätta.',
       confirm: 'Radera konto',
-      messageLine1: 'Är du säker på att du vill radera ditt konto?',
+      messageLine1:
+        'Är du säker på att du vill radera ditt konto? Viss associerad data kan behållas. För att begära fullständig radering av data, vänligen kontakta support.',
       messageLine2: 'Denna åtgärd är permanent och kan inte ångras.',
       title: 'Radera konto',
     },

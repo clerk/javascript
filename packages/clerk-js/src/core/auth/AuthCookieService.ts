@@ -1,6 +1,6 @@
 import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
-import { createCookieHandler } from '@clerk/shared/cookie';
+import type { createCookieHandler } from '@clerk/shared/cookie';
 import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import { noop } from '@clerk/shared/utils';
@@ -9,6 +9,7 @@ import type { Clerk, InstanceType } from '@clerk/types';
 import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
 import type { FapiClient } from '../fapiClient';
+import { createActiveContextCookie } from './cookies/activeContext';
 import type { ClientUatCookieHandler } from './cookies/clientUat';
 import { createClientUatCookie } from './cookies/clientUat';
 import type { SessionCookieHandler } from './cookies/session';
@@ -75,7 +76,7 @@ export class AuthCookieService {
 
     this.clientUat = createClientUatCookie(cookieSuffix);
     this.sessionCookie = createSessionCookie(cookieSuffix);
-    this.activeCookie = createCookieHandler('clerk_active_context');
+    this.activeCookie = createActiveContextCookie();
     this.devBrowser = createDevBrowser({
       frontendApi: clerk.frontendApi,
       fapiClient,
@@ -84,10 +85,6 @@ export class AuthCookieService {
   }
 
   public async setup() {
-    // Cleanup old cookie
-    // TODO: This should be removed after 2025-08-01
-    createCookieHandler('clerk_active_org').remove();
-
     if (this.instanceType === 'production') {
       return this.setupProduction();
     } else {

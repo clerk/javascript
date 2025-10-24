@@ -3,6 +3,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
 import React from 'react';
 
+import { isClerkAPIResponseError } from '@/index.headless';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
@@ -187,7 +188,9 @@ function SignUpStartInternal(): JSX.Element {
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
         const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
-        if (isRedirectingToSSOProvider) return;
+        if (isRedirectingToSSOProvider) {
+          return;
+        }
 
         status.setIdle();
         card.setIdle();
@@ -219,6 +222,7 @@ function SignUpStartInternal(): JSX.Element {
           case ERROR_CODES.FRAUD_DEVICE_BLOCKED:
           case ERROR_CODES.FRAUD_ACTION_BLOCKED:
           case ERROR_CODES.SIGNUP_RATE_LIMIT_EXCEEDED:
+          case ERROR_CODES.USER_BANNED:
             card.setError(error);
             break;
           default:
@@ -269,7 +273,7 @@ function SignUpStartInternal(): JSX.Element {
       } as any);
 
       // Get ticket value from query params if it exists
-      if (!fields.ticket && hasExistingSignUpWithTicket) {
+      if (!formState.ticket.value && hasExistingSignUpWithTicket) {
         const ticketValue = getClerkQueryParam('__clerk_ticket') || getClerkQueryParam('__clerk_invitation_token');
         if (ticketValue) {
           fieldsToSubmit.push({
@@ -352,7 +356,19 @@ function SignUpStartInternal(): JSX.Element {
           oidcPrompt,
         }),
       )
-      .catch(err => handleError(err, fieldsToSubmit, card.setError))
+      .catch(err => {
+        /**
+         * @experimental
+         */
+        if (
+          isClerkAPIResponseError(err) &&
+          err.errors?.[0]?.code === 'enterprise_connection_id_is_required_with_multiple_connections'
+        ) {
+          return navigate('./enterprise-connections');
+        }
+
+        return handleError(err, fieldsToSubmit, card.setError);
+      })
       .finally(() => card.setIdle());
   };
 

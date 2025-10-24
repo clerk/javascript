@@ -23,7 +23,9 @@ export const CaptchaElement = () => {
   const captchaLanguage = parsedCaptcha?.language || locale?.toLowerCase();
 
   useEffect(() => {
-    if (!elementRef.current) return;
+    if (!elementRef.current) {
+      return;
+    }
 
     const observer = new MutationObserver(mutations => {
       mutations.forEach(mutation => {

@@ -1,21 +1,23 @@
+import { describe, expect, it, vi } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { Checkout } from '..';
 
 const { createFixtures } = bindCreateFixtures('Checkout');
 
 // Mock Payment Element to be ready so the submit button is rendered during tests
-jest.mock('@clerk/shared/react', () => {
-  const actual = jest.requireActual('@clerk/shared/react');
+vi.mock('@clerk/shared/react', async importOriginal => {
+  const actual = await importOriginal();
   return {
     ...actual,
     __experimental_PaymentElementProvider: ({ children }: { children: any }) => children,
     __experimental_PaymentElement: (_: { fallback?: any }) => null,
     __experimental_usePaymentElement: () => ({
-      submit: jest.fn().mockResolvedValue({ data: { gateway: 'stripe', paymentToken: 'tok_test' }, error: null }),
-      reset: jest.fn().mockResolvedValue(undefined),
+      submit: vi.fn().mockResolvedValue({ data: { gateway: 'stripe', paymentToken: 'tok_test' }, error: null }),
+      reset: vi.fn().mockResolvedValue(undefined),
       isFormReady: true,
       provider: { name: 'stripe' },
       isProviderReady: true,
@@ -27,12 +29,13 @@ describe('Checkout', () => {
   it('displays spinner when checkout is initializing', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to prevent actual API calls and stay in loading state
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
-    const { baseElement } = render(
+    const { baseElement, getByRole } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -50,9 +53,7 @@ describe('Checkout', () => {
       expect(baseElement.querySelector('[role="dialog"]')).toBeVisible();
 
       // Verify the checkout title is displayed
-      const title = baseElement.querySelector('[data-localization-key="commerce.checkout.title"]');
-      expect(title).toBeVisible();
-      expect(title).toHaveTextContent('Checkout');
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
 
       // Verify spinner is shown during initialization
       const spinner = baseElement.querySelector('span[aria-live="polite"]');
@@ -66,7 +67,7 @@ describe('Checkout', () => {
     });
 
     // Mock billing to prevent actual API calls
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement, getByRole } = render(
       <Drawer.Root
@@ -98,6 +99,7 @@ describe('Checkout', () => {
   it('handles checkout initialization errors gracefully', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to reject with a Clerk-like error shape
@@ -106,7 +108,7 @@ describe('Checkout', () => {
       errors: [{ code: 'unknown_error' }],
     });
 
-    const { baseElement } = render(
+    const { getByRole, baseElement } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -122,17 +124,18 @@ describe('Checkout', () => {
     await waitFor(() => {
       // Component should still render the drawer structure even with errors
       expect(baseElement.querySelector('[role="dialog"]')).toBeVisible();
-      expect(baseElement.querySelector('[data-localization-key="commerce.checkout.title"]')).toBeVisible();
+      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
     });
   });
 
   it('displays proper loading state during checkout initialization', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to stay in loading state
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -161,11 +164,12 @@ describe('Checkout', () => {
   it('maintains accessibility attributes correctly', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
-    const { baseElement } = render(
+    const { baseElement, getByRole } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -185,7 +189,7 @@ describe('Checkout', () => {
       expect(dialog).toHaveAttribute('tabindex', '-1');
 
       // Check heading hierarchy
-      const heading = baseElement.querySelector('h2[data-localization-key="commerce.checkout.title"]');
+      const heading = getByRole('heading', { name: 'Checkout' });
       expect(heading).toBeVisible();
 
       // Check focus guards for modal
@@ -201,10 +205,11 @@ describe('Checkout', () => {
   it('renders without crashing when all required props are provided', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     // Mock billing to prevent actual API calls
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -228,8 +233,9 @@ describe('Checkout', () => {
   it('renders without errors for monthly period', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
     const { baseElement } = render(
       <Drawer.Root
         open
@@ -251,7 +257,7 @@ describe('Checkout', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
     });
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
     const { baseElement } = render(
       <Drawer.Root
         open
@@ -272,9 +278,10 @@ describe('Checkout', () => {
   it('renders with correct CSS classes and structure', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    fixtures.clerk.billing.startCheckout.mockImplementation(() => new Promise(() => {}));
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({} as any);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -305,10 +312,10 @@ describe('Checkout', () => {
   it('renders free trial details during confirmation stage', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
-
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
       id: 'chk_trial_1',
       status: 'needs_confirmation',
@@ -357,8 +364,8 @@ describe('Checkout', () => {
         freeTrialDays: 14,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
-      confirm: jest.fn(),
+      paymentMethod: undefined,
+      confirm: vi.fn(),
       freeTrialEndsAt,
     } as any);
 
@@ -388,6 +395,7 @@ describe('Checkout', () => {
   it('renders trial success details in completed stage', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
@@ -440,8 +448,8 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
-      confirm: jest.fn(),
+      paymentMethod: undefined,
+      confirm: vi.fn(),
       freeTrialEndsAt,
     } as any);
 
@@ -466,49 +474,16 @@ describe('Checkout', () => {
     });
   });
 
-  it('renders existing payment sources during checkout confirmation', async () => {
+  it('renders subscription start data on completed stage for downgrades', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
-    });
-
-    fixtures.clerk.user?.getPaymentSources.mockResolvedValue({
-      data: [
-        {
-          id: 'pm_test_visa',
-          last4: '4242',
-          paymentMethod: 'card',
-          cardType: 'visa',
-          isDefault: true,
-          isRemovable: true,
-          status: 'active',
-          walletType: undefined,
-          remove: jest.fn(),
-          makeDefault: jest.fn(),
-          pathRoot: '/',
-          reload: jest.fn(),
-        },
-        {
-          id: 'pm_test_mastercard',
-          last4: '5555',
-          paymentMethod: 'card',
-          cardType: 'mastercard',
-          isDefault: false,
-          isRemovable: true,
-          status: 'active',
-          walletType: undefined,
-          remove: jest.fn(),
-          makeDefault: jest.fn(),
-          pathRoot: '/',
-          reload: jest.fn(),
-        },
-      ],
-      total_count: 2,
+      f.withBilling();
     });
 
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
-      id: 'chk_trial_2',
-      status: 'needs_confirmation',
-      externalClientSecret: 'cs_test_trial_2',
+      id: 'chk_payment_method_2',
+      status: 'completed',
+      externalClientSecret: 'cs_test_payment_method_2',
       externalGatewayId: 'gw_test',
       totals: {
         subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
@@ -553,52 +528,546 @@ describe('Checkout', () => {
         freeTrialDays: 7,
         freeTrialEnabled: true,
       },
-      paymentSource: undefined,
-      confirm: jest.fn(),
-      freeTrialEndsAt: new Date('2025-08-19'),
+      paymentMethod: {
+        id: 'pm_test_visa',
+        last4: '4242',
+        paymentType: 'card',
+        cardType: 'visa',
+        isDefault: true,
+        isRemovable: true,
+        status: 'active',
+        walletType: undefined,
+        remove: vi.fn(),
+        makeDefault: vi.fn(),
+        pathRoot: '/',
+        reload: vi.fn(),
+      },
+      planPeriodStart: new Date('2025-08-19'),
+      confirm: vi.fn(),
+      freeTrialEndsAt: null,
     } as any);
 
-    const { baseElement, getByText, getByRole, userEvent } = render(
+    const { getByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
       >
         <Checkout
-          planId='plan_with_payment_sources'
+          planId='plan_payment_method_complete'
           planPeriod='month'
         />
       </Drawer.Root>,
       { wrapper },
     );
 
-    await waitFor(async () => {
-      // Verify checkout title is displayed
-      expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+    await waitFor(() => {
+      expect(getByText('Subscription begins')).toBeVisible();
+      expect(getByText('August 19, 2025')).toBeVisible();
+    });
+  });
 
-      // Verify segmented control for payment method source is rendered
-      const paymentMethodsButton = getByText('Payment Methods');
-      expect(paymentMethodsButton).toBeVisible();
-
-      const addPaymentMethodButton = getByText('Add payment method');
-      expect(addPaymentMethodButton).toBeVisible();
-
-      await userEvent.click(paymentMethodsButton);
+  it('renders payment method on completed stage', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
+    fixtures.clerk.billing.startCheckout.mockResolvedValue({
+      id: 'chk_payment_method_2',
+      status: 'completed',
+      externalClientSecret: 'cs_test_payment_method_2',
+      externalGatewayId: 'gw_test',
+      totals: {
+        subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+      },
+      isImmediatePlanChange: true,
+      planPeriod: 'month',
+      plan: {
+        id: 'plan_trial',
+        name: 'Pro',
+        description: 'Pro plan',
+        features: [],
+        fee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualFee: {
+          amount: 12000,
+          amountFormatted: '120.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        annualMonthlyFee: {
+          amount: 1000,
+          amountFormatted: '10.00',
+          currency: 'USD',
+          currencySymbol: '$',
+        },
+        slug: 'pro',
+        avatarUrl: '',
+        publiclyVisible: true,
+        isDefault: true,
+        isRecurring: true,
+        hasBaseFee: false,
+        forPayerType: 'user',
+        freeTrialDays: 7,
+        freeTrialEnabled: true,
+      },
+      paymentMethod: {
+        id: 'pm_test_visa',
+        last4: '4242',
+        paymentType: 'card',
+        cardType: 'visa',
+        isDefault: true,
+        isRemovable: true,
+        status: 'active',
+        walletType: undefined,
+        remove: vi.fn(),
+        makeDefault: vi.fn(),
+        pathRoot: '/',
+        reload: vi.fn(),
+      },
+      confirm: vi.fn(),
+      freeTrialEndsAt: null,
+    } as any);
+
+    const { getByText } = render(
+      <Drawer.Root
+        open
+        onOpenChange={() => {}}
+      >
+        <Checkout
+          planId='plan_payment_method_complete'
+          planPeriod='month'
+        />
+      </Drawer.Root>,
+      { wrapper },
+    );
+
     await waitFor(() => {
-      const visaPaymentSource = getByText('visa');
-      expect(visaPaymentSource).toBeVisible();
+      expect(getByText('Visa ⋯ 4242')).toBeVisible();
+    });
+  });
 
-      const last4Digits = getByText('⋯ 4242');
-      expect(last4Digits).toBeVisible();
+  describe('render payment methods', () => {
+    it('shows tabs with select when payments methods exist and plan is free trial', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
 
-      // Verify the default badge is shown for the first payment source
-      const defaultBadge = getByText('Default');
-      expect(defaultBadge).toBeVisible();
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
+        data: [
+          {
+            id: 'pm_test_visa',
+            last4: '4242',
+            paymentType: 'card',
+            cardType: 'visa',
+            isDefault: true,
+            isRemovable: true,
+            status: 'active',
+            walletType: undefined,
+            remove: vi.fn(),
+            makeDefault: vi.fn(),
+            pathRoot: '/',
+            reload: vi.fn(),
+          },
+          {
+            id: 'pm_test_mastercard',
+            last4: '5555',
+            paymentType: 'card',
+            cardType: 'mastercard',
+            isDefault: false,
+            isRemovable: true,
+            status: 'active',
+            walletType: undefined,
+            remove: vi.fn(),
+            makeDefault: vi.fn(),
+            pathRoot: '/',
+            reload: vi.fn(),
+          },
+        ],
+        total_count: 2,
+      });
 
-      // Verify the hidden input contains the correct payment source id
-      const hiddenInput = baseElement.querySelector('input[name="payment_source_id"]');
-      expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_trial_2',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_trial_2',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: {
+          id: 'plan_trial',
+          name: 'Pro',
+          description: 'Pro plan',
+          features: [],
+          fee: {
+            amount: 1000,
+            amountFormatted: '10.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          annualFee: {
+            amount: 12000,
+            amountFormatted: '120.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          annualMonthlyFee: {
+            amount: 1000,
+            amountFormatted: '10.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          slug: 'pro',
+          avatarUrl: '',
+          publiclyVisible: true,
+          isDefault: true,
+          isRecurring: true,
+          hasBaseFee: false,
+          forPayerType: 'user',
+          freeTrialDays: 7,
+          freeTrialEnabled: true,
+        },
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: new Date('2025-08-19'),
+      } as any);
+
+      const { baseElement, getByText, getByRole, userEvent } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_with_payment_methods'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(async () => {
+        // Verify checkout title is displayed
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+
+        // Verify segmented control for payment method source is rendered
+        const paymentMethodsButton = getByText('Payment Methods');
+        expect(paymentMethodsButton).toBeVisible();
+
+        const addPaymentMethodButton = getByText('Add payment method');
+        expect(addPaymentMethodButton).toBeVisible();
+
+        await userEvent.click(paymentMethodsButton);
+      });
+
+      await waitFor(() => {
+        const visaPaymentMethod = getByText('visa');
+        expect(visaPaymentMethod).toBeVisible();
+
+        const last4Digits = getByText('⋯ 4242');
+        expect(last4Digits).toBeVisible();
+
+        // Verify the default badge is shown for the first payment method
+        const defaultBadge = getByText('Default');
+        expect(defaultBadge).toBeVisible();
+
+        // Verify the hidden input contains the correct payment method id
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
+        expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
+
+        expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
+      });
+    });
+
+    it('shows tabs with select when payments methods exist and plan is immediate with total due now', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
+        data: [
+          {
+            id: 'pm_test_visa',
+            last4: '4242',
+            paymentType: 'card',
+            cardType: 'visa',
+            isDefault: true,
+            isRemovable: true,
+            status: 'active',
+            walletType: undefined,
+            remove: vi.fn(),
+            makeDefault: vi.fn(),
+            pathRoot: '/',
+            reload: vi.fn(),
+          },
+          {
+            id: 'pm_test_mastercard',
+            last4: '5555',
+            paymentType: 'card',
+            cardType: 'mastercard',
+            isDefault: false,
+            isRemovable: true,
+            status: 'active',
+            walletType: undefined,
+            remove: vi.fn(),
+            makeDefault: vi.fn(),
+            pathRoot: '/',
+            reload: vi.fn(),
+          },
+        ],
+        total_count: 2,
+      });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_trial_2',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_trial_2',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDueNow: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+        },
+        isImmediatePlanChange: true,
+        planPeriod: 'month',
+        plan: {
+          id: 'plan_trial',
+          name: 'Pro',
+          description: 'Pro plan',
+          features: [],
+          fee: {
+            amount: 1000,
+            amountFormatted: '10.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          annualFee: {
+            amount: 12000,
+            amountFormatted: '120.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          annualMonthlyFee: {
+            amount: 1000,
+            amountFormatted: '10.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          slug: 'pro',
+          avatarUrl: '',
+          publiclyVisible: true,
+          isDefault: true,
+          isRecurring: true,
+          hasBaseFee: false,
+          forPayerType: 'user',
+          freeTrialDays: 7,
+          freeTrialEnabled: true,
+        },
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+      } as any);
+
+      const { baseElement, getByText, getByRole, userEvent } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_with_payment_methods'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(async () => {
+        // Verify checkout title is displayed
+        expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
+
+        // Verify segmented control for payment method source is rendered
+        const paymentMethodsButton = getByText('Payment Methods');
+        expect(paymentMethodsButton).toBeVisible();
+
+        const addPaymentMethodButton = getByText('Add payment method');
+        expect(addPaymentMethodButton).toBeVisible();
+
+        await userEvent.click(paymentMethodsButton);
+      });
+
+      await waitFor(() => {
+        const visaPaymentMethod = getByText('visa');
+        expect(visaPaymentMethod).toBeVisible();
+
+        const last4Digits = getByText('⋯ 4242');
+        expect(last4Digits).toBeVisible();
+
+        // Verify the default badge is shown for the first payment method
+        const defaultBadge = getByText('Default');
+        expect(defaultBadge).toBeVisible();
+
+        // Verify the hidden input contains the correct payment method id
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
+        expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
+
+        expect(getByRole('button', { name: 'Pay $10.00' })).toBeInTheDocument();
+      });
+    });
+
+    it('hides tabs and select when subscription is a downgrade', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+        f.withBilling();
+      });
+
+      fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
+        data: [
+          {
+            id: 'pm_test_visa',
+            last4: '4242',
+            paymentType: 'card',
+            cardType: 'visa',
+            isDefault: true,
+            isRemovable: true,
+            status: 'active',
+            walletType: undefined,
+            remove: vi.fn(),
+            makeDefault: vi.fn(),
+            pathRoot: '/',
+            reload: vi.fn(),
+          },
+          {
+            id: 'pm_test_mastercard',
+            last4: '5555',
+            paymentType: 'card',
+            cardType: 'mastercard',
+            isDefault: false,
+            isRemovable: true,
+            status: 'active',
+            walletType: undefined,
+            remove: vi.fn(),
+            makeDefault: vi.fn(),
+            pathRoot: '/',
+            reload: vi.fn(),
+          },
+        ],
+        total_count: 2,
+      });
+
+      fixtures.clerk.billing.startCheckout.mockResolvedValue({
+        id: 'chk_trial_2',
+        status: 'needs_confirmation',
+        externalClientSecret: 'cs_test_trial_2',
+        externalGatewayId: 'gw_test',
+        totals: {
+          subtotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          grandTotal: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
+          taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+          totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        },
+        isImmediatePlanChange: false,
+        planPeriod: 'month',
+        plan: {
+          id: 'plan_trial',
+          name: 'Pro',
+          description: 'Pro plan',
+          features: [],
+          fee: {
+            amount: 1000,
+            amountFormatted: '10.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          annualFee: {
+            amount: 12000,
+            amountFormatted: '120.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          annualMonthlyFee: {
+            amount: 1000,
+            amountFormatted: '10.00',
+            currency: 'USD',
+            currencySymbol: '$',
+          },
+          slug: 'pro',
+          avatarUrl: '',
+          publiclyVisible: true,
+          isDefault: true,
+          isRecurring: true,
+          hasBaseFee: false,
+          forPayerType: 'user',
+          freeTrialDays: 7,
+          freeTrialEnabled: true,
+        },
+        paymentMethod: undefined,
+        confirm: vi.fn(),
+        freeTrialEndsAt: null,
+      } as any);
+
+      const { baseElement, queryByText, queryByRole, getByText } = render(
+        <Drawer.Root
+          open
+          onOpenChange={() => {}}
+        >
+          <Checkout
+            planId='plan_with_payment_methods'
+            planPeriod='month'
+          />
+        </Drawer.Root>,
+        { wrapper },
+      );
+
+      await waitFor(async () => {
+        // Verify checkout title is displayed
+        expect(queryByRole('heading', { name: 'Checkout' })).toBeVisible();
+      });
+
+      await waitFor(() => {
+        const paymentMethodsButton = queryByRole('button', { name: 'Payment Methods' });
+        expect(paymentMethodsButton).toBeNull();
+
+        const addPaymentMethodButton = queryByText('Add payment method');
+        expect(addPaymentMethodButton).toBeNull();
+
+        const visaPaymentMethod = queryByText('visa');
+        expect(visaPaymentMethod).toBeNull();
+
+        expect(
+          getByText(
+            'You will keep your current subscription and its features until the end of the billing cycle, then you will be switched to this subscription.',
+          ),
+        ).toBeInTheDocument();
+
+        // Verify the hidden input contains the correct payment method id
+        const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
+        expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
+
+        expect(queryByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
+      });
     });
   });
 });

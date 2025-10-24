@@ -89,6 +89,7 @@ const MemberRow = (props: {
           sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
           subtitle={membership.publicUserData?.identifier}
+          subtitleProps={{ variant: 'caption' }}
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
         />
       </Td>

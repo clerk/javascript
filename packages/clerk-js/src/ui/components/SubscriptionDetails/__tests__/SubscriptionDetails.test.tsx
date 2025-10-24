@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SubscriptionDetails } from '..';
 
 const { createFixtures } = bindCreateFixtures('SubscriptionDetails');
@@ -10,6 +12,7 @@ describe('SubscriptionDetails', () => {
   it('Displays spinner when init loading', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const { baseElement } = render(
@@ -31,6 +34,7 @@ describe('SubscriptionDetails', () => {
   it('single active monthly subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -81,7 +85,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
         },
@@ -134,6 +137,7 @@ describe('SubscriptionDetails', () => {
   it('single active annual subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -184,7 +188,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -237,6 +240,7 @@ describe('SubscriptionDetails', () => {
   it('active free subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -279,7 +283,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -319,6 +322,7 @@ describe('SubscriptionDetails', () => {
   it('one active annual and one upcoming monthly subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const planAnnual = {
@@ -407,7 +411,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: new Date('2021-04-01'),
-          paymentSourceId: 'src_annual',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -418,7 +421,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2022-02-01'),
           periodEnd: new Date('2022-03-01'),
           canceledAt: null,
-          paymentSourceId: 'src_monthly',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -478,6 +480,7 @@ describe('SubscriptionDetails', () => {
   it('one active and one upcoming FREE subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const planMonthly = {
@@ -560,7 +563,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: new Date('2021-01-03'),
-          paymentSourceId: 'src_free_active',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -570,7 +572,6 @@ describe('SubscriptionDetails', () => {
           createdAt: new Date('2021-01-03'),
           periodStart: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_free_upcoming',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -614,9 +615,10 @@ describe('SubscriptionDetails', () => {
   it('allows cancelling a subscription of a monthly plan', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+    const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -666,7 +668,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
           cancel: cancelSubscriptionMock,
@@ -718,6 +719,7 @@ describe('SubscriptionDetails', () => {
   it('calls resubscribe when the user clicks Resubscribe for a canceled subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
@@ -752,9 +754,9 @@ describe('SubscriptionDetails', () => {
       slug: 'annual-plan',
       avatarUrl: '',
       features: [],
-      __internal_toSnapshot: jest.fn(),
+      __internal_toSnapshot: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     const subscription = {
@@ -764,12 +766,11 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: new Date('2021-04-01'),
-      paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     // Mock getSubscriptions to return the canceled subscription
@@ -820,6 +821,7 @@ describe('SubscriptionDetails', () => {
   it('calls switchToMonthly when the user clicks Switch to monthly for an annual subscription', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
@@ -864,12 +866,11 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: null,
-      paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     // Mock getSubscriptions to return the annual subscription
@@ -925,6 +926,7 @@ describe('SubscriptionDetails', () => {
   it('past due subscription shows correct status and disables actions', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     const plan = {
@@ -981,7 +983,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'past_due' as const,
           pastDueAt: new Date('2021-01-15'),
@@ -989,7 +990,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, queryByText, queryByRole } = render(
+    const { getByRole, getByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -1008,15 +1009,13 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Subscribed on')).toBeNull();
       expect(getByText('Past due on')).toBeVisible();
       expect(getByText('January 15, 2021')).toBeVisible();
-
-      // Menu button should be present but disabled
-      expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
     });
   });
 
   it('active free trial subscription shows correct labels and behavior', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -1067,7 +1066,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,
@@ -1125,9 +1123,10 @@ describe('SubscriptionDetails', () => {
   it('allows cancelling a free trial with specific dialog text', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
-    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+    const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -1177,7 +1176,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,
@@ -1214,7 +1212,7 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Cancel free trial for Pro Plan plan?')).toBeVisible();
       expect(
         getByText(
-          "Your trial will stay active until February 1, 2021. After that, you'll lose access to trial features. You won't be changed.",
+          "Your trial will stay active until February 1, 2021. After that, you'll lose access to trial features. You won't be charged.",
         ),
       ).toBeVisible();
       expect(getByText('Keep free trial')).toBeVisible();

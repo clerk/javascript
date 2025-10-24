@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-import type { CommercePayerResourceType, CommercePlanResource, Theme } from '@clerk/types';
+import type { BillingPayerResourceType, BillingPlanResource, Theme } from '@clerk/types';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';
@@ -28,7 +28,7 @@ vi.mock('../withClerk', () => {
   };
 });
 
-const mockPlanResource: CommercePlanResource = {
+const mockPlanResource: BillingPlanResource = {
   id: 'plan_123',
   name: 'Test Plan',
   fee: {
@@ -53,7 +53,7 @@ const mockPlanResource: CommercePlanResource = {
   hasBaseFee: true,
   isRecurring: true,
   isDefault: false,
-  forPayerType: 'user' as CommercePayerResourceType,
+  forPayerType: 'user' as BillingPayerResourceType,
   publiclyVisible: true,
   slug: 'test-plan',
   avatarUrl: 'https://example.com/avatar.png',

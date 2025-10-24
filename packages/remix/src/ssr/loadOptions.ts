@@ -20,7 +20,6 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
   // 3. Then try from globalThis (Cloudflare Workers).
   // 4. Then from loader context (Cloudflare Pages).
   const secretKey = overrides.secretKey || getEnvVariable('CLERK_SECRET_KEY', context) || '';
-  const machineSecretKey = overrides.machineSecretKey || getEnvVariable('CLERK_MACHINE_SECRET_KEY', context);
   const publishableKey = overrides.publishableKey || getEnvVariable('CLERK_PUBLISHABLE_KEY', context) || '';
   const jwtKey = overrides.jwtKey || getEnvVariable('CLERK_JWT_KEY', context);
   const apiUrl = getEnvVariable('CLERK_API_URL', context) || apiUrlFromPublishableKey(publishableKey);
@@ -70,7 +69,6 @@ export const loadOptions = (args: LoaderFunctionArgs, overrides: RootAuthLoaderO
     // used to append options that are not initialized from env
     ...overrides,
     secretKey,
-    machineSecretKey,
     publishableKey,
     jwtKey,
     apiUrl,

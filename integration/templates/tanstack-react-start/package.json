@@ -8,11 +8,12 @@
     "start": "vite start --port=$PORT"
   },
   "dependencies": {
-    "@tanstack/react-router": "1.131.27",
-    "@tanstack/react-router-devtools": "1.131.27",
-    "@tanstack/react-start": "1.131.27",
+    "@tanstack/react-router": "1.132.47",
+    "@tanstack/react-router-devtools": "1.132.51",
+    "@tanstack/react-start": "1.132.51",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "srvx": "0.8.15",
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
@@ -20,9 +21,10 @@
     "@types/node": "^22.5.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
     "tailwindcss": "^4.0.8",
     "typescript": "^5.7.2",
-    "vite": "^6.0.11",
+    "vite": "^7.1.7",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

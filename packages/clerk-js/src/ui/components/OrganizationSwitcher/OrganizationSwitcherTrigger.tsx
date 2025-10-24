@@ -56,7 +56,6 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
             elementId={'organizationSwitcherTrigger'}
             gap={3}
             size='xs'
-            fetchRoles
             organization={organization}
             sx={{ maxWidth: '30ch' }}
           />

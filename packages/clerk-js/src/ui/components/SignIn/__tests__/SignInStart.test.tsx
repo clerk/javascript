@@ -1,19 +1,59 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/types';
 import { waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
-import { fireEvent, mockWebAuthn, render, screen } from '../../../../testUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
 describe('SignInStart', () => {
+  const originalGetComputedStyle = window.getComputedStyle;
+  const originalLocation = window.location;
+  const originalHistory = window.history;
+  const mockGetComputedStyle = vi.fn();
+
+  beforeEach(() => {
+    // Mock window.getComputedStyle
+    mockGetComputedStyle.mockReset();
+    mockGetComputedStyle.mockReturnValue({
+      animationName: '',
+      pointerEvents: 'auto',
+      getPropertyValue: vi.fn().mockReturnValue(''),
+    });
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: mockGetComputedStyle,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    // Restore patched globals
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: originalGetComputedStyle,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, 'history', {
+      value: originalHistory,
+      writable: true,
+      configurable: true,
+    });
+  });
+
   it('renders the component', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
@@ -167,7 +207,7 @@ describe('SignInStart', () => {
         });
       });
 
-      const wrapperBefore = ({ children }) => (
+      const wrapperBefore = ({ children }: { children: React.ReactNode }) => (
         <Wrapper>
           <AppearanceProvider
             appearanceKey={'signIn'}
@@ -289,7 +329,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrl: 'http://localhost:3000/#/sso-callback',
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
@@ -313,7 +353,7 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
         strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost/#/sso-callback',
+        redirectUrl: 'http://localhost:3000/#/sso-callback',
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
@@ -437,7 +477,7 @@ describe('SignInStart', () => {
       it(`calls sign in with identifier again with only the email if the api respondes with the error ${code}`, async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
-          f.withPassword();
+          f.withPassword({ required: true });
         });
 
         const errJSON = {
@@ -496,7 +536,7 @@ describe('SignInStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(
@@ -530,7 +570,7 @@ describe('SignInStart', () => {
       });
       Object.defineProperty(window, 'history', {
         writable: true,
-        value: { replaceState: jest.fn() },
+        value: { replaceState: vi.fn() },
       });
 
       render(

@@ -18,6 +18,11 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     enrollmentModes: [],
     defaultRole: null,
   };
+  slug: {
+    disabled: boolean;
+  } = {
+    disabled: false,
+  };
   enabled: boolean = false;
   maxAllowedMemberships: number = 1;
   forceOrganizationSelection!: boolean;
@@ -40,6 +45,10 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
       this.domains.enabled = this.withDefault(data.domains.enabled, this.domains.enabled);
       this.domains.enrollmentModes = this.withDefault(data.domains.enrollment_modes, this.domains.enrollmentModes);
       this.domains.defaultRole = this.withDefault(data.domains.default_role, this.domains.defaultRole);
+    }
+
+    if (data.slug) {
+      this.slug.disabled = this.withDefault(data.slug.disabled, this.slug.disabled);
     }
 
     this.enabled = this.withDefault(data.enabled, this.enabled);

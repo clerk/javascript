@@ -13,7 +13,9 @@ export class OrganizationMatcher {
   }
 
   private createMatcher(pattern?: string[]): MatchFunction | null {
-    if (!pattern) return null;
+    if (!pattern) {
+      return null;
+    }
     try {
       return match(pattern);
     } catch (e) {
@@ -23,21 +25,31 @@ export class OrganizationMatcher {
 
   findTarget(url: URL): OrganizationSyncTarget | null {
     const orgTarget = this.findOrganizationTarget(url);
-    if (orgTarget) return orgTarget;
+    if (orgTarget) {
+      return orgTarget;
+    }
 
     return this.findPersonalAccountTarget(url);
   }
 
   private findOrganizationTarget(url: URL): OrganizationSyncTarget | null {
-    if (!this.organizationPattern) return null;
+    if (!this.organizationPattern) {
+      return null;
+    }
 
     try {
       const result = this.organizationPattern(url.pathname);
-      if (!result || !('params' in result)) return null;
+      if (!result || !('params' in result)) {
+        return null;
+      }
 
       const params = result.params as { id?: string; slug?: string };
-      if (params.id) return { type: 'organization', organizationId: params.id };
-      if (params.slug) return { type: 'organization', organizationSlug: params.slug };
+      if (params.id) {
+        return { type: 'organization', organizationId: params.id };
+      }
+      if (params.slug) {
+        return { type: 'organization', organizationSlug: params.slug };
+      }
 
       return null;
     } catch (e) {
@@ -47,7 +59,9 @@ export class OrganizationMatcher {
   }
 
   private findPersonalAccountTarget(url: URL): OrganizationSyncTarget | null {
-    if (!this.personalAccountPattern) return null;
+    if (!this.personalAccountPattern) {
+      return null;
+    }
 
     try {
       const result = this.personalAccountPattern(url.pathname);

@@ -19,7 +19,9 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
     const checked = isControlled ? controlledChecked : internalChecked;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (isDisabled) return;
+      if (isDisabled) {
+        return;
+      }
       if (!isControlled) {
         setInternalChecked(e.target.checked);
       }

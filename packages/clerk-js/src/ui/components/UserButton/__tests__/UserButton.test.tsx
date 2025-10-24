@@ -1,7 +1,8 @@
-import { describe } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
+
 import { UserButton } from '../';
 
 const { createFixtures } = bindCreateFixtures('UserButton');

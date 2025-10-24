@@ -13,7 +13,7 @@ export type AvatarUploaderProps = {
   avatarPreviewPlaceholder?: React.ReactElement | null;
 };
 
-export const fileToBase64 = (file: File): Promise<string> => {
+const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -114,6 +114,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 variant='ghost'
                 colorScheme='danger'
                 onClick={handleRemove}
+                size='xs'
               />
             )}
           </Flex>

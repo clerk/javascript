@@ -386,7 +386,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     if (!mustActivate) {
       return null;
     }
-    if (authenticateContext.handshakeRedirectLoopCounter > 0) {
+    if (authenticateContext.handshakeRedirectLoopCounter >= 3) {
       // We have an organization that needs to be activated, but this isn't our first time redirecting.
       // This is because we attempted to activate the organization previously, but the organization
       // must not have been valid (either not found, or not valid for this user), and gave us back
@@ -461,16 +461,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
         }
       }
     }
-    /**
-     * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
-     */
-    if (
-      authenticateContext.instanceType === 'development' &&
-      authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser)
-    ) {
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
-    }
-
     const isRequestEligibleForMultiDomainSync =
       authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
 
@@ -500,7 +490,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
-    // Multi-domain development sync flow
+    // Multi-domain development sync flow - primary responds to syncing
+    // IMPORTANT: This must come BEFORE dev-browser-sync check to avoid the root domain
+    // triggering its own handshakes when it's in the middle of handling a satellite sync request
     const redirectUrl = new URL(authenticateContext.clerkUrl).searchParams.get(
       constants.QueryParameters.ClerkRedirectUrl,
     );
@@ -523,6 +515,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
     /**
      * End multi-domain sync flows
      */
+
+    /**
+     * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
+     */
+    if (
+      authenticateContext.instanceType === 'development' &&
+      authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser)
+    ) {
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
+    }
 
     if (authenticateContext.instanceType === 'development' && !hasDevBrowserToken) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserMissing, '');
@@ -576,7 +578,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       const shouldForceHandshakeForCrossDomain =
         !authenticateContext.isSatellite && // We're on primary
         authenticateContext.secFetchDest === 'document' && // Document navigation
-        authenticateContext.isCrossOriginReferrer(); // Came from different domain
+        authenticateContext.isCrossOriginReferrer() && // Came from different domain
+        !authenticateContext.isKnownClerkReferrer() && // Not from Clerk accounts portal or FAPI
+        authenticateContext.handshakeRedirectLoopCounter === 0; // Not in a redirect loop
 
       if (shouldForceHandshakeForCrossDomain) {
         return handleMaybeHandshakeStatus(

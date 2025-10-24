@@ -1,7 +1,7 @@
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
-  CommerceCheckoutResource,
+  BillingCheckoutResource,
   SetActiveNavigate,
 } from '@clerk/types';
 import { useMemo, useSyncExternalStore } from 'react';
@@ -27,7 +27,7 @@ type ForceNull<T> = {
   [K in keyof T]: null;
 };
 
-type CheckoutProperties = Omit<RemoveFunctions<CommerceCheckoutResource>, 'pathRoot' | 'status'>;
+type CheckoutProperties = Omit<RemoveFunctions<BillingCheckoutResource>, 'pathRoot' | 'status'>;
 
 type FetchStatusAndError =
   | {
@@ -85,7 +85,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
 
   if (forOrganization === 'organization' && !organization) {
     throw new Error(
-      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/reference/backend/types/auth-object#how-to-access-the-auth-object',
     );
   }
 
@@ -111,8 +111,9 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         isImmediatePlanChange: null,
         planPeriod: null,
         plan: null,
-        paymentSource: null,
+        paymentMethod: null,
         freeTrialEndsAt: null,
+        payer: null,
       };
     }
     const {

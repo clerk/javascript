@@ -8,7 +8,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSession = () => ToComputedRefs<UseSessionReturn>;
 
 /**
- * Returns the current [`Session`](https://clerk.com/docs/references/javascript/session) object which provides
+ * Returns the current [`Session`](https://clerk.com/docs/reference/javascript/session) object which provides
  * information about the active session and methods to manage it.
  *
  * @example
@@ -33,7 +33,7 @@ type UseSession = () => ToComputedRefs<UseSessionReturn>;
  * </template>
  */
 export const useSession: UseSession = () => {
-  const { sessionCtx, clerk } = useClerkContext();
+  const { sessionCtx, clerk } = useClerkContext('useSession');
 
   const result = computed<UseSessionReturn>(() => {
     if (sessionCtx.value === undefined) {

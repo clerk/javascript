@@ -69,8 +69,8 @@ export const csCZ: LocalizationResource = {
   badge__upcomingPlan: 'Nadcházející',
   badge__userDevice: 'Zařízení uživatele',
   badge__you: 'Vy',
-  commerce: {
-    addPaymentMethod: 'Přidat platební metodu',
+  billing: {
+    addPaymentMethod__label: 'Přidat platební metodu',
     alwaysFree: 'Vždy zdarma',
     annually: 'Ročně',
     availableFeatures: 'Dostupné funkce',
@@ -83,6 +83,7 @@ export const csCZ: LocalizationResource = {
     cancelSubscriptionAccessUntil:
       "Funkce '{{plan}}' můžete používat do {{ date | longDate('cs-CZ') }}, poté k nim ztratíte přístup.",
     cancelSubscriptionNoCharge: 'Za toto předplatné vám nebudou účtovány žádné poplatky.',
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: 'Zrušit předplatné {{plan}}?',
     cannotSubscribeMonthly:
       'Nelze se přihlásit k tomuto plánu s měsíční platbou. Abyste se k němu přihlásili, musíte zvolit roční platbu.',
@@ -124,8 +125,7 @@ export const csCZ: LocalizationResource = {
     monthly: 'Měsíčně',
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
-    paymentMethods: 'Platební metody',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Roční platba',
         monthly: 'Měsíční platba',
@@ -139,6 +139,7 @@ export const csCZ: LocalizationResource = {
         testCardInfo: 'Informace o testovací kartě',
       },
     },
+    paymentMethods__label: 'Platební metody',
     popular: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
@@ -222,7 +223,8 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__organizationSlug: 'moje-org',
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
-  formFieldInputPlaceholder__username: undefined,
+  formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -254,6 +256,7 @@ export const csCZ: LocalizationResource = {
     action__signOut: 'Odhlásit se',
     title: 'Přihlášen jako {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Naposledy použito',
   maintenanceMode: 'Momentálně provádíme údržbu, ale nebojte se, nemělo by to trvat déle než pár minut.',
   membershipRole__admin: 'Správce',
   membershipRole__basicMember: 'Člen',
@@ -285,7 +288,7 @@ export const csCZ: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Stav',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Nastavit jako výchozí',
         actionLabel__remove: 'Odebrat',
         add: 'Přidat novou platební metodu',
@@ -294,11 +297,11 @@ export const csCZ: LocalizationResource = {
         formButtonPrimary__add: 'Přidat platební metodu',
         formButtonPrimary__pay: 'Zaplatit {{amount}}',
         payWithTestCardButton: 'Zaplatit testovací kartou',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
@@ -321,6 +324,7 @@ export const csCZ: LocalizationResource = {
         totalPaid: 'Celkem zaplaceno',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Přihlásit se k plánu',
         actionLabel__switchPlan: 'Změnit plány',
         tableHeader__edit: 'Upravit',
@@ -643,6 +647,10 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -712,7 +720,7 @@ export const csCZ: LocalizationResource = {
         title: 'Přihlásit se do {{applicationName}} pomocí {{provider}}',
       },
       subtitle: 'Vítejte zpět! Prosím přihlaste se pro pokračování',
-      subtitleCombined: undefined,
+      subtitleCombined: 'Vítejte zpět! Prosím přihlaste se pro pokračování',
       title: 'Přihlásit se do {{applicationName}}',
       titleCombined: 'Pokračovat do {{applicationName}}',
     },
@@ -764,6 +772,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na předchozí kartu pro pokračování',
         title: 'E-mail úspěšně ověřen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -840,36 +852,38 @@ export const csCZ: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
-    captcha_invalid: undefined,
+    captcha_invalid:
+      'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
-    form_code_incorrect: undefined,
-    form_identifier_exists__email_address: undefined,
-    form_identifier_exists__phone_number: undefined,
-    form_identifier_exists__username: undefined,
-    form_identifier_not_found: undefined,
-    form_param_format_invalid: undefined,
-    form_param_format_invalid__email_address: undefined,
-    form_param_format_invalid__phone_number: undefined,
-    form_param_max_length_exceeded__first_name: undefined,
-    form_param_max_length_exceeded__last_name: undefined,
-    form_param_max_length_exceeded__name: undefined,
-    form_param_nil: undefined,
+    form_code_incorrect: 'Kód je nesprávný.',
+    form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
+    form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
+    form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
+    form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
+    form_param_format_invalid: 'Formát parametru je neplatný.',
+    form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
+    form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
+    form_param_max_length_exceeded__first_name: 'Jméno nesmí přesáhnout 256 znaků.',
+    form_param_max_length_exceeded__last_name: 'Příjmení nesmí přesáhnout 256 znaků.',
+    form_param_max_length_exceeded__name: 'Jméno nesmí přesáhnout 256 znaků.',
+    form_param_nil: 'Tento parametr je povinný.',
     form_param_type_invalid: undefined,
     form_param_type_invalid__email_address: undefined,
     form_param_type_invalid__phone_number: undefined,
-    form_param_value_invalid: undefined,
-    form_password_incorrect: undefined,
-    form_password_length_too_short: 'Vaše heslo je příliš krátké. Musí mít alespoň 8 znaků.',
+    form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
+    form_password_incorrect: 'Heslo je nesprávné.',
+    form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',
     form_password_pwned__sign_in:
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',
-    form_password_size_in_bytes_exceeded: undefined,
-    form_password_validation_failed: undefined,
-    form_username_invalid_character: undefined,
+    form_password_size_in_bytes_exceeded:
+      'Vaše heslo překročilo maximální povolený počet bajtů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
+    form_password_validation_failed: 'Nesprávné heslo',
+    form_username_invalid_character: 'Uživatelské jméno může obsahovat pouze alfanumerické znaky a podtržítka.',
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
-    identification_deletion_failed: undefined,
+    identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
@@ -892,8 +906,8 @@ export const csCZ: LocalizationResource = {
       requireUppercase: 'velké písmeno',
       sentencePrefix: 'Vaše heslo musí obsahovat',
     },
-    phone_number_exists: undefined,
-    session_exists: undefined,
+    phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
+    session_exists: 'Jste již přihlášen.',
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
@@ -969,7 +983,7 @@ export const csCZ: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Stav',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Nastavit jako výchozí',
         actionLabel__remove: 'Odebrat',
         add: 'Přidat novou platební metodu',
@@ -978,11 +992,11 @@ export const csCZ: LocalizationResource = {
         formButtonPrimary__add: 'Přidat platební metodu',
         formButtonPrimary__pay: 'Zaplatit {{amount}}',
         payWithTestCardButton: 'Zaplatit testovací kartou',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
@@ -1005,6 +1019,7 @@ export const csCZ: LocalizationResource = {
         totalPaid: 'Celkem zaplaceno',
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: 'Přihlásit se k plánu',
         actionLabel__switchPlan: 'Změnit plány',
         tableHeader__edit: 'Upravit',
@@ -1036,7 +1051,8 @@ export const csCZ: LocalizationResource = {
     deletePage: {
       actionDescription: 'Napište "Smazat účet" níže pro pokračování.',
       confirm: 'Smazat účet',
-      messageLine1: 'Jste si jisti, že chcete smazat svůj účet?',
+      messageLine1:
+        'Opravdu chcete smazat svůj účet? Některá související data mohou být zachována. Chcete-li požádat o úplné smazání dat, kontaktujte podporu.',
       messageLine2: 'Tato akce je trvalá a nevratná.',
       title: 'Smazat účet',
     },

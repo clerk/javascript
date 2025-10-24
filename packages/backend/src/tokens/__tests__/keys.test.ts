@@ -12,11 +12,13 @@ import {
   mockRsaJwkKid,
 } from '../../fixtures';
 import { server, validateHeaders } from '../../mock-server';
-import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from '../keys';
+import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from '../keys';
+
+const MOCK_KID = 'test-kid';
 
 describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
   it('throws an error if no key has been provided', () => {
-    expect(() => loadClerkJWKFromLocal()).toThrow(
+    expect(() => loadClerkJwkFromPem({ kid: MOCK_KID })).toThrow(
       new TokenVerificationError({
         action: TokenVerificationErrorAction.SetClerkJWTKey,
         message: 'Missing local JWK.',
@@ -26,13 +28,56 @@ describe('tokens.loadClerkJWKFromLocal(localKey)', () => {
   });
 
   it('loads the local key', () => {
-    const jwk = loadClerkJWKFromLocal(mockPEMKey);
+    const jwk = loadClerkJwkFromPem({ kid: MOCK_KID, pem: mockPEMKey });
     expect(jwk).toMatchObject(mockPEMJwk);
   });
 
   it('loads the local key in PEM format', () => {
-    const jwk = loadClerkJWKFromLocal(mockPEMJwtKey);
+    const jwk = loadClerkJwkFromPem({ kid: MOCK_KID, pem: mockPEMJwtKey });
     expect(jwk).toMatchObject(mockPEMJwk);
+  });
+
+  it('caches PEM keys separately for different kids', () => {
+    const jwk1 = loadClerkJwkFromPem({ kid: 'ins_1', pem: mockPEMKey }) as JsonWebKey & { kid: string };
+    expect(jwk1.kid).toBe('local-ins_1');
+    expect(jwk1.n).toBe(mockPEMJwk.n);
+
+    const jwk2 = loadClerkJwkFromPem({ kid: 'ins_2', pem: mockPEMJwtKey }) as JsonWebKey & { kid: string };
+    expect(jwk2.kid).toBe('local-ins_2');
+    expect(jwk2.n).toBe(mockPEMJwk.n);
+
+    // Verify both are cached independently
+    const jwk1Cached = loadClerkJwkFromPem({ kid: 'ins_1', pem: mockPEMKey });
+    const jwk2Cached = loadClerkJwkFromPem({ kid: 'ins_2', pem: mockPEMJwtKey });
+
+    expect(jwk1Cached).toBe(jwk1);
+    expect(jwk2Cached).toBe(jwk2); // Same object reference means its cached
+  });
+
+  it('returns cached JWK on subsequent calls with same kid', () => {
+    const jwk1 = loadClerkJwkFromPem({ kid: 'cache-test', pem: mockPEMKey });
+    const jwk2 = loadClerkJwkFromPem({ kid: 'cache-test', pem: mockPEMKey });
+    // Should return the exact same reference
+    expect(jwk1).toBe(jwk2);
+  });
+
+  it('uses "local-" prefix to avoid cache collision with remote keys', () => {
+    const localJwk = loadClerkJwkFromPem({ kid: 'test-kid', pem: mockPEMKey }) as JsonWebKey & { kid: string };
+    expect(localJwk.kid).toBe('local-test-kid');
+  });
+
+  it('creates separate cache entries for different kids even with same PEM', () => {
+    // Two JWT keys might theoretically use the same PEM (unlikely but possible)
+    const jwkA = loadClerkJwkFromPem({ kid: 'ins_key_a', pem: mockPEMKey }) as JsonWebKey & { kid: string };
+    const jwkB = loadClerkJwkFromPem({ kid: 'ins_key_b', pem: mockPEMKey }) as JsonWebKey & { kid: string };
+
+    // They should be different objects
+    expect(jwkA).not.toBe(jwkB);
+    // But have the same modulus
+    expect(jwkA.n).toBe(jwkB.n);
+    // And different prefixed kids
+    expect(jwkA.kid).toBe('local-ins_key_a');
+    expect(jwkB.kid).toBe('local-ins_key_b');
   });
 });
 

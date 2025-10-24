@@ -68,8 +68,8 @@ export const bgBG: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Потребителско устройство',
   badge__you: 'Вие',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -82,6 +82,7 @@ export const bgBG: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -121,8 +122,7 @@ export const bgBG: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +136,7 @@ export const bgBG: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +220,7 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Парола',
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -250,6 +252,7 @@ export const bgBG: LocalizationResource = {
     action__signOut: 'Изход',
     title: 'Влезли сте като {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последно използвано',
   maintenanceMode: 'Режим на поддръжка',
   membershipRole__admin: 'Админ',
   membershipRole__basicMember: 'Член',
@@ -281,7 +284,7 @@ export const bgBG: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +293,7 @@ export const bgBG: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -316,6 +319,7 @@ export const bgBG: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -636,6 +640,10 @@ export const bgBG: LocalizationResource = {
         titleNewTab: 'Влезнали сте в друг таб',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код за нулиране на парола',
       resendButton: 'Не сте получили код? Изпрати отново',
@@ -756,6 +764,10 @@ export const bgBG: LocalizationResource = {
         subtitleNewTab: 'Върнете се към предходния таб, за да продължите',
         title: 'Успешно потвърден имейл',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -959,7 +971,7 @@ export const bgBG: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -968,7 +980,7 @@ export const bgBG: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -994,6 +1006,7 @@ export const bgBG: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1026,7 +1039,8 @@ export const bgBG: LocalizationResource = {
     deletePage: {
       actionDescription: 'Напишете "Изтриване на акаунта" по-долу, за да продължите.',
       confirm: 'Изтриване на акаунта',
-      messageLine1: 'Сигурни ли сте, че искате да изтриете акаунта си?',
+      messageLine1:
+        'Сигурни ли сте, че искате да изтриете акаунта си? Някои свързани данни могат да бъдат запазени. За да поискате пълно изтриване на данните, моля, свържете се с поддръжката.',
       messageLine2: 'Това действие е перманентно и необратимо.',
       title: 'Изтриване на акаунта',
     },

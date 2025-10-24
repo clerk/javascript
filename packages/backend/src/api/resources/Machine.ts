@@ -1,5 +1,8 @@
 import type { MachineJSON } from './JSON';
 
+/**
+ * The Backend `Machine` object holds information about a machine.
+ */
 export class Machine {
   constructor(
     readonly id: string,

@@ -38,7 +38,9 @@ export async function _authenticateWithPopup(
   );
 
   const messageHandler = async (event: MessageEvent) => {
-    if (event.origin !== accountPortalHost) return;
+    if (event.origin !== accountPortalHost) {
+      return;
+    }
 
     let shouldRemoveListener = false;
 

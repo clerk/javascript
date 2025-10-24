@@ -111,7 +111,9 @@ export const removeInvalidValues = (variables: NonNullable<Theme['variables']>):
 
       if (typeof value === 'object') {
         return Object.entries(value).every(([key, value]) => {
-          if (typeof value !== 'string') return true;
+          if (typeof value !== 'string') {
+            return true;
+          }
 
           const isValid = !value.startsWith('var(');
           if (!isValid) {

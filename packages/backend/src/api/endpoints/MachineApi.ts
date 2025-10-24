@@ -1,9 +1,12 @@
+import type { ClerkPaginationRequest } from '@clerk/types';
+
 import { joinPaths } from '../../util/path';
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import type { Machine } from '../resources/Machine';
 import type { MachineScope } from '../resources/MachineScope';
 import type { MachineSecretKey } from '../resources/MachineSecretKey';
 import { AbstractAPI } from './AbstractApi';
+import type { WithSign } from './util-types';
 
 const basePath = '/machines';
 
@@ -37,10 +40,27 @@ type UpdateMachineParams = {
   defaultTokenTtl?: number;
 };
 
-type GetMachineListParams = {
-  limit?: number;
-  offset?: number;
+type GetMachineListParams = ClerkPaginationRequest<{
+  /**
+   * Sorts machines by name or created_at.
+   * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
+   */
+  orderBy?: WithSign<'name' | 'created_at'>;
+  /**
+   * Returns machines that have a ID or name that matches the given query.
+   */
   query?: string;
+}>;
+
+type RotateMachineSecretKeyParams = {
+  /**
+   * The ID of the machine to rotate the secret key for.
+   */
+  machineId: string;
+  /**
+   * The time in seconds that the previous secret key will remain valid after rotation.
+   */
+  previousTokenTtl: number;
 };
 
 export class MachineApi extends AbstractAPI {
@@ -91,6 +111,18 @@ export class MachineApi extends AbstractAPI {
     return this.request<MachineSecretKey>({
       method: 'GET',
       path: joinPaths(basePath, machineId, 'secret_key'),
+    });
+  }
+
+  async rotateSecretKey(params: RotateMachineSecretKeyParams) {
+    const { machineId, previousTokenTtl } = params;
+    this.requireId(machineId);
+    return this.request<MachineSecretKey>({
+      method: 'POST',
+      path: joinPaths(basePath, machineId, 'secret_key', 'rotate'),
+      bodyParams: {
+        previousTokenTtl,
+      },
     });
   }
 

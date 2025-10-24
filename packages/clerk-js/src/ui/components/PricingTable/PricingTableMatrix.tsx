@@ -1,4 +1,4 @@
-import type { CommercePlanResource, CommerceSubscriptionPlanPeriod } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
@@ -25,11 +25,11 @@ import { Check, InformationCircle } from '../../icons';
 import { common, InternalThemeProvider, mqu, type ThemableCssProp } from '../../styledSystem';
 
 interface PricingTableMatrixProps {
-  plans: CommercePlanResource[] | undefined;
-  highlightedPlan?: CommercePlanResource['slug'];
-  planPeriod: CommerceSubscriptionPlanPeriod;
-  setPlanPeriod: (val: CommerceSubscriptionPlanPeriod) => void;
-  onSelect: (plan: CommercePlanResource, event?: React.MouseEvent<HTMLElement>) => void;
+  plans: BillingPlanResource[] | undefined;
+  highlightedPlan?: BillingPlanResource['slug'];
+  planPeriod: BillingSubscriptionPlanPeriod;
+  setPlanPeriod: (val: BillingSubscriptionPlanPeriod) => void;
+  onSelect: (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => void;
 }
 
 export function PricingTableMatrix({
@@ -133,22 +133,22 @@ export function PricingTableMatrix({
                       id={segmentedControlId}
                       colorScheme='secondary'
                       variant='caption'
-                      localizationKey={localizationKeys('commerce.pricingTable.billingCycle')}
+                      localizationKey={localizationKeys('billing.pricingTable.billingCycle')}
                     >
                       Billing cycle
                     </Text>
                     <SegmentedControl.Root
                       aria-labelledby={segmentedControlId}
                       value={planPeriod}
-                      onChange={value => setPlanPeriod(value as CommerceSubscriptionPlanPeriod)}
+                      onChange={value => setPlanPeriod(value as BillingSubscriptionPlanPeriod)}
                     >
                       <SegmentedControl.Button
                         value='month'
-                        text={localizationKeys('commerce.monthly')}
+                        text={localizationKeys('billing.monthly')}
                       />
                       <SegmentedControl.Button
                         value='annual'
-                        text={localizationKeys('commerce.annually')}
+                        text={localizationKeys('billing.annually')}
                       />
                     </SegmentedControl.Root>
                   </>
@@ -211,7 +211,7 @@ export function PricingTableMatrix({
                             <Badge
                               elementDescriptor={descriptors.pricingTableMatrixBadge}
                               colorScheme='secondary'
-                              localizationKey={localizationKeys('commerce.popular')}
+                              localizationKey={localizationKeys('billing.popular')}
                             />
                           ) : null}
                         </Span>
@@ -251,7 +251,7 @@ export function PricingTableMatrix({
                                   marginInlineEnd: t.space.$1,
                                 },
                               })}
-                              localizationKey={localizationKeys('commerce.month')}
+                              localizationKey={localizationKeys('billing.month')}
                             />
                             {plan.annualMonthlyFee.amount > 0 ? (
                               <Box
@@ -291,7 +291,7 @@ export function PricingTableMatrix({
                                       size='sm'
                                       aria-hidden
                                     />{' '}
-                                    <Span localizationKey={localizationKeys('commerce.billedAnnually')} />
+                                    <Span localizationKey={localizationKeys('billing.billedAnnually')} />
                                   </Text>
                                 </Box>
                               </Box>
@@ -301,7 +301,7 @@ export function PricingTableMatrix({
                           <Text
                             elementDescriptor={descriptors.pricingTableMatrixFee}
                             variant='h2'
-                            localizationKey={localizationKeys('commerce.free')}
+                            localizationKey={localizationKeys('billing.free')}
                             colorScheme='body'
                           />
                         )}
@@ -398,7 +398,7 @@ export function PricingTableMatrix({
                             icon={Check}
                             colorScheme='neutral'
                             size='sm'
-                            aria-label={t(localizationKeys('commerce.pricingTable.included'))}
+                            aria-label={t(localizationKeys('billing.pricingTable.included'))}
                           />
                         )}
                       </Box>

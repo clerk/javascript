@@ -6,7 +6,7 @@ import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from 
  */
 export type SharedSignedInAuthObjectProperties = {
   /**
-   * The current user's [session claims](https://clerk.com/docs/backend-requests/resources/session-tokens).
+   * The current user's [session claims](https://clerk.com/docs/guides/sessions/session-tokens).
    */
   sessionClaims: JwtPayload;
   /**
@@ -18,7 +18,7 @@ export type SharedSignedInAuthObjectProperties = {
    */
   sessionStatus: SessionStatusClaim | null;
   /**
-   * Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/users/user-impersonation).
+   * Holds identifier for the user that is impersonating the current user. Read more about [impersonation](https://clerk.com/docs/guides/users/impersonation).
    */
   actor: ActClaim | undefined;
   /**

@@ -68,8 +68,8 @@ export const fiFI: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const fiFI: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const fiFI: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const fiFI: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -206,7 +207,7 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyExpirationDate: undefined,
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
-  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Delete account',
+  formFieldInputPlaceholder__confirmDeletionUserAccount: 'Poista tili',
   formFieldInputPlaceholder__emailAddress: undefined,
   formFieldInputPlaceholder__emailAddress_username: undefined,
   formFieldInputPlaceholder__emailAddresses: 'esimerkki@domain.fi, esimerkki2@domain.fi',
@@ -219,6 +220,7 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -250,6 +252,7 @@ export const fiFI: LocalizationResource = {
     action__signOut: 'Kirjaudu ulos',
     title: 'Kirjautuneena käyttäjänä {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Viimeksi käytetty',
   maintenanceMode: 'Olemme tällä hetkellä huoltotilassa, mutta älä huoli, se ei kestä kauempaa kuin muutama minuutti.',
   membershipRole__admin: 'Ylläpitäjä',
   membershipRole__basicMember: 'Jäsen',
@@ -281,7 +284,7 @@ export const fiFI: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +293,7 @@ export const fiFI: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -316,6 +319,7 @@ export const fiFI: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -636,6 +640,10 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nollaa salasana',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
@@ -756,6 +764,10 @@ export const fiFI: LocalizationResource = {
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         title: 'Rekisteröitynyt toiseen välilehteen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -961,7 +973,7 @@ export const fiFI: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -970,7 +982,7 @@ export const fiFI: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -996,6 +1008,7 @@ export const fiFI: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1026,9 +1039,10 @@ export const fiFI: LocalizationResource = {
       title: 'Lisää yhdistetty tili',
     },
     deletePage: {
-      actionDescription: 'Kirjoita "Delete account" poistaaksesi tilisi.',
+      actionDescription: 'Kirjoita "Poista tili" poistaaksesi tilisi.',
       confirm: 'Poista tili',
-      messageLine1: 'Oletko varma, että haluat poistaa tilisi?',
+      messageLine1:
+        'Haluatko varmasti poistaa tilisi? Joitakin liittyviä tietoja saatetaan säilyttää. Pyydä täydellistä tietojen poistamista ottamalla yhteyttä tukeen.',
       messageLine2: 'Tämä toiminto on pysyvä ja peruuttamaton.',
       title: 'Poista tili',
     },

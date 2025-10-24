@@ -68,8 +68,8 @@ export const msMY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Peranti pengguna',
   badge__you: 'Anda',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const msMY: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const msMY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const msMY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const msMY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Masukkan kata laluan anda',
   formFieldInputPlaceholder__phoneNumber: 'Masukkan nombor telefon anda',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const msMY: LocalizationResource = {
     action__signOut: 'Daftar keluar',
     title: 'Didaftarkan sebagai {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Terakhir digunakan',
   maintenanceMode:
     'Kami sedang menjalani penyelenggaraan, tetapi jangan risau, ini tidak sepatutnya mengambil masa lebih daripada beberapa minit.',
   membershipRole__admin: 'Pentadbir',
@@ -281,7 +284,7 @@ export const msMY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Jadikan lalai',
         actionLabel__remove: 'Keluarkan',
         add: 'Tambah sumber pembayaran baharu',
@@ -290,11 +293,11 @@ export const msMY: LocalizationResource = {
         formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
         formButtonPrimary__pay: 'Bayar {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
           messageLine2:
             'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
-          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
+          successMessage: '{{paymentMethod}} telah dikeluarkan dari akaun anda.',
           title: 'Keluarkan sumber pembayaran',
         },
         title: 'Pilihan tersedia',
@@ -317,6 +320,7 @@ export const msMY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -640,6 +644,10 @@ export const msMY: LocalizationResource = {
         titleNewTab: 'Didaftarkan masuk pada tab lain',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod tetapan semula kata laluan',
       resendButton: 'Tidak menerima kod? Hantar semula',
@@ -761,6 +769,10 @@ export const msMY: LocalizationResource = {
         subtitleNewTab: 'Kembali ke tab sebelumnya untuk meneruskan',
         title: 'Berjaya mengesahkan e-mel',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -975,7 +987,7 @@ export const msMY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Jadikan lalai',
         actionLabel__remove: 'Keluarkan',
         add: 'Tambah sumber pembayaran baharu',
@@ -984,11 +996,11 @@ export const msMY: LocalizationResource = {
         formButtonPrimary__add: 'Tambah Kaedah Pembayaran',
         formButtonPrimary__pay: 'Bayar {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} akan dikeluarkan dari akaun ini.',
           messageLine2:
             'Anda tidak akan dapat menggunakan sumber pembayaran ini lagi dan langganan berulang yang bergantung padanya tidak akan berfungsi lagi.',
-          successMessage: '{{paymentSource}} telah dikeluarkan dari akaun anda.',
+          successMessage: '{{paymentMethod}} telah dikeluarkan dari akaun anda.',
           title: 'Keluarkan sumber pembayaran',
         },
         title: 'Pilihan tersedia',
@@ -1011,6 +1023,7 @@ export const msMY: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1043,7 +1056,8 @@ export const msMY: LocalizationResource = {
     deletePage: {
       actionDescription: 'Taip "Delete account" di bawah untuk meneruskan.',
       confirm: 'Padam akaun',
-      messageLine1: 'Adakah anda pasti mahu memadam akaun anda?',
+      messageLine1:
+        'Adakah anda pasti mahu memadamkan akaun anda? Sesetengah data yang berkaitan mungkin disimpan. Untuk meminta pemadaman data sepenuhnya, sila hubungi sokongan.',
       messageLine2: 'Tindakan ini adalah kekal dan tidak boleh dibatalkan.',
       title: 'Padam akaun',
     },

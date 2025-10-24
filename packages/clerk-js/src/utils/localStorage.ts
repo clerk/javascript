@@ -38,7 +38,9 @@ export class SafeLocalStorage {
   static getItem<T>(key: string, defaultValue: T): T {
     try {
       const item = window.localStorage.getItem(this._key(key));
-      if (!item) return defaultValue;
+      if (!item) {
+        return defaultValue;
+      }
       const entry = parse(item) as unknown as StorageEntry<T> | undefined | null;
 
       if (!entry) {

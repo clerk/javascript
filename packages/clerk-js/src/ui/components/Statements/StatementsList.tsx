@@ -1,4 +1,4 @@
-import type { CommerceStatementResource } from '@clerk/types';
+import type { BillingStatementResource } from '@clerk/types';
 
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
 import { formatDate } from '@/ui/utils/formatDate';
@@ -39,7 +39,7 @@ export const StatementsList = () => {
   );
 };
 
-const StatementsListRow = ({ statement }: { statement: CommerceStatementResource }) => {
+const StatementsListRow = ({ statement }: { statement: BillingStatementResource }) => {
   const {
     timestamp,
     id,

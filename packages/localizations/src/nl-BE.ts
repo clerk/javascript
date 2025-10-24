@@ -13,7 +13,7 @@
 import type { LocalizationResource } from '@clerk/types';
 
 export const nlBE: LocalizationResource = {
-  locale: 'nl-NL',
+  locale: 'nl-BE',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
@@ -68,8 +68,8 @@ export const nlBE: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const nlBE: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const nlBE: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const nlBE: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -218,6 +219,7 @@ export const nlBE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -249,6 +251,7 @@ export const nlBE: LocalizationResource = {
     action__signOut: 'Uitloggen',
     title: 'Ingelogd als {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Laatst gebruikt',
   maintenanceMode: 'Onderhoudsmodus',
   membershipRole__admin: 'Beheerder',
   membershipRole__basicMember: 'Lid',
@@ -280,7 +283,7 @@ export const nlBE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -289,7 +292,7 @@ export const nlBE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -315,6 +318,7 @@ export const nlBE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -636,6 +640,10 @@ export const nlBE: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -755,6 +763,10 @@ export const nlBE: LocalizationResource = {
         subtitleNewTab: 'Ga naar de vorige tab om verder te gaan',
         title: 'E-mail bevestigd',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -960,7 +972,7 @@ export const nlBE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +981,7 @@ export const nlBE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -995,6 +1007,7 @@ export const nlBE: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1025,11 +1038,12 @@ export const nlBE: LocalizationResource = {
       title: 'Verbind externe account',
     },
     deletePage: {
-      actionDescription: 'Type "Delete account" below to continue.',
-      confirm: 'Delete account',
-      messageLine1: 'Are you sure you want to delete your account?',
-      messageLine2: 'This action is permanent and irreversible.',
-      title: 'Delete account',
+      actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
+      confirm: 'Account verwijderen',
+      messageLine1:
+        'Weet je zeker dat je je account wilt verwijderen? Sommige bijbehorende gegevens kunnen bewaard blijven. Neem contact op met de ondersteuning om volledige gegevensverwijdering aan te vragen.',
+      messageLine2: 'Deze actie is permanent en onherroepelijk.',
+      title: 'Account verwijderen',
     },
     emailAddressPage: {
       emailCode: {

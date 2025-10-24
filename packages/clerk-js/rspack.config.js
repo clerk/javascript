@@ -17,6 +17,7 @@ const variants = {
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
   clerkCHIPS: 'clerk.chips.browser',
+  clerkChannelBrowser: 'clerk.channel.browser',
 };
 
 const variantToSourceFile = {
@@ -26,7 +27,8 @@ const variantToSourceFile = {
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
-  [variants.clerkCHIPS]: './src/index.chips.browser.ts',
+  [variants.clerkCHIPS]: './src/index.browser.ts',
+  [variants.clerkChannelBrowser]: './src/index.browser.ts',
 };
 
 /**
@@ -58,6 +60,7 @@ const common = ({ mode, variant, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
+        __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
       }),
       new rspack.EnvironmentPlugin({
@@ -82,7 +85,9 @@ const common = ({ mode, variant, disableRHC = false }) => {
      * SDKs such as Browser Extensions.
      */
     // TODO: @COMMERCE:  Do we still need this?
-    externals: disableRHC ? ['@stripe/stripe-js', '@stripe/react-stripe-js'] : undefined,
+    externals: disableRHC
+      ? ['@stripe/stripe-js', '@stripe/react-stripe-js', '@coinbase/wallet-sdk', '@base-org/account']
+      : undefined,
     optimization: {
       splitChunks: {
         cacheGroups: {
@@ -94,6 +99,11 @@ const common = ({ mode, variant, disableRHC = false }) => {
           zxcvbnTSCommonVendor: {
             test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
             name: 'zxcvbn-common',
+            chunks: 'all',
+          },
+          baseAccountSDKVendor: {
+            test: /[\\/]node_modules[\\/](@base-org\/account|@noble\/curves|abitype|ox|preact|eventemitter3|viem|zustand)[\\/]/,
+            name: 'base-account-sdk',
             chunks: 'all',
           },
           coinbaseWalletSDKVendor: {
@@ -417,6 +427,13 @@ const prodConfig = ({ mode, env, analysis }) => {
     commonForProdChunked(),
   );
 
+  const clerkChannelBrowser = merge(
+    entryForVariant(variants.clerkChannelBrowser),
+    common({ mode, variant: variants.clerkChannelBrowser }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
+
   const clerkEsm = merge(
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
@@ -474,6 +491,12 @@ const prodConfig = ({ mode, env, analysis }) => {
       new rspack.IgnorePlugin({
         resourceRegExp: /^@stripe\/stripe-js$/,
       }),
+      new rspack.IgnorePlugin({
+        resourceRegExp: /^@coinbase\/wallet-sdk$/,
+      }),
+      new rspack.IgnorePlugin({
+        resourceRegExp: /^@base-org\/account$/,
+      }),
       new rspack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
@@ -525,6 +548,7 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkHeadless,
     clerkHeadlessBrowser,
     clerkCHIPS,
+    clerkChannelBrowser,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -630,6 +654,11 @@ const devConfig = ({ mode, env }) => {
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),
       common({ mode, variant: variants.clerkCHIPS }),
+      commonForDev(),
+    ),
+    [variants.clerkChannelBrowser]: merge(
+      entryForVariant(variants.clerkChannelBrowser),
+      common({ mode, variant: variants.clerkChannelBrowser }),
       commonForDev(),
     ),
   };

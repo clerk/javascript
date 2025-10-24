@@ -80,6 +80,7 @@ const InvitationRow = (props: {
         <UserPreview
           sx={{ maxWidth: '30ch' }}
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
+          subtitleProps={{ variant: 'caption' }}
         />
       </Td>
       <Td>

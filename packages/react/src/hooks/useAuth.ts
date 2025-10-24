@@ -26,10 +26,10 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * The `useAuth()` hook provides access to the current user's authentication state and methods to manage the active session.
  *
  * > [!NOTE]
- * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/references/backend/types/auth-object).
+ * > To access auth data server-side, see the [`Auth` object reference doc](https://clerk.com/docs/reference/backend/types/auth-object).
  *
  * <If sdk="nextjs">
- * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/references/nextjs/rendering-modes) for more information, including code examples.
+ * By default, Next.js opts all routes into static rendering. If you need to opt a route or routes into dynamic rendering because you need to access the authentication data at request time, you can create a boundary by passing the `dynamic` prop to `<ClerkProvider>`. See the [guide on rendering modes](https://clerk.com/docs/guides/development/rendering-modes) for more information, including code examples.
  * </If>
  *
  * @unionReturnHeadings

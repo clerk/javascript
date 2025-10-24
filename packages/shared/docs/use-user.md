@@ -6,14 +6,14 @@
 import { useUser } from '@clerk/nextjs';
 
 export default function HomePage() {
-  const { isLoaded, user } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
 
   if (!isLoaded) {
     // Handle loading state
     return null;
   }
 
-  if (!user) return null;
+  if (!isSignedIn) return null;
 
   const updateUser = async () => {
     await user.update({
@@ -25,8 +25,8 @@ export default function HomePage() {
   return (
     <>
       <button onClick={updateUser}>Update your name</button>
-      <p>user.firstName: {user?.firstName}</p>
-      <p>user.lastName: {user?.lastName}</p>
+      <p>user.firstName: {user.firstName}</p>
+      <p>user.lastName: {user.lastName}</p>
     </>
   );
 }
@@ -42,21 +42,26 @@ export default function HomePage() {
 import { useUser } from '@clerk/nextjs';
 
 export default function HomePage() {
-  const { isLoaded, user } = useUser();
+  const { isSignedIn, isLoaded, user } = useUser();
 
   if (!isLoaded) {
     // Handle loading state
     return null;
   }
 
-  if (!user) return null;
+  if (!isSignedIn) return null;
 
   const updateUser = async () => {
     // Update data via an API endpoint
-    const updateMetadata = await fetch('/api/updateMetadata');
+    const updateMetadata = await fetch('/api/updateMetadata', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'admin',
+      }),
+    });
 
     // Check if the update was successful
-    if (updateMetadata.message !== 'success') {
+    if ((await updateMetadata.json()).message !== 'success') {
       throw new Error('Error updating');
     }
 
@@ -67,7 +72,7 @@ export default function HomePage() {
   return (
     <>
       <button onClick={updateUser}>Update your metadata</button>
-      <p>user role: {user?.publicMetadata.role}</p>
+      <p>user role: {user.publicMetadata.role}</p>
     </>
   );
 }

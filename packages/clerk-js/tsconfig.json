@@ -24,5 +24,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "jest.setup.ts", "jest.setup-after-env.ts", "jest.jsdom-with-timezone.ts"]
+  "include": ["src", "vitest.config.mts", "vitest.setup.mts"]
 }

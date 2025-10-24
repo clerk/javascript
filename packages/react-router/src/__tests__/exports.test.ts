@@ -1,5 +1,8 @@
+import { logger } from '@clerk/shared/logger';
+import { vi } from 'vitest';
+
 import * as publicExports from '../index';
-import * as ssrExports from '../ssr/index';
+import * as serverExports from '../server/index';
 
 describe('root public exports', () => {
   it('should not change unexpectedly', () => {
@@ -7,8 +10,18 @@ describe('root public exports', () => {
   });
 });
 
-describe('ssr public exports', () => {
+describe('server public exports', () => {
   it('should not change unexpectedly', () => {
+    expect(Object.keys(serverExports).sort()).toMatchSnapshot();
+  });
+});
+
+describe('deprecated ssr public exports', () => {
+  it('should not change unexpectedly', async () => {
+    const warnOnceSpy = vi.spyOn(logger, 'warnOnce').mockImplementation(() => {});
+    const ssrExports = await import('../ssr/index');
     expect(Object.keys(ssrExports).sort()).toMatchSnapshot();
+    expect(warnOnceSpy).toHaveBeenCalled();
+    warnOnceSpy.mockRestore();
   });
 });

@@ -30,58 +30,59 @@ function getCacheValues() {
   return Object.values(cache);
 }
 
-function setInCache(jwk: JsonWebKeyWithKid, shouldExpire = true) {
-  cache[jwk.kid] = jwk;
+function setInCache(cacheKey: string, jwk: JsonWebKeyWithKid, shouldExpire = true) {
+  cache[cacheKey] = jwk;
   lastUpdatedAt = shouldExpire ? Date.now() : -1;
 }
 
-const LocalJwkKid = 'local';
 const PEM_HEADER = '-----BEGIN PUBLIC KEY-----';
 const PEM_TRAILER = '-----END PUBLIC KEY-----';
 const RSA_PREFIX = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA';
 const RSA_SUFFIX = 'IDAQAB';
 
+type LoadClerkJwkFromPemOptions = {
+  kid: string;
+  pem?: string;
+};
+
 /**
- *
  * Loads a local PEM key usually from process.env and transform it to JsonWebKey format.
- * The result is also cached on the module level to avoid unnecessary computations in subsequent invocations.
- *
- * @param {string} localKey
- * @returns {JsonWebKey} key
+ * The result is cached on the module level to avoid unnecessary computations in subsequent invocations.
  */
-export function loadClerkJWKFromLocal(localKey?: string): JsonWebKey {
-  if (!getFromCache(LocalJwkKid)) {
-    if (!localKey) {
-      throw new TokenVerificationError({
-        action: TokenVerificationErrorAction.SetClerkJWTKey,
-        message: 'Missing local JWK.',
-        reason: TokenVerificationErrorReason.LocalJWKMissing,
-      });
-    }
+export function loadClerkJwkFromPem(params: LoadClerkJwkFromPemOptions): JsonWebKey {
+  const { kid, pem } = params;
 
-    const modulus = localKey
-      .replace(/\r\n|\n|\r/g, '')
-      .replace(PEM_HEADER, '')
-      .replace(PEM_TRAILER, '')
-      .replace(RSA_PREFIX, '')
-      .replace(RSA_SUFFIX, '')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_');
+  // We use a cache key that includes the local prefix in order to avoid
+  // cache conflicts when loadClerkJwkFromPem and loadClerkJWKFromRemote
+  // are called with the same kid
+  const prefixedKid = `local-${kid}`;
+  const cachedJwk = getFromCache(prefixedKid);
 
-    // JWK https://datatracker.ietf.org/doc/html/rfc7517
-    setInCache(
-      {
-        kid: 'local',
-        kty: 'RSA',
-        alg: 'RS256',
-        n: modulus,
-        e: 'AQAB',
-      },
-      false, // local key never expires in cache
-    );
+  if (cachedJwk) {
+    return cachedJwk;
   }
 
-  return getFromCache(LocalJwkKid);
+  if (!pem) {
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.SetClerkJWTKey,
+      message: 'Missing local JWK.',
+      reason: TokenVerificationErrorReason.LocalJWKMissing,
+    });
+  }
+
+  const modulus = pem
+    .replace(/\r\n|\n|\r/g, '')
+    .replace(PEM_HEADER, '')
+    .replace(PEM_TRAILER, '')
+    .replace(RSA_PREFIX, '')
+    .replace(RSA_SUFFIX, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+
+  // https://datatracker.ietf.org/doc/html/rfc7517
+  const jwk = { kid: prefixedKid, kty: 'RSA', alg: 'RS256', n: modulus, e: 'AQAB' };
+  setInCache(prefixedKid, jwk, false); // local key never expires in cache
+  return jwk;
 }
 
 /**
@@ -127,13 +128,9 @@ export type LoadClerkJWKFromRemoteOptions = {
  * @param {string} options.alg - The algorithm of the JWT
  * @returns {JsonWebKey} key
  */
-export async function loadClerkJWKFromRemote({
-  secretKey,
-  apiUrl = API_URL,
-  apiVersion = API_VERSION,
-  kid,
-  skipJwksCache,
-}: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
+export async function loadClerkJWKFromRemote(params: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
+  const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, kid, skipJwksCache } = params;
+
   if (skipJwksCache || cacheHasExpired() || !getFromCache(kid)) {
     if (!secretKey) {
       throw new TokenVerificationError({
@@ -153,7 +150,7 @@ export async function loadClerkJWKFromRemote({
       });
     }
 
-    keys.forEach(key => setInCache(key));
+    keys.forEach(key => setInCache(key.kid, key));
   }
 
   const jwk = getFromCache(kid);

@@ -68,8 +68,8 @@ export const ruRU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пользовательское устройство',
   badge__you: 'Вы',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -81,6 +81,7 @@ export const ruRU: LocalizationResource = {
     cancelSubscription: undefined,
     cancelSubscriptionAccessUntil: undefined,
     cancelSubscriptionNoCharge: undefined,
+    cancelSubscriptionPastDue: undefined,
     cancelSubscriptionTitle: undefined,
     cannotSubscribeMonthly: undefined,
     cannotSubscribeUnrecoverable: undefined,
@@ -120,8 +121,7 @@ export const ruRU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -135,6 +135,7 @@ export const ruRU: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,6 +222,7 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Введите ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Введите ваш номер телефона',
   formFieldInputPlaceholder__username: 'Имя пользователя',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -252,6 +254,7 @@ export const ruRU: LocalizationResource = {
     action__signOut: 'Выйти',
     title: 'Вы вошли как {{identifier}}',
   },
+  lastAuthenticationStrategy: 'Последнее использование',
   maintenanceMode:
     'В данный момент мы проводим техническое обслуживание, но не беспокойтесь, это не займет больше нескольких минут.',
   membershipRole__admin: 'Администратор',
@@ -284,7 +287,7 @@ export const ruRU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -293,7 +296,7 @@ export const ruRU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -319,6 +322,7 @@ export const ruRU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -644,6 +648,10 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код восстановления пароля',
       resendButton: 'Отправить код еще раз',
@@ -765,6 +773,10 @@ export const ruRU: LocalizationResource = {
         subtitleNewTab: 'Вернитесь на предыдущую вкладку, чтобы продолжить',
         title: 'Почта верифицирована',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -975,7 +987,7 @@ export const ruRU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Сделать основной',
         actionLabel__remove: 'Удалить',
         add: 'Добавить новый способ оплаты',
@@ -984,11 +996,11 @@ export const ruRU: LocalizationResource = {
         formButtonPrimary__add: 'Добавить способ оплаты',
         formButtonPrimary__pay: 'Оплатить {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} будет удален из этой учетной записи.',
           messageLine2:
             'Вы больше не сможете использовать этот способ оплаты, и любые зависимые функции больше не будут работать.',
-          successMessage: '{{paymentSource}} был удален из вашей учетной записи.',
+          successMessage: '{{paymentMethod}} был удален из вашей учетной записи.',
           title: 'Удалить способ оплаты',
         },
         title: 'Доступные опции',
@@ -1011,6 +1023,7 @@ export const ruRU: LocalizationResource = {
         totalPaid: undefined,
       },
       subscriptionsListSection: {
+        actionLabel__manageSubscription: undefined,
         actionLabel__newSubscription: undefined,
         actionLabel__switchPlan: undefined,
         tableHeader__edit: undefined,
@@ -1043,7 +1056,8 @@ export const ruRU: LocalizationResource = {
     deletePage: {
       actionDescription: 'Введите "Удалить учетную запись" ниже, чтобы продолжить.',
       confirm: 'Удалить учетную запись',
-      messageLine1: 'Вы уверены, что хотите удалить свою учетную запись?',
+      messageLine1:
+        'Вы уверены, что хотите удалить свою учетную запись? Некоторые связанные данные могут быть сохранены. Чтобы запросить полное удаление данных, обратитесь в службу поддержки.',
       messageLine2: 'Это действие является окончательным и необратимым.',
       title: 'Удалить учетную запись',
     },

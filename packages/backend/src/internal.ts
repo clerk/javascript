@@ -13,6 +13,8 @@ export type {
   InferAuthObjectFromToken,
   InferAuthObjectFromTokenArray,
   GetAuthFn,
+  AuthOptions,
+  GetAuthFnNoRequest,
 } from './tokens/types';
 
 export { TokenType } from './tokens/tokenTypes';

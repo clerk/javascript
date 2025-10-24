@@ -1,0 +1,84 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import type { __experimental_CheckoutButtonProps } from '@clerk/types';
+import type { ButtonProps } from '../../types';
+import { addUnstyledAttributeToFirstTag, logAsPropUsageDeprecation } from './utils';
+
+type Props<Tag extends HTMLTag = 'button'> = Polymorphic<ButtonProps<Tag>> &
+  Omit<__experimental_CheckoutButtonProps, 'onSubscriptionComplete'> & { clickIdentifier?: string };
+
+import { generateSafeId } from '@clerk/astro/internal';
+
+const safeId = generateSafeId();
+
+if ('as' in Astro.props) {
+  logAsPropUsageDeprecation();
+}
+
+const {
+  as: Tag = 'button',
+  asChild,
+  planId,
+  planPeriod,
+  for: _for,
+  newSubscriptionRedirectUrl,
+  checkoutProps,
+  clickIdentifier,
+  ...props
+} = Astro.props;
+
+const checkoutOptions = {
+  planId,
+  planPeriod,
+  for: _for,
+  newSubscriptionRedirectUrl,
+  clickIdentifier,
+  ...checkoutProps,
+};
+
+let htmlElement = '';
+
+if (asChild) {
+  htmlElement = await Astro.slots.render('default');
+  htmlElement = addUnstyledAttributeToFirstTag(htmlElement, safeId);
+}
+---
+
+{
+  asChild ? (
+    <Fragment set:html={htmlElement} />
+  ) : (
+    <Tag
+      {...props}
+      data-clerk-unstyled-id={safeId}
+    >
+      <slot>Checkout</slot>
+    </Tag>
+  )
+}
+
+<script is:inline define:vars={{ props, checkoutOptions, safeId }}>
+  const btn = document.querySelector(`[data-clerk-unstyled-id="${safeId}"]`);
+
+  btn.addEventListener('click', () => {
+    const clerk = window.Clerk;
+
+    // Authentication checks
+    if (!clerk.user) {
+      throw new Error('Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
+    }
+
+    if (!clerk.organization && checkoutOptions.for === 'organization') {
+      throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
+    }
+
+    if (checkoutOptions.clickIdentifier) {
+      const clickEvent = new CustomEvent('clerk:subscription-complete', { detail: checkoutOptions.clickIdentifier });
+      checkoutOptions.onSubscriptionComplete = () => {
+        document.dispatchEvent(clickEvent);
+      };
+    }
+
+    return clerk.__internal_openCheckout(checkoutOptions);
+  });
+</script>

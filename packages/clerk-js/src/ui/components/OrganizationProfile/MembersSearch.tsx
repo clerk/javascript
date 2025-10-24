@@ -102,6 +102,7 @@ export const MembersSearch = ({ query, value, memberships, onSearchChange, onQue
               <Icon
                 icon={MagnifyingGlass}
                 elementDescriptor={descriptors.organizationProfileMembersSearchInputIcon}
+                sx={t => ({ color: t.colors.$colorMutedForeground })}
               />
             )
           }

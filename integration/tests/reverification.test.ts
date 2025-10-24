@@ -77,7 +77,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
       await u.po.userVerification.continue();
       await u.po.userVerification.waitForClosed();
 
-      await u.po.userProfile.enterTestOtpCode();
+      await u.po.userProfile.enterTestOtpCode({
+        awaitPrepare: false,
+      });
 
       await expect(
         u.page.locator('.cl-profileSectionItem__emailAddresses').filter({
@@ -117,7 +119,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withReverification] })(
 
       await u.po.userVerification.waitForClosed();
 
-      await u.po.userProfile.enterTestOtpCode();
+      await u.po.userProfile.enterTestOtpCode({
+        awaitPrepare: false,
+      });
 
       const formatedPhoneNumber = stringPhoneNumber(newFakePhoneNumber);
 
