@@ -91,7 +91,7 @@ export type UseCheckoutReturn = FetchStatusAndError &
      */
     clear: () => void;
     /**
-     * A function that finalizes the checkout process. Can optionally accept a `redirectUrl` to navigate the user to upon completion.
+     * A function that finalizes the checkout process. Can optionally accept a `navigate()` function to redirect the user after completion.
      */
     finalize: (params?: { navigate?: SetActiveNavigate }) => void;
     getState: () => __experimental_CheckoutCacheState;
