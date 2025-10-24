@@ -78,15 +78,37 @@ export const application = (
       });
 
       if (opts.detached) {
-        log(`Dev server started in detached mode with pid ${proc.pid}`);
-        log(`  stdout: ${stdoutFilePath}`);
-        log(`  stderr: ${stderrFilePath}`);
+        console.log(`[${name}:dev] Process spawned with pid ${proc.pid}`);
+        console.log(`[${name}:dev]   stdout: ${stdoutFilePath}`);
+        console.log(`[${name}:dev]   stderr: ${stderrFilePath}`);
+
+        // Give the process a moment to start and write logs
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        // Dump logs early to help diagnose startup issues
+        try {
+          const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
+          console.log(`[${name}:dev] ===== EARLY STDOUT (${stdoutContent.length} bytes) =====`);
+          console.log(stdoutContent || '(empty)');
+          console.log(`[${name}:dev] ===== END EARLY STDOUT =====`);
+        } catch (e) {
+          console.log(`[${name}:dev] No stdout yet: ${e.message}`);
+        }
+
+        try {
+          const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
+          console.log(`[${name}:dev] ===== EARLY STDERR (${stderrContent.length} bytes) =====`);
+          console.log(stderrContent || '(empty)');
+          console.log(`[${name}:dev] ===== END EARLY STDERR =====`);
+        } catch (e) {
+          console.log(`[${name}:dev] No stderr yet: ${e.message}`);
+        }
       }
 
       const shouldExit = () => {
         const hasExited = !!proc.exitCode && proc.exitCode !== 0;
         if (hasExited) {
-          log(`Process ${proc.pid} exited with code ${proc.exitCode}`);
+          console.log(`[${name}:dev] Process ${proc.pid} exited with code ${proc.exitCode}`);
         }
         return hasExited;
       };
