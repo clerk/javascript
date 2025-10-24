@@ -91,25 +91,33 @@ export const application = (
         return hasExited;
       };
 
+      // Use a finite timeout to avoid hanging forever
+      const maxWaitTimeMs = 60000; // 60 seconds
+      const pollIntervalMs = 1000;
+      const maxAttempts = Math.floor(maxWaitTimeMs / pollIntervalMs);
+
       try {
-        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+        await waitForServer(runtimeServerUrl, { log, maxAttempts, delayInMs: pollIntervalMs, shouldExit });
         log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       } catch (error) {
+        console.error(`[${name}:dev] Failed to start server after ${maxWaitTimeMs}ms`);
         if (opts.detached) {
-          log('Failed to start server. Dumping log files:');
+          console.log(`[${name}:dev] Dumping log files from detached process...`);
           try {
             const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
-            log('=== STDOUT ===');
-            log(stdoutContent || '(empty)');
+            console.log(`[${name}:dev] ============ STDOUT (${stdoutContent.length} bytes) ============`);
+            console.log(stdoutContent || '(empty)');
+            console.log(`[${name}:dev] ============ END STDOUT ============`);
           } catch (e) {
-            log(`Could not read stdout file: ${e.message}`);
+            console.error(`[${name}:dev] Could not read stdout: ${e.message}`);
           }
           try {
             const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
-            log('=== STDERR ===');
-            log(stderrContent || '(empty)');
+            console.log(`[${name}:dev] ============ STDERR (${stderrContent.length} bytes) ============`);
+            console.log(stderrContent || '(empty)');
+            console.log(`[${name}:dev] ============ END STDERR ============`);
           } catch (e) {
-            log(`Could not read stderr file: ${e.message}`);
+            console.error(`[${name}:dev] Could not read stderr: ${e.message}`);
           }
         }
         throw error;
