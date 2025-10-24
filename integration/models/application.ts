@@ -77,7 +77,8 @@ export const application = (
         log: opts.detached ? undefined : log,
       });
 
-      await waitForServer(runtimeServerUrl, { log });
+      const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
+      await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
       log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
