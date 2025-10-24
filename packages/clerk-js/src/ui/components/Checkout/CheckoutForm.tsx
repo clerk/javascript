@@ -15,6 +15,7 @@ import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, useEnvironment, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
 import { SubscriptionBadge } from '../Subscriptions/badge';
@@ -138,7 +139,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 });
 
 const useCheckoutMutations = () => {
-  const { for: _for, onSubscriptionComplete } = useCheckoutContext();
+  const { onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
   const card = useCardState();
@@ -172,6 +173,11 @@ const useCheckoutMutations = () => {
     });
   };
 
+  const payWithoutPaymentMethod = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    return confirmCheckout({});
+  };
+
   const addPaymentMethodAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
 
   const payWithTestCard = () =>
@@ -184,6 +190,7 @@ const useCheckoutMutations = () => {
     payWithExistingPaymentMethod,
     addPaymentMethodAndPay,
     payWithTestCard,
+    payWithoutPaymentMethod,
   };
 };
 
@@ -220,13 +227,9 @@ const CheckoutFormElementsInternal = () => {
     paymentMethods.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
-  // Check if payment methods should be shown based on:
-  // 1. Immediate plan change (not a downgrade)
-  // 2. Either there's an amount due now OR it's a free trial that requires payment method
-  const showPaymentMethods =
-    isImmediatePlanChange &&
-    (totals.totalDueNow.amount > 0 ||
-      (!!freeTrialEndsAt && environment.commerceSettings.billing.freeTrialRequiresPaymentMethod));
+  const isFreeTrial = Boolean(freeTrialEndsAt);
+  const showTabs = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || isFreeTrial);
+  const needsPaymentMethod = !(isFreeTrial && !environment.commerceSettings.billing.freeTrialRequiresPaymentMethod);
 
   if (!id) {
     return null;
@@ -240,7 +243,7 @@ const CheckoutFormElementsInternal = () => {
     >
       {__BUILD_DISABLE_RHC__ ? null : (
         <>
-          {paymentMethods.length > 0 && showPaymentMethods && (
+          {paymentMethods.length > 0 && showTabs && needsPaymentMethod && (
             <SegmentedControl.Root
               aria-label='Payment method source'
               value={paymentMethodSource}
@@ -261,18 +264,17 @@ const CheckoutFormElementsInternal = () => {
         </>
       )}
 
-      {showPaymentMethods && paymentMethodSource === 'existing' && (
-        <ExistingPaymentMethodForm
-          paymentMethods={paymentMethods}
-          totalDueNow={totals.totalDueNow}
-        />
-      )}
+      {paymentMethodSource === 'existing' &&
+        (needsPaymentMethod ? (
+          <ExistingPaymentMethodForm
+            paymentMethods={paymentMethods}
+            totalDueNow={totals.totalDueNow}
+          />
+        ) : (
+          <FreeTrialButton />
+        ))}
 
-      {__BUILD_DISABLE_RHC__
-        ? null
-        : showPaymentMethods && paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />}
-
-      {!showPaymentMethods && <FreeTrialButton />}
+      {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />}
     </Col>
   );
 };
@@ -356,52 +358,17 @@ const useSubmitLabel = () => {
 };
 
 const FreeTrialButton = withCardStateProvider(() => {
-  const { for: _for, onSubscriptionComplete } = useCheckoutContext();
-  const submitLabel = useSubmitLabel();
+  const { for: _for } = useCheckoutContext();
+  const { payWithoutPaymentMethod } = useCheckoutMutations();
   const card = useCardState();
-  const { checkout } = useCheckout();
-
-  const handleFreeTrialStart = async () => {
-    card.setLoading();
-    card.setError(undefined);
-
-    try {
-      // For free trials without payment method requirement, we can confirm without payment details
-      const { data, error } = await checkout.confirm({});
-
-      if (error) {
-        handleError(error, [], card.setError);
-      } else if (data) {
-        onSubscriptionComplete?.();
-      }
-    } catch (error) {
-      handleError(error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
 
   return (
     <Form
-      sx={t => ({
-        display: 'flex',
-        flexDirection: 'column',
-        rowGap: t.space.$4,
-      })}
+      onSubmit={payWithoutPaymentMethod}
+      sx={formProps}
     >
       <Card.Alert>{card.error}</Card.Alert>
-      <Button
-        type='button'
-        colorScheme='primary'
-        size='sm'
-        textVariant={'buttonLarge'}
-        sx={{
-          width: '100%',
-        }}
-        isLoading={card.isLoading}
-        localizationKey={submitLabel}
-        onClick={handleFreeTrialStart}
-      />
+      <CheckoutSubmitButton />
     </Form>
   );
 });
@@ -425,6 +392,32 @@ const AddPaymentMethodForCheckout = withCardStateProvider(() => {
   );
 });
 
+const CheckoutSubmitButton = (props: PropsOfComponent<typeof Button>) => {
+  const card = useCardState();
+  const submitLabel = useSubmitLabel();
+
+  return (
+    <Button
+      type='submit'
+      colorScheme='primary'
+      size='sm'
+      textVariant={'buttonLarge'}
+      sx={{
+        width: '100%',
+      }}
+      isLoading={card.isLoading}
+      localizationKey={submitLabel}
+      {...props}
+    />
+  );
+};
+
+const formProps: ThemableCssProp = t => ({
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: t.space.$4,
+});
+
 const ExistingPaymentMethodForm = withCardStateProvider(
   ({
     totalDueNow,
@@ -433,7 +426,6 @@ const ExistingPaymentMethodForm = withCardStateProvider(
     totalDueNow: BillingMoneyAmount;
     paymentMethods: BillingPaymentMethodResource[];
   }) => {
-    const submitLabel = useSubmitLabel();
     const { checkout } = useCheckout();
     const { paymentMethod, isImmediatePlanChange, freeTrialEndsAt } = checkout;
     const environment = useEnvironment();
@@ -466,11 +458,7 @@ const ExistingPaymentMethodForm = withCardStateProvider(
     return (
       <Form
         onSubmit={payWithExistingPaymentMethod}
-        sx={t => ({
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: t.space.$4,
-        })}
+        sx={formProps}
       >
         {showPaymentMethods ? (
           <Select
@@ -513,17 +501,7 @@ const ExistingPaymentMethodForm = withCardStateProvider(
           />
         )}
         <Card.Alert>{card.error}</Card.Alert>
-        <Button
-          type='submit'
-          colorScheme='primary'
-          size='sm'
-          textVariant={'buttonLarge'}
-          sx={{
-            width: '100%',
-          }}
-          isLoading={card.isLoading}
-          localizationKey={submitLabel}
-        />
+        <CheckoutSubmitButton />
       </Form>
     );
   },
