@@ -37,7 +37,7 @@ export type UseSubscriptionReturn = {
   /**
    * The subscription object, or `null` if the data hasn't been loaded yet.
    */
-  data: BillingSubscriptionResource | null;
+  data: BillingSubscriptionResource | null | undefined;
   /**
    * A boolean that indicates whether the initial data is still being fetched.
    */
@@ -53,7 +53,7 @@ export type UseSubscriptionReturn = {
   /**
    * Function to manually trigger a refresh of the subscription data.
    */
-  revalidate: () => Promise<void>;
+  revalidate: () => Promise<BillingSubscriptionResource | null | undefined>;
 };
 
 /**
@@ -62,7 +62,7 @@ export type UseSubscriptionReturn = {
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export const useSubscription = (params?: UseSubscriptionParams) => {
+export function useSubscription(params?: UseSubscriptionParams): UseSubscriptionReturn {
   useAssertWrappedByClerkProvider(hookName);
 
   const clerk = useClerkInstanceContext();
@@ -110,4 +110,4 @@ export const useSubscription = (params?: UseSubscriptionParams) => {
     isFetching: swr.isValidating,
     revalidate,
   };
-};
+}

@@ -90,6 +90,7 @@ const LINK_REPLACEMENTS = [
   ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
   ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
   ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
+  ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
 ];
 
 /**
