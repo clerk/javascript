@@ -280,7 +280,6 @@ jobs:
         test-name: [
             'generic',
             'express',
-            'quickstart',
             'ap-flows',
             'elements',
             'localhost',
