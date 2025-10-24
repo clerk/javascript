@@ -77,9 +77,43 @@ export const application = (
         log: opts.detached ? undefined : log,
       });
 
-      const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-      await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
-      log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
+      if (opts.detached) {
+        log(`Dev server started in detached mode with pid ${proc.pid}`);
+        log(`  stdout: ${stdoutFilePath}`);
+        log(`  stderr: ${stderrFilePath}`);
+      }
+
+      const shouldExit = () => {
+        const hasExited = !!proc.exitCode && proc.exitCode !== 0;
+        if (hasExited) {
+          log(`Process ${proc.pid} exited with code ${proc.exitCode}`);
+        }
+        return hasExited;
+      };
+
+      try {
+        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+        log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
+      } catch (error) {
+        if (opts.detached) {
+          log('Failed to start server. Dumping log files:');
+          try {
+            const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
+            log('=== STDOUT ===');
+            log(stdoutContent || '(empty)');
+          } catch (e) {
+            log(`Could not read stdout file: ${e.message}`);
+          }
+          try {
+            const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
+            log('=== STDERR ===');
+            log(stderrContent || '(empty)');
+          } catch (e) {
+            log(`Could not read stderr file: ${e.message}`);
+          }
+        }
+        throw error;
+      }
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
       return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
