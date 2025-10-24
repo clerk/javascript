@@ -54,14 +54,21 @@ if (clerkMonorepoPath) {
   // https://github.com/expo/expo/pull/26209
   const escapedPath = clerkMonorepoPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   config.resolver.blockList = [
-    // Block monorepo root node_modules for react/react-native (exact match)
+    // Block monorepo root node_modules for react/react-native/react-dom
     new RegExp(`${escapedPath}/node_modules/react/`),
     new RegExp(`${escapedPath}/node_modules/react$`),
     new RegExp(`${escapedPath}/node_modules/react-dom/`),
     new RegExp(`${escapedPath}/node_modules/react-dom$`),
     new RegExp(`${escapedPath}/node_modules/react-native/`),
     new RegExp(`${escapedPath}/node_modules/react-native$`),
-    // Block react/react-native/react-dom in all package node_modules (exact match)
+    // Block react in monorepo's pnpm store
+    new RegExp(`${escapedPath}/node_modules/\\.pnpm/.*/node_modules/react/`),
+    new RegExp(`${escapedPath}/node_modules/\\.pnpm/.*/node_modules/react$`),
+    new RegExp(`${escapedPath}/node_modules/\\.pnpm/.*/node_modules/react-dom/`),
+    new RegExp(`${escapedPath}/node_modules/\\.pnpm/.*/node_modules/react-dom$`),
+    new RegExp(`${escapedPath}/node_modules/\\.pnpm/.*/node_modules/react-native/`),
+    new RegExp(`${escapedPath}/node_modules/\\.pnpm/.*/node_modules/react-native$`),
+    // Block react/react-native/react-dom in all package node_modules
     new RegExp(`${escapedPath}/packages/.*/node_modules/react/`),
     new RegExp(`${escapedPath}/packages/.*/node_modules/react$`),
     new RegExp(`${escapedPath}/packages/.*/node_modules/react-dom/`),
@@ -69,6 +76,38 @@ if (clerkMonorepoPath) {
     new RegExp(`${escapedPath}/packages/.*/node_modules/react-native/`),
     new RegExp(`${escapedPath}/packages/.*/node_modules/react-native$`),
   ];
+
+  // Custom resolver to handle package.json subpath exports for @clerk packages
+  // This enables Metro to resolve imports like '@clerk/clerk-react/internal'
+  const originalResolveRequest = config.resolver.resolveRequest;
+  config.resolver.resolveRequest = (context, moduleName, platform) => {
+    // Check if this is a @clerk package with a subpath
+    const clerkPackageMatch = moduleName.match(/^(@clerk\/[^/]+)\/(.+)$/);
+    if (clerkPackageMatch && config.resolver.extraNodeModules) {
+      const [, packageName, subpath] = clerkPackageMatch;
+      const packageRoot = config.resolver.extraNodeModules[packageName];
+
+      if (packageRoot) {
+        // Try to resolve via the subpath-workaround directory (e.g., internal/package.json)
+        const subpathDir = path.join(packageRoot, subpath);
+        try {
+          const subpathPkg = require(path.join(subpathDir, 'package.json'));
+          if (subpathPkg.main) {
+            const resolvedPath = path.join(subpathDir, subpathPkg.main);
+            return { type: 'sourceFile', filePath: resolvedPath };
+          }
+        } catch (e) {
+          // Subpath directory doesn't exist, continue with default resolution
+        }
+      }
+    }
+
+    // Fall back to default resolution
+    if (originalResolveRequest) {
+      return originalResolveRequest(context, moduleName, platform);
+    }
+    return context.resolveRequest(context, moduleName, platform);
+  };
 }
 
 module.exports = config;
