@@ -35,7 +35,7 @@ export type UseSubscriptionParams = {
  */
 export type UseSubscriptionReturn = {
   /**
-   * The subscription object, or `null` if the data hasn't been loaded yet.
+   * The subscription object, `undefined` before the first fetch, or `null` if no subscription exists.
    */
   data: BillingSubscriptionResource | null | undefined;
   /**
@@ -47,9 +47,9 @@ export type UseSubscriptionReturn = {
    */
   isFetching: boolean;
   /**
-   * Any error that occurred during the data fetch, or `null` if no error occurred.
+   * Any error that occurred during the data fetch, or `undefined` if no error occurred.
    */
-  error: Error | null;
+  error: Error | undefined;
   /**
    * Function to manually trigger a refresh of the subscription data.
    */
