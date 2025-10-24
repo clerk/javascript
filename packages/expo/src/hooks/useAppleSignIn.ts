@@ -1,5 +1,6 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';
@@ -74,9 +75,6 @@ export function useAppleSignIn() {
         setActive,
       };
     }
-
-    // Lazy load expo-apple-authentication to avoid import issues on web
-    const AppleAuthentication = await import('expo-apple-authentication');
 
     // Check if Apple Authentication is available on the device
     const isAvailable = await AppleAuthentication.isAvailableAsync();
