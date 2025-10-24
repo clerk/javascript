@@ -280,7 +280,6 @@ jobs:
         test-name: [
             'generic',
             'express',
-            'quickstart',
             'ap-flows',
             'elements',
             'localhost',
@@ -306,6 +305,15 @@ jobs:
           - test-name: 'nextjs'
             test-project: 'chrome'
             next-version: '15'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '16'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '15'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '16'
 
     steps:
       - name: Checkout Repo
