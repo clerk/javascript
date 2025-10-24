@@ -228,6 +228,12 @@ const CheckoutFormElementsInternal = () => {
     (totals.totalDueNow.amount > 0 ||
       (!!freeTrialEndsAt && environment.commerceSettings.billing.freeTrialRequiresPaymentMethod));
 
+  // Only show the standalone free trial button when it's a free trial that does not
+  // require a payment method. Hiding payment methods (e.g. downgrade) should not imply
+  // showing the free trial button.
+  const showFreeTrialButton =
+    !showPaymentMethods && !!freeTrialEndsAt && !environment.commerceSettings.billing.freeTrialRequiresPaymentMethod;
+
   if (!id) {
     return null;
   }
@@ -261,18 +267,20 @@ const CheckoutFormElementsInternal = () => {
         </>
       )}
 
-      {showPaymentMethods && paymentMethodSource === 'existing' && (
+      {paymentMethods.length > 0 && (paymentMethodSource === 'existing' || !showPaymentMethods) && (
         <ExistingPaymentMethodForm
           paymentMethods={paymentMethods}
           totalDueNow={totals.totalDueNow}
         />
       )}
 
+      {/* {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />} */}
+
       {__BUILD_DISABLE_RHC__
         ? null
         : showPaymentMethods && paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />}
 
-      {!showPaymentMethods && <FreeTrialButton />}
+      {showFreeTrialButton && <FreeTrialButton />}
     </Col>
   );
 };
