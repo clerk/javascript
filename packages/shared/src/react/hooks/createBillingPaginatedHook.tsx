@@ -106,7 +106,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
       {
         type: resourceType,
         ...(options?.unauthenticated
-          ? { for: _for }
+          ? { for: safeFor }
           : {
               userId: user?.id,
               ...(isForOrganization ? { orgId: organization?.id } : {}),
