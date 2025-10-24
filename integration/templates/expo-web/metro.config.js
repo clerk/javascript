@@ -36,6 +36,14 @@ const config = getDefaultConfig(__dirname);
 if (clerkMonorepoPath) {
   config.watchFolders = [clerkMonorepoPath];
 
+  // Disable file watching to prevent infinite reload loops in integration tests
+  config.watchFolders = [clerkMonorepoPath];
+  config.watcher = {
+    healthCheck: {
+      enabled: false,
+    },
+  };
+
   // Prioritize local node_modules over monorepo node_modules
   config.resolver.nodeModulesPaths = [path.resolve(__dirname, 'node_modules'), `${clerkMonorepoPath}/node_modules`];
 
