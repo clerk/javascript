@@ -5,11 +5,6 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const packageJson = require('./package.json');
 const path = require('node:path');
-const clerkExpoPath = getClerkExpoPath();
-const clerkMonorepoPath = clerkExpoPath?.replace(/\/packages\/expo$/, '');
-
-/** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
 
 /** @type {() => string | undefined} */
 const getClerkExpoPath = () => {
@@ -30,6 +25,12 @@ const getClerkExpoPath = () => {
 
   return undefined;
 };
+
+const clerkExpoPath = getClerkExpoPath();
+const clerkMonorepoPath = clerkExpoPath?.replace(/\/packages\/expo$/, '');
+
+/** @type {import('expo/metro-config').MetroConfig} */
+const config = getDefaultConfig(__dirname);
 
 // Only customize Metro config when running from monorepo
 if (clerkMonorepoPath) {
