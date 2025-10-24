@@ -57,6 +57,7 @@ export type UseSubscriptionReturn = {
 };
 
 /**
+ * @internal
  *
  * Fetches subscription data for the current user or organization.
  *

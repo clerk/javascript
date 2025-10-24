@@ -27,14 +27,14 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
 /**
  * @interface
  */
-export type HookParams = PaginatedHookConfig<PagesOrInfiniteOptions> & {
+export interface HookParams extends PaginatedHookConfig<PagesOrInfiniteOptions> {
   /**
    * Specifies whether to fetch for the current user or organization.
    *
    * @default 'user'
    */
   for?: ForPayerType;
-};
+}
 
 /**
  * A hook factory that creates paginated data fetching hooks for commerce-related resources.
