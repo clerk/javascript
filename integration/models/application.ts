@@ -78,46 +78,38 @@ export const application = (
       });
 
       if (opts.detached) {
-        console.log(`[${name}:dev] Process spawned with pid ${proc.pid}`);
-        console.log(`[${name}:dev]   stdout: ${stdoutFilePath}`);
-        console.log(`[${name}:dev]   stderr: ${stderrFilePath}`);
-        console.log(`[${name}:dev]   command: ${scripts.dev}`);
-        console.log(`[${name}:dev]   cwd: ${appDirPath}`);
+        log(`Dev server started in detached mode with pid ${proc.pid}`);
+        log(`  stdout: ${stdoutFilePath}`);
+        log(`  stderr: ${stderrFilePath}`);
       }
 
       const shouldExit = () => {
         const hasExited = !!proc.exitCode && proc.exitCode !== 0;
         if (hasExited) {
-          console.log(`[${name}:dev] Process ${proc.pid} exited with code ${proc.exitCode}`);
+          log(`Process ${proc.pid} exited with code ${proc.exitCode}`);
         }
         return hasExited;
       };
 
-      // Use a finite timeout to avoid hanging forever
-      const maxWaitTimeMs = 60000; // 60 seconds
-      const pollIntervalMs = 1000;
-      const maxAttempts = Math.floor(maxWaitTimeMs / pollIntervalMs);
-
       try {
-        await waitForServer(runtimeServerUrl, { log, maxAttempts, delayInMs: pollIntervalMs, shouldExit });
+        await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
         log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       } catch (error) {
-        console.error(`[${name}:dev] Failed to start server after ${maxWaitTimeMs}ms`);
         if (opts.detached) {
-          console.log(`[${name}:dev] Reading log files...`);
+          log('Failed to start server. Dumping log files:');
           try {
             const stdoutContent = await fs.readFile(stdoutFilePath, 'utf-8');
-            console.log(`[${name}:dev] === STDOUT ===`);
-            console.log(stdoutContent || '(empty)');
+            log('=== STDOUT ===');
+            log(stdoutContent || '(empty)');
           } catch (e) {
-            console.error(`[${name}:dev] Could not read stdout file: ${e.message}`);
+            log(`Could not read stdout file: ${e.message}`);
           }
           try {
             const stderrContent = await fs.readFile(stderrFilePath, 'utf-8');
-            console.log(`[${name}:dev] === STDERR ===`);
-            console.log(stderrContent || '(empty)');
+            log('=== STDERR ===');
+            log(stderrContent || '(empty)');
           } catch (e) {
-            console.error(`[${name}:dev] Could not read stderr file: ${e.message}`);
+            log(`Could not read stderr file: ${e.message}`);
           }
         }
         throw error;
