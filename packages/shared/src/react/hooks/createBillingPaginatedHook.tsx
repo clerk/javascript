@@ -53,9 +53,11 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
     const { for: _for, ...paginationParams } = params || ({} as Partial<T>);
 
+    const safeFor = _for || 'user';
+
     useAssertWrappedByClerkProvider(hookName);
 
-    const fetchFn = useFetcher(_for || 'user');
+    const fetchFn = useFetcher(safeFor);
 
     const safeValues = useWithSafeValues(paginationParams, {
       initialPage: 1,
@@ -74,17 +76,18 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
 
     clerk.telemetry?.record(eventMethodCalled(hookName));
 
+    const isForOrganization = safeFor === 'organization';
+
     const hookParams =
       typeof paginationParams === 'undefined'
         ? undefined
         : ({
             initialPage: safeValues.initialPage,
             pageSize: safeValues.pageSize,
-            ...(options?.unauthenticated ? {} : _for === 'organization' ? { orgId: organization?.id } : {}),
+            ...(options?.unauthenticated ? {} : isForOrganization ? { orgId: organization?.id } : {}),
           } as TParams);
 
-    const isOrganization = _for === 'organization';
-    const billingEnabled = isOrganization
+    const billingEnabled = isForOrganization
       ? environment?.commerceSettings.billing.organization.enabled
       : environment?.commerceSettings.billing.user.enabled;
 
@@ -102,12 +105,11 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
       },
       {
         type: resourceType,
-        // userId: user?.id,
         ...(options?.unauthenticated
-          ? {}
+          ? { for: _for }
           : {
               userId: user?.id,
-              ...(_for === 'organization' ? { orgId: organization?.id } : {}),
+              ...(isForOrganization ? { orgId: organization?.id } : {}),
             }),
       },
     );
