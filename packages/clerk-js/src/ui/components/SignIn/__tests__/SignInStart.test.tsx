@@ -590,4 +590,114 @@ describe('SignInStart', () => {
       );
     });
   });
+
+  describe('Active session redirect', () => {
+    describe('multi-session mode', () => {
+      it('redirects to /choose when user has active sessions', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMultiSessionMode();
+          f.withUser({
+            email_addresses: ['user@clerk.com'],
+          });
+        });
+
+        // Mock active sessions using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
+          {
+            id: 'sess_123',
+            user: fixtures.clerk.user,
+            status: 'active',
+          } as any,
+        ]);
+
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith('choose');
+        });
+      });
+
+      it('redirects to /choose when user has multiple active sessions', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMultiSessionMode();
+          f.withUser({
+            email_addresses: ['user@clerk.com'],
+          });
+        });
+
+        // Mock multiple active sessions using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
+          {
+            id: 'sess_123',
+            user: fixtures.clerk.user,
+            status: 'active',
+          } as any,
+          {
+            id: 'sess_456',
+            user: { id: 'user_456' },
+            status: 'active',
+          } as any,
+        ]);
+
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.router.navigate).toHaveBeenCalledWith('choose');
+        });
+      });
+
+      it('does NOT redirect when user has no active sessions', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withMultiSessionMode();
+        });
+
+        // No active sessions using spyOn
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([]);
+
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(
+          () => {
+            expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+          },
+          { timeout: 100 },
+        );
+
+        screen.getByText(/email address/i);
+      });
+    });
+
+    describe('single-session mode', () => {
+      it('does NOT redirect to /choose when user has active session in single-session mode', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withUser({
+            email_addresses: ['user@clerk.com'],
+          });
+        });
+
+        vi.spyOn(fixtures.clerk.client, 'signedInSessions', 'get').mockReturnValue([
+          {
+            id: 'sess_123',
+            user: fixtures.clerk.user,
+            status: 'active',
+          } as any,
+        ]);
+
+        fixtures.environment.authConfig.singleSessionMode = true;
+
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(
+          () => {
+            expect(fixtures.router.navigate).not.toHaveBeenCalledWith('choose');
+          },
+          { timeout: 100 },
+        );
+      });
+    });
+  });
 });
