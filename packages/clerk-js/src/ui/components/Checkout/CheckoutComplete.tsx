@@ -5,7 +5,7 @@ import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { useCheckoutContext, useEnvironment } from '../../contexts';
+import { useCheckoutContext } from '../../contexts';
 import { Box, Button, descriptors, Heading, localizationKeys, Span, Text, useAppearance } from '../../customizables';
 import { transitionDurationValues, transitionTiming } from '../../foundations/transitions';
 import { usePrefersReducedMotion } from '../../hooks';
@@ -161,8 +161,7 @@ export const CheckoutComplete = () => {
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt } = checkout;
-  const environment = useEnvironment();
+  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt, needsPaymentMethod } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
 
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -431,16 +430,14 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                totals.totalDueNow.amount > 0 ||
-                (freeTrialEndsAt !== null && environment.commerceSettings.billing.freeTrialRequiresPaymentMethod)
+                totals.totalDueNow.amount > 0 || needsPaymentMethod
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                totals.totalDueNow.amount > 0 ||
-                (freeTrialEndsAt !== null && environment.commerceSettings.billing.freeTrialRequiresPaymentMethod)
+                totals.totalDueNow.amount > 0 || needsPaymentMethod
                   ? paymentMethod
                     ? paymentMethod.paymentType !== 'card'
                       ? `${capitalize(paymentMethod.paymentType)}`

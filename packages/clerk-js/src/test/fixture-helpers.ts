@@ -367,19 +367,16 @@ const createBillingSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     userHasPaidPlans = true,
     organizationEnabled = true,
     organizationHasPaidPlans = true,
-    freeTrialRequiresPaymentMethod = true,
   }: {
     userEnabled?: boolean;
     userHasPaidPlans?: boolean;
     organizationEnabled?: boolean;
     organizationHasPaidPlans?: boolean;
-    freeTrialRequiresPaymentMethod?: boolean;
   } = {}) => {
     os.user.enabled = userEnabled;
     os.user.has_paid_plans = userHasPaidPlans;
     os.organization.enabled = organizationEnabled;
     os.organization.has_paid_plans = organizationHasPaidPlans;
-    os.free_trial_requires_payment_method = freeTrialRequiresPaymentMethod;
   };
 
   return { withBilling };

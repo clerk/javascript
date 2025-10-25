@@ -815,6 +815,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   is_immediate_plan_change: boolean;
   // TODO(@COMMERCE): Remove optional after GA.
   free_trial_ends_at: number | null;
+  needs_payment_method: boolean;
   payer: BillingPayerJSON;
 }
 
