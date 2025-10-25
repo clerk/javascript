@@ -120,10 +120,10 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
-export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
+export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => undefined | Promise<any>;
+export type SetActiveNavigate = ({ session }: { session: SessionResource }) => undefined | Promise<unknown>;
 
-export type SignOutCallback = () => void | Promise<any>;
+export type SignOutCallback = () => undefined | Promise<any>;
 
 export type SignOutOptions = {
   /**
@@ -944,7 +944,7 @@ export type HandleOAuthCallbackParams = TransferableOption &
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
 
-export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | void;
+export type CustomNavigation = (to: string, options?: NavigateOptions) => Promise<unknown> | undefined;
 
 export type ClerkThemeOptions = DeepSnakeToCamel<DeepPartial<DisplayThemeJSON>>;
 
@@ -1640,6 +1640,12 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Provide custom menu actions and links to be rendered inside the UserButton.
    */
   customMenuItems?: CustomMenuItem[];
+
+  /**
+   * Callback to be executed after the user signs out. Overrides the default navigation behavior.
+   * If provided, this callback will be used instead of navigating to `afterSignOutUrl`.
+   */
+  signOutCallback?: SignOutCallback;
 };
 
 export type UserAvatarProps = {
