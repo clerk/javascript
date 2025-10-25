@@ -780,6 +780,10 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   freeTrialEndsAt: Date | null;
   /**
+   * Whether a payment method is required for this checkout session.
+   */
+  needsPaymentMethod: boolean;
+  /**
    * The payer associated with the checkout.
    */
   payer: BillingPayerResource;
