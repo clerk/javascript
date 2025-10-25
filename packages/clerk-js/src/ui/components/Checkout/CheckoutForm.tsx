@@ -219,15 +219,14 @@ const CheckoutFormElements = () => {
 
 const CheckoutFormElementsInternal = () => {
   const { checkout } = useCheckout();
-  const { id, totals, isImmediatePlanChange, freeTrialEndsAt, needsPaymentMethod } = checkout;
+  const { id, isImmediatePlanChange, needsPaymentMethod } = checkout;
   const { data: paymentMethods } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentMethods.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
-  const isFreeTrial = Boolean(freeTrialEndsAt);
-  const showTabs = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || isFreeTrial);
+  const showTabs = isImmediatePlanChange && needsPaymentMethod && paymentMethods.length > 0;
 
   if (!id) {
     return null;
@@ -332,20 +331,25 @@ export const PayWithTestPaymentMethod = () => {
 
 const useSubmitLabel = () => {
   const { checkout } = useCheckout();
-  const { status, freeTrialEndsAt, totals } = checkout;
+  const { status, freeTrialEndsAt, totals, needsPaymentMethod } = checkout;
 
   if (status === 'needs_initialization') {
     throw new Error('Clerk: Invalid state');
   }
 
-  if (freeTrialEndsAt) {
-    return localizationKeys('billing.startFreeTrial');
+  // If payment method is needed, show payment-related labels
+  if (needsPaymentMethod) {
+    if (totals.totalDueNow.amount > 0) {
+      return localizationKeys('billing.pay', {
+        amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
+      });
+    }
+    return localizationKeys('billing.subscribe');
   }
 
-  if (totals.totalDueNow.amount > 0) {
-    return localizationKeys('billing.pay', {
-      amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
-    });
+  // If no payment method needed and it's a trial, show free trial label
+  if (freeTrialEndsAt) {
+    return localizationKeys('billing.startFreeTrial');
   }
 
   return localizationKeys('billing.subscribe');

@@ -797,7 +797,8 @@ describe('Checkout', () => {
         const hiddenInput = baseElement.querySelector('input[name="payment_method_id"]');
         expect(hiddenInput).toHaveAttribute('value', 'pm_test_visa');
 
-        expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
+        // Since needsPaymentMethod is true, should show Subscribe button, not Start free trial
+        expect(getByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
       });
     });
 
@@ -1043,7 +1044,8 @@ describe('Checkout', () => {
       });
 
       await waitFor(() => {
-        expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
+        // Since needsPaymentMethod is true, should show Subscribe button, not Start free trial
+        expect(getByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
       });
     });
 
@@ -1128,13 +1130,15 @@ describe('Checkout', () => {
       await waitFor(async () => {
         expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
 
-        // Verify segmented control for payment method source is hidden
+        // Since needsPaymentMethod is true but no existing payment methods, should show payment collection UI directly
+        // Verify segmented control for payment method source is NOT visible (no choice to make)
         const paymentMethodsButton = queryByText('Payment Methods');
         expect(paymentMethodsButton).toBeNull();
         const addPaymentMethodButton = queryByText('Add payment method');
         expect(addPaymentMethodButton).toBeNull();
 
-        expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
+        // Should show Subscribe button, not Start free trial button
+        expect(getByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
       });
     });
 

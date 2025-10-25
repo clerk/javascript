@@ -331,7 +331,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : totals.totalDueNow.amount > 0
+                  : needsPaymentMethod
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -386,7 +386,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                totals.totalDueNow.amount > 0
+                needsPaymentMethod
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
