@@ -8,7 +8,10 @@ const mockOrganization: any = { id: 'org_1' };
 const getPlansSpy = vi.fn((args: any) =>
   Promise.resolve({
     // pageSize maps to limit; default to 10 if missing
-    data: Array.from({ length: args.limit ?? args.pageSize ?? 10 }, (_, i) => ({ id: `plan_${i + 1}`, for: args.for })),
+    data: Array.from<Partial<BillingPlanResource>, Partial<BillingPlanResource>>(
+      { length: args.limit ?? args.pageSize ?? 10 },
+      (_, i) => ({ id: `plan_${i + 1}`, forPayerType: args.for }),
+    ),
     total_count: 25,
   }),
 );
@@ -37,6 +40,8 @@ vi.mock('../../contexts', () => {
     useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
   };
 });
+
+import type { BillingPlanResource } from '@clerk/types';
 
 import { usePlans } from '../usePlans';
 import { wrapper } from './wrapper';
@@ -150,12 +155,12 @@ describe('usePlans', () => {
   it('conditionally renders hooks based on prop passed to render', async () => {
     const UserPlansCount = () => {
       const userPlans = usePlans({ initialPage: 1, pageSize: 2 });
-      return <div data-testid='user-type'>{userPlans.data.map(p => p.for)[0]}</div>;
+      return <div data-testid='user-type'>{userPlans.data.map(p => p.forPayerType)[0]}</div>;
     };
 
     const OrgPlansCount = () => {
       const orgPlans = usePlans({ initialPage: 1, pageSize: 2, for: 'organization' } as any);
-      return <div data-testid='org-type'>{orgPlans.data.map(p => p.for)[0]}</div>;
+      return <div data-testid='org-type'>{orgPlans.data.map(p => p.forPayerType)[0]}</div>;
     };
 
     const Conditional = ({ showOrg }: { showOrg: boolean }) => (showOrg ? <OrgPlansCount /> : <UserPlansCount />);
