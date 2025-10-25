@@ -367,6 +367,7 @@ describe('Checkout', () => {
       paymentMethod: undefined,
       confirm: vi.fn(),
       freeTrialEndsAt,
+      needsPaymentMethod: false,
     } as any);
 
     const { getByRole, getByText } = render(
@@ -451,6 +452,7 @@ describe('Checkout', () => {
       paymentMethod: undefined,
       confirm: vi.fn(),
       freeTrialEndsAt,
+      needsPaymentMethod: false,
     } as any);
 
     const { getByText } = render(
@@ -545,6 +547,7 @@ describe('Checkout', () => {
       planPeriodStart: new Date('2025-08-19'),
       confirm: vi.fn(),
       freeTrialEndsAt: null,
+      needsPaymentMethod: false,
     } as any);
 
     const { getByText } = render(
@@ -636,6 +639,7 @@ describe('Checkout', () => {
       },
       confirm: vi.fn(),
       freeTrialEndsAt: null,
+      needsPaymentMethod: true,
     } as any);
 
     const { getByText } = render(
@@ -748,6 +752,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
+        needsPaymentMethod: true,
       } as any);
 
       const { baseElement, getByText, getByRole, userEvent } = render(
@@ -887,6 +892,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: null,
+        needsPaymentMethod: true,
       } as any);
 
       const { baseElement, getByText, getByRole, userEvent } = render(
@@ -1013,6 +1019,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
+        needsPaymentMethod: true,
       } as any);
 
       const { getByText, getByRole, userEvent } = render(
@@ -1043,7 +1050,7 @@ describe('Checkout', () => {
     it('prompts for adding payment method for free trial if none exists and requires payment method', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
-        f.withBilling({ freeTrialRequiresPaymentMethod: true });
+        f.withBilling();
       });
 
       fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
@@ -1102,6 +1109,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
+        needsPaymentMethod: true,
       } as any);
 
       const { queryByText, getByRole } = render(
@@ -1133,7 +1141,7 @@ describe('Checkout', () => {
     it('does not prompt payment methods for free trial when not required', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
-        f.withBilling({ freeTrialRequiresPaymentMethod: false });
+        f.withBilling();
       });
 
       fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
@@ -1192,6 +1200,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
+        needsPaymentMethod: false,
       } as any);
 
       const { queryByText, getByRole, baseElement } = render(
@@ -1229,7 +1238,7 @@ describe('Checkout', () => {
     it('does not prompt payment methods for free trial when not required, even with stored payment methods', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ email_addresses: ['test@clerk.com'] });
-        f.withBilling({ freeTrialRequiresPaymentMethod: false });
+        f.withBilling();
       });
 
       fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
@@ -1296,6 +1305,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: new Date('2025-08-19'),
+        needsPaymentMethod: false,
       } as any);
 
       const { queryByText, getByRole, baseElement } = render(
@@ -1427,6 +1437,7 @@ describe('Checkout', () => {
         paymentMethod: undefined,
         confirm: vi.fn(),
         freeTrialEndsAt: null,
+        needsPaymentMethod: true,
       } as any);
 
       const { baseElement, queryByText, queryByRole, getByText } = render(

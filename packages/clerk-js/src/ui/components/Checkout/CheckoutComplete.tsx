@@ -430,14 +430,14 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                totals.totalDueNow.amount > 0 || needsPaymentMethod
+                needsPaymentMethod
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                totals.totalDueNow.amount > 0 || needsPaymentMethod
+                needsPaymentMethod
                   ? paymentMethod
                     ? paymentMethod.paymentType !== 'card'
                       ? `${capitalize(paymentMethod.paymentType)}`

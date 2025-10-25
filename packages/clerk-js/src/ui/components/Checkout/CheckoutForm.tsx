@@ -447,7 +447,7 @@ const ExistingPaymentMethodForm = withCardStateProvider(
       });
     }, [paymentMethods]);
 
-    const showPaymentMethods = isImmediatePlanChange && (totalDueNow.amount > 0 || needsPaymentMethod);
+    const showPaymentMethods = isImmediatePlanChange && needsPaymentMethod;
 
     return (
       <Form
