@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.28.4
+
+### Patch Changes
+
+- Fixes a bug where `usePlans()` would display stale data even if the `for` property has changed. ([#7067](https://github.com/clerk/javascript/pull/7067)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.28.3
 
 ### Patch Changes
