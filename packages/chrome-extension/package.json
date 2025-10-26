@@ -55,8 +55,8 @@
     "webextension-polyfill": "~0.12.0"
   },
   "devDependencies": {
-    "@types/chrome": "^0.1.12",
-    "@types/webextension-polyfill": "^0.12.3",
+    "@types/chrome": "^0.1.24",
+    "@types/webextension-polyfill": "^0.12.4",
     "type-fest": "^4.41.0"
   },
   "peerDependencies": {
