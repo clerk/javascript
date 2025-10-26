@@ -114,6 +114,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         paymentMethod: null,
         freeTrialEndsAt: null,
         payer: null,
+        needsPaymentMethod: null,
       };
     }
     const {

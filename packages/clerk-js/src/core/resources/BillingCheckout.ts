@@ -30,6 +30,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   isImmediatePlanChange!: boolean;
   freeTrialEndsAt!: Date | null;
   payer!: BillingPayerResource;
+  needsPaymentMethod!: boolean;
 
   constructor(data: BillingCheckoutJSON) {
     super();
@@ -53,6 +54,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     this.isImmediatePlanChange = data.is_immediate_plan_change;
     this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
     this.payer = new BillingPayer(data.payer);
+    this.needsPaymentMethod = data.needs_payment_method;
     return this;
   }
 

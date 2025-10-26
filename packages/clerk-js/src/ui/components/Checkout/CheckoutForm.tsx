@@ -12,7 +12,7 @@ import { Tooltip } from '@/ui/elements/Tooltip';
 import { handleError } from '@/ui/utils/errorHandler';
 
 import { DevOnly } from '../../common/DevOnly';
-import { useCheckoutContext, useEnvironment, usePaymentMethods } from '../../contexts';
+import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
@@ -219,17 +219,14 @@ const CheckoutFormElements = () => {
 
 const CheckoutFormElementsInternal = () => {
   const { checkout } = useCheckout();
-  const { id, totals, isImmediatePlanChange, freeTrialEndsAt } = checkout;
+  const { id, totals, isImmediatePlanChange, needsPaymentMethod } = checkout;
   const { data: paymentMethods } = usePaymentMethods();
-  const environment = useEnvironment();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentMethods.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
-  const isFreeTrial = Boolean(freeTrialEndsAt);
-  const showTabs = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || isFreeTrial);
-  const needsPaymentMethod = !(isFreeTrial && !environment.commerceSettings.billing.freeTrialRequiresPaymentMethod);
+  const showTabs = isImmediatePlanChange && needsPaymentMethod;
 
   if (!id) {
     return null;
@@ -243,7 +240,7 @@ const CheckoutFormElementsInternal = () => {
     >
       {__BUILD_DISABLE_RHC__ ? null : (
         <>
-          {paymentMethods.length > 0 && showTabs && needsPaymentMethod && (
+          {paymentMethods.length > 0 && showTabs && (
             <SegmentedControl.Root
               aria-label='Payment method source'
               value={paymentMethodSource}
@@ -264,17 +261,16 @@ const CheckoutFormElementsInternal = () => {
         </>
       )}
 
-      {paymentMethodSource === 'existing' &&
-        (needsPaymentMethod ? (
-          <ExistingPaymentMethodForm
-            paymentMethods={paymentMethods}
-            totalDueNow={totals.totalDueNow}
-          />
-        ) : (
-          <FreeTrialButton />
-        ))}
-
-      {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />}
+      {!needsPaymentMethod ? (
+        <FreeTrialButton />
+      ) : paymentMethodSource === 'existing' ? (
+        <ExistingPaymentMethodForm
+          paymentMethods={paymentMethods}
+          totalDueNow={totals.totalDueNow}
+        />
+      ) : (
+        !__BUILD_DISABLE_RHC__ && paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />
+      )}
     </Col>
   );
 };
@@ -419,16 +415,9 @@ const formProps: ThemableCssProp = t => ({
 });
 
 const ExistingPaymentMethodForm = withCardStateProvider(
-  ({
-    totalDueNow,
-    paymentMethods,
-  }: {
-    totalDueNow: BillingMoneyAmount;
-    paymentMethods: BillingPaymentMethodResource[];
-  }) => {
+  ({ paymentMethods }: { totalDueNow: BillingMoneyAmount; paymentMethods: BillingPaymentMethodResource[] }) => {
     const { checkout } = useCheckout();
-    const { paymentMethod, isImmediatePlanChange, freeTrialEndsAt } = checkout;
-    const environment = useEnvironment();
+    const { paymentMethod, isImmediatePlanChange, needsPaymentMethod } = checkout;
 
     const { payWithExistingPaymentMethod } = useCheckoutMutations();
     const card = useCardState();
@@ -450,10 +439,7 @@ const ExistingPaymentMethodForm = withCardStateProvider(
       });
     }, [paymentMethods]);
 
-    const showPaymentMethods =
-      isImmediatePlanChange &&
-      (totalDueNow.amount > 0 ||
-        (!!freeTrialEndsAt && environment.commerceSettings.billing.freeTrialRequiresPaymentMethod));
+    const showPaymentMethods = isImmediatePlanChange && needsPaymentMethod;
 
     return (
       <Form

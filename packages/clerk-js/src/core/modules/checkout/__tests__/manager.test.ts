@@ -21,6 +21,7 @@ const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> 
   isImmediatePlanChange: false,
   planPeriod: 'month',
   freeTrialEndsAt: null,
+  needsPaymentMethod: true,
   payer: {
     id: 'payer_123',
     createdAt: new Date('2025-01-01'),
