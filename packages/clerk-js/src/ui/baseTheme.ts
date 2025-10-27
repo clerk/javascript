@@ -60,8 +60,11 @@ const checkboxShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-visible': {
-      boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    '&[data-focus-visible="true"]': {
+      outlineWidth: '2px',
+      outlineStyle: 'solid',
+      outlineColor: theme.colors.$primary500,
+      outlineOffset: '3px',
     },
   };
 };
