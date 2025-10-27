@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.95.1
+
+### Patch Changes
+
+- Add title attribute to email address field with the recommended format. ([#6956](https://github.com/clerk/javascript/pull/6956)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 4.95.0
 
 ### Minor Changes

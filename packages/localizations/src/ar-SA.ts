@@ -122,7 +122,6 @@ export const arSA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -137,6 +136,7 @@ export const arSA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,11 +221,12 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: 'أدخل كلمة المرور',
   formFieldInputPlaceholder__phoneNumber: 'أدخل رقم الهاتف',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: 'الوصف',
-  formFieldLabel__apiKeyExpiration: 'انتهاء الصلاحية',
-  formFieldLabel__apiKeyName: 'اسم المفتاح السري',
-  formFieldLabel__automaticInvitations: 'تمكين الدعوة التلقائية لهذا النطاق',
-  formFieldLabel__backupCode: 'الرمز الاحتياطي',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKeyDescription: undefined,
+  formFieldLabel__apiKeyExpiration: undefined,
+  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
+  formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
   formFieldLabel__confirmPassword: 'تأكيد كلمة المرور',
   formFieldLabel__currentPassword: 'كلمة المرور الحالية',
@@ -637,6 +638,10 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'رمز التحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
@@ -758,6 +763,10 @@ export const arSA: LocalizationResource = {
         subtitleNewTab: 'ارجع إلى علامة التبويب السابقة للمتابعة',
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
