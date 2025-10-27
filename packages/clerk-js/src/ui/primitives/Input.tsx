@@ -38,9 +38,14 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     outlineStyle: 'solid',
     outlineColor: 'transparent',
     outlineOffset: '3px',
-    '&[data-focus-visible="true"]': {
-      outlineColor: theme.colors.$primary500,
-    },
+    '&[data-focus-visible="true"]':
+      props.focusRing !== false
+        ? {
+            outlineColor: theme.colors.$primary500,
+          }
+        : {
+            outlineColor: 'transparent',
+          },
   },
   variants: {
     variant: {
