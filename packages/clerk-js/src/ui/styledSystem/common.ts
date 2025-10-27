@@ -106,12 +106,6 @@ const borderVariants = (t: InternalTheme, props?: any) => {
               ),
             ].toString(),
           },
-          '&[data-focus-visible="true"]': {
-            outlineWidth: '2px',
-            outlineStyle: 'solid',
-            outlineColor: t.colors.$primary500,
-            outlineOffset: '3px',
-          },
         };
   return {
     normal: {

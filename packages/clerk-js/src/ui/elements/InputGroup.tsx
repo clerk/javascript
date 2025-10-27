@@ -45,7 +45,7 @@ export const InputGroup = forwardRef<
         ':focus-within,&[data-focus-within="true"]': {
           ...common.borderVariants(theme, {
             focusRing: true,
-          }).normal['&[data-focus-visible="true"]'],
+          }).normal['&:focus'],
         },
       })}
     >
