@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { useAppleAuthentication } from '../useAppleAuthentication';
+import { useSignInWithApple } from '../useSignInWithApple';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -48,7 +48,7 @@ vi.mock('react-native', () => {
   };
 });
 
-describe('useAppleAuthentication', () => {
+describe('useSignInWithApple', () => {
   const mockSignIn = {
     create: vi.fn(),
     createdSessionId: 'test-session-id',
@@ -88,7 +88,7 @@ describe('useAppleAuthentication', () => {
 
   describe('startAppleAuthenticationFlow', () => {
     test('should return the hook with startAppleAuthenticationFlow function', () => {
-      const { result } = renderHook(() => useAppleAuthentication());
+      const { result } = renderHook(() => useSignInWithApple());
 
       expect(result.current).toHaveProperty('startAppleAuthenticationFlow');
       expect(typeof result.current.startAppleAuthenticationFlow).toBe('function');
@@ -104,7 +104,7 @@ describe('useAppleAuthentication', () => {
       mockSignIn.firstFactorVerification.status = 'verified';
       mockSignIn.createdSessionId = 'test-session-id';
 
-      const { result } = renderHook(() => useAppleAuthentication());
+      const { result } = renderHook(() => useSignInWithApple());
 
       const response = await result.current.startAppleAuthenticationFlow();
 
@@ -160,7 +160,7 @@ describe('useAppleAuthentication', () => {
       const cancelError = Object.assign(new Error('User canceled'), { code: 'ERR_REQUEST_CANCELED' });
       mocks.signInAsync.mockRejectedValue(cancelError);
 
-      const { result } = renderHook(() => useAppleAuthentication());
+      const { result } = renderHook(() => useSignInWithApple());
 
       const response = await result.current.startAppleAuthenticationFlow();
 
@@ -197,7 +197,7 @@ describe('useAppleAuthentication', () => {
         isLoaded: false,
       });
 
-      const { result } = renderHook(() => useAppleAuthentication());
+      const { result } = renderHook(() => useSignInWithApple());
 
       const response = await result.current.startAppleAuthenticationFlow();
 

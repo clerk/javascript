@@ -26,11 +26,11 @@ export type StartAppleAuthenticationFlowReturnType = {
  *
  * @example
  * ```tsx
- * import { useAppleAuthentication } from '@clerk/clerk-expo';
+ * import { useSignInWithApple } from '@clerk/clerk-expo';
  * import { Button } from 'react-native';
  *
  * function AppleSignInButton() {
- *   const { startAppleAuthenticationFlow } = useAppleAuthentication();
+ *   const { startAppleAuthenticationFlow } = useSignInWithApple();
  *
  *   const onPress = async () => {
  *     try {
@@ -53,7 +53,7 @@ export type StartAppleAuthenticationFlowReturnType = {
  *
  * @returns An object containing the `startAppleAuthenticationFlow` function
  */
-export function useAppleAuthentication() {
+export function useSignInWithApple() {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 

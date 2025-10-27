@@ -49,7 +49,7 @@ export type StartAppleAuthenticationFlowReturnType = {
  *
  * @returns An object containing the `startAppleAuthenticationFlow` function that throws an error
  */
-export function useAppleAuthentication(): {
+export function useSignInWithApple(): {
   startAppleAuthenticationFlow: (
     startAppleAuthenticationFlowParams?: StartAppleAuthenticationFlowParams,
   ) => Promise<StartAppleAuthenticationFlowReturnType>;
