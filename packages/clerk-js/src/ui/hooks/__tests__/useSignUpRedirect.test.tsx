@@ -15,8 +15,8 @@ vi.mock('../../utils/redirectRules', () => ({
   signUpRedirectRules: [],
 }));
 
-import { useRedirectEngine } from '../useRedirectEngine';
 import { useRouter } from '../../router';
+import { useRedirectEngine } from '../useRedirectEngine';
 
 describe('useSignUpRedirect', () => {
   beforeEach(() => {

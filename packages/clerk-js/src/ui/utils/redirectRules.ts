@@ -27,7 +27,9 @@ export type RedirectRule<T extends Record<string, unknown> = Record<string, unkn
 
 function isValidRedirectUrl(url: string): boolean {
   try {
-    if (url.startsWith('/')) return true;
+    if (url.startsWith('/')) {
+      return true;
+    }
     const parsed = new URL(url, window.location.origin);
     return parsed.origin === window.location.origin;
   } catch {
