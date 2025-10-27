@@ -126,6 +126,7 @@ export function _futureAuthenticateWithPopup(
   return new Promise((resolve, reject) => {
     if (!client.client || !params.popup) {
       reject();
+      return;
     }
 
     const messageHandler = async (event: MessageEvent) => {
