@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { useSignInWithApple } from '../useSignInWithApple';
+import { useSignInWithApple } from '../useSignInWithApple.ios';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -139,9 +139,9 @@ describe('useSignInWithApple', () => {
         isLoaded: true,
       });
 
-      const { result } = renderHook(() => useAppleSignIn());
+      const { result } = renderHook(() => useSignInWithApple());
 
-      const response = await result.current.startAppleSignInFlow({
+      const response = await result.current.startAppleAuthenticationFlow({
         unsafeMetadata: { source: 'test' },
       });
 
@@ -171,9 +171,9 @@ describe('useSignInWithApple', () => {
     test('should throw error when Apple Authentication is not available', async () => {
       mocks.isAvailableAsync.mockResolvedValue(false);
 
-      const { result } = renderHook(() => useAppleSignIn());
+      const { result } = renderHook(() => useSignInWithApple());
 
-      await expect(result.current.startAppleSignInFlow()).rejects.toThrow(
+      await expect(result.current.startAppleAuthenticationFlow()).rejects.toThrow(
         'Apple Authentication is not available on this device.',
       );
     });
@@ -183,9 +183,9 @@ describe('useSignInWithApple', () => {
         identityToken: null,
       });
 
-      const { result } = renderHook(() => useAppleSignIn());
+      const { result } = renderHook(() => useSignInWithApple());
 
-      await expect(result.current.startAppleSignInFlow()).rejects.toThrow(
+      await expect(result.current.startAppleAuthenticationFlow()).rejects.toThrow(
         'No identity token received from Apple Sign-In.',
       );
     });
