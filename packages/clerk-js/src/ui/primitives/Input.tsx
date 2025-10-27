@@ -1,4 +1,5 @@
 import React from 'react';
+import { useFocusRing } from 'react-aria';
 
 import { localizationKeys, useLocalizations } from '../localization';
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
@@ -13,9 +14,6 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     padding: `${theme.space.$1x5} ${theme.space.$3}`,
     backgroundColor: theme.colors.$colorInput,
     color: theme.colors.$colorInputForeground,
-    // outline support for Windows contrast themes
-    outline: 'transparent solid 2px',
-    outlineOffset: '2px',
     maxHeight: theme.sizes.$9,
     width: props.type === 'checkbox' ? theme.sizes.$4 : '100%',
     aspectRatio: props.type === 'checkbox' ? '1/1' : 'unset',
@@ -34,6 +32,14 @@ const { applyVariants, filterProps } = createVariants((theme, props) => ({
     },
     '::placeholder': {
       color: theme.colors.$colorMutedForeground,
+    },
+    // outline support for Windows contrast themes
+    outlineWidth: '2px',
+    outlineStyle: 'solid',
+    outlineColor: 'transparent',
+    outlineOffset: '3px',
+    '&[data-focus-visible="true"]': {
+      outlineColor: theme.colors.$primary500,
     },
   },
   variants: {
@@ -64,6 +70,7 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
+  const { isFocusVisible, focusProps } = useFocusRing({ isTextInput: true });
   const { t } = useLocalizations();
   // @ts-expect-error Typescript is complaining that `feedbackMessageId` does not exist. We are clearly passing them from above.
   const { feedbackMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
@@ -107,6 +114,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       {...rest}
       {...typeProps}
       {...passwordManagerProps}
+      {...focusProps}
       ref={ref}
       onChange={onChange}
       disabled={isDisabled}
@@ -118,6 +126,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
       aria-disabled={_disabled}
       data-feedback={feedbackType}
       data-variant={props.variant || 'default'}
+      data-focus-visible={isFocusVisible}
       css={applyVariants(props)}
     />
   );
@@ -181,15 +190,17 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>((pr
   const _disabled = isDisabled || props.isDisabled;
   const _required = isRequired || props.isRequired;
   const _hasError = hasError || props.hasError;
-
+  const { isFocusVisible, focusProps } = useFocusRing({ isTextInput: true });
   return (
     <textarea
       {...rest}
+      {...focusProps}
       ref={ref}
       disabled={_disabled}
       required={_required}
       aria-invalid={_hasError}
       aria-required={_required}
+      data-focus-visible={isFocusVisible}
       css={applyVariants(props)}
     />
   );

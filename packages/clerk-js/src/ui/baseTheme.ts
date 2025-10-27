@@ -31,9 +31,9 @@ const inputShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-within,&[data-focus-within="true"]': {
-      boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
-    },
+    // '&:focus-within,&[data-focus-within="true"]': {
+    //   boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    // },
   };
 };
 
@@ -118,42 +118,18 @@ const clerkTheme: Appearance = {
           },
           '&[data-color="primary"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$primary500),
-            '&:focus': {
-              boxShadow: [
-                BUTTON_SOLID_SHADOW(theme.colors.$primary500),
-                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
-              ].toString(),
-            },
           },
           '&[data-color="danger"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
-            '&:focus': {
-              boxShadow: [
-                BUTTON_SOLID_SHADOW(theme.colors.$danger500),
-                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
-              ].toString(),
-            },
           },
         },
         '&[data-variant="outline"]': {
           borderWidth: 0,
           boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-          '&:focus': {
-            boxShadow: [
-              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
-            ].toString(),
-          },
         },
         '&[data-variant="bordered"]': {
           borderWidth: 0,
           boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-          '&:focus': {
-            boxShadow: [
-              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
-            ].toString(),
-          },
         },
       },
       badge: {

@@ -82,6 +82,7 @@
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
+    "react-aria": "3.34.0",
     "regenerator-runtime": "0.14.1",
     "swr": "2.3.4"
   },

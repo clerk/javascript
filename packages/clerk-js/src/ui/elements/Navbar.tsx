@@ -272,7 +272,6 @@ const NavButton = (props: NavButtonProps) => {
       textVariant='buttonLarge'
       size='md'
       isActive={isActive}
-      focusRing={false}
       {...rest}
       sx={[
         t => ({
