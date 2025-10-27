@@ -31,8 +31,13 @@ const inputShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-within,&[data-focus-within="true"]': {
+    // Mouse users - show focus ring (works for both direct inputs and containers)
+    '&:focus:not([data-focus-visible="true"]), &:has(input:focus:not([data-focus-visible="true"]))': {
       boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    },
+    // Keyboard users - show hover state only (outline is defined separately)
+    '&[data-focus-visible="true"], &:has(input[data-focus-visible="true"])': {
+      boxShadow: hoverShadow,
     },
   };
 };
