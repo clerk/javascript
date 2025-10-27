@@ -37,7 +37,6 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         variant='ghost'
         colorScheme='neutral'
         hoverAsFocus
-        focusRing={false}
         sx={[
           t => ({
             padding: `${t.space.$1} ${t.space.$2}`,
