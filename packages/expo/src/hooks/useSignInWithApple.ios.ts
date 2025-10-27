@@ -96,11 +96,10 @@ export function useSignInWithApple() {
       }
 
       // Create a SignIn with the Apple ID token strategy
-      // Note: Type assertions needed until @clerk/clerk-react propagates the new oauth_token_apple strategy type
       await signIn.create({
-        strategy: 'oauth_token_apple' as any,
+        strategy: 'oauth_token_apple',
         token: identityToken,
-      } as any);
+      });
 
       // Check if we need to transfer to SignUp (user doesn't exist yet)
       const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
