@@ -2,7 +2,7 @@ import type { Clerk, EnvironmentResource } from '@clerk/types';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useAuthRedirect } from '../useAuthRedirect';
+import { useRedirectEngine } from '../useRedirectEngine';
 
 // Mock dependencies
 vi.mock('@clerk/shared/react', () => ({
@@ -22,7 +22,6 @@ vi.mock('../../utils/redirectRules', async () => {
   return {
     ...actual,
     evaluateRedirectRules: vi.fn(),
-    isDevelopmentMode: vi.fn(() => false),
   };
 });
 
@@ -32,7 +31,7 @@ import { useEnvironment } from '../../contexts';
 import { useRouter } from '../../router';
 import { evaluateRedirectRules } from '../../utils/redirectRules';
 
-describe('useAuthRedirect', () => {
+describe('useRedirectEngine', () => {
   const mockNavigate = vi.fn();
   const mockClerk = {
     isSignedIn: false,
@@ -52,7 +51,7 @@ describe('useAuthRedirect', () => {
 
   it('returns isRedirecting false when no redirect needed', () => {
     const { result } = renderHook(() =>
-      useAuthRedirect({
+      useRedirectEngine({
         rules: [],
         additionalContext: {},
       }),
@@ -68,7 +67,7 @@ describe('useAuthRedirect', () => {
     });
 
     const { result } = renderHook(() =>
-      useAuthRedirect({
+      useRedirectEngine({
         rules: [],
         additionalContext: {},
       }),
@@ -88,7 +87,7 @@ describe('useAuthRedirect', () => {
     });
 
     renderHook(() =>
-      useAuthRedirect({
+      useRedirectEngine({
         rules: [],
         additionalContext: {},
       }),
@@ -99,23 +98,33 @@ describe('useAuthRedirect', () => {
     });
   });
 
-  it('executes onRedirect callback when provided', async () => {
-    const onRedirect = vi.fn();
+  it('handles cleanupQueryParams declaratively', async () => {
+    const mockReplaceState = vi.fn();
+    Object.defineProperty(window, 'history', {
+      value: { replaceState: mockReplaceState },
+      writable: true,
+    });
+    Object.defineProperty(window, 'location', {
+      value: { search: '?__clerk_add_account=true&other=value', pathname: '/sign-in' },
+      writable: true,
+    });
+
     (evaluateRedirectRules as any).mockReturnValue({
-      destination: '/dashboard',
-      reason: 'Test redirect',
-      onRedirect,
+      destination: '/sign-in',
+      reason: 'Cleanup params',
+      skipNavigation: true,
+      cleanupQueryParams: ['__clerk_add_account'],
     });
 
     renderHook(() =>
-      useAuthRedirect({
+      useRedirectEngine({
         rules: [],
         additionalContext: {},
       }),
     );
 
     await waitFor(() => {
-      expect(onRedirect).toHaveBeenCalled();
+      expect(mockReplaceState).toHaveBeenCalledWith({}, '', '/sign-in?other=value');
     });
   });
 
@@ -126,7 +135,7 @@ describe('useAuthRedirect', () => {
     };
 
     renderHook(() =>
-      useAuthRedirect({
+      useRedirectEngine({
         rules: [],
         additionalContext,
       }),
@@ -147,7 +156,7 @@ describe('useAuthRedirect', () => {
 
   it('re-evaluates when auth state changes', async () => {
     const { rerender } = renderHook(() =>
-      useAuthRedirect({
+      useRedirectEngine({
         rules: [],
         additionalContext: {},
       }),
@@ -175,7 +184,7 @@ describe('useAuthRedirect', () => {
     }
 
     const { result } = renderHook(() =>
-      useAuthRedirect<CustomContext>({
+      useRedirectEngine<CustomContext>({
         rules: [],
         additionalContext: {
           customField: 'test',

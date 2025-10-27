@@ -32,12 +32,11 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
-import { useAuthRedirect, useLoadingStatus } from '@/ui/hooks';
+import { useLoadingStatus, useSignInRedirect } from '@/ui/hooks';
 import { useSupportEmail } from '@/ui/hooks/useSupportEmail';
 import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
-import { signInRedirectRules } from '@/ui/utils/redirectRules';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { getClerkQueryParam, removeClerkQueryParam } from '@/utils';
@@ -77,7 +76,7 @@ function SignInStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const { displayConfig, userSettings, authConfig } = useEnvironment();
   const signIn = useCoreSignIn();
-  const { navigate, queryParams } = useRouter();
+  const { navigate } = useRouter();
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
@@ -104,7 +103,6 @@ function SignInStartInternal(): JSX.Element {
     shouldStartWithPhoneNumberIdentifier ? 'phone_number' : identifierAttributes[0] || '',
   );
   const [hasSwitchedByAutofill, setHasSwitchedByAutofill] = useState(false);
-  const [hasInitialized, setHasInitialized] = useState(false);
 
   const organizationTicket = getClerkQueryParam('__clerk_ticket') || '';
   const clerkStatus = getClerkQueryParam('__clerk_status') || '';
@@ -510,27 +508,10 @@ function SignInStartInternal(): JSX.Element {
     return components[identifierField.type as keyof typeof components];
   }, [identifierField.type]);
 
-  // Memoize additional context to prevent unnecessary re-evaluations
-  const redirectAdditionalContext = useMemo(
-    () => ({
-      afterSignInUrl,
-      hasInitialized,
-      organizationTicket,
-      queryParams,
-    }),
-    [afterSignInUrl, hasInitialized, organizationTicket, queryParams],
-  );
-
-  // Handle redirect scenarios - must be after all hooks
-  const { isRedirecting } = useAuthRedirect({
-    rules: signInRedirectRules,
-    additionalContext: redirectAdditionalContext,
+  const { isRedirecting } = useSignInRedirect({
+    afterSignInUrl,
+    organizationTicket,
   });
-
-  // Mark as initialized after first render
-  useEffect(() => {
-    setHasInitialized(true);
-  }, []);
 
   if (isRedirecting || status.isLoading || clerkStatus === 'sign_up') {
     // clerkStatus being sign_up will trigger a navigation to the sign up flow, so show a loading card instead of

@@ -2,7 +2,7 @@ import type { Clerk, EnvironmentResource } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
 import type { RedirectContext } from '../redirectRules';
-import { evaluateRedirectRules, signInRedirectRules, StopRedirectEvaluation } from '../redirectRules';
+import { evaluateRedirectRules, signInRedirectRules } from '../redirectRules';
 
 describe('evaluateRedirectRules', () => {
   it('returns null when no rules match', () => {
@@ -20,9 +20,9 @@ describe('evaluateRedirectRules', () => {
 
   it('returns the first matching rule', () => {
     const rules = [
-      () => null,
-      () => ({ destination: '/first', reason: 'First rule' }),
-      () => ({ destination: '/second', reason: 'Second rule' }),
+      () => [null, false] as const,
+      () => [{ destination: '/first', reason: 'First rule' }, false] as const,
+      () => [{ destination: '/second', reason: 'Second rule' }, false] as const,
     ];
 
     const context: RedirectContext = {
@@ -35,12 +35,10 @@ describe('evaluateRedirectRules', () => {
     expect(result).toEqual({ destination: '/first', reason: 'First rule' });
   });
 
-  it('handles StopRedirectEvaluation exception and returns null', () => {
+  it('handles shouldStop flag and returns null', () => {
     const rules = [
-      () => {
-        throw new StopRedirectEvaluation('Guard triggered');
-      },
-      () => ({ destination: '/should-not-reach', reason: 'Should not execute' }),
+      () => [null, true] as const,
+      () => [{ destination: '/should-not-reach', reason: 'Should not execute' }, false] as const,
     ];
 
     const context: RedirectContext = {
@@ -51,22 +49,6 @@ describe('evaluateRedirectRules', () => {
 
     const result = evaluateRedirectRules(rules, context);
     expect(result).toBeNull();
-  });
-
-  it('re-throws unexpected errors', () => {
-    const rules = [
-      () => {
-        throw new Error('Unexpected error');
-      },
-    ];
-
-    const context: RedirectContext = {
-      clerk: {} as Clerk,
-      currentPath: '/sign-in',
-      environment: {} as EnvironmentResource,
-    };
-
-    expect(() => evaluateRedirectRules(rules, context)).toThrow('Unexpected error');
   });
 });
 
@@ -201,7 +183,7 @@ describe('signInRedirectRules', () => {
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
-        hasInitialized: false,
+        hasInitializedRef: { current: false },
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
@@ -222,7 +204,7 @@ describe('signInRedirectRules', () => {
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
-        hasInitialized: false,
+        hasInitializedRef: { current: false },
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
@@ -243,7 +225,7 @@ describe('signInRedirectRules', () => {
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
-        hasInitialized: true,
+        hasInitializedRef: { current: true },
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
@@ -260,7 +242,7 @@ describe('signInRedirectRules', () => {
         environment: {
           authConfig: { singleSessionMode: false },
         } as EnvironmentResource,
-        hasInitialized: false,
+        hasInitializedRef: { current: false },
       };
 
       const result = evaluateRedirectRules(signInRedirectRules, context);
@@ -280,7 +262,7 @@ describe('signInRedirectRules', () => {
         environment: {
           authConfig: { singleSessionMode: true },
         } as EnvironmentResource,
-        hasInitialized: false,
+        hasInitializedRef: { current: false },
         afterSignInUrl: '/custom',
       };
 
@@ -311,8 +293,8 @@ describe('signInRedirectRules', () => {
         destination: '/sign-in',
         reason: 'User is adding account',
         skipNavigation: true,
+        cleanupQueryParams: ['__clerk_add_account'],
       });
-      expect(result?.onRedirect).toBeDefined();
     });
 
     it('does not skip navigation when __clerk_add_account query param is absent', () => {
