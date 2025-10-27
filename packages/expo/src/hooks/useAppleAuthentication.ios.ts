@@ -1,15 +1,15 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import { Platform } from 'react-native';
+import * as Crypto from 'expo-crypto';
 
 import { errorThrower } from '../utils/errors';
 
-export type StartAppleSignInFlowParams = {
+export type StartAppleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
-export type StartAppleSignInFlowReturnType = {
+export type StartAppleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
   setActive?: SetActive;
   signIn?: SignInResource;
@@ -17,7 +17,7 @@ export type StartAppleSignInFlowReturnType = {
 };
 
 /**
- * Hook for native Apple Sign-In on iOS using expo-apple-authentication.
+ * Hook for native Apple Authentication on iOS using expo-apple-authentication.
  *
  * This hook provides a simplified way to authenticate users with their Apple ID
  * using the native iOS Sign in with Apple UI. The authentication flow automatically
@@ -26,21 +26,21 @@ export type StartAppleSignInFlowReturnType = {
  *
  * @example
  * ```tsx
- * import { useAppleSignIn } from '@clerk/clerk-expo';
+ * import { useAppleAuthentication } from '@clerk/clerk-expo';
  * import { Button } from 'react-native';
  *
  * function AppleSignInButton() {
- *   const { startAppleSignInFlow } = useAppleSignIn();
+ *   const { startAppleAuthenticationFlow } = useAppleAuthentication();
  *
  *   const onPress = async () => {
  *     try {
- *       const { createdSessionId, setActive } = await startAppleSignInFlow();
+ *       const { createdSessionId, setActive } = await startAppleAuthenticationFlow();
  *
  *       if (createdSessionId && setActive) {
  *         await setActive({ session: createdSessionId });
  *       }
  *     } catch (err) {
- *       console.error('Apple Sign-In error:', err);
+ *       console.error('Apple Authentication error:', err);
  *     }
  *   };
  *
@@ -49,24 +49,17 @@ export type StartAppleSignInFlowReturnType = {
  * ```
  *
  * @requires expo-apple-authentication - Must be installed as a peer dependency
- * @platform iOS - This hook only works on iOS. On other platforms, it will throw an error.
+ * @platform iOS - This is the iOS-specific implementation
  *
- * @returns An object containing the `startAppleSignInFlow` function
+ * @returns An object containing the `startAppleAuthenticationFlow` function
  */
-export function useAppleSignIn() {
+export function useAppleAuthentication() {
   const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
   const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
 
-  async function startAppleSignInFlow(
-    startAppleSignInFlowParams?: StartAppleSignInFlowParams,
-  ): Promise<StartAppleSignInFlowReturnType> {
-    // Check platform compatibility
-    if (Platform.OS !== 'ios') {
-      return errorThrower.throw(
-        'Apple Sign-In is only available on iOS. Please use the web-based OAuth flow (useSSO with strategy: "oauth_apple") on other platforms.',
-      );
-    }
-
+  async function startAppleAuthenticationFlow(
+    startAppleAuthenticationFlowParams?: StartAppleAuthenticationFlowParams,
+  ): Promise<StartAppleAuthenticationFlowReturnType> {
     if (!isSignInLoaded || !isSignUpLoaded) {
       return {
         createdSessionId: null,
@@ -84,8 +77,6 @@ export function useAppleSignIn() {
 
     try {
       // Generate a cryptographically secure nonce for the Apple Sign-In request (required by Clerk)
-      // Lazy load expo-crypto to avoid import issues on web
-      const Crypto = await import('expo-crypto');
       const nonce = Crypto.randomUUID();
 
       // Request Apple authentication with requested scopes
@@ -118,7 +109,7 @@ export function useAppleSignIn() {
         // User doesn't exist - create a new SignUp with transfer
         await signUp.create({
           transfer: true,
-          unsafeMetadata: startAppleSignInFlowParams?.unsafeMetadata,
+          unsafeMetadata: startAppleAuthenticationFlowParams?.unsafeMetadata,
         });
 
         return {
@@ -154,6 +145,6 @@ export function useAppleSignIn() {
   }
 
   return {
-    startAppleSignInFlow,
+    startAppleAuthenticationFlow,
   };
 }

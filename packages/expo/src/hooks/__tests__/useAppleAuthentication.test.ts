@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { useAppleSignIn } from '../useAppleSignIn';
+import { useAppleAuthentication } from '../useAppleAuthentication';
 
 const mocks = vi.hoisted(() => {
   return {
@@ -48,7 +48,7 @@ vi.mock('react-native', () => {
   };
 });
 
-describe('useAppleSignIn', () => {
+describe('useAppleAuthentication', () => {
   const mockSignIn = {
     create: vi.fn(),
     createdSessionId: 'test-session-id',
@@ -86,12 +86,12 @@ describe('useAppleSignIn', () => {
     vi.restoreAllMocks();
   });
 
-  describe('startAppleSignInFlow', () => {
-    test('should return the hook with startAppleSignInFlow function', () => {
-      const { result } = renderHook(() => useAppleSignIn());
+  describe('startAppleAuthenticationFlow', () => {
+    test('should return the hook with startAppleAuthenticationFlow function', () => {
+      const { result } = renderHook(() => useAppleAuthentication());
 
-      expect(result.current).toHaveProperty('startAppleSignInFlow');
-      expect(typeof result.current.startAppleSignInFlow).toBe('function');
+      expect(result.current).toHaveProperty('startAppleAuthenticationFlow');
+      expect(typeof result.current.startAppleAuthenticationFlow).toBe('function');
     });
 
     test('should successfully sign in existing user', async () => {
@@ -104,9 +104,9 @@ describe('useAppleSignIn', () => {
       mockSignIn.firstFactorVerification.status = 'verified';
       mockSignIn.createdSessionId = 'test-session-id';
 
-      const { result } = renderHook(() => useAppleSignIn());
+      const { result } = renderHook(() => useAppleAuthentication());
 
-      const response = await result.current.startAppleSignInFlow();
+      const response = await result.current.startAppleAuthenticationFlow();
 
       expect(mocks.isAvailableAsync).toHaveBeenCalled();
       expect(mocks.randomUUID).toHaveBeenCalled();
@@ -160,9 +160,9 @@ describe('useAppleSignIn', () => {
       const cancelError = Object.assign(new Error('User canceled'), { code: 'ERR_REQUEST_CANCELED' });
       mocks.signInAsync.mockRejectedValue(cancelError);
 
-      const { result } = renderHook(() => useAppleSignIn());
+      const { result } = renderHook(() => useAppleAuthentication());
 
-      const response = await result.current.startAppleSignInFlow();
+      const response = await result.current.startAppleAuthenticationFlow();
 
       expect(response.createdSessionId).toBe(null);
       expect(response.setActive).toBe(mockSetActive);
@@ -197,9 +197,9 @@ describe('useAppleSignIn', () => {
         isLoaded: false,
       });
 
-      const { result } = renderHook(() => useAppleSignIn());
+      const { result } = renderHook(() => useAppleAuthentication());
 
-      const response = await result.current.startAppleSignInFlow();
+      const response = await result.current.startAppleAuthenticationFlow();
 
       expect(mocks.isAvailableAsync).not.toHaveBeenCalled();
       expect(mocks.signInAsync).not.toHaveBeenCalled();
