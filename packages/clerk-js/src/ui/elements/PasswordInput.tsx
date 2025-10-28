@@ -7,7 +7,7 @@ import { useEnvironment } from '../contexts';
 import { descriptors, Flex, Input, localizationKeys, useLocalizations } from '../customizables';
 import { usePassword } from '../hooks/usePassword';
 import { Eye, EyeSlash } from '../icons';
-import type { PropsOfComponent } from '../styledSystem';
+import { common, type PropsOfComponent } from '../styledSystem';
 import { mergeRefs } from '../utils/mergeRefs';
 import { IconButton } from './IconButton';
 
@@ -80,9 +80,13 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
   return (
     <Flex
       elementDescriptor={descriptors.formFieldInputGroup}
-      direction='col'
-      justify='center'
-      sx={{ position: 'relative' }}
+      sx={theme => ({
+        position: 'relative',
+        ...common.borderVariants(theme, { hasError: rest.hasError }).normal,
+        '&:focus-within,&[data-focus-within="true"]': {
+          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
+        },
+      })}
     >
       <Input
         {...rest}
@@ -100,7 +104,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         //@ts-expect-error Type mismatch between ForwardRef and RefObject due to null
         ref={mergeRefs(ref, inputRef)}
         type={hidden ? 'password' : 'text'}
-        sx={theme => ({ paddingRight: theme.space.$10 })}
+        variant='unstyled'
       />
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
@@ -108,13 +112,15 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='ghost'
         size='xs'
-        tabIndex={-1}
+        focusRing={false}
+        hoverAsFocus
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
-          position: 'absolute',
-          right: 0,
-          marginRight: theme.space.$1,
           color: theme.colors.$neutralAlpha400,
+          borderStartStartRadius: '0',
+          borderEndStartRadius: '0',
+          borderStartEndRadius: `calc(${theme.radii.$md} - ${theme.borderWidths.$normal})`,
+          borderEndEndRadius: `calc(${theme.radii.$md} - ${theme.borderWidths.$normal})`,
         })}
         icon={hidden ? Eye : EyeSlash}
       />

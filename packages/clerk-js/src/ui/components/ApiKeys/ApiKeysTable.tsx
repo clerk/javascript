@@ -21,6 +21,7 @@ import {
   Tr,
 } from '@/ui/customizables';
 import type { ElementDescriptor } from '@/ui/customizables/elementDescriptors';
+import { IconButton } from '@/ui/elements/IconButton';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { useClipboard } from '@/ui/hooks';
 import { Check, ClipboardOutline, Eye, EyeSlash } from '@/ui/icons';
@@ -68,40 +69,37 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
 
   return (
     <Flex
-      center
-      sx={{
+      sx={theme => ({
         width: '100%',
         position: 'relative',
-      }}
+        ...common.borderVariants(theme).normal,
+        '&:focus-within,&[data-focus-within="true"]': {
+          ...common.borderVariants(theme).normal['&:focus'],
+        },
+      })}
     >
       <Input
         type={revealed ? 'text' : 'password'}
         value={revealed && apiKeySecret ? apiKeySecret : `•`.repeat(25)}
         readOnly
-        aria-label='API key (hidden)'
-        sx={t => ({
-          paddingInlineEnd: t.sizes.$12,
-        })}
+        variant='unstyled'
       />
-      <Button
+      <IconButton
+        aria-label={`${revealed ? 'Show' : 'Hide'} api key`}
         variant='ghost'
-        sx={t => ({
-          position: 'absolute',
-          right: 0,
-          '&:focus-visible': {
-            ...common.focusRingStyles(t),
-          },
-        })}
+        size='xs'
         focusRing={false}
-        aria-label={'Show key'}
-        elementDescriptor={descriptors.apiKeysRevealButton}
-        onClick={() => setRevealed(!revealed)}
-      >
-        <Icon
-          icon={revealed ? EyeSlash : Eye}
-          sx={t => ({ color: t.colors.$colorMutedForeground })}
-        />
-      </Button>
+        hoverAsFocus
+        onClick={() => setRevealed(s => !s)}
+        sx={theme => ({
+          color: theme.colors.$neutralAlpha400,
+          borderStartStartRadius: '0',
+          borderEndStartRadius: '0',
+          borderStartEndRadius: `calc(${theme.radii.$md} - ${theme.borderWidths.$normal})`,
+          borderEndEndRadius: `calc(${theme.radii.$md} - ${theme.borderWidths.$normal})`,
+        })}
+        icon={revealed ? Eye : EyeSlash}
+      />
     </Flex>
   );
 };
