@@ -783,6 +783,10 @@ export interface BillingCheckoutResource extends ClerkResource {
    * The payer associated with the checkout.
    */
   payer: BillingPayerResource;
+  /**
+   * Whether a payment method is required for this checkout.
+   */
+  needsPaymentMethod: boolean;
 }
 
 /**
