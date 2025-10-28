@@ -70,8 +70,6 @@ const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
   return (
     <Flex
       sx={theme => ({
-        width: '100%',
-        position: 'relative',
         ...common.borderVariants(theme).normal,
         '&:focus-within,&[data-focus-within="true"]': {
           ...common.borderVariants(theme).normal['&:focus'],

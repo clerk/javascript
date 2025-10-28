@@ -81,7 +81,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     <Flex
       elementDescriptor={descriptors.formFieldInputGroup}
       sx={theme => ({
-        position: 'relative',
         ...common.borderVariants(theme, { hasError: rest.hasError }).normal,
         '&:focus-within,&[data-focus-within="true"]': {
           ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
