@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-[Billing Beta] Remove necessary `orgId` from BillingPayerMethods interface.
+[Billing Beta] Remove unnecessary `orgId` from BillingPayerMethods interface.
