@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { BillingMoneyAmount, BillingPaymentMethodResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { BillingPaymentMethodResource, ConfirmCheckoutParams } from '@clerk/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -219,7 +219,7 @@ const CheckoutFormElements = () => {
 
 const CheckoutFormElementsInternal = () => {
   const { checkout } = useCheckout();
-  const { id, totals, isImmediatePlanChange, needsPaymentMethod } = checkout;
+  const { id, isImmediatePlanChange, needsPaymentMethod } = checkout;
   const { data: paymentMethods } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -264,10 +264,7 @@ const CheckoutFormElementsInternal = () => {
       {!needsPaymentMethod ? (
         <FreeTrialButton />
       ) : paymentMethodSource === 'existing' ? (
-        <ExistingPaymentMethodForm
-          paymentMethods={paymentMethods}
-          totalDueNow={totals.totalDueNow}
-        />
+        <ExistingPaymentMethodForm paymentMethods={paymentMethods} />
       ) : (
         !__BUILD_DISABLE_RHC__ && paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />
       )}
@@ -415,7 +412,7 @@ const formProps: ThemableCssProp = t => ({
 });
 
 const ExistingPaymentMethodForm = withCardStateProvider(
-  ({ paymentMethods }: { totalDueNow: BillingMoneyAmount; paymentMethods: BillingPaymentMethodResource[] }) => {
+  ({ paymentMethods }: { paymentMethods: BillingPaymentMethodResource[] }) => {
     const { checkout } = useCheckout();
     const { paymentMethod, isImmediatePlanChange, needsPaymentMethod } = checkout;
 
