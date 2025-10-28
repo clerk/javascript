@@ -80,10 +80,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   }
 
   const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy as TStrategy | null;
+  const shouldShowLastAuthenticationStrategy = strategies.length > 1;
   const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
     [...strategies],
     MAX_STRATEGIES_PER_ROW,
-    lastAuthenticationStrategy,
+    shouldShowLastAuthenticationStrategy ? lastAuthenticationStrategy : null,
   );
   const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
 
@@ -194,7 +195,9 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 label={label}
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
-                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy}
+                lastAuthenticationStrategy={
+                  shouldShowLastAuthenticationStrategy && strategy === lastAuthenticationStrategy
+                }
               />
             );
           })}
