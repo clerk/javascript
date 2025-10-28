@@ -958,9 +958,9 @@ export const ptBR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Fechar menu do usuário',
     action__manageAccount: 'Gerenciar conta',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Abrir menu do usuário',
     action__signOut: 'Sair',
     action__signOutAll: 'Sair de todas as contas',
   },

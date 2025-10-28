@@ -969,9 +969,9 @@ export const deDE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Konto hinzufügen',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Benutzermenü schließen',
     action__manageAccount: 'Konto verwalten',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },

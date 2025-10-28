@@ -953,9 +953,9 @@ export const hiIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'खाता जोड़ें',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'उपयोगकर्ता मेनू बंद करें',
     action__manageAccount: 'खाता प्रबंधित करें',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
   },

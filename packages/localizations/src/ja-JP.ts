@@ -945,9 +945,9 @@ export const jaJP: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'アカウントの追加',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'ユーザーメニューを閉じる',
     action__manageAccount: 'アカウントの管理',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'ユーザーメニューを開く',
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
   },

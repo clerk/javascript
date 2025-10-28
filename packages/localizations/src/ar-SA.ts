@@ -940,9 +940,9 @@ export const arSA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'إضافة حساب',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'إغلاق قائمة المستخدم',
     action__manageAccount: 'إدارة الحساب',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },

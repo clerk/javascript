@@ -952,9 +952,9 @@ export const bnIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'অ্যাকাউন্ট যোগ করুন',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'ব্যবহারকারী মেনু বন্ধ করুন',
     action__manageAccount: 'অ্যাকাউন্ট পরিচালনা করুন',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
   },

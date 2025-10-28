@@ -942,9 +942,9 @@ export const ptPT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Fechar menu do utilizador',
     action__manageAccount: 'Configurar conta',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
   },

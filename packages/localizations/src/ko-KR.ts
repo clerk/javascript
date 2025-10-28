@@ -936,9 +936,9 @@ export const koKR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '계정 추가',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: '사용자 메뉴 닫기',
     action__manageAccount: '계정 관리',
-    action__openUserMenu: undefined,
+    action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
   },

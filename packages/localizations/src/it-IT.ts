@@ -951,9 +951,9 @@ export const itIT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Aggiungi account',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Chiudi menu utente',
     action__manageAccount: 'Gestisci account',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Apri menu utente',
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },

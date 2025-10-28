@@ -957,9 +957,9 @@ export const ruRU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавить учетную запись',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Закрыть меню пользователя',
     action__manageAccount: 'Управление учетной записью',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
   },

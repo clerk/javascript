@@ -927,9 +927,9 @@ export const zhTW: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '新增帳戶',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: '關閉使用者選單',
     action__manageAccount: '管理帳戶',
-    action__openUserMenu: undefined,
+    action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
   },

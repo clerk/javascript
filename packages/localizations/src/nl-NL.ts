@@ -942,9 +942,9 @@ export const nlNL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Gebruikersmenu sluiten',
     action__manageAccount: 'Account beheren',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Gebruikersmenu openen',
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },

@@ -946,9 +946,9 @@ export const esES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Añadir cuenta',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: 'Cerrar menú de usuario',
     action__manageAccount: 'Administrar cuenta',
-    action__openUserMenu: undefined,
+    action__openUserMenu: 'Abrir menú de usuario',
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
   },

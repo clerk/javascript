@@ -927,9 +927,9 @@ export const zhCN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '添加账户',
-    action__closeUserMenu: undefined,
+    action__closeUserMenu: '关闭用户菜单',
     action__manageAccount: '管理账户',
-    action__openUserMenu: undefined,
+    action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
   },
