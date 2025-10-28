@@ -490,9 +490,11 @@ export const bnIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'সংগঠন তৈরি করুন',
     action__invitationAccept: 'যোগ দিন',
     action__manageOrganization: 'পরিচালনা',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
     notSelected: 'কোনো সংগঠন নির্বাচিত নেই',
     personalWorkspace: 'ব্যক্তিগত অ্যাকাউন্ট',
@@ -950,7 +952,9 @@ export const bnIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'অ্যাকাউন্ট যোগ করুন',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'অ্যাকাউন্ট পরিচালনা করুন',
+    action__openUserMenu: undefined,
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
   },

@@ -500,9 +500,11 @@ export const deDE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organisation erstellen',
     action__invitationAccept: 'Beitreten',
     action__manageOrganization: 'Organisation verwalten',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Beitritt anfragen',
     notSelected: 'Keine Organisation ausgewählt',
     personalWorkspace: 'Persönlicher Arbeitsbereich',
@@ -967,7 +969,9 @@ export const deDE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Konto hinzufügen',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Konto verwalten',
+    action__openUserMenu: undefined,
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },

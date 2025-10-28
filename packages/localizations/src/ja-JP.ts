@@ -489,9 +489,11 @@ export const jaJP: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '組織の作成',
     action__invitationAccept: '参加する',
     action__manageOrganization: '組織の管理',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '参加をリクエストする',
     notSelected: '組織が選択されていません',
     personalWorkspace: '個人ワークスペース',
@@ -943,7 +945,9 @@ export const jaJP: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'アカウントの追加',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'アカウントの管理',
+    action__openUserMenu: undefined,
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
   },

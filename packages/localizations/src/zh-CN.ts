@@ -480,9 +480,11 @@ export const zhCN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '创建组织',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理组织',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '请求加入',
     notSelected: '未选择组织',
     personalWorkspace: '个人工作区',
@@ -925,7 +927,9 @@ export const zhCN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '添加账户',
+    action__closeUserMenu: undefined,
     action__manageAccount: '管理账户',
+    action__openUserMenu: undefined,
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
   },

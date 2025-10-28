@@ -490,9 +490,11 @@ export const nlNL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
@@ -940,7 +942,9 @@ export const nlNL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Account beheren',
+    action__openUserMenu: undefined,
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },

@@ -1,13 +1,12 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
-import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
 
 import { NotificationCountBadge, useProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
-import { Button, descriptors, Icon, localizationKeys } from '../../customizables';
+import { Button, descriptors, Icon, localizationKeys, useLocalizations } from '../../customizables';
 import { ChevronDown } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { organizationListParams } from './utils';
@@ -23,6 +22,7 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
     const { user } = useUser();
     const { organization } = useOrganization();
     const { hidePersonal } = useOrganizationSwitcherContext();
+    const { t } = useLocalizations();
 
     if (!user) {
       return null;
@@ -46,20 +46,11 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
           sx,
         ]}
         ref={ref}
-        aria-label={`${props.isOpen ? 'Close' : 'Open'} organization switcher`}
+        aria-label={`${props.isOpen ? t(localizationKeys('organizationSwitcher.action__closeOrganizationSwitcher')) : t(localizationKeys('organizationSwitcher.action__openOrganizationSwitcher'))}`}
         aria-expanded={props.isOpen}
         aria-haspopup='dialog'
         {...rest}
       >
-        {organization && (
-          <OrganizationPreview
-            elementId={'organizationSwitcherTrigger'}
-            gap={3}
-            size='xs'
-            organization={organization}
-            sx={{ maxWidth: '30ch' }}
-          />
-        )}
         {!organization && (
           <PersonalWorkspacePreview
             size='xs'

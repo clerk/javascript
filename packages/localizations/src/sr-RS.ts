@@ -488,9 +488,11 @@ export const srRS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
     notSelected: 'Organizacija nije izabrana',
     personalWorkspace: 'Lični nalog',
@@ -940,7 +942,9 @@ export const srRS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj nalog',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Upravljaj nalogom',
+    action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih naloga',
   },

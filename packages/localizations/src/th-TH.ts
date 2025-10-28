@@ -490,9 +490,11 @@ export const thTH: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'สร้างองค์กร',
     action__invitationAccept: 'เข้าร่วม',
     action__manageOrganization: 'จัดการ',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'ขอเข้าร่วม',
     notSelected: 'ไม่ได้เลือกองค์กร',
     personalWorkspace: 'บัญชีส่วนตัว',
@@ -941,7 +943,9 @@ export const thTH: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'เพิ่มบัญชี',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'จัดการบัญชี',
+    action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },

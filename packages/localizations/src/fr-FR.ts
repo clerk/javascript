@@ -502,9 +502,11 @@ export const frFR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Créer une organisation',
     action__invitationAccept: 'Rejoindre',
     action__manageOrganization: "Gérer l'organisation",
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Demander à rejoindre',
     notSelected: 'Aucune organisation sélectionnée',
     personalWorkspace: 'Espace de travail personnel',
@@ -960,7 +962,9 @@ export const frFR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Ajouter un compte',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gérer son compte',
+    action__openUserMenu: undefined,
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },

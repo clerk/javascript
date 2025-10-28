@@ -497,9 +497,11 @@ export const itIT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea Organizzazione',
     action__invitationAccept: 'Unisciti',
     action__manageOrganization: 'Gestisci Organizzazione',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Richiedi di unirti',
     notSelected: 'Nessuna organizzazione selezionata',
     personalWorkspace: 'Spazio di lavoro personale',
@@ -949,7 +951,9 @@ export const itIT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Aggiungi account',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestisci account',
+    action__openUserMenu: undefined,
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },

@@ -487,9 +487,11 @@ export const arSA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'أنشاء منظمة',
     action__invitationAccept: 'أنضمام',
     action__manageOrganization: 'أدارة المنظمة',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'طلب أنضمام',
     notSelected: 'لم يتم أختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
@@ -938,7 +940,9 @@ export const arSA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'إضافة حساب',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'إدارة الحساب',
+    action__openUserMenu: undefined,
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },

@@ -480,9 +480,11 @@ export const zhTW: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '建立組織',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理組織',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '請求加入',
     notSelected: '未選取組織',
     personalWorkspace: '個人工作區',
@@ -925,7 +927,9 @@ export const zhTW: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '新增帳戶',
+    action__closeUserMenu: undefined,
     action__manageAccount: '管理帳戶',
+    action__openUserMenu: undefined,
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
   },
