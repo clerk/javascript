@@ -266,7 +266,7 @@ export const nbNO: LocalizationResource = {
     subtitle: 'for å fortsette til {{applicationName}}',
     suggestionsAcceptedLabel: 'Venter på godkjenning',
     title: 'Velg en bruker',
-    titleWithoutPersonal: 'Velg en organiasjon',
+    titleWithoutPersonal: 'Velg en organisasjon',
   },
   organizationProfile: {
     apiKeysPage: {
