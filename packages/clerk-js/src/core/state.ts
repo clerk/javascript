@@ -5,6 +5,7 @@ import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
 import { SignIn } from './resources/SignIn';
 import { SignUp } from './resources/SignUp';
+import { Waitlist } from './resources/Waitlist';
 import {
   signInComputedSignal,
   signInErrorSignal,
@@ -14,6 +15,10 @@ import {
   signUpErrorSignal,
   signUpFetchSignal,
   signUpResourceSignal,
+  waitlistComputedSignal,
+  waitlistErrorSignal,
+  waitlistFetchSignal,
+  waitlistResourceSignal,
 } from './signals';
 
 export class State implements StateInterface {
@@ -26,6 +31,11 @@ export class State implements StateInterface {
   signUpErrorSignal = signUpErrorSignal;
   signUpFetchSignal = signUpFetchSignal;
   signUpSignal = signUpComputedSignal;
+
+  waitlistResourceSignal = waitlistResourceSignal;
+  waitlistErrorSignal = waitlistErrorSignal;
+  waitlistFetchSignal = waitlistFetchSignal;
+  waitlistSignal = waitlistComputedSignal;
 
   __internal_effect = effect;
   __internal_computed = computed;
@@ -44,6 +54,10 @@ export class State implements StateInterface {
     if (payload.resource instanceof SignUp) {
       this.signUpErrorSignal({ error: payload.error });
     }
+
+    if (payload.resource instanceof Waitlist) {
+      this.waitlistErrorSignal({ error: payload.error });
+    }
   };
 
   private onResourceUpdated = (payload: { resource: BaseResource }) => {
@@ -54,6 +68,10 @@ export class State implements StateInterface {
     if (payload.resource instanceof SignUp) {
       this.signUpResourceSignal({ resource: payload.resource });
     }
+
+    if (payload.resource instanceof Waitlist) {
+      this.waitlistResourceSignal({ resource: payload.resource });
+    }
   };
 
   private onResourceFetch = (payload: { resource: BaseResource; status: 'idle' | 'fetching' }) => {
@@ -63,6 +81,10 @@ export class State implements StateInterface {
 
     if (payload.resource instanceof SignUp) {
       this.signUpFetchSignal({ status: payload.status });
+    }
+
+    if (payload.resource instanceof Waitlist) {
+      this.waitlistFetchSignal({ status: payload.status });
     }
   };
 }

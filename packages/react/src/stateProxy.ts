@@ -26,12 +26,16 @@ export class StateProxy implements State {
 
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
+  private readonly waitlistSignalProxy = this.buildWaitlistProxy();
 
   signInSignal() {
     return this.signInSignalProxy;
   }
   signUpSignal() {
     return this.signUpSignalProxy;
+  }
+  waitlistSignal() {
+    return this.waitlistSignalProxy;
   }
 
   private buildSignInProxy() {
@@ -222,6 +226,30 @@ export class StateProxy implements State {
           'sendPhoneCode',
           'verifyPhoneCode',
         ] as const),
+      },
+    };
+  }
+
+  private buildWaitlistProxy() {
+    const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
+    const target = () => this.client.waitlist?.__internal_future;
+
+    return {
+      errors: defaultErrors(),
+      fetchStatus: 'idle' as const,
+      waitlist: {
+        get id() {
+          return gateProperty(target, 'id', undefined);
+        },
+        get createdAt() {
+          return gateProperty(target, 'createdAt', null);
+        },
+        get updatedAt() {
+          return gateProperty(target, 'updatedAt', null);
+        },
+
+        join: gateMethod(target, 'join'),
       },
     };
   }

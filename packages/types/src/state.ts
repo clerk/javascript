@@ -1,5 +1,6 @@
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
+import type { WaitlistFutureResource } from './waitlist';
 
 /**
  * Represents an error on a specific field.
@@ -128,6 +129,27 @@ export interface SignUpSignal {
   (): NullableSignUpSignal;
 }
 
+export interface WaitlistSignalValue {
+  /**
+   * The errors that occurred during the last fetch of the underlying `Waitlist` resource.
+   */
+  errors: Errors;
+  /**
+   * The fetch status of the underlying `Waitlist` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * The underlying `Waitlist` resource.
+   */
+  waitlist: WaitlistFutureResource;
+}
+export type NullableWaitlistSignal = Omit<WaitlistSignalValue, 'waitlist'> & {
+  waitlist: WaitlistFutureResource | null;
+};
+export interface WaitlistSignal {
+  (): NullableWaitlistSignal;
+}
+
 export interface State {
   /**
    * A Signal that updates when the underlying `SignIn` resource changes, including errors.
@@ -138,6 +160,11 @@ export interface State {
    * A Signal that updates when the underlying `SignUp` resource changes, including errors.
    */
   signUpSignal: SignUpSignal;
+
+  /**
+   * A Signal that updates when the underlying `Waitlist` resource changes, including errors.
+   */
+  waitlistSignal: WaitlistSignal;
 
   /**
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.

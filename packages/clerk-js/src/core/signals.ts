@@ -1,10 +1,11 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { Errors, SignInSignal, SignUpSignal } from '@clerk/types';
+import type { Errors, SignInSignal, SignUpSignal, WaitlistSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
+import type { Waitlist } from './resources/Waitlist';
 
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
 export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
@@ -32,6 +33,20 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
   const errors = errorsToParsedErrors(error);
 
   return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
+});
+
+export const waitlistResourceSignal = signal<{ resource: Waitlist | null }>({ resource: null });
+export const waitlistErrorSignal = signal<{ error: unknown }>({ error: null });
+export const waitlistFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+
+export const waitlistComputedSignal: WaitlistSignal = computed(() => {
+  const waitlist = waitlistResourceSignal().resource;
+  const error = waitlistErrorSignal().error;
+  const fetchStatus = waitlistFetchSignal().status;
+
+  const errors = errorsToParsedErrors(error);
+
+  return { errors, fetchStatus, waitlist: waitlist ? waitlist.__internal_future : null };
 });
 
 /**
