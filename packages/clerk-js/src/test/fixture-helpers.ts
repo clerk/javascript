@@ -362,11 +362,21 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
 
 const createBillingSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const os = environment.commerce_settings.billing;
-  const withBilling = () => {
-    os.user.enabled = true;
-    os.user.has_paid_plans = true;
-    os.organization.enabled = true;
-    os.organization.has_paid_plans = true;
+  const withBilling = ({
+    userEnabled = true,
+    userHasPaidPlans = true,
+    organizationEnabled = true,
+    organizationHasPaidPlans = true,
+  }: {
+    userEnabled?: boolean;
+    userHasPaidPlans?: boolean;
+    organizationEnabled?: boolean;
+    organizationHasPaidPlans?: boolean;
+  } = {}) => {
+    os.user.enabled = userEnabled;
+    os.user.has_paid_plans = userHasPaidPlans;
+    os.organization.enabled = organizationEnabled;
+    os.organization.has_paid_plans = organizationHasPaidPlans;
   };
 
   return { withBilling };
