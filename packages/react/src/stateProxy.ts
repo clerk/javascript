@@ -26,12 +26,17 @@ export class StateProxy implements State {
 
   private readonly signInSignalProxy = this.buildSignInProxy();
   private readonly signUpSignalProxy = this.buildSignUpProxy();
+  private readonly waitlistSignalProxy = this.buildWaitlistProxy();
 
   signInSignal() {
     return this.signInSignalProxy;
   }
   signUpSignal() {
     return this.signUpSignalProxy;
+  }
+
+  waitlistSignal() {
+    return this.waitlistSignalProxy;
   }
 
   private buildSignInProxy() {
@@ -222,6 +227,24 @@ export class StateProxy implements State {
           'sendPhoneCode',
           'verifyPhoneCode',
         ] as const),
+      },
+    };
+  }
+
+  private buildWaitlistProxy() {
+    const gateMethod = this.gateMethod.bind(this);
+    const target = () => ({
+      join: async (params: { emailAddress: string }) => {
+        await this.isomorphicClerk.joinWaitlist(params);
+        return { error: null as unknown };
+      },
+    });
+
+    return {
+      errors: defaultErrors(),
+      fetchStatus: 'idle' as const,
+      waitlist: {
+        join: gateMethod(target, 'join'),
       },
     };
   }

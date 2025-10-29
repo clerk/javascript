@@ -1,5 +1,6 @@
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
+import type { WaitlistFutureResource } from './waitlistFuture';
 
 /**
  * Represents an error on a specific field.
@@ -140,6 +141,11 @@ export interface State {
   signUpSignal: SignUpSignal;
 
   /**
+   * A Signal that updates when the waitlist flow changes, including errors.
+   */
+  waitlistSignal: WaitlistSignal;
+
+  /**
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
@@ -155,4 +161,30 @@ export interface State {
    * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;
+}
+
+/**
+ * The value returned by the `useWaitlist` hook.
+ */
+export interface WaitlistSignalValue {
+  /**
+   * The errors that occurred during the last waitlist request.
+   */
+  errors: Errors;
+  /**
+   * The fetch status of the waitlist request.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * The waitlist resource for custom UIs.
+   */
+  waitlist: WaitlistFutureResource;
+}
+
+export type NullableWaitlistSignal = Omit<WaitlistSignalValue, 'waitlist'> & {
+  waitlist: WaitlistFutureResource | null;
+};
+
+export interface WaitlistSignal {
+  (): NullableWaitlistSignal;
 }
