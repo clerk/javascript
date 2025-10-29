@@ -39,7 +39,11 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
+  const fee =
+    planPeriod === 'month'
+      ? plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.annualMonthlyFee!;
 
   return (
     <Drawer.Body>

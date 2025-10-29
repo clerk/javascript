@@ -8,8 +8,8 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   id!: string;
   name!: string;
   fee!: BillingMoneyAmount;
-  annualFee!: BillingMoneyAmount;
-  annualMonthlyFee!: BillingMoneyAmount;
+  annualFee: BillingMoneyAmount | null = null;
+  annualMonthlyFee: BillingMoneyAmount | null = null;
   description!: string;
   isDefault!: boolean;
   isRecurring!: boolean;
@@ -32,11 +32,17 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
       return this;
     }
 
+    console.log('data', {
+      fee: data.fee,
+      annual_fee: data.annual_fee,
+      annual_monthly_fee: data.annual_monthly_fee,
+    });
+
     this.id = data.id;
     this.name = data.name;
     this.fee = billingMoneyAmountFromJSON(data.fee);
-    this.annualFee = billingMoneyAmountFromJSON(data.annual_fee);
-    this.annualMonthlyFee = billingMoneyAmountFromJSON(data.annual_monthly_fee);
+    this.annualFee = data.annual_fee ? billingMoneyAmountFromJSON(data.annual_fee) : null;
+    this.annualMonthlyFee = data.annual_monthly_fee ? billingMoneyAmountFromJSON(data.annual_monthly_fee) : null;
     this.description = data.description;
     this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;
