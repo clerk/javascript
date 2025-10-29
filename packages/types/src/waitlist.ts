@@ -6,13 +6,6 @@ export interface WaitlistResource extends ClerkResource {
   updatedAt: Date | null;
 }
 
-export interface JoinWaitlistParams {
-  /**
-   * The user's email address to join the waitlist.
-   */
-  emailAddress: string;
-}
-
 export interface WaitlistFutureResource {
   /**
    * The unique identifier for the waitlist entry. `null` if the user has not joined the waitlist yet.
@@ -32,5 +25,7 @@ export interface WaitlistFutureResource {
   /**
    * Used to join the waitlist with the provided email address.
    */
-  join: (params: JoinWaitlistParams) => Promise<{ error: unknown }>;
+  join: (params: { emailAddress: string }) => Promise<{ error: unknown }>;
 }
+
+export type { JoinWaitlistParams } from './clerk';
