@@ -170,10 +170,10 @@ const useCheckoutMutations = () => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    const paymentSourceId = data.get(HIDDEN_INPUT_NAME) as string;
+    const paymentMethodId = data.get(HIDDEN_INPUT_NAME) as string;
 
     return confirmCheckout({
-      paymentSourceId,
+      paymentMethodId,
     });
   };
 
