@@ -233,7 +233,12 @@ export class StateProxy implements State {
   private buildWaitlistProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const target = () => this.client.waitlist?.__internal_future;
+    const target = () => {
+      if (!inBrowser() || !this.isomorphicClerk.loaded) {
+        return null;
+      }
+      return this.isomorphicClerk.__internal_state.__internal_waitlist.__internal_future;
+    };
 
     return {
       errors: defaultErrors(),

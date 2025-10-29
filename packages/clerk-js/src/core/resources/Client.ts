@@ -7,12 +7,11 @@ import type {
   SignedInSessionResource,
   SignInResource,
   SignUpResource,
-  WaitlistResource,
 } from '@clerk/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource, Session, SignIn, SignUp, Waitlist } from './internal';
+import { BaseResource, Session, SignIn, SignUp } from './internal';
 
 export class Client extends BaseResource implements ClientResource {
   private static instance: Client | null | undefined;
@@ -22,7 +21,6 @@ export class Client extends BaseResource implements ClientResource {
   sessions: Session[] = [];
   signUp: SignUpResource = new SignUp();
   signIn: SignInResource = new SignIn();
-  waitlist: WaitlistResource = new Waitlist();
   lastActiveSessionId: string | null = null;
   captchaBypass = false;
   cookieExpiresAt: Date | null = null;
@@ -86,7 +84,6 @@ export class Client extends BaseResource implements ClientResource {
       this.sessions = [];
       this.signUp = new SignUp(null);
       this.signIn = new SignIn(null);
-      this.waitlist = new Waitlist(null);
       this.lastActiveSessionId = null;
       this.lastAuthenticationStrategy = null;
       this.cookieExpiresAt = null;
@@ -134,7 +131,6 @@ export class Client extends BaseResource implements ClientResource {
       this.sessions = (data.sessions || []).map(s => new Session(s));
       this.signUp = new SignUp(data.sign_up);
       this.signIn = new SignIn(data.sign_in);
-      this.waitlist = new Waitlist((data as any).waitlist);
       this.lastActiveSessionId = data.last_active_session_id;
       this.captchaBypass = data.captcha_bypass || false;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;

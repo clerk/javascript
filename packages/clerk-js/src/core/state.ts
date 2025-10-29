@@ -37,6 +37,8 @@ export class State implements StateInterface {
   waitlistFetchSignal = waitlistFetchSignal;
   waitlistSignal = waitlistComputedSignal;
 
+  private _waitlistInstance: Waitlist | null = null;
+
   __internal_effect = effect;
   __internal_computed = computed;
 
@@ -44,6 +46,14 @@ export class State implements StateInterface {
     eventBus.on('resource:update', this.onResourceUpdated);
     eventBus.on('resource:error', this.onResourceError);
     eventBus.on('resource:fetch', this.onResourceFetch);
+  }
+
+  get __internal_waitlist() {
+    if (!this._waitlistInstance) {
+      this._waitlistInstance = new Waitlist(null);
+      this.waitlistResourceSignal({ resource: this._waitlistInstance });
+    }
+    return this._waitlistInstance;
   }
 
   private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {
