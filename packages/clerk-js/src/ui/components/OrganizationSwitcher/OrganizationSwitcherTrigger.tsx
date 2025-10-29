@@ -1,6 +1,7 @@
 import { useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import { forwardRef } from 'react';
 
+import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
 
@@ -51,6 +52,16 @@ export const OrganizationSwitcherTrigger = withAvatarShimmer(
         aria-haspopup='dialog'
         {...rest}
       >
+        {organization && (
+          <OrganizationPreview
+            elementId={'organizationSwitcherTrigger'}
+            gap={3}
+            size='xs'
+            organization={organization}
+            user={user}
+            sx={{ maxWidth: '30ch' }}
+          />
+        )}
         {!organization && (
           <PersonalWorkspacePreview
             size='xs'
