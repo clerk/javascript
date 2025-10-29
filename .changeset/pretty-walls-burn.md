@@ -4,4 +4,4 @@
 '@clerk/types': patch
 ---
 
-Add title attribute to email address field with the recommended format.
+Localize aria-labels within `UserButton` and `OrganizationSwitcher` triggers.

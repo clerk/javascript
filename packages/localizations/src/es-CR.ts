@@ -492,9 +492,11 @@ export const esCR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear Organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Administrar Organización',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Espacio personal',
@@ -950,7 +952,9 @@ export const esCR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Añadir cuenta',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrar cuenta',
+    action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
   },

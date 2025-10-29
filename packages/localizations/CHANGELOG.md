@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.26.3
+
+### Patch Changes
+
+- Add title attribute to email address field with the recommended format. ([#6956](https://github.com/clerk/javascript/pull/6956)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Added missing translations for the fr-FR localization. ([#6950](https://github.com/clerk/javascript/pull/6950)) by [@semleti](https://github.com/semleti)
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911)]:
+  - @clerk/types@4.95.1
+
 ## 3.26.2
 
 ### Patch Changes

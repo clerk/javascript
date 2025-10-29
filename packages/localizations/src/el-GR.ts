@@ -489,9 +489,11 @@ export const elGR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Δημιουργία Οργανισμού',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Διαχείριση Οργανισμού',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Δεν έχει επιλεγεί οργανισμός',
     personalWorkspace: 'Προσωπικός Χώρος Εργασίας',
@@ -946,7 +948,9 @@ export const elGR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Προσθήκη λογαριασμού',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Διαχείριση λογαριασμού',
+    action__openUserMenu: undefined,
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },

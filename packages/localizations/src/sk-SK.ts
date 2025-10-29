@@ -489,9 +489,11 @@ export const skSK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvoriť organizáciu',
     action__invitationAccept: 'Pripojiť sa',
     action__manageOrganization: 'Spravovať organizáciu',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požiadať o pripojenie',
     notSelected: 'Nie je vybraná žiadna organizácia',
     personalWorkspace: 'Osobný pracovný priestor',
@@ -947,7 +949,9 @@ export const skSK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Pridať účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovať účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásiť sa',
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },

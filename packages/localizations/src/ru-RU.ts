@@ -496,9 +496,11 @@ export const ruRU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
     action__manageOrganization: 'Настройки',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
     personalWorkspace: 'Личный профиль',
@@ -955,7 +957,9 @@ export const ruRU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавить учетную запись',
+    action__closeUserMenu: 'Закрыть меню пользователя',
     action__manageAccount: 'Управление учетной записью',
+    action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
   },

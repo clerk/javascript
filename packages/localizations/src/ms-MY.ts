@@ -491,9 +491,11 @@ export const msMY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Cipta organisasi',
     action__invitationAccept: 'Sertai',
     action__manageOrganization: 'Urus',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta untuk menyertai',
     notSelected: 'Tiada organisasi dipilih',
     personalWorkspace: 'Akaun peribadi',
@@ -955,7 +957,9 @@ export const msMY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tambah akaun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Urus akaun',
+    action__openUserMenu: undefined,
     action__signOut: 'Daftar keluar',
     action__signOutAll: 'Daftar keluar dari semua akaun',
   },
