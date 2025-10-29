@@ -21,7 +21,7 @@ export const useUserButtonContext = () => {
     throw new Error('Clerk: useUserButtonContext called outside of the mounted UserButton component.');
   }
 
-  const { componentName, customMenuItems, ...ctx } = context;
+  const { componentName, customMenuItems, signOutCallback, ...ctx } = context;
 
   const signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
@@ -31,7 +31,7 @@ export const useUserButtonContext = () => {
   }
 
   const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
-  const navigateAfterSignOut = () => navigate(afterSignOutUrl);
+  const navigateAfterSignOut = signOutCallback || (() => navigate(afterSignOutUrl));
 
   if (ctx.afterSignOutUrl) {
     deprecatedObjectProperty(
@@ -42,7 +42,8 @@ export const useUserButtonContext = () => {
   }
   const afterMultiSessionSingleSignOutUrl =
     ctx.afterMultiSessionSingleSignOutUrl || clerk.buildAfterMultiSessionSingleSignOutUrl();
-  const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
+  const navigateAfterMultiSessionSingleSignOut =
+    signOutCallback || (() => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl));
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;
 
