@@ -491,9 +491,11 @@ export const teIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'సంస్థను సృష్టించండి',
     action__invitationAccept: 'చేరండి',
     action__manageOrganization: 'నిర్వహించండి',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
     notSelected: 'సంస్థ ఎంచుకోబడలేదు',
     personalWorkspace: 'వ్యక్తిగత ఖాతా',
@@ -952,7 +954,9 @@ export const teIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'ఖాతాను జోడించండి',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'ఖాతాను నిర్వహించండి',
+    action__openUserMenu: undefined,
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
   },

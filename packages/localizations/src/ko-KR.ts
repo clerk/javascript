@@ -486,9 +486,11 @@ export const koKR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '조직 만들기',
     action__invitationAccept: 'Join',
     action__manageOrganization: '조직 관리',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: '선택한 조직 없음',
     personalWorkspace: '개인 워크스페이스',
@@ -934,7 +936,9 @@ export const koKR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '계정 추가',
+    action__closeUserMenu: '사용자 메뉴 닫기',
     action__manageAccount: '계정 관리',
+    action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
   },

@@ -489,9 +489,11 @@ export const trTR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organizasyon oluştur',
     action__invitationAccept: 'Katıl',
     action__manageOrganization: 'Organizasyonu yönet',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Katılmak için talepte bulun',
     notSelected: 'Organizasyon seçilmedi',
     personalWorkspace: 'Kişisel Çalışma Alanı',
@@ -944,7 +946,9 @@ export const trTR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Hesap ekle',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hesabı yönet',
+    action__openUserMenu: undefined,
     action__signOut: 'Çıkış yap',
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
