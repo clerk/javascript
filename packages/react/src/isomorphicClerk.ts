@@ -54,7 +54,7 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';

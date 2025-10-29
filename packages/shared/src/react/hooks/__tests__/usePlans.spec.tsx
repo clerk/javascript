@@ -41,8 +41,7 @@ vi.mock('../../contexts', () => {
   };
 });
 
-import type { BillingPlanResource } from '@clerk/types';
-
+import type { BillingPlanResource } from '../../../types/billing';
 import { usePlans } from '../usePlans';
 import { wrapper } from './wrapper';
 

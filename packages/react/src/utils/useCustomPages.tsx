@@ -1,5 +1,5 @@
 import { logErrorInDevMode } from '@clerk/shared/utils';
-import type { CustomPage } from '@clerk/types';
+import type { CustomPage } from '@clerk/shared/types';
 import type { ReactElement } from 'react';
 import React from 'react';
 

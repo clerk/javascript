@@ -15,7 +15,7 @@ import type {
   UserProfileProps,
   WaitlistProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
