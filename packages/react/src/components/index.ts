@@ -22,12 +22,9 @@ export {
   ClerkLoaded,
   ClerkLoading,
   Protect,
-  RedirectToCreateOrganization,
-  RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToTasks,
-  RedirectToUserProfile,
   SignedIn,
   SignedOut,
 } from './controlComponents';

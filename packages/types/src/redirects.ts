@@ -16,32 +16,13 @@ export type AfterMultiSessionSingleSignOutUrl = {
 };
 
 /**
- * @deprecated This will be removed in a future release.
- */
-export type LegacyRedirectProps = {
-  /**
-   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
-   */
-  afterSignInUrl?: string | null;
-  /**
-   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
-   */
-  afterSignUpUrl?: string | null;
-  /**
-   * @deprecated Use `fallbackRedirectUrl` or `forceRedirectUrl` instead.
-   */
-  redirectUrl?: string | null;
-};
-
-/**
  * Redirect URLs for different actions.
  * Mainly used to be used to type internal Clerk functions.
  */
 export type RedirectOptions = SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  SignUpFallbackRedirectUrl;
 
 export type AuthenticateWithRedirectParams = {
   /**

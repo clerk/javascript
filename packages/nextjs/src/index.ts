@@ -8,12 +8,9 @@ export {
   ClerkFailed,
   ClerkLoaded,
   ClerkLoading,
-  RedirectToCreateOrganization,
-  RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToTasks,
-  RedirectToUserProfile,
 } from './client-boundary/controlComponents';
 
 /**
