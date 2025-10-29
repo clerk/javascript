@@ -165,9 +165,6 @@
     "overrides": {
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3"
-    },
-    "patchedDependencies": {
-      "yalc@1.0.0-pre.53": "patches/yalc@1.0.0-pre.53.patch"
     }
   }
 }

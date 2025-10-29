@@ -43,11 +43,6 @@ overrides:
   jest: 29.7.0
   jest-snapshot-prettier: npm:prettier@^3.5.3
 
-patchedDependencies:
-  yalc@1.0.0-pre.53:
-    hash: 2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f
-    path: patches/yalc@1.0.0-pre.53.patch
-
 importers:
 
   .:
@@ -309,7 +304,7 @@ importers:
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.10)(jiti@2.6.1)(jsdom@27.0.0(postcss@8.5.6))(lightningcss@1.30.2)(msw@2.11.4(@types/node@22.18.10)(typescript@5.8.3))(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
       yalc:
         specifier: 1.0.0-pre.53
-        version: 1.0.0-pre.53(patch_hash=2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f)
+        version: 1.0.0-pre.53
       zx:
         specifier: catalog:repo
         version: 8.8.4
@@ -32617,7 +32612,7 @@ snapshots:
 
   y18n@5.0.8: {}
 
-  yalc@1.0.0-pre.53(patch_hash=2737a4bf8dd6ebdc410626225fe706ae0bb73b142e398279afff04d1b02dfc1f):
+  yalc@1.0.0-pre.53:
     dependencies:
       chalk: 4.1.2
       detect-indent: 6.1.0
