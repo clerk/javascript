@@ -15,6 +15,11 @@ function parseSemverMajor(range?: string): number | undefined {
   return match ? Number.parseInt(match[0], 10) : undefined;
 }
 
+/**
+ * Detects the installed Next.js version for a given application.
+ * Reads the version from node_modules/next/package.json to ensure
+ * we get the actual installed version rather than a tag like "latest" or "canary".
+ */
 async function detectNext(app: Application): Promise<{ version: string | undefined | null }> {
   // app.appDir exists for normal Application; for long-running apps, read it from the state file by serverUrl
   const appDir =
@@ -25,16 +30,12 @@ async function detectNext(app: Application): Promise<{ version: string | undefin
     return { version: null };
   }
 
-  // const pkg = await fs.readJSON(path.join(appDir, 'package.json'));
-  // const nextRange: string | undefined = pkg.dependencies?.next || pkg.devDependencies?.next;
-  // Prefer the resolved installed version from node_modules if available. This avoids issues with tags like
-  // "latest" or "canary" specified in the dependency range, ensuring we always parse a numeric semver.
   let installedVersion: string | undefined;
   try {
     const nextPkg = await fs.readJSON(path.join(appDir, 'node_modules', 'next', 'package.json'));
     installedVersion = String(nextPkg?.version || '');
   } catch {
-    // Ignore if not installed yet; we'll fall back to the declared range
+    // ignore
   }
 
   console.log('---detectNext---', installedVersion);
