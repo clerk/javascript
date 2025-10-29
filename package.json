@@ -78,7 +78,7 @@
     "@faker-js/faker": "^9.9.0",
     "@jest/globals": "29.7.0",
     "@octokit/rest": "^20.1.2",
-    "@playwright/test": "^1.44.0",
+    "@playwright/test": "^1.56.1",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
