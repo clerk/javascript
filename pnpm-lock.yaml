@@ -2257,12 +2257,6 @@ packages:
     cpu: [ppc64]
     os: [aix]
 
-  '@esbuild/aix-ppc64@0.25.0':
-    resolution: {integrity: sha512-O7vun9Sf8DFjH2UtqK8Ku3LkquL9SZL8OLY1T5NZkA34+wG3OQF7cl4Ql8vdNzM6fzBbYfLaiRLIOZ+2FOCgBQ==}
-    engines: {node: '>=18'}
-    cpu: [ppc64]
-    os: [aix]
-
   '@esbuild/aix-ppc64@0.25.10':
     resolution: {integrity: sha512-0NFWnA+7l41irNuaSVlLfgNT12caWJVLzp5eAVhZ0z1qpxbockccEt3s+149rE64VUI3Ml2zt8Nv5JVc4QXTsw==}
     engines: {node: '>=18'}
@@ -2271,12 +2265,6 @@ packages:
 
   '@esbuild/android-arm64@0.23.1':
     resolution: {integrity: sha512-xw50ipykXcLstLeWH7WRdQuysJqejuAGPd30vd1i5zSyKK3WE+ijzHmLKxdiCMtH1pHz78rOg0BKSYOSB/2Khw==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [android]
-
-  '@esbuild/android-arm64@0.25.0':
-    resolution: {integrity: sha512-grvv8WncGjDSyUBjN9yHXNt+cq0snxXbDxy5pJtzMKGmmpPxeAmAhWxXI+01lU5rwZomDgD3kJwulEnhTRUd6g==}
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [android]
@@ -2293,12 +2281,6 @@ packages:
     cpu: [arm]
     os: [android]
 
-  '@esbuild/android-arm@0.25.0':
-    resolution: {integrity: sha512-PTyWCYYiU0+1eJKmw21lWtC+d08JDZPQ5g+kFyxP0V+es6VPPSUhM6zk8iImp2jbV6GwjX4pap0JFbUQN65X1g==}
-    engines: {node: '>=18'}
-    cpu: [arm]
-    os: [android]
-
   '@esbuild/android-arm@0.25.10':
     resolution: {integrity: sha512-dQAxF1dW1C3zpeCDc5KqIYuZ1tgAdRXNoZP7vkBIRtKZPYe2xVr/d3SkirklCHudW1B45tGiUlz2pUWDfbDD4w==}
     engines: {node: '>=18'}
@@ -2307,12 +2289,6 @@ packages:
 
   '@esbuild/android-x64@0.23.1':
     resolution: {integrity: sha512-nlN9B69St9BwUoB+jkyU090bru8L0NA3yFvAd7k8dNsVH8bi9a8cUAUSEcEEgTp2z3dbEDGJGfP6VUnkQnlReg==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [android]
-
-  '@esbuild/android-x64@0.25.0':
-    resolution: {integrity: sha512-m/ix7SfKG5buCnxasr52+LI78SQ+wgdENi9CqyCXwjVR2X4Jkz+BpC3le3AoBPYTC9NHklwngVXvbJ9/Akhrfg==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [android]
@@ -2329,12 +2305,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
-  '@esbuild/darwin-arm64@0.25.0':
-    resolution: {integrity: sha512-mVwdUb5SRkPayVadIOI78K7aAnPamoeFR2bT5nszFUZ9P8UpK4ratOdYbZZXYSqPKMHfS1wdHCJk1P1EZpRdvw==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [darwin]
-
   '@esbuild/darwin-arm64@0.25.10':
     resolution: {integrity: sha512-JC74bdXcQEpW9KkV326WpZZjLguSZ3DfS8wrrvPMHgQOIEIG/sPXEN/V8IssoJhbefLRcRqw6RQH2NnpdprtMA==}
     engines: {node: '>=18'}
@@ -2343,12 +2313,6 @@ packages:
 
   '@esbuild/darwin-x64@0.23.1':
     resolution: {integrity: sha512-aClqdgTDVPSEGgoCS8QDG37Gu8yc9lTHNAQlsztQ6ENetKEO//b8y31MMu2ZaPbn4kVsIABzVLXYLhCGekGDqw==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [darwin]
-
-  '@esbuild/darwin-x64@0.25.0':
-    resolution: {integrity: sha512-DgDaYsPWFTS4S3nWpFcMn/33ZZwAAeAFKNHNa1QN0rI4pUjgqf0f7ONmXf6d22tqTY+H9FNdgeaAa+YIFUn2Rg==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [darwin]
@@ -2365,12 +2329,6 @@ packages:
     cpu: [arm64]
     os: [freebsd]
 
-  '@esbuild/freebsd-arm64@0.25.0':
-    resolution: {integrity: sha512-VN4ocxy6dxefN1MepBx/iD1dH5K8qNtNe227I0mnTRjry8tj5MRk4zprLEdG8WPyAPb93/e4pSgi1SoHdgOa4w==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [freebsd]
-
   '@esbuild/freebsd-arm64@0.25.10':
     resolution: {integrity: sha512-3ZioSQSg1HT2N05YxeJWYR+Libe3bREVSdWhEEgExWaDtyFbbXWb49QgPvFH8u03vUPX10JhJPcz7s9t9+boWg==}
     engines: {node: '>=18'}
@@ -2379,12 +2337,6 @@ packages:
 
   '@esbuild/freebsd-x64@0.23.1':
     resolution: {integrity: sha512-lK1eJeyk1ZX8UklqFd/3A60UuZ/6UVfGT2LuGo3Wp4/z7eRTRYY+0xOu2kpClP+vMTi9wKOfXi2vjUpO1Ro76g==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [freebsd]
-
-  '@esbuild/freebsd-x64@0.25.0':
-    resolution: {integrity: sha512-mrSgt7lCh07FY+hDD1TxiTyIHyttn6vnjesnPoVDNmDfOmggTLXRv8Id5fNZey1gl/V2dyVK1VXXqVsQIiAk+A==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [freebsd]
@@ -2401,12 +2353,6 @@ packages:
     cpu: [arm64]
     os: [linux]
 
-  '@esbuild/linux-arm64@0.25.0':
-    resolution: {integrity: sha512-9QAQjTWNDM/Vk2bgBl17yWuZxZNQIF0OUUuPZRKoDtqF2k4EtYbpyiG5/Dk7nqeK6kIJWPYldkOcBqjXjrUlmg==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [linux]
-
   '@esbuild/linux-arm64@0.25.10':
     resolution: {integrity: sha512-5luJWN6YKBsawd5f9i4+c+geYiVEw20FVW5x0v1kEMWNq8UctFjDiMATBxLvmmHA4bf7F6hTRaJgtghFr9iziQ==}
     engines: {node: '>=18'}
@@ -2415,12 +2361,6 @@ packages:
 
   '@esbuild/linux-arm@0.23.1':
     resolution: {integrity: sha512-CXXkzgn+dXAPs3WBwE+Kvnrf4WECwBdfjfeYHpMeVxWE0EceB6vhWGShs6wi0IYEqMSIzdOF1XjQ/Mkm5d7ZdQ==}
-    engines: {node: '>=18'}
-    cpu: [arm]
-    os: [linux]
-
-  '@esbuild/linux-arm@0.25.0':
-    resolution: {integrity: sha512-vkB3IYj2IDo3g9xX7HqhPYxVkNQe8qTK55fraQyTzTX/fxaDtXiEnavv9geOsonh2Fd2RMB+i5cbhu2zMNWJwg==}
     engines: {node: '>=18'}
     cpu: [arm]
     os: [linux]
@@ -2437,12 +2377,6 @@ packages:
     cpu: [ia32]
     os: [linux]
 
-  '@esbuild/linux-ia32@0.25.0':
-    resolution: {integrity: sha512-43ET5bHbphBegyeqLb7I1eYn2P/JYGNmzzdidq/w0T8E2SsYL1U6un2NFROFRg1JZLTzdCoRomg8Rvf9M6W6Gg==}
-    engines: {node: '>=18'}
-    cpu: [ia32]
-    os: [linux]
-
   '@esbuild/linux-ia32@0.25.10':
     resolution: {integrity: sha512-NrSCx2Kim3EnnWgS4Txn0QGt0Xipoumb6z6sUtl5bOEZIVKhzfyp/Lyw4C1DIYvzeW/5mWYPBFJU3a/8Yr75DQ==}
     engines: {node: '>=18'}
@@ -2451,12 +2385,6 @@ packages:
 
   '@esbuild/linux-loong64@0.23.1':
     resolution: {integrity: sha512-Vx09LzEoBa5zDnieH8LSMRToj7ir/Jeq0Gu6qJ/1GcBq9GkfoEAoXvLiW1U9J1qE/Y/Oyaq33w5p2ZWrNNHNEw==}
-    engines: {node: '>=18'}
-    cpu: [loong64]
-    os: [linux]
-
-  '@esbuild/linux-loong64@0.25.0':
-    resolution: {integrity: sha512-fC95c/xyNFueMhClxJmeRIj2yrSMdDfmqJnyOY4ZqsALkDrrKJfIg5NTMSzVBr5YW1jf+l7/cndBfP3MSDpoHw==}
     engines: {node: '>=18'}
     cpu: [loong64]
     os: [linux]
@@ -2473,12 +2401,6 @@ packages:
     cpu: [mips64el]
     os: [linux]
 
-  '@esbuild/linux-mips64el@0.25.0':
-    resolution: {integrity: sha512-nkAMFju7KDW73T1DdH7glcyIptm95a7Le8irTQNO/qtkoyypZAnjchQgooFUDQhNAy4iu08N79W4T4pMBwhPwQ==}
-    engines: {node: '>=18'}
-    cpu: [mips64el]
-    os: [linux]
-
   '@esbuild/linux-mips64el@0.25.10':
     resolution: {integrity: sha512-ab6eiuCwoMmYDyTnyptoKkVS3k8fy/1Uvq7Dj5czXI6DF2GqD2ToInBI0SHOp5/X1BdZ26RKc5+qjQNGRBelRA==}
     engines: {node: '>=18'}
@@ -2487,12 +2409,6 @@ packages:
 
   '@esbuild/linux-ppc64@0.23.1':
     resolution: {integrity: sha512-dKN8fgVqd0vUIjxuJI6P/9SSSe/mB9rvA98CSH2sJnlZ/OCZWO1DJvxj8jvKTfYUdGfcq2dDxoKaC6bHuTlgcw==}
-    engines: {node: '>=18'}
-    cpu: [ppc64]
-    os: [linux]
-
-  '@esbuild/linux-ppc64@0.25.0':
-    resolution: {integrity: sha512-NhyOejdhRGS8Iwv+KKR2zTq2PpysF9XqY+Zk77vQHqNbo/PwZCzB5/h7VGuREZm1fixhs4Q/qWRSi5zmAiO4Fw==}
     engines: {node: '>=18'}
     cpu: [ppc64]
     os: [linux]
@@ -2509,12 +2425,6 @@ packages:
     cpu: [riscv64]
     os: [linux]
 
-  '@esbuild/linux-riscv64@0.25.0':
-    resolution: {integrity: sha512-5S/rbP5OY+GHLC5qXp1y/Mx//e92L1YDqkiBbO9TQOvuFXM+iDqUNG5XopAnXoRH3FjIUDkeGcY1cgNvnXp/kA==}
-    engines: {node: '>=18'}
-    cpu: [riscv64]
-    os: [linux]
-
   '@esbuild/linux-riscv64@0.25.10':
     resolution: {integrity: sha512-FE557XdZDrtX8NMIeA8LBJX3dC2M8VGXwfrQWU7LB5SLOajfJIxmSdyL/gU1m64Zs9CBKvm4UAuBp5aJ8OgnrA==}
     engines: {node: '>=18'}
@@ -2523,12 +2433,6 @@ packages:
 
   '@esbuild/linux-s390x@0.23.1':
     resolution: {integrity: sha512-9ygs73tuFCe6f6m/Tb+9LtYxWR4c9yg7zjt2cYkjDbDpV/xVn+68cQxMXCjUpYwEkze2RcU/rMnfIXNRFmSoDw==}
-    engines: {node: '>=18'}
-    cpu: [s390x]
-    os: [linux]
-
-  '@esbuild/linux-s390x@0.25.0':
-    resolution: {integrity: sha512-XM2BFsEBz0Fw37V0zU4CXfcfuACMrppsMFKdYY2WuTS3yi8O1nFOhil/xhKTmE1nPmVyvQJjJivgDT+xh8pXJA==}
     engines: {node: '>=18'}
     cpu: [s390x]
     os: [linux]
@@ -2545,23 +2449,11 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@esbuild/linux-x64@0.25.0':
-    resolution: {integrity: sha512-9yl91rHw/cpwMCNytUDxwj2XjFpxML0y9HAOH9pNVQDpQrBxHy01Dx+vaMu0N1CKa/RzBD2hB4u//nfc+Sd3Cw==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [linux]
-
   '@esbuild/linux-x64@0.25.10':
     resolution: {integrity: sha512-QSX81KhFoZGwenVyPoberggdW1nrQZSvfVDAIUXr3WqLRZGZqWk/P4T8p2SP+de2Sr5HPcvjhcJzEiulKgnxtA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
-
-  '@esbuild/netbsd-arm64@0.25.0':
-    resolution: {integrity: sha512-RuG4PSMPFfrkH6UwCAqBzauBWTygTvb1nxWasEJooGSJ/NwRw7b2HOwyRTQIU97Hq37l3npXoZGYMy3b3xYvPw==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [netbsd]
 
   '@esbuild/netbsd-arm64@0.25.10':
     resolution: {integrity: sha512-AKQM3gfYfSW8XRk8DdMCzaLUFB15dTrZfnX8WXQoOUpUBQ+NaAFCP1kPS/ykbbGYz7rxn0WS48/81l9hFl3u4A==}
@@ -2571,12 +2463,6 @@ packages:
 
   '@esbuild/netbsd-x64@0.23.1':
     resolution: {integrity: sha512-aevEkCNu7KlPRpYLjwmdcuNz6bDFiE7Z8XC4CPqExjTvrHugh28QzUXVOZtiYghciKUacNktqxdpymplil1beA==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [netbsd]
-
-  '@esbuild/netbsd-x64@0.25.0':
-    resolution: {integrity: sha512-jl+qisSB5jk01N5f7sPCsBENCOlPiS/xptD5yxOx2oqQfyourJwIKLRA2yqWdifj3owQZCL2sn6o08dBzZGQzA==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [netbsd]
@@ -2593,12 +2479,6 @@ packages:
     cpu: [arm64]
     os: [openbsd]
 
-  '@esbuild/openbsd-arm64@0.25.0':
-    resolution: {integrity: sha512-21sUNbq2r84YE+SJDfaQRvdgznTD8Xc0oc3p3iW/a1EVWeNj/SdUCbm5U0itZPQYRuRTW20fPMWMpcrciH2EJw==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [openbsd]
-
   '@esbuild/openbsd-arm64@0.25.10':
     resolution: {integrity: sha512-5Se0VM9Wtq797YFn+dLimf2Zx6McttsH2olUBsDml+lm0GOCRVebRWUvDtkY4BWYv/3NgzS8b/UM3jQNh5hYyw==}
     engines: {node: '>=18'}
@@ -2607,12 +2487,6 @@ packages:
 
   '@esbuild/openbsd-x64@0.23.1':
     resolution: {integrity: sha512-aY2gMmKmPhxfU+0EdnN+XNtGbjfQgwZj43k8G3fyrDM/UdZww6xrWxmDkuz2eCZchqVeABjV5BpildOrUbBTqA==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [openbsd]
-
-  '@esbuild/openbsd-x64@0.25.0':
-    resolution: {integrity: sha512-2gwwriSMPcCFRlPlKx3zLQhfN/2WjJ2NSlg5TKLQOJdV0mSxIcYNTMhk3H3ulL/cak+Xj0lY1Ym9ysDV1igceg==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [openbsd]
@@ -2635,12 +2509,6 @@ packages:
     cpu: [x64]
     os: [sunos]
 
-  '@esbuild/sunos-x64@0.25.0':
-    resolution: {integrity: sha512-bxI7ThgLzPrPz484/S9jLlvUAHYMzy6I0XiU1ZMeAEOBcS0VePBFxh1JjTQt3Xiat5b6Oh4x7UC7IwKQKIJRIg==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [sunos]
-
   '@esbuild/sunos-x64@0.25.10':
     resolution: {integrity: sha512-fswk3XT0Uf2pGJmOpDB7yknqhVkJQkAQOcW/ccVOtfx05LkbWOaRAtn5SaqXypeKQra1QaEa841PgrSL9ubSPQ==}
     engines: {node: '>=18'}
@@ -2649,12 +2517,6 @@ packages:
 
   '@esbuild/win32-arm64@0.23.1':
     resolution: {integrity: sha512-4O+gPR5rEBe2FpKOVyiJ7wNDPA8nGzDuJ6gN4okSA1gEOYZ67N8JPk58tkWtdtPeLz7lBnY6I5L3jdsr3S+A6A==}
-    engines: {node: '>=18'}
-    cpu: [arm64]
-    os: [win32]
-
-  '@esbuild/win32-arm64@0.25.0':
-    resolution: {integrity: sha512-ZUAc2YK6JW89xTbXvftxdnYy3m4iHIkDtK3CLce8wg8M2L+YZhIvO1DKpxrd0Yr59AeNNkTiic9YLf6FTtXWMw==}
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [win32]
@@ -2671,12 +2533,6 @@ packages:
     cpu: [ia32]
     os: [win32]
 
-  '@esbuild/win32-ia32@0.25.0':
-    resolution: {integrity: sha512-eSNxISBu8XweVEWG31/JzjkIGbGIJN/TrRoiSVZwZ6pkC6VX4Im/WV2cz559/TXLcYbcrDN8JtKgd9DJVIo8GA==}
-    engines: {node: '>=18'}
-    cpu: [ia32]
-    os: [win32]
-
   '@esbuild/win32-ia32@0.25.10':
     resolution: {integrity: sha512-QHPDbKkrGO8/cz9LKVnJU22HOi4pxZnZhhA2HYHez5Pz4JeffhDjf85E57Oyco163GnzNCVkZK0b/n4Y0UHcSw==}
     engines: {node: '>=18'}
@@ -2685,12 +2541,6 @@ packages:
 
   '@esbuild/win32-x64@0.23.1':
     resolution: {integrity: sha512-BHpFFeslkWrXWyUPnbKm+xYYVYruCinGcftSBaa8zoF9hZO4BcSCFUvHVTtzpIY6YzUnYtuEhZ+C9iEXjxnasg==}
-    engines: {node: '>=18'}
-    cpu: [x64]
-    os: [win32]
-
-  '@esbuild/win32-x64@0.25.0':
-    resolution: {integrity: sha512-ZENoHJBxA20C2zFzh6AI4fT6RraMzjYw4xKWemRTRmRVtN9c5DcH9r/f2ihEkMjOW5eGgrwCslG/+Y/3bL+DHQ==}
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
@@ -2745,7 +2595,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -3469,9 +3319,6 @@ packages:
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
-
-  '@napi-rs/wasm-runtime@1.0.5':
-    resolution: {integrity: sha512-TBr9Cf9onSAS2LQ2+QHx6XcC6h9+RIzJgbqG3++9TUZSH204AwEy5jg3BTQ0VATsyoGj4ee49tN/y6rvaOOtcg==}
 
   '@napi-rs/wasm-runtime@1.0.7':
     resolution: {integrity: sha512-SeDnOO0Tk7Okiq6DbXmmBODgOAb9dp9gjlphokTUxmt8U3liIP1ZsozBahH69j/RJv+Rfs6IwUKHTgQYJ/HBAw==}
@@ -4583,9 +4430,6 @@ packages:
 
   '@rolldown/pluginutils@1.0.0-beta.45':
     resolution: {integrity: sha512-Le9ulGCrD8ggInzWw/k2J8QcbPz7eGIOWqfJ2L+1R0Opm7n6J37s2hiDWlh6LJN0Lk9L5sUzMvRHKW7UxBZsQA==}
-
-  '@rolldown/pluginutils@1.0.0-beta.9-commit.d91dfb5':
-    resolution: {integrity: sha512-8sExkWRK+zVybw3+2/kBkYBFeLnEUWz1fT7BLHplpzmtqkOfTbAQ9gkt4pzwGIIZmg4Qn5US5ACjUBenrhezwQ==}
 
   '@rollup/plugin-alias@5.1.1':
     resolution: {integrity: sha512-PR9zDb+rOzkRb2VD+EuKB7UC41vU5DIwZ5qqCpk0KJudcWAyi8rvYOhS7+L5aZCspw1stTViLgN5v6FF1p5cgQ==}
@@ -6377,10 +6221,6 @@ packages:
     resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
     engines: {node: '>=12'}
 
-  ansis@4.1.0:
-    resolution: {integrity: sha512-BGcItUBWSMRgOCe+SVZJ+S7yTRG0eGt9cXAHev72yuGcY23hnLA7Bky5L/xLyPINoSN95geovfBkqoTlNZYa7w==}
-    engines: {node: '>=14'}
-
   ansis@4.2.0:
     resolution: {integrity: sha512-HqZ5rWlFjGiV0tDm3UxxgNRqsOTniqoKZu0pIAfh7TZQMGuZK+hH0drySty0si0QXj1ieop4+SkSfPZBPPkHig==}
     engines: {node: '>=14'}
@@ -6505,10 +6345,6 @@ packages:
   assertion-error@2.0.1:
     resolution: {integrity: sha512-Izi8RQcffqCeNVgFigKli1ssklIbpHnCYc6AknXGYoB6grJqyeby7jv12JUQgmTAnIDnbck1uxksT4dzN3PWBA==}
     engines: {node: '>=12'}
-
-  ast-kit@2.1.1:
-    resolution: {integrity: sha512-mfh6a7gKXE8pDlxTvqIc/syH/P3RkzbOF6LeHdcKztLEzYe6IMsRCL7N8vI7hqTGWNxpkCuuRTpT21xNWqhRtQ==}
-    engines: {node: '>=20.18.0'}
 
   ast-kit@2.1.3:
     resolution: {integrity: sha512-TH+b3Lv6pUjy/Nu0m6A2JULtdzLpmqF9x1Dhj00ZoEiML8qvVA9j1flkzTKNYgdEhWrjDwtWNpyyCUbfQe514g==}
@@ -6769,9 +6605,6 @@ packages:
 
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
-
-  birpc@2.5.0:
-    resolution: {integrity: sha512-VSWO/W6nNQdyP520F1mhf+Lc2f8pjGQOtoHHm7Ze8Go1kX7akpVIrtTa0fn+HB0QJEDVacl6aO08YE0PgXfdnQ==}
 
   birpc@2.6.1:
     resolution: {integrity: sha512-LPnFhlDpdSH6FJhJyn4M0kFO7vtQ5iPw24FnG0y21q09xC7e8+1LeR31S1MAIrDAHp4m7aas4bEkTDTvMAtebQ==}
@@ -8264,11 +8097,6 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  esbuild@0.25.0:
-    resolution: {integrity: sha512-BXq5mqc8ltbaN34cDqWuYKyNhX8D/Z0J1xdtdQ8UcIIIyJyz+ZMKUt58tF3SrZ85jcfN/PZYhjR5uDQAYNVbuw==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   esbuild@0.25.10:
     resolution: {integrity: sha512-9RiGKvCwaqxO2owP61uQ4BgNborAQskMR6QusfWzQqv7AZOg5oGehdY2pRJMTKuwxd1IDBP4rSbI5lHzU7SMsQ==}
     engines: {node: '>=18'}
@@ -9161,9 +8989,6 @@ packages:
   get-symbol-description@1.1.0:
     resolution: {integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==}
     engines: {node: '>= 0.4'}
-
-  get-tsconfig@4.10.0:
-    resolution: {integrity: sha512-kGzZ3LWWQcGIAmg6iWvXn0ei6WDtV26wzHRMwDSzmAbcXrTEXxHy6IehI6/4eT6VRKyMP1eF1VqwrVUmE/LR7A==}
 
   get-tsconfig@4.13.0:
     resolution: {integrity: sha512-1VKTZJCwBrvbd+Wn3AOgQP/2Av+TfTCOlE4AcRJE72W1ksZXbAx8PPBR9RzgTeSPzlPMHrbANMH3LbltH73wxQ==}
@@ -10487,6 +10312,7 @@ packages:
   keygrip@1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
     engines: {node: '>= 0.6'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -17142,16 +16968,10 @@ snapshots:
   '@esbuild/aix-ppc64@0.23.1':
     optional: true
 
-  '@esbuild/aix-ppc64@0.25.0':
-    optional: true
-
   '@esbuild/aix-ppc64@0.25.10':
     optional: true
 
   '@esbuild/android-arm64@0.23.1':
-    optional: true
-
-  '@esbuild/android-arm64@0.25.0':
     optional: true
 
   '@esbuild/android-arm64@0.25.10':
@@ -17160,16 +16980,10 @@ snapshots:
   '@esbuild/android-arm@0.23.1':
     optional: true
 
-  '@esbuild/android-arm@0.25.0':
-    optional: true
-
   '@esbuild/android-arm@0.25.10':
     optional: true
 
   '@esbuild/android-x64@0.23.1':
-    optional: true
-
-  '@esbuild/android-x64@0.25.0':
     optional: true
 
   '@esbuild/android-x64@0.25.10':
@@ -17178,16 +16992,10 @@ snapshots:
   '@esbuild/darwin-arm64@0.23.1':
     optional: true
 
-  '@esbuild/darwin-arm64@0.25.0':
-    optional: true
-
   '@esbuild/darwin-arm64@0.25.10':
     optional: true
 
   '@esbuild/darwin-x64@0.23.1':
-    optional: true
-
-  '@esbuild/darwin-x64@0.25.0':
     optional: true
 
   '@esbuild/darwin-x64@0.25.10':
@@ -17196,16 +17004,10 @@ snapshots:
   '@esbuild/freebsd-arm64@0.23.1':
     optional: true
 
-  '@esbuild/freebsd-arm64@0.25.0':
-    optional: true
-
   '@esbuild/freebsd-arm64@0.25.10':
     optional: true
 
   '@esbuild/freebsd-x64@0.23.1':
-    optional: true
-
-  '@esbuild/freebsd-x64@0.25.0':
     optional: true
 
   '@esbuild/freebsd-x64@0.25.10':
@@ -17214,16 +17016,10 @@ snapshots:
   '@esbuild/linux-arm64@0.23.1':
     optional: true
 
-  '@esbuild/linux-arm64@0.25.0':
-    optional: true
-
   '@esbuild/linux-arm64@0.25.10':
     optional: true
 
   '@esbuild/linux-arm@0.23.1':
-    optional: true
-
-  '@esbuild/linux-arm@0.25.0':
     optional: true
 
   '@esbuild/linux-arm@0.25.10':
@@ -17232,16 +17028,10 @@ snapshots:
   '@esbuild/linux-ia32@0.23.1':
     optional: true
 
-  '@esbuild/linux-ia32@0.25.0':
-    optional: true
-
   '@esbuild/linux-ia32@0.25.10':
     optional: true
 
   '@esbuild/linux-loong64@0.23.1':
-    optional: true
-
-  '@esbuild/linux-loong64@0.25.0':
     optional: true
 
   '@esbuild/linux-loong64@0.25.10':
@@ -17250,16 +17040,10 @@ snapshots:
   '@esbuild/linux-mips64el@0.23.1':
     optional: true
 
-  '@esbuild/linux-mips64el@0.25.0':
-    optional: true
-
   '@esbuild/linux-mips64el@0.25.10':
     optional: true
 
   '@esbuild/linux-ppc64@0.23.1':
-    optional: true
-
-  '@esbuild/linux-ppc64@0.25.0':
     optional: true
 
   '@esbuild/linux-ppc64@0.25.10':
@@ -17268,16 +17052,10 @@ snapshots:
   '@esbuild/linux-riscv64@0.23.1':
     optional: true
 
-  '@esbuild/linux-riscv64@0.25.0':
-    optional: true
-
   '@esbuild/linux-riscv64@0.25.10':
     optional: true
 
   '@esbuild/linux-s390x@0.23.1':
-    optional: true
-
-  '@esbuild/linux-s390x@0.25.0':
     optional: true
 
   '@esbuild/linux-s390x@0.25.10':
@@ -17286,13 +17064,7 @@ snapshots:
   '@esbuild/linux-x64@0.23.1':
     optional: true
 
-  '@esbuild/linux-x64@0.25.0':
-    optional: true
-
   '@esbuild/linux-x64@0.25.10':
-    optional: true
-
-  '@esbuild/netbsd-arm64@0.25.0':
     optional: true
 
   '@esbuild/netbsd-arm64@0.25.10':
@@ -17301,25 +17073,16 @@ snapshots:
   '@esbuild/netbsd-x64@0.23.1':
     optional: true
 
-  '@esbuild/netbsd-x64@0.25.0':
-    optional: true
-
   '@esbuild/netbsd-x64@0.25.10':
     optional: true
 
   '@esbuild/openbsd-arm64@0.23.1':
     optional: true
 
-  '@esbuild/openbsd-arm64@0.25.0':
-    optional: true
-
   '@esbuild/openbsd-arm64@0.25.10':
     optional: true
 
   '@esbuild/openbsd-x64@0.23.1':
-    optional: true
-
-  '@esbuild/openbsd-x64@0.25.0':
     optional: true
 
   '@esbuild/openbsd-x64@0.25.10':
@@ -17331,16 +17094,10 @@ snapshots:
   '@esbuild/sunos-x64@0.23.1':
     optional: true
 
-  '@esbuild/sunos-x64@0.25.0':
-    optional: true
-
   '@esbuild/sunos-x64@0.25.10':
     optional: true
 
   '@esbuild/win32-arm64@0.23.1':
-    optional: true
-
-  '@esbuild/win32-arm64@0.25.0':
     optional: true
 
   '@esbuild/win32-arm64@0.25.10':
@@ -17349,16 +17106,10 @@ snapshots:
   '@esbuild/win32-ia32@0.23.1':
     optional: true
 
-  '@esbuild/win32-ia32@0.25.0':
-    optional: true
-
   '@esbuild/win32-ia32@0.25.10':
     optional: true
 
   '@esbuild/win32-x64@0.23.1':
-    optional: true
-
-  '@esbuild/win32-x64@0.25.0':
     optional: true
 
   '@esbuild/win32-x64@0.25.10':
@@ -18738,13 +18489,6 @@ snapshots:
       '@tybys/wasm-util': 0.10.1
     optional: true
 
-  '@napi-rs/wasm-runtime@1.0.5':
-    dependencies:
-      '@emnapi/core': 1.5.0
-      '@emnapi/runtime': 1.5.0
-      '@tybys/wasm-util': 0.10.1
-    optional: true
-
   '@napi-rs/wasm-runtime@1.0.7':
     dependencies:
       '@emnapi/core': 1.5.0
@@ -18902,7 +18646,7 @@ snapshots:
       '@nuxt/kit': 3.19.2(magicast@0.3.5)
       '@vue/devtools-core': 7.7.7(vite@7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))(vue@3.5.21(typescript@5.8.3))
       '@vue/devtools-kit': 7.7.7
-      birpc: 2.5.0
+      birpc: 2.6.1
       consola: 3.4.2
       destr: 2.0.5
       error-stack-parser-es: 1.0.5
@@ -19245,7 +18989,7 @@ snapshots:
 
   '@oxc-minify/binding-wasm32-wasi@0.87.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.5
+      '@napi-rs/wasm-runtime': 1.0.7
     optional: true
 
   '@oxc-minify/binding-win32-arm64-msvc@0.87.0':
@@ -19292,7 +19036,7 @@ snapshots:
 
   '@oxc-parser/binding-wasm32-wasi@0.87.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.5
+      '@napi-rs/wasm-runtime': 1.0.7
     optional: true
 
   '@oxc-parser/binding-win32-arm64-msvc@0.87.0':
@@ -19345,7 +19089,7 @@ snapshots:
 
   '@oxc-transform/binding-wasm32-wasi@0.87.0':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.5
+      '@napi-rs/wasm-runtime': 1.0.7
     optional: true
 
   '@oxc-transform/binding-win32-arm64-msvc@0.87.0':
@@ -20007,8 +19751,6 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.45': {}
 
-  '@rolldown/pluginutils@1.0.0-beta.9-commit.d91dfb5': {}
-
   '@rollup/plugin-alias@5.1.1(rollup@4.52.4)':
     optionalDependencies:
       rollup: 4.52.4
@@ -20272,7 +20014,7 @@ snapshots:
 
   '@rspack/binding-wasm32-wasi@1.4.11':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.0.5
+      '@napi-rs/wasm-runtime': 1.0.7
     optional: true
 
   '@rspack/binding-win32-arm64-msvc@1.4.11':
@@ -20743,7 +20485,7 @@ snapshots:
       '@babel/generator': 7.28.3
       '@babel/parser': 7.28.4
       '@babel/preset-typescript': 7.27.1(@babel/core@7.28.4)
-      ansis: 4.1.0
+      ansis: 4.2.0
       diff: 8.0.2
       fast-glob: 3.3.3
       pathe: 2.0.3
@@ -21567,7 +21309,7 @@ snapshots:
       '@babel/core': 7.28.4
       '@babel/plugin-syntax-typescript': 7.27.1(@babel/core@7.28.4)
       '@babel/plugin-transform-typescript': 7.28.0(@babel/core@7.28.4)
-      '@rolldown/pluginutils': 1.0.0-beta.9-commit.d91dfb5
+      '@rolldown/pluginutils': 1.0.0-beta.45
       '@vue/babel-plugin-jsx': 1.5.0(@babel/core@7.28.4)
       vite: 7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
       vue: 3.5.21(typescript@5.8.3)
@@ -21690,7 +21432,7 @@ snapshots:
   '@vue-macros/common@3.0.0-beta.16(vue@3.5.21(typescript@5.8.3))':
     dependencies:
       '@vue/compiler-sfc': 3.5.21
-      ast-kit: 2.1.1
+      ast-kit: 2.1.3
       local-pkg: 1.1.2
       magic-string-ast: 1.0.0
       unplugin-utils: 0.2.4
@@ -21806,7 +21548,7 @@ snapshots:
   '@vue/devtools-kit@7.7.7':
     dependencies:
       '@vue/devtools-shared': 7.7.7
-      birpc: 2.5.0
+      birpc: 2.6.1
       hookable: 5.5.3
       mitt: 3.0.1
       perfect-debounce: 1.0.0
@@ -22190,8 +21932,6 @@ snapshots:
 
   ansi-styles@6.2.3: {}
 
-  ansis@4.1.0: {}
-
   ansis@4.2.0: {}
 
   any-promise@1.3.0: {}
@@ -22342,11 +22082,6 @@ snapshots:
 
   assertion-error@2.0.1: {}
 
-  ast-kit@2.1.1:
-    dependencies:
-      '@babel/parser': 7.28.4
-      pathe: 2.0.3
-
   ast-kit@2.1.3:
     dependencies:
       '@babel/parser': 7.28.4
@@ -22375,7 +22110,7 @@ snapshots:
   ast-walker-scope@0.8.1:
     dependencies:
       '@babel/parser': 7.28.4
-      ast-kit: 2.1.1
+      ast-kit: 2.1.3
 
   astral-regex@1.0.0:
     optional: true
@@ -22763,8 +22498,6 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  birpc@2.5.0: {}
-
   birpc@2.6.1: {}
 
   bl@4.1.0:
@@ -22919,9 +22652,9 @@ snapshots:
     dependencies:
       run-applescript: 7.0.0
 
-  bundle-require@5.1.0(esbuild@0.25.0):
+  bundle-require@5.1.0(esbuild@0.25.10):
     dependencies:
-      esbuild: 0.25.0
+      esbuild: 0.25.10
       load-tsconfig: 0.2.5
 
   bundlewatch@0.4.1:
@@ -24413,34 +24146,6 @@ snapshots:
       '@esbuild/win32-ia32': 0.23.1
       '@esbuild/win32-x64': 0.23.1
 
-  esbuild@0.25.0:
-    optionalDependencies:
-      '@esbuild/aix-ppc64': 0.25.0
-      '@esbuild/android-arm': 0.25.0
-      '@esbuild/android-arm64': 0.25.0
-      '@esbuild/android-x64': 0.25.0
-      '@esbuild/darwin-arm64': 0.25.0
-      '@esbuild/darwin-x64': 0.25.0
-      '@esbuild/freebsd-arm64': 0.25.0
-      '@esbuild/freebsd-x64': 0.25.0
-      '@esbuild/linux-arm': 0.25.0
-      '@esbuild/linux-arm64': 0.25.0
-      '@esbuild/linux-ia32': 0.25.0
-      '@esbuild/linux-loong64': 0.25.0
-      '@esbuild/linux-mips64el': 0.25.0
-      '@esbuild/linux-ppc64': 0.25.0
-      '@esbuild/linux-riscv64': 0.25.0
-      '@esbuild/linux-s390x': 0.25.0
-      '@esbuild/linux-x64': 0.25.0
-      '@esbuild/netbsd-arm64': 0.25.0
-      '@esbuild/netbsd-x64': 0.25.0
-      '@esbuild/openbsd-arm64': 0.25.0
-      '@esbuild/openbsd-x64': 0.25.0
-      '@esbuild/sunos-x64': 0.25.0
-      '@esbuild/win32-arm64': 0.25.0
-      '@esbuild/win32-ia32': 0.25.0
-      '@esbuild/win32-x64': 0.25.0
-
   esbuild@0.25.10:
     optionalDependencies:
       '@esbuild/aix-ppc64': 0.25.10
@@ -24518,7 +24223,7 @@ snapshots:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3(supports-color@8.1.1)
       eslint: 9.31.0(jiti@2.6.1)
-      get-tsconfig: 4.10.0
+      get-tsconfig: 4.13.0
       is-bun-module: 2.0.0
       stable-hash: 0.0.5
       tinyglobby: 0.2.15
@@ -25645,10 +25350,6 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
-
-  get-tsconfig@4.10.0:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
 
   get-tsconfig@4.13.0:
     dependencies:
@@ -31858,12 +31559,12 @@ snapshots:
 
   tsup@8.5.0(@swc/core@1.11.29(@swc/helpers@0.5.17))(jiti@2.6.1)(postcss@8.5.6)(tsx@4.19.2)(typescript@5.8.3)(yaml@2.8.1):
     dependencies:
-      bundle-require: 5.1.0(esbuild@0.25.0)
+      bundle-require: 5.1.0(esbuild@0.25.10)
       cac: 6.7.14
       chokidar: 4.0.3
       consola: 3.4.2
       debug: 4.4.3(supports-color@8.1.1)
-      esbuild: 0.25.0
+      esbuild: 0.25.10
       fix-dts-default-cjs-exports: 1.0.1
       joycon: 3.1.1
       picocolors: 1.1.1
@@ -31888,7 +31589,7 @@ snapshots:
   tsx@4.19.2:
     dependencies:
       esbuild: 0.23.1
-      get-tsconfig: 4.10.0
+      get-tsconfig: 4.13.0
     optionalDependencies:
       fsevents: 2.3.3
 
@@ -32539,7 +32240,7 @@ snapshots:
 
   vite-dev-rpc@1.1.0(vite@7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)):
     dependencies:
-      birpc: 2.5.0
+      birpc: 2.6.1
       vite: 7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)
       vite-hot-client: 2.1.0(vite@7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1))
 
@@ -32609,7 +32310,7 @@ snapshots:
 
   vite-plugin-inspect@11.3.3(@nuxt/kit@3.19.2(magicast@0.3.5))(vite@7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1)):
     dependencies:
-      ansis: 4.1.0
+      ansis: 4.2.0
       debug: 4.4.3(supports-color@8.1.1)
       error-stack-parser-es: 1.0.5
       ohash: 2.0.11
@@ -32636,7 +32337,7 @@ snapshots:
 
   vite@6.3.6(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
-      esbuild: 0.25.0
+      esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.6
@@ -32653,7 +32354,7 @@ snapshots:
 
   vite@7.1.5(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
-      esbuild: 0.25.0
+      esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.6
@@ -32670,7 +32371,7 @@ snapshots:
 
   vite@7.1.5(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(tsx@4.19.2)(yaml@2.8.1):
     dependencies:
-      esbuild: 0.25.0
+      esbuild: 0.25.10
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.6
