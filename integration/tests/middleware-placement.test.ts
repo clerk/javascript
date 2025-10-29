@@ -27,8 +27,17 @@ async function detectNext(app: Application): Promise<{ isNext: boolean; version?
 
   const pkg = await fs.readJSON(path.join(appDir, 'package.json'));
   const nextRange: string | undefined = pkg.dependencies?.next || pkg.devDependencies?.next;
+  // Prefer the resolved installed version from node_modules if available. This avoids issues with tags like
+  // "latest" or "canary" specified in the dependency range, ensuring we always parse a numeric semver.
+  let installedVersion: string | undefined;
+  try {
+    const nextPkg = await fs.readJSON(path.join(appDir, 'node_modules', 'next', 'package.json'));
+    installedVersion = String(nextPkg?.version || '');
+  } catch {
+    // Ignore if not installed yet; we'll fall back to the declared range
+  }
 
-  return { isNext: Boolean(nextRange), version: nextRange };
+  return { isNext: Boolean(nextRange), version: installedVersion || nextRange };
 }
 
 const middlewareFileContents = `
