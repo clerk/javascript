@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.103.1
+
+### Patch Changes
+
+- Bring back OrgPreview within the OrgSwitcher component ([#7091](https://github.com/clerk/javascript/pull/7091)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.103.0
 
 ### Minor Changes

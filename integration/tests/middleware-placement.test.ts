@@ -15,20 +15,31 @@ function parseSemverMajor(range?: string): number | undefined {
   return match ? Number.parseInt(match[0], 10) : undefined;
 }
 
-async function detectNext(app: Application): Promise<{ isNext: boolean; version?: string }> {
+/**
+ * Detects the installed Next.js version for a given application.
+ * Reads the version from node_modules/next/package.json to ensure
+ * we get the actual installed version rather than a tag like "latest" or "canary".
+ */
+async function detectNext(app: Application): Promise<{ version: string | undefined | null }> {
   // app.appDir exists for normal Application; for long-running apps, read it from the state file by serverUrl
   const appDir =
     (app as any).appDir ||
     Object.values(stateFile.getLongRunningApps() || {}).find(a => a.serverUrl === app.serverUrl)?.appDir;
 
   if (!appDir) {
-    return { isNext: false };
+    return { version: null };
   }
 
-  const pkg = await fs.readJSON(path.join(appDir, 'package.json'));
-  const nextRange: string | undefined = pkg.dependencies?.next || pkg.devDependencies?.next;
+  let installedVersion: string | undefined;
+  try {
+    const nextPkg = await fs.readJSON(path.join(appDir, 'node_modules', 'next', 'package.json'));
+    installedVersion = String(nextPkg?.version || '');
+  } catch {
+    // ignore
+  }
 
-  return { isNext: Boolean(nextRange), version: nextRange };
+  console.log('---detectNext---', installedVersion);
+  return { version: installedVersion };
 }
 
 const middlewareFileContents = `
