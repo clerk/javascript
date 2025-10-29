@@ -106,11 +106,6 @@ export type SignUpCreateParams = Partial<
 
 export type SignUpUpdateParams = SignUpCreateParams;
 
-/**
- * @deprecated Use `SignUpAuthenticateWithWeb3Params` instead.
- */
-export type SignUpAuthenticateWithMetamaskParams = SignUpAuthenticateWithWeb3Params;
-
 export type SignUpAuthenticateWithWeb3Params = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };

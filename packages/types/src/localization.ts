@@ -633,14 +633,6 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         primaryButton: LocalizationValue;
         actionLabel__connectionFailed: LocalizationValue;
-        /**
-         * @deprecated Use `actionLabel__connectionFailed` instead.
-         */
-        actionLabel__reauthorize: LocalizationValue;
-        /**
-         * @deprecated Use `subtitle__disconnected` instead.
-         */
-        subtitle__reauthorize: LocalizationValue;
         subtitle__disconnected: LocalizationValue;
         destructiveActionTitle: LocalizationValue;
       };
@@ -720,10 +712,6 @@ export type __internal_LocalizationResource = {
         successMessage: LocalizationValue;
       };
       emailLink: {
-        /**
-         * @deprecated Use `emailAddressPage.formHint` instead.
-         */
-        formHint: LocalizationValue;
         formTitle: LocalizationValue;
         formSubtitle: LocalizationValue<'identifier'>;
         resendButton: LocalizationValue;

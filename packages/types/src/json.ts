@@ -303,10 +303,6 @@ export interface UserJSON extends ClerkResourceJSON {
   external_accounts: ExternalAccountJSON[];
   enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
-  /**
-   * @deprecated Use `enterprise_accounts` instead.
-   */
-  saml_accounts: SamlAccountJSON[];
 
   organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;

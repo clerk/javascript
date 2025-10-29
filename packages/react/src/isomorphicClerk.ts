@@ -154,7 +154,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       nativeUnsubscribe?: UnsubscribeCallback;
     }
   >();
-  private loadedListeners: Array<() => void> = [];
 
   #status: ClerkStatus = 'loading';
   #domain: DomainOrProxyUrl['domain'];
@@ -521,27 +520,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.#eventBus.off(...args);
     }
-  };
-
-  /**
-   * @deprecated Please use `addStatusListener`. This api will be removed in the next major.
-   */
-  public addOnLoaded = (cb: () => void) => {
-    this.loadedListeners.push(cb);
-    /**
-     * When IsomorphicClerk is loaded execute the callback directly
-     */
-    if (this.loaded) {
-      this.emitLoaded();
-    }
-  };
-
-  /**
-   * @deprecated Please use `__internal_setStatus`. This api will be removed in the next major.
-   */
-  public emitLoaded = () => {
-    this.loadedListeners.forEach(cb => cb());
-    this.loadedListeners = [];
   };
 
   private beforeLoad = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {

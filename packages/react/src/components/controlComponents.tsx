@@ -174,45 +174,6 @@ export const RedirectToTasks = withClerk(({ clerk, ...props }: WithClerkProp<Red
   return null;
 }, 'RedirectToTasks');
 
-/**
- * @function
- * @deprecated Use [`redirectToUserProfile()`](https://clerk.com/docs/reference/javascript/clerk#redirect-to-user-profile) instead.
- */
-export const RedirectToUserProfile = withClerk(({ clerk }) => {
-  React.useEffect(() => {
-    deprecated('RedirectToUserProfile', 'Use the `redirectToUserProfile()` method instead.');
-    void clerk.redirectToUserProfile();
-  }, []);
-
-  return null;
-}, 'RedirectToUserProfile');
-
-/**
- * @function
- * @deprecated Use [`redirectToOrganizationProfile()`](https://clerk.com/docs/reference/javascript/clerk#redirect-to-organization-profile) instead.
- */
-export const RedirectToOrganizationProfile = withClerk(({ clerk }) => {
-  React.useEffect(() => {
-    deprecated('RedirectToOrganizationProfile', 'Use the `redirectToOrganizationProfile()` method instead.');
-    void clerk.redirectToOrganizationProfile();
-  }, []);
-
-  return null;
-}, 'RedirectToOrganizationProfile');
-
-/**
- * @function
- * @deprecated Use [`redirectToCreateOrganization()`](https://clerk.com/docs/reference/javascript/clerk#redirect-to-create-organization) instead.
- */
-export const RedirectToCreateOrganization = withClerk(({ clerk }) => {
-  React.useEffect(() => {
-    deprecated('RedirectToCreateOrganization', 'Use the `redirectToCreateOrganization()` method instead.');
-    void clerk.redirectToCreateOrganization();
-  }, []);
-
-  return null;
-}, 'RedirectToCreateOrganization');
-
 export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
     React.useEffect(() => {
