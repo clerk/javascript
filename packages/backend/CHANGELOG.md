@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.19.1
+
+### Patch Changes
+
+- Remove \_\_clerk_handshake_nonce query parameter from redirect URLs in development mode to prevent infinite loops. ([#7054](https://github.com/clerk/javascript/pull/7054)) by [@bratsos](https://github.com/bratsos)
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/shared@3.29.0
+  - @clerk/types@4.96.0
+
 ## 2.19.0
 
 ### Minor Changes
