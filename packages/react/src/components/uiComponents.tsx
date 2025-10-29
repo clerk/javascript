@@ -1,4 +1,3 @@
-import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   APIKeysProps,
   CreateOrganizationProps,
@@ -16,6 +15,7 @@ import type {
   WaitlistProps,
   Without,
 } from '@clerk/shared/types';
+import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
