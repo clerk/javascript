@@ -15,18 +15,18 @@ function parseSemverMajor(range?: string): number | undefined {
   return match ? Number.parseInt(match[0], 10) : undefined;
 }
 
-async function detectNext(app: Application): Promise<{ isNext: boolean; version?: string }> {
+async function detectNext(app: Application): Promise<{ version: string | undefined | null }> {
   // app.appDir exists for normal Application; for long-running apps, read it from the state file by serverUrl
   const appDir =
     (app as any).appDir ||
     Object.values(stateFile.getLongRunningApps() || {}).find(a => a.serverUrl === app.serverUrl)?.appDir;
 
   if (!appDir) {
-    return { isNext: false };
+    return { version: null };
   }
 
-  const pkg = await fs.readJSON(path.join(appDir, 'package.json'));
-  const nextRange: string | undefined = pkg.dependencies?.next || pkg.devDependencies?.next;
+  // const pkg = await fs.readJSON(path.join(appDir, 'package.json'));
+  // const nextRange: string | undefined = pkg.dependencies?.next || pkg.devDependencies?.next;
   // Prefer the resolved installed version from node_modules if available. This avoids issues with tags like
   // "latest" or "canary" specified in the dependency range, ensuring we always parse a numeric semver.
   let installedVersion: string | undefined;
@@ -37,7 +37,8 @@ async function detectNext(app: Application): Promise<{ isNext: boolean; version?
     // Ignore if not installed yet; we'll fall back to the declared range
   }
 
-  return { isNext: Boolean(nextRange), version: installedVersion || nextRange };
+  console.log('---detectNext---', installedVersion);
+  return { version: installedVersion };
 }
 
 const middlewareFileContents = `
