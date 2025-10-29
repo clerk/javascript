@@ -215,7 +215,10 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
   }
 
   const fee =
-    subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.fee : subscriptionItem.plan.annualMonthlyFee;
+    subscriptionItem.planPeriod === 'month'
+      ? subscriptionItem.plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscriptionItem.plan.annualMonthlyFee!;
 
   return (
     <Box

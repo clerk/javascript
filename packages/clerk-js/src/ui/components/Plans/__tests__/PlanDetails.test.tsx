@@ -221,18 +221,8 @@ describe('PlanDetails', () => {
         currencySymbol: '$',
         currency: 'USD',
       },
-      annualFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
-      annualMonthlyFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
+      annualFee: null,
+      annualMonthlyFee: null,
     };
 
     const { wrapper } = await createFixtures(f => {
@@ -265,18 +255,8 @@ describe('PlanDetails', () => {
         currencySymbol: '$',
         currency: 'USD',
       },
-      annualFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
-      annualMonthlyFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
+      annualFee: null,
+      annualMonthlyFee: null,
       isDefault: true,
     };
 

@@ -634,8 +634,8 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   id: string;
   name: string;
   fee: BillingMoneyAmountJSON;
-  annual_fee: BillingMoneyAmountJSON;
-  annual_monthly_fee: BillingMoneyAmountJSON;
+  annual_fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
   amount: number;
   amount_formatted: string;
   annual_amount: number;

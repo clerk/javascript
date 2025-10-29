@@ -227,7 +227,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
   const { plan, closeSlot, planPeriod, setPlanPeriod } = props;
 
   const fee = useMemo(() => {
-    if (plan.annualMonthlyFee.amount <= 0) {
+    if (!plan.annualMonthlyFee) {
       return plan.fee;
     }
     return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
@@ -333,7 +333,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
         </>
       </Flex>
 
-      {plan.annualMonthlyFee.amount > 0 ? (
+      {plan.annualMonthlyFee ? (
         <Box
           elementDescriptor={descriptors.planDetailPeriodToggle}
           sx={t => ({
