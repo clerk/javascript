@@ -208,6 +208,7 @@ export const createSignIn = (signInParams: Partial<SignInJSON> = {}, user: Parti
     object: 'sign_in',
     second_factor_verification: signInParams.second_factor_verification,
     supported_first_factors: signInParams.supported_first_factors,
+    untrusted_first_factors: signInParams.untrusted_first_factors || [],
     supported_second_factors: signInParams.supported_second_factors,
     user_data: {
       first_name: user.first_name,

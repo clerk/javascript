@@ -36,7 +36,10 @@ import type { UserSettingsJSON } from './userSettings';
 import type { Nullable, Override } from './utils';
 
 export type SignInJSONSnapshot = Override<
-  Nullable<SignInJSON, 'status' | 'identifier' | 'supported_first_factors' | 'supported_second_factors'>,
+  Nullable<
+    SignInJSON,
+    'status' | 'identifier' | 'supported_first_factors' | 'untrusted_first_factors' | 'supported_second_factors'
+  >,
   {
     first_factor_verification: VerificationJSONSnapshot;
     second_factor_verification: VerificationJSONSnapshot;

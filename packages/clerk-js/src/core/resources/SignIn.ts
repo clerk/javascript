@@ -108,6 +108,7 @@ export class SignIn extends BaseResource implements SignInResource {
   private _status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
+  untrustedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
@@ -533,6 +534,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.supportedIdentifiers = data.supported_identifiers;
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
+      this.untrustedFirstFactors = deepSnakeToCamel(data.untrusted_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
@@ -552,6 +554,7 @@ export class SignIn extends BaseResource implements SignInResource {
       status: this.status || null,
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
+      untrusted_first_factors: deepCamelToSnake(this.untrustedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
