@@ -42,6 +42,7 @@ export interface SignInResource extends ClerkResource {
    */
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
+  untrustedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
   clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
@@ -104,6 +105,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   identifier: string;
   user_data: UserDataJSON;
   supported_first_factors: SignInFirstFactorJSON[];
+  untrusted_first_factors: SignInFirstFactorJSON[];
   supported_second_factors: SignInSecondFactorJSON[];
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
