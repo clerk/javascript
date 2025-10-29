@@ -489,9 +489,11 @@ export const daDK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opret organisation',
     action__invitationAccept: 'Deltag',
     action__manageOrganization: 'Administrer organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Anmod om at deltage',
     notSelected: 'Ingen organisation valgt',
     personalWorkspace: 'Personligt arbejdsområde',
@@ -938,7 +940,9 @@ export const daDK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tilføj konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
   },

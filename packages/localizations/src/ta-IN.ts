@@ -492,9 +492,11 @@ export const taIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'நிறுவனத்தை உருவாக்கு',
     action__invitationAccept: 'சேரவும்',
     action__manageOrganization: 'நிர்வகி',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'சேர கோரிக்கை',
     notSelected: 'நிறுவனம் எதுவும் தேர்ந்தெடுக்கப்படவில்லை',
     personalWorkspace: 'தனிப்பட்ட கணக்கு',
@@ -956,7 +958,9 @@ export const taIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'கணக்கைச் சேர்',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'கணக்கை நிர்வகி',
+    action__openUserMenu: undefined,
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
   },

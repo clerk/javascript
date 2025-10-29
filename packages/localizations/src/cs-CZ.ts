@@ -494,9 +494,11 @@ export const csCZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
     action__manageOrganization: 'Spravovat organizaci',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požádat o připojení',
     notSelected: 'Není vybrána žádná organizace',
     personalWorkspace: 'Osobní účet',
@@ -951,7 +953,9 @@ export const csCZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Přidat účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovat účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },

@@ -489,9 +489,11 @@ export const hiIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'संगठन बनाएँ',
     action__invitationAccept: 'शामिल हों',
     action__manageOrganization: 'प्रबंधित करें',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
     notSelected: 'कोई संगठन चयनित नहीं',
     personalWorkspace: 'व्यक्तिगत खाता',
@@ -951,7 +953,9 @@ export const hiIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'खाता जोड़ें',
+    action__closeUserMenu: 'उपयोगकर्ता मेनू बंद करें',
     action__manageAccount: 'खाता प्रबंधित करें',
+    action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
   },

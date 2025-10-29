@@ -489,9 +489,11 @@ export const svSE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Skapa organisation',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Hantera organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Ingen organisation vald',
     personalWorkspace: 'Personligt Arbetsområde',
@@ -943,7 +945,9 @@ export const svSE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lägg till konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hantera konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logga ut',
     action__signOutAll: 'Logga ut från alla konton',
   },
