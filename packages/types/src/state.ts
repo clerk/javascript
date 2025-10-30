@@ -182,4 +182,8 @@ export interface State {
    * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;
+  /**
+   * An instance of the Waitlist resource.
+   */
+  __internal_waitlist: WaitlistFutureResource;
 }
