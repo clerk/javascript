@@ -120,7 +120,7 @@ describe('Session', () => {
       } as SessionJSON);
 
       expect(SessionTokenCache.size()).toBe(1);
-      const cachedEntry1 = SessionTokenCache.get({ tokenId: 'session_1::activeOrganization' });
+      const cachedEntry1 = SessionTokenCache.get({ tokenId: 'session_1-activeOrganization' });
       expect(cachedEntry1).toBeDefined();
 
       const session2 = new Session({

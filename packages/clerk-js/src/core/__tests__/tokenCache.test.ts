@@ -281,7 +281,7 @@ describe('SessionTokenCache', () => {
     it('always broadcasts regardless of cache state', async () => {
       mockBroadcastChannel.postMessage.mockClear();
 
-      const tokenId = 'session_456';
+      const tokenId = 'sess_2GbDB4enNdCa5vS1zpC3Xzg9tK9';
       const tokenResolver = Promise.resolve(
         new Token({
           id: tokenId,
@@ -291,7 +291,7 @@ describe('SessionTokenCache', () => {
       );
 
       SessionTokenCache.set({ tokenId, tokenResolver });
-      await Promise.resolve();
+      await tokenResolver;
 
       expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
       const firstCall = mockBroadcastChannel.postMessage.mock.calls[0][0];
@@ -308,7 +308,7 @@ describe('SessionTokenCache', () => {
       );
 
       SessionTokenCache.set({ tokenId, tokenResolver: tokenResolver2 });
-      await Promise.resolve();
+      await tokenResolver2;
 
       expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
     });
