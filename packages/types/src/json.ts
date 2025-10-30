@@ -621,9 +621,9 @@ export interface FeatureJSON extends ClerkResourceJSON {
   object: 'feature';
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   slug: string;
-  avatar_url: string;
+  avatar_url: string | null;
 }
 
 /**
@@ -636,23 +636,23 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   fee: BillingMoneyAmountJSON;
   annual_fee: BillingMoneyAmountJSON | null;
   annual_monthly_fee: BillingMoneyAmountJSON | null;
-  amount: number;
-  amount_formatted: string;
-  annual_amount: number;
-  annual_amount_formatted: string;
-  annual_monthly_amount: number;
-  annual_monthly_amount_formatted: string;
-  currency_symbol: string;
-  currency: string;
-  description: string;
+  amount?: number;
+  amount_formatted?: string;
+  annual_amount?: number;
+  annual_amount_formatted?: string;
+  annual_monthly_amount?: number;
+  annual_monthly_amount_formatted?: string;
+  currency_symbol?: string;
+  currency?: string;
+  description: string | null;
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   for_payer_type: BillingPayerResourceType;
   publicly_visible: boolean;
   slug: string;
-  avatar_url: string;
-  features: FeatureJSON[];
+  avatar_url: string | null;
+  features?: FeatureJSON[];
   free_trial_days?: number | null;
   free_trial_enabled?: boolean;
 }
@@ -663,13 +663,18 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
 export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
   object: 'commerce_payment_method';
   id: string;
-  last4: string;
-  payment_type: 'card' | 'link';
-  card_type: string;
-  is_default: boolean;
-  is_removable: boolean;
+  last4: string | null;
+  payment_type?: 'card' | 'link';
+  payment_method?: string;
+  card_type: string | null;
+  is_default?: boolean;
+  is_removable?: boolean;
   status: BillingPaymentMethodStatus;
-  wallet_type: string | null;
+  wallet_type?: string | null;
+  expiry_year?: number | null;
+  expiry_month?: number | null;
+  created_at?: number | null;
+  updated_at?: number | null;
 }
 
 /**
@@ -713,7 +718,7 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   paid_at?: number;
   failed_at?: number;
   updated_at: number;
-  payment_method: BillingPaymentMethodJSON;
+  payment_method?: BillingPaymentMethodJSON | null;
   subscription: BillingSubscriptionItemJSON;
   subscription_item: BillingSubscriptionItemJSON;
   charge_type: BillingPaymentChargeType;
@@ -787,16 +792,20 @@ export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
   subtotal: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
-  total_due_now: BillingMoneyAmountJSON;
-  credit: BillingMoneyAmountJSON;
-  past_due: BillingMoneyAmountJSON;
+  total_due_now?: BillingMoneyAmountJSON | null;
+  credit?: BillingMoneyAmountJSON | null;
+  past_due?: BillingMoneyAmountJSON | null;
+  total_due_after_free_trial?: BillingMoneyAmountJSON | null;
+  proration?: {
+    credit: BillingMoneyAmountJSON | null;
+  } | null;
 }
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BillingStatementTotalsJSON extends Omit<BillingCheckoutTotalsJSON, 'total_due_now'> {}
+export interface BillingStatementTotalsJSON
+  extends Omit<BillingCheckoutTotalsJSON, 'total_due_now' | 'total_due_after_free_trial'> {}
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -806,7 +815,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  payment_method?: BillingPaymentMethodJSON;
+  payment_method?: BillingPaymentMethodJSON | null;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   plan_period_start?: number;
@@ -825,19 +834,19 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
 export interface BillingPayerJSON extends ClerkResourceJSON {
   object: 'commerce_payer';
   id: string;
-  created_at: number;
-  updated_at: number;
-  image_url: string | null;
+  created_at?: number | null;
+  updated_at?: number | null;
+  image_url?: string | null;
 
   // User attributes
-  user_id?: string;
-  email?: string;
-  first_name?: string;
-  last_name?: string;
+  user_id?: string | null;
+  email?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
 
   // Organization attributes
-  organization_id?: string;
-  organization_name?: string;
+  organization_id?: string | null;
+  organization_name?: string | null;
 }
 
 export interface ApiKeyJSON extends ClerkResourceJSON {

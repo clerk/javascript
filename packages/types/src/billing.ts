@@ -139,9 +139,9 @@ export interface BillingPlanResource extends ClerkResource {
    */
   annualMonthlyFee: BillingMoneyAmount | null;
   /**
-   * A short description of what the plan offers.
+   * A short description of what the plan offers, or `null` if no description is provided.
    */
-  description: string;
+  description: string | null;
   /**
    * Whether the plan is the default plan.
    */
@@ -169,9 +169,9 @@ export interface BillingPlanResource extends ClerkResource {
    */
   slug: string;
   /**
-   * The URL of the plan's avatar image.
+   * The URL of the plan's avatar image, or `null` if not set.
    */
-  avatarUrl: string;
+  avatarUrl: string | null;
   /**
    * The features the plan offers.
    */
@@ -201,17 +201,17 @@ export interface FeatureResource extends ClerkResource {
    */
   name: string;
   /**
-   * A short description of what the feature provides.
+   * A short description of what the feature provides, or `null` if not provided.
    */
-  description: string;
+  description: string | null;
   /**
    * A unique, URL-friendly identifier for the feature.
    */
   slug: string;
   /**
-   * The URL of the feature's avatar image.
+   * The URL of the feature's avatar image, or `null` if not set.
    */
-  avatarUrl: string;
+  avatarUrl: string | null;
 }
 
 /**
@@ -280,23 +280,23 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * The last four digits of the payment method.
    */
-  last4: string;
+  last4: string | null;
   /**
    * The type of payment method. For example, `'card'` or `'link'`.
    */
-  paymentType: 'card' | 'link';
+  paymentType?: 'card' | 'link';
   /**
    * The brand or type of card. For example, `'visa'` or `'mastercard'`.
    */
-  cardType: string;
+  cardType: string | null;
   /**
    * Whether the payment method is set as the default for the account.
    */
-  isDefault: boolean;
+  isDefault?: boolean;
   /**
    * Whether the payment method can be removed by the user.
    */
-  isRemovable: boolean;
+  isRemovable?: boolean;
   /**
    * The current status of the payment method.
    */
@@ -304,7 +304,23 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * The type of digital wallet, if applicable. For example, `'apple_pay'`, or `'google_pay'`.
    */
-  walletType: string | undefined;
+  walletType?: string | null;
+  /**
+   * The card expiration year, if available.
+   */
+  expiryYear?: number | null;
+  /**
+   * The card expiration month, if available.
+   */
+  expiryMonth?: number | null;
+  /**
+   * The date the payment method was created, if available.
+   */
+  createdAt?: Date | null;
+  /**
+   * The date the payment method was last updated, if available.
+   */
+  updatedAt?: Date | null;
   /**
    * A function that removes this payment method from the account. Accepts the following parameters:
    * <ul>
@@ -652,15 +668,25 @@ export interface BillingCheckoutTotals {
   /**
    * The amount that needs to be immediately paid to complete the checkout.
    */
-  totalDueNow: BillingMoneyAmount;
+  totalDueNow?: BillingMoneyAmount | null;
   /**
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
-  credit: BillingMoneyAmount;
+  credit?: BillingMoneyAmount | null;
   /**
    * Any outstanding amount from previous unpaid invoices that is being collected as part of the checkout.
    */
-  pastDue: BillingMoneyAmount;
+  pastDue?: BillingMoneyAmount | null;
+  /**
+   * The amount that becomes due after a free trial ends.
+   */
+  totalDueAfterFreeTrial?: BillingMoneyAmount | null;
+  /**
+   * The proration credit applied when changing plans.
+   */
+  proration?: {
+    credit: BillingMoneyAmount | null;
+  } | null;
 }
 
 /**
@@ -668,8 +694,7 @@ export interface BillingCheckoutTotals {
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BillingStatementTotals extends Omit<BillingCheckoutTotals, 'totalDueNow'> {}
+export interface BillingStatementTotals extends Omit<BillingCheckoutTotals, 'totalDueNow' | 'totalDueAfterFreeTrial'> {}
 
 /**
  * The `startCheckout()` method accepts the following parameters.
@@ -744,7 +769,7 @@ export interface BillingCheckoutResource extends ClerkResource {
   /**
    * The payment method being used for the checkout, such as a credit card or bank account.
    */
-  paymentMethod?: BillingPaymentMethodResource;
+  paymentMethod?: BillingPaymentMethodResource | null;
   /**
    * The subscription plan details for the checkout.
    */
@@ -800,37 +825,37 @@ export interface BillingPayerResource extends ClerkResource {
   /**
    * The date and time when the payer was created.
    */
-  createdAt: Date;
+  createdAt?: Date | null;
   /**
    * The date and time when the payer was last updated.
    */
-  updatedAt: Date;
+  updatedAt?: Date | null;
   /**
    * The URL of the payer's avatar image.
    */
-  imageUrl: string | null;
+  imageUrl?: string | null;
   /**
    * The unique identifier for the payer.
    */
-  userId?: string;
+  userId?: string | null;
   /**
    * The email address of the payer.
    */
-  email?: string;
+  email?: string | null;
   /**
    * The first name of the payer.
    */
-  firstName?: string;
+  firstName?: string | null;
   /**
    * The last name of the payer.
    */
-  lastName?: string;
+  lastName?: string | null;
   /**
    * The unique identifier for the organization that the payer belongs to.
    */
-  organizationId?: string;
+  organizationId?: string | null;
   /**
    * The name of the organization that the payer belongs to.
    */
-  organizationName?: string;
+  organizationName?: string | null;
 }

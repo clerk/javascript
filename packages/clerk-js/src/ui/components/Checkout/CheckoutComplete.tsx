@@ -11,7 +11,26 @@ import { transitionDurationValues, transitionTiming } from '../../foundations/tr
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
 
-const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+const capitalize = (name?: string | null, fallback = '') => {
+  if (!name) {
+    return fallback;
+  }
+
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
+const formatPaymentMethodLabel = (method: BillingPaymentMethodResource) => {
+  const paymentType = method.paymentType ?? 'card';
+
+  if (paymentType !== 'card') {
+    return capitalize(paymentType, 'Payment');
+  }
+
+  const brand = capitalize(method.cardType, 'Card');
+  const suffix = method.last4 ? ` ⋯ ${method.last4}` : '';
+
+  return `${brand}${suffix}`;
+};
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
 const SuccessRing = ({ positionX, positionY }: { positionX: number; positionY: number }) => {
@@ -418,7 +437,13 @@ export const CheckoutComplete = () => {
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__totalPaid')} />
-            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
+            <LineItems.Description
+              text={
+                totals.totalDueNow
+                  ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
+                  : `${totals.grandTotal.currencySymbol}0.00`
+              }
+            />
           </LineItems.Group>
 
           {freeTrialEndsAt ? (
@@ -439,9 +464,7 @@ export const CheckoutComplete = () => {
               text={
                 needsPaymentMethod
                   ? paymentMethod
-                    ? paymentMethod.paymentType !== 'card'
-                      ? `${capitalize(paymentMethod.paymentType)}`
-                      : `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
+                    ? formatPaymentMethodLabel(paymentMethod)
                     : '–'
                   : planPeriodStart
                     ? formatDate(new Date(planPeriodStart))

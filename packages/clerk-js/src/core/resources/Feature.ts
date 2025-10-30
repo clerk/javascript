@@ -5,9 +5,9 @@ import { BaseResource } from './internal';
 export class Feature extends BaseResource implements FeatureResource {
   id!: string;
   name!: string;
-  description!: string;
+  description: string | null = null;
   slug!: string;
-  avatarUrl!: string;
+  avatarUrl: string | null = null;
 
   constructor(data: FeatureJSON) {
     super();
@@ -21,9 +21,9 @@ export class Feature extends BaseResource implements FeatureResource {
 
     this.id = data.id;
     this.name = data.name;
-    this.description = data.description;
+    this.description = data.description ?? null;
     this.slug = data.slug;
-    this.avatarUrl = data.avatar_url;
+    this.avatarUrl = data.avatar_url ?? null;
 
     return this;
   }

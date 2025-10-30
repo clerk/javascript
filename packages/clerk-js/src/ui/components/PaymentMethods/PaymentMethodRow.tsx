@@ -4,6 +4,10 @@ import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../cu
 import { CreditCard, GenericPayment } from '../../icons';
 
 export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaymentMethodResource }) => {
+  const paymentType = paymentMethod.paymentType ?? 'card';
+  const cardLabel = paymentMethod.cardType ?? 'card';
+  const last4 = paymentMethod.last4 ? `⋯ ${paymentMethod.last4}` : null;
+
   return (
     <Flex
       sx={{ overflow: 'hidden' }}
@@ -12,7 +16,7 @@ export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaym
       elementDescriptor={descriptors.paymentMethodRow}
     >
       <Icon
-        icon={paymentMethod.paymentType === 'card' ? CreditCard : GenericPayment}
+        icon={paymentType === 'card' ? CreditCard : GenericPayment}
         sx={t => ({ alignSelf: 'center', color: t.colors.$colorMutedForeground })}
         elementDescriptor={descriptors.paymentMethodRowIcon}
       />
@@ -22,7 +26,7 @@ export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaym
         elementDescriptor={descriptors.paymentMethodRowType}
       >
         {/* TODO(@COMMERCE): Localize this */}
-        {paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType}
+        {paymentType === 'card' ? cardLabel : paymentType}
       </Text>
       <Text
         sx={t => ({ color: t.colors.$colorMutedForeground })}
@@ -30,7 +34,7 @@ export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaym
         truncate
         elementDescriptor={descriptors.paymentMethodRowValue}
       >
-        {paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : null}
+        {paymentType === 'card' ? last4 : null}
       </Text>
       {paymentMethod.isDefault && (
         <Badge

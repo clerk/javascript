@@ -10,14 +10,14 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
   fee!: BillingMoneyAmount;
   annualFee: BillingMoneyAmount | null = null;
   annualMonthlyFee: BillingMoneyAmount | null = null;
-  description!: string;
+  description: string | null = null;
   isDefault!: boolean;
   isRecurring!: boolean;
   hasBaseFee!: boolean;
   forPayerType!: BillingPayerResourceType;
   publiclyVisible!: boolean;
   slug!: string;
-  avatarUrl!: string;
+  avatarUrl: string | null = null;
   features!: Feature[];
   freeTrialDays!: number | null;
   freeTrialEnabled!: boolean;
@@ -32,25 +32,19 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
       return this;
     }
 
-    console.log('data', {
-      fee: data.fee,
-      annual_fee: data.annual_fee,
-      annual_monthly_fee: data.annual_monthly_fee,
-    });
-
     this.id = data.id;
     this.name = data.name;
     this.fee = billingMoneyAmountFromJSON(data.fee);
     this.annualFee = data.annual_fee ? billingMoneyAmountFromJSON(data.annual_fee) : null;
     this.annualMonthlyFee = data.annual_monthly_fee ? billingMoneyAmountFromJSON(data.annual_monthly_fee) : null;
-    this.description = data.description;
+    this.description = data.description ?? null;
     this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;
     this.hasBaseFee = data.has_base_fee;
     this.forPayerType = data.for_payer_type;
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
-    this.avatarUrl = data.avatar_url;
+    this.avatarUrl = data.avatar_url ?? null;
     this.freeTrialDays = this.withDefault(data.free_trial_days, null);
     this.freeTrialEnabled = this.withDefault(data.free_trial_enabled, false);
     this.features = (data.features || []).map(feature => new Feature(feature));

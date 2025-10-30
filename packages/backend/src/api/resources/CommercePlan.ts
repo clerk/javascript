@@ -29,7 +29,7 @@ export class BillingPlan {
     /**
      * The description of the plan.
      */
-    readonly description: string | undefined,
+    readonly description: string | null,
     /**
      * Whether the plan is the default plan.
      */
@@ -53,11 +53,11 @@ export class BillingPlan {
     /**
      * The annual fee of the plan.
      */
-    readonly annualFee: BillingMoneyAmount,
+    readonly annualFee: BillingMoneyAmount | null,
     /**
      * The annual fee of the plan on a monthly basis.
      */
-    readonly annualMonthlyFee: BillingMoneyAmount,
+    readonly annualMonthlyFee: BillingMoneyAmount | null,
     /**
      * The type of payer for the plan.
      */
@@ -69,7 +69,11 @@ export class BillingPlan {
   ) {}
 
   static fromJSON(data: BillingPlanJSON): BillingPlan {
-    const formatAmountJSON = (fee: BillingPlanJSON['fee']) => {
+    const formatAmountJSON = (fee: BillingPlanJSON['fee'] | null | undefined): BillingMoneyAmount | null => {
+      if (!fee) {
+        return null;
+      }
+
       return {
         amount: fee.amount,
         amountFormatted: fee.amount_formatted,
@@ -82,16 +86,18 @@ export class BillingPlan {
       data.product_id,
       data.name,
       data.slug,
-      data.description,
+      data.description ?? null,
       data.is_default,
       data.is_recurring,
       data.has_base_fee,
       data.publicly_visible,
-      formatAmountJSON(data.fee),
+      // fee is required and should not be null in API responses
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      formatAmountJSON(data.fee)!,
       formatAmountJSON(data.annual_fee),
       formatAmountJSON(data.annual_monthly_fee),
       data.for_payer_type,
-      data.features.map(feature => Feature.fromJSON(feature)),
+      (data.features ?? []).map(feature => Feature.fromJSON(feature)),
     );
   }
 }

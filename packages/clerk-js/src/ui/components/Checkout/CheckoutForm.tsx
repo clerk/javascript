@@ -22,7 +22,26 @@ import { SubscriptionBadge } from '../Subscriptions/badge';
 
 type PaymentMethodSource = 'existing' | 'new';
 
-const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+const capitalize = (name?: string | null, fallback = '') => {
+  if (!name) {
+    return fallback;
+  }
+
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
+
+const formatPaymentMethodLabel = (method: BillingPaymentMethodResource) => {
+  const paymentType = method.paymentType ?? 'card';
+
+  if (paymentType !== 'card') {
+    return capitalize(paymentType, 'Payment');
+  }
+
+  const brand = capitalize(method.cardType, 'Card');
+  const suffix = method.last4 ? ` ⋯ ${method.last4}` : '';
+
+  return `${brand}${suffix}`;
+};
 
 const HIDDEN_INPUT_NAME = 'payment_method_id';
 
@@ -44,6 +63,10 @@ export const CheckoutForm = withCardStateProvider(() => {
       ? plan.fee
       : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         plan.annualMonthlyFee!;
+
+  const totalDueNowDisplay = totals.totalDueNow
+    ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
+    : `${fee.currencySymbol}0.00`;
 
   return (
     <Drawer.Body>
@@ -116,7 +139,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 
           <LineItems.Group borderTop>
             <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
-            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
+            <LineItems.Description text={totalDueNowDisplay} />
           </LineItems.Group>
         </LineItems.Root>
       </Box>
@@ -345,7 +368,7 @@ const useSubmitLabel = () => {
     return localizationKeys('billing.startFreeTrial');
   }
 
-  if (totals.totalDueNow.amount > 0) {
+  if (totals.totalDueNow && totals.totalDueNow.amount > 0) {
     return localizationKeys('billing.pay', {
       amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
     });
@@ -427,17 +450,10 @@ const ExistingPaymentMethodForm = withCardStateProvider(
     );
 
     const options = useMemo(() => {
-      return paymentMethods.map(method => {
-        const label =
-          method.paymentType !== 'card'
-            ? `${capitalize(method.paymentType)}`
-            : `${capitalize(method.cardType)} ⋯ ${method.last4}`;
-
-        return {
-          value: method.id,
-          label,
-        };
-      });
+      return paymentMethods.map(method => ({
+        value: method.id,
+        label: formatPaymentMethodLabel(method),
+      }));
     }, [paymentMethods]);
 
     const showPaymentMethods = isImmediatePlanChange && needsPaymentMethod;

@@ -18,6 +18,21 @@ import * as AddPaymentMethod from './AddPaymentMethod';
 import { PaymentMethodRow } from './PaymentMethodRow';
 import { TestPaymentMethod } from './TestPaymentMethod';
 
+const capitalize = (value?: string | null) => (value ? value.charAt(0).toUpperCase() + value.slice(1) : '');
+
+const formatPaymentMethodIdentifier = (paymentMethod: BillingPaymentMethodResource) => {
+  const paymentType = paymentMethod.paymentType ?? 'card';
+
+  if (paymentType !== 'card') {
+    return capitalize(paymentType) || paymentType;
+  }
+
+  const brand = capitalize(paymentMethod.cardType) || 'Card';
+  const last4 = paymentMethod.last4 ? ` ⋯ ${paymentMethod.last4}` : '';
+
+  return `${brand}${last4}`;
+};
+
 const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void }) => {
   const { close } = useActionContext();
   const clerk = useClerk();
@@ -62,9 +77,7 @@ const RemoveScreen = ({
   const subscriberType = useSubscriberTypeContext();
   const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
-  const ref = useRef(
-    `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
-  );
+  const ref = useRef(formatPaymentMethodIdentifier(paymentMethod));
 
   if (!ref.current) {
     return null;
@@ -110,10 +123,18 @@ export const PaymentMethods = withCardStateProvider(() => {
 
   const { data: paymentMethods, isLoading, revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
-  const sortedPaymentMethods = useMemo(
-    () => paymentMethods.sort((a, b) => (a.isDefault && !b.isDefault ? -1 : 1)),
-    [paymentMethods],
-  );
+  const sortedPaymentMethods = useMemo(() => {
+    return [...paymentMethods].sort((a, b) => {
+      const aDefault = a.isDefault ?? false;
+      const bDefault = b.isDefault ?? false;
+
+      if (aDefault === bDefault) {
+        return 0;
+      }
+
+      return aDefault ? -1 : 1;
+    });
+  }, [paymentMethods]);
 
   if (!resource) {
     return null;
