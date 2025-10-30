@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/types';
+import type { SessionResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
 import { Flow } from '@/ui/customizables';

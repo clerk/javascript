@@ -10,7 +10,6 @@ export default defineConfig({
   minify: false,
   sourcemap: false,
   dts: true,
-  tsconfig: './tsconfig.build.json',
   target: 'es2020',
   onSuccess: async () => {
     // Ensure dist/themes directory exists

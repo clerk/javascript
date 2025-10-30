@@ -1,12 +1,12 @@
+import { useMemo, useSyncExternalStore } from 'react';
+
+import type { ClerkAPIResponseError } from '../..';
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   BillingCheckoutResource,
   SetActiveNavigate,
-} from '@clerk/types';
-import { useMemo, useSyncExternalStore } from 'react';
-
-import type { ClerkAPIResponseError } from '../..';
+} from '../../types';
 import type { __experimental_CheckoutProvider } from '../contexts';
 import { useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';

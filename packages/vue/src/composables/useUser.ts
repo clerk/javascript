@@ -1,4 +1,4 @@
-import type { UseUserReturn } from '@clerk/types';
+import type { UseUserReturn } from '@clerk/shared/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';

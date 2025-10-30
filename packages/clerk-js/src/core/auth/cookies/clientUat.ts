@@ -1,7 +1,7 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
-import type { ClientResource } from '@clerk/types';
+import type { ClientResource } from '@clerk/shared/types';
 
 import { inCrossOriginIframe } from '../../../utils';
 import { getCookieDomain } from '../getCookieDomain';

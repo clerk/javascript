@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useClerk } from '../../../composables';
-import type { UserButtonProps, UserProfileProps } from '@clerk/types';
+import type { UserButtonProps, UserProfileProps } from '@clerk/shared/types';
 import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 import { computed, provide } from 'vue';
 import { UserButtonInjectionKey, UserProfileInjectionKey } from '../../../keys';

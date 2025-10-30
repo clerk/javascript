@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { PhoneNumberResource, VerificationStrategy } from '@clerk/types';
+import type { PhoneNumberResource, VerificationStrategy } from '@clerk/shared/types';
 import React, { Fragment, useState } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';

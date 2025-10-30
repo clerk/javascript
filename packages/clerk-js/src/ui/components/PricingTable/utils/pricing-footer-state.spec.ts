@@ -1,4 +1,8 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
+} from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { getPricingFooterState } from './pricing-footer-state';

@@ -25,12 +25,6 @@ export type {
    * These components and their prop types are unstable and may change in future releases.
    * They are part of Clerk's Billing feature which is available under public beta.
    */
-  __experimental_SubscriptionDetailsButtonProps as SubscriptionDetailsButtonProps,
-  /**
-   * @experimental
-   * These components and their prop types are unstable and may change in future releases.
-   * They are part of Clerk's Billing feature which is available under public beta.
-   */
   __experimental_CheckoutButtonProps as CheckoutButtonProps,
   /**
    * @experimental
@@ -38,4 +32,10 @@ export type {
    * They are part of Clerk's Billing feature which is available under public beta.
    */
   __experimental_PlanDetailsButtonProps as PlanDetailsButtonProps,
-} from '@clerk/types';
+  /**
+   * @experimental
+   * These components and their prop types are unstable and may change in future releases.
+   * They are part of Clerk's Billing feature which is available under public beta.
+   */
+  __experimental_SubscriptionDetailsButtonProps as SubscriptionDetailsButtonProps,
+} from '@clerk/shared/types';

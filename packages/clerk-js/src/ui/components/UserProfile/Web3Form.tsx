@@ -1,5 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import type { Web3Provider, Web3Strategy } from '@clerk/types';
+import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
