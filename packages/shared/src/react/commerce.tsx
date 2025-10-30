@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
-import type { Stripe, StripeElements } from '@stripe/stripe-js';
+import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -237,7 +237,7 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
           appearance: {
             variables: stripeAppearance,
           },
-          locale: locale as any,
+          locale: locale as StripeElementsOptions['locale'],
         }}
       >
         <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
