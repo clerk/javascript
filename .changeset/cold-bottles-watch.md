@@ -3,4 +3,4 @@
 '@clerk/shared': patch
 ---
 
-Pass current localization value to Stripe Elements
+Propagate locale from ClerkProvider to PaymentElement
