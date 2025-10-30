@@ -21,12 +21,204 @@ const defaultErrors = (): Errors => ({
   global: null,
 });
 
+interface PropertyConfig<TTarget> {
+  [key: string]: { key: keyof TTarget; defaultValue: any };
+}
+
+interface MethodConfig<TTarget> {
+  [key: string]: keyof TTarget & string;
+}
+
+interface StructConfig<TTarget> {
+  [key: string]: {
+    getTarget: () => TTarget;
+    methods: readonly (keyof TTarget & string)[];
+    getters?: readonly (keyof TTarget)[];
+    fallbacks?: Partial<TTarget>;
+  };
+}
+
+interface ResourceProxyConfig<TTarget, TResourceName extends string> {
+  resourceName: TResourceName;
+  target: () => TTarget;
+  resourceProperties?: PropertyConfig<TTarget>;
+  resourceMethods?: MethodConfig<TTarget>;
+  resourceStructs?: StructConfig<TTarget>;
+  resourceDefaults?: Partial<TTarget>;
+}
+
 export class StateProxy implements State {
   constructor(private isomorphicClerk: IsomorphicClerk) {}
 
-  private readonly signInSignalProxy = this.buildSignInProxy();
-  private readonly signUpSignalProxy = this.buildSignUpProxy();
-  private readonly waitlistSignalProxy = this.buildWaitlistProxy();
+  private readonly signInSignalProxy = this.createResourceProxy({
+    resourceName: 'signIn',
+    target: () => this.client.signIn.__internal_future,
+    resourceProperties: {
+      id: { key: 'id', defaultValue: undefined },
+      supportedFirstFactors: { key: 'supportedFirstFactors', defaultValue: [] },
+      supportedSecondFactors: { key: 'supportedSecondFactors', defaultValue: [] },
+      secondFactorVerification: {
+        key: 'secondFactorVerification',
+        defaultValue: {
+          status: null,
+          error: null,
+          expireAt: null,
+          externalVerificationRedirectURL: null,
+          nonce: null,
+          attempts: null,
+          message: null,
+          strategy: null,
+          verifiedAtClient: null,
+          verifiedFromTheSameClient: () => false,
+          __internal_toSnapshot: () => {
+            throw new Error('__internal_toSnapshot called before Clerk is loaded');
+          },
+          pathRoot: '',
+          reload: () => {
+            throw new Error('__internal_toSnapshot called before Clerk is loaded');
+          },
+        },
+      },
+      identifier: { key: 'identifier', defaultValue: null },
+      createdSessionId: { key: 'createdSessionId', defaultValue: null },
+      userData: { key: 'userData', defaultValue: {} },
+      firstFactorVerification: {
+        key: 'firstFactorVerification',
+        defaultValue: {
+          status: null,
+          error: null,
+          expireAt: null,
+          externalVerificationRedirectURL: null,
+          nonce: null,
+          attempts: null,
+          message: null,
+          strategy: null,
+          verifiedAtClient: null,
+          verifiedFromTheSameClient: () => false,
+          __internal_toSnapshot: () => {
+            throw new Error('__internal_toSnapshot called before Clerk is loaded');
+          },
+          pathRoot: '',
+          reload: () => {
+            throw new Error('__internal_toSnapshot called before Clerk is loaded');
+          },
+        },
+      },
+    },
+    resourceMethods: {
+      create: 'create',
+      password: 'password',
+      sso: 'sso',
+      finalize: 'finalize',
+      ticket: 'ticket',
+      passkey: 'passkey',
+      web3: 'web3',
+    },
+    resourceStructs: {
+      emailCode: {
+        getTarget: () => this.client.signIn.__internal_future.emailCode,
+        methods: ['sendCode', 'verifyCode'] as const,
+      },
+      emailLink: {
+        getTarget: () => this.client.signIn.__internal_future.emailLink,
+        methods: ['sendLink', 'waitForVerification'] as const,
+        getters: ['verification'] as const,
+        fallbacks: { verification: null },
+      },
+      resetPasswordEmailCode: {
+        getTarget: () => this.client.signIn.__internal_future.resetPasswordEmailCode,
+        methods: ['sendCode', 'verifyCode', 'submitPassword'] as const,
+      },
+      phoneCode: {
+        getTarget: () => this.client.signIn.__internal_future.phoneCode,
+        methods: ['sendCode', 'verifyCode'] as const,
+      },
+      mfa: {
+        getTarget: () => this.client.signIn.__internal_future.mfa,
+        methods: ['sendPhoneCode', 'verifyPhoneCode', 'verifyTOTP', 'verifyBackupCode'] as const,
+      },
+    },
+    resourceDefaults: {
+      status: 'needs_identifier',
+      availableStrategies: [],
+      isTransferable: false,
+    },
+  });
+
+  private readonly signUpSignalProxy = this.createResourceProxy({
+    resourceName: 'signUp',
+    target: () => this.client.signUp.__internal_future,
+    resourceProperties: {
+      id: { key: 'id', defaultValue: undefined },
+      requiredFields: { key: 'requiredFields', defaultValue: [] },
+      optionalFields: { key: 'optionalFields', defaultValue: [] },
+      missingFields: { key: 'missingFields', defaultValue: [] },
+      username: { key: 'username', defaultValue: null },
+      firstName: { key: 'firstName', defaultValue: null },
+      lastName: { key: 'lastName', defaultValue: null },
+      emailAddress: { key: 'emailAddress', defaultValue: null },
+      phoneNumber: { key: 'phoneNumber', defaultValue: null },
+      web3Wallet: { key: 'web3Wallet', defaultValue: null },
+      hasPassword: { key: 'hasPassword', defaultValue: false },
+      unsafeMetadata: { key: 'unsafeMetadata', defaultValue: {} },
+      createdSessionId: { key: 'createdSessionId', defaultValue: null },
+      createdUserId: { key: 'createdUserId', defaultValue: null },
+      abandonAt: { key: 'abandonAt', defaultValue: null },
+      legalAcceptedAt: { key: 'legalAcceptedAt', defaultValue: null },
+      locale: { key: 'locale', defaultValue: null },
+      status: { key: 'status', defaultValue: 'missing_requirements' },
+      unverifiedFields: { key: 'unverifiedFields', defaultValue: [] },
+      isTransferable: { key: 'isTransferable', defaultValue: false },
+    },
+    resourceMethods: {
+      create: 'create',
+      update: 'update',
+      sso: 'sso',
+      password: 'password',
+      ticket: 'ticket',
+      web3: 'web3',
+      finalize: 'finalize',
+    },
+    resourceStructs: {
+      verifications: {
+        getTarget: () => this.client.signUp.__internal_future.verifications,
+        methods: ['sendEmailCode', 'verifyEmailCode', 'sendPhoneCode', 'verifyPhoneCode'] as const,
+      },
+    },
+  });
+
+  private readonly waitlistSignalProxy = this.createResourceProxy({
+    resourceName: 'waitlist',
+    target: (): { id?: string; createdAt: Date | null; updatedAt: Date | null; join: (params: any) => Promise<any> } => {
+      if (!inBrowser() || !this.isomorphicClerk.loaded) {
+        return {
+          id: undefined,
+          createdAt: null,
+          updatedAt: null,
+          join: () => Promise.resolve({ error: null }),
+        };
+      }
+      const state = this.isomorphicClerk.__internal_state;
+      const waitlist = state.__internal_waitlist;
+      if (waitlist && '__internal_future' in waitlist) {
+        return (waitlist as { __internal_future: any }).__internal_future;
+      }
+      return {
+        id: undefined,
+        createdAt: null,
+        updatedAt: null,
+        join: () => Promise.resolve({ error: null }),
+      };
+    },
+    resourceProperties: {
+      id: { key: 'id', defaultValue: undefined },
+      createdAt: { key: 'createdAt', defaultValue: null },
+      updatedAt: { key: 'updatedAt', defaultValue: null },
+    },
+    resourceMethods: {
+      join: 'join',
+    },
+  });
 
   signInSignal() {
     return this.signInSignalProxy;
@@ -45,236 +237,52 @@ export class StateProxy implements State {
     return this.isomorphicClerk.__internal_state.__internal_waitlist;
   }
 
-  private buildSignInProxy() {
-    const gateProperty = this.gateProperty.bind(this);
-    const target = () => this.client.signIn.__internal_future;
-
-    return {
-      errors: defaultErrors(),
-      fetchStatus: 'idle' as const,
-      signIn: {
-        status: 'needs_identifier' as const,
-        availableStrategies: [],
-        isTransferable: false,
-        get id() {
-          return gateProperty(target, 'id', undefined);
-        },
-        get supportedFirstFactors() {
-          return gateProperty(target, 'supportedFirstFactors', []);
-        },
-        get supportedSecondFactors() {
-          return gateProperty(target, 'supportedSecondFactors', []);
-        },
-        get secondFactorVerification() {
-          return gateProperty(target, 'secondFactorVerification', {
-            status: null,
-            error: null,
-            expireAt: null,
-            externalVerificationRedirectURL: null,
-            nonce: null,
-            attempts: null,
-            message: null,
-            strategy: null,
-            verifiedAtClient: null,
-            verifiedFromTheSameClient: () => false,
-            __internal_toSnapshot: () => {
-              throw new Error('__internal_toSnapshot called before Clerk is loaded');
-            },
-            pathRoot: '',
-            reload: () => {
-              throw new Error('__internal_toSnapshot called before Clerk is loaded');
-            },
-          });
-        },
-        get identifier() {
-          return gateProperty(target, 'identifier', null);
-        },
-        get createdSessionId() {
-          return gateProperty(target, 'createdSessionId', null);
-        },
-        get userData() {
-          return gateProperty(target, 'userData', {});
-        },
-        get firstFactorVerification() {
-          return gateProperty(target, 'firstFactorVerification', {
-            status: null,
-            error: null,
-            expireAt: null,
-            externalVerificationRedirectURL: null,
-            nonce: null,
-            attempts: null,
-            message: null,
-            strategy: null,
-            verifiedAtClient: null,
-            verifiedFromTheSameClient: () => false,
-            __internal_toSnapshot: () => {
-              throw new Error('__internal_toSnapshot called before Clerk is loaded');
-            },
-            pathRoot: '',
-            reload: () => {
-              throw new Error('__internal_toSnapshot called before Clerk is loaded');
-            },
-          });
-        },
-
-        create: this.gateMethod(target, 'create'),
-        password: this.gateMethod(target, 'password'),
-        sso: this.gateMethod(target, 'sso'),
-        finalize: this.gateMethod(target, 'finalize'),
-
-        emailCode: this.wrapMethods(() => target().emailCode, ['sendCode', 'verifyCode'] as const),
-        emailLink: this.wrapStruct(
-          () => target().emailLink,
-          ['sendLink', 'waitForVerification'] as const,
-          ['verification'] as const,
-          { verification: null },
-        ),
-        resetPasswordEmailCode: this.wrapMethods(() => target().resetPasswordEmailCode, [
-          'sendCode',
-          'verifyCode',
-          'submitPassword',
-        ] as const),
-        phoneCode: this.wrapMethods(() => target().phoneCode, ['sendCode', 'verifyCode'] as const),
-        mfa: this.wrapMethods(() => target().mfa, [
-          'sendPhoneCode',
-          'verifyPhoneCode',
-          'verifyTOTP',
-          'verifyBackupCode',
-        ] as const),
-        ticket: this.gateMethod(target, 'ticket'),
-        passkey: this.gateMethod(target, 'passkey'),
-        web3: this.gateMethod(target, 'web3'),
-      },
-    };
-  }
-
-  private buildSignUpProxy() {
+  private createResourceProxy<TTarget, TResourceName extends string>(
+    config: ResourceProxyConfig<TTarget, TResourceName>,
+  ): {
+    errors: Errors;
+    fetchStatus: 'idle';
+    [K in TResourceName]: any;
+  } {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
     const wrapMethods = this.wrapMethods.bind(this);
-    const target = () => this.client.signUp.__internal_future;
+    const wrapStruct = this.wrapStruct.bind(this);
+    const target = config.target;
+
+    const resource: any = { ...config.resourceDefaults };
+
+    if (config.resourceProperties) {
+      for (const [propName, { key, defaultValue }] of Object.entries(config.resourceProperties)) {
+        Object.defineProperty(resource, propName, {
+          get: () => gateProperty(target, key as keyof TTarget, defaultValue),
+          enumerable: true,
+        });
+      }
+    }
+
+    if (config.resourceMethods) {
+      for (const [methodName, methodKey] of Object.entries(config.resourceMethods)) {
+        resource[methodName] = gateMethod(target, methodKey);
+      }
+    }
+
+    if (config.resourceStructs) {
+      for (const [structName, structConfig] of Object.entries(config.resourceStructs)) {
+        resource[structName] = wrapStruct(
+          structConfig.getTarget,
+          structConfig.methods,
+          structConfig.getters || [],
+          structConfig.fallbacks || {},
+        );
+      }
+    }
 
     return {
       errors: defaultErrors(),
       fetchStatus: 'idle' as const,
-      signUp: {
-        get id() {
-          return gateProperty(target, 'id', undefined);
-        },
-        get requiredFields() {
-          return gateProperty(target, 'requiredFields', []);
-        },
-        get optionalFields() {
-          return gateProperty(target, 'optionalFields', []);
-        },
-        get missingFields() {
-          return gateProperty(target, 'missingFields', []);
-        },
-        get username() {
-          return gateProperty(target, 'username', null);
-        },
-        get firstName() {
-          return gateProperty(target, 'firstName', null);
-        },
-        get lastName() {
-          return gateProperty(target, 'lastName', null);
-        },
-        get emailAddress() {
-          return gateProperty(target, 'emailAddress', null);
-        },
-        get phoneNumber() {
-          return gateProperty(target, 'phoneNumber', null);
-        },
-        get web3Wallet() {
-          return gateProperty(target, 'web3Wallet', null);
-        },
-        get hasPassword() {
-          return gateProperty(target, 'hasPassword', false);
-        },
-        get unsafeMetadata() {
-          return gateProperty(target, 'unsafeMetadata', {});
-        },
-        get createdSessionId() {
-          return gateProperty(target, 'createdSessionId', null);
-        },
-        get createdUserId() {
-          return gateProperty(target, 'createdUserId', null);
-        },
-        get abandonAt() {
-          return gateProperty(target, 'abandonAt', null);
-        },
-        get legalAcceptedAt() {
-          return gateProperty(target, 'legalAcceptedAt', null);
-        },
-        get locale() {
-          return gateProperty(target, 'locale', null);
-        },
-        get status() {
-          return gateProperty(target, 'status', 'missing_requirements');
-        },
-        get unverifiedFields() {
-          return gateProperty(target, 'unverifiedFields', []);
-        },
-        get isTransferable() {
-          return gateProperty(target, 'isTransferable', false);
-        },
-
-        create: gateMethod(target, 'create'),
-        update: gateMethod(target, 'update'),
-        sso: gateMethod(target, 'sso'),
-        password: gateMethod(target, 'password'),
-        ticket: gateMethod(target, 'ticket'),
-        web3: gateMethod(target, 'web3'),
-        finalize: gateMethod(target, 'finalize'),
-
-        verifications: wrapMethods(() => target().verifications, [
-          'sendEmailCode',
-          'verifyEmailCode',
-          'sendPhoneCode',
-          'verifyPhoneCode',
-        ] as const),
-      },
-    };
-  }
-
-  private buildWaitlistProxy() {
-    const gateProperty = this.gateProperty.bind(this);
-    const gateMethod = this.gateMethod.bind(this);
-    const fallbackWaitlistFuture = {
-      id: undefined,
-      createdAt: null,
-      updatedAt: null,
-      join: () => Promise.resolve({ error: null }),
-    };
-    const target = (): typeof fallbackWaitlistFuture => {
-      if (!inBrowser() || !this.isomorphicClerk.loaded) {
-        return fallbackWaitlistFuture;
-      }
-      const state = this.isomorphicClerk.__internal_state;
-      const waitlist = state.__internal_waitlist;
-      if (waitlist && '__internal_future' in waitlist) {
-        return (waitlist as { __internal_future: typeof fallbackWaitlistFuture }).__internal_future;
-      }
-      return fallbackWaitlistFuture;
-    };
-
-    return {
-      errors: defaultErrors(),
-      fetchStatus: 'idle' as const,
-      waitlist: {
-        get id() {
-          return gateProperty(target, 'id', undefined);
-        },
-        get createdAt() {
-          return gateProperty(target, 'createdAt', null);
-        },
-        get updatedAt() {
-          return gateProperty(target, 'updatedAt', null);
-        },
-
-        join: gateMethod(target, 'join'),
-      },
-    };
+      [config.resourceName]: resource,
+    } as any;
   }
 
   __internal_effect(_: () => void): () => void {

@@ -1,16 +1,27 @@
 import type { SignInSignalValue, SignUpSignalValue, WaitlistSignalValue } from '@clerk/types';
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 
+type SignalName = 'signIn' | 'signUp' | 'waitlist';
+
 function useClerkSignal(signal: 'signIn'): SignInSignalValue;
 function useClerkSignal(signal: 'signUp'): SignUpSignalValue;
 function useClerkSignal(signal: 'waitlist'): WaitlistSignalValue;
-function useClerkSignal(signal: 'signIn' | 'signUp' | 'waitlist'): SignInSignalValue | SignUpSignalValue | WaitlistSignalValue {
+function useClerkSignal(signal: SignalName): SignInSignalValue | SignUpSignalValue | WaitlistSignalValue {
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();
+
+  const signalGetter = useMemo(() => {
+    const map: Record<SignalName, () => SignInSignalValue | SignUpSignalValue | WaitlistSignalValue> = {
+      signIn: () => clerk.__internal_state.signInSignal() as SignInSignalValue,
+      signUp: () => clerk.__internal_state.signUpSignal() as SignUpSignalValue,
+      waitlist: () => clerk.__internal_state.waitlistSignal() as WaitlistSignalValue,
+    };
+    return map[signal];
+  }, [clerk.__internal_state, signal]);
 
   const subscribe = useCallback(
     (callback: () => void) => {
@@ -19,36 +30,16 @@ function useClerkSignal(signal: 'signIn' | 'signUp' | 'waitlist'): SignInSignalV
       }
 
       return clerk.__internal_state.__internal_effect(() => {
-        switch (signal) {
-          case 'signIn':
-            clerk.__internal_state.signInSignal();
-            break;
-          case 'signUp':
-            clerk.__internal_state.signUpSignal();
-            break;
-          case 'waitlist':
-            clerk.__internal_state.waitlistSignal();
-            break;
-          default:
-            throw new Error(`Unknown signal: ${signal}`);
-        }
+        signalGetter();
         callback();
       });
     },
-    [clerk, clerk.loaded, clerk.__internal_state],
+    [clerk, clerk.loaded, clerk.__internal_state, signalGetter],
   );
+
   const getSnapshot = useCallback(() => {
-    switch (signal) {
-      case 'signIn':
-        return clerk.__internal_state.signInSignal() as SignInSignalValue;
-      case 'signUp':
-        return clerk.__internal_state.signUpSignal() as SignUpSignalValue;
-      case 'waitlist':
-        return clerk.__internal_state.waitlistSignal() as WaitlistSignalValue;
-      default:
-        throw new Error(`Unknown signal: ${signal}`);
-    }
-  }, [clerk.__internal_state]);
+    return signalGetter();
+  }, [signalGetter]);
 
   const value = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 

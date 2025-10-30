@@ -84,10 +84,24 @@ export interface Errors {
   global: unknown[] | null; // does not include any errors that could be parsed as a field error
 }
 
+type ResourceSignalValue<TFutureResource, TSignalName extends string> = {
+  errors: Errors;
+  fetchStatus: 'idle' | 'fetching';
+  [K in TSignalName]: TFutureResource;
+};
+
+type ResourceSignal<TFutureResource, TSignalName extends string> = () => Omit<
+  ResourceSignalValue<TFutureResource, TSignalName>,
+  TSignalName
+> & {
+  [K in TSignalName]: TFutureResource | null;
+};
+
 /**
  * The value returned by the `useSignInSignal` hook.
  */
-export interface SignInSignalValue {
+export interface SignInSignalValue
+  extends ResourceSignalValue<SignInFutureResource, 'signIn'> {
   /**
    * Represents the errors that occurred during the last fetch of the parent resource.
    */
@@ -104,11 +118,12 @@ export interface SignInSignalValue {
 export type NullableSignInSignal = Omit<SignInSignalValue, 'signIn'> & {
   signIn: SignInFutureResource | null;
 };
-export interface SignInSignal {
-  (): NullableSignInSignal;
-}
+export interface SignInSignal extends ResourceSignal<SignInFutureResource, 'signIn'> {}
 
-export interface SignUpSignalValue {
+/**
+ * The value returned by the `useSignUpSignal` hook.
+ */
+export interface SignUpSignalValue extends ResourceSignalValue<SignUpFutureResource, 'signUp'> {
   /**
    * The errors that occurred during the last fetch of the underlying `SignUp` resource.
    */
@@ -125,11 +140,13 @@ export interface SignUpSignalValue {
 export type NullableSignUpSignal = Omit<SignUpSignalValue, 'signUp'> & {
   signUp: SignUpFutureResource | null;
 };
-export interface SignUpSignal {
-  (): NullableSignUpSignal;
-}
+export interface SignUpSignal extends ResourceSignal<SignUpFutureResource, 'signUp'> {}
 
-export interface WaitlistSignalValue {
+/**
+ * The value returned by the `useWaitlistSignal` hook.
+ */
+export interface WaitlistSignalValue
+  extends ResourceSignalValue<WaitlistFutureResource, 'waitlist'> {
   /**
    * The errors that occurred during the last fetch of the underlying `Waitlist` resource.
    */
@@ -146,9 +163,7 @@ export interface WaitlistSignalValue {
 export type NullableWaitlistSignal = Omit<WaitlistSignalValue, 'waitlist'> & {
   waitlist: WaitlistFutureResource | null;
 };
-export interface WaitlistSignal {
-  (): NullableWaitlistSignal;
-}
+export interface WaitlistSignal extends ResourceSignal<WaitlistFutureResource, 'waitlist'> {}
 
 export interface State {
   /**

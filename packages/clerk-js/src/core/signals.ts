@@ -7,47 +7,62 @@ import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
 import type { Waitlist } from './resources/Waitlist';
 
-export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
-export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
-export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+interface ResourceSignalSet<TResource extends { __internal_future: any }, TComputedSignal> {
+  resourceSignal: ReturnType<typeof signal<{ resource: TResource | null }>>;
+  errorSignal: ReturnType<typeof signal<{ error: unknown }>>;
+  fetchSignal: ReturnType<typeof signal<{ status: 'idle' | 'fetching' }>>;
+  computedSignal: TComputedSignal;
+}
 
-export const signInComputedSignal: SignInSignal = computed(() => {
-  const signIn = signInResourceSignal().resource;
-  const error = signInErrorSignal().error;
-  const fetchStatus = signInFetchSignal().status;
+function createResourceSignalSet<
+  TResource extends { __internal_future: any },
+  TSignalName extends string,
+  TComputedSignal extends () => { errors: Errors; fetchStatus: 'idle' | 'fetching'; [K in TSignalName]: any },
+>(
+  resourceName: TSignalName,
+): ResourceSignalSet<TResource, TComputedSignal> {
+  const resourceSignal = signal<{ resource: TResource | null }>({ resource: null });
+  const errorSignal = signal<{ error: unknown }>({ error: null });
+  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
-  const errors = errorsToParsedErrors(error);
+  const computedSignal = computed(() => {
+    const resource = resourceSignal().resource;
+    const error = errorSignal().error;
+    const fetchStatus = fetchSignal().status;
+    const errors = errorsToParsedErrors(error);
 
-  return { errors, fetchStatus, signIn: signIn ? signIn.__internal_future : null };
-});
+    return {
+      errors,
+      fetchStatus,
+      [resourceName]: resource ? resource.__internal_future : null,
+    } as ReturnType<TComputedSignal>;
+  }) as TComputedSignal;
 
-export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resource: null });
-export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
-export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+  return {
+    resourceSignal,
+    errorSignal,
+    fetchSignal,
+    computedSignal,
+  };
+}
 
-export const signUpComputedSignal: SignUpSignal = computed(() => {
-  const signUp = signUpResourceSignal().resource;
-  const error = signUpErrorSignal().error;
-  const fetchStatus = signUpFetchSignal().status;
+const signInSignals = createResourceSignalSet<SignIn, 'signIn', SignInSignal>('signIn');
+export const signInResourceSignal = signInSignals.resourceSignal;
+export const signInErrorSignal = signInSignals.errorSignal;
+export const signInFetchSignal = signInSignals.fetchSignal;
+export const signInComputedSignal = signInSignals.computedSignal;
 
-  const errors = errorsToParsedErrors(error);
+const signUpSignals = createResourceSignalSet<SignUp, 'signUp', SignUpSignal>('signUp');
+export const signUpResourceSignal = signUpSignals.resourceSignal;
+export const signUpErrorSignal = signUpSignals.errorSignal;
+export const signUpFetchSignal = signUpSignals.fetchSignal;
+export const signUpComputedSignal = signUpSignals.computedSignal;
 
-  return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
-});
-
-export const waitlistResourceSignal = signal<{ resource: Waitlist | null }>({ resource: null });
-export const waitlistErrorSignal = signal<{ error: unknown }>({ error: null });
-export const waitlistFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-
-export const waitlistComputedSignal: WaitlistSignal = computed(() => {
-  const waitlist = waitlistResourceSignal().resource;
-  const error = waitlistErrorSignal().error;
-  const fetchStatus = waitlistFetchSignal().status;
-
-  const errors = errorsToParsedErrors(error);
-
-  return { errors, fetchStatus, waitlist: waitlist ? waitlist.__internal_future : null };
-});
+const waitlistSignals = createResourceSignalSet<Waitlist, 'waitlist', WaitlistSignal>('waitlist');
+export const waitlistResourceSignal = waitlistSignals.resourceSignal;
+export const waitlistErrorSignal = waitlistSignals.errorSignal;
+export const waitlistFetchSignal = waitlistSignals.fetchSignal;
+export const waitlistComputedSignal = waitlistSignals.computedSignal;
 
 /**
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
