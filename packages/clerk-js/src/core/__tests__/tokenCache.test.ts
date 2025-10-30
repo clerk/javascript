@@ -277,6 +277,41 @@ describe('SessionTokenCache', () => {
       // Critical: postMessage should NOT be called when handling a broadcast
       expect(mockBroadcastChannel.postMessage).not.toHaveBeenCalled();
     });
+
+    it('always broadcasts regardless of cache state', async () => {
+      mockBroadcastChannel.postMessage.mockClear();
+
+      const tokenId = 'session_456';
+      const tokenResolver = Promise.resolve(
+        new Token({
+          id: tokenId,
+          jwt: mockJwt,
+          object: 'token',
+        }) as TokenResource,
+      );
+
+      SessionTokenCache.set({ tokenId, tokenResolver });
+      await Promise.resolve();
+
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
+      const firstCall = mockBroadcastChannel.postMessage.mock.calls[0][0];
+      expect(firstCall.tokenId).toBe(tokenId);
+
+      mockBroadcastChannel.postMessage.mockClear();
+
+      const tokenResolver2 = Promise.resolve(
+        new Token({
+          id: tokenId,
+          jwt: mockJwt,
+          object: 'token',
+        }) as TokenResource,
+      );
+
+      SessionTokenCache.set({ tokenId, tokenResolver: tokenResolver2 });
+      await Promise.resolve();
+
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('token expiration with absolute time', () => {

@@ -67,6 +67,7 @@ export class Session extends BaseResource implements SessionResource {
     super();
 
     this.fromJSON(data);
+    this.#hydrateCache(this.lastActiveToken);
   }
 
   end = (): Promise<SessionResource> => {
@@ -129,6 +130,21 @@ export class Session extends BaseResource implements SessionResource {
     })(params);
   };
 
+  #hydrateCache = (token: TokenResource | null) => {
+    if (!token) {
+      return;
+    }
+
+    const tokenId = this.#getCacheId();
+    const existing = SessionTokenCache.get({ tokenId });
+    if (!existing) {
+      SessionTokenCache.set({
+        tokenId,
+        tokenResolver: Promise.resolve(token),
+      });
+    }
+  };
+
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
   // and retrieve it using the session id concatenated with the jwt template name.
   // e.g. session id is 'sess_abc12345' and jwt template name is 'haris'
@@ -188,7 +204,7 @@ export class Session extends BaseResource implements SessionResource {
         body: {
           ...config,
           strategy: factor.strategy,
-        },
+        } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
@@ -214,7 +230,7 @@ export class Session extends BaseResource implements SessionResource {
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
-        body: { ...config, strategy: attemptFactor.strategy },
+        body: { ...config, strategy: attemptFactor.strategy } as any,
       })
     )?.response as unknown as SessionVerificationJSON;
 
