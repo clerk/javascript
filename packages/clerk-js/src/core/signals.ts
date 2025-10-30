@@ -3,51 +3,115 @@ import { snakeToCamel } from '@clerk/shared/underscore';
 import type { Errors, SignInSignal, SignUpSignal, WaitlistSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
-import type { SignIn } from './resources/SignIn';
-import type { SignUp } from './resources/SignUp';
-import type { Waitlist } from './resources/Waitlist';
+import { SignIn } from './resources/SignIn';
+import { SignUp } from './resources/SignUp';
+import { Waitlist } from './resources/Waitlist';
+import type { BaseResource } from './resources/Base';
 
-export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
-export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
-export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+interface ResourceSignalSet<TResource extends { __internal_future: any }, TComputedSignal> {
+  resourceSignal: ReturnType<typeof signal<{ resource: TResource | null }>>;
+  errorSignal: ReturnType<typeof signal<{ error: unknown }>>;
+  fetchSignal: ReturnType<typeof signal<{ status: 'idle' | 'fetching' }>>;
+  computedSignal: TComputedSignal;
+}
 
-export const signInComputedSignal: SignInSignal = computed(() => {
-  const signIn = signInResourceSignal().resource;
-  const error = signInErrorSignal().error;
-  const fetchStatus = signInFetchSignal().status;
+type ResourceClass<T extends BaseResource = BaseResource> = new (...args: any[]) => T & {
+  __internal_future: any;
+  static __internal_resourceName: string;
+};
 
-  const errors = errorsToParsedErrors(error);
+type ResourceName<T extends ResourceClass> = T['__internal_resourceName'];
 
-  return { errors, fetchStatus, signIn: signIn ? signIn.__internal_future : null };
-});
+function createResourceSignalSet<
+  TResource extends { __internal_future: any },
+  TSignalName extends string,
+  TComputedSignal extends () => { errors: Errors; fetchStatus: 'idle' | 'fetching'; [K in TSignalName]: any },
+>(
+  resourceName: TSignalName,
+): ResourceSignalSet<TResource, TComputedSignal> {
+  const resourceSignal = signal<{ resource: TResource | null }>({ resource: null });
+  const errorSignal = signal<{ error: unknown }>({ error: null });
+  const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
-export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resource: null });
-export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
-export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+  const computedSignal = computed(() => {
+    const resource = resourceSignal().resource;
+    const error = errorSignal().error;
+    const fetchStatus = fetchSignal().status;
+    const errors = errorsToParsedErrors(error);
 
-export const signUpComputedSignal: SignUpSignal = computed(() => {
-  const signUp = signUpResourceSignal().resource;
-  const error = signUpErrorSignal().error;
-  const fetchStatus = signUpFetchSignal().status;
+    return {
+      errors,
+      fetchStatus,
+      [resourceName]: resource ? resource.__internal_future : null,
+    } as ReturnType<TComputedSignal>;
+  }) as TComputedSignal;
 
-  const errors = errorsToParsedErrors(error);
+  return {
+    resourceSignal,
+    errorSignal,
+    fetchSignal,
+    computedSignal,
+  };
+}
 
-  return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
-});
+const resourceSignalRegistry = new Map<
+  ResourceClass,
+  ResourceSignalSet<any, any>
+>();
 
-export const waitlistResourceSignal = signal<{ resource: Waitlist | null }>({ resource: null });
-export const waitlistErrorSignal = signal<{ error: unknown }>({ error: null });
-export const waitlistFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
+const resourceNameToSignalSet = new Map<string, ResourceSignalSet<any, any>>();
 
-export const waitlistComputedSignal: WaitlistSignal = computed(() => {
-  const waitlist = waitlistResourceSignal().resource;
-  const error = waitlistErrorSignal().error;
-  const fetchStatus = waitlistFetchSignal().status;
+function registerResourceSignals<
+  TResourceClass extends ResourceClass,
+  TResource extends InstanceType<TResourceClass>,
+  TSignalName extends ResourceName<TResourceClass>,
+>(
+  ResourceClass: TResourceClass & { __internal_resourceName: TSignalName },
+  signalType: () => { errors: Errors; fetchStatus: 'idle' | 'fetching'; [K in TSignalName]: any },
+): ResourceSignalSet<TResource, ReturnType<typeof signalType>> {
+  const resourceName = ResourceClass.__internal_resourceName;
+  const signalSet = createResourceSignalSet<TResource, TSignalName, ReturnType<typeof signalType>>(
+    resourceName,
+  );
+  resourceSignalRegistry.set(ResourceClass as ResourceClass, signalSet);
+  resourceNameToSignalSet.set(resourceName, signalSet);
+  return signalSet;
+}
 
-  const errors = errorsToParsedErrors(error);
+export function getSignalSetByResourceName(
+  resourceName: string,
+): ResourceSignalSet<any, any> | undefined {
+  return resourceNameToSignalSet.get(resourceName);
+}
 
-  return { errors, fetchStatus, waitlist: waitlist ? waitlist.__internal_future : null };
-});
+const signInSignals = registerResourceSignals(SignIn, (() => ({})) as SignInSignal);
+export const signInResourceSignal = signInSignals.resourceSignal;
+export const signInErrorSignal = signInSignals.errorSignal;
+export const signInFetchSignal = signInSignals.fetchSignal;
+export const signInComputedSignal = signInSignals.computedSignal;
+
+const signUpSignals = registerResourceSignals(SignUp, (() => ({})) as SignUpSignal);
+export const signUpResourceSignal = signUpSignals.resourceSignal;
+export const signUpErrorSignal = signUpSignals.errorSignal;
+export const signUpFetchSignal = signUpSignals.fetchSignal;
+export const signUpComputedSignal = signUpSignals.computedSignal;
+
+const waitlistSignals = registerResourceSignals(Waitlist, (() => ({})) as WaitlistSignal);
+export const waitlistResourceSignal = waitlistSignals.resourceSignal;
+export const waitlistErrorSignal = waitlistSignals.errorSignal;
+export const waitlistFetchSignal = waitlistSignals.fetchSignal;
+export const waitlistComputedSignal = waitlistSignals.computedSignal;
+
+export function getResourceSignalSet(
+  resource: BaseResource,
+): ResourceSignalSet<any, any> | undefined {
+  for (const [ResourceClass, signalSet] of resourceSignalRegistry) {
+    if (resource instanceof ResourceClass) {
+      return signalSet;
+    }
+  }
+  return undefined;
+}
 
 /**
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put

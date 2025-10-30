@@ -3,40 +3,18 @@ import { computed, effect } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
-import { SignIn } from './resources/SignIn';
-import { SignUp } from './resources/SignUp';
 import { Waitlist } from './resources/Waitlist';
 import {
-  signInComputedSignal,
-  signInErrorSignal,
-  signInFetchSignal,
-  signInResourceSignal,
-  signUpComputedSignal,
-  signUpErrorSignal,
-  signUpFetchSignal,
-  signUpResourceSignal,
-  waitlistComputedSignal,
-  waitlistErrorSignal,
-  waitlistFetchSignal,
-  waitlistResourceSignal,
+  getResourceSignalSet,
+  getSignalSetByResourceName,
 } from './signals';
 
+type ResourceClassWithName = new (...args: any[]) => BaseResource & {
+  __internal_future: any;
+  static __internal_resourceName: string;
+};
+
 export class State implements StateInterface {
-  signInResourceSignal = signInResourceSignal;
-  signInErrorSignal = signInErrorSignal;
-  signInFetchSignal = signInFetchSignal;
-  signInSignal = signInComputedSignal;
-
-  signUpResourceSignal = signUpResourceSignal;
-  signUpErrorSignal = signUpErrorSignal;
-  signUpFetchSignal = signUpFetchSignal;
-  signUpSignal = signUpComputedSignal;
-
-  waitlistResourceSignal = waitlistResourceSignal;
-  waitlistErrorSignal = waitlistErrorSignal;
-  waitlistFetchSignal = waitlistFetchSignal;
-  waitlistSignal = waitlistComputedSignal;
-
   private _waitlistInstance: Waitlist | null = null;
 
   __internal_effect = effect;
@@ -48,52 +26,63 @@ export class State implements StateInterface {
     eventBus.on('resource:fetch', this.onResourceFetch);
 
     this._waitlistInstance = new Waitlist(null);
-    this.waitlistResourceSignal({ resource: this._waitlistInstance });
+    const waitlistSignalSet = getSignalSetByResourceName('waitlist');
+    if (waitlistSignalSet) {
+      waitlistSignalSet.resourceSignal({ resource: this._waitlistInstance });
+    }
   }
 
   get __internal_waitlist() {
     return this._waitlistInstance;
   }
 
+  getSignalsForResource(resource: BaseResource) {
+    return getResourceSignalSet(resource);
+  }
+
+  getSignalsByName(resourceName: string) {
+    return getSignalSetByResourceName(resourceName);
+  }
+
+  getSignalsForClass<T extends ResourceClassWithName>(ResourceClass: T) {
+    return getSignalSetByResourceName(ResourceClass.__internal_resourceName);
+  }
+
+  getSignalForResourceName<T extends string>(
+    resourceName: T,
+  ): (() => { errors: any; fetchStatus: 'idle' | 'fetching'; [K in T]: any }) | undefined {
+    const signalSet = getSignalSetByResourceName(resourceName);
+    return signalSet?.computedSignal;
+  }
+
+  getSignalForResource(resource: BaseResource) {
+    const signalSet = getResourceSignalSet(resource);
+    return signalSet?.computedSignal;
+  }
+
+  getSignalForClass<T extends ResourceClassWithName>(ResourceClass: T) {
+    const signalSet = getSignalSetByResourceName(ResourceClass.__internal_resourceName);
+    return signalSet?.computedSignal;
+  }
+
   private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInErrorSignal({ error: payload.error });
-    }
-
-    if (payload.resource instanceof SignUp) {
-      this.signUpErrorSignal({ error: payload.error });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistErrorSignal({ error: payload.error });
+    const signalSet = getResourceSignalSet(payload.resource);
+    if (signalSet) {
+      signalSet.errorSignal({ error: payload.error });
     }
   };
 
   private onResourceUpdated = (payload: { resource: BaseResource }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInResourceSignal({ resource: payload.resource });
-    }
-
-    if (payload.resource instanceof SignUp) {
-      this.signUpResourceSignal({ resource: payload.resource });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistResourceSignal({ resource: payload.resource });
+    const signalSet = getResourceSignalSet(payload.resource);
+    if (signalSet) {
+      signalSet.resourceSignal({ resource: payload.resource });
     }
   };
 
   private onResourceFetch = (payload: { resource: BaseResource; status: 'idle' | 'fetching' }) => {
-    if (payload.resource instanceof SignIn) {
-      this.signInFetchSignal({ status: payload.status });
-    }
-
-    if (payload.resource instanceof SignUp) {
-      this.signUpFetchSignal({ status: payload.status });
-    }
-
-    if (payload.resource instanceof Waitlist) {
-      this.waitlistFetchSignal({ status: payload.status });
+    const signalSet = getResourceSignalSet(payload.resource);
+    if (signalSet) {
+      signalSet.fetchSignal({ status: payload.status });
     }
   };
 }

@@ -76,6 +76,7 @@ declare global {
 }
 
 export class SignUp extends BaseResource implements SignUpResource {
+  static readonly __internal_resourceName = 'signUp' as const;
   pathRoot = '/client/sign_ups';
 
   id: string | undefined;
