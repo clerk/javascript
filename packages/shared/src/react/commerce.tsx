@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { Stripe, StripeElements } from '@stripe/stripe-js';
+import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
@@ -60,6 +60,23 @@ const useInternalEnvironment = () => {
   const clerk = useClerk();
   // @ts-expect-error `__unstable__environment` is not typed
   return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+};
+
+const useLocalization = () => {
+  const clerk = useClerk();
+
+  let locale = 'en';
+  try {
+    const localization = clerk.__internal_getOption('localization');
+    locale = localization?.locale || 'en';
+  } catch {
+    // ignore errors
+  }
+
+  // Normalize locale to 2-letter language code for Stripe compatibility
+  const normalizedLocale = locale.split('-')[0];
+
+  return normalizedLocale;
 };
 
 const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
@@ -218,6 +235,7 @@ const PaymentElementProvider = ({ children, ...props }: PropsWithChildren<Paymen
 
 const PaymentElementInternalRoot = (props: PropsWithChildren) => {
   const { stripe, externalClientSecret, stripeAppearance } = usePaymentElementContext();
+  const locale = useLocalization();
 
   if (stripe && externalClientSecret) {
     return (
@@ -231,6 +249,7 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
           appearance: {
             variables: stripeAppearance,
           },
+          locale: locale as StripeElementsOptions['locale'],
         }}
       >
         <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
