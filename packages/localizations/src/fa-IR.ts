@@ -69,8 +69,8 @@ export const faIR: LocalizationResource = {
   badge__upcomingPlan: 'به زودی',
   badge__userDevice: 'دستگاه کاربر',
   badge__you: 'شما',
-  commerce: {
-    addPaymentMethod: 'افزودن روش پرداخت',
+  billing: {
+    addPaymentMethod__label: 'افزودن روش پرداخت',
     alwaysFree: 'همیشه رایگان',
     annually: 'سالانه',
     availableFeatures: 'ویژگی ها',
@@ -126,8 +126,7 @@ export const faIR: LocalizationResource = {
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
-    paymentMethods: 'روش های پرداخت',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
         monthly: 'پرداخت ماهانه',
@@ -141,6 +140,7 @@ export const faIR: LocalizationResource = {
         testCardInfo: 'تست اطلاعات کارت',
       },
     },
+    paymentMethods__label: 'روش های پرداخت',
     popular: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
@@ -225,6 +225,7 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',
@@ -288,7 +289,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -297,11 +298,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',
@@ -494,9 +495,11 @@ export const faIR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'ایجاد سازمان',
     action__invitationAccept: 'بپیوندید',
     action__manageOrganization: 'مدیریت',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'درخواست عضویت',
     notSelected: 'هیچ سازمانی انتخاب نشده است',
     personalWorkspace: 'حساب شخصی',
@@ -647,6 +650,10 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -767,6 +774,10 @@ export const faIR: LocalizationResource = {
         subtitleNewTab: 'برای ادامه به برگه قبلی برگردید',
         title: 'ایمیل با موفقیت تأیید شد',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -941,7 +952,9 @@ export const faIR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'افزودن حساب',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'مدیریت حساب',
+    action__openUserMenu: undefined,
     action__signOut: 'خروج',
     action__signOutAll: 'خروج از همه حساب‌ها',
   },
@@ -973,7 +986,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -982,11 +995,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',
@@ -1043,7 +1056,7 @@ export const faIR: LocalizationResource = {
       actionDescription: 'برای ادامه، عبارت "Delete account" را در زیر تایپ کنید.',
       confirm: 'حذف حساب',
       messageLine1:
-        'آیا مطمئن هستید که می‌خواهید حساب کاربری خود را از Clerk حذف کنید؟ لطفاً با صاحب برنامه تماس بگیرید تا اطلاعات شما را از برنامه آنها و سایر خدمات حذف کنند.',
+        'آیا مطمئن هستید که می‌خواهید حساب خود را حذف کنید؟ برخی از داده‌های مرتبط ممکن است حفظ شوند. برای درخواست حذف کامل داده‌ها، لطفاً با پشتیبانی تماس بگیرید.',
       messageLine2: 'این اقدام دائمی و غیرقابل برگشت است.',
       title: 'حذف حساب',
     },

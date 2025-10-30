@@ -68,8 +68,8 @@ export const jaJP: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'ユーザーデバイス',
   badge__you: 'あなた',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const jaJP: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const jaJP: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__password: 'パスワード',
   formFieldInputPlaceholder__phoneNumber: '電話番号',
   formFieldInputPlaceholder__username: 'ユーザー名',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const jaJP: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const jaJP: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +489,11 @@ export const jaJP: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '組織の作成',
     action__invitationAccept: '参加する',
     action__manageOrganization: '組織の管理',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '参加をリクエストする',
     notSelected: '組織が選択されていません',
     personalWorkspace: '個人ワークスペース',
@@ -638,6 +641,10 @@ export const jaJP: LocalizationResource = {
         titleNewTab: '他のタブでサインイン済み',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'パスワードリセットコード',
       resendButton: 'コードを再送信',
@@ -758,6 +765,10 @@ export const jaJP: LocalizationResource = {
         subtitleNewTab: '続行するために前のタブに戻ってください',
         title: 'メールアドレスが正常に確認されました',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -934,7 +945,9 @@ export const jaJP: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'アカウントの追加',
+    action__closeUserMenu: 'ユーザーメニューを閉じる',
     action__manageAccount: 'アカウントの管理',
+    action__openUserMenu: 'ユーザーメニューを開く',
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
   },
@@ -965,7 +978,7 @@ export const jaJP: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -974,7 +987,7 @@ export const jaJP: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1033,7 +1046,7 @@ export const jaJP: LocalizationResource = {
       actionDescription: '続行するには下記に「Delete account」を入力してください。',
       confirm: 'アカウント削除',
       messageLine1:
-        'Clerk からアカウントを削除してもよろしいですか？あなたの情報をアプリケーションや他のサービスから削除するには、アプリケーションの所有者にお問い合わせください。',
+        'アカウントを削除してもよろしいですか？一部の関連データが保持される場合があります。完全なデータ削除をリクエストするには、サポートにお問い合わせください。',
       messageLine2: 'この操作は永久的で取り消すことはできません。',
       title: 'アカウントの削除',
     },

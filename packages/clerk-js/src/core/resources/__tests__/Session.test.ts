@@ -1,4 +1,4 @@
-import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/types';
+import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
@@ -17,8 +17,17 @@ const baseFapiClientOptions = {
 };
 
 describe('Session', () => {
+  beforeEach(() => {
+    // Mock Date.now() to make the test tokens appear valid
+    // mockJwt has iat: 1666648250, exp: 1666648310
+    // Set current time to 1666648260 (10 seconds after iat, 50 seconds before exp)
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(1666648260 * 1000));
+  });
+
   afterEach(() => {
     SessionTokenCache.clear();
+    vi.useRealTimers();
   });
 
   describe('getToken()', () => {
@@ -249,6 +258,102 @@ describe('Session', () => {
       expect((BaseResource.fapiClient.request as Mock<any>).mock.calls[0][0]).toMatchObject({
         body: { organizationId: 'newActiveOrganization' },
       });
+    });
+
+    it('deduplicates concurrent getToken calls to prevent multiple API requests', async () => {
+      BaseResource.clerk = clerkMock() as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      const [token1, token2, token3] = await Promise.all([session.getToken(), session.getToken(), session.getToken()]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+      expect(token1).toEqual(mockJwt);
+      expect(token2).toEqual(mockJwt);
+      expect(token3).toEqual(mockJwt);
+    });
+
+    it('deduplicates concurrent getToken calls with same template', async () => {
+      BaseResource.clerk = clerkMock() as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      const [token1, token2] = await Promise.all([
+        session.getToken({ template: 'custom-template' }),
+        session.getToken({ template: 'custom-template' }),
+      ]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+      expect(token1).toEqual(mockJwt);
+      expect(token2).toEqual(mockJwt);
+    });
+
+    it('does not deduplicate getToken calls with different templates', async () => {
+      BaseResource.clerk = clerkMock() as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      await Promise.all([session.getToken({ template: 'template1' }), session.getToken({ template: 'template2' })]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not deduplicate getToken calls with different organization IDs', async () => {
+      BaseResource.clerk = clerkMock() as any;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      await Promise.all([session.getToken({ organizationId: 'org_1' }), session.getToken({ organizationId: 'org_2' })]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(2);
     });
   });
 

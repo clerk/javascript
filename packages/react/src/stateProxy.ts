@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/types';
+import type { Errors, State } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';
@@ -131,6 +131,7 @@ export class StateProxy implements State {
           'verifyBackupCode',
         ] as const),
         ticket: this.gateMethod(target, 'ticket'),
+        passkey: this.gateMethod(target, 'passkey'),
         web3: this.gateMethod(target, 'web3'),
       },
     };
@@ -193,6 +194,9 @@ export class StateProxy implements State {
         },
         get legalAcceptedAt() {
           return gateProperty(target, 'legalAcceptedAt', null);
+        },
+        get locale() {
+          return gateProperty(target, 'locale', null);
         },
         get status() {
           return gateProperty(target, 'status', 'missing_requirements');

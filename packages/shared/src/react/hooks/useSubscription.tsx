@@ -1,7 +1,7 @@
-import type { EnvironmentResource, ForPayerType } from '@clerk/types';
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
+import type { EnvironmentResource, ForPayerType } from '../../types';
 import { useSWR } from '../clerk-swr';
 import {
   useAssertWrappedByClerkProvider,

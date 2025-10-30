@@ -1,4 +1,4 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionItemResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import { useProtect } from '@/ui/common/Gate';
@@ -216,8 +216,8 @@ function SubscriptionRow({ subscription, length }: { subscription: BillingSubscr
               })}
               localizationKey={
                 subscription.planPeriod === 'annual'
-                  ? localizationKeys('commerce.year')
-                  : localizationKeys('commerce.month')
+                  ? localizationKeys('billing.year')
+                  : localizationKeys('billing.month')
               }
             />
           )}

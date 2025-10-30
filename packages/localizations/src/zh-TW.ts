@@ -68,8 +68,8 @@ export const zhTW: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '用戶設備',
   badge__you: '您',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const zhTW: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const zhTW: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -281,7 +282,7 @@ export const zhTW: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +291,7 @@ export const zhTW: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -479,9 +480,11 @@ export const zhTW: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '建立組織',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理組織',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '請求加入',
     notSelected: '未選取組織',
     personalWorkspace: '個人工作區',
@@ -628,6 +631,10 @@ export const zhTW: LocalizationResource = {
         titleNewTab: '已在其他分頁登入',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重設密碼代碼',
       resendButton: '重新傳送代碼',
@@ -747,6 +754,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回上一個分頁以繼續',
         title: '電子郵件驗證成功',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -916,7 +927,9 @@ export const zhTW: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '新增帳戶',
+    action__closeUserMenu: '關閉使用者選單',
     action__manageAccount: '管理帳戶',
+    action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
   },
@@ -945,7 +958,7 @@ export const zhTW: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -954,7 +967,7 @@ export const zhTW: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1012,7 +1025,7 @@ export const zhTW: LocalizationResource = {
     deletePage: {
       actionDescription: '請在下方輸入「Delete account」以繼續。',
       confirm: '刪除帳戶',
-      messageLine1: '您確定要刪除您在 Clerk 的帳戶嗎？請聯絡應用程式擁有者以從他們的應用程式和其他服務中刪除您的資訊。',
+      messageLine1: '您確定要刪除您的帳戶嗎？某些相關資料可能會被保留。如需申請完全刪除資料，請聯絡支援團隊。',
       messageLine2: '此動作將永久生效且無法復原。',
       title: '刪除帳戶',
     },

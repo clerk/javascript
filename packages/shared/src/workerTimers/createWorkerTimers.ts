@@ -1,4 +1,5 @@
 import { noop } from '../utils/noop';
+import pollerWorkerSource from './workerTimers.built';
 import type {
   WorkerClearTimeout,
   WorkerSetTimeout,
@@ -7,9 +8,6 @@ import type {
   WorkerTimerId,
   WorkerTimerResponseEvent,
 } from './workerTimers.types';
-// @ts-ignore
-// eslint-disable-next-line import/default
-import pollerWorkerSource from './workerTimers.worker';
 
 const createWebWorker = (source: string, opts: ConstructorParameters<typeof Worker>[1] = {}): Worker | null => {
   if (typeof Worker === 'undefined') {

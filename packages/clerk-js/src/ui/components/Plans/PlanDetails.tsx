@@ -4,7 +4,7 @@ import type {
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
   ClerkAPIResponseError,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
@@ -143,7 +143,7 @@ const PlanDetailsInternal = ({
           <Text
             elementDescriptor={descriptors.planDetailCaption}
             variant={'caption'}
-            localizationKey={localizationKeys('commerce.availableFeatures')}
+            localizationKey={localizationKeys('billing.availableFeatures')}
             colorScheme='secondary'
             sx={t => ({
               padding: t.space.$4,
@@ -328,7 +328,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
                 marginInlineEnd: t.space.$1,
               },
             })}
-            localizationKey={localizationKeys('commerce.month')}
+            localizationKey={localizationKeys('billing.month')}
           />
         </>
       </Flex>
@@ -344,7 +344,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           <Switch
             isChecked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('commerce.billedAnnually')}
+            label={localizationKeys('billing.billedAnnually')}
           />
         </Box>
       ) : (
@@ -353,7 +353,7 @@ const Header = React.forwardRef<HTMLDivElement, HeaderProps>((props, ref) => {
           variant='caption'
           colorScheme='secondary'
           localizationKey={
-            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
+            plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
           }
           sx={t => ({
             justifySelf: 'flex-start',

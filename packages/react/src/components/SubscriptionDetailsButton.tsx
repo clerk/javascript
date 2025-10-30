@@ -1,4 +1,4 @@
-import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/types';
+import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useAuth } from '../hooks';

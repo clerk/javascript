@@ -68,8 +68,8 @@ export const mnMN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
   badge__you: 'Чи',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const mnMN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const mnMN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const mnMN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const mnMN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +490,11 @@ export const mnMN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Байгууллага үүсгэх',
     action__invitationAccept: 'Нэгдэх',
     action__manageOrganization: 'Удирдах',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Нэгдэх хүсэлт',
     notSelected: 'Байгууллага сонгогдоогүй байна',
     personalWorkspace: 'Хувийн бүртгэл',
@@ -639,6 +642,10 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
@@ -759,6 +766,10 @@ export const mnMN: LocalizationResource = {
         subtitleNewTab: 'Үргэлжлүүлэхийн тулд өмнөх таб руу буцна уу',
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -932,7 +943,9 @@ export const mnMN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Бүртгэл нэмэх',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Бүртгэлийг удирдах',
+    action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
@@ -964,7 +977,7 @@ export const mnMN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +986,7 @@ export const mnMN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1033,7 +1046,7 @@ export const mnMN: LocalizationResource = {
       actionDescription: 'Үргэлжлүүлэхийн тулд "Delete account" гэж бичнэ үү.',
       confirm: 'Бүртгэл устгах',
       messageLine1:
-        'Та Clerk-ээс бүртгэлээ устгахдаа итгэлтэй байна уу? Таны мэдээллийг тэдний аппликэйшн болон бусад үйлчилгээнээс устгахын тулд аппликэйшний эзэнтэй холбогдоно уу.',
+        'Та үнэхээр бүртгэлээ устгахыг хүсч байна уу? Зарим холбогдох өгөгдөл хадгалагдах боломжтой. Бүрэн өгөгдөл устгахыг хүсвэл дэмжлэгтэй холбогдоно уу.',
       messageLine2: 'Энэ үйлдэл нь байнгын бөгөөд эргэлт буцалтгүй юм.',
       title: 'Бүртгэл устгах',
     },

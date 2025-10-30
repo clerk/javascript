@@ -10,7 +10,6 @@ import {
   isClerkRuntimeError,
 } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
-import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
@@ -20,8 +19,6 @@ import {
   eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
-import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
@@ -94,7 +91,9 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
+import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -164,8 +163,6 @@ import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
-export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -227,7 +224,7 @@ export class Clerk implements ClerkInterface {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
   #captchaHeartbeat?: CaptchaHeartbeat;
-  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
+  #broadcastChannel: BroadcastChannel | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
@@ -1154,16 +1151,24 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    // Temporary backward compatibility for legacy prop: `forOrganizations`. Will be removed in the coming minor release.
+    const nextProps = { ...(props as any) } as PricingTableProps & { forOrganizations?: boolean };
+    if (typeof (props as any)?.forOrganizations !== 'undefined') {
+      logger.warnOnce(
+        'Clerk: [IMPORTANT] <PricingTable /> prop `forOrganizations` is deprecated and will be removed in the coming minors. Use `for="organization"` instead.',
+      );
+    }
+
     void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
       controls.mountComponent({
         name: 'PricingTable',
         appearanceKey: 'pricingTable',
         node,
-        props,
+        props: nextProps,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', nextProps));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
@@ -2415,6 +2420,7 @@ export class Clerk implements ClerkInterface {
       ..._props,
       options: this.#initOptions({ ...this.#options, ..._props.options }),
     };
+
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
@@ -2553,7 +2559,10 @@ export class Clerk implements ClerkInterface {
      */
     this.#pageLifecycle = createPageLifecycle();
 
-    this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.#broadcastChannel = new BroadcastChannel('clerk');
+    }
+
     this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
@@ -2762,10 +2771,10 @@ export class Clerk implements ClerkInterface {
     });
 
     /**
-     * Background tabs get notified of a signout event from active tab.
+     * Background tabs get notified of cross-tab signout events.
      */
-    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
-      if (data.type === 'signout') {
+    this.#broadcastChannel?.addEventListener('message', (event: MessageEvent) => {
+      if (event.data?.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
     });

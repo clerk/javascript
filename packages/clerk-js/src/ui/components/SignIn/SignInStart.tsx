@@ -1,13 +1,13 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   ClerkAPIError,
   PhoneCodeChannel,
   PhoneCodeChannelData,
   SignInCreateParams,
   SignInResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -39,7 +39,7 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { useHandleAuthenticateWithPasskey } from './shared';
+import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -224,12 +224,13 @@ function SignInStartInternal(): JSX.Element {
       })
       .then(res => {
         switch (res.status) {
-          case 'needs_first_factor':
-            if (hasOnlyEnterpriseSSOFirstFactors(res)) {
-              return authenticateWithEnterpriseSSO();
+          case 'needs_first_factor': {
+            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+              return navigate('factor-one');
             }
 
-            return navigate('factor-one');
+            return authenticateWithEnterpriseSSO();
+          }
           case 'needs_second_factor':
             return navigate('factor-two');
           case 'complete':
@@ -253,7 +254,7 @@ function SignInStartInternal(): JSX.Element {
         // Keep the card in loading state during SSO redirect to prevent UI flicker
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
-        const isRedirectingToSSOProvider = hasOnlyEnterpriseSSOFirstFactors(signIn);
+        const isRedirectingToSSOProvider = !!hasOnlyEnterpriseSSOFirstFactors(signIn);
         if (isRedirectingToSSOProvider) {
           return;
         }
@@ -381,12 +382,13 @@ function SignInStartInternal(): JSX.Element {
             await authenticateWithEnterpriseSSO();
           }
           break;
-        case 'needs_first_factor':
-          if (hasOnlyEnterpriseSSOFirstFactors(res)) {
-            await authenticateWithEnterpriseSSO();
-            break;
+        case 'needs_first_factor': {
+          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            return navigate('factor-one');
           }
-          return navigate('factor-one');
+
+          return authenticateWithEnterpriseSSO();
+        }
         case 'needs_second_factor':
           return navigate('factor-two');
         case 'complete':

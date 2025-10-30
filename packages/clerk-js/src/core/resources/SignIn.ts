@@ -1,11 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
-import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
-import {
-  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
-  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
-} from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -38,6 +33,7 @@ import type {
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
   SignInFutureMFAPhoneCodeVerifyParams,
+  SignInFuturePasskeyParams,
   SignInFuturePasswordParams,
   SignInFuturePhoneCodeSendParams,
   SignInFuturePhoneCodeVerifyParams,
@@ -58,7 +54,12 @@ import type {
   Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
+import {
+  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 
 import { debugLogger } from '@/utils/debug';
 
@@ -68,6 +69,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getBrowserLocale,
   getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
@@ -163,9 +165,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
   create = (params: SignInCreateParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
+    const locale = getBrowserLocale();
     return this._basePost({
       path: this.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   };
 
@@ -222,6 +225,7 @@ export class SignIn extends BaseResource implements SignInResource {
           redirectUrl: params.redirectUrl,
           actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
           oidcPrompt: params.oidcPrompt,
+          enterpriseConnectionId: params.enterpriseConnectionId,
         } as EnterpriseSSOConfig;
         break;
       default:
@@ -308,7 +312,8 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
+      params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -328,6 +333,7 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        enterpriseConnectionId,
       });
     }
 
@@ -704,9 +710,10 @@ class SignInFuture implements SignInFutureResource {
   }
 
   private async _create(params: SignInFutureCreateParams): Promise<void> {
+    const locale = getBrowserLocale();
     await this.resource.__internal_basePost({
       path: this.resource.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   }
 
@@ -725,9 +732,14 @@ class SignInFuture implements SignInFutureResource {
       // TODO @userland-errors:
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
+      const locale = getBrowserLocale();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { identifier: identifier || previousIdentifier, password: params.password },
+        body: {
+          identifier: identifier || previousIdentifier,
+          password: params.password,
+          ...(locale ? { locale } : {}),
+        },
       });
     });
   }
@@ -971,6 +983,77 @@ class SignInFuture implements SignInFutureResource {
 
       await this.resource.__internal_basePost({
         body: { signature, strategy },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
+  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: unknown }> {
+    const { flow } = params || {};
+
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+    const isWebAuthnAutofillSupported =
+      SignIn.clerk.__internal_isWebAuthnAutofillSupported || isWebAuthnAutofillSupportedOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.resource, async () => {
+      if (flow === 'autofill' || flow === 'discoverable') {
+        await this._create({ strategy: 'passkey' });
+      } else {
+        const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+
+        if (!passKeyFactor) {
+          clerkVerifyPasskeyCalledBeforeCreate();
+        }
+        await this.resource.__internal_basePost({
+          body: { strategy: 'passkey' },
+          action: 'prepare_first_factor',
+        });
+      }
+
+      const { nonce } = this.firstFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+      if (!publicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      let canUseConditionalUI = false;
+
+      if (flow === 'autofill') {
+        /**
+         * If autofill is not supported gracefully handle the result, we don't need to throw.
+         * The caller should always check this before calling this method.
+         */
+        canUseConditionalUI = await isWebAuthnAutofillSupported();
+      }
+
+      // Invoke the navigator.create.get() method.
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: canUseConditionalUI,
+      });
+
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      await this.resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
         action: 'attempt_first_factor',
       });
     });
