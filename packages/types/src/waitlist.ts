@@ -25,7 +25,9 @@ export interface WaitlistFutureResource {
   /**
    * Used to join the waitlist with the provided email address.
    */
-  join: (params: { emailAddress: string }) => Promise<{ error: unknown }>;
+  join: (params: JoinWaitlistParams) => Promise<{ error: unknown }>;
 }
 
-export type { JoinWaitlistParams } from './clerk';
+export type JoinWaitlistParams = {
+  emailAddress: string;
+};
