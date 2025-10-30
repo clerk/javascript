@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "2.16.4",
+  "version": "2.17.3",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -65,15 +65,7 @@
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "web",
-    "local-credentials",
-    "passkeys",
-    "secure-store",
-    "resource-cache",
-    "token-cache",
-    "experimental",
-    "legacy"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
@@ -108,6 +100,7 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "expo": ">=53 <55",
     "expo-auth-session": ">=5",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",

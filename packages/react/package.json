@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react",
-  "version": "5.53.1",
+  "version": "5.53.4",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -77,15 +77,10 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist",
-    "internal",
-    "errors",
-    "experimental",
-    "legacy"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
@@ -101,7 +96,6 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {

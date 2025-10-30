@@ -21,6 +21,7 @@ export { default as PlanDetailsButton } from './unstyled/PlanDetailsButton.astro
  */
 export { default as SignIn } from './interactive/SignIn.astro';
 export { default as SignUp } from './interactive/SignUp.astro';
+export { default as UserAvatar } from './interactive/UserAvatar.astro';
 export { UserButton } from './interactive/UserButton';
 export { UserProfile } from './interactive/UserProfile';
 export { OrganizationProfile } from './interactive/OrganizationProfile';

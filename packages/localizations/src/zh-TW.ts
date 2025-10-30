@@ -121,7 +121,6 @@ export const zhTW: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const zhTW: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -479,9 +480,11 @@ export const zhTW: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '建立組織',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理組織',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '請求加入',
     notSelected: '未選取組織',
     personalWorkspace: '個人工作區',
@@ -628,6 +631,10 @@ export const zhTW: LocalizationResource = {
         titleNewTab: '已在其他分頁登入',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重設密碼代碼',
       resendButton: '重新傳送代碼',
@@ -747,6 +754,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回上一個分頁以繼續',
         title: '電子郵件驗證成功',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -916,7 +927,9 @@ export const zhTW: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '新增帳戶',
+    action__closeUserMenu: '關閉使用者選單',
     action__manageAccount: '管理帳戶',
+    action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
   },

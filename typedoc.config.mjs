@@ -1,8 +1,5 @@
-import path from 'node:path';
-import fs from 'node:fs';
 import { OptionDefaults } from 'typedoc';
 
-const IGNORE_LIST = ['.DS_Store', 'dev-cli', 'expo-passkeys', 'testing', 'themes', 'upgrade'];
 const CUSTOM_BLOCK_TAGS = [
   '@unionReturnHeadings',
   '@displayFunctionSignature',
@@ -10,16 +7,6 @@ const CUSTOM_BLOCK_TAGS = [
   '@experimental',
   '@hideReturns',
 ];
-
-/**
- * Return an array of relative paths to all folders in the "packages" folder to be used for the "entryPoints" option.
- */
-function getPackages() {
-  const packagesDir = path.resolve('packages');
-  const packages = fs.readdirSync(packagesDir);
-
-  return packages.filter(dir => !IGNORE_LIST.includes(dir)).map(dir => path.join('packages', dir));
-}
 
 /** @type {import("typedoc-plugin-markdown").PluginOptions} */
 const typedocPluginMarkdownOptions = {
@@ -116,7 +103,7 @@ const config = {
     disableSources: true,
     ...typedocPluginReplaceTextOptions,
   },
-  entryPoints: ['packages/backend', 'packages/nextjs', 'packages/react', 'packages/shared', 'packages/types'], // getPackages(),
+  entryPoints: ['packages/backend', 'packages/nextjs', 'packages/react', 'packages/shared'],
   ...typedocPluginMarkdownOptions,
 };
 

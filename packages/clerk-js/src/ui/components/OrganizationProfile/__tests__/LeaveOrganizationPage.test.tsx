@@ -1,4 +1,4 @@
-import type { DeletedObjectResource } from '@clerk/types';
+import type { DeletedObjectResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,3 @@
-import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
@@ -15,7 +14,8 @@ import type {
   SignUpProps,
   UserProfileProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';

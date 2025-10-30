@@ -67,6 +67,7 @@ export type InternalUIComponentId =
   | 'organization-list'
   | 'organization-profile'
   | 'organization-switcher'
+  | 'user-avatar'
   | 'user-button'
   | 'user-profile'
   | 'google-one-tap'

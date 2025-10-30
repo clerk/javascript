@@ -1,4 +1,4 @@
-import type { JoinWaitlistParams, WaitlistFutureResource, WaitlistJSON, WaitlistResource } from '@clerk/types';
+import type { JoinWaitlistParams, WaitlistFutureResource, WaitlistJSON, WaitlistResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';

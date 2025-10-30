@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { SelectId } from '@clerk/types';
+import type { SelectId } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, { useState } from 'react';
 
@@ -7,7 +7,7 @@ import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
 import { ChevronDown } from '../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import { colors } from '../utils/colors';
 import { withFloatingTree } from './contexts';
 import type { InputWithIcon } from './InputWithIcon';
@@ -51,17 +51,22 @@ type SelectState<O extends Option> = Pick<
 
 const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
 
-const defaultRenderOption = <O extends Option>(option: O, _index?: number, isFocused?: boolean) => {
+const defaultRenderOption = <O extends Option>(option: O, _index?: number) => {
   return (
     <Flex
       sx={theme => ({
+        position: 'relative',
         width: '100%',
         padding: `${theme.space.$2} ${theme.space.$4}`,
         margin: `0 ${theme.space.$1}`,
         borderRadius: theme.radii.$md,
-        ...(isFocused && { backgroundColor: theme.colors.$neutralAlpha100 }),
-        '&:hover': {
-          backgroundColor: theme.colors.$neutralAlpha100,
+        '&:hover, &[data-focused="true"]': {
+          background: common.mutedBackground(theme),
+        },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: `calc(${theme.space.$0x5} * -1) calc(${theme.space.$1} * -1)`,
         },
       })}
     >

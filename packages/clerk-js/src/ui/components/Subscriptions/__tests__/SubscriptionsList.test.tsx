@@ -1,4 +1,4 @@
-import type { BillingPayerResourceType } from '@clerk/types';
+import type { BillingPayerResourceType } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -91,7 +91,6 @@ describe('SubscriptionsList', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-01-15'),
           canceledAt: null,
-          paymentMethodId: 'src_free',
           planPeriod: 'month' as const,
           isFreeTrial: false,
           pastDueAt: null,
@@ -156,7 +155,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-01-15'),
       canceledAt: null,
-      paymentMethodId: 'src_trial',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: true, // This subscription is in a free trial
@@ -220,7 +218,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: null,
-      paymentMethodId: 'src_past_due',
       planPeriod: 'month' as const,
       status: 'past_due' as const,
       isFreeTrial: false,
@@ -285,7 +282,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: null,
-      paymentMethodId: 'src_active',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: false,
@@ -349,7 +345,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-02-01'),
       periodEnd: new Date('2021-03-01'),
       canceledAt: null,
-      paymentMethodId: 'src_upcoming',
       planPeriod: 'month' as const,
       status: 'upcoming' as const,
       isFreeTrial: false,
@@ -385,7 +380,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: new Date('2021-01-15'),
-      paymentMethodId: 'src_active_canceled',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: false,

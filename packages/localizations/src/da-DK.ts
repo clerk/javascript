@@ -121,7 +121,6 @@ export const daDK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const daDK: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const daDK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Indtast adgangskode',
   formFieldInputPlaceholder__phoneNumber: 'Indtast telefonnummer',
   formFieldInputPlaceholder__username: 'Indtast brugernavn',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -488,9 +489,11 @@ export const daDK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opret organisation',
     action__invitationAccept: 'Deltag',
     action__manageOrganization: 'Administrer organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Anmod om at deltage',
     notSelected: 'Ingen organisation valgt',
     personalWorkspace: 'Personligt arbejdsområde',
@@ -638,6 +641,10 @@ export const daDK: LocalizationResource = {
         titleNewTab: 'Logget ind på anden fane',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nulstil adgangskode',
       resendButton: 'Modtog du ikke en kode? Send igen',
@@ -757,6 +764,10 @@ export const daDK: LocalizationResource = {
         subtitleNewTab: 'Vend tilbage til forrige fane for at fortsætte',
         title: 'E-mail er bekræftet',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -929,7 +940,9 @@ export const daDK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tilføj konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
   },

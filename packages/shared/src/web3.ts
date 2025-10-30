@@ -1,4 +1,4 @@
-import type { Web3ProviderData } from '@clerk/types';
+import type { Web3ProviderData } from './types';
 
 export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {

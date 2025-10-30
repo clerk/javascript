@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/types';
+import type { Errors, State } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';

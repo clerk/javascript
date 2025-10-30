@@ -64,7 +64,6 @@ export const createLongRunningApps = () => {
      * Tanstack apps - basic flows
      */
     { id: 'tanstack.react-start', config: tanstack.reactStart, env: envs.withEmailCodes },
-    { id: 'tanstack.react-router', config: tanstack.reactRouter, env: envs.withEmailCodes },
  
     /**
      * Various apps - basic flows

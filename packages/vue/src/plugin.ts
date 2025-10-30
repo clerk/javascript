@@ -1,7 +1,14 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
-import type { Clerk, ClientResource, InitialState, MultiDomainAndOrProxy, Resources, Without } from '@clerk/types';
+import type {
+  Clerk,
+  ClientResource,
+  InitialState,
+  MultiDomainAndOrProxy,
+  Resources,
+  Without,
+} from '@clerk/shared/types';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 

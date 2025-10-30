@@ -127,7 +127,6 @@ export const ptBR: LocalizationResource = {
     monthly: 'Mensal',
     pastDue: 'Atrasado',
     pay: 'Pagar {{amount}}',
-    paymentMethods__label: 'Métodos de pagamento',
     paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento anual',
@@ -142,6 +141,7 @@ export const ptBR: LocalizationResource = {
         testCardInfo: 'Informações do cartão de teste',
       },
     },
+    paymentMethods__label: 'Métodos de pagamento',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturamento',
@@ -226,6 +226,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',
@@ -496,9 +497,11 @@ export const ptBR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Gerenciar organização',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar participação',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
@@ -647,6 +650,10 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -768,6 +775,10 @@ export const ptBR: LocalizationResource = {
         subtitleNewTab: 'Retorne para a aba anterior para continuar',
         title: 'E-mail verificado com sucesso',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -947,7 +958,9 @@ export const ptBR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
+    action__closeUserMenu: 'Fechar menu do usuário',
     action__manageAccount: 'Gerenciar conta',
+    action__openUserMenu: 'Abrir menu do usuário',
     action__signOut: 'Sair',
     action__signOutAll: 'Sair de todas as contas',
   },
