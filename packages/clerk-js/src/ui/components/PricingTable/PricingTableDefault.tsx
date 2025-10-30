@@ -1,4 +1,4 @@
-import { useClerk, useSession } from '@clerk/shared/react';
+import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
 import * as React from 'react';
 
@@ -24,6 +24,7 @@ import {
 import { Check, Plus } from '../../icons';
 import { common, InternalThemeProvider } from '../../styledSystem';
 import { SubscriptionBadge } from '../Subscriptions/badge';
+import { getPricingFooterState } from './utils/pricing-footer-state';
 
 interface PricingTableDefaultProps {
   plans?: BillingPlanResource[] | null;
@@ -103,6 +104,7 @@ function Card(props: CardProps) {
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
+  const { organization } = useOrganization();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
@@ -129,35 +131,14 @@ function Card(props: CardProps) {
   );
 
   const hasFeatures = plan.features.length > 0;
-  const showStatusRow = !!subscription;
 
-  let shouldShowFooter = false;
-  let shouldShowFooterNotice = false;
-
-  if (!subscription) {
-    shouldShowFooter = true;
-    shouldShowFooterNotice = false;
-  } else if (subscription.status === 'upcoming') {
-    shouldShowFooter = true;
-    shouldShowFooterNotice = true;
-  } else if (subscription.status === 'active') {
-    if (subscription.canceledAt) {
-      shouldShowFooter = true;
-      shouldShowFooterNotice = false;
-    } else if (planPeriod !== subscription.planPeriod && plan.annualMonthlyFee.amount > 0) {
-      shouldShowFooter = true;
-      shouldShowFooterNotice = false;
-    } else if (plan.freeTrialEnabled && subscription.isFreeTrial) {
-      shouldShowFooter = true;
-      shouldShowFooterNotice = true;
-    } else {
-      shouldShowFooter = false;
-      shouldShowFooterNotice = false;
-    }
-  } else {
-    shouldShowFooter = false;
-    shouldShowFooterNotice = false;
-  }
+  const { shouldShowFooter, shouldShowFooterNotice } = getPricingFooterState({
+    subscription,
+    plan,
+    planPeriod,
+    for: pricingTableProps.for,
+    hasActiveOrganization: !!organization,
+  });
 
   return (
     <Box
@@ -185,7 +166,7 @@ function Card(props: CardProps) {
         planPeriod={planPeriod}
         setPlanPeriod={setPlanPeriod}
         badge={
-          showStatusRow ? (
+          subscription ? (
             <SubscriptionBadge subscription={subscription.isFreeTrial ? { status: 'free_trial' } : subscription} />
           ) : undefined
         }
@@ -390,7 +371,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
                 marginInlineEnd: t.space.$0x25,
               },
             })}
-            localizationKey={localizationKeys('commerce.month')}
+            localizationKey={localizationKeys('billing.month')}
           />
         ) : null}
       </Flex>
@@ -405,7 +386,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           <Switch
             isChecked={planPeriod === 'annual'}
             onChange={(checked: boolean) => setPlanPeriod(checked ? 'annual' : 'month')}
-            label={localizationKeys('commerce.billedAnnually')}
+            label={localizationKeys('billing.billedAnnually')}
           />
         </Box>
       ) : (
@@ -414,7 +395,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
           variant='caption'
           colorScheme='secondary'
           localizationKey={
-            plan.isDefault ? localizationKeys('commerce.alwaysFree') : localizationKeys('commerce.billedMonthlyOnly')
+            plan.isDefault ? localizationKeys('billing.alwaysFree') : localizationKeys('billing.billedMonthlyOnly')
           }
           sx={t => ({
             justifySelf: 'flex-start',
@@ -521,7 +502,7 @@ const CardFeaturesList = React.forwardRef<HTMLDivElement, CardFeaturesListProps>
             size='md'
             aria-hidden
           />
-          <Span localizationKey={localizationKeys('commerce.seeAllFeatures')} />
+          <Span localizationKey={localizationKeys('billing.seeAllFeatures')} />
         </SimpleButton>
       )}
     </Box>

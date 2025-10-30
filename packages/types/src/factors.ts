@@ -63,6 +63,14 @@ export type SamlFactor = {
 
 export type EnterpriseSSOFactor = {
   strategy: EnterpriseSSOStrategy;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionId?: string;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionName?: string;
 };
 
 export type TOTPFactor = {
@@ -116,6 +124,14 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   redirectUrl: string;
   actionCompleteRedirectUrl: string;
   oidcPrompt?: string;
+  /**
+   * @experimental
+   */
+  emailAddressId?: string;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionId?: string;
 };
 
 export type PhoneCodeSecondFactorConfig = {

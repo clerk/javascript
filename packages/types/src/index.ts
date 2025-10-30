@@ -1,4 +1,3 @@
-export * from './api';
 export * from './apiKeys';
 export * from './apiKeysSettings';
 export * from './appearance';
@@ -18,6 +17,7 @@ export * from './elementIds';
 export * from './emailAddress';
 export * from './enterpriseAccount';
 export * from './environment';
+export * from './errors';
 export * from './externalAccount';
 export * from './factors';
 export * from './hooks';

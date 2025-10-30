@@ -1,4 +1,3 @@
-import type { ClerkAPIResponseError } from './api';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -15,6 +14,7 @@ import type {
   SignUpTheme,
   SubscriptionDetailsTheme,
   TaskChooseOrganizationTheme,
+  UserAvatarTheme,
   UserButtonTheme,
   UserProfileTheme,
   UserVerificationTheme,
@@ -31,6 +31,7 @@ import type {
 import type { ClientResource } from './client';
 import type { CustomMenuItem } from './customMenuItems';
 import type { CustomPage } from './customPages';
+import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
@@ -406,6 +407,21 @@ export interface Clerk {
    * @param targetNode Target node to unmount the SignUp component from.
    */
   unmountSignUp: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mount a user avatar component at the target element.
+   *
+   * @param targetNode Target node to mount the UserAvatar component.
+   */
+  mountUserAvatar: (targetNode: HTMLDivElement, userAvatarProps?: UserAvatarProps) => void;
+
+  /**
+   * Unmount a user avatar component at the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the UserAvatar component from.
+   */
+  unmountUserAvatar: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a user button component at the target element.
@@ -979,11 +995,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -996,7 +1012,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/components/overview) and not [Account Portal](https://clerk.com/docs/account-portal/overview) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
     supportEmail?: string;
     /**
@@ -1004,11 +1020,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     touchSession?: boolean;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances. **It is required to be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signInUrl?: string;
     /**
-     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/deployments/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+     * This URL will be used for any redirects that might happen and needs to point to your primary application on the client-side. This option is optional for production instances but **must be set for a satellite application in a development instance**. It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
      */
     signUpUrl?: string;
     /**
@@ -1024,7 +1040,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     isSatellite?: boolean | ((url: URL) => boolean);
     /**
-     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
+     * Controls whether or not Clerk will collect [telemetry data](https://clerk.com/docs/guides/how-clerk-works/security/clerk-telemetry). If set to `debug`, telemetry events are only logged to the console and not sent to Clerk.
      */
     telemetry?:
       | false
@@ -1042,11 +1058,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
         };
 
     /**
-     * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/references/sdk/overview).
+     * Contains information about the SDK that the host application is using. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
      */
     sdkMetadata?: SDKMetadata;
     /**
-     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/account-portal/overview#waitlist).
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/customizing-clerk/account-portal#waitlist).
      */
     waitlistUrl?: string;
     /**
@@ -1480,6 +1496,7 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the user profile modal will open.
+   * @example __experimental_startPath: '/members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1511,6 +1528,7 @@ export type OrganizationProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the organization profile modal will open.
+   * @example __experimental_startPath: '/organization-members'
    * @experimental
    **/
   __experimental_startPath?: string;
@@ -1545,8 +1563,9 @@ export type CreateOrganizationProps = RoutingOptions & {
    */
   appearance?: CreateOrganizationTheme;
   /**
-   * Hides the optional "slug" field in the organization creation screen.
-   * @default false
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
@@ -1621,6 +1640,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Provide custom menu actions and links to be rendered inside the UserButton.
    */
   customMenuItems?: CustomMenuItem[];
+};
+
+export type UserAvatarProps = {
+  appearance?: UserAvatarTheme;
+  rounded?: boolean;
 };
 
 type PrimitiveKeys<T> = {
@@ -1700,8 +1724,9 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * Hides the optional "slug" field in the organization creation screen.
-     * @default false
+     * @deprecated
+     * This prop will be removed in a future version.
+     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
      */
     hideSlug?: boolean;
     /**
@@ -1760,8 +1785,9 @@ export type OrganizationListProps = {
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
   /**
-   * Hides the optional "slug" field in the organization creation screen.
-   * @default false
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };
@@ -1805,10 +1831,11 @@ type PricingTableDefaultProps = {
 
 type PricingTableBaseProps = {
   /**
-   * Whether to show pricing table for organizations.
-   * @default false
+   * The subscriber type to display plans for.
+   * If `organization`, show plans for the active organization; otherwise for the user.
+   * @default 'user'
    */
-  forOrganizations?: boolean;
+  for?: ForPayerType;
   /**
    * Customisation options to fully match the Clerk components to your own brand.
    * These options serve as overrides and will be merged with the global `appearance`

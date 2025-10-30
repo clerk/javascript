@@ -68,8 +68,8 @@ export const koKR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '사용자 장치',
   badge__you: '당신',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const koKR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const koKR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const koKR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const koKR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -485,9 +486,11 @@ export const koKR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '조직 만들기',
     action__invitationAccept: 'Join',
     action__manageOrganization: '조직 관리',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: '선택한 조직 없음',
     personalWorkspace: '개인 워크스페이스',
@@ -634,6 +637,10 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '비밀번호 재설정 코드',
       resendButton: '코드 재전송',
@@ -753,6 +760,10 @@ export const koKR: LocalizationResource = {
         subtitleNewTab: '계속하려면 이전 탭으로 돌아가기',
         title: '이메일 인증 성공',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -925,7 +936,9 @@ export const koKR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '계정 추가',
+    action__closeUserMenu: '사용자 메뉴 닫기',
     action__manageAccount: '계정 관리',
+    action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
   },
@@ -956,7 +969,7 @@ export const koKR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -965,7 +978,7 @@ export const koKR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1024,7 +1037,7 @@ export const koKR: LocalizationResource = {
       actionDescription: '계속하려면 아래에 계정 삭제를 입력하세요.',
       confirm: '계정 삭제',
       messageLine1:
-        'Clerk에서 계정을 삭제하시겠습니까? 애플리케이션 및 기타 서비스에서 귀하의 정보를 삭제하려면 애플리케이션 소유자에게 문의하시기 바랍니다.',
+        '계정을 삭제하시겠습니까? 일부 관련 데이터가 보관될 수 있습니다. 전체 데이터 삭제를 요청하려면 고객 지원에 문의하세요.',
       messageLine2: '이 작업은 영구적이며 되돌릴 수 없습니다.',
       title: '계정 삭제',
     },

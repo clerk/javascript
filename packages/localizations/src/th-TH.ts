@@ -69,8 +69,8 @@ export const thTH: LocalizationResource = {
   badge__upcomingPlan: 'แผนที่จะมา',
   badge__userDevice: 'อุปกรณ์ผู้ใช้',
   badge__you: 'คุณ',
-  commerce: {
-    addPaymentMethod: 'เพิ่มวิธีชำระเงิน',
+  billing: {
+    addPaymentMethod__label: 'เพิ่มวิธีชำระเงิน',
     alwaysFree: 'ฟรีตลอดไป',
     annually: 'รายปี',
     availableFeatures: 'ฟีเจอร์ที่มี',
@@ -125,8 +125,7 @@ export const thTH: LocalizationResource = {
     monthly: 'รายเดือน',
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
-    paymentMethods: 'วิธีการชำระเงิน',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'ชำระรายปี',
         monthly: 'ชำระรายเดือน',
@@ -140,6 +139,7 @@ export const thTH: LocalizationResource = {
         testCardInfo: 'ข้อมูลบัตรทดสอบ',
       },
     },
+    paymentMethods__label: 'วิธีการชำระเงิน',
     popular: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
@@ -223,6 +223,7 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__password: 'ใส่รหัสผ่านของคุณ',
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'คำอธิบาย',
   formFieldLabel__apiKeyExpiration: 'วันหมดอายุ',
   formFieldLabel__apiKeyName: 'ชื่อคีย์ลับ',
@@ -286,7 +287,7 @@ export const thTH: LocalizationResource = {
         tableHeader__date: 'วันที่',
         tableHeader__status: 'สถานะ',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'ตั้งเป็นค่าเริ่มต้น',
         actionLabel__remove: 'ลบ',
         add: 'เพิ่มวิธีชำระเงินใหม่',
@@ -295,11 +296,11 @@ export const thTH: LocalizationResource = {
         formButtonPrimary__add: 'เพิ่มวิธีชำระเงิน',
         formButtonPrimary__pay: 'ชำระ {{amount}}',
         payWithTestCardButton: 'ชำระด้วยบัตรทดสอบ',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} จะถูกลบออกจากบัญชีนี้',
           messageLine2:
             'คุณจะไม่สามารถใช้แหล่งชำระเงินนี้ได้อีก และการสมัครสมาชิกแบบต่ออายุอัตโนมัติที่เกี่ยวข้องจะไม่ทำงานอีกต่อไป',
-          successMessage: '{{paymentSource}} ได้ถูกลบออกจากบัญชีของคุณแล้ว',
+          successMessage: '{{paymentMethod}} ได้ถูกลบออกจากบัญชีของคุณแล้ว',
           title: 'ลบวิธีชำระเงิน',
         },
         title: 'วิธีการชำระเงิน',
@@ -489,9 +490,11 @@ export const thTH: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'สร้างองค์กร',
     action__invitationAccept: 'เข้าร่วม',
     action__manageOrganization: 'จัดการ',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'ขอเข้าร่วม',
     notSelected: 'ไม่ได้เลือกองค์กร',
     personalWorkspace: 'บัญชีส่วนตัว',
@@ -640,6 +643,10 @@ export const thTH: LocalizationResource = {
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'รหัสรีเซ็ตรหัสผ่าน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -759,6 +766,10 @@ export const thTH: LocalizationResource = {
         subtitleNewTab: 'กลับไปยังแท็บก่อนหน้าเพื่อดำเนินการต่อ',
         title: 'ยืนยันอีเมลสำเร็จ',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -932,7 +943,9 @@ export const thTH: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'เพิ่มบัญชี',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'จัดการบัญชี',
+    action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },
@@ -963,7 +976,7 @@ export const thTH: LocalizationResource = {
         tableHeader__date: 'วันที่',
         tableHeader__status: 'สถานะ',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'ตั้งเป็นค่าเริ่มต้น',
         actionLabel__remove: 'ลบ',
         add: 'เพิ่มวิธีชำระเงินใหม่',
@@ -972,11 +985,11 @@ export const thTH: LocalizationResource = {
         formButtonPrimary__add: 'เพิ่มวิธีชำระเงิน',
         formButtonPrimary__pay: 'ชำระ {{amount}}',
         payWithTestCardButton: 'ชำระด้วยบัตรทดสอบ',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} จะถูกลบออกจากบัญชีนี้',
           messageLine2:
             'คุณจะไม่สามารถใช้แหล่งชำระเงินนี้ได้อีก และการสมัครสมาชิกแบบต่ออายุอัตโนมัติที่เกี่ยวข้องจะไม่ทำงานอีกต่อไป',
-          successMessage: '{{paymentSource}} ได้ถูกลบออกจากบัญชีของคุณแล้ว',
+          successMessage: '{{paymentMethod}} ได้ถูกลบออกจากบัญชีของคุณแล้ว',
           title: 'ลบวิธีชำระเงิน',
         },
         title: 'วิธีการชำระเงิน',
@@ -1032,7 +1045,7 @@ export const thTH: LocalizationResource = {
       actionDescription: 'พิมพ์ "Delete account" ด้านล่างเพื่อดำเนินการต่อ',
       confirm: 'Delete account',
       messageLine1:
-        'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณจาก Clerk? กรุณาติดต่อเจ้าของแอปพลิเคชันเพื่อลบข้อมูลของคุณออกจากแอปพลิเคชันและบริการอื่นๆ ของพวกเขา',
+        'คุณแน่ใจหรือไม่ว่าต้องการลบบัญชีของคุณ? ข้อมูลที่เกี่ยวข้องบางส่วนอาจถูกเก็บไว้ หากต้องการขอลบข้อมูลทั้งหมด โปรดติดต่อฝ่ายสนับสนุน',
       messageLine2: 'การดำเนินการนี้จะถาวรและไม่สามารถยกเลิกได้',
       title: 'ลบบัญชี',
     },

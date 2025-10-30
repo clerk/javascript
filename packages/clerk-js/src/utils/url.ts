@@ -405,6 +405,7 @@ const frontendApiRedirectPathsNoUserInput: string[] = [
   '/v1/verify', // magic links
   '/v1/tickets/accept', // ticket flow
   '/oauth/authorize-with-immediate-redirect', // OAuth 2 identity provider
+  '/oauth/end_session', // OIDC logout
 ];
 
 export function isRedirectForFAPIInitiatedFlow(frontendApi: string, redirectUrl: string): boolean {

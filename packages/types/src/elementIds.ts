@@ -43,7 +43,7 @@ export type ProfileSectionId =
   | 'organizationDomains'
   | 'manageVerifiedDomains'
   | 'subscriptionsList'
-  | 'paymentSources';
+  | 'paymentMethods';
 export type ProfilePageId = 'account' | 'security' | 'organizationGeneral' | 'organizationMembers' | 'billing';
 
 export type UserPreviewId = 'userButton' | 'personalWorkspace';
@@ -64,4 +64,4 @@ export type CardActionId =
   | 'signOut';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
-export type SelectId = 'countryCode' | 'role' | 'paymentSource' | 'apiKeyExpiration';
+export type SelectId = 'countryCode' | 'role' | 'paymentMethod' | 'apiKeyExpiration';

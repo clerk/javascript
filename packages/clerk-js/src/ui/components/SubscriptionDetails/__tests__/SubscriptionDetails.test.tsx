@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SubscriptionDetails } from '..';
 
 const { createFixtures } = bindCreateFixtures('SubscriptionDetails');
@@ -83,7 +85,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
         },
@@ -187,7 +188,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -283,7 +283,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -412,7 +411,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: new Date('2021-04-01'),
-          paymentSourceId: 'src_annual',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -423,7 +421,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2022-02-01'),
           periodEnd: new Date('2022-03-01'),
           canceledAt: null,
-          paymentSourceId: 'src_monthly',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -566,7 +563,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: new Date('2021-01-03'),
-          paymentSourceId: 'src_free_active',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -576,7 +572,6 @@ describe('SubscriptionDetails', () => {
           createdAt: new Date('2021-01-03'),
           periodStart: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_free_upcoming',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -623,7 +618,7 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
-    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+    const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -673,7 +668,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
           cancel: cancelSubscriptionMock,
@@ -760,9 +754,9 @@ describe('SubscriptionDetails', () => {
       slug: 'annual-plan',
       avatarUrl: '',
       features: [],
-      __internal_toSnapshot: jest.fn(),
+      __internal_toSnapshot: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     const subscription = {
@@ -772,12 +766,11 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: new Date('2021-04-01'),
-      paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     // Mock getSubscriptions to return the canceled subscription
@@ -873,12 +866,11 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: null,
-      paymentSourceId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     // Mock getSubscriptions to return the annual subscription
@@ -991,7 +983,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month' as const,
           status: 'past_due' as const,
           pastDueAt: new Date('2021-01-15'),
@@ -1075,7 +1066,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,
@@ -1136,7 +1126,7 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
-    const cancelSubscriptionMock = jest.fn().mockResolvedValue({});
+    const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -1186,7 +1176,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentSourceId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,

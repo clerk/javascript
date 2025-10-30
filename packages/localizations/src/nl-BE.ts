@@ -68,8 +68,8 @@ export const nlBE: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const nlBE: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const nlBE: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const nlBE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -282,7 +283,7 @@ export const nlBE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +292,7 @@ export const nlBE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +490,11 @@ export const nlBE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
@@ -639,6 +642,10 @@ export const nlBE: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -758,6 +765,10 @@ export const nlBE: LocalizationResource = {
         subtitleNewTab: 'Ga naar de vorige tab om verder te gaan',
         title: 'E-mail bevestigd',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +942,9 @@ export const nlBE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Account beheren',
+    action__openUserMenu: undefined,
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
@@ -963,7 +976,7 @@ export const nlBE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +985,7 @@ export const nlBE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1032,7 +1045,7 @@ export const nlBE: LocalizationResource = {
       actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
       confirm: 'Account verwijderen',
       messageLine1:
-        'Bent u zeker dat u uw account van Clerk wilt verwijderen? Gelieve contact op te nemen met de eigenaar van de applicatie om uw informatie uit hun applicatie en andere services te verwijderen.',
+        'Weet je zeker dat je je account wilt verwijderen? Sommige bijbehorende gegevens kunnen bewaard blijven. Neem contact op met de ondersteuning om volledige gegevensverwijdering aan te vragen.',
       messageLine2: 'Deze actie is permanent en onherroepelijk.',
       title: 'Account verwijderen',
     },

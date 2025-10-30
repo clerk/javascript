@@ -7,7 +7,7 @@ import type { AuthenticateContext } from './authenticateContext';
 import type { SignedInState, SignedOutState } from './authStatus';
 import { AuthErrorReason, signedIn, signedOut } from './authStatus';
 import { getCookieName, getCookieValue } from './cookie';
-import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
+import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import type { OrganizationMatcher } from './organizationMatcher';
 import { TokenType } from './tokenTypes';
 import type { OrganizationSyncOptions, OrganizationSyncTarget } from './types';
@@ -66,7 +66,7 @@ export async function verifyHandshakeToken(
   let key;
 
   if (jwtKey) {
-    key = loadClerkJWKFromLocal(jwtKey);
+    key = loadClerkJwkFromPem({ kid, pem: jwtKey });
   } else if (secretKey) {
     // Fetch JWKS from Backend API using the key
     key = await loadClerkJWKFromRemote({ secretKey, apiUrl, apiVersion, kid, jwksCacheTtlInMs, skipJwksCache });
@@ -78,9 +78,7 @@ export async function verifyHandshakeToken(
     });
   }
 
-  return await verifyHandshakeJwt(token, {
-    key,
-  });
+  return verifyHandshakeJwt(token, { key });
 }
 
 export class HandshakeService {
@@ -223,6 +221,7 @@ export class HandshakeService {
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       newUrl.searchParams.delete(constants.QueryParameters.DevBrowser);
+      newUrl.searchParams.delete(constants.QueryParameters.HandshakeNonce);
       headers.append(constants.Headers.Location, newUrl.toString());
       headers.set(constants.Headers.CacheControl, 'no-store');
     }

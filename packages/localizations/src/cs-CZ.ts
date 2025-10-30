@@ -69,8 +69,8 @@ export const csCZ: LocalizationResource = {
   badge__upcomingPlan: 'Nadcházející',
   badge__userDevice: 'Zařízení uživatele',
   badge__you: 'Vy',
-  commerce: {
-    addPaymentMethod: 'Přidat platební metodu',
+  billing: {
+    addPaymentMethod__label: 'Přidat platební metodu',
     alwaysFree: 'Vždy zdarma',
     annually: 'Ročně',
     availableFeatures: 'Dostupné funkce',
@@ -125,8 +125,7 @@ export const csCZ: LocalizationResource = {
     monthly: 'Měsíčně',
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
-    paymentMethods: 'Platební metody',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Roční platba',
         monthly: 'Měsíční platba',
@@ -140,6 +139,7 @@ export const csCZ: LocalizationResource = {
         testCardInfo: 'Informace o testovací kartě',
       },
     },
+    paymentMethods__label: 'Platební metody',
     popular: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
@@ -224,6 +224,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -287,7 +288,7 @@ export const csCZ: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Stav',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Nastavit jako výchozí',
         actionLabel__remove: 'Odebrat',
         add: 'Přidat novou platební metodu',
@@ -296,11 +297,11 @@ export const csCZ: LocalizationResource = {
         formButtonPrimary__add: 'Přidat platební metodu',
         formButtonPrimary__pay: 'Zaplatit {{amount}}',
         payWithTestCardButton: 'Zaplatit testovací kartou',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
@@ -493,9 +494,11 @@ export const csCZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
     action__manageOrganization: 'Spravovat organizaci',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požádat o připojení',
     notSelected: 'Není vybrána žádná organizace',
     personalWorkspace: 'Osobní účet',
@@ -646,6 +649,10 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -767,6 +774,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na předchozí kartu pro pokračování',
         title: 'E-mail úspěšně ověřen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -942,7 +953,9 @@ export const csCZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Přidat účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovat účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },
@@ -974,7 +987,7 @@ export const csCZ: LocalizationResource = {
         tableHeader__date: 'Datum',
         tableHeader__status: 'Stav',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Nastavit jako výchozí',
         actionLabel__remove: 'Odebrat',
         add: 'Přidat novou platební metodu',
@@ -983,11 +996,11 @@ export const csCZ: LocalizationResource = {
         formButtonPrimary__add: 'Přidat platební metodu',
         formButtonPrimary__pay: 'Zaplatit {{amount}}',
         payWithTestCardButton: 'Zaplatit testovací kartou',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} bude odstraněn z tohoto účtu.',
           messageLine2:
             'Tento platební zdroj již nebudete moci používat a veškerá opakující se předplatná, která na něm závisí, přestanou fungovat.',
-          successMessage: '{{paymentSource}} byl odstraněn z vašeho účtu.',
+          successMessage: '{{paymentMethod}} byl odstraněn z vašeho účtu.',
           title: 'Odebrat platební metodu',
         },
         title: 'Platební metody',
@@ -1043,7 +1056,7 @@ export const csCZ: LocalizationResource = {
       actionDescription: 'Napište "Smazat účet" níže pro pokračování.',
       confirm: 'Smazat účet',
       messageLine1:
-        'Jste si jisti, že chcete smazat svůj účet z Clerk? Kontaktujte prosím vlastníka aplikace pro smazání vašich informací z jejich aplikace a dalších služeb.',
+        'Opravdu chcete smazat svůj účet? Některá související data mohou být zachována. Chcete-li požádat o úplné smazání dat, kontaktujte podporu.',
       messageLine2: 'Tato akce je trvalá a nevratná.',
       title: 'Smazat účet',
     },

@@ -1,7 +1,8 @@
-import { describe } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
+
 import { UserButton } from '../';
 
 const { createFixtures } = bindCreateFixtures('UserButton');
@@ -29,7 +30,7 @@ describe('UserButton', () => {
       __experimental_asStandalone: true,
     });
     const { getByText, queryByRole } = render(<UserButton />, { wrapper });
-    expect(queryByRole('button', { name: 'Open user button' })).toBeNull();
+    expect(queryByRole('button', { name: 'Open user menu' })).toBeNull();
     getByText('Manage account');
   });
 
@@ -43,7 +44,7 @@ describe('UserButton', () => {
       });
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user button' }));
+    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
     expect(getByText('Manage account')).not.toBeNull();
   });
 
@@ -57,7 +58,7 @@ describe('UserButton', () => {
       });
     });
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user button' }));
+    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
     await userEvent.click(getByText('Manage account'));
     expect(fixtures.clerk.openUserProfile).toHaveBeenCalled();
   });
@@ -75,7 +76,7 @@ describe('UserButton', () => {
     fixtures.clerk.signOut.mockImplementationOnce(callback => callback());
 
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user button' }));
+    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
     await userEvent.click(getByText('Sign out'));
 
     expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
@@ -95,7 +96,7 @@ describe('UserButton', () => {
     props.setProps({ afterSignOutUrl: '/after-sign-out' });
 
     const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user button' }));
+    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
     await userEvent.click(getByText('Sign out'));
 
     expect(fixtures.router.navigate).toHaveBeenCalledWith('/after-sign-out');
@@ -132,7 +133,7 @@ describe('UserButton', () => {
     it('renders all sessions', async () => {
       const { wrapper } = await createFixtures(initConfig);
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
       expect(getByText('First1 Last1')).toBeDefined();
       expect(getByText('First2 Last2')).toBeDefined();
       expect(getByText('First3 Last3')).toBeDefined();
@@ -142,7 +143,7 @@ describe('UserButton', () => {
       const { wrapper, fixtures } = await createFixtures(initConfig);
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
       await userEvent.click(getByText('First3 Last3'));
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
         expect.objectContaining({ session: expect.objectContaining({ user: expect.objectContaining({ id: '3' }) }) }),
@@ -155,7 +156,7 @@ describe('UserButton', () => {
         return Promise.resolve(callback());
       });
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
       await userEvent.click(getByText('Sign out'));
       await waitFor(() => {
         expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function), { sessionId: '0' });
@@ -169,7 +170,7 @@ describe('UserButton', () => {
         return Promise.resolve(callback());
       });
       const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-      await userEvent.click(getByRole('button', { name: 'Open user button' }));
+      await userEvent.click(getByRole('button', { name: 'Open user menu' }));
       await userEvent.click(getByText('Sign out of all accounts'));
       await waitFor(() => {
         expect(fixtures.clerk.signOut).toHaveBeenCalledWith(expect.any(Function));

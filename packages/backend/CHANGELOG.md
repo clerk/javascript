@@ -1,5 +1,132 @@
 # Change Log
 
+## 2.19.1
+
+### Patch Changes
+
+- Remove \_\_clerk_handshake_nonce query parameter from redirect URLs in development mode to prevent infinite loops. ([#7054](https://github.com/clerk/javascript/pull/7054)) by [@bratsos](https://github.com/bratsos)
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/shared@3.29.0
+  - @clerk/types@4.96.0
+
+## 2.19.0
+
+### Minor Changes
+
+- Add missing payer field to BillingSubscriptionItemWebhookEventJSON ([#7024](https://github.com/clerk/javascript/pull/7024)) by [@Wendrowiec13](https://github.com/Wendrowiec13)
+
+### Patch Changes
+
+- Fix infinite redirect loop in multi-domain development flows by reordering authentication checks to prioritize satellite sync requests over dev-browser-sync handshakes. ([#7018](https://github.com/clerk/javascript/pull/7018)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911)]:
+  - @clerk/types@4.95.1
+  - @clerk/shared@3.28.3
+
+## 2.18.3
+
+### Patch Changes
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035)]:
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+
+## 2.18.2
+
+### Patch Changes
+
+- Updated dependencies [[`d8147fb`](https://github.com/clerk/javascript/commit/d8147fb58bfd6caf9a4f0a36fdc48c630d00387f)]:
+  - @clerk/shared@3.28.1
+
+## 2.18.1
+
+### Patch Changes
+
+- Fixed JWT public key caching in `verifyToken()` to support multi-instance scenarios. Public keys are now correctly cached per `kid` from the token header instead of using a single shared cache key. ([#6993](https://github.com/clerk/javascript/pull/6993)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  **What was broken:**
+
+  When verifying JWT tokens with the `jwtKey` option (PEM public key), all keys were cached under the same cache key. This caused verification failures in multi-instance scenarios.
+
+  **What's fixed:**
+
+  JWT public keys are now cached using the `kid` value from each token's header.
+
+- Replace `/commerce` endpoints with `/billing` endpoints. ([#6854](https://github.com/clerk/javascript/pull/6854)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`305f4ee`](https://github.com/clerk/javascript/commit/305f4eeb825086d55d1b0df198a0c43da8d94993), [`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2), [`1236c74`](https://github.com/clerk/javascript/commit/1236c745fd58020e0972938ca0a9ae697a24af02)]:
+  - @clerk/shared@3.28.0
+  - @clerk/types@4.94.0
+
+## 2.18.0
+
+### Minor Changes
+
+- Added support for User `locale` ([#6938](https://github.com/clerk/javascript/pull/6938)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Add `enterpriseConnectionId` to `SamlAccount` and `EnterpriseAccount` resources ([#6961](https://github.com/clerk/javascript/pull/6961)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Added API keys list method to the backend SDK client ([#6948](https://github.com/clerk/javascript/pull/6948)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add `last_authenticated_at` to `SAMLAccount` resource, which represents the date when the SAML account was last authenticated ([#6954](https://github.com/clerk/javascript/pull/6954)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Added internal helper type for `auth` and `getAuth()` functions that don't require a request or context parameter ([#6910](https://github.com/clerk/javascript/pull/6910)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Added `adminDeleteEnabled` param to Organization update method ([#6880](https://github.com/clerk/javascript/pull/6880)) by [@ccaspanello](https://github.com/ccaspanello)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`9766c4a`](https://github.com/clerk/javascript/commit/9766c4afd26f2841d6f79dbdec2584ef8becd22f), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342)]:
+  - @clerk/types@4.93.0
+  - @clerk/shared@3.27.4
+
+## 2.17.2
+
+### Patch Changes
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/shared@3.27.3
+
+## 2.17.1
+
+### Patch Changes
+
+- Add `slug_disabled` field on organization settings ([#6902](https://github.com/clerk/javascript/pull/6902)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a), [`8777f35`](https://github.com/clerk/javascript/commit/8777f350f5fb51413609a53d9de05b2e5d1d7cfe), [`2c0128b`](https://github.com/clerk/javascript/commit/2c0128b05ecf48748f27f10f0b0215a279ba6cc1)]:
+  - @clerk/types@4.91.0
+  - @clerk/shared@3.27.2
+
+## 2.17.0
+
+### Minor Changes
+
+- Add `user_id` field to `organizationInvitation.accepted` webhook events. ([#6887](https://github.com/clerk/javascript/pull/6887)) by [@kduprey](https://github.com/kduprey)
+
+  Creates a new `OrganizationInvitationAcceptedJSON` interface that extends `OrganizationInvitationJSON` with a required `user_id` field, and updates the webhook type system to use this interface specifically for `organizationInvitation`.accepted events.
+
+### Patch Changes
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+  - @clerk/shared@3.27.1
+
+## 2.16.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- [Billing Beta] Update subscription item `plan` and `planId` properties to be `null`. ([#6839](https://github.com/clerk/javascript/pull/6839)) by [@paddycarver](https://github.com/paddycarver)
+
+### Patch Changes
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`9cf89cd`](https://github.com/clerk/javascript/commit/9cf89cd3402c278e8d5bfcd8277cee292bc45333), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4), [`5546352`](https://github.com/clerk/javascript/commit/55463527df9a710ef3215c353bab1ef423d1de62)]:
+  - @clerk/shared@3.27.0
+  - @clerk/types@4.89.0
+
 ## 2.15.0
 
 ### Minor Changes

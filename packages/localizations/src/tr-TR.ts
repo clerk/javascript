@@ -68,8 +68,8 @@ export const trTR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Kullanıcı cihazı',
   badge__you: 'Siz',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const trTR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const trTR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Şifrenizi girin',
   formFieldInputPlaceholder__phoneNumber: 'Telefon numaranızı girin',
   formFieldInputPlaceholder__username: 'Kullanıcı adınızı girin',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -282,7 +283,7 @@ export const trTR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +292,7 @@ export const trTR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +489,11 @@ export const trTR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organizasyon oluştur',
     action__invitationAccept: 'Katıl',
     action__manageOrganization: 'Organizasyonu yönet',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Katılmak için talepte bulun',
     notSelected: 'Organizasyon seçilmedi',
     personalWorkspace: 'Kişisel Çalışma Alanı',
@@ -639,6 +642,10 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Şifre sıfırlama kodu',
       resendButton: 'Tekrar gönder',
@@ -759,6 +766,10 @@ export const trTR: LocalizationResource = {
         subtitleNewTab: 'Devam etmek için önceki sekmeye dönün',
         title: 'E-posta adresiniz başarıyla doğrulandı',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -935,7 +946,9 @@ export const trTR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Hesap ekle',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hesabı yönet',
+    action__openUserMenu: undefined,
     action__signOut: 'Çıkış yap',
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },
@@ -967,7 +980,7 @@ export const trTR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -976,7 +989,7 @@ export const trTR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1036,7 +1049,7 @@ export const trTR: LocalizationResource = {
       actionDescription: 'Devam etmek için aşağıya “Hesabı sil” yazın.',
       confirm: 'Hesabı sil',
       messageLine1:
-        "Clerk'teki hesabınızı silmek istediğinizden emin misiniz? Bilgilerinizi uygulamalarından ve diğer hizmetlerinden silmek için lütfen uygulama sahibiyle iletişime geçin.",
+        'Hesabınızı silmek istediğinizden emin misiniz? Bazı ilişkili veriler saklanabilir. Tam veri silme talebinde bulunmak için lütfen destek ekibiyle iletişime geçin.',
       messageLine2: 'Bu işlem kalıcıdır ve geri alınamaz.',
       title: 'Hesabı sil',
     },

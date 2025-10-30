@@ -21,6 +21,7 @@ import {
   SignInContext,
   SignUpContext,
   SubscriberTypeContext,
+  UserAvatarContext,
   UserButtonContext,
   UserProfileContext,
   UserVerificationContext,
@@ -50,6 +51,8 @@ export function ComponentContextProvider({
           {children}
         </UserVerificationContext.Provider>
       );
+    case 'UserAvatar':
+      return <UserAvatarContext.Provider value={{ componentName, ...props }}>{children}</UserAvatarContext.Provider>;
     case 'UserButton':
       return (
         <UserButtonContext.Provider value={{ componentName, ...(props as UserButtonProps) }}>
@@ -92,7 +95,12 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'organization' : 'user'}>
+        <SubscriberTypeContext.Provider
+          value={
+            // Backward compatibility: support legacy `forOrganizations: true`
+            (props as any).forOrganizations ? 'organization' : (props as PricingTableProps).for || 'user'
+          }
+        >
           <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
             {children}
           </PricingTableContext.Provider>

@@ -85,7 +85,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
 
   if (forOrganization === 'organization' && !organization) {
     throw new Error(
-      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/references/backend/types/auth-object#how-to-access-the-auth-object',
+      'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/reference/backend/types/auth-object#how-to-access-the-auth-object',
     );
   }
 
@@ -106,15 +106,15 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         id: null,
         externalClientSecret: null,
         externalGatewayId: null,
-        status: null,
         totals: null,
         isImmediatePlanChange: null,
         planPeriod: null,
         plan: null,
-        paymentSource: null,
+        paymentMethod: null,
         freeTrialEndsAt: null,
         payer: null,
-      };
+        needsPaymentMethod: null,
+      } satisfies ForceNull<CheckoutProperties>;
     }
     const {
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -124,7 +124,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
       // All the above need to be removed from the properties
       ...rest
     } = managerProperties.checkout;
-    return rest;
+    return rest satisfies CheckoutProperties;
   }, [managerProperties.checkout]);
 
   const checkout = {

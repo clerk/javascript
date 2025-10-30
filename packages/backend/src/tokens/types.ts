@@ -22,7 +22,7 @@ export type AuthenticateRequestOptions = {
    */
   publishableKey?: string;
   /**
-   * The domain of a [satellite application](https://clerk.com/docs/advanced-usage/satellite-domains) in a multi-domain setup.
+   * The domain of a [satellite application](https://clerk.com/docs/guides/dashboard/dns-domains/satellite-domains) in a multi-domain setup.
    */
   domain?: string;
   /**
@@ -53,7 +53,7 @@ export type AuthenticateRequestOptions = {
    */
   afterSignUpUrl?: string;
   /**
-   * Used to activate a specific [organization](https://clerk.com/docs/organizations/overview) or [personal account](https://clerk.com/docs/organizations/organization-workspaces) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
+   * Used to activate a specific [organization](https://clerk.com/docs/guides/organizations/overview) or [personal account](https://clerk.com/docs/guides/dashboard/overview) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
    *
    * If the activation can't be performed, either because an organization doesn't exist or the user lacks access, the active organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
    */
@@ -85,7 +85,7 @@ export type OrganizationSyncOptions = {
    *
    * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
    *
-   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/components/organization/organization-switcher).
+   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/reference/components/organization/organization-switcher).
    *
    * @example
    * ["/orgs/:slug", "/orgs/:slug/(.*)"]
@@ -97,7 +97,7 @@ export type OrganizationSyncOptions = {
   organizationPatterns?: Pattern[];
 
   /**
-   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/organizations/organization-workspaces) (user-specific, outside any organization).
+   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/guides/dashboard/overview) (user-specific, outside any organization).
    *
    * If the route also matches the `organizationPattern` prop, the `organizationPattern` prop takes precedence.
    *
@@ -187,14 +187,13 @@ export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = 
   ? AuthenticatedMachineObject<T> | UnauthenticatedMachineObject<T>
   : never;
 
-type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 type MaybePromise<T, IsPromise extends boolean> = IsPromise extends true ? Promise<T> : T;
 
 /**
  * Shared generic overload type for getAuth() helpers across SDKs.
  *
- * - Parameterized by the request type (RequestType).
  * - Handles different accepted token types and their corresponding return types.
  */
 export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> {
@@ -234,4 +233,52 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
    * const auth = await getAuth(req)
    */
   (req: RequestType, options?: PendingSessionOptions): MaybePromise<SessionAuthObject, ReturnsPromise>;
+}
+
+/**
+ * Shared generic overload type for auth() or getAuth() helpers that don't require a request parameter.
+ *
+ * - Handles different accepted token types and their corresponding return types.
+ * - The SessionAuthType parameter allows frameworks to extend the base SessionAuthObject with additional properties like redirect methods.
+ */
+export interface GetAuthFnNoRequest<
+  SessionAuthType extends SessionAuthObject = SessionAuthObject,
+  ReturnsPromise extends boolean = false,
+> {
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: ['session_token', 'api_key'] })
+   */
+  <T extends TokenType[]>(
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<
+    | InferAuthObjectFromTokenArray<T, SessionAuthType, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
+    | InvalidTokenAuthObject,
+    ReturnsPromise
+  >;
+
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'session_token' })
+   */
+  <T extends TokenType>(
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<
+    InferAuthObjectFromToken<T, SessionAuthType, MachineAuthObject<Exclude<T, SessionTokenType>>>,
+    ReturnsPromise
+  >;
+
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'any' })
+   */
+  (
+    options: AuthOptions & { acceptsToken: 'any' },
+  ): MaybePromise<Exclude<AuthObject, SessionAuthObject> | SessionAuthType, ReturnsPromise>;
+
+  /**
+   * @example
+   * const authObject = await auth()
+   */
+  (options?: PendingSessionOptions): MaybePromise<SessionAuthType, ReturnsPromise>;
 }

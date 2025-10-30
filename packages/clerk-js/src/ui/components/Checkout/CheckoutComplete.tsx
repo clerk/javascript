@@ -161,7 +161,7 @@ export const CheckoutComplete = () => {
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { totals, paymentSource, planPeriodStart, freeTrialEndsAt } = checkout;
+  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt, needsPaymentMethod } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
 
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -330,10 +330,10 @@ export const CheckoutComplete = () => {
               textVariant='h2'
               localizationKey={
                 freeTrialEndsAt
-                  ? localizationKeys('commerce.checkout.title__trialSuccess')
-                  : totals.totalDueNow.amount > 0
-                    ? localizationKeys('commerce.checkout.title__paymentSuccessful')
-                    : localizationKeys('commerce.checkout.title__subscriptionSuccessful')
+                  ? localizationKeys('billing.checkout.title__trialSuccess')
+                  : needsPaymentMethod
+                    ? localizationKeys('billing.checkout.title__paymentSuccessful')
+                    : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
               sx={t => ({
                 opacity: 0,
@@ -386,9 +386,9 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                totals.totalDueNow.amount > 0
-                  ? localizationKeys('commerce.checkout.description__paymentSuccessful')
-                  : localizationKeys('commerce.checkout.description__subscriptionSuccessful')
+                needsPaymentMethod
+                  ? localizationKeys('billing.checkout.description__paymentSuccessful')
+                  : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
             />
           </Span>
@@ -417,31 +417,31 @@ export const CheckoutComplete = () => {
       >
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
-            <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__totalPaid')} />
+            <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__totalPaid')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
 
           {freeTrialEndsAt ? (
             <LineItems.Group variant='secondary'>
-              <LineItems.Title title={localizationKeys('commerce.checkout.lineItems.title__freeTrialEndsAt')} />
+              <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__freeTrialEndsAt')} />
               <LineItems.Description text={formatDate(freeTrialEndsAt)} />
             </LineItems.Group>
           ) : null}
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
-                  ? localizationKeys('commerce.checkout.lineItems.title__paymentMethod')
-                  : localizationKeys('commerce.checkout.lineItems.title__subscriptionBegins')
+                needsPaymentMethod
+                  ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
+                  : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
-                  ? paymentSource
-                    ? paymentSource.paymentMethod !== 'card'
-                      ? `${capitalize(paymentSource.paymentMethod)}`
-                      : `${capitalize(paymentSource.cardType)} ⋯ ${paymentSource.last4}`
+                needsPaymentMethod
+                  ? paymentMethod
+                    ? paymentMethod.paymentType !== 'card'
+                      ? `${capitalize(paymentMethod.paymentType)}`
+                      : `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
                     : '–'
                   : planPeriodStart
                     ? formatDate(new Date(planPeriodStart))

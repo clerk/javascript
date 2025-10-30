@@ -1,8 +1,10 @@
 import type { BillingPayerResourceType } from '@clerk/types';
+import { describe, expect, it, vi } from 'vitest';
 
-import { render, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
+
 import { localizationKeys } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { SubscriptionsList } from '../SubscriptionsList';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -35,7 +37,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -82,24 +84,23 @@ describe('SubscriptionsList', () => {
             freeTrialDays: null,
             freeTrialEnabled: false,
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
           },
           status: 'active',
           createdAt: new Date('2021-01-01'),
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-01-15'),
           canceledAt: null,
-          paymentSourceId: 'src_free',
           planPeriod: 'month' as const,
           isFreeTrial: false,
           pastDueAt: null,
-          cancel: jest.fn(),
+          cancel: vi.fn(),
           pathRoot: '',
-          reload: jest.fn(),
+          reload: vi.fn(),
         },
       ],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const testProps = {
@@ -148,20 +149,19 @@ describe('SubscriptionsList', () => {
         freeTrialDays: 14,
         freeTrialEnabled: true,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-01-15'),
       canceledAt: null,
-      paymentSourceId: 'src_trial',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: true, // This subscription is in a free trial
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -174,7 +174,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [freeTrialSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -212,20 +212,19 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: null,
-      paymentSourceId: 'src_past_due',
       planPeriod: 'month' as const,
       status: 'past_due' as const,
       isFreeTrial: false,
       pastDueAt: new Date('2021-01-15'),
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -238,7 +237,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [pastDueSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -277,20 +276,19 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: null,
-      paymentSourceId: 'src_active',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: false,
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -303,7 +301,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [activeSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });
@@ -341,20 +339,19 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-02-01'),
       periodEnd: new Date('2021-03-01'),
       canceledAt: null,
-      paymentSourceId: 'src_upcoming',
       planPeriod: 'month' as const,
       status: 'upcoming' as const,
       isFreeTrial: false,
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     const activeCanceledSubscription = {
@@ -377,20 +374,19 @@ describe('SubscriptionsList', () => {
         freeTrialDays: null,
         freeTrialEnabled: false,
         pathRoot: '',
-        reload: jest.fn(),
+        reload: vi.fn(),
       },
       createdAt: new Date('2021-01-01'),
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: new Date('2021-01-15'),
-      paymentSourceId: 'src_active_canceled',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: false,
       pastDueAt: null,
-      cancel: jest.fn(),
+      cancel: vi.fn(),
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     };
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -403,7 +399,7 @@ describe('SubscriptionsList', () => {
       updatedAt: null,
       subscriptionItems: [activeCanceledSubscription, upcomingSubscription],
       pathRoot: '',
-      reload: jest.fn(),
+      reload: vi.fn(),
     });
 
     const { getByText, queryByText } = render(<SubscriptionsList {...props} />, { wrapper });

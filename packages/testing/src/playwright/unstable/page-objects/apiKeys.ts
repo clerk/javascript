@@ -43,7 +43,7 @@ export const createAPIKeysComponentPageObject = (testArgs: { page: EnhancedPage 
     },
     selectExpiration: async (value?: keyof typeof expirationOptions) => {
       await page.getByRole('button', { name: /Select date/i }).click();
-      return page.getByText(expirationOptions[value ?? 'never'], { exact: true }).click();
+      return page.getByText(expirationOptions[value ?? 'never'], { exact: true }).click({ force: true });
     },
     clickSaveButton: () => {
       return page.getByText(/Create key/i).click();

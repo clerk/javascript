@@ -10,7 +10,6 @@ import {
   isClerkRuntimeError,
 } from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
-import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
@@ -87,6 +86,7 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   UserResource,
@@ -163,8 +163,6 @@ import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
-export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -226,7 +224,7 @@ export class Clerk implements ClerkInterface {
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
   #captchaHeartbeat?: CaptchaHeartbeat;
-  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
+  #broadcastChannel: BroadcastChannel | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
@@ -475,10 +473,21 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-      if (this.environment?.clientDebugMode) {
+      const telemetry = this.#options.telemetry;
+      const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
+
+      const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
+      const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
+      const isProd = this.environment?.isProduction?.() ?? false;
+
+      const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
+      const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
+
+      if (shouldEnable) {
         initDebugLogger({
           enabled: true,
-          telemetryCollector: this.telemetry,
+          ...(logLevel ? { logLevel } : {}),
+          ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
       debugLogger.info('load() complete', {}, 'clerk');
@@ -866,6 +875,30 @@ export class Clerk implements ClerkInterface {
     );
   };
 
+  public mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    const component = 'UserAvatar';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
+      controls.mountComponent({
+        name: component,
+        appearanceKey: 'userAvatar',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountUserAvatar = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     const component = 'SignUp';
@@ -1118,16 +1151,24 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    // Temporary backward compatibility for legacy prop: `forOrganizations`. Will be removed in the coming minor release.
+    const nextProps = { ...(props as any) } as PricingTableProps & { forOrganizations?: boolean };
+    if (typeof (props as any)?.forOrganizations !== 'undefined') {
+      logger.warnOnce(
+        'Clerk: [IMPORTANT] <PricingTable /> prop `forOrganizations` is deprecated and will be removed in the coming minors. Use `for="organization"` instead.',
+      );
+    }
+
     void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
       controls.mountComponent({
         name: 'PricingTable',
         appearanceKey: 'pricingTable',
         node,
-        props,
+        props: nextProps,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', nextProps));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
@@ -2526,7 +2567,10 @@ export class Clerk implements ClerkInterface {
      */
     this.#pageLifecycle = createPageLifecycle();
 
-    this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.#broadcastChannel = new BroadcastChannel('clerk');
+    }
+
     this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
@@ -2735,10 +2779,10 @@ export class Clerk implements ClerkInterface {
     });
 
     /**
-     * Background tabs get notified of a signout event from active tab.
+     * Background tabs get notified of cross-tab signout events.
      */
-    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
-      if (data.type === 'signout') {
+    this.#broadcastChannel?.addEventListener('message', (event: MessageEvent) => {
+      if (event.data?.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
     });
