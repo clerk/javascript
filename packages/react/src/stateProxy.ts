@@ -38,6 +38,13 @@ export class StateProxy implements State {
     return this.waitlistSignalProxy;
   }
 
+  get __internal_waitlist() {
+    if (!inBrowser() || !this.isomorphicClerk.loaded) {
+      return null;
+    }
+    return this.isomorphicClerk.__internal_state.__internal_waitlist;
+  }
+
   private buildSignInProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const target = () => this.client.signIn.__internal_future;
@@ -233,11 +240,22 @@ export class StateProxy implements State {
   private buildWaitlistProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const target = () => {
+    const fallbackWaitlistFuture = {
+      id: undefined,
+      createdAt: null,
+      updatedAt: null,
+      join: () => Promise.resolve({ error: null }),
+    };
+    const target = (): typeof fallbackWaitlistFuture => {
       if (!inBrowser() || !this.isomorphicClerk.loaded) {
-        return null;
+        return fallbackWaitlistFuture;
       }
-      return this.isomorphicClerk.__internal_state.__internal_waitlist.__internal_future;
+      const state = this.isomorphicClerk.__internal_state;
+      const waitlist = state.__internal_waitlist;
+      if (waitlist && '__internal_future' in waitlist) {
+        return (waitlist as { __internal_future: typeof fallbackWaitlistFuture }).__internal_future;
+      }
+      return fallbackWaitlistFuture;
     };
 
     return {

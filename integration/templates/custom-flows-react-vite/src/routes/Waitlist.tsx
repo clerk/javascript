@@ -21,7 +21,7 @@ export function Waitlist({ className, ...props }: React.ComponentProps<'div'>) {
     await waitlist.join({ emailAddress });
   };
 
-  if (waitlist.id) {
+  if (waitlist?.id) {
     return (
       <div
         className={cn('flex flex-col gap-6', className)}
