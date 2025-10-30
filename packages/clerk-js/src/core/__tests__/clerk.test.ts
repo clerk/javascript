@@ -6,7 +6,7 @@ import type {
   SignInJSON,
   SignUpJSON,
   TokenResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 

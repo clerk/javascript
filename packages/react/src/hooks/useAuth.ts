@@ -7,7 +7,7 @@ import type {
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';

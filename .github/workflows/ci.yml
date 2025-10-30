@@ -208,8 +208,6 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - node-version: 20
-            test-filter: "--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/expo"
           - node-version: 22
             test-filter: "**"
 
@@ -281,7 +279,6 @@ jobs:
           [
             "generic",
             "express",
-            "quickstart",
             "ap-flows",
             "elements",
             "localhost",
@@ -306,6 +303,15 @@ jobs:
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "15"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "16"
 
     steps:
       - name: Checkout Repo
@@ -323,6 +329,15 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
+      - name: Verify jq is installed
+        shell: bash
+        run: |
+          if ! command -v jq &> /dev/null; then
+            echo "jq not found, installing..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --version
+
       - name: Task Status
         id: task-status
         env:
@@ -332,8 +347,16 @@ jobs:
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          AFFECTED=0
-          (pnpm turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          # Use turbo's built-in --affected flag to detect changes
+          # This automatically uses GITHUB_BASE_REF in GitHub Actions
+          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
+
+          if [ "$TASK_COUNT" -gt 0 ]; then
+            AFFECTED=1
+          else
+            AFFECTED=0
+          fi
+
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 

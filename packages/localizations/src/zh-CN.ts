@@ -121,7 +121,6 @@ export const zhCN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const zhCN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -479,9 +480,11 @@ export const zhCN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '创建组织',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理组织',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '请求加入',
     notSelected: '未选择组织',
     personalWorkspace: '个人工作区',
@@ -628,6 +631,10 @@ export const zhCN: LocalizationResource = {
         titleNewTab: '在其他标签页上登录',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重置密码代码',
       resendButton: '重新发送代码',
@@ -747,6 +754,10 @@ export const zhCN: LocalizationResource = {
         subtitleNewTab: '返回上一个标签页继续',
         title: '成功验证电子邮件',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -916,7 +927,9 @@ export const zhCN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '添加账户',
+    action__closeUserMenu: '关闭用户菜单',
     action__manageAccount: '管理账户',
+    action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
   },

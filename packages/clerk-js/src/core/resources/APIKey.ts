@@ -1,4 +1,4 @@
-import type { ApiKeyJSON, APIKeyResource } from '@clerk/types';
+import type { ApiKeyJSON, APIKeyResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';

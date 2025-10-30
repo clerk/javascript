@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.101.1",
+  "version": "5.103.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -63,7 +63,6 @@
     "@base-org/account": "2.0.1",
     "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "@coinbase/wallet-sdk": "4.3.0",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.1",
@@ -93,7 +92,7 @@
     "@rspack/plugin-react-refresh": "^1.5.0",
     "@svgr/webpack": "^6.5.1",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.18.8",
+    "@types/node": "^22.18.12",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "jsdom": "26.1.0",

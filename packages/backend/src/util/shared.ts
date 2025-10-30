@@ -1,13 +1,13 @@
-export { addClerkPrefix, getScriptUrl, getClerkJsMajorVersionOrTag } from '@clerk/shared/url';
-export { retry } from '@clerk/shared/retry';
+export { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
 export {
+  getCookieSuffix,
+  getSuffixedCookieName,
   isDevelopmentFromSecretKey,
   isProductionFromSecretKey,
   parsePublishableKey,
-  getCookieSuffix,
-  getSuffixedCookieName,
 } from '@clerk/shared/keys';
-export { deprecated, deprecatedProperty } from '@clerk/shared/deprecated';
+export { retry } from '@clerk/shared/retry';
+export { addClerkPrefix, getClerkJsMajorVersionOrTag, getScriptUrl } from '@clerk/shared/url';
 
 import { buildErrorThrower } from '@clerk/shared/error';
 import { createDevOrStagingUrlCache } from '@clerk/shared/keys';

@@ -127,6 +127,7 @@ export type __internal_LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: LocalizationValue;
   formFieldInputPlaceholder__apiKeyDescription: LocalizationValue;
   formFieldInputPlaceholder__apiKeyExpirationDate: LocalizationValue;
+  formFieldInput__emailAddress_format: LocalizationValue;
   formFieldError__notMatchingPasswords: LocalizationValue;
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
@@ -931,6 +932,8 @@ export type __internal_LocalizationResource = {
     action__signOut: LocalizationValue;
     action__signOutAll: LocalizationValue;
     action__addAccount: LocalizationValue;
+    action__openUserMenu: LocalizationValue;
+    action__closeUserMenu: LocalizationValue;
   };
   organizationSwitcher: {
     personalWorkspace: LocalizationValue;
@@ -939,6 +942,8 @@ export type __internal_LocalizationResource = {
     action__manageOrganization: LocalizationValue;
     action__invitationAccept: LocalizationValue;
     action__suggestionsAccept: LocalizationValue;
+    action__openOrganizationSwitcher: LocalizationValue;
+    action__closeOrganizationSwitcher: LocalizationValue;
     suggestionsAcceptedLabel: LocalizationValue;
   };
   impersonationFab: {

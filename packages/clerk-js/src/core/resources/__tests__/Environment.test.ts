@@ -1,4 +1,4 @@
-import type { EnvironmentJSONSnapshot } from '@clerk/types';
+import type { EnvironmentJSONSnapshot } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { Environment } from '../internal';

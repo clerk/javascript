@@ -121,7 +121,6 @@ export const msMY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const msMY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const msMY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Masukkan kata laluan anda',
   formFieldInputPlaceholder__phoneNumber: 'Masukkan nombor telefon anda',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -490,9 +491,11 @@ export const msMY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Cipta organisasi',
     action__invitationAccept: 'Sertai',
     action__manageOrganization: 'Urus',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta untuk menyertai',
     notSelected: 'Tiada organisasi dipilih',
     personalWorkspace: 'Akaun peribadi',
@@ -643,6 +646,10 @@ export const msMY: LocalizationResource = {
         titleNewTab: 'Didaftarkan masuk pada tab lain',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod tetapan semula kata laluan',
       resendButton: 'Tidak menerima kod? Hantar semula',
@@ -764,6 +771,10 @@ export const msMY: LocalizationResource = {
         subtitleNewTab: 'Kembali ke tab sebelumnya untuk meneruskan',
         title: 'Berjaya mengesahkan e-mel',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -946,7 +957,9 @@ export const msMY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tambah akaun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Urus akaun',
+    action__openUserMenu: undefined,
     action__signOut: 'Daftar keluar',
     action__signOutAll: 'Daftar keluar dari semua akaun',
   },

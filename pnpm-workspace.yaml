@@ -12,9 +12,11 @@ catalogs:
     react-dom: 18.3.1
   repo:
     tslib: 2.8.1
+    tsdown: 0.15.7
     tsup: 8.5.0
     typescript: 5.8.3
-    zx: 8.8.4
+    zx: 8.8.5
+    rolldown: 1.0.0-beta.43
 
 minimumReleaseAge: 2880
 
