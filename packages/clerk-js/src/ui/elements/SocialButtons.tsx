@@ -41,6 +41,7 @@ type SocialButtonsRootProps = SocialButtonsProps & {
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
   alternativePhoneCodeCallback: (channel: PhoneCodeChannel) => void;
   idleAfterDelay?: boolean;
+  showLastAuthenticationStrategy?: boolean;
 };
 
 const isWeb3Strategy = (val: string): val is Web3Strategy => {
@@ -60,6 +61,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     enableWeb3Providers = true,
     enableAlternativePhoneCodeProviders = true,
     idleAfterDelay = true,
+    showLastAuthenticationStrategy = false,
   } = props;
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
@@ -79,7 +81,14 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return null;
   }
 
-  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy as TStrategy | null;
+  const clientLastAuth = showLastAuthenticationStrategy ? clerk.client?.lastAuthenticationStrategy : null;
+
+  const isValidStrategy = (strategy: unknown): strategy is TStrategy => {
+    return strategies.includes(strategy as TStrategy);
+  };
+
+  const lastAuthenticationStrategy = clientLastAuth && isValidStrategy(clientLastAuth) ? clientLastAuth : null;
+
   const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
     [...strategies],
     MAX_STRATEGIES_PER_ROW,
