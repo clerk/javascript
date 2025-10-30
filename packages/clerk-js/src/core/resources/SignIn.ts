@@ -96,6 +96,7 @@ import { eventBus } from '../events';
 import { BaseResource, UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
+  static readonly __internal_resourceName = 'signIn' as const;
   pathRoot = '/client/sign_ins';
 
   id?: string;

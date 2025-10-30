@@ -6,6 +6,7 @@ import { eventBus } from '../events';
 import { BaseResource } from './internal';
 
 export class Waitlist extends BaseResource implements WaitlistResource {
+  static readonly __internal_resourceName = 'waitlist' as const;
   pathRoot = '/waitlist';
 
   id = '';
