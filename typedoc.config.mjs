@@ -94,6 +94,7 @@ const config = {
     './.typedoc/custom-router.mjs',
     './.typedoc/custom-theme.mjs',
     './.typedoc/custom-plugin.mjs',
+    './.typedoc/exports-json-plugin.mjs',
   ],
   theme: 'clerkTheme',
   router: 'clerk-router',
