@@ -35,9 +35,9 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   BillingNamespace,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -210,7 +210,6 @@ export class Clerk implements ClerkInterface {
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
   public organization: OrganizationResource | null | undefined;
-  public user: UserResource | null | undefined;
   public __internal_country?: string | null;
   public telemetry: TelemetryCollector | undefined;
   public readonly __internal_state: State = new State();
@@ -219,6 +218,7 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
+  #user: UserResource | null | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -263,6 +263,47 @@ export class Clerk implements ClerkInterface {
 
   get publishableKey(): string {
     return this.#publishableKey;
+  }
+
+  get user(): UserResource | null | undefined {
+    return this.#user;
+  }
+
+  set user(value: UserResource | null | undefined) {
+    if (!value) {
+      this.#user = value;
+      return;
+    }
+
+    const organizationsEnabled = this.environment?.organizationSettings.enabled;
+    // TODO - Replace with organizations modal
+    const openModal = () => this.__internal_openReverification();
+
+    this.#user = new Proxy(value, {
+      get(target, prop) {
+        // TODO - Simplify this map
+        const organizationProperties: {
+          [K in keyof UserResource]: Lowercase<string & K> extends `${string}organization${string}` ? K : never;
+        }[keyof UserResource][] = [
+          'createOrganizationEnabled',
+          'createOrganizationsLimit',
+          'organizationMemberships',
+          'getOrganizationMemberships',
+          'getOrganizationInvitations',
+          'getOrganizationSuggestions',
+        ];
+
+        if (
+          typeof prop === 'string' &&
+          (organizationProperties as readonly string[]).includes(prop) &&
+          !organizationsEnabled
+        ) {
+          openModal();
+        }
+
+        return Reflect.get(target, prop);
+      },
+    });
   }
 
   get version(): string {
@@ -430,7 +471,8 @@ export class Clerk implements ClerkInterface {
     ) {
       // Typing this.#options as ClerkOptions to ensure proper type checking. TypeScript will infer the type as `never`
       // since missing both `routerPush` and `routerReplace` is not a valid ClerkOptions.
-      const options = this.#options as ClerkOptions;
+      const options = this.#options;
+      // @ts-ignore
       const missingRouter = !options.routerPush ? 'routerPush' : 'routerReplace';
       logger.warnOnce(
         `Clerk: Both \`routerPush\` and \`routerReplace\` need to be defined, but \`${missingRouter}\` is not defined. This may cause issues with navigation in your application.`,
@@ -786,6 +828,7 @@ export class Clerk implements ClerkInterface {
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
+    // TODO -> Only error out if dialog was dismissed
     if (disabledOrganizationsFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
@@ -1029,14 +1072,14 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
-          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-        });
-      }
-      return;
-    }
+    // if (disabledOrganizationsFeature(this, this.environment)) {
+    //   if (this.#instanceType === 'development') {
+    //     throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
+    //       code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+    //     });
+    //   }
+    //   return;
+    // }
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
       controls.mountComponent({
         name: 'OrganizationSwitcher',
@@ -2524,8 +2567,9 @@ export class Clerk implements ClerkInterface {
     this.#authService = await AuthCookieService.create(
       this,
       this.#fapiClient,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.#instanceType!,
+
+      // @ts-ignore
+      this.#instanceType,
       this.#publicEventBus,
     );
 
