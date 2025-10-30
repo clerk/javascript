@@ -239,20 +239,19 @@ function otherOptions() {
   });
 
   const updateOtherOptions = () => {
-    const options = Object.fromEntries(
-      Object.entries(otherOptionsInputs).map(([key, input]) => {
-        sessionStorage.setItem(key, input.value);
+    void Clerk.__unstable__updateProps({
+      options: Object.fromEntries(
+        Object.entries(otherOptionsInputs).map(([key, input]) => {
+          sessionStorage.setItem(key, input.value);
 
-        if (key === 'localization') {
-          const localizationObj = l[input.value as keyof typeof l];
-          return [key, localizationObj];
-        }
+          if (key === 'localization') {
+            return [key, l[input.value as keyof typeof l]];
+          }
 
-        return [key, input.value];
-      }),
-    );
-
-    void Clerk.__unstable__updateProps({ options });
+          return [key, input.value];
+        }),
+      ),
+    });
   };
 
   Object.values(otherOptionsInputs).forEach(input => {
