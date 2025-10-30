@@ -280,7 +280,6 @@ jobs:
             "generic",
             "express",
             "ap-flows",
-            "elements",
             "localhost",
             "sessions",
             "sessions:staging",
