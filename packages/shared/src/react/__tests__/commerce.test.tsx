@@ -16,9 +16,7 @@ jest.mock('../stripe-react', () => ({
       {children}
     </div>
   ),
-  PaymentElement: ({ fallback }: { fallback?: React.ReactNode }) => (
-    <div data-testid='stripe-payment-element'>{fallback}</div>
-  ),
+  PaymentElement: ({ fallback }: { fallback?: React.ReactNode }) => <div>{fallback}</div>,
   useElements: () => null,
   useStripe: () => null,
 }));
@@ -211,79 +209,9 @@ describe('PaymentElement Localization', () => {
     expect(elements).toHaveAttribute('data-locale', 'en');
   });
 
-  it('should handle different locale values', () => {
-    const locales = ['en', 'es', 'fr', 'de', 'it'];
-
-    locales.forEach(locale => {
-      const { unmount } = renderWithLocale(locale);
-
-      const elements = screen.getByTestId('stripe-elements');
-      expect(elements).toHaveAttribute('data-locale', locale);
-
-      unmount();
-    });
-  });
-
-  it('should handle undefined localization object', () => {
-    // Mock the __internal_getOption to return undefined for localization
-    mockGetOption.mockImplementation(key => {
-      if (key === 'localization') {
-        return undefined;
-      }
-      return undefined;
-    });
-
-    const options = {
-      localization: undefined,
-    };
-
-    render(
-      <OptionsContext.Provider value={options}>
-        <__experimental_PaymentElementProvider checkout={mockCheckout}>
-          <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-        </__experimental_PaymentElementProvider>
-      </OptionsContext.Provider>,
-    );
-
-    const elements = screen.getByTestId('stripe-elements');
-    expect(elements).toHaveAttribute('data-locale', 'en');
-  });
-
-  it('should work with full LocalizationResource structure like ClerkProvider', () => {
-    // Mock the __internal_getOption to return the expected localization
-    mockGetOption.mockImplementation(key => {
-      if (key === 'localization') {
-        return { locale: 'fr-FR' };
-      }
-      return undefined;
-    });
-
-    // This test simulates the actual ClerkProvider usage pattern:
-    // import { frFR } from '@clerk/localizations';
-    // <ClerkProvider localization={frFR}>
-    const options = {
-      localization: {
-        locale: 'fr-FR',
-        // This would normally contain all the translation strings from frFR
-        // but we only need the locale property for our implementation
-      },
-    };
-
-    render(
-      <OptionsContext.Provider value={options}>
-        <__experimental_PaymentElementProvider checkout={mockCheckout}>
-          <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-        </__experimental_PaymentElementProvider>
-      </OptionsContext.Provider>,
-    );
-
-    const elements = screen.getByTestId('stripe-elements');
-    // Should normalize 'fr-FR' to 'fr' for Stripe compatibility
-    expect(elements).toHaveAttribute('data-locale', 'fr');
-  });
-
   it('should normalize full locale strings to 2-letter codes for Stripe', () => {
     const testCases = [
+      { input: 'en', expected: 'en' },
       { input: 'en-US', expected: 'en' },
       { input: 'fr-FR', expected: 'fr' },
       { input: 'es-ES', expected: 'es' },
