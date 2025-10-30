@@ -1,13 +1,12 @@
-import '@testing-library/jest-dom';
-
 import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../commerce';
 import { OptionsContext } from '../contexts';
 
 // Mock the Stripe components
-jest.mock('../stripe-react', () => ({
+vi.mock('../stripe-react', () => ({
   Elements: ({ children, options }: { children: React.ReactNode; options: any }) => (
     <div
       data-testid='stripe-elements'
@@ -22,10 +21,10 @@ jest.mock('../stripe-react', () => ({
 }));
 
 // Mock the hooks
-const mockGetOption = jest.fn();
-jest.mock('../hooks/useClerk', () => ({
+const mockGetOption = vi.fn();
+vi.mock('../hooks/useClerk', () => ({
   useClerk: () => ({
-    __internal_loadStripeJs: jest.fn().mockResolvedValue(() => Promise.resolve({})),
+    __internal_loadStripeJs: vi.fn().mockResolvedValue(() => Promise.resolve({})),
     __internal_getOption: mockGetOption,
     __unstable__environment: {
       commerceSettings: {
@@ -41,11 +40,11 @@ jest.mock('../hooks/useClerk', () => ({
   }),
 }));
 
-jest.mock('../hooks/useUser', () => ({
+vi.mock('../hooks/useUser', () => ({
   useUser: () => ({
     user: {
       id: 'user_123',
-      initializePaymentSource: jest.fn().mockResolvedValue({
+      initializePaymentSource: vi.fn().mockResolvedValue({
         externalGatewayId: 'acct_123',
         externalClientSecret: 'seti_123',
         paymentMethodOrder: ['card'],
@@ -54,18 +53,18 @@ jest.mock('../hooks/useUser', () => ({
   }),
 }));
 
-jest.mock('../hooks/useOrganization', () => ({
+vi.mock('../hooks/useOrganization', () => ({
   useOrganization: () => ({
     organization: null,
   }),
 }));
 
-jest.mock('swr', () => ({
+vi.mock('swr', () => ({
   __esModule: true,
-  default: () => ({ data: { loadStripe: jest.fn().mockResolvedValue({}) } }),
+  default: () => ({ data: { loadStripe: vi.fn().mockResolvedValue({}) } }),
 }));
 
-jest.mock('swr/mutation', () => ({
+vi.mock('swr/mutation', () => ({
   __esModule: true,
   default: () => ({
     data: {
@@ -73,7 +72,7 @@ jest.mock('swr/mutation', () => ({
       externalClientSecret: 'seti_123',
       paymentMethodOrder: ['card'],
     },
-    trigger: jest.fn().mockResolvedValue({
+    trigger: vi.fn().mockResolvedValue({
       externalGatewayId: 'acct_123',
       externalClientSecret: 'seti_123',
       paymentMethodOrder: ['card'],
@@ -84,6 +83,7 @@ jest.mock('swr/mutation', () => ({
 describe('PaymentElement Localization', () => {
   const mockCheckout = {
     id: 'checkout_123',
+    needsPaymentMethod: true,
     plan: {
       id: 'plan_123',
       name: 'Test Plan',
@@ -112,7 +112,7 @@ describe('PaymentElement Localization', () => {
       freeTrialDays: 0,
       freeTrialEnabled: false,
       pathRoot: '/',
-      reload: jest.fn(),
+      reload: vi.fn(),
       features: [],
       limits: {},
       metadata: {},
@@ -128,11 +128,11 @@ describe('PaymentElement Localization', () => {
     status: 'needs_confirmation' as const,
     error: null,
     fetchStatus: 'idle' as const,
-    confirm: jest.fn(),
-    start: jest.fn(),
-    clear: jest.fn(),
-    finalize: jest.fn(),
-    getState: jest.fn(),
+    confirm: vi.fn(),
+    start: vi.fn(),
+    clear: vi.fn(),
+    finalize: vi.fn(),
+    getState: vi.fn(),
     isConfirming: false,
     isStarting: false,
     planPeriod: 'month' as const,
@@ -153,7 +153,7 @@ describe('PaymentElement Localization', () => {
       organizationId: undefined,
       organizationName: undefined,
       pathRoot: '/',
-      reload: jest.fn(),
+      reload: vi.fn(),
     },
   };
 
@@ -183,7 +183,7 @@ describe('PaymentElement Localization', () => {
     renderWithLocale('es');
 
     const elements = screen.getByTestId('stripe-elements');
-    expect(elements).toHaveAttribute('data-locale', 'es');
+    expect(elements.getAttribute('data-locale')).toBe('es');
   });
 
   it('should default to "en" when no locale is provided', () => {
@@ -206,7 +206,7 @@ describe('PaymentElement Localization', () => {
     );
 
     const elements = screen.getByTestId('stripe-elements');
-    expect(elements).toHaveAttribute('data-locale', 'en');
+    expect(elements.getAttribute('data-locale')).toBe('en');
   });
 
   it('should normalize full locale strings to 2-letter codes for Stripe', () => {
@@ -242,7 +242,7 @@ describe('PaymentElement Localization', () => {
       );
 
       const elements = screen.getByTestId('stripe-elements');
-      expect(elements).toHaveAttribute('data-locale', expected);
+      expect(elements.getAttribute('data-locale')).toBe(expected);
 
       unmount();
     });
