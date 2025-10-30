@@ -188,7 +188,7 @@ export class Session extends BaseResource implements SessionResource {
         body: {
           ...config,
           strategy: factor.strategy,
-        } as any,
+        },
       })
     )?.response as unknown as SessionVerificationJSON;
 
@@ -214,7 +214,7 @@ export class Session extends BaseResource implements SessionResource {
       await BaseResource._fetch({
         method: 'POST',
         path: `/client/sessions/${this.id}/verify/attempt_first_factor`,
-        body: { ...config, strategy: attemptFactor.strategy } as any,
+        body: { ...config, strategy: attemptFactor.strategy },
       })
     )?.response as unknown as SessionVerificationJSON;
 
