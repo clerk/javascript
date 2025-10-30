@@ -1,5 +1,29 @@
 # Change Log
 
+## 4.96.0
+
+### Minor Changes
+
+- Allow free trials without requiring a payment method, based on the configuration of an instance. ([#7068](https://github.com/clerk/javascript/pull/7068)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Billing Beta] Remove unnecessary `orgId` from BillingPayerMethods interface. ([#7087](https://github.com/clerk/javascript/pull/7087)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Localize aria-labels within `UserButton` and `OrganizationSwitcher` triggers. ([#7086](https://github.com/clerk/javascript/pull/7086)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.95.1
+
+### Patch Changes
+
+- Add title attribute to email address field with the recommended format. ([#6956](https://github.com/clerk/javascript/pull/6956)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 4.95.0
+
+### Minor Changes
+
+- [Billing Beta]: Dropping `paymentMethodId` from subscription item. ([#7017](https://github.com/clerk/javascript/pull/7017)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 4.94.0
 
 ### Minor Changes

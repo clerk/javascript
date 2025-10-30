@@ -730,7 +730,6 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   credit?: {
     amount: BillingMoneyAmountJSON;
   };
-  payment_method_id: string;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   status: BillingSubscriptionStatus;
@@ -817,6 +816,7 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   // TODO(@COMMERCE): Remove optional after GA.
   free_trial_ends_at: number | null;
   payer: BillingPayerJSON;
+  needs_payment_method: boolean;
 }
 
 /**

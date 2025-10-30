@@ -121,7 +121,6 @@ export const kkKZ: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const kkKZ: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const kkKZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Құпия сөзді енгізіңіз',
   formFieldInputPlaceholder__phoneNumber: 'Телефон нөмірін енгізіңіз',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -480,9 +481,11 @@ export const kkKZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
     action__manageOrganization: 'Басқару',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Қосылу сұрауы',
     notSelected: 'Ұйым таңдалмады',
     personalWorkspace: 'Жеке есептік жазба',
@@ -630,6 +633,10 @@ export const kkKZ: LocalizationResource = {
         titleNewTab: 'Басқа бетте кірдіңіз',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Құпия сөзді қалпына келтіру коды',
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
@@ -750,6 +757,10 @@ export const kkKZ: LocalizationResource = {
         subtitleNewTab: 'Жалғастыру үшін алдыңғы бетке оралыңыз',
         title: 'Электрондық пошта расталды',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -921,7 +932,9 @@ export const kkKZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Есептік жазба қосу',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Есептік жазбаны басқару',
+    action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
   },

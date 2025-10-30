@@ -121,7 +121,6 @@ export const nlBE: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const nlBE: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const nlBE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -489,9 +490,11 @@ export const nlBE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
@@ -639,6 +642,10 @@ export const nlBE: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -758,6 +765,10 @@ export const nlBE: LocalizationResource = {
         subtitleNewTab: 'Ga naar de vorige tab om verder te gaan',
         title: 'E-mail bevestigd',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +942,9 @@ export const nlBE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Account beheren',
+    action__openUserMenu: undefined,
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },

@@ -69,6 +69,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getBrowserLocale,
   getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
@@ -164,9 +165,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
   create = (params: SignInCreateParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
+    const locale = getBrowserLocale();
     return this._basePost({
       path: this.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   };
 
@@ -708,9 +710,10 @@ class SignInFuture implements SignInFutureResource {
   }
 
   private async _create(params: SignInFutureCreateParams): Promise<void> {
+    const locale = getBrowserLocale();
     await this.resource.__internal_basePost({
       path: this.resource.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   }
 
@@ -729,9 +732,14 @@ class SignInFuture implements SignInFutureResource {
       // TODO @userland-errors:
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
+      const locale = getBrowserLocale();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { identifier: identifier || previousIdentifier, password: params.password },
+        body: {
+          identifier: identifier || previousIdentifier,
+          password: params.password,
+          ...(locale ? { locale } : {}),
+        },
       });
     });
   }

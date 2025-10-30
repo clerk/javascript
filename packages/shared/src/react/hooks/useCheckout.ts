@@ -106,7 +106,6 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         id: null,
         externalClientSecret: null,
         externalGatewayId: null,
-        status: null,
         totals: null,
         isImmediatePlanChange: null,
         planPeriod: null,
@@ -114,7 +113,8 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         paymentMethod: null,
         freeTrialEndsAt: null,
         payer: null,
-      };
+        needsPaymentMethod: null,
+      } satisfies ForceNull<CheckoutProperties>;
     }
     const {
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -124,7 +124,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
       // All the above need to be removed from the properties
       ...rest
     } = managerProperties.checkout;
-    return rest;
+    return rest satisfies CheckoutProperties;
   }, [managerProperties.checkout]);
 
   const checkout = {

@@ -121,7 +121,6 @@ export const esCR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const esCR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,6 +221,7 @@ export const esCR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresa tu contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingresa tu número de teléfono',
   formFieldInputPlaceholder__username: 'Ingresa tu nombre de usuario',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -491,9 +492,11 @@ export const esCR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear Organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Administrar Organización',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Espacio personal',
@@ -643,6 +646,10 @@ export const esCR: LocalizationResource = {
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código para restablecer contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -765,6 +772,10 @@ export const esCR: LocalizationResource = {
         subtitleNewTab: 'Regresa a la pestaña anterior para continuar',
         title: 'Correo electrónico verificado con éxito',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -941,7 +952,9 @@ export const esCR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Añadir cuenta',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrar cuenta',
+    action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
   },

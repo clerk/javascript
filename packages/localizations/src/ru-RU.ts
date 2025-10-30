@@ -121,7 +121,6 @@ export const ruRU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const ruRU: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -222,6 +222,7 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Введите ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Введите ваш номер телефона',
   formFieldInputPlaceholder__username: 'Имя пользователя',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -495,9 +496,11 @@ export const ruRU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
     action__manageOrganization: 'Настройки',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
     personalWorkspace: 'Личный профиль',
@@ -647,6 +650,10 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код восстановления пароля',
       resendButton: 'Отправить код еще раз',
@@ -768,6 +775,10 @@ export const ruRU: LocalizationResource = {
         subtitleNewTab: 'Вернитесь на предыдущую вкладку, чтобы продолжить',
         title: 'Почта верифицирована',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -946,7 +957,9 @@ export const ruRU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавить учетную запись',
+    action__closeUserMenu: 'Закрыть меню пользователя',
     action__manageAccount: 'Управление учетной записью',
+    action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
   },

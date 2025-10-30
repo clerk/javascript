@@ -41,7 +41,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
                   padding: t.space.$0x5,
                   boxSizing: 'content-box',
                   opacity: t.opacity.$inactive,
-                  ':hover': {
+                  ':hover,:focus-visible': {
                     opacity: 1,
                   },
                 }

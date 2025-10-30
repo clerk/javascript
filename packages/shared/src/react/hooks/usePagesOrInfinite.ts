@@ -10,6 +10,7 @@ import type {
   PaginatedResources,
   ValueOrSetter,
 } from '../types';
+import { usePreviousValue } from './usePreviousValue';
 
 /**
  * Returns an object containing only the keys from the first object that are not present in the second object.
@@ -81,7 +82,7 @@ export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | 
 
   const newObj: Record<string, unknown> = {};
   for (const key of Object.keys(defaultValues)) {
-    // @ts-ignore
+    // @ts-ignore - defaultValues and params share shape; dynamic index access is safe here
     newObj[key] = shouldUseDefaults ? defaultValues[key] : (params?.[key] ?? defaultValues[key]);
   }
 
@@ -157,10 +158,35 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     pageSize: pageSizeRef.current,
   };
 
+  const previousIsSignedIn = usePreviousValue(isSignedIn);
+
   // cacheMode being `true` indicates that the cache key is defined, but the fetcher is not.
   // This allows to ready the cache instead of firing a request.
   const shouldFetch = !triggerInfinite && enabled && (!cacheMode ? !!fetcher : true);
-  const swrKey = isSignedIn ? pagesCacheKey : shouldFetch ? pagesCacheKey : null;
+
+  // Attention:
+  //
+  // This complex logic is necessary to ensure that the cached data is not used when the user is signed out.
+  // `useSWR` with `key` set to `null` and `keepPreviousData` set to `true` will return the previous cached data until the hook unmounts.
+  // So for hooks that render authenticated data, we need to ensure that the cached data is not used when the user is signed out.
+  //
+  // 1. Fetcher should not fire if user is signed out on mount. (fetcher does not run, loading states are not triggered)
+  // 2. If user was signed in and then signed out, cached data should become null. (fetcher runs and returns null, loading states are triggered)
+  //
+  // We achieve (2) by setting the key to the cache key when the user transitions to signed out and forcing the fetcher to return null.
+  const swrKey =
+    typeof isSignedIn === 'boolean'
+      ? previousIsSignedIn === true && isSignedIn === false
+        ? pagesCacheKey
+        : isSignedIn
+          ? shouldFetch
+            ? pagesCacheKey
+            : null
+          : null
+      : shouldFetch
+        ? pagesCacheKey
+        : null;
+
   const swrFetcher =
     !cacheMode && !!fetcher
       ? (cacheKeyParams: Record<string, unknown>) => {
@@ -180,6 +206,22 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     mutate: swrMutate,
   } = useSWR(swrKey, swrFetcher, { keepPreviousData, ...cachingSWROptions });
 
+  // Attention:
+  //
+  // Cache behavior for infinite loading when signing out:
+  //
+  // Unlike `useSWR` above (which requires complex transition handling), `useSWRInfinite` has simpler sign-out semantics:
+  // 1. When user is signed out on mount, the key getter returns `null`, preventing any fetches.
+  // 2. When user transitions from signed in to signed out, the key getter returns `null` for all page indices.
+  // 3. When `useSWRInfinite`'s key getter returns `null`, SWR will not fetch data and considers that page invalid.
+  // 4. Unlike paginated mode, `useSWRInfinite` does not support `keepPreviousData`, so there's no previous data retention.
+  //
+  // This simpler behavior works because:
+  // - `useSWRInfinite` manages multiple pages internally, each with its own cache key
+  // - When the key getter returns `null`, all page fetches are prevented and pages become invalid
+  // - Without `keepPreviousData`, the hook will naturally reflect the empty/invalid state
+  //
+  // Result: No special transition logic needed - just return `null` from key getter when `isSignedIn === false`.
   const {
     data: swrInfiniteData,
     isLoading: swrInfiniteIsLoading,
@@ -190,7 +232,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     mutate: swrInfiniteMutate,
   } = useSWRInfinite(
     pageIndex => {
-      if (!triggerInfinite || !enabled) {
+      if (!triggerInfinite || !enabled || isSignedIn === false) {
         return null;
       }
 
@@ -202,9 +244,9 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       };
     },
     cacheKeyParams => {
-      // @ts-ignore
+      // @ts-ignore - remove cache-only keys from request params
       const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
-      // @ts-ignore
+      // @ts-ignore - fetcher expects Params subset; narrowing at call-site
       return fetcher?.(requestParams);
     },
     cachingSWROptions,
@@ -225,7 +267,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       }
       return setPaginatedPage(numberOrgFn);
     },
-    [setSize],
+    [setSize, triggerInfinite],
   );
 
   const data = useMemo(() => {

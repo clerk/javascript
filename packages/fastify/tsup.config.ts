@@ -3,20 +3,20 @@ import { defineConfig } from 'tsup';
 import { name, version } from './package.json';
 
 export default defineConfig(overrideOptions => {
-  const isProd = overrideOptions.env?.NODE_ENV === 'production';
+  const isWatch = !!overrideOptions.watch;
 
   return {
-    entry: ['src/index.ts', 'src/webhooks.ts'],
-    onSuccess: 'tsc',
-    minify: isProd,
-    clean: true,
-    sourcemap: true,
+    entry: ['./src/index.ts', './src/webhooks.ts'],
     format: ['cjs', 'esm'],
-    legacyOutput: true,
+    bundle: true,
+    clean: true,
+    minify: false,
+    sourcemap: true,
+    dts: true,
     define: {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
-      __DEV__: `${!isProd}`,
+      __DEV__: `${isWatch}`,
     },
   };
 });
