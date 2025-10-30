@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/shared/react';
-import type { PhoneCodeFactor } from '@clerk/types';
+import type { PhoneCodeFactor } from '@clerk/shared/types';
 
 import { Flow, localizationKeys } from '../../customizables';
 import type { UVFactorTwoCodeCard } from './UVFactorTwoCodeForm';

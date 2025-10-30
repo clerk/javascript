@@ -1,4 +1,4 @@
-import type { EnvironmentResource } from '@clerk/types';
+import type { EnvironmentResource } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { assertContextExists } from './utils';

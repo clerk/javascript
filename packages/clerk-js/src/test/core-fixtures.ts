@@ -12,7 +12,7 @@ import type {
   SignInJSON,
   SignUpJSON,
   UserJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { vi } from 'vitest';
 
 export const mockJwt =

@@ -1,4 +1,4 @@
-import type { OrganizationDomainResource } from '@clerk/types';
+import type { OrganizationDomainResource } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../../customizables';
 import { Badge, localizationKeys } from '../../customizables';

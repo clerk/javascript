@@ -38,7 +38,7 @@ import type {
   SignUpUpdateParams,
   StartEmailLinkFlowParams,
   Web3Provider,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
 

@@ -1,6 +1,6 @@
 import { useClientContext } from '@clerk/shared/react';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { UseSignInReturn } from '@clerk/types';
+import type { UseSignInReturn } from '@clerk/shared/types';
 
 import { useIsomorphicClerkContext } from '../../contexts/IsomorphicClerkContext';
 import { useAssertWrappedByClerkProvider } from '../useAssertWrappedByClerkProvider';

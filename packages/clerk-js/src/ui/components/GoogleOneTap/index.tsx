@@ -1,4 +1,4 @@
-import type { GoogleOneTapProps } from '@clerk/types';
+import type { GoogleOneTapProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { withCoreSessionSwitchGuard } from '../../contexts';

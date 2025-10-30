@@ -1,6 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { Errors, SignInSignal, SignUpSignal } from '@clerk/types';
 import { computed, signal } from 'alien-signals';
 
 import type { SignIn } from './resources/SignIn';

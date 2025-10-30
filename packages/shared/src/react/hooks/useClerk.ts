@@ -1,5 +1,4 @@
-import type { LoadedClerk } from '@clerk/types';
-
+import type { LoadedClerk } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 
 /**

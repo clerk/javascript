@@ -8,7 +8,7 @@ describe.skip('memoizeStateListenerCallback', () => {
   });
 });
 
-// import { Resources, UserJSON } from '@clerk/types';
+// import { Resources, UserJSON } from '@clerk/shared/types';
 //
 // const frontEndApi = '';
 // const path = '';
