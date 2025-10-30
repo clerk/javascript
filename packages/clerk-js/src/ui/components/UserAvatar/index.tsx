@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react/index';
-import type { UserAvatarProps } from '@clerk/types';
+import type { UserAvatarProps } from '@clerk/shared/types';
 
 import { useUserAvatarContext, withCoreUserGuard } from '@/ui/contexts';
 import { descriptors } from '@/ui/customizables';

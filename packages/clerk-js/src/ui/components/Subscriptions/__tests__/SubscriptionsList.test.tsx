@@ -1,4 +1,4 @@
-import type { BillingPayerResourceType } from '@clerk/types';
+import type { BillingPayerResourceType } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';

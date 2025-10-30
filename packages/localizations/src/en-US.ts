@@ -485,9 +485,11 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: 'Close organization switcher',
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
+    action__openOrganizationSwitcher: 'Open organization switcher',
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organization selected',
     personalWorkspace: 'Personal account',
@@ -940,7 +942,9 @@ export const enUS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Add account',
+    action__closeUserMenu: 'Close user menu',
     action__manageAccount: 'Manage account',
+    action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
   },

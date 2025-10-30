@@ -1,5 +1,8 @@
 'use client';
 
+import type { PropsWithChildren } from 'react';
+import React from 'react';
+
 import type {
   BillingSubscriptionPlanPeriod,
   ClerkOptions,
@@ -9,10 +12,7 @@ import type {
   OrganizationResource,
   SignedInSessionResource,
   UserResource,
-} from '@clerk/types';
-import type { PropsWithChildren } from 'react';
-import React from 'react';
-
+} from '../types';
 import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
 
@@ -117,19 +117,19 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
 }
 
 export {
+  __experimental_CheckoutProvider,
+  ClerkInstanceContext,
   ClientContext,
-  useClientContext,
+  OptionsContext,
   OrganizationProvider,
+  SessionContext,
+  useAssertWrappedByClerkProvider,
+  useCheckoutContext,
+  useClerkInstanceContext,
+  useClientContext,
+  useOptionsContext,
   useOrganizationContext,
   UserContext,
-  OptionsContext,
-  useOptionsContext,
-  useUserContext,
-  SessionContext,
   useSessionContext,
-  ClerkInstanceContext,
-  useClerkInstanceContext,
-  useCheckoutContext,
-  __experimental_CheckoutProvider,
-  useAssertWrappedByClerkProvider,
+  useUserContext,
 };

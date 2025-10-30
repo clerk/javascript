@@ -1,6 +1,5 @@
-import type { ClerkPaginatedResponse } from '@clerk/types';
-
 import type { ClerkAPIResponseError } from '../error';
+import type { ClerkPaginatedResponse } from '../types';
 
 export type ValueOrSetter<T = unknown> = (size: T | ((_size: T) => T)) => void;
 

@@ -1,5 +1,4 @@
-import type { ClerkAPIErrorJSON, ClerkAPIResponseError as ClerkAPIResponseErrorInterface } from '@clerk/types';
-
+import type { ClerkAPIErrorJSON, ClerkAPIResponseError as ClerkAPIResponseErrorInterface } from '../types';
 import { ClerkAPIError } from './clerkApiError';
 import type { ClerkErrorParams } from './clerkError';
 import { ClerkError } from './clerkError';

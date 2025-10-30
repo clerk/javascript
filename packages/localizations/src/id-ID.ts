@@ -490,9 +490,11 @@ export const idID: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Buat organisasi',
     action__invitationAccept: 'Gabung',
     action__manageOrganization: 'Kelola',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta bergabung',
     notSelected: 'Tidak ada organisasi dipilih',
     personalWorkspace: 'Akun pribadi',
@@ -950,7 +952,9 @@ export const idID: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tambah akun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Kelola akun',
+    action__openUserMenu: undefined,
     action__signOut: 'Keluar',
     action__signOutAll: 'Keluar dari semua akun',
   },

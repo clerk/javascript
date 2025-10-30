@@ -1,5 +1,4 @@
-import type { ClerkHostRouter, RoutingMode } from '@clerk/types';
-
+import type { ClerkHostRouter, RoutingMode } from '../types';
 import { isAbsoluteUrl, withLeadingSlash, withoutTrailingSlash } from '../url';
 
 export const PRESERVED_QUERYSTRING_PARAMS = ['after_sign_in_url', 'after_sign_up_url', 'redirect_url'];
@@ -64,8 +63,8 @@ function normalizePath(path: string) {
 /**
  * Factory function to create an instance of ClerkRouter with the provided host router.
  *
- * @param router host router instance to be used by the router
- * @param basePath base path of the router, navigation and matching will be scoped to this path
+ * @param router - host router instance to be used by the router
+ * @param basePath - base path of the router, navigation and matching will be scoped to this path
  * @returns A ClerkRouter instance
  */
 export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/'): ClerkRouter {
@@ -93,6 +92,9 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     return `${destinationUrl.pathname}${destinationUrl.search}`;
   }
 
+  /**
+   *
+   */
   function match(path?: string, index?: boolean) {
     const pathToMatch = path ?? (index && '/');
 
@@ -105,29 +107,47 @@ export function createClerkRouter(router: ClerkHostRouter, basePath: string = '/
     return normalizePath(`${normalizedBasePath}${normalizedPath}`) === normalizePath(router.pathname());
   }
 
+  /**
+   *
+   */
   function child(childBasePath: string) {
     return createClerkRouter(router, `${normalizedBasePath}${normalizePath(childBasePath)}`);
   }
 
+  /**
+   *
+   */
   function push(path: string) {
     const destinationUrl = makeDestinationUrlWithPreservedQueryParameters(path);
     return router.push(destinationUrl);
   }
 
+  /**
+   *
+   */
   function replace(path: string) {
     const destinationUrl = makeDestinationUrlWithPreservedQueryParameters(path);
     return router.replace(destinationUrl);
   }
 
+  /**
+   *
+   */
   function shallowPush(path: string) {
     const destinationUrl = makeDestinationUrlWithPreservedQueryParameters(path);
     return router.shallowPush(destinationUrl);
   }
 
+  /**
+   *
+   */
   function pathname() {
     return router.pathname();
   }
 
+  /**
+   *
+   */
   function searchParams() {
     return router.searchParams();
   }
