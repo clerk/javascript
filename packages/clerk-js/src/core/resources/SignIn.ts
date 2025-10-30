@@ -1117,8 +1117,11 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
-      // Reload the client to prevent an issue where the created session is not picked up.
-      await SignIn.clerk.client?.reload();
+      // Reload the client if the created session is not in the client's sessions. This can happen during modal SSO
+      // flows where the in-memory client does not have the created session.
+      if (SignIn.clerk.client && !SignIn.clerk.client.sessions.some(s => s.id === this.resource.createdSessionId)) {
+        await SignIn.clerk.client.reload();
+      }
 
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
