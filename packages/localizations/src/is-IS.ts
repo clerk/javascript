@@ -490,9 +490,11 @@ export const isIS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Stofna samtök',
     action__invitationAccept: 'Ganga í',
     action__manageOrganization: 'Stjórna',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Biðja um að ganga í',
     notSelected: 'Engin samtök valin',
     personalWorkspace: 'Persónulegur reikningur',
@@ -944,7 +946,9 @@ export const isIS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Bæta við reikningi',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Stjórna reikningi',
+    action__openUserMenu: undefined,
     action__signOut: 'Skrá út',
     action__signOutAll: 'Skrá út af öllum reikningum',
   },

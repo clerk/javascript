@@ -494,9 +494,11 @@ export const viVN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Tạo tổ chức',
     action__invitationAccept: 'Tham gia',
     action__manageOrganization: 'Quản lý',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
@@ -947,7 +949,9 @@ export const viVN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Thêm tài khoản',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Quản lý tài khoản',
+    action__openUserMenu: undefined,
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
   },

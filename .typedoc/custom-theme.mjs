@@ -44,6 +44,8 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
 
     const superPartials = this.partials;
 
+    this._insideFunctionSignature = false;
+
     this.partials = {
       ...superPartials,
       /**
@@ -153,10 +155,17 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           );
         }
 
+        const prevInsideParams = this._insideFunctionSignature;
+        this._insideFunctionSignature = true;
         md.push(this.partials.signatureParameters(model.parameters || []));
+        this._insideFunctionSignature = prevInsideParams;
 
         if (model.type) {
-          md.push(`: ${this.partials.someType(model.type)}`);
+          const prevInsideType = this._insideFunctionSignature;
+          this._insideFunctionSignature = true;
+          const typeOutput = this.partials.someType(model.type);
+          this._insideFunctionSignature = prevInsideType;
+          md.push(`: ${typeOutput}`);
         }
 
         const result = md.join('');
@@ -353,6 +362,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           .replace(/<code>/g, '')
           .replace(/<\/code>/g, '');
 
+        // Only wrap in <code> if NOT inside a function signature
+        if (this._insideFunctionSignature) {
+          return output;
+        }
+
         return `<code>${output}</code>`;
       },
       /**
@@ -370,6 +384,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
           // Remove any `<code>` and `</code>` tags
           .replace(/<code>/g, '')
           .replace(/<\/code>/g, '');
+
+        // Only wrap in <code> if NOT inside a function signature
+        if (this._insideFunctionSignature) {
+          return output;
+        }
 
         return `<code>${output}</code>`;
       },
@@ -393,6 +412,11 @@ class ClerkMarkdownThemeContext extends MarkdownThemeContext {
               .replace(/<\/code>/g, ''),
           )
           .join(delimiter);
+
+        // Only wrap in <code> if NOT inside a function signature
+        if (this._insideFunctionSignature) {
+          return output;
+        }
 
         return `<code>${output}</code>`;
       },
@@ -491,6 +515,32 @@ ${tabs}
           // Remove any `<code>` and `</code>` tags
           .replace(/<code>/g, '')
           .replace(/<\/code>/g, '');
+
+        // Only wrap in <code> if NOT inside a function signature
+        if (this._insideFunctionSignature) {
+          return output;
+        }
+
+        return `<code>${output}</code>`;
+      },
+      /**
+       * Ensures that reflection types (like Simplify wrapped types) are wrapped in a single codeblock
+       * @param {import('typedoc').ReflectionType} model
+       */
+      reflectionType: model => {
+        const defaultOutput = superPartials.reflectionType(model);
+
+        const output = defaultOutput
+          // Remove any backticks
+          .replace(/`/g, '')
+          // Remove any `<code>` and `</code>` tags
+          .replace(/<code>/g, '')
+          .replace(/<\/code>/g, '');
+
+        // Only wrap in <code> if NOT inside a function signature
+        if (this._insideFunctionSignature) {
+          return output;
+        }
 
         return `<code>${output}</code>`;
       },

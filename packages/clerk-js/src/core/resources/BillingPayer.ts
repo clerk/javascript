@@ -1,4 +1,4 @@
-import type { BillingPayerJSON, BillingPayerResource } from '@clerk/types';
+import type { BillingPayerJSON, BillingPayerResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
 

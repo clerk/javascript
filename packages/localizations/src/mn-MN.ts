@@ -490,9 +490,11 @@ export const mnMN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Байгууллага үүсгэх',
     action__invitationAccept: 'Нэгдэх',
     action__manageOrganization: 'Удирдах',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Нэгдэх хүсэлт',
     notSelected: 'Байгууллага сонгогдоогүй байна',
     personalWorkspace: 'Хувийн бүртгэл',
@@ -941,7 +943,9 @@ export const mnMN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Бүртгэл нэмэх',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Бүртгэлийг удирдах',
+    action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },

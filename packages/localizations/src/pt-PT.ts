@@ -488,9 +488,11 @@ export const ptPT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Configurar organização',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar participação',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
@@ -940,7 +942,9 @@ export const ptPT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
+    action__closeUserMenu: 'Fechar menu do utilizador',
     action__manageAccount: 'Configurar conta',
+    action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
   },

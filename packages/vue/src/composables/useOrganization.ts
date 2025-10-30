@@ -1,5 +1,5 @@
 import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
-import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
+import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';

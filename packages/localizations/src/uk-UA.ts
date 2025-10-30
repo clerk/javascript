@@ -488,9 +488,11 @@ export const ukUA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Створити організацію',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Управління організацією',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Організація не обрана',
     personalWorkspace: 'Особистий робочий простір',
@@ -937,7 +939,9 @@ export const ukUA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Додати акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управління акаунтом',
+    action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
   },

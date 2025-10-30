@@ -2,7 +2,7 @@ import type {
   CreateEnterpriseSSOLinkFlowReturn,
   EmailAddressResource,
   StartEnterpriseSSOLinkFlowParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import React from 'react';
 
 type EnterpriseSSOLinkEmailAddressReturn = CreateEnterpriseSSOLinkFlowReturn<

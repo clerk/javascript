@@ -1,5 +1,5 @@
+import type { CustomMenuItem } from '@clerk/shared/types';
 import { logErrorInDevMode } from '@clerk/shared/utils';
-import type { CustomMenuItem } from '@clerk/types';
 import { ref } from 'vue';
 
 import { MenuAction, MenuLink } from '../components/ui-components/UserButton';
