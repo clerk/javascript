@@ -32,6 +32,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   return (
     <SocialButtons
       {...rest}
+      showLastAuthenticationStrategy={false}
       idleAfterDelay={!shouldUsePopup}
       oauthCallback={(strategy: OAuthStrategy) => {
         if (shouldUsePopup) {
