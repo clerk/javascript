@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
 import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
-import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { type PropsWithChildren, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
+import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';

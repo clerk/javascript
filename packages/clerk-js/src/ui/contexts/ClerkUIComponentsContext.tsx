@@ -5,7 +5,7 @@ import type {
   TaskChooseOrganizationProps,
   UserButtonProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';

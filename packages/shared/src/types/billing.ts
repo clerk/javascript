@@ -490,6 +490,11 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    */
   id: string;
   /**
+   * The unique identifier for the payment method being used for the subscription item.
+   */
+  //TODO(@COMMERCE): should this be nullable ?
+  paymentMethodId: string;
+  /**
    * The plan associated with the subscription item.
    */
   plan: BillingPlanResource;

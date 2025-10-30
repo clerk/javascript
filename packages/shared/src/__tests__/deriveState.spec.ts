@@ -1,7 +1,7 @@
-import type { InitialState, Resources } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
 import { deriveState } from '../deriveState';
+import type { InitialState, Resources } from '../types';
 
 describe('deriveState', () => {
   const mockInitialState = {

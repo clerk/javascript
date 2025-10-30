@@ -1,4 +1,4 @@
-import type { InstanceType } from '@clerk/types';
+import type { InstanceType } from '@clerk/shared/types';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { SUPPORTED_FAPI_VERSION } from '../constants';

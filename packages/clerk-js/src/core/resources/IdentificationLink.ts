@@ -1,4 +1,8 @@
-import type { IdentificationLinkJSON, IdentificationLinkJSONSnapshot, IdentificationLinkResource } from '@clerk/types';
+import type {
+  IdentificationLinkJSON,
+  IdentificationLinkJSONSnapshot,
+  IdentificationLinkResource,
+} from '@clerk/shared/types';
 
 import { BaseResource } from './Base';
 

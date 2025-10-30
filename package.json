@@ -134,9 +134,11 @@
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "rimraf": "6.0.1",
+    "rolldown": "catalog:repo",
     "statuses": "^1.5.0",
     "tree-kill": "^1.2.2",
     "ts-jest": "29.2.5",
+    "tsdown": "catalog:repo",
     "tsup": "catalog:repo",
     "turbo": "^2.5.4",
     "typedoc": "0.28.5",
@@ -162,10 +164,9 @@
     ],
     "overrides": {
       "jest": "29.7.0",
-      "jest-snapshot-prettier": "npm:prettier@^3.5.3"
-    },
-    "patchedDependencies": {
-      "yalc@1.0.0-pre.53": "patches/yalc@1.0.0-pre.53.patch"
+      "jest-snapshot-prettier": "npm:prettier@^3.5.3",
+      "react": "catalog:react",
+      "react-dom": "catalog:react"
     }
   }
 }
