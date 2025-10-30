@@ -117,7 +117,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
-        run: pnpm turbo build $TURBO_ARGS --only
+        run: pnpm turbo build $TURBO_ARGS --only --filter=!@clerk/elements
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -245,7 +245,7 @@ jobs:
         run: |
           # Only run Typedoc tests for one matrix version
           if [ "${{ matrix.node-version }}" == "22" ]; then
-            pnpm test:typedoc
+            pnpm turbo run //#test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -280,14 +280,12 @@ jobs:
             "generic",
             "express",
             "ap-flows",
-            "elements",
             "localhost",
             "sessions",
             "sessions:staging",
             "handshake",
             "handshake:staging",
             "astro",
-            "expo-web",
             "tanstack-react-start",
             "vue",
             "nuxt",

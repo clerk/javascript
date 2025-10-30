@@ -12,10 +12,10 @@ export type DevBrowserCookieHandler = {
   remove: () => void;
 };
 
-const getCookieAttributes = (): { sameSite: string; secure: boolean } => {
+const getCookieAttributes = () => {
   const sameSite = inCrossOriginIframe() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
-  return { sameSite, secure };
+  return { sameSite, secure } as const;
 };
 
 /**

@@ -13,11 +13,11 @@ export type SessionCookieHandler = {
   get: () => string | undefined;
 };
 
-const getCookieAttributes = (): { sameSite: string; secure: boolean; partitioned: boolean } => {
+const getCookieAttributes = () => {
   const sameSite = __BUILD_VARIANT_CHIPS__ ? 'None' : inCrossOriginIframe() ? 'None' : 'Lax';
   const secure = getSecureAttribute(sameSite);
   const partitioned = __BUILD_VARIANT_CHIPS__ && secure;
-  return { sameSite, secure, partitioned };
+  return { sameSite, secure, partitioned } as const;
 };
 
 /**
