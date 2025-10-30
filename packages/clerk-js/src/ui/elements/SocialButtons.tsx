@@ -96,12 +96,14 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   );
   const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
 
+  const remainingStrategiesCount = lastAuthenticationStrategy ? strategies.length - 1 : strategies.length;
+
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
       ? true
       : socialButtonsVariant === 'iconButton'
         ? false
-        : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
+        : remainingStrategiesCount <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
   const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
     card.setLoading(strategy);
@@ -160,13 +162,15 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           })}
         >
           {row.map(strategy => {
+            const isLastAuthButton = strategy === lastAuthenticationStrategy;
+
             const label =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+              isLastAuthButton || remainingStrategiesCount === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
                 ? `Continue with ${strategyToDisplayData[strategy].name}`
                 : strategyToDisplayData[strategy].name;
 
             const localizedText =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+              isLastAuthButton || remainingStrategiesCount === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
                 ? localizationKeys('socialButtonsBlockButton', {
                     provider: strategyToDisplayData[strategy].name,
                   })
