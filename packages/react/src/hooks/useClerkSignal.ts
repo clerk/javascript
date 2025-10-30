@@ -15,12 +15,11 @@ function useClerkSignal(signal: SignalName): SignInSignalValue | SignUpSignalVal
   const clerk = useIsomorphicClerkContext();
 
   const signalGetter = useMemo(() => {
-    const map: Record<SignalName, () => SignInSignalValue | SignUpSignalValue | WaitlistSignalValue> = {
-      signIn: () => clerk.__internal_state.signInSignal() as SignInSignalValue,
-      signUp: () => clerk.__internal_state.signUpSignal() as SignUpSignalValue,
-      waitlist: () => clerk.__internal_state.waitlistSignal() as WaitlistSignalValue,
-    };
-    return map[signal];
+    const signalFn = clerk.__internal_state.getSignalForResourceName(signal);
+    if (!signalFn) {
+      throw new Error(`Signal not found for resource: ${signal}`);
+    }
+    return signalFn as () => SignInSignalValue | SignUpSignalValue | WaitlistSignalValue;
   }, [clerk.__internal_state, signal]);
 
   const subscribe = useCallback(

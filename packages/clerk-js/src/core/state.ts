@@ -3,65 +3,18 @@ import { computed, effect } from 'alien-signals';
 
 import { eventBus } from './events';
 import type { BaseResource } from './resources/Base';
-import { SignIn } from './resources/SignIn';
-import { SignUp } from './resources/SignUp';
 import { Waitlist } from './resources/Waitlist';
 import {
   getResourceSignalSet,
-  signInComputedSignal,
-  signInErrorSignal,
-  signInFetchSignal,
-  signInResourceSignal,
-  signUpComputedSignal,
-  signUpErrorSignal,
-  signUpFetchSignal,
-  signUpResourceSignal,
-  waitlistComputedSignal,
-  waitlistErrorSignal,
-  waitlistFetchSignal,
-  waitlistResourceSignal,
+  getSignalSetByResourceName,
 } from './signals';
 
+type ResourceClassWithName = new (...args: any[]) => BaseResource & {
+  __internal_future: any;
+  static __internal_resourceName: string;
+};
+
 export class State implements StateInterface {
-  get signInResourceSignal() {
-    return signInResourceSignal;
-  }
-  get signInErrorSignal() {
-    return signInErrorSignal;
-  }
-  get signInFetchSignal() {
-    return signInFetchSignal;
-  }
-  get signInSignal() {
-    return signInComputedSignal;
-  }
-
-  get signUpResourceSignal() {
-    return signUpResourceSignal;
-  }
-  get signUpErrorSignal() {
-    return signUpErrorSignal;
-  }
-  get signUpFetchSignal() {
-    return signUpFetchSignal;
-  }
-  get signUpSignal() {
-    return signUpComputedSignal;
-  }
-
-  get waitlistResourceSignal() {
-    return waitlistResourceSignal;
-  }
-  get waitlistErrorSignal() {
-    return waitlistErrorSignal;
-  }
-  get waitlistFetchSignal() {
-    return waitlistFetchSignal;
-  }
-  get waitlistSignal() {
-    return waitlistComputedSignal;
-  }
-
   private _waitlistInstance: Waitlist | null = null;
 
   __internal_effect = effect;
@@ -73,11 +26,43 @@ export class State implements StateInterface {
     eventBus.on('resource:fetch', this.onResourceFetch);
 
     this._waitlistInstance = new Waitlist(null);
-    this.waitlistResourceSignal({ resource: this._waitlistInstance });
+    const waitlistSignalSet = getSignalSetByResourceName('waitlist');
+    if (waitlistSignalSet) {
+      waitlistSignalSet.resourceSignal({ resource: this._waitlistInstance });
+    }
   }
 
   get __internal_waitlist() {
     return this._waitlistInstance;
+  }
+
+  getSignalsForResource(resource: BaseResource) {
+    return getResourceSignalSet(resource);
+  }
+
+  getSignalsByName(resourceName: string) {
+    return getSignalSetByResourceName(resourceName);
+  }
+
+  getSignalsForClass<T extends ResourceClassWithName>(ResourceClass: T) {
+    return getSignalSetByResourceName(ResourceClass.__internal_resourceName);
+  }
+
+  getSignalForResourceName<T extends string>(
+    resourceName: T,
+  ): (() => { errors: any; fetchStatus: 'idle' | 'fetching'; [K in T]: any }) | undefined {
+    const signalSet = getSignalSetByResourceName(resourceName);
+    return signalSet?.computedSignal;
+  }
+
+  getSignalForResource(resource: BaseResource) {
+    const signalSet = getResourceSignalSet(resource);
+    return signalSet?.computedSignal;
+  }
+
+  getSignalForClass<T extends ResourceClassWithName>(ResourceClass: T) {
+    const signalSet = getSignalSetByResourceName(ResourceClass.__internal_resourceName);
+    return signalSet?.computedSignal;
   }
 
   private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {

@@ -59,6 +59,8 @@ const resourceSignalRegistry = new Map<
   ResourceSignalSet<any, any>
 >();
 
+const resourceNameToSignalSet = new Map<string, ResourceSignalSet<any, any>>();
+
 function registerResourceSignals<
   TResourceClass extends ResourceClass,
   TResource extends InstanceType<TResourceClass>,
@@ -72,7 +74,14 @@ function registerResourceSignals<
     resourceName,
   );
   resourceSignalRegistry.set(ResourceClass as ResourceClass, signalSet);
+  resourceNameToSignalSet.set(resourceName, signalSet);
   return signalSet;
+}
+
+export function getSignalSetByResourceName(
+  resourceName: string,
+): ResourceSignalSet<any, any> | undefined {
+  return resourceNameToSignalSet.get(resourceName);
 }
 
 const signInSignals = registerResourceSignals(SignIn, (() => ({})) as SignInSignal);
