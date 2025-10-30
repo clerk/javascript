@@ -1,6 +1,6 @@
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
-import type { WaitlistFutureResource } from './waitlist';
+import type { WaitlistFutureResource, WaitlistResource } from './waitlist';
 
 /**
  * Represents an error on a specific field.
@@ -185,5 +185,5 @@ export interface State {
   /**
    * An instance of the Waitlist resource.
    */
-  __internal_waitlist: WaitlistFutureResource;
+  __internal_waitlist: WaitlistResource | null;
 }
