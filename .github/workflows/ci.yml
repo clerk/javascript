@@ -117,7 +117,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
-        run: pnpm turbo build $TURBO_ARGS --only
+        run: pnpm turbo build $TURBO_ARGS --only --filter=!@clerk/elements
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
