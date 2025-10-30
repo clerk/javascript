@@ -67,7 +67,6 @@ export class Session extends BaseResource implements SessionResource {
     super();
 
     this.fromJSON(data);
-    this.#hydrateCache(this.lastActiveToken);
   }
 
   end = (): Promise<SessionResource> => {
@@ -128,15 +127,6 @@ export class Session extends BaseResource implements SessionResource {
       features: (this.lastActiveToken?.jwt?.claims.fea as string) || '',
       plans: (this.lastActiveToken?.jwt?.claims.pla as string) || '',
     })(params);
-  };
-
-  #hydrateCache = (token: TokenResource | null) => {
-    if (token) {
-      SessionTokenCache.set({
-        tokenId: this.#getCacheId(),
-        tokenResolver: Promise.resolve(token),
-      });
-    }
   };
 
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
