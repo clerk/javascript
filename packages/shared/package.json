@@ -87,7 +87,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:declarations": "tsc -p tsconfig.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:publish": "pnpm dev -- --env.publish",

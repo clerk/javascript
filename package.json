@@ -55,7 +55,7 @@
     "test:integration:vue": "E2E_APP_ID=vue.vite pnpm test:integration:base --grep @vue",
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
-    "typedoc:generate": "pnpm build:declarations && pnpm typedoc:generate:skip-build",
+    "typedoc:generate": "pnpm build && pnpm typedoc:generate:skip-build",
     "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && rm -rf .typedoc/docs && mv .typedoc/temp-docs .typedoc/docs",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",

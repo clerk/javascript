@@ -358,6 +358,17 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
+    },
+    "//#typedoc:generate": {
+      "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build", "@clerk/types#build"],
+      "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs"],
+      "outputs": [".typedoc/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:typedoc": {
+      "dependsOn": ["//#typedoc:generate"],
+      "inputs": [".typedoc/**"],
+      "outputLogs": "new-only"
     }
   }
 }
