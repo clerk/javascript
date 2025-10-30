@@ -121,7 +121,6 @@ export const nbNO: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const nbNO: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -265,7 +266,7 @@ export const nbNO: LocalizationResource = {
     subtitle: 'for å fortsette til {{applicationName}}',
     suggestionsAcceptedLabel: 'Venter på godkjenning',
     title: 'Velg en bruker',
-    titleWithoutPersonal: 'Velg en organiasjon',
+    titleWithoutPersonal: 'Velg en organisasjon',
   },
   organizationProfile: {
     apiKeysPage: {
@@ -488,9 +489,11 @@ export const nbNO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opprett organisasjon',
     action__invitationAccept: 'Bli med',
     action__manageOrganization: 'Administrer organisasjon',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Spør om å bli med',
     notSelected: 'Ingen organisasjon valgt',
     personalWorkspace: 'Personlig arbeidsområde',
@@ -638,6 +641,10 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Tilbakestill passord-kode',
       resendButton: 'Send kode på nytt',
@@ -758,6 +765,10 @@ export const nbNO: LocalizationResource = {
         subtitleNewTab: 'Gå tilbake til forrige fane for å fortsette',
         title: 'E-posten ble verifisert',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +942,9 @@ export const nbNO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Legg til konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
   },

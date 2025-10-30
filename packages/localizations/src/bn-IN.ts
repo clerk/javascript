@@ -121,7 +121,6 @@ export const bnIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const bnIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const bnIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'আপনার পাসওয়ার্ড লিখুন',
   formFieldInputPlaceholder__phoneNumber: 'আপনার ফোন নম্বর লিখুন',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -489,9 +490,11 @@ export const bnIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'সংগঠন তৈরি করুন',
     action__invitationAccept: 'যোগ দিন',
     action__manageOrganization: 'পরিচালনা',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
     notSelected: 'কোনো সংগঠন নির্বাচিত নেই',
     personalWorkspace: 'ব্যক্তিগত অ্যাকাউন্ট',
@@ -641,6 +644,10 @@ export const bnIN: LocalizationResource = {
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'পাসওয়ার্ড রিসেট কোড',
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
@@ -762,6 +769,10 @@ export const bnIN: LocalizationResource = {
         subtitleNewTab: 'চালিয়ে যেতে আগের ট্যাবে ফিরে যান',
         title: 'সফলভাবে ইমেইল যাচাই করা হয়েছে',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -941,7 +952,9 @@ export const bnIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'অ্যাকাউন্ট যোগ করুন',
+    action__closeUserMenu: 'ব্যবহারকারী মেনু বন্ধ করুন',
     action__manageAccount: 'অ্যাকাউন্ট পরিচালনা করুন',
+    action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
   },

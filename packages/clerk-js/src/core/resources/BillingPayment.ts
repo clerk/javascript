@@ -6,7 +6,7 @@ import type {
   BillingPaymentResource,
   BillingPaymentStatus,
   BillingSubscriptionItemResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { billingMoneyAmountFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';

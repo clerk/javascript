@@ -121,7 +121,6 @@ export const svSE: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const svSE: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ange ditt lösenord',
   formFieldInputPlaceholder__phoneNumber: 'Ange ditt telefonnummer',
   formFieldInputPlaceholder__username: 'Ange ditt användarnamn',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -488,9 +489,11 @@ export const svSE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Skapa organisation',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Hantera organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Ingen organisation vald',
     personalWorkspace: 'Personligt Arbetsområde',
@@ -640,6 +643,10 @@ export const svSE: LocalizationResource = {
         titleNewTab: 'Loggade in på annan flik',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Återställ lösenordskod',
       resendButton: 'Fick du inte en kod? Skicka igen',
@@ -761,6 +768,10 @@ export const svSE: LocalizationResource = {
         subtitleNewTab: 'Återgå till föregående flik för att fortsätta',
         title: 'E-posten har verifierats',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -934,7 +945,9 @@ export const svSE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lägg till konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hantera konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logga ut',
     action__signOutAll: 'Logga ut från alla konton',
   },

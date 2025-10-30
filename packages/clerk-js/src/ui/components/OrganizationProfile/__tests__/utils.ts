@@ -9,7 +9,7 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
   PublicUserData,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { vi } from 'vitest';
 
 type FakeMemberParams = {

@@ -103,6 +103,12 @@ if (typeof window !== 'undefined') {
     writable: true,
   });
 
+  Object.defineProperty(window.navigator, 'language', {
+    writable: true,
+    configurable: true,
+    value: '',
+  });
+
   // Mock IntersectionObserver
   //@ts-expect-error - Mocking class
   globalThis.IntersectionObserver = class IntersectionObserver {

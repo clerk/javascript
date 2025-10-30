@@ -1,4 +1,4 @@
-import type { RoutingOptions, RoutingStrategy } from '@clerk/types';
+import type { RoutingOptions, RoutingStrategy } from '@clerk/shared/types';
 
 import { clerkInvalidRoutingStrategy } from '../core/errors';
 

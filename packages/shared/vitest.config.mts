@@ -7,13 +7,13 @@ export default defineConfig({
     typecheck: {
       enabled: true,
       tsconfig: './tsconfig.test.json',
-      include: ['**/*.type.spec.{ts,tsx}'],
+      include: ['**/*.type.{test,spec}.{ts,tsx}'],
     },
     env: {
       CLERK_SECRET_KEY: 'TEST_SECRET_KEY',
     },
     environment: 'jsdom',
-    include: ['**/*.spec.{js,ts,jsx,tsx}'],
+    include: ['**/*.{test,spec}.{ts,tsx}'],
     setupFiles: './vitest.setup.mts',
   },
 });

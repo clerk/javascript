@@ -121,7 +121,6 @@ export const esUY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +135,7 @@ export const esUY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,6 +221,7 @@ export const esUY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresá tu contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingresá tu número de teléfono',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -490,9 +491,11 @@ export const esUY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Gestionar',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Cuenta personal',
@@ -642,6 +645,10 @@ export const esUY: LocalizationResource = {
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código para restablecer la contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -763,6 +770,10 @@ export const esUY: LocalizationResource = {
         subtitleNewTab: 'Volvé a la pestaña anterior para continuar',
         title: 'Correo verificado con éxito',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -943,7 +954,9 @@ export const esUY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Agregar cuenta',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestionar cuenta',
+    action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Cerrar sesión en todas las cuentas',
   },

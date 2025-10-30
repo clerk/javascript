@@ -125,7 +125,6 @@ export const csCZ: LocalizationResource = {
     monthly: 'Měsíčně',
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
-    paymentMethods__label: 'Platební metody',
     paymentMethod: {
       applePayDescription: {
         annual: 'Roční platba',
@@ -140,6 +139,7 @@ export const csCZ: LocalizationResource = {
         testCardInfo: 'Informace o testovací kartě',
       },
     },
+    paymentMethods__label: 'Platební metody',
     popular: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
@@ -224,6 +224,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -493,9 +494,11 @@ export const csCZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
     action__manageOrganization: 'Spravovat organizaci',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požádat o připojení',
     notSelected: 'Není vybrána žádná organizace',
     personalWorkspace: 'Osobní účet',
@@ -646,6 +649,10 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -767,6 +774,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na předchozí kartu pro pokračování',
         title: 'E-mail úspěšně ověřen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -942,7 +953,9 @@ export const csCZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Přidat účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovat účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },

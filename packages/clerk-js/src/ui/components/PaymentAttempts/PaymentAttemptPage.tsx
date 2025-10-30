@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { BillingSubscriptionItemResource } from '@clerk/types';
+import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
 import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';

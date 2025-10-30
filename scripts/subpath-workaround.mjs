@@ -7,16 +7,18 @@ const loadJSON = path => JSON.parse(fs.readFileSync(new URL(path, import.meta.ur
 const writeJSON = (path, contents) =>
   fs.writeFileSync(new URL(path, import.meta.url), JSON.stringify(contents, null, 2));
 
-const pkgJsonPlaceholder = name => ({
-  main: `../dist/${name}.js`,
+const pkgJsonPlaceholder = (distPath, name) => ({
+  main: `../${distPath}/${name}.js`,
 });
-const pkgJsonBarrelPlaceholder = name => ({
-  main: `../dist/${name}/index.js`,
+const pkgJsonBarrelPlaceholder = (distPath, name) => ({
+  main: `../${distPath}/${name}/index.js`,
 });
 
 async function run() {
   const pkgName = argv._[0];
   console.log(`Loading package.json for ${pkgName}`);
+  const distPath = argv._[1] ? `${argv._[1]}` : 'dist';
+  console.log(`Dist path: ${distPath}`);
   const pkgFile = loadJSON(`../packages/${pkgName}/package.json`);
   const subpathHelperFile = await import(`../packages/${pkgName}/subpaths.mjs`);
 
@@ -47,7 +49,7 @@ async function run() {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
-    writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonPlaceholder(name));
+    writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonPlaceholder(distPath, name));
   });
 
   // Create directories for each subpath barrel file using the pkgJsonBarrelPlaceholder
@@ -56,7 +58,7 @@ async function run() {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir);
     }
-    writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonBarrelPlaceholder(name));
+    writeJSON(`../packages/${pkgName}/${name}/package.json`, pkgJsonBarrelPlaceholder(distPath, name));
   });
 
   console.log('Successfully created subpath directories with placeholder files');
