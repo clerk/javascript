@@ -1,7 +1,7 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { isClerkAPIResponseError } from '@/index.headless';
 import { Card } from '@/ui/elements/Card';
@@ -130,6 +130,15 @@ function SignUpStartInternal(): JSX.Element {
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
   const oidcPrompt = ctx.oidcPrompt;
 
+  const onlyLegalAcceptedMissing = useMemo(
+    () =>
+      signUp.missingFields &&
+      signUp.missingFields.length === 1 &&
+      signUp.missingFields[0] === 'legal_accepted' &&
+      signUp.unverifiedFields &&
+      signUp.unverifiedFields.length === 0,
+    [signUp.missingFields, signUp.unverifiedFields],
+  );
   const fields = determineActiveFields({
     attributes,
     hasTicket: hasTicket || hasExistingSignUpWithTicket,
@@ -445,6 +454,7 @@ function SignUpStartInternal(): JSX.Element {
                     formState={formState}
                     canToggleEmailPhone={canToggleEmailPhone}
                     handleEmailPhoneToggle={handleChangeActive}
+                    onlyLegalAcceptedMissing={onlyLegalAcceptedMissing}
                   />
                 )}
               </SocialButtonsReversibleContainerWithDivider>
