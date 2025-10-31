@@ -31,7 +31,7 @@ declare global {
 /**
  * The `Organization` object holds information about an organization, as well as methods for managing it.
  *
- * To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/guides/organizations/overview#enable-organizations-in-your-application).
+ * To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/guides/organizations/configure#enable-organizations).
  *
  * @interface
  */
