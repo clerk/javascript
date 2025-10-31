@@ -1412,7 +1412,7 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          if (newSession?.status !== 'pending' && this.session?.id !== newSession?.id) {
+          if (newSession?.status !== 'pending' && (this.session?.id !== newSession?.id || shouldSwitchOrganization)) {
             this.#setTransitiveState();
           }
 
