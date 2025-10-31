@@ -178,11 +178,7 @@ export class AuthCookieService {
     }
 
     if (!token && !isValidBrowserOnline()) {
-      debugLogger.warn(
-        'Removing session cookie while offline',
-        { sessionId: this.clerk.session?.id },
-        'authCookieService',
-      );
+      debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
 
     this.setActiveContextInStorage();
