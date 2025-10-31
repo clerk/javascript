@@ -1,7 +1,7 @@
 'use server';
 
 import { auth, reverificationError } from '@clerk/nextjs/server';
-import { ReverificationConfig } from '@clerk/types';
+import type { ReverificationConfig } from '@clerk/shared/types';
 const logUserIdActionReverification = async () => {
   const { userId, has } = await auth.protect();
 

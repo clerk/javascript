@@ -15,8 +15,7 @@ const appRouter = applicationConfig()
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
   .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || linkPackage('nextjs'))
-  .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/types', linkPackage('types'));
+  .addDependency('@clerk/shared', linkPackage('shared'));
 
 const appRouterTurbo = appRouter.clone().setName('next-app-router-turbopack').addScript('dev', 'pnpm dev');
 
