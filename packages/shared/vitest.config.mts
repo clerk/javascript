@@ -17,10 +17,7 @@ function HookAliasPlugin() {
       const chosenRQ = rqHooks.has(name) || useRQ;
       const impl = `${name}.${chosenRQ ? 'rq' : 'swr'}.tsx`;
 
-      const baseDirs = [
-        process.cwd(),
-        path.join(process.cwd(), 'packages', 'shared'),
-      ];
+      const baseDirs = [process.cwd(), path.join(process.cwd(), 'packages', 'shared')];
 
       const candidates: string[] = [];
       for (const base of baseDirs) {
