@@ -2420,6 +2420,7 @@ export class Clerk implements ClerkInterface {
       ..._props,
       options: this.#initOptions({ ...this.#options, ..._props.options }),
     };
+
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 

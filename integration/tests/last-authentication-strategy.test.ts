@@ -115,5 +115,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(socialButtonContainers).toHaveCount(1);
       await expect(socialButtonContainers.first().locator('.cl-button')).toHaveCount(3);
     });
+
+    test('should not show "Last used" badge on sign-up even when lastAuthenticationStrategy is set', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+      await mockLastAuthenticationStrategyResponse(page, 'oauth_google');
+
+      await u.po.signUp.goTo();
+      await u.po.signUp.waitForMounted();
+
+      await expect(page.locator('.cl-lastAuthenticationStrategyBadge')).toHaveCount(0);
+    });
   },
 );

@@ -131,9 +131,15 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: TokenResource | null) => {
-    if (token) {
+    if (!token) {
+      return;
+    }
+
+    const tokenId = this.#getCacheId();
+    const existing = SessionTokenCache.get({ tokenId });
+    if (!existing) {
       SessionTokenCache.set({
-        tokenId: this.#getCacheId(),
+        tokenId,
         tokenResolver: Promise.resolve(token),
       });
     }
