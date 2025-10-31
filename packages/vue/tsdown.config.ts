@@ -9,9 +9,7 @@ export default defineConfig(() => {
     clean: true,
     entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts'],
     format: ['esm'],
-    bundle: true,
     sourcemap: true,
-    minify: false,
     dts: false,
     plugins: [
       // Adds .vue files support
