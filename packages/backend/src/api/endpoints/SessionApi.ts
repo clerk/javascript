@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, SessionStatus } from '@clerk/types';
+import type { ClerkPaginationRequest, SessionStatus } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { Cookies } from '../resources/Cookies';

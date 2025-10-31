@@ -12,7 +12,7 @@ import type {
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { LoaderFunction, LoaderFunctionArgs, UNSAFE_DataWithResponseInit } from 'react-router';
 
 export type GetAuthReturn = Promise<SignedInAuthObject | SignedOutAuthObject>;

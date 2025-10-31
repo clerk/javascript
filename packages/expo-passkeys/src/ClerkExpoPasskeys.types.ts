@@ -4,7 +4,7 @@ import type {
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse as ClerkPublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse as ClerkPublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export type {
   PublicKeyCredentialRequestOptionsWithoutExtensions,

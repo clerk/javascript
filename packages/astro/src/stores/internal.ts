@@ -5,7 +5,7 @@ import type {
   OrganizationResource,
   SignedInSessionResource,
   UserResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { atom, map } from 'nanostores';
 
 export const $csrState = map<{

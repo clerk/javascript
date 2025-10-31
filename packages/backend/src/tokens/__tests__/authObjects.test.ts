@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBackendApiClient } from '../../api/factory';

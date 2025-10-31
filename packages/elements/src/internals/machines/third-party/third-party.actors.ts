@@ -3,7 +3,7 @@ import type {
   HandleOAuthCallbackParams,
   HandleSamlCallbackParams,
   LoadedClerk,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { SetOptional } from 'type-fest';
 import type { AnyActorRef, AnyEventObject } from 'xstate';
 import { fromCallback, fromPromise } from 'xstate';

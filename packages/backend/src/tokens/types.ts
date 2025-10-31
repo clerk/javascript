@@ -1,5 +1,5 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import type {

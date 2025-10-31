@@ -1,5 +1,6 @@
 /**
  * A ES6 compatible utility that implements `Promise.allSettled`
+ *
  * @internal
  */
 export function allSettled<T>(

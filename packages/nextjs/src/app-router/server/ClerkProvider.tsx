@@ -1,4 +1,4 @@
-import type { InitialState, Without } from '@clerk/types';
+import type { InitialState, Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import React from 'react';

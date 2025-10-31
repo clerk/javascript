@@ -9,7 +9,7 @@ import type {
   ServerGetTokenOptions,
   SessionStatusClaim,
   SharedSignedInAuthObjectProperties,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { APIKey, CreateBackendApiOptions, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api';

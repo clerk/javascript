@@ -117,6 +117,7 @@ export type SignUpForceRedirectUrl = {
 export type SignUpFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs up, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   *
    * @default '/'
    */
   signUpFallbackRedirectUrl?: string | null;
@@ -125,6 +126,7 @@ export type SignUpFallbackRedirectUrl = {
 export type SignInFallbackRedirectUrl = {
   /**
    * The fallback URL to redirect to after the user signs in, if there's no `redirect_url` in the path already. It's recommended to use the [environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables#sign-in-and-sign-up-redirects) instead.
+   *
    * @default '/'
    */
   signInFallbackRedirectUrl?: string | null;

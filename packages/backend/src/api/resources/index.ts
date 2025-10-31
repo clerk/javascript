@@ -20,7 +20,7 @@ export type {
   SignInStatus,
 } from './Enums';
 
-export type { SignUpStatus } from '@clerk/types';
+export type { SignUpStatus } from '@clerk/shared/types';
 
 export * from './ExternalAccount';
 export * from './IdentificationLink';

@@ -1,4 +1,10 @@
-import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, SignInStrategy, Web3Provider } from '@clerk/types';
+import type {
+  EnterpriseSSOStrategy,
+  OAuthProvider,
+  SamlStrategy,
+  SignInStrategy,
+  Web3Provider,
+} from '@clerk/shared/types';
 
 type Strategy = OAuthProvider | SamlStrategy | EnterpriseSSOStrategy | Web3Provider;
 

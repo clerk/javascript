@@ -7,7 +7,7 @@ import type {
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export type ClerkMiddlewareOptions = {
   publishableKey?: string;

@@ -1,5 +1,5 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
-import type { SessionStatusClaim } from '@clerk/types';
+import type { SessionStatusClaim } from '@clerk/shared/types';
 
 import { constants } from './constants';
 import { errorThrower, parsePublishableKey } from './util/shared';

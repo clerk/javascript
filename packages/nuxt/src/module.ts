@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/types';
+import type { Without } from '@clerk/shared/types';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
