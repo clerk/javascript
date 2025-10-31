@@ -1,7 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
-import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
@@ -54,7 +53,8 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';

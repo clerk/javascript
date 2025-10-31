@@ -1,4 +1,4 @@
-import type { BillingPaymentMethodResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { CreditCard, GenericPayment } from '../../icons';

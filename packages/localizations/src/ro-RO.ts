@@ -497,9 +497,11 @@ export const roRO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Creează organizație',
     action__invitationAccept: 'Alătură-te',
     action__manageOrganization: 'Gestionează',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicită alăturarea',
     notSelected: 'Nicio organizație selectată',
     personalWorkspace: 'Cont personal',
@@ -955,7 +957,9 @@ export const roRO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adaugă cont',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestionează contul',
+    action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
   },

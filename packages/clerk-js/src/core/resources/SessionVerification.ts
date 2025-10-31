@@ -1,4 +1,3 @@
-import { deepSnakeToCamel } from '@clerk/shared/underscore';
 import type {
   SessionResource,
   SessionVerificationFirstFactor,
@@ -8,7 +7,8 @@ import type {
   SessionVerificationSecondFactor,
   SessionVerificationStatus,
   VerificationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { deepSnakeToCamel } from '@clerk/shared/underscore';
 
 import { BaseResource, Session, Verification } from './internal';
 

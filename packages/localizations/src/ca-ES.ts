@@ -490,9 +490,11 @@ export const caES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea organització',
     action__invitationAccept: 'Uneix-te',
     action__manageOrganization: 'Gestiona',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Sol·licita unir-te',
     notSelected: "No s'ha seleccionat cap organització",
     personalWorkspace: 'Compte personal',
@@ -942,7 +944,9 @@ export const caES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Afegeix compte',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestiona compte',
+    action__openUserMenu: undefined,
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
