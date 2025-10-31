@@ -627,6 +627,12 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre messagerie',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Ce lien ne correspond pas à la demande en cours.',

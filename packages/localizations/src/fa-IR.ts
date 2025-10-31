@@ -620,6 +620,12 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

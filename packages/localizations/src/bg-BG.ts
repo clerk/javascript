@@ -613,6 +613,12 @@ export const bgBG: LocalizationResource = {
       subtitle: 'за да продължите към {{applicationName}}',
       title: 'Проверете вашия имейл',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

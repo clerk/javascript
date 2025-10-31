@@ -619,6 +619,12 @@ export const csCZ: LocalizationResource = {
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zkontrolujte svůj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

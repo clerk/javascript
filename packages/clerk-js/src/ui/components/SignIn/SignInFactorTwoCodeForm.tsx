@@ -1,6 +1,6 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
+import type { EmailCodeFactor, PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -17,7 +17,7 @@ import { useRouter } from '../../router';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
-  factor: PhoneCodeFactor | TOTPFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | TOTPFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
   prepare?: () => Promise<SignInResource>;

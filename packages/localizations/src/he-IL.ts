@@ -606,6 +606,12 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'בדוק את הדוא"ל שלך',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'להמשך, פתח את קוד האימות מהמכשיר והדפדפן ממנו אתה מתכוון לבצע כניסה',

@@ -617,6 +617,12 @@ export const taIN: LocalizationResource = {
       subtitle: '{{applicationName}} க்கு தொடர',
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'தொடர, நீங்கள் உள்நுழைவைத் தொடங்கிய சாதனத்திலும் உலாவியிலும் சரிபார்ப்பு இணைப்பைத் திறக்கவும்',

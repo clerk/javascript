@@ -612,6 +612,12 @@ export const daDK: LocalizationResource = {
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Tjek din email',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Klient uoverensstemmelse. Prøv igen.',

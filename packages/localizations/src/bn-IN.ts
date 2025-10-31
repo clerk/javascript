@@ -615,6 +615,12 @@ export const bnIN: LocalizationResource = {
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল চেক করুন',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-ইন শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',

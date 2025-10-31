@@ -612,6 +612,12 @@ export const jaJP: LocalizationResource = {
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールを確認',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

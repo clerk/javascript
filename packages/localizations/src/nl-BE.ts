@@ -613,6 +613,12 @@ export const nlBE: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Check je e-mail',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'De client komt niet overeen met wat verwacht werd. Probeer het opnieuw.',

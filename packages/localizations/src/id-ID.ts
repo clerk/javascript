@@ -614,6 +614,12 @@ export const idID: LocalizationResource = {
       subtitle: 'untuk melanjutkan ke {{applicationName}}',
       title: 'Periksa email Anda',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

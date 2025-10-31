@@ -613,6 +613,12 @@ export const isIS: LocalizationResource = {
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

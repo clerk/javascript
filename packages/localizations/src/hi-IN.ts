@@ -614,6 +614,12 @@ export const hiIN: LocalizationResource = {
       subtitle: '{{applicationName}} पर जारी रखने के लिए',
       title: 'अपना ईमेल जांचें',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'जारी रखने के लिए, सत्यापन लिंक को उस डिवाइस और ब्राउज़र पर खोलें जिससे आपने साइन-अप शुरू किया था',

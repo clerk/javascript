@@ -613,6 +613,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',

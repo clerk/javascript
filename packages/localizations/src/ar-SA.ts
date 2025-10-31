@@ -610,6 +610,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'التحقق من البريد الإلكتروني',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'للمتابعة, قم بفتح رابط التحقق عبر نفس الجهاز والمتصفح الذي انشأت محاولة تسجيل الدخول منه',

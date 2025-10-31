@@ -479,6 +479,12 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue;
       title: LocalizationValue<'provider'>;
     };
+    emailCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
     phoneCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

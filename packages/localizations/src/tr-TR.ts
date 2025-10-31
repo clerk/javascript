@@ -612,6 +612,12 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'E-posta kutunuzu kontrol edin',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

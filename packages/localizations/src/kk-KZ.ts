@@ -604,6 +604,12 @@ export const kkKZ: LocalizationResource = {
       subtitle: '{{applicationName}} қолдануды жалғастыру үшін',
       title: 'Электрондық поштаңызды тексеріңіз',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Бастапқы құрылғыда растау сілтемесін ашыңыз.',

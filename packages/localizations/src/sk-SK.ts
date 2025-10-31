@@ -614,6 +614,12 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Skontrolujte svoj email',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Pre pokračovanie otvorte overovací odkaz na zariadení a prehliadači použitom na prihlásenie.',

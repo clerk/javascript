@@ -611,6 +611,12 @@ export const ukUA: LocalizationResource = {
       subtitle: 'продовжити до {{applicationName}}',
       title: 'Перевірте свою електронну пошту',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

@@ -616,6 +616,12 @@ export const teIN: LocalizationResource = {
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'కొనసాగించడానికి, మీరు సైన్-ఇన్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',

@@ -613,6 +613,12 @@ export const plPL: LocalizationResource = {
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Sprawdź swoją pocztę e-mail',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

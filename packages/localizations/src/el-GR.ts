@@ -613,6 +613,12 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Ελέγξτε το email σας',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

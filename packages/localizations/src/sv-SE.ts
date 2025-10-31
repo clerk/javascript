@@ -613,6 +613,12 @@ export const svSE: LocalizationResource = {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

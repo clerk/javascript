@@ -616,6 +616,12 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Праверце вашу пошту',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

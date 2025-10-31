@@ -625,6 +625,12 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Überprüfen Sie Ihren Posteingang',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Die Anfrage stammt von einem nicht kompatiblen Client.',

@@ -610,6 +610,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
+    emailCodeMfa: {
+      formTitle: 'Verification code',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'Enter the code sent to your email to continue',
+      title: 'Verification required',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

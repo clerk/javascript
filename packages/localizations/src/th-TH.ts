@@ -614,6 +614,12 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'เพื่อดำเนินการต่อ เปิดลิงก์ยืนยันในอุปกรณ์และเบราว์เซอร์ที่คุณเริ่มต้นการเข้าสู่ระบบ',

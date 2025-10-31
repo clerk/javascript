@@ -611,6 +611,12 @@ export const srRS: LocalizationResource = {
       subtitle: 'da nastaviš na {{applicationName}}',
       title: 'Proveri svoj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

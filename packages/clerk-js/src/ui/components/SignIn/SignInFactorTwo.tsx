@@ -8,6 +8,7 @@ import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../commo
 import { useCoreSignIn } from '../../contexts';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
+import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { determineStartingSignInSecondFactor } from './utils';
@@ -77,6 +78,15 @@ function SignInFactorTwoInternal(): JSX.Element {
       );
     case 'backup_code':
       return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+    case 'email_code':
+      return (
+        <SignInFactorTwoEmailCodeCard
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
     default:
       return <LoadingCard />;
   }

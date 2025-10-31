@@ -612,6 +612,12 @@ export const hrHR: LocalizationResource = {
       subtitle: 'za nastavak na {{applicationName}}',
       title: 'Provjerite svoju e-poštu',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

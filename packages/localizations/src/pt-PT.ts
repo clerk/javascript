@@ -611,6 +611,12 @@ export const ptPT: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique o seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'O cliente não corresponde ao esperado. Tente novamente.',

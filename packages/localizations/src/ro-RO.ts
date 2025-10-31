@@ -622,6 +622,12 @@ export const roRO: LocalizationResource = {
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verifică-ți emailul',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

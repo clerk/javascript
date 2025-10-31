@@ -602,6 +602,12 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       title: '檢查您的電子郵件',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

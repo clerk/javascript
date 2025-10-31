@@ -613,6 +613,12 @@ export const mnMN: LocalizationResource = {
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Имэйлээ шалгана уу',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

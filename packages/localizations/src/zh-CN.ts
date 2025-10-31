@@ -602,6 +602,12 @@ export const zhCN: LocalizationResource = {
       subtitle: '继续使用 {{applicationName}}',
       title: '查看您的电子邮件',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

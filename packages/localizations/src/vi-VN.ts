@@ -619,6 +619,12 @@ export const viVN: LocalizationResource = {
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Kiểm tra email',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng nhập',

@@ -608,6 +608,12 @@ export const koKR: LocalizationResource = {
       subtitle: '{{applicationName}}로 계속하려면',
       title: '이메일을 확인하세요',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
