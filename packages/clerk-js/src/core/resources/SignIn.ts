@@ -612,6 +612,8 @@ class SignInFuture implements SignInFutureResource {
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
+  #hasBeenFinalized = false;
+
   constructor(readonly resource: SignIn) {}
 
   get id() {
@@ -665,6 +667,10 @@ class SignInFuture implements SignInFutureResource {
 
   get secondFactorVerification() {
     return this.resource.secondFactorVerification;
+  }
+
+  get hasBeenFinalized() {
+    return this.#hasBeenFinalized;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
@@ -1120,6 +1126,7 @@ class SignInFuture implements SignInFutureResource {
       // Reload the client to prevent an issue where the created session is not picked up.
       await SignIn.clerk.client?.reload();
 
+      this.#hasBeenFinalized = true;
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
