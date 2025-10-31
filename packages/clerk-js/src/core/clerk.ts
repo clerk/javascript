@@ -1412,7 +1412,7 @@ export class Clerk implements ClerkInterface {
             return;
           }
 
-          if (newSession?.status !== 'pending') {
+          if (newSession?.status !== 'pending' && this.session?.id !== newSession?.id) {
             this.#setTransitiveState();
           }
 
@@ -2351,7 +2351,9 @@ export class Clerk implements ClerkInterface {
   }
 
   updateClient = (newClient: ClientResource): void => {
-    if (!this.client) {
+    const isFirstClientSet = !this.client;
+
+    if (isFirstClientSet) {
       // This is the first time client is being
       // set, so we also need to set session
       const session = this.#options.selectInitialSession
@@ -2381,6 +2383,11 @@ export class Clerk implements ClerkInterface {
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
+    } else if (!isFirstClientSet && newClient.sessions?.length > 0) {
+      const session = this.#options.selectInitialSession
+        ? this.#options.selectInitialSession(newClient)
+        : this.#defaultSession(newClient);
+      this.#setAccessors(session);
     }
 
     this.#emit();
@@ -2591,6 +2598,12 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = async () => {
+          const jwtInCookie = this.#authService?.getSessionCookie();
+          if (jwtInCookie) {
+            const preliminaryClient = createClientFromJwt(jwtInCookie);
+            this.updateClient(preliminaryClient);
+          }
+
           return Client.getOrCreateInstance()
             .fetch()
             .then(res => this.updateClient(res))
