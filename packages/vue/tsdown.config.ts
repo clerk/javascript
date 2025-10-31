@@ -1,10 +1,8 @@
-import autoPropsPlugin from '@vue.ts/tsx-auto-props/esbuild';
-import { defineConfig, type Options } from 'tsup';
-import vuePlugin from 'unplugin-vue/esbuild';
+import autoPropsPlugin from '@vue.ts/tsx-auto-props/rolldown';
+import { defineConfig } from 'tsdown';
+import vuePlugin from 'unplugin-vue/rolldown';
 
-import { name, version } from './package.json';
-
-type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
+import { name, version } from './package.json' with { type: 'json' };
 
 export default defineConfig(() => {
   return {
@@ -15,7 +13,7 @@ export default defineConfig(() => {
     sourcemap: true,
     minify: false,
     dts: false,
-    esbuildPlugins: [
+    plugins: [
       // Adds .vue files support
       vuePlugin(),
       // Automatically generates runtime props from TypeScript types/interfaces for all
@@ -25,9 +23,11 @@ export default defineConfig(() => {
         include: ['**/*.ts'],
       }),
     ],
-    define: {
-      PACKAGE_NAME: `"${name}"`,
-      PACKAGE_VERSION: `"${version}"`,
+    transform: {
+      define: {
+        PACKAGE_NAME: `"${name}"`,
+        PACKAGE_VERSION: `"${version}"`,
+      },
     },
     external: ['vue'],
   };
