@@ -79,11 +79,10 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
-      const result = await createApiKey({
+      await createApiKey({
         ...params,
         subject,
       });
-      console.log('result', result);
       closeCardFn();
       card.setError(undefined);
       setShowCopyAlert(true);
