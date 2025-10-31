@@ -16,7 +16,9 @@ export type DistributivePick<T, K extends PropertyKey> = T extends unknown ? Pic
 export type CommonQueryResult = 'data' | 'error' | 'isLoading' | 'isFetching' | 'status';
 
 /**
+ * An alternative `useBaseQuery` implementation that allows for an observer to be created every time a query client changes.
  *
+ * @internal
  */
 export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey extends QueryKey>(
   options: UseBaseQueryOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>,
@@ -60,9 +62,9 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   }, [defaultedOptions, observer]);
 
   if (!isQueryClientLoaded) {
-    // In this step we attempt to return a dummy result that matches RQ's pending state while on SSR or untill the query client is loaded on the client (after clerk-js loads).
+    // In this step we attempt to return a dummy result that matches RQ's pending state while on SSR or until the query client is loaded on the client (after clerk-js loads).
     // When the query client is not loaded, we return the result as if the query was not enabled.
-    // `isLoading` and `isFetching` need to be `false` because we can't know if the query will be enabled during SSR since most conditions really on client-only data that are available after clerk-js loads.
+    // `isLoading` and `isFetching` need to be `false` because we can't know if the query will be enabled during SSR since most conditions rely on client-only data that are available after clerk-js loads.
     return {
       data: undefined,
       error: null,
