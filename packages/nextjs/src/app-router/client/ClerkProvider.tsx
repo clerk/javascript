@@ -15,7 +15,6 @@ import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
-import { detectKeylessEnvDriftAction } from '../keyless-actions';
 import { invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
@@ -27,6 +26,11 @@ import { useAwaitableReplace } from './useAwaitableReplace';
 const LazyCreateKeylessApplication = dynamic(() =>
   import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
 );
+
+/**
+ * LazyKeylessDriftDetector should only be loaded if the conditions below are met.
+ */
+const LazyKeylessDriftDetector = dynamic(() => import('./keyless-drift-detector.js').then(m => m.KeylessDriftDetector));
 
 const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   if (isNextWithUnstableServerActions) {
@@ -43,13 +47,6 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
   const [isPending, startTransition] = useTransition();
-
-  // Call drift detection on mount (client-side)
-  useSafeLayoutEffect(() => {
-    if (canUseKeyless) {
-      void detectKeylessEnvDriftAction();
-    }
-  }, []);
 
   // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
   const isNested = Boolean(useClerkNextOptions());
@@ -137,12 +134,19 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKeyless?: boolean }) => {
-  const { children, disableKeyless = false, ...rest } = props;
+export const ClientClerkProvider = (
+  props: NextClerkProviderProps & { disableKeyless?: boolean; disableKeylessDriftDetection?: boolean },
+) => {
+  const { children, disableKeyless = false, disableKeylessDriftDetection = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 
   if (safePublishableKey || !canUseKeyless || disableKeyless) {
-    return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
+    return (
+      <NextClientClerkProvider {...rest}>
+        {!disableKeylessDriftDetection && <LazyKeylessDriftDetector />}
+        {children}
+      </NextClientClerkProvider>
+    );
   }
 
   return (
