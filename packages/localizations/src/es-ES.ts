@@ -68,8 +68,8 @@ export const esES: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const esES: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const esES: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingrese su contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingrese su número telefónico',
   formFieldInputPlaceholder__username: 'Ingrese su nombre de usuario',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const esES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const esES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +490,11 @@ export const esES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear Organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Administrar Organización',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Espacio de trabajo personal',
@@ -640,6 +643,10 @@ export const esES: LocalizationResource = {
         titleNewTab: 'Inició sesión en otra pestaña',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de restablecimiento de contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -759,6 +766,10 @@ export const esES: LocalizationResource = {
         subtitleNewTab: 'Volver a la pestaña anterior para continuar',
         title: 'Correo electrónico verificado con éxito',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -935,7 +946,9 @@ export const esES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Añadir cuenta',
+    action__closeUserMenu: 'Cerrar menú de usuario',
     action__manageAccount: 'Administrar cuenta',
+    action__openUserMenu: 'Abrir menú de usuario',
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
   },
@@ -967,7 +980,7 @@ export const esES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -976,7 +989,7 @@ export const esES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1035,7 +1048,7 @@ export const esES: LocalizationResource = {
       actionDescription: 'Escribe "Eliminar cuenta" a continuación para continuar.',
       confirm: 'Eliminar cuenta',
       messageLine1:
-        '¿Estás seguro de que quieres eliminar tu cuenta de Clerk? Por favor, contacta al propietario de la aplicación para eliminar tu información de su aplicación y otros servicios.',
+        '¿Está seguro de que desea eliminar su cuenta? Es posible que se conserven algunos datos asociados. Para solicitar la eliminación completa de datos, póngase en contacto con el soporte técnico.',
       messageLine2: 'Esta acción es permanente e irreversible.',
       title: 'Eliminar cuenta',
     },

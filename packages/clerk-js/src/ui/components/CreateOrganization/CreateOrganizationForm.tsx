@@ -1,7 +1,8 @@
 import { useOrganization, useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams, OrganizationResource } from '@clerk/types';
+import type { CreateOrganizationParams, OrganizationResource } from '@clerk/shared/types';
 import React from 'react';
 
+import { useEnvironment } from '@/ui/contexts';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -33,6 +34,11 @@ type CreateOrganizationFormProps = {
     headerTitle?: LocalizationKey;
     headerSubtitle?: LocalizationKey;
   };
+  /**
+   * @deprecated
+   * This prop will be removed in a future version.
+   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
+   */
   hideSlug?: boolean;
 };
 
@@ -45,6 +51,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
     userMemberships: organizationListParams.userMemberships,
   });
   const { organization } = useOrganization();
+  const { organizationSettings } = useEnvironment();
   const [file, setFile] = React.useState<File | null>();
 
   const nameField = useFormControl('name', '', {
@@ -62,6 +69,9 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
   const dataChanged = !!nameField.value;
   const canSubmit = dataChanged;
 
+  // Environment setting takes precedence over prop
+  const organizationSlugEnabled = !organizationSettings.slug.disabled && !props.hideSlug;
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit) {
@@ -75,7 +85,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
     try {
       const createOrgParams: CreateOrganizationParams = { name: nameField.value };
 
-      if (!props.hideSlug) {
+      if (organizationSlugEnabled) {
         createOrgParams.slug = slugField.value;
       }
 
@@ -188,7 +198,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
               ignorePasswordManager
             />
           </Form.ControlRow>
-          {!props.hideSlug && (
+          {organizationSlugEnabled && (
             <Form.ControlRow elementId={slugField.id}>
               <Form.PlainInput
                 {...slugField.props}

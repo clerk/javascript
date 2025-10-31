@@ -68,8 +68,8 @@ export const caES: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: "Dispositiu de l'usuari",
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -122,8 +122,7 @@ export const caES: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -137,6 +136,7 @@ export const caES: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const caES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Contrasenya',
   formFieldInputPlaceholder__phoneNumber: 'Número de telèfon',
   formFieldInputPlaceholder__username: "Nom d'usuari",
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const caES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const caES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +490,11 @@ export const caES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea organització',
     action__invitationAccept: 'Uneix-te',
     action__manageOrganization: 'Gestiona',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Sol·licita unir-te',
     notSelected: "No s'ha seleccionat cap organització",
     personalWorkspace: 'Compte personal',
@@ -639,6 +642,10 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codi de restabliment de contrasenya',
       resendButton: 'No has rebut el codi? Reenvia',
@@ -759,6 +766,10 @@ export const caES: LocalizationResource = {
         subtitleNewTab: 'Torna a la pestanya anterior per continuar',
         title: 'Correu electrònic verificat amb èxit',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -933,7 +944,9 @@ export const caES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Afegeix compte',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestiona compte',
+    action__openUserMenu: undefined,
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },
@@ -965,7 +978,7 @@ export const caES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -974,7 +987,7 @@ export const caES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1034,7 +1047,7 @@ export const caES: LocalizationResource = {
       actionDescription: 'Escriu "Elimina compte" a continuació per continuar.',
       confirm: 'Elimina compte',
       messageLine1:
-        "Estàs segur que vols eliminar el teu compte de Clerk? Si us plau, contacta amb el propietari de l'aplicació per eliminar la teva informació de la seva aplicació i altres serveis.",
+        "Esteu segur que voleu suprimir el vostre compte? És possible que es conservin algunes dades associades. Per sol·licitar la supressió completa de les dades, poseu-vos en contacte amb l'assistència.",
       messageLine2: 'Aquesta acció és permanent i irreversible.',
       title: 'Elimina compte',
     },

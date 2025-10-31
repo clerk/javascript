@@ -68,9 +68,9 @@ exports[`root public exports > should not change unexpectedly 1`] = `
 
 exports[`server public exports > should not change unexpectedly 1`] = `
 [
+  "auth",
   "clerkClient",
-  "createClerkHandler",
-  "getAuth",
+  "clerkMiddleware",
 ]
 `;
 

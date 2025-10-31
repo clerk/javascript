@@ -68,8 +68,8 @@ export const skSK: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const skSK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const skSK: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,6 +220,7 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadajte heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadajte telefónne číslo',
   formFieldInputPlaceholder__username: 'Zadajte užívateľské meno',
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -283,7 +284,7 @@ export const skSK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +293,7 @@ export const skSK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +489,11 @@ export const skSK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvoriť organizáciu',
     action__invitationAccept: 'Pripojiť sa',
     action__manageOrganization: 'Spravovať organizáciu',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požiadať o pripojenie',
     notSelected: 'Nie je vybraná žiadna organizácia',
     personalWorkspace: 'Osobný pracovný priestor',
@@ -640,6 +643,10 @@ export const skSK: LocalizationResource = {
         titleNewTab: 'Prihlásené v inom okne',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Overovací kód pre obnovenie hesla',
       resendButton: 'Znovu poslať kód',
@@ -760,6 +767,10 @@ export const skSK: LocalizationResource = {
         subtitleNewTab: 'Vráťte sa do predchádzajúceho okna pre pokračovanie',
         title: 'Email úspešne overený',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -938,7 +949,9 @@ export const skSK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Pridať účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovať účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásiť sa',
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
@@ -970,7 +983,7 @@ export const skSK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -979,7 +992,7 @@ export const skSK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1038,7 +1051,7 @@ export const skSK: LocalizationResource = {
       actionDescription: 'Pre pokračovanie napíšte "Zmazať účet".',
       confirm: 'Zmazať účet',
       messageLine1:
-        'Ste si istý, že chcete zmazať svoj účet z Clerk? Kontaktujte prosím vlastníka aplikácie na vymazanie vašich informácií z ich aplikácie a iných služieb.',
+        'Naozaj chcete odstrániť svoj účet? Niektoré súvisiace údaje môžu zostať zachované. Ak chcete požiadať o úplné vymazanie údajov, obráťte sa na podporu.',
       messageLine2: 'Táto akcia je trvalá a nemôže byť vrátená späť.',
       title: 'Zmazať účet',
     },

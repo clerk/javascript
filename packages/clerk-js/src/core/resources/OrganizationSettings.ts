@@ -3,7 +3,7 @@ import type {
   OrganizationSettingsJSON,
   OrganizationSettingsJSONSnapshot,
   OrganizationSettingsResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource } from './internal';
 
@@ -17,6 +17,11 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     enabled: false,
     enrollmentModes: [],
     defaultRole: null,
+  };
+  slug: {
+    disabled: boolean;
+  } = {
+    disabled: false,
   };
   enabled: boolean = false;
   maxAllowedMemberships: number = 1;
@@ -40,6 +45,10 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
       this.domains.enabled = this.withDefault(data.domains.enabled, this.domains.enabled);
       this.domains.enrollmentModes = this.withDefault(data.domains.enrollment_modes, this.domains.enrollmentModes);
       this.domains.defaultRole = this.withDefault(data.domains.default_role, this.domains.defaultRole);
+    }
+
+    if (data.slug) {
+      this.slug.disabled = this.withDefault(data.slug.disabled, this.slug.disabled);
     }
 
     this.enabled = this.withDefault(data.enabled, this.enabled);

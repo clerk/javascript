@@ -461,16 +461,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
         }
       }
     }
-    /**
-     * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
-     */
-    if (
-      authenticateContext.instanceType === 'development' &&
-      authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser)
-    ) {
-      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
-    }
-
     const isRequestEligibleForMultiDomainSync =
       authenticateContext.isSatellite && authenticateContext.secFetchDest === 'document';
 
@@ -500,7 +490,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SatelliteCookieNeedsSyncing, '', headers);
     }
 
-    // Multi-domain development sync flow
+    // Multi-domain development sync flow - primary responds to syncing
+    // IMPORTANT: This must come BEFORE dev-browser-sync check to avoid the root domain
+    // triggering its own handshakes when it's in the middle of handling a satellite sync request
     const redirectUrl = new URL(authenticateContext.clerkUrl).searchParams.get(
       constants.QueryParameters.ClerkRedirectUrl,
     );
@@ -523,6 +515,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
     /**
      * End multi-domain sync flows
      */
+
+    /**
+     * Otherwise, check for "known unknown" auth states that we can resolve with a handshake.
+     */
+    if (
+      authenticateContext.instanceType === 'development' &&
+      authenticateContext.clerkUrl.searchParams.has(constants.QueryParameters.DevBrowser)
+    ) {
+      return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserSync, '');
+    }
 
     if (authenticateContext.instanceType === 'development' && !hasDevBrowserToken) {
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.DevBrowserMissing, '');

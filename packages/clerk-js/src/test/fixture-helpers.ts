@@ -15,7 +15,7 @@ import type {
   UserJSON,
   UserSettingsJSON,
   VerificationJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
@@ -342,22 +342,41 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
   const withForceOrganizationSelection = () => {
     os.force_organization_selection = true;
   };
+  const withOrganizationSlug = (enabled = false) => {
+    os.slug.disabled = !enabled;
+  };
 
   const withOrganizationDomains = (modes?: OrganizationEnrollmentMode[], defaultRole?: string) => {
     os.domains.enabled = true;
     os.domains.enrollment_modes = modes || ['automatic_invitation', 'manual_invitation'];
     os.domains.default_role = defaultRole ?? null;
   };
-  return { withOrganizations, withMaxAllowedMemberships, withOrganizationDomains, withForceOrganizationSelection };
+  return {
+    withOrganizations,
+    withMaxAllowedMemberships,
+    withOrganizationDomains,
+    withForceOrganizationSelection,
+    withOrganizationSlug,
+  };
 };
 
 const createBillingSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const os = environment.commerce_settings.billing;
-  const withBilling = () => {
-    os.user.enabled = true;
-    os.user.has_paid_plans = true;
-    os.organization.enabled = true;
-    os.organization.has_paid_plans = true;
+  const withBilling = ({
+    userEnabled = true,
+    userHasPaidPlans = true,
+    organizationEnabled = true,
+    organizationHasPaidPlans = true,
+  }: {
+    userEnabled?: boolean;
+    userHasPaidPlans?: boolean;
+    organizationEnabled?: boolean;
+    organizationHasPaidPlans?: boolean;
+  } = {}) => {
+    os.user.enabled = userEnabled;
+    os.user.has_paid_plans = userHasPaidPlans;
+    os.organization.enabled = organizationEnabled;
+    os.organization.has_paid_plans = organizationHasPaidPlans;
   };
 
   return { withBilling };

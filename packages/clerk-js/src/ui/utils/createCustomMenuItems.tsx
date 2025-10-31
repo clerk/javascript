@@ -1,4 +1,4 @@
-import type { CustomMenuItem, LoadedClerk } from '@clerk/types';
+import type { CustomMenuItem, LoadedClerk } from '@clerk/shared/types';
 
 import { USER_BUTTON_ITEM_ID } from '../constants';
 import type { LocalizationKey } from '../customizables';

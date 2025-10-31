@@ -1,4 +1,4 @@
-import type { ZxcvbnResult } from '@clerk/types';
+import type { ZxcvbnResult } from '@clerk/shared/types';
 
 export type zxcvbnFN = (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
 

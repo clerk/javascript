@@ -1,55 +1,59 @@
 import type {
-  AddPaymentSourceParams,
-  BillingInitializedPaymentSourceJSON,
-  BillingPaymentSourceJSON,
+  AddPaymentMethodParams,
+  BillingInitializedPaymentMethodJSON,
+  BillingPaymentMethodJSON,
   ClerkPaginatedResponse,
-  GetPaymentSourcesParams,
-  InitializePaymentSourceParams,
-} from '@clerk/types';
+  GetPaymentMethodsParams,
+  InitializePaymentMethodParams,
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
-import { BaseResource, BillingInitializedPaymentSource, BillingPaymentSource } from '../../resources/internal';
+import { BaseResource, BillingInitializedPaymentMethod, BillingPaymentMethod } from '../../resources/internal';
+import { Billing } from './namespace';
 
-export const initializePaymentSource = async (params: InitializePaymentSourceParams) => {
+const PAYMENT_METHODS_PATH = '/payment_methods';
+
+type WithOptionalOrgType<T> = T & {
+  orgId?: string;
+};
+
+export const initializePaymentMethod = async (params: WithOptionalOrgType<InitializePaymentMethodParams>) => {
   const { orgId, ...rest } = params;
   const json = (
     await BaseResource._fetch({
-      path: orgId
-        ? `/organizations/${orgId}/commerce/payment_sources/initialize`
-        : `/me/commerce/payment_sources/initialize`,
+      path: Billing.path(`${PAYMENT_METHODS_PATH}/initialize`, { orgId }),
       method: 'POST',
       body: rest as any,
     })
-  )?.response as unknown as BillingInitializedPaymentSourceJSON;
-  return new BillingInitializedPaymentSource(json);
+  )?.response as unknown as BillingInitializedPaymentMethodJSON;
+  return new BillingInitializedPaymentMethod(json);
 };
 
-export const addPaymentSource = async (params: AddPaymentSourceParams) => {
+export const addPaymentMethod = async (params: WithOptionalOrgType<AddPaymentMethodParams>) => {
   const { orgId, ...rest } = params;
 
   const json = (
     await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/payment_sources` : `/me/commerce/payment_sources`,
+      path: Billing.path(PAYMENT_METHODS_PATH, { orgId }),
       method: 'POST',
       body: rest as any,
     })
-  )?.response as unknown as BillingPaymentSourceJSON;
-  return new BillingPaymentSource(json);
+  )?.response as unknown as BillingPaymentMethodJSON;
+  return new BillingPaymentMethod(json);
 };
 
-export const getPaymentSources = async (params: GetPaymentSourcesParams) => {
-  const { orgId, ...rest } = params;
+export const getPaymentMethods = async (params?: WithOptionalOrgType<GetPaymentMethodsParams>) => {
+  const { orgId, ...rest } = params ?? {};
 
   return await BaseResource._fetch({
-    path: orgId ? `/organizations/${orgId}/commerce/payment_sources` : `/me/commerce/payment_sources`,
+    path: Billing.path(PAYMENT_METHODS_PATH, { orgId }),
     method: 'GET',
     search: convertPageToOffsetSearchParams(rest),
   }).then(res => {
-    const { data: paymentSources, total_count } =
-      res?.response as unknown as ClerkPaginatedResponse<BillingPaymentSourceJSON>;
+    const { data, total_count } = res?.response as unknown as ClerkPaginatedResponse<BillingPaymentMethodJSON>;
     return {
       total_count,
-      data: paymentSources.map(paymentSource => new BillingPaymentSource(paymentSource)),
+      data: data.map(paymentMethod => new BillingPaymentMethod(paymentMethod)),
     };
   });
 };

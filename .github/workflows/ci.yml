@@ -6,6 +6,7 @@ on:
     branches:
       - main
       - release/v4
+      - vincent-and-the-doctor
 
 permissions:
   contents: read
@@ -17,7 +18,7 @@ concurrency:
 jobs:
   # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
   check-permissions:
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -47,7 +48,7 @@ jobs:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Formatting | Dedupe | Changeset
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -88,7 +89,7 @@ jobs:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Build Packages
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     permissions:
       contents: read
     defaults:
@@ -134,7 +135,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -194,7 +195,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -207,10 +208,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - node-version: 18
-            test-filter: '--filter=@clerk/astro --filter=@clerk/backend --filter=@clerk/express --filter=@clerk/nextjs --filter=@clerk/clerk-react --filter=@clerk/shared --filter=@clerk/remix --filter=@clerk/tanstack-react-start --filter=@clerk/elements --filter=@clerk/vue --filter=@clerk/nuxt --filter=@clerk/clerk-expo'
           - node-version: 22
-            test-filter: '**'
+            test-filter: "**"
 
     steps:
       - name: Checkout Repo
@@ -267,7 +266,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -276,11 +275,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name:
-          [
+        test-name: [
             'generic',
             'express',
-            'quickstart',
             'ap-flows',
             'elements',
             'localhost',
@@ -291,7 +288,6 @@ jobs:
             'astro',
             'expo-web',
             'tanstack-react-start',
-            'tanstack-react-router',
             'vue',
             'nuxt',
             'react-router',
@@ -299,7 +295,7 @@ jobs:
             'machine',
             'custom',
           ]
-        test-project: ['chrome']
+        test-project: ["chrome"]
         include:
           - test-name: 'nextjs'
             test-project: 'chrome'
@@ -307,6 +303,15 @@ jobs:
           - test-name: 'nextjs'
             test-project: 'chrome'
             next-version: '15'
+          - test-name: 'nextjs'
+            test-project: 'chrome'
+            next-version: '16'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '15'
+          - test-name: 'quickstart'
+            test-project: 'chrome'
+            next-version: '16'
 
     steps:
       - name: Checkout Repo
@@ -324,17 +329,34 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
+      - name: Verify jq is installed
+        shell: bash
+        run: |
+          if ! command -v jq &> /dev/null; then
+            echo "jq not found, installing..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          jq --version
+
       - name: Task Status
         id: task-status
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: 'latest'
+          E2E_CLERK_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
         run: |
-          AFFECTED=0
-          (pnpm turbo-ignore --task=test:integration:${{ matrix.test-name }} --fallback=${{ github.base_ref || 'refs/heads/main' }}) || AFFECTED=1
+          # Use turbo's built-in --affected flag to detect changes
+          # This automatically uses GITHUB_BASE_REF in GitHub Actions
+          TASK_COUNT=$(pnpm turbo run test:integration:${{ matrix.test-name }} --affected --dry=json 2>/dev/null | jq '.tasks | length' 2>/dev/null || echo "0")
+
+          if [ "$TASK_COUNT" -gt 0 ]; then
+            AFFECTED=1
+          else
+            AFFECTED=0
+          fi
+
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
@@ -373,8 +395,8 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
         env:
-          INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
-          INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
+          INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
+          INTEGRATION_ROOT_CA: "${{secrets.INTEGRATION_ROOT_CA}}"
         with:
           script: |
             const fs = require('fs');
@@ -399,7 +421,7 @@ jobs:
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: 'latest'
+          E2E_CLERK_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
@@ -419,7 +441,7 @@ jobs:
     name: Publish with pkg-pr-new
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [check-permissions, build-packages]
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash

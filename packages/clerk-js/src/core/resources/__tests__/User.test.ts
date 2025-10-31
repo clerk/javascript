@@ -1,4 +1,4 @@
-import type { UserJSON } from '@clerk/types';
+import type { UserJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource } from '../internal';

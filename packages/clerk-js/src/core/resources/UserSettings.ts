@@ -14,7 +14,7 @@ import type {
   UserSettingsJSONSnapshot,
   UserSettingsResource,
   Web3Strategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource } from './internal';
 
