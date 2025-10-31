@@ -54,20 +54,6 @@ export class APIKeys implements APIKeysNamespace {
       });
   }
 
-  async getSecret(id: string): Promise<string> {
-    return BaseResource.clerk
-      .getFapiClient()
-      .request<{ secret: string }>({
-        ...(await this.getBaseFapiProxyOptions()),
-        method: 'GET',
-        path: `/api_keys/${id}/secret`,
-      })
-      .then(res => {
-        const { secret } = res.payload as unknown as { secret: string };
-        return secret;
-      });
-  }
-
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
     const json = (await BaseResource._fetch<ApiKeyJSON>({
       ...(await this.getBaseFapiProxyOptions()),
