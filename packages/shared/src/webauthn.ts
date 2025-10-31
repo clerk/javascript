@@ -1,5 +1,8 @@
 import { isValidBrowser } from './browser';
 
+/**
+ *
+ */
 function isWebAuthnSupported() {
   return (
     isValidBrowser() &&
@@ -8,6 +11,9 @@ function isWebAuthnSupported() {
   );
 }
 
+/**
+ *
+ */
 async function isWebAuthnAutofillSupported(): Promise<boolean> {
   try {
     return isWebAuthnSupported() && (await window.PublicKeyCredential.isConditionalMediationAvailable());
@@ -16,6 +22,9 @@ async function isWebAuthnAutofillSupported(): Promise<boolean> {
   }
 }
 
+/**
+ *
+ */
 async function isWebAuthnPlatformAuthenticatorSupported(): Promise<boolean> {
   try {
     return (

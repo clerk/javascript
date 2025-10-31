@@ -1,4 +1,4 @@
-import type { ClerkHostRouter } from '@clerk/types';
+import type { ClerkHostRouter } from '@clerk/shared/types';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { NEXT_WINDOW_HISTORY_SUPPORT_VERSION } from '~/internals/constants';

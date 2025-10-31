@@ -1,5 +1,4 @@
 ---
-'@clerk/types': minor
 '@clerk/shared': minor
 '@clerk/astro': patch
 '@clerk/backend': patch

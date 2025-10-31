@@ -1,4 +1,4 @@
-import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/types';
+import type { SignInStrategy as ClerkSignInStrategy } from '@clerk/shared/types';
 import { useSelector } from '@xstate/react';
 import { useCallback, useEffect } from 'react';
 import type { ActorRefFrom, SnapshotFrom } from 'xstate';

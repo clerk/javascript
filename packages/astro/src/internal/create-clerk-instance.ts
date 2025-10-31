@@ -1,5 +1,5 @@
 import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
-import type { ClerkOptions } from '@clerk/types';
+import type { ClerkOptions } from '@clerk/shared/types';
 
 import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';

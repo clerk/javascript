@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import type { TelemetryEventRaw } from '@clerk/shared/types';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { createClerkClientWithOptions } from './createClerkClient';

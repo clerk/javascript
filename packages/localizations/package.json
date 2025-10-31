@@ -64,7 +64,7 @@
     "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
-    "@clerk/types": "workspace:^"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {},
   "engines": {

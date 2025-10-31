@@ -1,4 +1,4 @@
-import type { ClerkOptions } from '@clerk/types';
+import type { ClerkOptions } from '@clerk/shared/types';
 import type { AstroIntegration } from 'astro';
 import { envField } from 'astro/config';
 

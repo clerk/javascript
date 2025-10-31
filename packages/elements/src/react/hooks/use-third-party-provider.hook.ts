@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/shared/types';
 import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef } from 'xstate';

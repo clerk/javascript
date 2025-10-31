@@ -360,7 +360,7 @@
       "outputLogs": "new-only"
     },
     "//#typedoc:generate": {
-      "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build", "@clerk/types#build"],
+      "dependsOn": ["@clerk/nextjs#build", "@clerk/react#build", "@clerk/shared#build"],
       "inputs": ["tsconfig.typedoc.json", "typedoc.config.mjs"],
       "outputs": [".typedoc/**"],
       "outputLogs": "new-only"

@@ -143,6 +143,7 @@ export interface State {
    * An alias for `effect()` from `alien-signals`, which can be used to subscribe to changes from Signals.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_effect: (callback: () => void) => () => void;
@@ -152,6 +153,7 @@ export interface State {
    * its dependencies change.
    *
    * @see https://github.com/stackblitz/alien-signals#usage
+   *
    * @experimental This experimental API is subject to change.
    */
   __internal_computed: <T>(getter: (previousValue?: T) => T) => () => T;

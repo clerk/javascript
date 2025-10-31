@@ -7,7 +7,7 @@ import type {
   SamlStrategy,
   SignInStrategy,
   Web3Strategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { ActorRefFrom } from 'xstate';
 
 import type { ClerkElementsError } from '~/internals/errors';

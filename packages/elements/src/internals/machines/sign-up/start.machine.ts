@@ -1,4 +1,4 @@
-import type { SignUpResource, Web3Strategy } from '@clerk/types';
+import type { SignUpResource, Web3Strategy } from '@clerk/shared/types';
 import type { DoneActorEvent } from 'xstate';
 import { and, assertEvent, assign, enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
 

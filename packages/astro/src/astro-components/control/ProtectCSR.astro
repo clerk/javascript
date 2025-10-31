@@ -44,7 +44,7 @@ const {
 <script>
   import { $sessionStore } from '@clerk/astro/client';
   import { type AuthState, BaseClerkControlElement } from './BaseClerkControlElement';
-  import type { CheckAuthorization } from '@clerk/types';
+  import type { CheckAuthorization } from '@clerk/shared/types';
 
   class ClerkProtect extends BaseClerkControlElement {
     private defaultSlot: HTMLDivElement | null = null;

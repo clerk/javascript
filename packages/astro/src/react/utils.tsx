@@ -1,4 +1,4 @@
-import type { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk } from '@clerk/shared/types';
 import { computed, type Store, type StoreValue } from 'nanostores';
 import React from 'react';
 

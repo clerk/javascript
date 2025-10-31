@@ -1,4 +1,4 @@
-import type { JwtPayload, PendingSessionOptions } from '@clerk/types';
+import type { JwtPayload, PendingSessionOptions } from '@clerk/shared/types';
 
 import { constants } from '../constants';
 import type { TokenVerificationErrorReason } from '../errors';

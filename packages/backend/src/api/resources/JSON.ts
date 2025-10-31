@@ -1,4 +1,4 @@
-import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/types';
+import type { LastAuthenticationStrategy, SignUpStatus, VerificationStatus } from '@clerk/shared/types';
 
 import type {
   ActorTokenStatus,

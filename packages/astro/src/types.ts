@@ -5,7 +5,7 @@ import type {
   MultiDomainAndOrProxyPrimitives,
   ProtectProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 

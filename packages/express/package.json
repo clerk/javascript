@@ -69,7 +69,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {

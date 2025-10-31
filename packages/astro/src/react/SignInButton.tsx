@@ -1,4 +1,4 @@
-import type { SignInButtonProps, SignInProps } from '@clerk/types';
+import type { SignInButtonProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute, withClerk, type WithClerkProp } from './utils';

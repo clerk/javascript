@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { BlocklistIdentifier } from '../resources/BlocklistIdentifier';

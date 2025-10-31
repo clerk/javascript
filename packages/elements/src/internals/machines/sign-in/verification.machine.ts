@@ -12,7 +12,7 @@ import type {
   SignInResource,
   SignInSecondFactor,
   Web3Attempt,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { DoneActorEvent } from 'xstate';
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 

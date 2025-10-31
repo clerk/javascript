@@ -14,7 +14,7 @@ import type {
   CheckAuthorizationParamsWithCustomPermissions,
   CheckAuthorizationWithCustomPermissions,
   OrganizationCustomPermissionKey,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { constants as nextConstants } from '../constants';
 import { isNextFetcher } from './nextFetcher';
