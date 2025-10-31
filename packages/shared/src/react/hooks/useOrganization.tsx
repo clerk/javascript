@@ -1,4 +1,4 @@
-import { getCurrentOrganizationMembership } from '../../organization';
+import { getCurrentOrganizationMembership, withOrganizationsEnabled } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   ClerkPaginatedResponse,
@@ -270,7 +270,10 @@ const undefinedPaginatedResource = {
  * }
  * ```
  */
-export function useOrganization<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
+export const useOrganization = withOrganizationsEnabled(() => {
+  useAssertWrappedByClerkProvider('useOrganization');
+  return useClerkInstanceContext();
+})(function useOrganization<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
   const {
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
@@ -469,4 +472,4 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     memberships,
     invitations,
   };
-}
+});

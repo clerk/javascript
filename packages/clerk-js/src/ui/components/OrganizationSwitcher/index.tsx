@@ -4,7 +4,12 @@ import { cloneElement, useId } from 'react';
 import { withCardStateProvider, withFloatingTree } from '@/ui/elements/contexts';
 import { Popover } from '@/ui/elements/Popover';
 
-import { AcceptedInvitationsProvider, useOrganizationSwitcherContext, withCoreUserGuard } from '../../contexts';
+import {
+  AcceptedInvitationsProvider,
+  useOrganizationSwitcherContext,
+  withCoreUserGuard,
+  withOrganizationsEnabledGuard,
+} from '../../contexts';
 import { Flow } from '../../customizables';
 import { usePopover } from '../../hooks';
 import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
@@ -69,4 +74,6 @@ const _OrganizationSwitcher = () => {
   );
 };
 
-export const OrganizationSwitcher = withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher));
+export const OrganizationSwitcher = withOrganizationsEnabledGuard(
+  withCoreUserGuard(withCardStateProvider(_OrganizationSwitcher)),
+);

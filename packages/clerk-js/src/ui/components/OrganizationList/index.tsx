@@ -1,4 +1,4 @@
-import { withCoreUserGuard } from '../../contexts';
+import { withCoreUserGuard, withOrganizationsEnabledGuard } from '../../contexts';
 import { Flow } from '../../customizables';
 import { Route, Switch } from '../../router';
 import { OrganizationListPage } from './OrganizationListPage';
@@ -17,6 +17,6 @@ const OrganizationListInternal = () => {
   );
 };
 
-const AuthenticatedRoutes = withCoreUserGuard(OrganizationListPage);
+const AuthenticatedRoutes = withOrganizationsEnabledGuard(withCoreUserGuard(OrganizationListPage));
 
 export const OrganizationList = OrganizationListInternal;
