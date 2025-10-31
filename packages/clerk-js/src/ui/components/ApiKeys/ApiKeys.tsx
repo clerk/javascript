@@ -177,7 +177,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
               variant='body'
               sx={{ flex: 1 }}
             >
-              Make sure to copy your API key now. You won&apos;t be able to see it again.
+              Save your API Key now. For security reasons, we won't allow you to view it again later.
             </Text>
           </Flex>
           <ClipboardInput
