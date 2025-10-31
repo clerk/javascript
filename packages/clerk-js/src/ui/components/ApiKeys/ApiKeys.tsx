@@ -8,6 +8,7 @@ import { useProtect } from '@/ui/common';
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
   Alert,
+  AlertIcon,
   Box,
   Button,
   Col,
@@ -24,7 +25,7 @@ import { ClipboardInput } from '@/ui/elements/ClipboardInput';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
-import { InformationCircle, MagnifyingGlass } from '@/ui/icons';
+import { Check, ClipboardOutline, MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
 
@@ -64,22 +65,25 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     cacheKey,
   } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
-  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
-    clerk.apiKeys.create(arg),
-  );
-  const { t } = useLocalizations();
   const clerk = useClerk();
+  const {
+    data: createdApiKey,
+    trigger: createApiKey,
+    isMutating,
+  } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
+  const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
-  const [showCopyAlert, setShowCopyAlert] = useState(true);
+  const [showCopyAlert, setShowCopyAlert] = useState(false);
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
-      await createApiKey({
+      const result = await createApiKey({
         ...params,
         subject,
       });
+      console.log('result', result);
       closeCardFn();
       card.setError(undefined);
       setShowCopyAlert(true);
@@ -156,35 +160,45 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 
       {showCopyAlert ? (
         <Alert
-          colorScheme='info'
+          elementDescriptor={descriptors.alert}
+          elementId={descriptors.alert.setId('warning')}
+          colorScheme='warning'
           align='start'
-          sx={t => ({
-            flexDirection: 'column',
-            alignItems: 'stretch',
-            gap: t.space.$4,
-            backgroundColor: t.colors.$successAlpha50,
-            borderColor: t.colors.$successAlpha300,
-          })}
         >
-          <Flex gap={2}>
-            <Icon
-              icon={InformationCircle}
-              colorScheme='success'
-              sx={t => ({ flexShrink: 0, marginTop: t.space.$1 })}
+          <AlertIcon
+            elementId={descriptors.alert.setId('warning')}
+            elementDescriptor={descriptors.alertIcon}
+            variant='warning'
+            colorScheme='warning'
+            sx={{ flexShrink: 0 }}
+          />
+          <Col
+            elementDescriptor={descriptors.alertTextContainer}
+            elementId={descriptors.alertTextContainer.setId('warning')}
+            gap={1}
+            sx={{ flex: 1 }}
+          >
+            <Text
+              elementDescriptor={descriptors.alertText}
+              variant='body'
+              localizationKey={`Save your "${createdApiKey?.name}" API Key now`}
+              sx={{ textAlign: 'left' }}
             />
             <Text
-              colorScheme='secondary'
+              elementDescriptor={descriptors.alertText}
               variant='body'
-              sx={{ flex: 1 }}
-            >
-              Save your API Key now. For security reasons, we won't allow you to view it again later.
-            </Text>
-          </Flex>
-          <ClipboardInput
-            value='ak_EWRJJP47ZN7TW5TP38Q5X7BR5PBP9MD1'
-            readOnly
-            sx={{ width: '100%' }}
-          />
+              colorScheme='secondary'
+              localizationKey={`For security reasons, we won't allow you to view it again later.`}
+              sx={{ textAlign: 'left' }}
+            />
+            <ClipboardInput
+              value={createdApiKey?.secret ?? ''}
+              readOnly
+              sx={{ width: '100%' }}
+              copyIcon={ClipboardOutline}
+              copiedIcon={Check}
+            />
+          </Col>
         </Alert>
       ) : null}
       <ApiKeysTable

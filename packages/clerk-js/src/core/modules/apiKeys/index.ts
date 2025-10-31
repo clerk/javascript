@@ -69,35 +69,31 @@ export class APIKeys implements APIKeysNamespace {
   }
 
   async create(params: CreateAPIKeyParams): Promise<APIKeyResource> {
-    const json = (
-      await BaseResource._fetch<ApiKeyJSON>({
-        ...(await this.getBaseFapiProxyOptions()),
-        path: '/api_keys',
-        method: 'POST',
-        body: JSON.stringify({
-          type: params.type ?? 'api_key',
-          name: params.name,
-          subject: params.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
-          description: params.description,
-          seconds_until_expiration: params.secondsUntilExpiration,
-        }),
-      })
-    )?.response as ApiKeyJSON;
+    const json = (await BaseResource._fetch<ApiKeyJSON>({
+      ...(await this.getBaseFapiProxyOptions()),
+      path: '/api_keys',
+      method: 'POST',
+      body: JSON.stringify({
+        type: params.type ?? 'api_key',
+        name: params.name,
+        subject: params.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
+        description: params.description,
+        seconds_until_expiration: params.secondsUntilExpiration,
+      }),
+    })) as unknown as ApiKeyJSON;
 
     return new APIKey(json);
   }
 
   async revoke(params: RevokeAPIKeyParams): Promise<APIKeyResource> {
-    const json = (
-      await BaseResource._fetch<ApiKeyJSON>({
-        ...(await this.getBaseFapiProxyOptions()),
-        method: 'POST',
-        path: `/api_keys/${params.apiKeyID}/revoke`,
-        body: JSON.stringify({
-          revocation_reason: params.revocationReason,
-        }),
-      })
-    )?.response as ApiKeyJSON;
+    const json = (await BaseResource._fetch<ApiKeyJSON>({
+      ...(await this.getBaseFapiProxyOptions()),
+      method: 'POST',
+      path: `/api_keys/${params.apiKeyID}/revoke`,
+      body: JSON.stringify({
+        revocation_reason: params.revocationReason,
+      }),
+    })) as unknown as ApiKeyJSON;
 
     return new APIKey(json);
   }

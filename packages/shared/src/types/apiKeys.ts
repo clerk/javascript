@@ -14,6 +14,7 @@ export interface APIKeyResource extends ClerkResource {
   expiration: Date | null;
   createdBy: string | null;
   description: string | null;
+  secret?: string;
   lastUsedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
