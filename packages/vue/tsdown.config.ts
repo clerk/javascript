@@ -2,7 +2,7 @@ import autoPropsPlugin from '@vue.ts/tsx-auto-props/rolldown';
 import { defineConfig } from 'tsdown';
 import vuePlugin from 'unplugin-vue/rolldown';
 
-import { name, version } from './package.json' with { type: 'json' };
+import sharedPackage from './package.json' with { type: 'json' };
 
 export default defineConfig(() => {
   return {
@@ -23,8 +23,8 @@ export default defineConfig(() => {
     ],
     transform: {
       define: {
-        PACKAGE_NAME: `"${name}"`,
-        PACKAGE_VERSION: `"${version}"`,
+        PACKAGE_NAME: `"${sharedPackage.name}"`,
+        PACKAGE_VERSION: `"${sharedPackage.version}"`,
       },
     },
     external: ['vue'],
