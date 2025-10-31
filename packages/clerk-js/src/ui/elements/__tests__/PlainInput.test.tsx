@@ -222,7 +222,7 @@ describe('PlainInput', () => {
     expect(successElement).toHaveTextContent(/Some Success/i);
   });
 
-  it('aria-live attribute is correctly applied', async () => {
+  it('screen reader only live region announces feedback changes', async () => {
     const { wrapper } = await createFixtures();
     const { Field } = createField('firstname', 'init value', {
       type: 'text',
@@ -236,21 +236,34 @@ describe('PlainInput', () => {
     await userEvent.click(getByRole('button', { name: /set error/i }));
     expect(await findByText(/Some Error/i)).toBeInTheDocument();
 
-    // Verify the visible error message has aria-live="polite"
-    const errorElement = container.querySelector('#error-firstname');
-    expect(errorElement).toHaveAttribute('aria-live', 'polite');
+    // Verify there's a screen-reader-only aria-live region with the error content
+    const ariaLiveRegions = container.querySelectorAll('[aria-live="polite"]');
+    expect(ariaLiveRegions.length).toBeGreaterThanOrEqual(1);
+
+    // Find the screen reader only region (it will have the visually hidden styles)
+    const srOnlyRegion = Array.from(ariaLiveRegions).find(el => {
+      const style = window.getComputedStyle(el);
+      return style.position === 'absolute' && style.width === '1px';
+    });
+    expect(srOnlyRegion).toBeDefined();
+    expect(srOnlyRegion).toHaveTextContent(/Some Error/i);
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
     expect(await findByText(/Some Success/i)).toBeInTheDocument();
 
-    // Verify the visible success message has aria-live="polite"
-    const successElement = container.querySelector('#firstname-success-feedback');
-    expect(successElement).toHaveAttribute('aria-live', 'polite');
+    // Verify the screen reader only region updated its content
+    expect(srOnlyRegion).toHaveTextContent(/Some Success/i);
 
-    // The previous error message should now have aria-live="off" (though it might still exist in DOM but hidden)
-    // Verify exactly one element has aria-live="polite" at a time
-    const allAriaLivePolite = container.querySelectorAll('[aria-live="polite"]');
-    expect(allAriaLivePolite.length).toBe(1);
+    // Verify the visible error/success elements exist with proper IDs for aria-describedby
+    const errorElement = container.querySelector('#error-firstname');
+    const successElement = container.querySelector('#firstname-success-feedback');
+
+    // One should be visible, the other hidden (for animation)
+    const errorVisible = errorElement && window.getComputedStyle(errorElement).visibility === 'visible';
+    const successVisible = successElement && window.getComputedStyle(successElement).visibility === 'visible';
+
+    // At least one should be visible (might be both during transition)
+    expect(errorVisible || successVisible).toBe(true);
   });
 });
