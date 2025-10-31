@@ -21,7 +21,7 @@
     "target": "ES2019",
     "noEmitOnError": false,
     "incremental": true,
-    "moduleSuffixes": [".ios", ".android", ".native", ""]
+    "moduleSuffixes": [".web", ".ios", ".android", ".native", ""]
   },
   "include": ["src"]
 }
