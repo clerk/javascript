@@ -92,7 +92,6 @@ export const DUMMY_CLERK_CLIENT_RESOURCE = {
     status: null,
     supported_identifiers: [],
     supported_first_factors: [],
-    untrusted_first_factors: [],
     supported_second_factors: null,
     first_factor_verification: {
       object: 'verification',

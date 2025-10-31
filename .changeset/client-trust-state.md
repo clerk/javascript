@@ -4,4 +4,4 @@
 '@clerk/expo': minor
 ---
 
-Added `client_trust_state` and `untrusted_first_factors` fields to Client and SignIn resources to support new fraud protection feature.
+Adds `client_trust_state` field to Client and SignIn resources to support new fraud protection feature.
