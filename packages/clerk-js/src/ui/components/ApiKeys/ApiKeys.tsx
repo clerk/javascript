@@ -7,6 +7,7 @@ import useSWRMutation from 'swr/mutation';
 import { useProtect } from '@/ui/common';
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
+  Alert,
   Box,
   Button,
   Col,
@@ -15,13 +16,15 @@ import {
   Flow,
   Icon,
   localizationKeys,
+  Text,
   useLocalizations,
 } from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
+import { ClipboardInput } from '@/ui/elements/ClipboardInput';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
-import { MagnifyingGlass } from '@/ui/icons';
+import { InformationCircle, MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
 
@@ -69,6 +72,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
+  const [showCopyAlert, setShowCopyAlert] = useState(true);
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
@@ -78,6 +82,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
       });
       closeCardFn();
       card.setError(undefined);
+      setShowCopyAlert(true);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
@@ -148,6 +153,40 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           </Flex>
         </Action.Open>
       </Action.Root>
+
+      {showCopyAlert ? (
+        <Alert
+          colorScheme='info'
+          align='start'
+          sx={t => ({
+            flexDirection: 'column',
+            alignItems: 'stretch',
+            gap: t.space.$4,
+            backgroundColor: t.colors.$successAlpha50,
+            borderColor: t.colors.$successAlpha300,
+          })}
+        >
+          <Flex gap={2}>
+            <Icon
+              icon={InformationCircle}
+              colorScheme='success'
+              sx={t => ({ flexShrink: 0, marginTop: t.space.$1 })}
+            />
+            <Text
+              colorScheme='secondary'
+              variant='body'
+              sx={{ flex: 1 }}
+            >
+              Make sure to copy your API key now. You won&apos;t be able to see it again.
+            </Text>
+          </Flex>
+          <ClipboardInput
+            value='ak_EWRJJP47ZN7TW5TP38Q5X7BR5PBP9MD1'
+            readOnly
+            sx={{ width: '100%' }}
+          />
+        </Alert>
+      ) : null}
       <ApiKeysTable
         rows={apiKeys}
         isLoading={isLoading}

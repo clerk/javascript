@@ -129,14 +129,14 @@ export const ApiKeysTable = ({
           <Tr>
             <Th>Name</Th>
             <Th>Last used</Th>
-            <Th>Key</Th>
+            {/* <Th>Key</Th> */}
             {canManageAPIKeys && <Th>Actions</Th>}
           </Tr>
         </Thead>
         <Tbody>
           {isLoading ? (
             <Tr>
-              <Td colSpan={4}>
+              <Td colSpan={3}>
                 <Spinner
                   colorScheme='primary'
                   sx={{ margin: 'auto', display: 'block' }}
@@ -185,7 +185,7 @@ export const ApiKeysTable = ({
                     <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />
                   </Box>
                 </Td>
-                <Td>
+                {/* <Td>
                   <Flex
                     direction='row'
                     gap={1}
@@ -198,7 +198,7 @@ export const ApiKeysTable = ({
                     <SecretInputWithToggle apiKeyID={apiKey.id} />
                     <CopySecretButton apiKeyID={apiKey.id} />
                   </Flex>
-                </Td>
+                </Td> */}
                 {canManageAPIKeys && (
                   <Td>
                     <ThreeDotsMenu
