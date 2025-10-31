@@ -96,12 +96,15 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   );
   const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
 
+  // When last auth strategy is present, check remaining strategies count for button type
+  const remainingStrategiesCount = lastAuthenticationStrategyPresent ? strategies.length - 1 : strategies.length;
+
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
       ? true
       : socialButtonsVariant === 'iconButton'
         ? false
-        : strategies.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
+        : remainingStrategiesCount <= SOCIAL_BUTTON_BLOCK_THRESHOLD;
 
   const startOauth = async (strategy: OAuthStrategy | Web3Strategy) => {
     card.setLoading(strategy);
@@ -161,12 +164,12 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
         >
           {row.map(strategy => {
             const label =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+              remainingStrategiesCount <= SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
                 ? `Continue with ${strategyToDisplayData[strategy].name}`
                 : strategyToDisplayData[strategy].name;
 
             const localizedText =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
+              remainingStrategiesCount <= SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
                 ? localizationKeys('socialButtonsBlockButton', {
                     provider: strategyToDisplayData[strategy].name,
                   })
@@ -224,15 +227,6 @@ type SocialButtonProps = PropsOfComponent<typeof Button> & {
 const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButtonElement> | null): JSX.Element => {
   const { icon, label, id, textLocalizationKey, lastAuthenticationStrategy, ...rest } = props;
 
-  if (lastAuthenticationStrategy) {
-    return (
-      <SocialButtonBlock
-        {...props}
-        ref={ref}
-      />
-    );
-  }
-
   return (
     <Button
       ref={ref}
@@ -245,9 +239,11 @@ const SocialButtonIcon = forwardRef((props: SocialButtonProps, ref: Ref<HTMLButt
       sx={t => ({
         minHeight: t.sizes.$8,
         width: '100%',
+        position: 'relative',
       })}
       {...rest}
     >
+      {lastAuthenticationStrategy && <LastAuthenticationStrategyBadge overlay />}
       {icon}
     </Button>
   );
