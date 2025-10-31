@@ -609,6 +609,12 @@ export const esUY: LocalizationResource = {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Revisá tu correo',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

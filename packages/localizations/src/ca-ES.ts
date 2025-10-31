@@ -607,6 +607,12 @@ export const caES: LocalizationResource = {
       subtitle: 'per continuar a {{applicationName}}',
       title: 'Comprova el teu correu electrònic',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,

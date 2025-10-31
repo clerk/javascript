@@ -4,6 +4,7 @@ import type {
   EmailCodeAttempt,
   EmailCodeConfig,
   EmailCodeFactor,
+  EmailCodeSecondFactorConfig,
   EmailLinkConfig,
   EmailLinkFactor,
   EnterpriseSSOConfig,
@@ -116,9 +117,9 @@ export type AttemptFirstFactorParams =
   | ResetPasswordPhoneCodeAttempt
   | ResetPasswordEmailCodeAttempt;
 
-export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
+export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
+export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
 
 export type SignInCreateParams = (
   | {
