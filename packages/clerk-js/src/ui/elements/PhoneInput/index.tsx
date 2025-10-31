@@ -78,8 +78,16 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
         position: 'relative',
         borderRadius: theme.radii.$md,
         zIndex: 1,
-        '&:focus-within,&[data-focus-within="true"]': {
-          ...common.borderVariants(theme, { hasError: rest.hasError }).normal['&:focus'],
+        '&:has(input:focus:not([data-focus-visible="true"]))': {
+          ...common.borderVariants(theme, {
+            focusRing: true,
+          }).normal['&:focus'],
+        },
+        '&:has(input:focus[data-focus-visible="true"]), &:has(button:focus-visible)': {
+          outlineWidth: '2px',
+          outlineStyle: 'solid',
+          outlineColor: theme.colors.$primary500,
+          outlineOffset: '3px',
         },
       })}
     >
@@ -128,6 +136,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             },
           })}
           hoverAsFocus
+          focusRing={false}
           isDisabled={rest.isDisabled}
           icon={ChevronUpDown}
           iconSx={t => ({
@@ -199,6 +208,7 @@ const PhoneInputBase = forwardRef<HTMLInputElement, PhoneInputProps & { feedback
             }),
             sx,
           ]}
+          focusRing={false}
           //use our internal ref while forwarding
           //@ts-expect-error
           ref={mergeRefs(phoneInputRef, ref)}

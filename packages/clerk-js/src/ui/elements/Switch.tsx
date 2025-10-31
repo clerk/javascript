@@ -39,7 +39,10 @@ export const Switch = forwardRef<HTMLDivElement, SwitchProps>(
           isolation: 'isolate',
           width: 'fit-content',
           '&:has(input:focus-visible) > input + span': {
-            ...common.focusRingStyles(t),
+            outlineWidth: '2px',
+            outlineStyle: 'solid',
+            outlineColor: t.colors.$primary500,
+            outlineOffset: '3px',
           },
         })}
       >

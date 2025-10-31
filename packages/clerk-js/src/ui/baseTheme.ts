@@ -31,8 +31,13 @@ const inputShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-within,&[data-focus-within="true"]': {
+    // Mouse users - show focus ring (works for both direct inputs and containers)
+    '&:focus:not([data-focus-visible="true"]), &:has(input:focus:not([data-focus-visible="true"]))': {
       boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    },
+    // Keyboard users - show hover state only (outline is defined separately)
+    '&[data-focus-visible="true"], &:has(input[data-focus-visible="true"])': {
+      boxShadow: hoverShadow,
     },
   };
 };
@@ -55,8 +60,11 @@ const checkboxShadowStyles = (
     '&:hover': {
       boxShadow: hoverShadow,
     },
-    '&:focus-visible': {
-      boxShadow: [hoverShadow, theme.shadows.$focusRing.replace('{{color}}', colors.focus)].toString(),
+    '&[data-focus-visible="true"]': {
+      outlineWidth: '2px',
+      outlineStyle: 'solid',
+      outlineColor: theme.colors.$primary500,
+      outlineOffset: '3px',
     },
   };
 };
@@ -118,42 +126,18 @@ const clerkTheme: Appearance = {
           },
           '&[data-color="primary"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$primary500),
-            '&:focus': {
-              boxShadow: [
-                BUTTON_SOLID_SHADOW(theme.colors.$primary500),
-                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
-              ].toString(),
-            },
           },
           '&[data-color="danger"]': {
             boxShadow: BUTTON_SOLID_SHADOW(theme.colors.$danger500),
-            '&:focus': {
-              boxShadow: [
-                BUTTON_SOLID_SHADOW(theme.colors.$danger500),
-                theme.shadows.$focusRing.replace('{{color}}', theme.colors.$dangerAlpha200),
-              ].toString(),
-            },
           },
         },
         '&[data-variant="outline"]': {
           borderWidth: 0,
           boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-          '&:focus': {
-            boxShadow: [
-              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
-            ].toString(),
-          },
         },
         '&[data-variant="bordered"]': {
           borderWidth: 0,
           boxShadow: BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-          '&:focus': {
-            boxShadow: [
-              BUTTON_OUTLINE_SHADOW(theme.colors.$borderAlpha100),
-              theme.shadows.$focusRing.replace('{{color}}', theme.colors.$colorRing),
-            ].toString(),
-          },
         },
       },
       badge: {
