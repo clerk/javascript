@@ -139,7 +139,7 @@ describe('loadClerkJsScript(options)', () => {
 
     try {
       await loadPromise;
-      fail('Should have thrown error');
+      throw new Error('Should have thrown error');
     } catch (error) {
       expect(error).toBeInstanceOf(ClerkRuntimeError);
       expect((error as Error).message).toContain('Clerk: Failed to load Clerk');

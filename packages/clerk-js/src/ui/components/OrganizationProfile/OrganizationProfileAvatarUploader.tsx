@@ -1,4 +1,4 @@
-import type { OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/shared/types';
 
 import type { AvatarUploaderProps } from '@/ui/elements/AvatarUploader';
 import { AvatarUploader } from '@/ui/elements/AvatarUploader';

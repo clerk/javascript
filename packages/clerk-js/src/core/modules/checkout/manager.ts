@@ -3,7 +3,7 @@ import type {
   __experimental_CheckoutInstance,
   BillingCheckoutResource,
   ClerkAPIResponseError,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
 

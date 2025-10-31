@@ -1,4 +1,4 @@
-import type { SignUpModes } from '@clerk/types';
+import type { SignUpModes } from '@clerk/shared/types';
 
 // TODO: Do we still have a use for this or can we simply preserve all params?
 export const PRESERVED_QUERYSTRING_PARAMS = [

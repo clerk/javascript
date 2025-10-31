@@ -490,9 +490,11 @@ export const bgBG: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Създаване на организация',
     action__invitationAccept: 'Присъединяване',
     action__manageOrganization: 'Управление',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Заявка за присъединяване',
     notSelected: 'Няма избрана организация',
     personalWorkspace: 'Личен акаунт',
@@ -939,7 +941,9 @@ export const bgBG: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавяне на акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управление на акаунта',
+    action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
   },

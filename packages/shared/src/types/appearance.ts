@@ -654,34 +654,41 @@ export type Elements = {
 export type Variables = {
   /**
    * The primary color used throughout the components. Set this to your brand color.
+   *
    * @default '#2F3037'
    */
   colorPrimary?: CssColorOrScale;
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
+   *
    * @deprecated Use {@link Variables.colorPrimaryForeground} instead.
+   *
    * @default 'white'
    */
   colorTextOnPrimaryBackground?: CssColor;
   /**
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
+   *
    * @default 'white'
    */
   colorPrimaryForeground?: CssColor;
   /**
    * The color used to indicate errors or destructive actions. Set this to your brand's danger color.
+   *
    * @default '#EF4444'
    */
   colorDanger?: CssColorOrScale;
   /**
    * The color used to indicate an action that completed successfully or a positive result.
+   *
    * @default '#22C543'
    */
   colorSuccess?: CssColorOrScale;
   /**
    * The color used for potentially destructive actions or when the user's attention is required.
+   *
    * @default '#F36B16'
    */
   colorWarning?: CssColorOrScale;
@@ -689,17 +696,21 @@ export type Variables = {
    * The color that will be used as the neutral color for all the components. To achieve sufficient contrast,
    * light themes should be using dark shades ('black'), while dark themes should be using light shades ('white').
    * This option applies to borders, backgrounds for hovered elements, hovered dropdown options etc.
+   *
    * @default 'black'
    */
   colorNeutral?: CssColorOrAlphaScale;
   /**
    * The default text color.
+   *
    * @deprecated Use {@link Variables.colorForeground} instead.
+   *
    * @default '#212126'
    */
   colorText?: CssColor;
   /**
    * The default text color.
+   *
    * @default 'inherit'
    */
   colorForeground?: CssColor;
@@ -711,65 +722,80 @@ export type Variables = {
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.
+   *
    * @deprecated Use {@link Variables.colorMutedForeground} instead.
+   *
    * @default '#747686'
    */
   colorTextSecondary?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
    * This color is a lighter shade of {@link Variables.colorText}.
+   *
    * @default '#747686'
    */
   colorMutedForeground?: CssColor;
   /**
    * The background color for the card container.
+   *
    * @default 'white'
    */
   colorBackground?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   *
    * @deprecated Use {@link Variables.colorInputForeground} instead.
+   *
    * @default 'black'
    */
   colorInputText?: CssColor;
   /**
    * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   *
    * @default 'black'
    */
   colorInputForeground?: CssColor;
   /**
    * The background color for all input elements.
+   *
    * @deprecated Use {@link Variables.colorInput} instead.
+   *
    * @default 'white'
    */
   colorInputBackground?: CssColor;
   /**
    * The background color for all input elements.
+   *
    * @default 'white'
    */
   colorInput?: CssColor;
   /**
    * The color of the avatar shimmer
+   *
    * @default 'rgba(255, 255, 255, 0.36)'
    */
   colorShimmer?: CssColor;
   /**
    * The color of the ring when an interactive element is focused rendered at 15% opacity.
+   *
    * @default {@link Variables.colorNeutral} at 15% opacity
    */
   colorRing?: CssColor;
   /**
    * The base shadow color used in the components.
+   *
    * @default '#000000'
    */
   colorShadow?: CssColor;
   /**
    * The base border color used in the components.
+   *
    * @default {@link Variables.colorNeutral}
    */
   colorBorder?: CssColor;
   /**
    * The background color of the modal backdrop rendered at 73% opacity.
+   *
    * @default {@link Variables.colorNeutral} at 73% opacity
    */
   colorModalBackdrop?: CssColor;
@@ -777,7 +803,9 @@ export type Variables = {
    * The default font that will be used in all components.
    * This can be the name of a custom font loaded by your code or the name of a web-safe font ((@link WebSafeFont})
    * If a specific fontFamily is not provided, the components will inherit the font of the parent element.
+   *
    * @default 'inherit'
+   *
    * @example
    * { fontFamily: 'Montserrat' }
    */
@@ -785,12 +813,14 @@ export type Variables = {
   /**
    * The default font that will be used in all buttons. See {@link Variables.fontFamily} for details.
    * If not provided, {@link Variables.fontFamily} will be used instead.
+   *
    * @default 'inherit'
    */
   fontFamilyButtons?: FontFamily;
   /**
    * The value will be used as the base `md` to calculate all the other scale values (`xs`, `sm`, `lg` and `xl`).
    * By default, this value is relative to the root fontSize of the html element.
+   *
    * @default '0.8125rem'
    */
   fontSize?: CssLengthUnit | FontSizeScale;
@@ -798,6 +828,7 @@ export type Variables = {
    * The font weight the components will use. By default, the components will use the 400, 500, 600 and 700 weights
    * for normal, medium, semibold and bold text respectively.
    * You can override the default weights by passing a {@link FontWeightScale} object
+   *
    * @default { normal: 400, medium: 500, semibold: 600, bold: 700 };
    */
   fontWeight?: FontWeightScale;
@@ -805,17 +836,21 @@ export type Variables = {
    * The size that will be used as the `md` base borderRadius value. This is used as the base to calculate the `sm`, `lg`, `xl`,
    * our components use. As a general rule, the bigger an element is, the larger its borderRadius is going to be.
    * eg: the Card element uses 'xl'
+   *
    * @default '0.375rem'
    */
   borderRadius?: CssLengthUnit;
   /**
    * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
+   *
    * @deprecated Use {@link Variables.spacing} instead.
+   *
    * @default '1rem'
    */
   spacingUnit?: CssLengthUnit;
   /**
    * The base spacing that all margins, paddings and gaps between the elements are derived from.
+   *
    * @default '1rem'
    */
   spacing?: CssLengthUnit;
@@ -830,6 +865,7 @@ export type Theme = {
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * Supports both object-based themes and string-based themes:
+   *
    * @example
    * import { dark } from "@clerk/themes";
    * appearance={{ theme: dark }}
@@ -844,6 +880,7 @@ export type Theme = {
    * @deprecated Use `theme` instead. This property will be removed in a future version.
    * A theme used as the base theme for the components.
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   *
    * @example
    * import { dark } from "@clerk/themes";
    * appearance={{ baseTheme: dark }}
@@ -879,6 +916,7 @@ export type Layout = {
   /**
    * Controls whether the logo will be rendered inside or outside the component card.
    * To customise the logo further, you can use {@link Appearance.elements}
+   *
    * @default inside
    */
   logoPlacement?: 'inside' | 'outside' | 'none';
@@ -888,6 +926,7 @@ export type Layout = {
    * This option is helpful when you need to display different logos for different themes,
    * eg: white logo on dark themes, black logo on light themes
    * To customise the logo further, you can use {@link Appearance.elements}
+   *
    * @default undefined
    */
   logoImageUrl?: string;
@@ -896,6 +935,7 @@ export type Layout = {
    * usually found in the SignIn and SignUp components.
    * If a URL is provided, it will be used as the `href` of the link.
    * If a value is not passed in, the components will use the Home URL as set in the Clerk dashboard
+   *
    * @default undefined
    */
   logoLinkUrl?: string;
@@ -904,18 +944,21 @@ export type Layout = {
    * By default, the components will use block buttons if you have less than
    * 3 social providers enabled, otherwise icon buttons will be used.
    * To customise the social buttons further, you can use {@link Appearance.elements}
+   *
    * @default auto
    */
   socialButtonsVariant?: 'auto' | 'iconButton' | 'blockButton';
   /**
    * Controls whether the social buttons will be rendered above or below the card form.
    * To customise the social button container further, you can use {@link Appearance.elements}
+   *
    * @default 'top'
    */
   socialButtonsPlacement?: 'top' | 'bottom';
   /**
    * Controls whether the SignIn or SignUp forms will include optional fields.
    * You can make a field required or optional through the {@link https://dashboard.clerk.com|Clerk dashboard}.
+   *
    * @default true
    */
   showOptionalFields?: boolean;
@@ -936,12 +979,14 @@ export type Layout = {
   privacyPageUrl?: string;
   /**
    * This option enables the shimmer animation for the avatars of <UserButton/> and <OrganizationSwitcher/>
+   *
    * @default true
    */
   shimmer?: boolean;
   /**
    * This option enables/disables animations for the components. If you want to disable animations, you can set this to false.
    * Also the prefers-reduced-motion media query is respected and animations are disabled if the user has set it to reduce motion regardless of this option.
+   *
    * @default true
    */
   animations?: boolean;
@@ -949,6 +994,7 @@ export type Layout = {
   /**
    * This option disables development mode warning.
    * We don't recommend disabling this unless you want to see a preview of how the components will look in production.
+   *
    * @default false
    */
   unsafe_disableDevelopmentModeWarnings?: boolean;
@@ -957,11 +1003,13 @@ export type Layout = {
 export type CaptchaAppearanceOptions = {
   /**
    * The widget theme. Can take the following values: light, dark, auto.
+   *
    * @default 'auto'
    */
   theme?: 'auto' | 'light' | 'dark';
   /**
    * The widget size. Can take the following values: normal, flexible, compact.
+   *
    * @default 'normal'
    */
   size?: 'normal' | 'flexible' | 'compact';

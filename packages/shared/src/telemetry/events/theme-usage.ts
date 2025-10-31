@@ -1,4 +1,4 @@
-import type { Appearance, BaseTheme, TelemetryEventRaw } from '@clerk/types';
+import type { Appearance, BaseTheme, TelemetryEventRaw } from '../../types';
 
 export const EVENT_THEME_USAGE = 'THEME_USAGE';
 export const EVENT_SAMPLING_RATE = 1;

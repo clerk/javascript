@@ -1,4 +1,9 @@
-import type { BillingMoneyAmount, BillingPayerResourceType, BillingPlanJSON, BillingPlanResource } from '@clerk/types';
+import type {
+  BillingMoneyAmount,
+  BillingPayerResourceType,
+  BillingPlanJSON,
+  BillingPlanResource,
+} from '@clerk/shared/types';
 
 import { billingMoneyAmountFromJSON } from '@/utils/billing';
 

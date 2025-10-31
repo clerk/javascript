@@ -1,4 +1,4 @@
-import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/types';
+import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
 
 import {
   canViewOrManageAPIKeys,
