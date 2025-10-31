@@ -1,3 +1,4 @@
+import { isValidBrowserOnline } from '@clerk/shared/browser';
 import type { createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { clerkEvents } from '@clerk/shared/clerkEventBus';
 import type { createCookieHandler } from '@clerk/shared/cookie';
@@ -5,6 +6,8 @@ import { setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { is4xxError, isClerkAPIResponseError, isClerkRuntimeError, isNetworkError } from '@clerk/shared/error';
 import type { Clerk, InstanceType } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
+
+import { debugLogger } from '@/utils/debug';
 
 import { clerkMissingDevBrowserJwt } from '../errors';
 import { eventBus, events } from '../events';
@@ -172,6 +175,10 @@ export class AuthCookieService {
     // Only allow background tabs to update if both session and organization match
     if (!document.hasFocus() && !this.isCurrentContextActive()) {
       return;
+    }
+
+    if (!token && !isValidBrowserOnline()) {
+      debugLogger.warn('Removing session cookie (offline)', { sessionId: this.clerk.session?.id }, 'authCookieService');
     }
 
     this.setActiveContextInStorage();

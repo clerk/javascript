@@ -1380,6 +1380,13 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       const token = await newSession?.getToken();
       if (!token) {
+        if (!isValidBrowserOnline()) {
+          debugLogger.warn(
+            'Token is null when setting active session (offline)',
+            { sessionId: newSession?.id },
+            'clerk',
+          );
+        }
         eventBus.emit(events.TokenUpdate, { token: null });
       }
 
@@ -2380,6 +2387,13 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      if (!this.session?.lastActiveToken && !isValidBrowserOnline()) {
+        debugLogger.warn(
+          'No last active token when updating client (offline)',
+          { sessionId: this.session?.id },
+          'clerk',
+        );
+      }
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 

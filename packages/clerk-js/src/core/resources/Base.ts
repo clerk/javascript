@@ -8,6 +8,8 @@ import type {
   DeletedObjectJSON,
 } from '@clerk/shared/types';
 
+import { debugLogger } from '@/utils/debug';
+
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
@@ -98,7 +100,14 @@ export abstract class BaseResource {
           code: 'network_error',
         });
       } else if (!isValidBrowserOnline()) {
-        console.warn(e);
+        debugLogger.warn(
+          'Network request failed while offline, returning null',
+          {
+            method: requestInit.method,
+            path: requestInit.path,
+          },
+          'baseResource',
+        );
         return null;
       } else {
         throw e;
