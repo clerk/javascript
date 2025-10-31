@@ -576,6 +576,8 @@ class SignUpFuture implements SignUpFutureResource {
     verifyPhoneCode: this.verifyPhoneCode.bind(this),
   };
 
+  #hasBeenFinalized = false;
+
   constructor(readonly resource: SignUp) {}
 
   get id() {
@@ -674,6 +676,10 @@ class SignUpFuture implements SignUpFutureResource {
     }
 
     return undefined;
+  }
+
+  get hasBeenFinalized() {
+    return this.#hasBeenFinalized;
   }
 
   private async getCaptchaToken(): Promise<{
@@ -900,6 +906,7 @@ class SignUpFuture implements SignUpFutureResource {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
+      this.#hasBeenFinalized = true;
       await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }
