@@ -105,6 +105,7 @@ export type FlowMetadata = {
   part?:
     | 'start'
     | 'emailCode'
+    | 'emailCode2Fa'
     | 'phoneCode'
     | 'phoneCode2Fa'
     | 'totp2Fa'

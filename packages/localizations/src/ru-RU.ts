@@ -614,6 +614,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Проверьте Вашу почту',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle:

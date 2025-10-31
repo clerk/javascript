@@ -3,6 +3,7 @@ import type { CamelToSnake, DeepPartial } from './utils';
 
 /**
  * @internal
+ *
  * @example
  * type PageTitle = LocalizationValue<'name', 'greeting'>;
  *     // ?^
@@ -69,6 +70,7 @@ export type __internal_LocalizationResource = {
   maintenanceMode: LocalizationValue;
   /**
    * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   *
    * @experimental
    */
   roles: {
@@ -475,6 +477,12 @@ export type __internal_LocalizationResource = {
       resendButton: LocalizationValue;
       subtitle: LocalizationValue;
       title: LocalizationValue<'provider'>;
+    };
+    emailCodeMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
     };
     phoneCodeMfa: {
       title: LocalizationValue;

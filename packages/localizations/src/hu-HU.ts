@@ -606,6 +606,12 @@ export const huHU: LocalizationResource = {
       subtitle: 'hogy folytathasd a(z) {{applicationName}}',
       title: 'Ellenőrizd az emailed',
     },
+    emailCodeMfa: {
+      formTitle: undefined,
+      resendButton: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
