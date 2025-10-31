@@ -89,18 +89,16 @@ export interface BillingPayerMethods {
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  initializePaymentMethod: (
-    params: Exclude<InitializePaymentMethodParams, 'orgId'>,
-  ) => Promise<BillingInitializedPaymentMethodResource>;
+  initializePaymentMethod: (params: InitializePaymentMethodParams) => Promise<BillingInitializedPaymentMethodResource>;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
-  addPaymentMethod: (params: Exclude<AddPaymentMethodParams, 'orgId'>) => Promise<BillingPaymentMethodResource>;
+  addPaymentMethod: (params: AddPaymentMethodParams) => Promise<BillingPaymentMethodResource>;
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
    */
   getPaymentMethods: (
-    params: Exclude<GetPaymentMethodsParams, 'orgId'>,
+    params?: GetPaymentMethodsParams,
   ) => Promise<ClerkPaginatedResponse<BillingPaymentMethodResource>>;
 }
 
@@ -226,29 +224,29 @@ export type BillingPaymentMethodStatus = 'active' | 'expired' | 'disconnected';
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type GetPaymentMethodsParams = WithOptionalOrgType<ClerkPaginationParams>;
+export type GetPaymentMethodsParams = ClerkPaginationParams;
 
 /**
  * @inline
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type PaymentGateway = 'stripe' | 'paypal';
+export type PaymentGateway = 'stripe';
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type InitializePaymentMethodParams = WithOptionalOrgType<{
+export type InitializePaymentMethodParams = {
   /**
    * The payment gateway to use.
    */
   gateway: PaymentGateway;
-}>;
+};
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type AddPaymentMethodParams = WithOptionalOrgType<{
+export type AddPaymentMethodParams = {
   /**
    * The payment gateway to use.
    */
@@ -257,7 +255,7 @@ export type AddPaymentMethodParams = WithOptionalOrgType<{
    * A token representing payment details, usually from a payment form.
    */
   paymentToken: string;
-}>;
+};
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -491,6 +489,11 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The unique identifier for the subscription item.
    */
   id: string;
+  /**
+   * The unique identifier for the payment method being used for the subscription item.
+   */
+  //TODO(@COMMERCE): should this be nullable ?
+  paymentMethodId: string;
   /**
    * The plan associated with the subscription item.
    */
@@ -783,6 +786,10 @@ export interface BillingCheckoutResource extends ClerkResource {
    * The payer associated with the checkout.
    */
   payer: BillingPayerResource;
+  /**
+   * Whether a payment method is required for this checkout.
+   */
+  needsPaymentMethod: boolean;
 }
 
 /**

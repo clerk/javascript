@@ -484,9 +484,11 @@ export const heIL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'צור ארגון',
     action__invitationAccept: 'הצטרף',
     action__manageOrganization: 'נהל ארגון',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'בקשה להצטרפות',
     notSelected: 'לא נבחר ארגון',
     personalWorkspace: 'אזור אישי',
@@ -931,7 +933,9 @@ export const heIL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'הוסף חשבון',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'נהל חשבון',
+    action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
   },

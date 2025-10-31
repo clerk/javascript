@@ -491,9 +491,11 @@ export const esUY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Gestionar',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Cuenta personal',
@@ -952,7 +954,9 @@ export const esUY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Agregar cuenta',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestionar cuenta',
+    action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Cerrar sesión en todas las cuentas',
   },

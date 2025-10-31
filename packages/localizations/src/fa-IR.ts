@@ -495,9 +495,11 @@ export const faIR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'ایجاد سازمان',
     action__invitationAccept: 'بپیوندید',
     action__manageOrganization: 'مدیریت',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'درخواست عضویت',
     notSelected: 'هیچ سازمانی انتخاب نشده است',
     personalWorkspace: 'حساب شخصی',
@@ -950,7 +952,9 @@ export const faIR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'افزودن حساب',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'مدیریت حساب',
+    action__openUserMenu: undefined,
     action__signOut: 'خروج',
     action__signOutAll: 'خروج از همه حساب‌ها',
   },

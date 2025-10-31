@@ -1,4 +1,4 @@
-import type { UserData as IUserData, UserDataJSON, UserDataJSONSnapshot } from '@clerk/types';
+import type { UserData as IUserData, UserDataJSON, UserDataJSONSnapshot } from '@clerk/shared/types';
 
 export class UserData implements IUserData {
   firstName?: string;

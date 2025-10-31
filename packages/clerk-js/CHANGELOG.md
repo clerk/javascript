@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.103.1
+
+### Patch Changes
+
+- Bring back OrgPreview within the OrgSwitcher component ([#7091](https://github.com/clerk/javascript/pull/7091)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.103.0
+
+### Minor Changes
+
+- Allow free trials without requiring a payment method, based on the configuration of an instance. ([#7068](https://github.com/clerk/javascript/pull/7068)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Billing Beta] Remove unnecessary `orgId` from BillingPayerMethods interface. ([#7087](https://github.com/clerk/javascript/pull/7087)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Ensure `ThreeDotsMenu` is full opacity when focus visible. ([#7080](https://github.com/clerk/javascript/pull/7080)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Localize aria-labels within `UserButton` and `OrganizationSwitcher` triggers. ([#7086](https://github.com/clerk/javascript/pull/7086)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/shared@3.29.0
+  - @clerk/types@4.96.0
+  - @clerk/localizations@3.26.4
+
 ## 5.102.1
 
 ### Patch Changes

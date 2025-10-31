@@ -490,9 +490,11 @@ export const fiFI: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Luo organisaatio',
     action__invitationAccept: 'Liity',
     action__manageOrganization: 'Hallitse',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Pyydä liittymistä',
     notSelected: 'Ei valittua organisaatiota',
     personalWorkspace: 'Henkilökohtainen tili',
@@ -941,7 +943,9 @@ export const fiFI: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lisää tili',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hallitse tiliä',
+    action__openUserMenu: undefined,
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },

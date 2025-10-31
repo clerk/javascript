@@ -489,9 +489,11 @@ export const huHU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Szervezet létrehozása',
     action__invitationAccept: 'Csatlakozás',
     action__manageOrganization: 'Kezelés',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Csatlakozás kérése',
     notSelected: 'Nincs szervezet kiválasztva',
     personalWorkspace: 'Személyes fiók',
@@ -942,7 +944,9 @@ export const huHU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Fiók hozzáadása',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Fiók kezelése',
+    action__openUserMenu: undefined,
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },

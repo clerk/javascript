@@ -1,4 +1,4 @@
-import type { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import type { FormControlState } from '@/ui/utils/useFormControl';

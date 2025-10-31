@@ -493,9 +493,11 @@ export const beBY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Стварыць арганізацыю',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Кіраванне арганізацыяй',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Арганізацыя не выбрана',
     personalWorkspace: 'Асабістае працоўнае прастора',
@@ -947,7 +949,9 @@ export const beBY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Дадаць уліковы запіс',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Кіраванне ўліковым запісам',
+    action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },

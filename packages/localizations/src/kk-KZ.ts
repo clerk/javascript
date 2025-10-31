@@ -481,9 +481,11 @@ export const kkKZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
     action__manageOrganization: 'Басқару',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Қосылу сұрауы',
     notSelected: 'Ұйым таңдалмады',
     personalWorkspace: 'Жеке есептік жазба',
@@ -930,7 +932,9 @@ export const kkKZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Есептік жазба қосу',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Есептік жазбаны басқару',
+    action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
   },
