@@ -16,19 +16,29 @@ import { deleteKeylessAction } from '../keyless-actions';
 export async function getKeylessStatus(
   params: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
-  let [shouldRunAsKeyless, runningWithClaimedKeys, locallyStoredPublishableKey] = [false, false, ''];
+  let [shouldRunAsKeyless, runningWithClaimedKeys, runningWithDriftedKeys, locallyStoredPublishableKey] = [
+    false,
+    false,
+    false,
+    '',
+  ];
   if (canUseKeyless) {
     locallyStoredPublishableKey = await import('../../server/keyless-node.js')
       .then(mod => mod.safeParseClerkFile()?.publishableKey || '')
       .catch(() => '');
 
     runningWithClaimedKeys = Boolean(params.publishableKey) && params.publishableKey === locallyStoredPublishableKey;
+    runningWithDriftedKeys =
+      Boolean(params.publishableKey) &&
+      Boolean(locallyStoredPublishableKey) &&
+      params.publishableKey !== locallyStoredPublishableKey;
     shouldRunAsKeyless = !params.publishableKey || runningWithClaimedKeys;
   }
 
   return {
     shouldRunAsKeyless,
     runningWithClaimedKeys,
+    runningWithDriftedKeys,
   };
 }
 
@@ -59,6 +69,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         nonce={await generateNonce()}
         initialState={await generateStatePromise()}
         disableKeyless
+        disableKeylessDriftDetection
       >
         {children}
       </ClientClerkProvider>
@@ -77,6 +88,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
       })}
       nonce={await generateNonce()}
       initialState={await generateStatePromise()}
+      disableKeylessDriftDetection
     >
       {children}
     </ClientClerkProvider>
