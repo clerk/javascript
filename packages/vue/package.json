@@ -72,7 +72,7 @@
     "@vue.ts/tsx-auto-props": "^1.0.0-beta.5",
     "unplugin-vue": "^7.0.3",
     "vue": "3.5.22",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.1.2"
   },
   "peerDependencies": {
     "vue": "^3.2.0"

@@ -8,7 +8,8 @@ export default defineConfig(() => {
   return {
     clean: true,
     entry: ['./src/index.ts', './src/experimental.ts', './src/internal.ts', './src/errors.ts'],
-    format: ['esm'],
+    format: ['es'],
+    unbundle: false,
     sourcemap: true,
     dts: false,
     plugins: [
@@ -21,11 +22,9 @@ export default defineConfig(() => {
         include: ['**/*.ts'],
       }),
     ],
-    transform: {
-      define: {
-        PACKAGE_NAME: `"${sharedPackage.name}"`,
-        PACKAGE_VERSION: `"${sharedPackage.version}"`,
-      },
+    define: {
+      PACKAGE_NAME: `"${sharedPackage.name}"`,
+      PACKAGE_VERSION: `"${sharedPackage.version}"`,
     },
     external: ['vue'],
   };
