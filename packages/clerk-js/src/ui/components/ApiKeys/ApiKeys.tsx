@@ -117,29 +117,25 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
   const clerk = useClerk();
-  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_key, { arg }: { arg: CreateAPIKeyParams }) =>
-    clerk.apiKeys.create(arg),
-  );
+  const {
+    data: createdApiKey,
+    trigger: createApiKey,
+    isMutating,
+  } = useSWRMutation(cacheKey, (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
   const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
   const [showCopyAlert, setShowCopyAlert] = useState(false);
-  const [apiKeySecret, setApiKeySecret] = useState('');
-  const [createdApiKeyName, setCreatedApiKeyName] = useState('');
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
-      const createdApiKey = await createApiKey({
+      await createApiKey({
         ...params,
         subject,
       });
       closeCardFn();
       card.setError(undefined);
-
-      // The secret is only available in the create response
-      setCreatedApiKeyName(params.name);
-      setApiKeySecret(createdApiKey.secret ?? '');
       setShowCopyAlert(true);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
@@ -214,8 +210,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 
       {showCopyAlert ? (
         <SaveApiKeyAlert
-          apiKeyName={createdApiKeyName}
-          apiKeySecret={apiKeySecret}
+          apiKeyName={createdApiKey?.name ?? ''}
+          apiKeySecret={createdApiKey?.secret ?? ''}
         />
       ) : null}
       <ApiKeysTable
