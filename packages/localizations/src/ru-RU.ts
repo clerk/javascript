@@ -46,6 +46,10 @@ export const ruRU: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Назад',
   badge__activePlan: undefined,

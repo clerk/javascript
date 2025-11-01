@@ -46,6 +46,10 @@ export const svSE: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Tillbaka',
   badge__activePlan: undefined,

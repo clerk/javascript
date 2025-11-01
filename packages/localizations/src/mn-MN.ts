@@ -46,6 +46,10 @@ export const mnMN: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Буцах',
   badge__activePlan: undefined,

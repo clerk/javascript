@@ -46,6 +46,10 @@ export const skSK: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Späť',
   badge__activePlan: undefined,

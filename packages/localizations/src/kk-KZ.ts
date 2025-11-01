@@ -46,6 +46,10 @@ export const kkKZ: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Артқа',
   badge__activePlan: undefined,

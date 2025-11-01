@@ -35,6 +35,10 @@ export const enUS: LocalizationResource = {
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
     },
+    saveAlert: {
+      subtitle: "For security reasons, we won't allow you to view it again later.",
+      title: 'Save your "{{name}}" API Key now',
+    },
   },
   backButton: 'Back',
   badge__activePlan: 'Active',

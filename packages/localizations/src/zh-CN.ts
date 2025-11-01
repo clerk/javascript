@@ -46,6 +46,10 @@ export const zhCN: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: '返回',
   badge__activePlan: undefined,

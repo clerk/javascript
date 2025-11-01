@@ -47,6 +47,10 @@ export const roRO: LocalizationResource = {
       formHint: 'Sigur vrei să ștergi această cheie Secret?',
       formTitle: 'Revoci cheia secretă „{{apiKeyName}}”?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Înapoi',
   badge__activePlan: 'Activ',

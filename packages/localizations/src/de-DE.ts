@@ -47,6 +47,10 @@ export const deDE: LocalizationResource = {
       formHint: 'Sind Sie sicher, dass Sie diesen API-Key löschen wollen?',
       formTitle: 'API-Key "{{apiKeyName}}" widerrufen?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Zurück',
   badge__activePlan: 'Aktiv',

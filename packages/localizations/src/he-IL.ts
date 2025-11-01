@@ -46,6 +46,10 @@ export const heIL: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'חזור',
   badge__activePlan: undefined,

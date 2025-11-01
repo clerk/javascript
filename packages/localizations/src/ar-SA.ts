@@ -46,6 +46,10 @@ export const arSA: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'الرجوع',
   badge__activePlan: undefined,

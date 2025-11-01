@@ -47,6 +47,10 @@ export const itIT: LocalizationResource = {
       formHint: 'Sei sicuro di voler eliminare questa Chiave Segreta?',
       formTitle: 'Revoca "{{apiKeyName}}" chiave segreta?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Indietro',
   badge__activePlan: 'Attivo',

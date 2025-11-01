@@ -47,6 +47,10 @@ export const viVN: LocalizationResource = {
       formHint: 'Bạn có chắc chắn muốn xóa khoá này không?',
       formTitle: 'Hủy khoá "{{apiKeyName}}" không?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Quay lại',
   badge__activePlan: 'Đang hoạt động',

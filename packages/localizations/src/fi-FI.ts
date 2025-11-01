@@ -46,6 +46,10 @@ export const fiFI: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Takaisin',
   badge__activePlan: undefined,

@@ -46,6 +46,10 @@ export const huHU: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Vissza',
   badge__activePlan: undefined,
