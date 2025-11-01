@@ -46,6 +46,10 @@ export const plPL: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Powrót',
   badge__activePlan: undefined,

@@ -46,6 +46,10 @@ export const jaJP: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: '戻る',
   badge__activePlan: undefined,

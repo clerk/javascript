@@ -46,6 +46,10 @@ export const daDK: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Tilbage',
   badge__activePlan: undefined,

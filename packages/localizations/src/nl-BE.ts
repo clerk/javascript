@@ -46,6 +46,10 @@ export const nlBE: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Terug',
   badge__activePlan: undefined,

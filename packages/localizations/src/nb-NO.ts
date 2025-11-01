@@ -46,6 +46,10 @@ export const nbNO: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Tilbake',
   badge__activePlan: undefined,

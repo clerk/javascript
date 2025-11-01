@@ -47,6 +47,10 @@ export const frFR: LocalizationResource = {
       formHint: 'Êtes-vous sûr de vouloir supprimer cette clé secrète ?',
       formTitle: 'Révoquer la clé secrète « {{apiKeyName}} » ?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Retour',
   badge__activePlan: 'Actif',

@@ -7,6 +7,8 @@ import useSWRMutation from 'swr/mutation';
 import { useProtect } from '@/ui/common';
 import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Col,
@@ -15,13 +17,15 @@ import {
   Flow,
   Icon,
   localizationKeys,
+  Text,
   useLocalizations,
 } from '@/ui/customizables';
 import { Action } from '@/ui/elements/Action';
+import { ClipboardInput } from '@/ui/elements/ClipboardInput';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
-import { MagnifyingGlass } from '@/ui/icons';
+import { Check, ClipboardOutline, MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
 
@@ -34,6 +38,57 @@ type APIKeysPageProps = {
   subject: string;
   perPage?: number;
   revokeModalRoot?: React.MutableRefObject<HTMLElement | null>;
+};
+
+type SaveApiKeyAlertProps = {
+  apiKeyName: string;
+  apiKeySecret: string;
+};
+
+const SaveApiKeyAlert = ({ apiKeyName, apiKeySecret }: SaveApiKeyAlertProps) => {
+  return (
+    <Alert
+      elementDescriptor={descriptors.alert}
+      elementId={descriptors.alert.setId('warning')}
+      colorScheme='warning'
+      align='start'
+    >
+      <AlertIcon
+        elementId={descriptors.alert.setId('warning')}
+        elementDescriptor={descriptors.alertIcon}
+        variant='warning'
+        colorScheme='warning'
+        sx={{ flexShrink: 0 }}
+      />
+      <Col
+        elementDescriptor={descriptors.alertTextContainer}
+        elementId={descriptors.alertTextContainer.setId('warning')}
+        gap={1}
+        sx={{ flex: 1 }}
+      >
+        <Text
+          elementDescriptor={descriptors.alertText}
+          variant='body'
+          localizationKey={localizationKeys('apiKeys.saveAlert.title', { name: apiKeyName })}
+          sx={{ textAlign: 'left' }}
+        />
+        <Text
+          elementDescriptor={descriptors.alertText}
+          variant='body'
+          colorScheme='secondary'
+          localizationKey={localizationKeys('apiKeys.saveAlert.subtitle')}
+          sx={{ textAlign: 'left' }}
+        />
+        <ClipboardInput
+          value={apiKeySecret}
+          readOnly
+          sx={{ width: '100%' }}
+          copyIcon={ClipboardOutline}
+          copiedIcon={Check}
+        />
+      </Col>
+    </Alert>
+  );
 };
 
 const RevokeAPIKeyConfirmationModal = lazy(() =>
@@ -61,14 +116,17 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     cacheKey,
   } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
-  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
-    clerk.apiKeys.create(arg),
-  );
-  const { t } = useLocalizations();
   const clerk = useClerk();
+  const {
+    data: createdApiKey,
+    trigger: createApiKey,
+    isMutating,
+  } = useSWRMutation(cacheKey, (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
+  const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
+  const [showCopyAlert, setShowCopyAlert] = useState(false);
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
@@ -78,6 +136,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
       });
       closeCardFn();
       card.setError(undefined);
+      setShowCopyAlert(true);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
@@ -148,6 +207,13 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           </Flex>
         </Action.Open>
       </Action.Root>
+
+      {showCopyAlert ? (
+        <SaveApiKeyAlert
+          apiKeyName={createdApiKey?.name ?? ''}
+          apiKeySecret={createdApiKey?.secret ?? ''}
+        />
+      ) : null}
       <ApiKeysTable
         rows={apiKeys}
         isLoading={isLoading}

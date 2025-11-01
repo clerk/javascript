@@ -46,6 +46,10 @@ export const esMX: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Atrás',
   badge__activePlan: undefined,

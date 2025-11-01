@@ -46,6 +46,10 @@ export const elGR: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Πίσω',
   badge__activePlan: undefined,

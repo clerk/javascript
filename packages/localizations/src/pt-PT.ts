@@ -46,6 +46,10 @@ export const ptPT: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Voltar',
   badge__activePlan: undefined,

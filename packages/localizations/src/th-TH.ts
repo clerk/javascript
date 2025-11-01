@@ -47,6 +47,10 @@ export const thTH: LocalizationResource = {
       formHint: 'คุณแน่ใจหรือไม่ว่าต้องการลบคีย์ลับนี้?',
       formTitle: 'เพิกถอนคีย์ลับ "{{apiKeyName}}"?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'ย้อนกลับ',
   badge__activePlan: 'ใช้งานอยู่',

@@ -46,6 +46,10 @@ export const trTR: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Geri',
   badge__activePlan: undefined,

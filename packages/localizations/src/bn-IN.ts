@@ -46,6 +46,10 @@ export const bnIN: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'পিছনে',
   badge__activePlan: undefined,

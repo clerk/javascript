@@ -47,6 +47,10 @@ export const ptBR: LocalizationResource = {
       formHint: 'Tem certeza de que deseja excluir esta chave de API?',
       formTitle: 'Revogar chave de API "{{apiKeyName}}"?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Voltar',
   badge__activePlan: 'Ativo',

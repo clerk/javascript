@@ -46,6 +46,10 @@ export const isIS: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Til baka',
   badge__activePlan: undefined,

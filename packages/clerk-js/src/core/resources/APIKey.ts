@@ -18,6 +18,7 @@ export class APIKey extends BaseResource implements APIKeyResource {
   expiration!: Date | null;
   createdBy!: string | null;
   description!: string | null;
+  secret?: string;
   lastUsedAt!: Date | null;
   createdAt!: Date;
   updatedAt!: Date;
@@ -44,6 +45,7 @@ export class APIKey extends BaseResource implements APIKeyResource {
     this.expiration = data.expiration ? unixEpochToDate(data.expiration) : null;
     this.createdBy = data.created_by;
     this.description = data.description;
+    this.secret = data.secret;
     this.lastUsedAt = data.last_used_at ? unixEpochToDate(data.last_used_at) : null;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);

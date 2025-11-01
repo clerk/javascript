@@ -46,6 +46,10 @@ export const teIN: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'వెనుకకు',
   badge__activePlan: undefined,

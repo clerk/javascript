@@ -47,6 +47,10 @@ export const csCZ: LocalizationResource = {
       formHint: 'Jste si jisti, že chcete smazat tento tajný klíč?',
       formTitle: 'Zrušit tajný klíč "{{apiKeyName}}"?',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Zpět',
   badge__activePlan: 'Aktivní',

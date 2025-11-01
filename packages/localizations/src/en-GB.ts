@@ -46,6 +46,10 @@ export const enGB: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Back',
   badge__activePlan: undefined,

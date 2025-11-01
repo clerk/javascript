@@ -46,6 +46,10 @@ export const hrHR: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Natrag',
   badge__activePlan: undefined,

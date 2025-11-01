@@ -46,6 +46,10 @@ export const srRS: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'Nazad',
   badge__activePlan: undefined,

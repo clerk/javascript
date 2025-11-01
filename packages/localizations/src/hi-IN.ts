@@ -46,6 +46,10 @@ export const hiIN: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'वापस',
   badge__activePlan: undefined,

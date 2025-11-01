@@ -46,6 +46,10 @@ export const koKR: LocalizationResource = {
       formHint: undefined,
       formTitle: undefined,
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: '돌아가기',
   badge__activePlan: undefined,

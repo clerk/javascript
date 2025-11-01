@@ -47,6 +47,10 @@ export const faIR: LocalizationResource = {
       formHint: 'آیا مطمئن هستید که می‌خواهید این کلید محرمانه را حذف کنید؟',
       formTitle: 'کلید محرمانه "{{apiKeyName}}" لغو شود؟',
     },
+    saveAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   backButton: 'بازگشت',
   badge__activePlan: 'فعال',
