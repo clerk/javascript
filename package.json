@@ -25,6 +25,7 @@
     "nuke": "node ./scripts/nuke.mjs",
     "prepare": "husky install",
     "release": "changeset publish && git push --follow-tags",
+    "release:alpha-v6": "changeset publish --tag alpha-v6 --no-git-tag",
     "release:canary": "changeset publish --tag canary --no-git-tag",
     "release:snapshot": "changeset publish --tag snapshot --no-git-tag",
     "release:verdaccio": "if [ \"$(npm config get registry)\" = \"https://registry.npmjs.org/\" ]; then echo 'Error: Using default registry' && exit 1; else TURBO_CONCURRENCY=1 pnpm build && changeset publish --no-git-tag; fi",
@@ -58,6 +59,7 @@
     "typedoc:generate": "pnpm build && pnpm typedoc:generate:skip-build",
     "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && rm -rf .typedoc/docs && mv .typedoc/temp-docs .typedoc/docs",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
+    "version-packages:alpha-v6": "./scripts/alpha-v6.mjs",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm yalc push --replace --sig; cd '../../'; done"
