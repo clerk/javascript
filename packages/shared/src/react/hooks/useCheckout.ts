@@ -27,11 +27,23 @@ type ForceNull<T> = {
   [K in keyof T]: null;
 };
 
+/**
+ * @inline
+ */
 type CheckoutProperties = Omit<RemoveFunctions<BillingCheckoutResource>, 'pathRoot' | 'status'>;
 
+/**
+ * @inline
+ */
 type FetchStatusAndError =
   | {
+      /**
+       * Returns an error object if any part of the checkout process fails.
+       */
       error: ClerkAPIResponseError;
+      /**
+       * The data fetching status.
+       */
       fetchStatus: 'error';
     }
   | {
@@ -40,34 +52,73 @@ type FetchStatusAndError =
     };
 
 /**
- * @internal
+ * @inline
  * On status === 'needs_initialization', all properties are null.
- * On status === 'needs_confirmation' or 'completed', all properties are defined the same as the CommerceCheckoutResource.
+ * On status === 'needs_confirmation' or 'completed', all properties are defined the same as the BillingCheckoutResource.
  */
 type CheckoutPropertiesPerStatus =
   | ({
+      /**
+       * @inline
+       * The current status of the checkout session. The following statuses are possible:
+       *  <ul>
+       *  <li>`needs_initialization`: The checkout hasn't started but the hook is mounted. Call `start()` to continue.</li>
+       *  <li>`needs_confirmation`: The checkout has been initialized and is awaiting confirmation. Call `confirm()` to continue.</li>
+       *  <li>`completed`: The checkout has been successfully confirmed. Call `finalize()` to complete the checkout.</li>
+       * </ul>
+       */
       status: Extract<__experimental_CheckoutCacheState['status'], 'needs_initialization'>;
     } & ForceNull<CheckoutProperties>)
   | ({
       status: Extract<__experimental_CheckoutCacheState['status'], 'needs_confirmation' | 'completed'>;
     } & CheckoutProperties);
 
+/**
+ * @interface
+ */
+export type UseCheckoutReturn = FetchStatusAndError &
+  CheckoutPropertiesPerStatus & {
+    /**
+     * A function that confirms and finalizes the checkout process, usually after the user has provided and validated payment information.
+     */
+    confirm: __experimental_CheckoutInstance['confirm'];
+    /**
+     * A function that initializes the checkout process by creating a checkout resource on the server.
+     */
+    start: __experimental_CheckoutInstance['start'];
+    /**
+     * A function that clears the current checkout state from the cache.
+     */
+    clear: () => void;
+    /**
+     * A function that finalizes the checkout process. Can optionally accept a `navigate()` function to redirect the user after completion.
+     */
+    finalize: (params?: { navigate?: SetActiveNavigate }) => void;
+    getState: () => __experimental_CheckoutCacheState;
+    /**
+     * A boolean that indicates if the `start()` method is in progress.
+     */
+    isStarting: boolean;
+    /**
+     * A boolean that indicates if the `confirm()` method is in progress.
+     */
+    isConfirming: boolean;
+  };
+
 type __experimental_UseCheckoutReturn = {
-  checkout: FetchStatusAndError &
-    CheckoutPropertiesPerStatus & {
-      confirm: __experimental_CheckoutInstance['confirm'];
-      start: __experimental_CheckoutInstance['start'];
-      clear: () => void;
-      finalize: (params?: { navigate?: SetActiveNavigate }) => void;
-      getState: () => __experimental_CheckoutCacheState;
-      isStarting: boolean;
-      isConfirming: boolean;
-    };
+  checkout: UseCheckoutReturn;
 };
 
-type Params = Parameters<typeof __experimental_CheckoutProvider>[0];
+type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];
 
-export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn => {
+/**
+ * @function
+ *
+ * @param [options] - An object containing the configuration for the checkout flow.
+ *
+ * **Required** if the hook is used without a `<CheckoutProvider />` wrapping the component tree.
+ */
+export const useCheckout = (options?: UseCheckoutParams): __experimental_UseCheckoutReturn => {
   const contextOptions = useCheckoutContext();
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 

@@ -18,3 +18,8 @@ export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentMethod
     return user?.getPaymentMethods;
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePaymentMethodsReturn = ReturnType<typeof usePaymentMethods>;

@@ -16,3 +16,8 @@ export const usePaymentAttempts = createBillingPaginatedHook<BillingPaymentResou
     return undefined;
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePaymentAttemptsReturn = ReturnType<typeof usePaymentAttempts>;
