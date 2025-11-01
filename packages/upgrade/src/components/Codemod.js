@@ -49,7 +49,7 @@ export function Codemod(props) {
             <Text>{glob.toString()}</Text>
           ) : (
             <TextInput
-              defaultValue='**/*'
+              defaultValue='**/*.(js|jsx|ts|tsx|mjs|cjs)'
               onSubmit={val => {
                 setGlob(val.split(/[ ,]/));
               }}
