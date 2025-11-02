@@ -1,6 +1,6 @@
 export * from './beforeUnloadTracker';
 export * from './billing';
-export * from './completeSignUpFlow';
+export * from '@clerk/shared/internal/clerk-js/completeSignUpFlow';
 export * from './email';
 export * from '@clerk/shared/internal/clerk-js/encoders';
 export * from './errors';

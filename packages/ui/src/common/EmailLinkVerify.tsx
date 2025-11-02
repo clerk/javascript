@@ -1,8 +1,8 @@
 import { EmailLinkErrorCodeStatus, isEmailLinkError } from '@clerk/shared/error';
+import { completeSignUpFlow } from '@clerk/shared/internal/clerk-js/completeSignUpFlow';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
-import { completeSignUpFlow } from '../../utils';
 import { useCoreSignUp } from '../contexts';
 import type { LocalizationKey } from '../localization';
 import { useRouter } from '../router';
