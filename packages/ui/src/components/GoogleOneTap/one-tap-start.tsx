@@ -4,11 +4,11 @@ import { useEffect, useRef } from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
 
-import type { GISCredentialResponse } from '../../../utils/one-tap';
-import { loadGIS } from '../../../utils/one-tap';
 import { useEnvironment, useGoogleOneTapContext } from '../../contexts';
 import { useFetch } from '../../hooks';
 import { useRouter } from '../../router';
+import type { GISCredentialResponse } from '../../utils/one-tap';
+import { loadGIS } from '../../utils/one-tap';
 
 function OneTapStartInternal(): JSX.Element | null {
   const clerk = useClerk();

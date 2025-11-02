@@ -1,6 +1,5 @@
+import { clerkFailedToLoadThirdPartyScript } from '@clerk/shared/internal/clerk-js/errors';
 import { loadScript } from '@clerk/shared/loadScript';
-
-import { clerkFailedToLoadThirdPartyScript } from '../core/errors';
 
 interface GISCredentialResponse {
   credential: string;
