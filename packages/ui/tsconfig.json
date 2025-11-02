@@ -15,6 +15,7 @@
     "module": "preserve",
     "lib": ["ES2023", "DOM", "WebWorker"],
     "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
