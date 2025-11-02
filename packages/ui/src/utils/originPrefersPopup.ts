@@ -1,4 +1,4 @@
-import { inIframe } from '@/utils';
+import { inIframe } from '@clerk/shared/internal/clerk-js/runtime';
 
 const POPUP_PREFERRED_ORIGINS = [
   '.lovable.app',

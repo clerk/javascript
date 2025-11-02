@@ -1,9 +1,9 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 import type { ClientResource } from '@clerk/shared/types';
 
-import { inCrossOriginIframe } from '../../../utils';
 import { getCookieDomain } from '../getCookieDomain';
 import { getSecureAttribute } from '../getSecureAttribute';
 

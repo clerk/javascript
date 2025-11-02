@@ -3,12 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { originPrefersPopup } from '../originPrefersPopup';
 
 // Mock the inIframe function
-vi.mock('@/utils', () => ({
+vi.mock('@clerk/shared/internal/clerk-js/runtime', () => ({
   inIframe: vi.fn(),
 }));
 
 // Import the mocked function
-import { inIframe } from '@/utils';
+import { inIframe } from '@clerk/shared/internal/clerk-js/runtime';
 const mockInIframe = vi.mocked(inIframe);
 
 describe('originPrefersPopup', () => {

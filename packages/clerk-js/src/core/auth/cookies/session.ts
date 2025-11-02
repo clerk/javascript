@@ -1,8 +1,8 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 
-import { inCrossOriginIframe } from '../../../utils';
 import { getSecureAttribute } from '../getSecureAttribute';
 
 const SESSION_COOKIE_NAME = '__session';

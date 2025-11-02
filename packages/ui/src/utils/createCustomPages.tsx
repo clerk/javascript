@@ -1,12 +1,12 @@
-import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
-
 import {
   canViewOrManageAPIKeys,
   disabledAPIKeysFeature,
   disabledOrganizationBillingFeature,
   disabledUserBillingFeature,
-  isValidUrl,
-} from '../../utils';
+} from '@clerk/shared/internal/clerk-js/componentGuards';
+import { isValidUrl } from '@clerk/shared/internal/clerk-js/url';
+import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
+
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
 import type { NavbarRoute } from '../elements/Navbar';
 import { Code, CreditCard, Organization, TickShield, User, Users } from '../icons';
@@ -14,7 +14,6 @@ import { localizationKeys } from '../localization';
 import { ExternalElementMounter } from './ExternalElementMounter';
 import { isDevelopmentSDK } from './runtimeEnvironment';
 import { sanitizeCustomLinkURL } from './sanitizeCustomLinkURL';
-
 export type CustomPageContent = {
   url: string;
   mount: (el: HTMLDivElement) => void;
