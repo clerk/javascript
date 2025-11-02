@@ -1,14 +1,6 @@
 import { CLERK_MODAL_STATE } from '../core/constants';
 import { encodeB64, getClerkQueryParam } from '../utils';
 
-export const buildVirtualRouterUrl = ({ base, path }: { base: string; path: string | undefined }) => {
-  if (!path) {
-    return base;
-  }
-
-  return base + path;
-};
-
 export const readStateParam = () => {
   const urlClerkState = getClerkQueryParam(CLERK_MODAL_STATE) ?? '';
 

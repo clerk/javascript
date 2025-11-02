@@ -9,6 +9,17 @@ import {
   isClerkAPIResponseError,
   isClerkRuntimeError,
 } from '@clerk/shared/error';
+import {
+  canViewOrManageAPIKeys,
+  disabledAllBillingFeatures,
+  disabledAPIKeysFeature,
+  disabledOrganizationsFeature,
+  isSignedInAndSingleSessionModeEnabled,
+  noOrganizationExists,
+  noUserExists,
+} from '@clerk/shared/internal/clerk-js/componentGuards';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
@@ -94,21 +105,17 @@ import type {
 } from '@clerk/shared/types';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import type { MountComponentRenderer } from '@clerk/ui/internal';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
-import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
-  disabledAllBillingFeatures,
-  disabledAPIKeysFeature,
-  disabledOrganizationsFeature,
   errorThrower,
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -123,10 +130,6 @@ import {
   isError,
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
-  isSignedInAndSingleSessionModeEnabled,
-  noOrganizationExists,
-  noUserExists,
-  processCssLayerNameExtraction,
   removeClerkQueryParam,
   requiresUserInput,
   stripOrigin,
@@ -138,7 +141,6 @@ import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
 import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED, ERROR_CODES } from './constants';
 import {
   clerkErrorInitFailed,
   clerkInvalidSignInUrlFormat,
@@ -159,7 +161,6 @@ import { createCheckoutInstance } from './modules/checkout/instance';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
-import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
 
@@ -2942,16 +2943,9 @@ export class Clerk implements ClerkInterface {
   };
 
   #initOptions = (options?: ClerkOptions): ClerkOptions => {
-    const processedOptions = options ? { ...options } : {};
-
-    // Extract cssLayerName from baseTheme if present and move it to appearance level
-    if (processedOptions.appearance) {
-      processedOptions.appearance = processCssLayerNameExtraction(processedOptions.appearance);
-    }
-
     return {
       ...defaultOptions,
-      ...processedOptions,
+      ...options,
       allowedRedirectOrigins: createAllowedRedirectOrigins(
         options?.allowedRedirectOrigins,
         this.frontendApi,
