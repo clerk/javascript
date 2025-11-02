@@ -65,7 +65,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
           await navigate(redirectUrlComplete);
         },
       });
-    } catch (err) {
+    } catch (err: any) {
       handleError(err, [nameField, slugField], card.setError);
     }
   };

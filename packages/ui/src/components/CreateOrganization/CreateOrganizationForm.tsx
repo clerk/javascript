@@ -104,7 +104,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
       }
 
       wizard.nextStep();
-    } catch (err) {
+    } catch (err: any) {
       handleError(err, [nameField, slugField], card.setError);
     }
   };

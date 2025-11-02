@@ -74,7 +74,7 @@ const RemoveScreen = ({
     await paymentMethod
       .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
       .then(revalidate)
-      .catch((error: Error) => {
+      .catch((error: any) => {
         handleError(error, [], card.setError);
       });
   };

@@ -41,7 +41,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
       const signature = await generateWeb3Signature({ identifier, nonce: message, provider });
       await web3Wallet?.attemptVerification({ signature });
       card.setIdle();
-    } catch (err) {
+    } catch (err: any) {
       card.setIdle();
       const fieldError = getFieldError(err);
       if (fieldError) {

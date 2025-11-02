@@ -47,7 +47,7 @@ export const DeleteUserForm = withCardStateProvider((props: DeleteUserFormProps)
         session: null,
         redirectUrl,
       });
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [], card.setError);
     }
   };

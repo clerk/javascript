@@ -154,7 +154,7 @@ export const VerifiedDomainForm = withCardStateProvider((props: VerifiedDomainFo
       await domains.revalidate();
 
       onSuccess();
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [enrollmentMode], card.setError);
     }
   };

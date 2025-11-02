@@ -41,7 +41,7 @@ function useHandleAuthenticateWithPasskey(onSecondFactor: () => Promise<unknown>
         default:
           return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
       }
-    } catch (err) {
+    } catch (err: any) {
       const { flow } = args[0] || {};
 
       if (isClerkRuntimeError(err)) {

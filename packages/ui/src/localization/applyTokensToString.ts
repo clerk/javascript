@@ -73,7 +73,7 @@ const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens
     const value = modifiers.reduce((acc, mod) => {
       try {
         return MODIFIERS[mod.modifierName](acc, ...mod.params);
-      } catch (e) {
+      } catch (e: any) {
         console.warn(e);
         return '';
       }

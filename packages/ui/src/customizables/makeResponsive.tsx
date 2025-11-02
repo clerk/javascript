@@ -58,6 +58,10 @@ const generateSrc = ({ src, width }: { src?: string; width: number }) => {
     return src;
   }
 
+  if (typeof src !== 'string') {
+    return src;
+  }
+
   const newSrc = new URL(src);
   if (width) {
     newSrc.searchParams.append('width', width?.toString());

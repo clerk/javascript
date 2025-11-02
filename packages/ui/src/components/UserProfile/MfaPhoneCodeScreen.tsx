@@ -102,7 +102,7 @@ const EnableMFAButtonForPhone = (
       await setReservedForSecondFactor();
       resourceRef.current = phone;
       onSuccess();
-    } catch (err) {
+    } catch (err: any) {
       handleError(err, [], card.setError);
     } finally {
       card.setIdle();
@@ -141,7 +141,7 @@ export const MFAVerifyPhone = (props: MFAVerifyPhoneProps) => {
       await setReservedForSecondFactor();
       resourceRef.current = phone;
       onSuccess();
-    } catch (err) {
+    } catch (err: any) {
       handleError(err, [], card.setError);
     } finally {
       card.setIdle();

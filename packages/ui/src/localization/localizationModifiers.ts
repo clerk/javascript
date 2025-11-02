@@ -4,7 +4,7 @@ import { titleize } from '@clerk/shared/underscore';
 const timeString = (val: Date | string | number, locale?: string) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US', { timeStyle: 'short' }).format(normalizeDate(val));
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e);
     return '';
   }
@@ -13,7 +13,7 @@ const timeString = (val: Date | string | number, locale?: string) => {
 const weekday = (val: Date | string | number, locale?: string, weekday?: 'long' | 'short' | 'narrow' | undefined) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US', { weekday: weekday || 'long' }).format(normalizeDate(val));
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e);
     return '';
   }
@@ -31,7 +31,7 @@ const shortDate = (val: Date | string | number, locale?: string) => {
       day: 'numeric',
       ...(date.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}),
     }).format(normalizeDate(val));
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e);
     return '';
   }
@@ -47,7 +47,7 @@ const longDate = (val: Date | string | number, locale?: string) => {
       day: 'numeric',
       year: 'numeric',
     }).format(normalizeDate(val));
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e);
     return '';
   }
@@ -56,7 +56,7 @@ const longDate = (val: Date | string | number, locale?: string) => {
 const numeric = (val: Date | number | string, locale?: string) => {
   try {
     return new Intl.DateTimeFormat(locale || 'en-US').format(normalizeDate(val));
-  } catch (e) {
+  } catch (e: any) {
     console.warn(e);
     return '';
   }

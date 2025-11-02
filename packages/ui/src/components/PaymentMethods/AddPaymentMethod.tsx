@@ -210,7 +210,7 @@ const AddPaymentMethodForm = ({ children }: PropsWithChildren) => {
     }
     try {
       await onSuccess(data);
-    } catch (error) {
+    } catch (error: any) {
       void handleError(error, [], card.setError);
     } finally {
       card.setIdle();

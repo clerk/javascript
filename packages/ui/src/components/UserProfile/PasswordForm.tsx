@@ -124,7 +124,7 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
 
       await updatePasswordWithReverification(user, [opts]);
       onSuccess();
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
     }
   };

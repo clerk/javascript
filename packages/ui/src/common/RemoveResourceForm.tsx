@@ -25,7 +25,7 @@ export const RemoveResourceForm = withCardStateProvider((props: RemoveFormProps)
   const handleSubmit = async () => {
     try {
       await deleteWithReverification().then(onSuccess);
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [], card.setError);
     }
   };

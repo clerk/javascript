@@ -148,7 +148,7 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         await navigate(response.verification!.externalVerificationRedirectURL?.href || '');
       }
-    } catch (err) {
+    } catch (err: any) {
       handleError(err, [], card.setError);
     }
   };

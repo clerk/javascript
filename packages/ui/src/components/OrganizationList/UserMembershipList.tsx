@@ -1,7 +1,7 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/shared/types';
 
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { sharedMainIdentifierSx } from '@/ui/common/organizations/OrganizationPreview';
 import { localizationKeys, useLocalizations } from '@/ui/customizables';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -31,7 +31,7 @@ export const MembershipPreview = (props: { organization: OrganizationResource })
         });
 
         await navigateAfterSelectOrganization(organization);
-      } catch (err) {
+      } catch (err: any) {
         if (!isClerkAPIResponseError(err)) {
           handleError(err, [], card.setError);
           return;

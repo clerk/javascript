@@ -40,7 +40,7 @@ export const EmailLinkVerify = (props: EmailLinkVerifyProps) => {
         continuePath,
         navigate,
       });
-    } catch (err) {
+    } catch (err: any) {
       if (
         isEmailLinkError(err) &&
         (err.code === EmailLinkErrorCodeStatus.Expired || err.code === EmailLinkErrorCodeStatus.ClientMismatch)

@@ -142,7 +142,7 @@ const ActionConfirmationPage = withCardStateProvider((props: ActionConfirmationP
     }
     try {
       await onConfirmation().then(() => wizard.nextStep());
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [], card.setError);
     }
   };

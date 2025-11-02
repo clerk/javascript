@@ -126,7 +126,7 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
             await navigate(redirectUrlComplete);
           },
         });
-      } catch (err) {
+      } catch (err: any) {
         if (!isClerkAPIResponseError(err)) {
           handleError(err, [], card.setError);
           return;

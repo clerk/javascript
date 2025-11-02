@@ -210,7 +210,7 @@ const AddPasskeyButton = ({ onClick }: { onClick?: () => void }) => {
     }
     try {
       await createPasskey();
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [], card.setError);
     }
   };

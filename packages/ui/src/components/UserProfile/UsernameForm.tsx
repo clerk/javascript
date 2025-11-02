@@ -44,7 +44,7 @@ export const UsernameForm = withCardStateProvider((props: UsernameFormProps) => 
     try {
       await updateUsername(usernameField.value);
       onSuccess();
-    } catch (e) {
+    } catch (e: any) {
       handleError(e, [usernameField], card.setError);
     }
   };

@@ -92,7 +92,7 @@ const ResetPasswordInternal = () => {
         default:
           return console.error(clerkInvalidFAPIResponse(status, supportEmail));
       }
-    } catch (e) {
+    } catch (e: any) {
       return handleError(e, [passwordField, confirmField], card.setError);
     }
   };

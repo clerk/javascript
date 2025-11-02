@@ -26,7 +26,7 @@ function OneTapStartInternal(): JSX.Element | null {
         token: response.credential,
       });
       await clerk.handleGoogleOneTapCallback(res, ctx.generateCallbackUrls(window.location.href), navigate);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
     }
   }

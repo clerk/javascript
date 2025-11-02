@@ -403,7 +403,7 @@ function SignInStartInternal(): JSX.Element {
           return;
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       return attemptToRecoverFromSignInError(e);
     }
   };
