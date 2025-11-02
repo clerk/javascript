@@ -19,7 +19,13 @@ import {
   noUserExists,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import {
+  getTaskEndpoint,
+  navigateIfTaskExists,
+  warnMissingPendingTaskHandlers,
+} from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
@@ -133,7 +139,6 @@ import {
   removeClerkQueryParam,
   requiresUserInput,
   stripOrigin,
-  windowNavigate,
 } from '../utils';
 import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
@@ -159,11 +164,6 @@ import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
-import {
-  getTaskEndpoint,
-  navigateIfTaskExists,
-  warnMissingPendingTaskHandlers,
-} from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;

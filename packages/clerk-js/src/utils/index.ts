@@ -22,4 +22,4 @@ export * from './runtime';
 export * from './tokenId';
 export * from '@clerk/shared/internal/clerk-js/url';
 export * from './web3';
-export * from './windowNavigate';
+export * from '@clerk/shared/internal/clerk-js/windowNavigate';

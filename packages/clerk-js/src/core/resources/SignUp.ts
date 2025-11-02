@@ -1,5 +1,6 @@
 import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -54,7 +55,6 @@ import {
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
-  windowNavigate,
 } from '../../utils';
 import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
