@@ -13,7 +13,7 @@ export * from './image';
 export * from './instance';
 export * from './jwt';
 export * from './locale';
-export * from './organization';
+export * from '@clerk/shared/internal/clerk-js/organization';
 export * from './pageLifecycle';
 export * from '@clerk/shared/internal/clerk-js/path';
 export * from '@clerk/shared/internal/clerk-js/queryStateParams';

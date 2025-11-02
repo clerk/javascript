@@ -1,4 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
@@ -23,7 +24,6 @@ import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
-import { isOrganizationId } from '@/utils';
 
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
