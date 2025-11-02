@@ -92,7 +92,7 @@
     "@rspack/plugin-react-refresh": "^1.5.0",
     "@svgr/webpack": "^6.5.1",
     "@types/cloudflare-turnstile": "^0.2.2",
-    "@types/node": "^22.18.12",
+    "@types/node": "^22.18.13",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "jsdom": "26.1.0",
