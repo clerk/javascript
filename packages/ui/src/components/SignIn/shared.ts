@@ -1,5 +1,6 @@
 import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
+import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useClerk } from '@clerk/shared/react';
 import type { EnterpriseSSOFactor, SignInFirstFactor } from '@clerk/shared/types';
 import { useCallback, useEffect } from 'react';
@@ -7,7 +8,6 @@ import { useCallback, useEffect } from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 
