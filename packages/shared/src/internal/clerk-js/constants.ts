@@ -55,3 +55,6 @@ export const SIGN_UP_MODES = {
 
 // This is the currently supported version of the Frontend API
 export const SUPPORTED_FAPI_VERSION = '2025-04-10';
+
+export const CAPTCHA_ELEMENT_ID = 'clerk-captcha';
+export const CAPTCHA_INVISIBLE_CLASSNAME = 'clerk-invisible-captcha';
