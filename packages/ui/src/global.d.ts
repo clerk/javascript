@@ -4,16 +4,17 @@ declare module '*.svg' {
   export default value;
 }
 
-declare const __PKG_NAME__: string;
-declare const __PKG_VERSION__: string;
-declare const __DEV__: boolean;
-
-/**
- * Build time feature flags.
- */
-declare const __BUILD_DISABLE_RHC__: string;
-
 declare global {
+  declare const __PKG_NAME__: string;
+  declare const __PKG_VERSION__: string;
+  declare const __DEV__: boolean;
+
+  /**
+   * Build time feature flags.
+   */
+  declare const __BUILD_DISABLE_RHC__: string;
+
+  var __BUILD_DISABLE_RHC__: string;
   interface Window {
     Clerk?: Clerk & { __internal_last_error?: any };
   }
