@@ -7,7 +7,7 @@ import { useCallback, useEffect } from 'react';
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { __internal_WebAuthnAbortService } from '../../../utils/passkeys';
+import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 

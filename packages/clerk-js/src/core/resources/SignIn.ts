@@ -82,7 +82,7 @@ import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '../../utils/passkeys';
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
