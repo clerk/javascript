@@ -61,7 +61,6 @@
   "browserslist": "last 2 years",
   "dependencies": {
     "@base-org/account": "2.0.1",
-    "@clerk/localizations": "workspace:^",
     "@clerk/shared": "workspace:^",
     "@clerk/ui": "workspace:^",
     "@coinbase/wallet-sdk": "4.3.0",
