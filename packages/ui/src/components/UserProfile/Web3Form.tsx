@@ -1,3 +1,4 @@
+import { generateWeb3Signature, getWeb3Identifier } from '@clerk/shared/internal/clerk-js/web3';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
 
@@ -5,7 +6,6 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { getFieldError, handleError } from '@/ui/utils/errorHandler';
 
-import { generateWeb3Signature, getWeb3Identifier } from '../../../utils/web3';
 import { descriptors, Image, localizationKeys, Text } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 

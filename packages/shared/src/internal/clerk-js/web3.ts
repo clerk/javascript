@@ -1,6 +1,5 @@
+import { clerkUnsupportedEnvironmentWarning } from '@clerk/shared/internal/clerk-js/errors';
 import type { Web3Provider } from '@clerk/shared/types';
-
-import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
 
 import { toHex } from './hex';
 import { getInjectedWeb3Providers } from './injectedWeb3Providers';
