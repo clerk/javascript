@@ -10,9 +10,9 @@ import { InformationBox } from '@/ui/elements/InformationBox';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { isDefaultImage } from '../../../utils';
 import { useEnvironment } from '../../contexts';
 import { localizationKeys } from '../../customizables';
+import { isDefaultImage } from '../../utils/image';
 import { UserProfileAvatarUploader } from './UserProfileAvatarUploader';
 
 type ProfileFormProps = FormProps;

@@ -9,7 +9,6 @@ export * from './filterUndefinedValues';
 export * from '@clerk/shared/internal/clerk-js/queryParams';
 export * from './hex';
 export * from './ignoreEventValue';
-export * from './image';
 export * from './instance';
 export * from './jwt';
 export * from './locale';
