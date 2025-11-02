@@ -1,7 +1,7 @@
+import { buildEmailAddress } from '@clerk/shared/internal/clerk-js/email';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
-import { buildEmailAddress } from '../../utils';
 import { useEnvironment, useOptions } from '../contexts';
 
 export function useSupportEmail(): string {
