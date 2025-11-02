@@ -55,7 +55,7 @@
     "zod": "3.24.2"
   },
   "devDependencies": {
-    "@types/yargs": "^17.0.33"
+    "@types/yargs": "^17.0.34"
   },
   "peerDependencies": {
     "@langchain/core": "^0.3.6",
