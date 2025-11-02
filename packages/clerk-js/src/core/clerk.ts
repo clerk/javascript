@@ -9,6 +9,7 @@ import {
   isClerkAPIResponseError,
   isClerkRuntimeError,
 } from '@clerk/shared/error';
+import { assertNoLegacyProp } from '@clerk/shared/internal/clerk-js/assertNoLegacyProp';
 import {
   canViewOrManageAPIKeys,
   disabledAllBillingFeatures,
@@ -19,6 +20,7 @@ import {
   noUserExists,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
   navigateIfTaskExists,
@@ -140,10 +142,8 @@ import {
   requiresUserInput,
   stripOrigin,
 } from '../utils';
-import { assertNoLegacyProp } from '../utils/assertNoLegacyProp';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
-import { RedirectUrls } from '../utils/redirectUrls';
 import { AuthCookieService } from './auth/AuthCookieService';
 import { CaptchaHeartbeat } from './auth/CaptchaHeartbeat';
 import {

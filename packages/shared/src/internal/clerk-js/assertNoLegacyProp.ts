@@ -1,4 +1,4 @@
-import { logger } from '@clerk/shared/logger';
+import { logger } from '../../logger';
 
 export function assertNoLegacyProp(props: Record<string, any>) {
   const legacyProps = ['redirectUrl', 'afterSignInUrl', 'afterSignUpUrl', 'after_sign_in_url', 'after_sign_up_url'];

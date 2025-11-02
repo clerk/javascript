@@ -1,8 +1,8 @@
+import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import type { HandleOAuthCallbackParams } from '@clerk/shared/types';
 import { createContext, useCallback, useContext } from 'react';
 
-import { RedirectUrls } from '../../../utils/redirectUrls';
 import { useEnvironment, useOptions } from '../../contexts';
 import { useRouter } from '../../router';
 import type { GoogleOneTapCtx } from '../../types';
