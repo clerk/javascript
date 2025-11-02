@@ -1,4 +1,5 @@
-import { clerkErrorPathRouterMissingPath, PRESERVED_QUERYSTRING_PARAMS } from '@clerk/shared/internal/clerk-js';
+import { PRESERVED_QUERYSTRING_PARAMS } from '@clerk/shared/internal/clerk-js/constants';
+import { clerkErrorPathRouterMissingPath } from '@clerk/shared/internal/clerk-js/errors';
 import type { RoutingOptions } from '@clerk/shared/types';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';

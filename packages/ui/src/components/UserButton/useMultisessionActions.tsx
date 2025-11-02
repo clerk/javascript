@@ -1,12 +1,12 @@
 import { useClerk } from '@clerk/shared/react';
 import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
 
-import { navigateIfTaskExists } from '@/core/sessionTasks';
+import { navigateIfTaskExists } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { useEnvironment } from '@/ui/contexts';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
 
-import { windowNavigate } from '../../../utils/windowNavigate';
+import { windowNavigate } from '../../../utils';
 import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { useRouter } from '../../router';
 

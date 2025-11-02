@@ -1,7 +1,7 @@
-import { CLERK_MODAL_STATE } from '@clerk/shared/internal/clerk-js';
+import { CLERK_MODAL_STATE } from '@clerk/shared/internal/clerk-js/constants';
+import { removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { readStateParam } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import React from 'react';
-
-import { readStateParam, removeClerkQueryParam } from '../../utils';
 
 export const useClerkModalStateParams = () => {
   const [state, setState] = React.useState({ startPath: '', path: '', componentName: '', socialProvider: '' });

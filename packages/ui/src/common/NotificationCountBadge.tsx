@@ -1,4 +1,5 @@
-import { formatToCompactNumber } from '../../ui/utils/intl';
+import { formatToCompactNumber } from '@/utils/intl';
+
 import { Flex, localizationKeys, NotificationBadge, useLocalizations } from '../customizables';
 import { usePrefersReducedMotion } from '../hooks';
 import type { PropsOfComponent, ThemableCssProp } from '../styledSystem';

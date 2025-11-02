@@ -1,7 +1,6 @@
 import type { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '@clerk/shared/internal/clerk-js/constants';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
-
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '../core/constants';
 
 const _ClerkQueryParams = [
   '__clerk_status',
@@ -34,11 +33,17 @@ type ClerkQueryParamsToValuesMap = {
   __clerk_status: TicketStatus | VerifyTokenStatus;
 } & Record<(typeof _ClerkQueryParams)[number], string>;
 
+/**
+ *
+ */
 export function getClerkQueryParam<T extends ClerkQueryParam>(param: T): ClerkQueryParamsToValuesMap[T] | null {
   const val = new URL(window.location.href).searchParams.get(param);
   return val ? (val as ClerkQueryParamsToValuesMap[T]) : null;
 }
 
+/**
+ *
+ */
 export function removeClerkQueryParam<T extends ClerkQueryParam>(param: T) {
   const url = new URL(window.location.href);
   if (url.searchParams.has(param)) {

@@ -1,4 +1,5 @@
-import { runIfFunctionOrReturn } from '../../../utils';
+import { runIfFunctionOrReturn } from '@clerk/shared/utils';
+
 import { AlertIcon, Flex, Link, Text } from '../../customizables';
 import { useRouter } from '../../router';
 

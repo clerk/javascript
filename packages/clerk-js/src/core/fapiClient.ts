@@ -1,16 +1,12 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
+import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { retry } from '@clerk/shared/retry';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/shared/types';
 import { camelToSnake } from '@clerk/shared/underscore';
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  buildEmailAddress as buildEmailAddressUtil,
-  buildURL as buildUrlUtil,
-  filterUndefinedValues,
-  stringifyQueryParams,
-} from '../utils';
+import { buildEmailAddress as buildEmailAddressUtil, buildURL as buildUrlUtil, filterUndefinedValues } from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 

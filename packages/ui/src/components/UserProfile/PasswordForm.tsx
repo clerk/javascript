@@ -35,6 +35,7 @@ const generateSuccessPageText = (userHasPassword: boolean, sessionSignOut: boole
 
 type PasswordFormProps = FormProps;
 export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => {
+  const { t, locale } = useLocalizations();
   const { onSuccess, onReset } = props;
   const { user } = useUser();
   const updatePasswordWithReverification = useReverification(
@@ -94,8 +95,6 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
     passwordField,
     confirmPasswordField: confirmField,
   });
-
-  const { t, locale } = useLocalizations();
 
   const canSubmit =
     (currentPasswordRequired ? currentPasswordField.value && isPasswordMatch : isPasswordMatch) &&

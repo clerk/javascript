@@ -1,7 +1,7 @@
+import { isAllowedRedirect } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
-import { isAllowedRedirect } from '../../../utils';
 import type { CheckoutCtx } from '../../types';
 import { useOptions } from '../OptionsContext';
 

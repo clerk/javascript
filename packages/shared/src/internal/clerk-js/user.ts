@@ -1,3 +1,5 @@
+import type { UserResource } from '@clerk/shared/types';
+
 type NameHelperParams = {
   firstName?: string | null;
   lastName?: string | null;
@@ -9,8 +11,6 @@ export const getFullName = ({ firstName, lastName, name }: NameHelperParams) =>
 
 export const getInitials = ({ firstName, lastName, name }: NameHelperParams) =>
   [(firstName || '')[0], (lastName || '')[0]].join('').trim() || (name || '')[0];
-
-import type { UserResource } from '@clerk/shared/types';
 
 export const getIdentifier = (user: Partial<UserResource>): string => {
   if (user.username) {

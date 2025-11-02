@@ -1,4 +1,4 @@
-import { clerkUIErrorDOMElementNotFound } from '@clerk/shared/internal/clerk-js';
+import { clerkUIErrorDOMElementNotFound } from '@clerk/shared/internal/clerk-js/errors';
 import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,

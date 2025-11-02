@@ -1,3 +1,4 @@
+import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SignedInSessionResource } from '@clerk/shared/types';
 import type { PointerEventHandler } from 'react';
@@ -21,7 +22,6 @@ import { useMultipleSessions } from '../../hooks/useMultipleSessions';
 import { Eye } from '../../icons';
 import type { PropsOfComponent } from '../../styledSystem';
 import { InternalThemeProvider, mqu } from '../../styledSystem';
-import { getFullName, getIdentifier } from '../../utils/user';
 
 type EyeCircleProps = PropsOfComponent<typeof Col> & {
   width: string;

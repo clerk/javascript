@@ -1,8 +1,8 @@
+import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 
-import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '../../utils';
 import { BaseRouter } from './BaseRouter';
 
 interface PathRouterProps {

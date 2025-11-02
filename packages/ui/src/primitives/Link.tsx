@@ -1,6 +1,6 @@
+import { sanitizeHref } from '@clerk/shared/internal/clerk-js/url';
 import React from 'react';
 
-import { sanitizeHref } from '../../utils/url';
 import type { PrimitiveProps, StyleVariants } from '../styledSystem';
 import { common, createVariants } from '../styledSystem';
 import { applyDataStateProps } from './applyDataStateProps';

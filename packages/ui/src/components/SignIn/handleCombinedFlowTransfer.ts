@@ -1,3 +1,4 @@
+import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   LoadedClerk,
   PhoneCodeChannel,
@@ -7,7 +8,6 @@ import type {
   SignUpResource,
 } from '@clerk/shared/types';
 
-import { SIGN_UP_MODES } from '../../../core/constants';
 import type { RouteContextValue } from '../../router/RouteContext';
 import { lazyCompleteSignUpFlow } from './lazy-sign-up';
 

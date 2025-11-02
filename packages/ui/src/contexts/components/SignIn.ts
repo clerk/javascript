@@ -1,12 +1,12 @@
+import { SIGN_IN_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
 import { createContext, useContext, useMemo } from 'react';
 
-import { getTaskEndpoint } from '@/core/sessionTasks';
+import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 
-import { SIGN_IN_INITIAL_VALUE_KEYS } from '../../../core/constants';
-import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
 import { buildRedirectUrl, MAGIC_LINK_VERIFY_PATH_ROUTE, SSO_CALLBACK_PATH_ROUTE } from '../../common/redirects';
 import { useEnvironment, useOptions } from '../../contexts';

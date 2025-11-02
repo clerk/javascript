@@ -1,5 +1,6 @@
 import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/shared/types';
+import { runIfFunctionOrReturn } from '@clerk/shared/utils';
 import React from 'react';
 
 import { Actions, SmallAction } from '@/ui/elements/Actions';
@@ -8,7 +9,6 @@ import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { PersonalWorkspacePreview } from '@/ui/elements/PersonalWorkspacePreview';
 import { PopoverCard } from '@/ui/elements/PopoverCard';
 
-import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';

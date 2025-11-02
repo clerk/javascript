@@ -1,11 +1,11 @@
 import type { SignedInSessionResource } from '@clerk/shared/types';
 
+import type { ElementDescriptor, ElementId } from '@/customizables/elementDescriptors';
+import { useRouter } from '@/router';
 import { Action, Actions, SmallAction, SmallActions } from '@/ui/elements/Actions';
 import { PreviewButton } from '@/ui/elements/PreviewButton';
 import { UserPreview } from '@/ui/elements/UserPreview';
 
-import type { ElementDescriptor, ElementId } from '../../../ui/customizables/elementDescriptors';
-import { useRouter } from '../../../ui/router';
 import { USER_BUTTON_ITEM_ID } from '../../constants';
 import { useUserButtonContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';

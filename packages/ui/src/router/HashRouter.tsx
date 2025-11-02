@@ -1,6 +1,6 @@
+import { hasUrlInFragment, stripOrigin } from '@clerk/shared/internal/clerk-js/url';
 import React from 'react';
 
-import { hasUrlInFragment, stripOrigin } from '../../utils';
 import { BaseRouter } from './BaseRouter';
 
 export const hashRouterBase = 'CLERK-ROUTER/HASH';

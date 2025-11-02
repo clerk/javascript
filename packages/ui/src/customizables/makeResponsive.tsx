@@ -1,6 +1,5 @@
+import { isDataUri, isValidUrl } from '@clerk/shared/internal/clerk-js/url';
 import React from 'react';
-
-import { isDataUri, isValidUrl } from '../../utils';
 
 type Responsive<T = Record<never, never>> = T & {
   size?: number;

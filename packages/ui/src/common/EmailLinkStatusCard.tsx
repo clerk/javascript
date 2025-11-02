@@ -1,6 +1,6 @@
+import type { VerifyTokenStatus } from '@clerk/shared/internal/clerk-js/queryParams';
 import React from 'react';
 
-import type { VerifyTokenStatus } from '../../utils/getClerkQueryParam';
 import type { LocalizationKey } from '../customizables';
 import { Col, descriptors, Flex, Flow, Icon, localizationKeys, Spinner, Text } from '../customizables';
 import { Card } from '../elements/Card';

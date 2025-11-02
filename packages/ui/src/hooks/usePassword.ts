@@ -1,11 +1,12 @@
+import type { UsePasswordCbs, UsePasswordConfig } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import type { PasswordValidation } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 import { useCallback, useMemo } from 'react';
 
-import type { UsePasswordCbs, UsePasswordConfig } from '../../utils/passwords/password';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { localizationKeys, useLocalizations } from '../localization';
 import type { FormControlState } from '../utils/useFormControl';
+import { loadZxcvbn } from '../utils/zxcvbn';
 import { generateErrorTextUtil } from './usePasswordComplexity';
 
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
@@ -63,11 +64,11 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
   );
 
   const validatePassword = useMemo(() => {
-    return createValidatePassword(config, {
+    return createValidatePassword(loadZxcvbn, config, {
       onValidation: onValidate,
       onValidationComplexity,
     });
-  }, [onValidate]);
+  }, [onValidate, config]);
 
   return {
     validatePassword,

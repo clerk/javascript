@@ -1,4 +1,5 @@
 import { isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
+import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
@@ -10,7 +11,6 @@ import { IdentityPreview } from '@/ui/elements/IdentityPreview';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';

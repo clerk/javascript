@@ -1,4 +1,5 @@
 import { isUserLockedError } from '@clerk/shared/error';
+import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeFactor, SignInFactor } from '@clerk/shared/types';
 
@@ -7,7 +8,6 @@ import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCa
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { type LocalizationKey, localizationKeys } from '../../localization';

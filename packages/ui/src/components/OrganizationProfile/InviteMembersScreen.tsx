@@ -1,11 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
+import { runIfFunctionOrReturn } from '@clerk/shared/utils';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { IconCircle } from '@/ui/elements/IconCircle';
 import { SuccessPage } from '@/ui/elements/SuccessPage';
 
-import { runIfFunctionOrReturn } from '../../../utils';
 import { useWizard, Wizard } from '../../common';
 import { useOrganizationProfileContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
@@ -26,7 +26,7 @@ export const InviteMembersScreen = withCardStateProvider((props: InviteMembersSc
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const { organization } = useOrganization();
-  //@ts-expect-error
+  // @ts-expect-error - __unstable_manageBillingUrl and __unstable_manageBillingMembersLimit are unstable props
   const { __unstable_manageBillingUrl, __unstable_manageBillingMembersLimit } = useOrganizationProfileContext();
 
   if (!organization) {

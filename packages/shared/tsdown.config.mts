@@ -42,6 +42,7 @@ export default defineConfig(({ watch }) => {
         './src/types/index.ts',
         './src/dom/*.ts',
         './src/internal/clerk-js/*.ts',
+        './src/internal/clerk-js/**/*.ts',
         '!./src/**/*.{test,spec}.{ts,tsx}',
       ],
       outDir: './dist/runtime',

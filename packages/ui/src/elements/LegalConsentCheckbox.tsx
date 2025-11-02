@@ -1,4 +1,5 @@
-import { useEnvironment } from '../../ui/contexts';
+import { useEnvironment } from '@/contexts';
+
 import type { LocalizationKey } from '../customizables';
 import {
   descriptors,

@@ -1,4 +1,4 @@
-import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js';
+import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import type { ClerkAPIError } from '@clerk/shared/types';
 import type { ChangeEvent } from 'react';
 import React, { forwardRef, useRef, useState } from 'react';

@@ -1,4 +1,5 @@
-import { buildURL } from '../../utils/url';
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
+
 import type { SignInContextType, SignUpContextType, UserProfileContextType } from './../contexts';
 
 export const SSO_CALLBACK_PATH_ROUTE = '/sso-callback';

@@ -1,3 +1,4 @@
+import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { OAuthProvider, OAuthStrategy } from '@clerk/shared/types';
 
@@ -6,7 +7,6 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { handleError } from '@/ui/utils/errorHandler';
 import { sleep } from '@/ui/utils/sleep';
 
-import { appendModalState } from '../../../utils';
 import { ProviderInitialIcon } from '../../common';
 import { useUserProfileContext } from '../../contexts';
 import { descriptors, Image, localizationKeys } from '../../customizables';

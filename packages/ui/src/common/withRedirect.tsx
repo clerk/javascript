@@ -1,5 +1,6 @@
-import type { ComponentGuard } from '@clerk/shared/internal/clerk-js';
-import { isSignedInAndSingleSessionModeEnabled, warnings } from '@clerk/shared/internal/clerk-js';
+import type { ComponentGuard } from '@clerk/shared/internal/clerk-js/componentGuards';
+import { isSignedInAndSingleSessionModeEnabled } from '@clerk/shared/internal/clerk-js/componentGuards';
+import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import { useClerk } from '@clerk/shared/react';
 import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/shared/types';

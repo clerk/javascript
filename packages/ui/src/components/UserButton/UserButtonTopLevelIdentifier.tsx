@@ -1,6 +1,6 @@
+import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
 
-import { getFullName, getIdentifier } from '../../../utils/user';
 import { descriptors, Text } from '../../customizables';
 
 type UserButtonTopLevelIdentifierProps = {

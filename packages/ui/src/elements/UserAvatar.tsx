@@ -1,6 +1,6 @@
+import { getFullName, getInitials } from '@clerk/shared/internal/clerk-js/user';
 import type { UserResource } from '@clerk/shared/types';
 
-import { getFullName, getInitials } from '../../utils/user';
 import type { PropsOfComponent } from '../styledSystem';
 import { Avatar } from './Avatar';
 

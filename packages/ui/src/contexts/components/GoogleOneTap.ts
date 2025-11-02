@@ -1,7 +1,7 @@
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import type { HandleOAuthCallbackParams } from '@clerk/shared/types';
 import { createContext, useCallback, useContext } from 'react';
 
-import { buildURL } from '../../../utils';
 import { RedirectUrls } from '../../../utils/redirectUrls';
 import { useEnvironment, useOptions } from '../../contexts';
 import { useRouter } from '../../router';

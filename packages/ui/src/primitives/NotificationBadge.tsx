@@ -38,7 +38,7 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   },
 }));
 
-// @ts-ignore
+// @ts-ignore noop
 export type NotificationBadgeProps = PropsOfComponent<typeof Flex> & StyleVariants<typeof applyVariants>;
 
 export const NotificationBadge = (props: NotificationBadgeProps) => {

@@ -1,3 +1,4 @@
+import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -8,7 +9,6 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { Col, descriptors, localizationKeys, useLocalizations } from '../../customizables';
 import { useConfirmPassword } from '../../hooks';

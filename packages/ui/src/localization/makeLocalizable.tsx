@@ -103,7 +103,7 @@ export const useLocalizations = () => {
     );
   };
 
-  return { t, translateError, locale: localization?.locale || defaultResource?.locale };
+  return { t, translateError, locale: localization?.locale || (defaultResource.locale as string) };
 };
 
 const localizationKeyAttribute = (localizationKey: LocalizationKey) => {

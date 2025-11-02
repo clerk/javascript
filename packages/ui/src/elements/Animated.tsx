@@ -1,7 +1,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { cloneElement, type PropsWithChildren } from 'react';
 
-import { useAppearance } from '../../ui/customizables';
+import { useAppearance } from '@/customizables';
 
 type AnimatedProps = PropsWithChildren<{ asChild?: boolean }>;
 

@@ -1,4 +1,7 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
+import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type {
   ClerkAPIError,
@@ -21,9 +24,6 @@ import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
-import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
-import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils';
 import type { SignInStartIdentifier } from '../../common';
 import {
   buildSSOCallbackURL,

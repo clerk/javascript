@@ -72,9 +72,9 @@ interface BuildURLOptions<T> {
  * References:
  * https://developer.mozilla.org/en-US/docs/Web/API/URL
  *
- * @param {BuildURLParams} params
- * @param {BuildURLOptions} options
- * @returns {URL | string} Returns the URL href
+ * @param params
+ * @param options
+ * @returns Returns the URL href
  */
 export function buildURL<B extends boolean>(
   params: BuildURLParams,
@@ -170,8 +170,8 @@ export function toURL(url: string | URL): URL {
  * References:
  * https://developer.mozilla.org/en-US/docs/Web/API/URL
  *
- * @param {URL | string} url
- * @returns {string} Returns the URL href without the origin
+ * @param url
+ * @returns Returns the URL href without the origin
  */
 export function stripOrigin(url: URL | string): string {
   // In non-browser environments `window.location.origin` might not be available
@@ -190,7 +190,8 @@ export function stripOrigin(url: URL | string): string {
  *
  * Strips the trailing slashes from a string
  *
- * @returns {string} Returns the string without trailing slashes
+ * @returns Returns the string without trailing slashes
+ *
  * @param path
  */
 export const trimTrailingSlash = (path: string): string => {
@@ -202,7 +203,8 @@ export const trimTrailingSlash = (path: string): string => {
  *
  * Strips the leading slashes from a string
  *
- * @returns {string} Returns the string without leading slashes
+ * @returns Returns the string without leading slashes
+ *
  * @param path
  */
 export const trimLeadingSlash = (path: string): string => {
@@ -226,7 +228,7 @@ export function getSearchParameterFromHash({
   return dummyUrlForHash.searchParams.get(paramName);
 }
 
-export function isValidUrl(val: unknown): val is string {
+export function isValidUrl(val: unknown) {
   if (!val) {
     return false;
   }

@@ -1,1 +1,1 @@
-export * from '../../../utils/completeSignUpFlow';
+export { completeSignUpFlow } from '../../../utils';

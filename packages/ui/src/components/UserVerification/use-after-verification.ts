@@ -1,8 +1,8 @@
+import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
 import type { SessionVerificationResource } from '@clerk/shared/types';
 import { useCallback } from 'react';
 
-import { clerkInvalidFAPIResponse } from '../../../core/errors';
 import { useUserVerification } from '../../contexts';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useRouter } from '../../router';

@@ -1,3 +1,4 @@
+import { forwardClerkQueryParams } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/shared/types';
 import React from 'react';
@@ -5,7 +6,6 @@ import React from 'react';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 
-import { forwardClerkQueryParams } from '../../../utils/getClerkQueryParam';
 import { SignInContext, useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { useRouter } from '../../router';

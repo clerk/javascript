@@ -1,8 +1,9 @@
+import { getQueryParams, stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
+import { trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 
-import { getQueryParams, stringifyQueryParams, trimTrailingSlash } from '../../utils';
 import { useWindowEventListener } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';

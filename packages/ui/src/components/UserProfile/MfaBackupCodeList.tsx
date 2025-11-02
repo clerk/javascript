@@ -1,6 +1,6 @@
+import { getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
 
-import { getIdentifier } from '../../../utils/user';
 import { PrintableComponent, usePrintable } from '../../common';
 import { useEnvironment } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';

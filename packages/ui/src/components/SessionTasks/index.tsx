@@ -1,3 +1,4 @@
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
 import type { SessionResource } from '@clerk/shared/types';
@@ -8,7 +9,6 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
-import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import {
   SessionTasksContext,
   TaskChooseOrganizationContext,

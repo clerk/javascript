@@ -1,4 +1,4 @@
-import { warnings } from '@clerk/shared/internal/clerk-js';
+import { warnings } from '@clerk/shared/internal/clerk-js/warnings';
 import type { ComponentType } from 'react';
 
 import { withRedirect } from '@/ui/common';

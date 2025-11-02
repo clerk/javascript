@@ -3,4 +3,4 @@
  * The constants have been moved to @clerk/shared/internal/clerk-js/constants
  * to make them available across all Clerk packages.
  */
-export * from '@clerk/shared/internal/clerk-js';
+export * from '@clerk/shared/internal/clerk-js/constants';

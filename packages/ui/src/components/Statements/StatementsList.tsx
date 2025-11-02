@@ -1,9 +1,9 @@
 import type { BillingStatementResource } from '@clerk/shared/types';
 
+import { useStatements, useSubscriberTypeLocalizationRoot } from '@/contexts';
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { useStatements, useSubscriberTypeLocalizationRoot } from '../../../ui/contexts';
 import { localizationKeys, Td, Text } from '../../customizables';
 import { useRouter } from '../../router';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';

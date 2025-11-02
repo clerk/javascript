@@ -1,7 +1,7 @@
+import { getFullName, getIdentifier } from '@clerk/shared/internal/clerk-js/user';
 import type { ExternalAccountResource, SamlAccountResource, UserPreviewId, UserResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { getFullName, getIdentifier } from '../../utils/user';
 import type { LocalizationKey } from '../customizables';
 import { descriptors, Flex, Text, useLocalizations } from '../customizables';
 import type { InternalTheme, PropsOfComponent, ThemableCssProp } from '../styledSystem';

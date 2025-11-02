@@ -1,8 +1,8 @@
 import { useOrganization } from '@clerk/shared/react';
+import { runIfFunctionOrReturn } from '@clerk/shared/utils';
 
 import { Gauge } from '@/ui/elements/Gauge';
 
-import { runIfFunctionOrReturn } from '../../../utils';
 import { useOrganizationProfileContext } from '../../contexts';
 import { Flex, Icon, Link, Text } from '../../customizables';
 import { ArrowRightIcon } from '../../icons';

@@ -1,12 +1,12 @@
+import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import type { EmailAddressResource } from '@clerk/shared/types';
 import React from 'react';
 
+import { useRouter } from '@/router';
 import { useCardState } from '@/ui/elements/contexts';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useRouter } from '../../../ui/router';
-import { appendModalState } from '../../../utils';
 import { useUserProfileContext } from '../../contexts';
 import { Button, descriptors, Flex, localizationKeys } from '../../customizables';
 import { useEnterpriseSSOLink } from '../../hooks';

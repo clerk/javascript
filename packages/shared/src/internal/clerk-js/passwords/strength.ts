@@ -1,6 +1,6 @@
 import type { PasswordSettingsData, ZxcvbnResult } from '@clerk/shared/types';
 
-import type { zxcvbnFN } from '../zxcvbn';
+type zxcvbnFN = (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
 
 type PasswordStrength =
   | {

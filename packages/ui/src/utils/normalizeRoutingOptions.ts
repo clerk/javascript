@@ -1,6 +1,5 @@
+import { clerkInvalidRoutingStrategy } from '@clerk/shared/internal/clerk-js/errors';
 import type { RoutingOptions, RoutingStrategy } from '@clerk/shared/types';
-
-import { clerkInvalidRoutingStrategy } from '../core/errors';
 
 export const normalizeRoutingOptions = ({
   routing,

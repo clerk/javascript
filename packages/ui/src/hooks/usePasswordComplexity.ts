@@ -1,7 +1,10 @@
+import type {
+  ComplexityErrors,
+  UsePasswordComplexityConfig,
+} from '@clerk/shared/internal/clerk-js/passwords/complexity';
+import { validate } from '@clerk/shared/internal/clerk-js/passwords/complexity';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { ComplexityErrors, UsePasswordComplexityConfig } from '../../utils/passwords/complexity';
-import { validate } from '../../utils/passwords/complexity';
 import type { LocalizationKey } from '../localization';
 import { localizationKeys, useLocalizations } from '../localization';
 import { addFullStop, createListFormat } from '../utils/passwordUtils';
@@ -77,7 +80,7 @@ export const usePasswordComplexity = (config: UsePasswordComplexityConfig) => {
       return generateErrorTextUtil({
         config,
         t,
-        locale,
+        locale: locale || 'en',
         failedValidations,
       });
     },

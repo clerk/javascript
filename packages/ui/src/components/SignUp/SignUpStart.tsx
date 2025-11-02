@@ -1,9 +1,11 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
+import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { isClerkAPIResponseError } from '@/index.headless';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
@@ -15,8 +17,6 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { createUsernameError } from '@/ui/utils/usernameUtils';
 
-import { ERROR_CODES, SIGN_UP_MODES } from '../../../core/constants';
-import { getClerkQueryParam, removeClerkQueryParam } from '../../../utils/getClerkQueryParam';
 import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';

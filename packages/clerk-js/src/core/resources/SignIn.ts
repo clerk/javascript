@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -82,8 +83,8 @@ import {
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
 } from '../../utils/passkeys';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -513,7 +514,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
+      return createValidatePassword(loadZxcvbn, {
         ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);

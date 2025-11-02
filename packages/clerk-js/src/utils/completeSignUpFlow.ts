@@ -1,6 +1,5 @@
+import { forwardClerkQueryParams } from '@clerk/shared/internal/clerk-js/queryParams';
 import type { SignUpResource } from '@clerk/shared/types';
-
-import { forwardClerkQueryParams } from './getClerkQueryParam';
 
 type CompleteSignUpFlowProps = {
   signUp: SignUpResource;

@@ -1,4 +1,5 @@
 import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -57,9 +58,9 @@ import {
 } from '../../utils';
 import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -463,7 +464,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
+      return createValidatePassword(loadZxcvbn, {
         ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);

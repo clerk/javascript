@@ -1,3 +1,4 @@
+import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -34,7 +35,6 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
-import { getFullName } from '../../utils/user';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
 import { BackupCode } from './BackupCode';

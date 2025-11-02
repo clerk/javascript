@@ -1,8 +1,8 @@
+import { pathFromFullPath, trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { LoadedClerk } from '@clerk/shared/types';
 import React from 'react';
 
-import { pathFromFullPath, trimTrailingSlash } from '../../utils';
 import { useNavigateToFlowStart } from '../hooks';
 import { newPaths } from './newPaths';
 import { match } from './pathToRegexp';

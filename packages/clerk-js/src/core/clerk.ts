@@ -159,7 +159,11 @@ import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
-import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
+import {
+  getTaskEndpoint,
+  navigateIfTaskExists,
+  warnMissingPendingTaskHandlers,
+} from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;

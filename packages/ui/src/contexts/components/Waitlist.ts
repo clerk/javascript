@@ -1,6 +1,6 @@
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { createContext, useContext, useMemo } from 'react';
 
-import { buildURL } from '../../../utils';
 import { useEnvironment, useOptions } from '../../contexts';
 import { useRouter } from '../../router';
 import type { WaitlistCtx } from '../../types';

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Clerk } from '../../../core/clerk';
+import type { Clerk } from '@clerk/shared/types';
 import { PathRouter, Route, useRouter } from '..';
 
 const mockNavigate = vi.fn();

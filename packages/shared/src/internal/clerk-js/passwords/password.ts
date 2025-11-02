@@ -1,9 +1,15 @@
-import type { PasswordSettingsData, PasswordValidation, ValidatePasswordCallbacks } from '@clerk/shared/types';
+import type {
+  PasswordSettingsData,
+  PasswordValidation,
+  ValidatePasswordCallbacks,
+  ZxcvbnResult,
+} from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 
-import { loadZxcvbn } from '../zxcvbn';
 import { createValidateComplexity } from './complexity';
 import { createValidatePasswordStrength } from './strength';
+
+type zxcvbnFN = (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
 
 export type UsePasswordConfig = PasswordSettingsData & {
   validatePassword: boolean;
@@ -17,7 +23,11 @@ export type UsePasswordCbs = {
   onValidationComplexity?: (b: boolean) => void;
 };
 
-export const createValidatePassword = (config: UsePasswordConfig, callbacks?: ValidatePasswordCallbacks) => {
+export const createValidatePassword = (
+  loadZxcvbn: () => Promise<zxcvbnFN>,
+  config: UsePasswordConfig,
+  callbacks?: ValidatePasswordCallbacks,
+) => {
   const { onValidation = noop, onValidationComplexity = noop } = callbacks || {};
   const { show_zxcvbn, validatePassword: validatePasswordProp } = config;
   const getComplexity = createValidateComplexity(config);
