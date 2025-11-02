@@ -17,6 +17,10 @@ export const faIR: LocalizationResource = {
   apiKeys: {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "ایجاد شده {{ createdDate | shortDate('en-US') }} • منقضی می‌شود {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "ایجاد شده {{ createdDate | shortDate('en-US') }} • هرگز منقضی نمی‌شود",
@@ -46,10 +50,6 @@ export const faIR: LocalizationResource = {
       formButtonPrimary__revoke: 'لغو کلید',
       formHint: 'آیا مطمئن هستید که می‌خواهید این کلید محرمانه را حذف کنید؟',
       formTitle: 'کلید محرمانه "{{apiKeyName}}" لغو شود؟',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'بازگشت',

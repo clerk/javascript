@@ -17,6 +17,10 @@ export const frFR: LocalizationResource = {
   apiKeys: {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Créée le {{ createdDate | shortDate('fr-FR') }} • Expire le {{ expiresDate | longDate('fr-FR') }}",
     createdAndExpirationStatus__never: "Créée le {{ createdDate | shortDate('fr-FR') }} • N’expire jamais",
@@ -46,10 +50,6 @@ export const frFR: LocalizationResource = {
       formButtonPrimary__revoke: 'Révoquer la clé',
       formHint: 'Êtes-vous sûr de vouloir supprimer cette clé secrète ?',
       formTitle: 'Révoquer la clé secrète « {{apiKeyName}} » ?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Retour',

@@ -17,6 +17,10 @@ export const itIT: LocalizationResource = {
   apiKeys: {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
     createdAndExpirationStatus__never: "Creata {{ createdDate | shortDate('it-IT') }} • Nessuna scadenza",
@@ -46,10 +50,6 @@ export const itIT: LocalizationResource = {
       formButtonPrimary__revoke: 'Revoca chiave',
       formHint: 'Sei sicuro di voler eliminare questa Chiave Segreta?',
       formTitle: 'Revoca "{{apiKeyName}}" chiave segreta?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Indietro',

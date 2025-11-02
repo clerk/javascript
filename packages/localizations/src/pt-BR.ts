@@ -17,6 +17,10 @@ export const ptBR: LocalizationResource = {
   apiKeys: {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Criada {{ createdDate | shortDate('pt-BR') }} • Expira {{ expiresDate | longDate('pt-BR') }}",
     createdAndExpirationStatus__never: "Criada {{ createdDate | shortDate('pt-BR') }} • Nunca expira",
@@ -46,10 +50,6 @@ export const ptBR: LocalizationResource = {
       formButtonPrimary__revoke: 'Revogar chave',
       formHint: 'Tem certeza de que deseja excluir esta chave de API?',
       formTitle: 'Revogar chave de API "{{apiKeyName}}"?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Voltar',

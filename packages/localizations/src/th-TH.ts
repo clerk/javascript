@@ -17,6 +17,10 @@ export const thTH: LocalizationResource = {
   apiKeys: {
     action__add: 'เพิ่มคีย์ใหม่',
     action__search: 'ค้นหาคีย์',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • หมดอายุ {{ expiresDate | longDate('th-TH') }}",
     createdAndExpirationStatus__never: "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • ไม่มีวันหมดอายุ",
@@ -46,10 +50,6 @@ export const thTH: LocalizationResource = {
       formButtonPrimary__revoke: 'เพิกถอนคีย์',
       formHint: 'คุณแน่ใจหรือไม่ว่าต้องการลบคีย์ลับนี้?',
       formTitle: 'เพิกถอนคีย์ลับ "{{apiKeyName}}"?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'ย้อนกลับ',

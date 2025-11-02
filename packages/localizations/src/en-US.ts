@@ -5,6 +5,10 @@ export const enUS: LocalizationResource = {
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    copyAlert: {
+      subtitle: "For security reasons, we won't allow you to view it again later.",
+      title: 'Copy your "{{name}}" API Key now',
+    },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
@@ -34,10 +38,6 @@ export const enUS: LocalizationResource = {
       formButtonPrimary__revoke: 'Revoke key',
       formHint: 'Are you sure you want to delete this Secret key?',
       formTitle: 'Revoke "{{apiKeyName}}" secret key?',
-    },
-    saveAlert: {
-      subtitle: "For security reasons, we won't allow you to view it again later.",
-      title: 'Save your "{{name}}" API Key now',
     },
   },
   backButton: 'Back',

@@ -17,6 +17,10 @@ export const roRO: LocalizationResource = {
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",
     createdAndExpirationStatus__never: "Creată {{ createdDate | shortDate('ro-RO') }} • Nu expiră niciodată",
@@ -46,10 +50,6 @@ export const roRO: LocalizationResource = {
       formButtonPrimary__revoke: 'Revocă cheia',
       formHint: 'Sigur vrei să ștergi această cheie Secret?',
       formTitle: 'Revoci cheia secretă „{{apiKeyName}}”?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Înapoi',

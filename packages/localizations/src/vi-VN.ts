@@ -17,6 +17,10 @@ export const viVN: LocalizationResource = {
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
@@ -46,10 +50,6 @@ export const viVN: LocalizationResource = {
       formButtonPrimary__revoke: 'Hủy khoá',
       formHint: 'Bạn có chắc chắn muốn xóa khoá này không?',
       formTitle: 'Hủy khoá "{{apiKeyName}}" không?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Quay lại',

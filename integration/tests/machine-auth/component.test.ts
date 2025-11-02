@@ -97,7 +97,7 @@ testAgainstRunningApps({
     await expect(table.locator('.cl-tableRow', { hasText: apiKeyName })).toHaveCount(0);
   });
 
-  test('can copy api key secret', async ({ page, context }) => {
+  test('can copy api key secret after creation', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
@@ -109,71 +109,33 @@ testAgainstRunningApps({
 
     const apiKeyName = `${fakeAdmin.firstName}-${Date.now()}`;
 
+    // Wait for create API response to get the secret
+    const createResponsePromise = page.waitForResponse(
+      response => response.url().includes('/api_keys') && response.request().method() === 'POST',
+    );
+
     // Create API key
     await u.po.apiKeys.clickAddButton();
     await u.po.apiKeys.waitForFormOpened();
     await u.po.apiKeys.typeName(apiKeyName);
     await u.po.apiKeys.selectExpiration('1d');
     await u.po.apiKeys.clickSaveButton();
-    await u.po.apiKeys.waitForFormClosed();
 
-    const responsePromise = page.waitForResponse(
-      response => response.url().includes('/secret') && response.request().method() === 'GET',
-    );
+    // Get the secret from the create response
+    const createResponse = await createResponsePromise;
+    const apiKeyData = await createResponse.json();
+    const secret = apiKeyData.secret;
 
-    // Copy API key
-    const table = u.page.locator('.cl-apiKeysTable');
-    const row = table.locator('.cl-tableRow', { hasText: apiKeyName });
-    await row.waitFor({ state: 'attached' });
-    await row.locator('.cl-apiKeysCopyButton').click();
+    // Wait for the alert to appear with the copy input and copy API key
+    const copyButton = page.locator('.cl-formFieldInputCopyToClipboardButton');
+    await copyButton.waitFor({ state: 'attached' });
+    await copyButton.click();
 
     // Read clipboard contents
-    const data = await (await responsePromise).json();
     await context.grantPermissions(['clipboard-read']);
     const clipboardText = await page.evaluate('navigator.clipboard.readText()');
     await context.clearPermissions();
-    expect(clipboardText).toBe(data.secret);
-  });
-
-  test('can toggle api key secret visibility', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.po.signIn.goTo();
-    await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
-    await u.po.expect.toBeSignedIn();
-
-    await u.po.page.goToRelative('/api-keys');
-    await u.po.apiKeys.waitForMounted();
-
-    const apiKeyName = `${fakeAdmin.firstName}-${Date.now()}`;
-
-    // Create API key
-    await u.po.apiKeys.clickAddButton();
-    await u.po.apiKeys.waitForFormOpened();
-    await u.po.apiKeys.typeName(apiKeyName);
-    await u.po.apiKeys.selectExpiration('1d');
-    await u.po.apiKeys.clickSaveButton();
-    await u.po.apiKeys.waitForFormClosed();
-
-    const responsePromise = page.waitForResponse(
-      response => response.url().includes('/secret') && response.request().method() === 'GET',
-    );
-
-    // Toggle API key secret visibility
-    const table = u.page.locator('.cl-apiKeysTable');
-    const row = table.locator('.cl-tableRow', { hasText: apiKeyName });
-    await row.waitFor({ state: 'attached' });
-    await expect(row.locator('input')).toHaveAttribute('type', 'password');
-    await row.locator('.cl-apiKeysRevealButton').click();
-
-    // Verify if secret matches the input value
-    const data = await (await responsePromise).json();
-    await expect(row.locator('input')).toHaveAttribute('type', 'text');
-    await expect(row.locator('input')).toHaveValue(data.secret);
-
-    // Toggle visibility off
-    await row.locator('.cl-apiKeysRevealButton').click();
-    await expect(row.locator('input')).toHaveAttribute('type', 'password');
+    expect(clipboardText).toBe(secret);
   });
 
   test('component does not render for orgs when user does not have permissions', async ({ page, context }) => {

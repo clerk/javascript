@@ -17,6 +17,10 @@ export const csCZ: LocalizationResource = {
   apiKeys: {
     action__add: 'Přidat nový klíč',
     action__search: 'Vyhledat klíče',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Platí do {{ expiresDate | longDate('cs-CZ') }}",
     createdAndExpirationStatus__never: "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Nikdy nevyprší",
@@ -46,10 +50,6 @@ export const csCZ: LocalizationResource = {
       formButtonPrimary__revoke: 'Zrušit klíč',
       formHint: 'Jste si jisti, že chcete smazat tento tajný klíč?',
       formTitle: 'Zrušit tajný klíč "{{apiKeyName}}"?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Zpět',

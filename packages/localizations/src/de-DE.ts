@@ -17,6 +17,10 @@ export const deDE: LocalizationResource = {
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
+    copyAlert: {
+      subtitle: undefined,
+      title: undefined,
+    },
     createdAndExpirationStatus__expiresOn:
       "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft ab {{ expiresDate | longDate('de-DE') }}",
     createdAndExpirationStatus__never: "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft nie ab",
@@ -46,10 +50,6 @@ export const deDE: LocalizationResource = {
       formButtonPrimary__revoke: 'API-Key widerrufen',
       formHint: 'Sind Sie sicher, dass Sie diesen API-Key löschen wollen?',
       formTitle: 'API-Key "{{apiKeyName}}" widerrufen?',
-    },
-    saveAlert: {
-      subtitle: undefined,
-      title: undefined,
     },
   },
   backButton: 'Zurück',
