@@ -4,13 +4,12 @@ import { ClipboardInput } from '@/ui/elements/ClipboardInput';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
-import { Modal } from '@/ui/elements/Modal';
 import { useClipboard } from '@/ui/hooks';
 import { Check, ClipboardOutline } from '@/ui/icons';
 import { localizationKeys } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { getApiKeyModalContainerStyles } from './utils';
+import { ApiKeyModal } from './ApiKeyModal';
 
 type CopyApiKeyModalProps = {
   isOpen: boolean;
@@ -47,12 +46,11 @@ export const CopyApiKeyModal = ({
   }
 
   return (
-    <Modal
+    <ApiKeyModal
       handleOpen={onOpen}
       handleClose={onClose}
       canCloseModal={false}
-      portalRoot={modalRoot}
-      containerSx={getApiKeyModalContainerStyles(modalRoot)}
+      modalRoot={modalRoot}
     >
       <Card.Root
         role='alertdialog'
@@ -92,6 +90,6 @@ export const CopyApiKeyModal = ({
           </FormContainer>
         </Card.Content>
       </Card.Root>
-    </Modal>
+    </ApiKeyModal>
   );
 };

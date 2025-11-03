@@ -6,11 +6,10 @@ import { Card } from '@/ui/elements/Card';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
-import { Modal } from '@/ui/elements/Modal';
 import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { getApiKeyModalContainerStyles } from './utils';
+import { ApiKeyModal } from './ApiKeyModal';
 
 type RevokeAPIKeyConfirmationModalProps = {
   subject: string;
@@ -67,12 +66,11 @@ export const RevokeAPIKeyConfirmationModal = ({
   }
 
   return (
-    <Modal
+    <ApiKeyModal
       handleOpen={onOpen}
       handleClose={handleClose}
       canCloseModal={false}
-      portalRoot={modalRoot}
-      containerSx={getApiKeyModalContainerStyles(modalRoot)}
+      modalRoot={modalRoot}
     >
       <Card.Root
         role='alertdialog'
@@ -106,6 +104,6 @@ export const RevokeAPIKeyConfirmationModal = ({
           </FormContainer>
         </Card.Content>
       </Card.Root>
-    </Modal>
+    </ApiKeyModal>
   );
 };
