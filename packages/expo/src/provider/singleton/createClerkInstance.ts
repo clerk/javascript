@@ -10,6 +10,7 @@ import type {
 } from '@clerk/types';
 import { Platform } from 'react-native';
 
+import packageJson from '../../../package.json';
 import {
   ClientResourceCache,
   DUMMY_CLERK_CLIENT_RESOURCE,
@@ -164,7 +165,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
         // Instructs the backend that the request is from a mobile device.
         // Some iOS devices have an empty user-agent, so we can't rely on that.
         if (isNative()) {
-          (requestInit.headers as Headers).set('x-mobile', '1');
+          (requestInit.headers as Headers).set('x-expo-sdk-version', packageJson.version);
         }
       });
 
