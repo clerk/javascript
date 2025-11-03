@@ -10,27 +10,35 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
-  "type": "module",
   "exports": {
-    "./*": {
-      "import": {
-        "types": "./dist/*.d.mts",
-        "default": "./dist/*.mjs"
-      },
-      "require": {
-        "types": "./dist/*.d.ts",
-        "default": "./dist/*.js"
-      }
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/ui.mjs",
+      "require": "./dist/ui.js",
+      "default": "./dist/ui.mjs"
+    },
+    "./internal": {
+      "types": "./dist/types/internal.d.ts",
+      "import": "./dist/ui.mjs",
+      "require": "./dist/ui.js",
+      "default": "./dist/ui.mjs"
     },
     "./package.json": "./package.json"
   },
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsdown",
+    "build": "pnpm build:bundle && pnpm build:declarations",
+    "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
+    "build:bundle": "rspack build --config rspack.config.js --env production",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
+    "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
-    "dev": "tsdown --watch src",
+    "dev": "rspack serve --config rspack.config.js",
+    "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4001}",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
@@ -55,25 +63,21 @@
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
+    "react": "catalog:peer-react",
+    "react-dom": "catalog:peer-react",
     "swr": "2.3.4"
   },
   "devDependencies": {
+    "@rspack/cli": "^1.4.11",
+    "@rspack/core": "^1.4.11",
+    "@rspack/plugin-react-refresh": "^1.5.0",
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
+    "@svgr/webpack": "^6.5.1",
+    "@types/webpack-env": "^1.18.8",
+    "bundlewatch": "^0.4.1",
     "cross-fetch": "^4.1.0",
-    "rolldown": "catalog:repo"
-  },
-  "peerDependencies": {
-    "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    },
-    "react-dom": {
-      "optional": true
-    }
+    "webpack-merge": "^5.10.0"
   },
   "engines": {
     "node": ">=20.9.0"

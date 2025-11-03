@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJsScript, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
@@ -81,6 +81,10 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
+  __unstable_ClerkUi?: {
+    mountComponentRenderer: any;
+    version: string;
+  };
 }
 
 declare const global: Global;
@@ -429,6 +433,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
+    console.log('local clerk react');
+
     if (this.mode !== 'browser' || this.loaded) {
       return;
     }
@@ -475,19 +481,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
         global.Clerk = c;
       } else if (!__BUILD_DISABLE_RHC__) {
         // Hot-load latest ClerkJS from Clerk CDN
-        if (!global.Clerk) {
-          await loadClerkJsScript({
-            ...this.options,
-            publishableKey: this.#publishableKey,
-            proxyUrl: this.proxyUrl,
-            domain: this.domain,
-            nonce: this.options.nonce,
-          });
-        }
+        const scriptLoadingOptions = {
+          ...this.options,
+          publishableKey: this.#publishableKey,
+          proxyUrl: this.proxyUrl,
+          domain: this.domain,
+          nonce: this.options.nonce,
+        };
+
+        await Promise.all([
+          global.Clerk ? Promise.resolve() : loadClerkJsScript(scriptLoadingOptions),
+          global.__unstable_ClerkUi ? Promise.resolve() : loadClerkUiScript(scriptLoadingOptions),
+        ]);
 
         if (!global.Clerk) {
+          // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
           throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
         }
+
+        console.log('all loaded');
 
         this.beforeLoad(global.Clerk);
         await global.Clerk.load(this.options);

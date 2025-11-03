@@ -2,7 +2,6 @@
   "compilerOptions": {
     "rootDir": "src",
     "verbatimModuleSyntax": true,
-    "types": ["node"],
     "target": "es2022",
     "strict": true,
     "skipLibCheck": true,

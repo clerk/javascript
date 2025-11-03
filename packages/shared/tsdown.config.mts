@@ -8,7 +8,7 @@ export default defineConfig(({ watch }) => {
   const common = {
     dts: true,
     sourcemap: true,
-    clean: true,
+    clean: false,
     target: 'es2022',
     platform: 'neutral',
     external: ['react', 'react-dom'],
@@ -19,6 +19,7 @@ export default defineConfig(({ watch }) => {
       PACKAGE_VERSION: `"${sharedPackage.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
       __DEV__: `${watch}`,
+      __BUILD_DISABLE_RHC__: JSON.stringify(false),
     },
   } satisfies Options;
 

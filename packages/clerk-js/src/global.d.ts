@@ -17,4 +17,14 @@ declare const __BUILD_VARIANT_CHIPS__: boolean;
 interface Window {
   __unstable__onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
   __unstable__onAfterSetActive: () => Promise<void> | void;
+
+  /**
+   * TODO @nikos: implment type
+   * UI components loaded from @clerk/ui browser bundle.
+   * This is injected by the @clerk/ui package and consumed by clerk-js.
+   */
+  __unstable_ClerkUi?: {
+    mountComponentRenderer: any;
+    version: string;
+  };
 }

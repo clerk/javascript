@@ -1,13 +1,14 @@
 // It's crucial this is the first import,
 // otherwise chunk loading will not work
-// eslint-disable-next-line
+
 import './utils/setWebpackChunkPublicPath';
 
 import { Clerk } from './core/clerk';
 
-import { mountComponentRenderer } from './ui/Components';
-
-Clerk.mountComponentRenderer = mountComponentRenderer;
+// Load UI components from window (injected by @clerk/ui browser bundle)
+if (window.__unstable_ClerkUi) {
+  Clerk.mountComponentRenderer = window.__unstable_ClerkUi.mountComponentRenderer;
+}
 
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||
@@ -26,7 +27,7 @@ const domain =
 if (!window.Clerk) {
   window.Clerk = new Clerk(publishableKey, {
     proxyUrl,
-    // @ts-expect-error
+    // @ts-expect-error - domain is not typed
     domain,
   });
 }

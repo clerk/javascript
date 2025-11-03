@@ -1,9 +1,9 @@
+import type { Clerk } from '@clerk/shared/types';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Clerk } from '@clerk/shared/types';
 import { HashRouter, Route, useRouter } from '..';
 
 const mockNavigate = vi.fn();

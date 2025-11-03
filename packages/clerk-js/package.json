@@ -32,7 +32,6 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
-    "postbuild": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
@@ -52,6 +51,7 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --profile node16 --ignore-rules named-exports",
     "lint:publint": "publint || true",
+    "postbuild:disabled": "node ../../scripts/search-for-rhc.mjs file dist/clerk.no-rhc.mjs",
     "test": "vitest --watch=false",
     "test:sandbox:integration": "playwright test",
     "test:sandbox:integration:ui": "playwright test --ui",
@@ -90,10 +90,6 @@
     "jsdom": "26.1.0",
     "minimatch": "^10.0.3",
     "webpack-merge": "^5.10.0"
-  },
-  "peerDependencies": {
-    "react": "catalog:peer-react",
-    "react-dom": "catalog:peer-react"
   },
   "engines": {
     "node": ">=18.17.0"

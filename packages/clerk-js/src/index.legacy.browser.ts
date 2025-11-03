@@ -7,9 +7,10 @@ import 'regenerator-runtime/runtime';
 
 import { Clerk } from './core/clerk';
 
-import { mountComponentRenderer } from './ui/Components';
-
-Clerk.mountComponentRenderer = mountComponentRenderer;
+// Load UI components from window (injected by @clerk/ui browser bundle)
+if (window.__unstable_ClerkUi) {
+  Clerk.mountComponentRenderer = window.__unstable_ClerkUi.mountComponentRenderer;
+}
 
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||

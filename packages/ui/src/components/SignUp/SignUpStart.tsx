@@ -1,11 +1,11 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';

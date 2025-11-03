@@ -457,7 +457,7 @@ export default tseslint.config([
   },
   {
     name: 'repo/jsdoc-internal',
-    files: ['packages/shared/src/**/internal/**/*.{ts,tsx}'],
+    files: ['packages/shared/src/**/internal/**/*.{ts,tsx}', 'packages/shared/src/**/*.{ts,tsx}'],
     plugins: {
       jsdoc: pluginJsDoc,
     },

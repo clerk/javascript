@@ -19,7 +19,12 @@ import {
   noOrganizationExists,
   noUserExists,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
-import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import {
+  CLERK_SATELLITE_URL,
+  CLERK_SUFFIXED_COOKIES,
+  CLERK_SYNCED,
+  ERROR_CODES,
+} from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -113,7 +118,25 @@ import type {
 } from '@clerk/shared/types';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
-import type { MountComponentRenderer } from '@clerk/ui/internal';
+
+// TODO: Replace with proper type from @clerk/ui
+type MountComponentRenderer = (
+  clerk: any,
+  environment: any,
+  options: any,
+) => {
+  ensureMounted: (options?: { preloadHint?: string }) => Promise<{
+    mountImpersonationFab: () => void;
+    updateProps: (props: any) => void;
+    openModal: (name: string, props: any) => void;
+    closeModal: (name: string) => void;
+    openDrawer: (name: string, props: any) => void;
+    closeDrawer: (name: string) => void;
+    mountComponent: (config: any) => void;
+    unmountComponent: (config: any) => void;
+    prefetch: (name: string) => void;
+  }>;
+};
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 

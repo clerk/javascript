@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { ClerkRuntimeError } from '../error';
 import {
   buildClerkJsScriptAttributes,
+  buildScriptHost,
   clerkJsScriptUrl,
   loadClerkJsScript,
   setClerkJsLoadingErrorPackageName,
@@ -183,6 +184,65 @@ describe('clerkJsScriptUrl()', () => {
   test('uses provided clerkJSVersion', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, clerkJSVersion: '6' });
     expect(result).toContain('/npm/@clerk/clerk-js@6/');
+  });
+});
+
+describe('buildScriptHost()', () => {
+  const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
+  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk';
+  const mockProxyUrl = 'https://proxy.clerk.com';
+  const mockDomain = 'custom.com';
+
+  test('returns frontendApi from publishableKey when no proxyUrl or domain', () => {
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey });
+    expect(result).toBe('foo-bar-13.clerk.accounts.dev');
+  });
+
+  test('returns proxyUrl host when proxyUrl is provided and valid', () => {
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey, proxyUrl: mockProxyUrl });
+    expect(result).toBe('proxy.clerk.com');
+  });
+
+  test('returns domain with clerk prefix when domain is provided for production key', () => {
+    const result = buildScriptHost({ publishableKey: mockProdPublishableKey, domain: mockDomain });
+    expect(result).toBe('clerk.custom.com');
+  });
+
+  test('returns frontendApi when domain is provided for development key', () => {
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey, domain: mockDomain });
+    expect(result).toBe('foo-bar-13.clerk.accounts.dev');
+  });
+
+  test('prioritizes proxyUrl over domain', () => {
+    const result = buildScriptHost({
+      publishableKey: mockProdPublishableKey,
+      proxyUrl: mockProxyUrl,
+      domain: mockDomain,
+    });
+    expect(result).toBe('proxy.clerk.com');
+  });
+
+  test('handles relative proxyUrl', () => {
+    // Mock window.location for relative URL conversion
+    const originalLocation = global.window.location;
+    Object.defineProperty(global.window, 'location', {
+      get() {
+        return {
+          origin: 'https://example.com',
+        };
+      },
+      configurable: true,
+    });
+
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey, proxyUrl: '/__clerk' });
+    // Relative URLs are converted to absolute, then protocol is stripped
+    expect(result).toBe('example.com/__clerk');
+
+    // Restore original location
+    Object.defineProperty(global.window, 'location', {
+      value: originalLocation,
+      writable: true,
+    });
   });
 });
 
