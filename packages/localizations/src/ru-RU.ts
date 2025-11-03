@@ -17,9 +17,10 @@ export const ruRU: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
@@ -227,6 +228,7 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Введите ваш номер телефона',
   formFieldInputPlaceholder__username: 'Имя пользователя',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,

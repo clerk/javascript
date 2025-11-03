@@ -17,9 +17,10 @@ export const deDE: LocalizationResource = {
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft ab {{ expiresDate | longDate('de-DE') }}",
@@ -232,6 +233,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: undefined,
   formFieldLabel__apiKeyDescription: 'Beschreibung',
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',

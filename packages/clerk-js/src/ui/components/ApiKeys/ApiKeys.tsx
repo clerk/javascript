@@ -26,7 +26,6 @@ import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
 
 import { ApiKeysTable } from './ApiKeysTable';
-import { CopyApiKeyAlert } from './CopyApiKeyAlert';
 import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
 import { useApiKeys } from './useApiKeys';
@@ -40,6 +39,12 @@ type APIKeysPageProps = {
 const RevokeAPIKeyConfirmationModal = lazy(() =>
   import(/* webpackChunkName: "revoke-api-key-modal"*/ './RevokeAPIKeyConfirmationModal').then(module => ({
     default: module.RevokeAPIKeyConfirmationModal,
+  })),
+);
+
+const CopyApiKeyModal = lazy(() =>
+  import(/* webpackChunkName: "copy-api-key-modal"*/ './CopyApiKeyModal').then(module => ({
+    default: module.CopyApiKeyModal,
   })),
 );
 
@@ -72,7 +77,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
-  const [showCopyAlert, setShowCopyAlert] = useState(false);
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
   const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
     try {
@@ -82,7 +87,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
       });
       closeCardFn();
       card.setError(undefined);
-      setShowCopyAlert(true);
+      setIsCopyModalOpen(true);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
@@ -154,12 +159,6 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         </Action.Open>
       </Action.Root>
 
-      {showCopyAlert ? (
-        <CopyApiKeyAlert
-          apiKeyName={createdApiKey?.name ?? ''}
-          apiKeySecret={createdApiKey?.secret ?? ''}
-        />
-      ) : null}
       <ApiKeysTable
         rows={apiKeys}
         isLoading={isLoading}
@@ -187,6 +186,14 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         }}
         apiKeyId={selectedApiKeyId}
         apiKeyName={selectedApiKeyName}
+        modalRoot={revokeModalRoot}
+      />
+      <CopyApiKeyModal
+        isOpen={isCopyModalOpen}
+        onOpen={() => setIsCopyModalOpen(true)}
+        onClose={() => setIsCopyModalOpen(false)}
+        apiKeyName={createdApiKey?.name ?? ''}
+        apiKeySecret={createdApiKey?.secret ?? ''}
         modalRoot={revokeModalRoot}
       />
     </Col>

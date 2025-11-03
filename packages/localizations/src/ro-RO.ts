@@ -17,9 +17,10 @@ export const roRO: LocalizationResource = {
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",
@@ -231,6 +232,7 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Introdu numărul de telefon',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: undefined,
   formFieldLabel__apiKeyDescription: 'Descriere',
   formFieldLabel__apiKeyExpiration: 'Expirare',
   formFieldLabel__apiKeyName: 'Numele cheii secrete',

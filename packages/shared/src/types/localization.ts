@@ -109,6 +109,7 @@ export type __internal_LocalizationResource = {
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__apiKey: LocalizationValue;
   formFieldLabel__apiKeyName: LocalizationValue;
   formFieldLabel__apiKeyDescription: LocalizationValue;
   formFieldLabel__apiKeyExpiration: LocalizationValue;
@@ -1238,9 +1239,10 @@ export type __internal_LocalizationResource = {
     createdAndExpirationStatus__expiresOn: LocalizationValue<'createdDate' | 'expiresDate'>;
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
-    copyAlert: {
-      title: LocalizationValue<'name'>;
-      subtitle: LocalizationValue;
+    copySecret: {
+      formTitle: LocalizationValue<'name'>;
+      formHint: LocalizationValue;
+      formButtonPrimary__copyAndClose: LocalizationValue;
     };
   };
   taskChooseOrganization: {

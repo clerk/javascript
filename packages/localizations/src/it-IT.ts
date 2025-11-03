@@ -17,9 +17,10 @@ export const itIT: LocalizationResource = {
   apiKeys: {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
@@ -232,6 +233,7 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: undefined,
   formFieldLabel__apiKeyDescription: 'Descrizione',
   formFieldLabel__apiKeyExpiration: 'Scadenza',
   formFieldLabel__apiKeyName: 'Nome chiave segreta',

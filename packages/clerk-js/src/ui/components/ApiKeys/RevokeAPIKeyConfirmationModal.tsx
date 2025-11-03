@@ -10,6 +10,8 @@ import { Modal } from '@/ui/elements/Modal';
 import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
+import { getApiKeyModalContainerStyles } from './utils';
+
 type RevokeAPIKeyConfirmationModalProps = {
   subject: string;
   isOpen: boolean;
@@ -70,24 +72,7 @@ export const RevokeAPIKeyConfirmationModal = ({
       handleClose={handleClose}
       canCloseModal={false}
       portalRoot={modalRoot}
-      containerSx={[
-        { alignItems: 'center' },
-        modalRoot
-          ? t => ({
-              position: 'absolute',
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'inherit',
-              backdropFilter: `blur(${t.sizes.$2})`,
-              display: 'flex',
-              justifyContent: 'center',
-              minHeight: '100%',
-              height: '100%',
-              width: '100%',
-              borderRadius: t.radii.$lg,
-            })
-          : {},
-      ]}
+      containerSx={getApiKeyModalContainerStyles(modalRoot)}
     >
       <Card.Root
         role='alertdialog'

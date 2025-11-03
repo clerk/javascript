@@ -5,9 +5,10 @@ export const enUS: LocalizationResource = {
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
-    copyAlert: {
-      subtitle: "For security reasons, we won't allow you to view it again later.",
-      title: 'Copy your "{{name}}" API Key now',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
     },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
@@ -219,6 +220,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
+  formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Secret key name',
