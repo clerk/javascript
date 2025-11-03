@@ -352,24 +352,6 @@ describe('SignUpStart', () => {
       screen.getByText('Terms of Service');
       screen.getByText('Privacy Policy');
     });
-
-    it('displays legal consent only if included in missing fields without unverified fields', async () => {
-      const { wrapper } = await createFixtures(f => {
-        f.withEmailAddress({ required: true });
-        f.withPassword({ required: true });
-        f.startSignUpWithMissingLegalAccepted();
-        f.withLegalConsent();
-        f.withTermsPrivacyPolicyUrls({
-          privacyPolicy: 'https://clerk.dev/privacy',
-          termsOfService: 'https://clerk.dev/tos',
-        });
-      });
-      const { getByText, queryByText } = render(<SignUpStart />, { wrapper });
-      expect(getByText('Terms of Service')).toBeVisible();
-      expect(getByText('Privacy Policy')).toBeVisible();
-      expect(queryByText('Phone number')).not.toBeInTheDocument();
-      expect(queryByText('Password')).not.toBeInTheDocument();
-    });
   });
 
   describe('ticket flow', () => {

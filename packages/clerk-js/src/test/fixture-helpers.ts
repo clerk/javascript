@@ -275,7 +275,6 @@ const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
       status: 'missing_requirements',
       legal_accepted_at: null,
       missing_fields: ['legal_accepted'],
-      unverified_fields: [],
     } as SignUpJSON;
   };
 
