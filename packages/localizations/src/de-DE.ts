@@ -17,9 +17,10 @@ export const deDE: LocalizationResource = {
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft ab {{ expiresDate | longDate('de-DE') }}",

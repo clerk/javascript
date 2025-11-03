@@ -11,14 +11,14 @@ type ClipboardInputProps = PropsOfComponent<typeof Input> & {
 };
 
 export const ClipboardInput = (props: ClipboardInputProps) => {
-  const { id, value, copyIcon = Clipboard, copiedIcon = TickShield, ...rest } = props;
+  const { id, value, copyIcon = Clipboard, copiedIcon = TickShield, sx, ...rest } = props;
   const { onCopy, hasCopied } = useClipboard(value as string);
 
   return (
     <Flex
       direction='col'
       justify='center'
-      sx={{ position: 'relative' }}
+      sx={[{ position: 'relative' }, sx]}
     >
       <Input
         {...rest}

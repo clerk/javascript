@@ -17,9 +17,10 @@ export const thTH: LocalizationResource = {
   apiKeys: {
     action__add: 'เพิ่มคีย์ใหม่',
     action__search: 'ค้นหาคีย์',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • หมดอายุ {{ expiresDate | longDate('th-TH') }}",

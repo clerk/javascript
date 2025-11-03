@@ -17,9 +17,10 @@ export const frFR: LocalizationResource = {
   apiKeys: {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "Créée le {{ createdDate | shortDate('fr-FR') }} • Expire le {{ expiresDate | longDate('fr-FR') }}",

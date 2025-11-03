@@ -17,9 +17,10 @@ export const itIT: LocalizationResource = {
   apiKeys: {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn:
       "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",

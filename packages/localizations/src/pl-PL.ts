@@ -17,9 +17,10 @@ export const plPL: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
-    copyAlert: {
-      subtitle: undefined,
-      title: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: undefined,
+      formHint: undefined,
+      formTitle: undefined,
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
