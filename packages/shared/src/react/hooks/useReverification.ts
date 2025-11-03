@@ -79,15 +79,17 @@ type UseReverificationResult<Fetcher extends (...args: any[]) => Promise<any> | 
 /**
  * @interface
  */
-type UseReverification = <Fetcher extends (...args: any[]) => Promise<any> | undefined>(
-  /**
-   * A function that returns a promise.
-   */
+type UseReverification = <
+  Fetcher extends (...args: any[]) => Promise<any> | undefined,
+  Options extends UseReverificationOptions = UseReverificationOptions,
+> /**
+ * A function that returns a promise.
+ */(
   fetcher: Fetcher,
   /**
-   * The optional options object.
+   * Optional configuration object extending `UseReverificationOptions`.
    */
-  options?: UseReverificationOptions,
+  options?: Options,
 ) => UseReverificationResult<Fetcher>;
 
 type CreateReverificationHandlerParams = UseReverificationOptions & {
