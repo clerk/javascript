@@ -175,6 +175,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           rowInfo={{ allRowsCount: itemCount, startingRow, endingRow }}
         />
       )}
+
+      {/* Modals */}
       <RevokeAPIKeyConfirmationModal
         subject={subject}
         isOpen={isRevokeModalOpen}

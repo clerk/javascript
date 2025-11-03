@@ -854,6 +854,9 @@ export interface ApiKeyJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_by: string | null;
   description: string | null;
+  /**
+   * This property is only present in the response from `create()`.
+   */
   secret?: string;
   last_used_at: number | null;
   created_at: number;
