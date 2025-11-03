@@ -5,8 +5,12 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Modal } from '@/ui/elements/Modal';
+import { useClipboard } from '@/ui/hooks';
 import { Check, ClipboardOutline } from '@/ui/icons';
 import { localizationKeys } from '@/ui/localization';
+import { useFormControl } from '@/ui/utils/useFormControl';
+
+import { getApiKeyModalContainerStyles } from './utils';
 
 type CopyApiKeyModalProps = {
   isOpen: boolean;
@@ -25,8 +29,16 @@ export const CopyApiKeyModal = ({
   apiKeySecret,
   modalRoot,
 }: CopyApiKeyModalProps) => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const apiKeyField = useFormControl('name', apiKeySecret, {
+    type: 'text',
+    label: localizationKeys('formFieldLabel__apiKey'),
+    isRequired: false,
+  });
+
+  const { onCopy } = useClipboard(apiKeySecret);
+
+  const handleSubmit = () => {
+    onCopy();
     onClose();
   };
 
@@ -40,24 +52,7 @@ export const CopyApiKeyModal = ({
       handleClose={onClose}
       canCloseModal={false}
       portalRoot={modalRoot}
-      containerSx={[
-        { alignItems: 'center' },
-        modalRoot
-          ? t => ({
-              position: 'absolute',
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'inherit',
-              backdropFilter: `blur(${t.sizes.$2})`,
-              display: 'flex',
-              justifyContent: 'center',
-              minHeight: '100%',
-              height: '100%',
-              width: '100%',
-              borderRadius: t.radii.$lg,
-            })
-          : {},
-      ]}
+      containerSx={getApiKeyModalContainerStyles(modalRoot)}
     >
       <Card.Root
         role='alertdialog'
@@ -78,13 +73,15 @@ export const CopyApiKeyModal = ({
                 elementDescriptor={descriptors.apiKeysCopyModalInput}
                 sx={{ flex: 1 }}
               >
-                <ClipboardInput
-                  value={apiKeySecret}
-                  readOnly
-                  sx={{ width: '100%' }}
-                  copyIcon={ClipboardOutline}
-                  copiedIcon={Check}
-                />
+                <Form.CommonInputWrapper {...apiKeyField.props}>
+                  <ClipboardInput
+                    value={apiKeySecret}
+                    readOnly
+                    sx={{ width: '100%' }}
+                    copyIcon={ClipboardOutline}
+                    copiedIcon={Check}
+                  />
+                </Form.CommonInputWrapper>
               </Form.ControlRow>
               <FormButtons
                 submitLabel={localizationKeys('apiKeys.copySecret.formButtonPrimary__copyAndClose')}

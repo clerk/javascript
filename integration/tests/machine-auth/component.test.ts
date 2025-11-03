@@ -126,13 +126,22 @@ testAgainstRunningApps({
     const apiKeyData = await createResponse.json();
     const secret = apiKeyData.secret;
 
-    // Wait for the alert to appear with the copy input and copy API key
-    const copyButton = page.locator('.cl-formFieldInputCopyToClipboardButton');
-    await copyButton.waitFor({ state: 'attached' });
-    await copyButton.click();
+    // Wait for the copy modal to appear
+    const copyModal = page.locator('.cl-apiKeysCopyModal');
+    await copyModal.waitFor({ state: 'attached' });
 
-    // Read clipboard contents
+    // Grant clipboard permissions before clicking the button
     await context.grantPermissions(['clipboard-read']);
+
+    // Click "Copy & Close" button which will copy the secret and close the modal
+    const copyAndCloseButton = copyModal.locator('.cl-apiKeysCopyModalSubmitButton');
+    await copyAndCloseButton.waitFor({ state: 'attached' });
+    await copyAndCloseButton.click();
+
+    // Wait for modal to close
+    await copyModal.waitFor({ state: 'detached' });
+
+    // Read clipboard contents to verify the secret was copied
     const clipboardText = await page.evaluate('navigator.clipboard.readText()');
     await context.clearPermissions();
     expect(clipboardText).toBe(secret);
