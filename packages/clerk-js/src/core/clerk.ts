@@ -1351,6 +1351,13 @@ export class Clerk implements ClerkInterface {
           const newLastActiveOrganizationId = matchingOrganization?.organization.id || null;
           const isPersonalWorkspace = newLastActiveOrganizationId === null;
 
+          // If a slug was explicitly provided but doesn't match any organization, throw an error
+          if (organizationIdOrSlug && !matchingOrganization) {
+            throw new Error(
+              `Unable to find organization with slug "${organizationIdOrSlug}". The user is not a member of this organization or it does not exist.`,
+            );
+          }
+
           // Do not update in-memory to personal workspace if force organization selection is enabled
           if (this.environment?.organizationSettings?.forceOrganizationSelection && isPersonalWorkspace) {
             return;

@@ -378,6 +378,33 @@ describe('Clerk singleton', () => {
         });
       });
 
+      it('throws an error when setting active organization with invalid slug', async () => {
+        const mockSession2 = {
+          id: '1',
+          status,
+          user: {
+            organizationMemberships: [
+              {
+                id: 'orgmem_id',
+                organization: {
+                  id: 'org_id',
+                  slug: 'valid-org-slug',
+                },
+              },
+            ],
+          },
+          touch: vi.fn(),
+          getToken: vi.fn(),
+        };
+        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession2] }));
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await expect(sut.setActive({ organization: 'invalid-org-slug' })).rejects.toThrow(
+          'Unable to find organization with slug "invalid-org-slug". The user is not a member of this organization or it does not exist.',
+        );
+      });
+
       it('redirects the user to the /v1/client/touch endpoint if the cookie_expires_at is less than 8 days away', async () => {
         mockSession.touch.mockReturnValue(Promise.resolve());
         mockClientFetch.mockReturnValue(
