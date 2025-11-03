@@ -74,7 +74,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(socialButtonContainers.first().locator('.cl-button')).toHaveCount(3);
     });
 
-    test('should show "Last used" badge when lastAuthenticationStrategy is oauth_google', async ({ page, context }) => {
+    test('should show "Last used" badge when lastAuthenticationStrategy is saml_google', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, 'saml_google');
 

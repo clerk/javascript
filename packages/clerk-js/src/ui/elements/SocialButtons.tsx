@@ -88,7 +88,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   };
 
   // Convert SAML strategies to OAuth strategies for consistency when matching last used strategy.
-  const convertedClientLastAuth = clientLastAuth.startsWith('saml_')
+  const convertedClientLastAuth = clientLastAuth?.startsWith('saml_')
     ? clientLastAuth.replace('saml_', 'oauth_')
     : clientLastAuth;
 
