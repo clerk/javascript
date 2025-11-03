@@ -1,6 +1,6 @@
-import { CLERK_MODAL_STATE } from '@clerk/shared/internal/clerk-js/constants';
-import { encodeB64 } from '@clerk/shared/internal/clerk-js/encoders';
-import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { CLERK_MODAL_STATE } from './constants';
+import { encodeB64 } from './encoders';
+import { getClerkQueryParam } from './queryParams';
 
 export const readStateParam = () => {
   const urlClerkState = getClerkQueryParam(CLERK_MODAL_STATE) ?? '';

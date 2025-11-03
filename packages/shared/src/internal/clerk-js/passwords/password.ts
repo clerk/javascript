@@ -4,8 +4,8 @@ import type {
   ValidatePasswordCallbacks,
   ZxcvbnResult,
 } from '@clerk/shared/types';
-import { noop } from '@clerk/shared/utils';
 
+import { noop } from '../../../utils';
 import { createValidateComplexity } from './complexity';
 import { createValidatePasswordStrength } from './strength';
 

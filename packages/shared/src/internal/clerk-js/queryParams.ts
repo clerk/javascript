@@ -1,6 +1,6 @@
-import type { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
-import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from '@clerk/shared/internal/clerk-js/constants';
-import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
+import type { EmailLinkErrorCodeStatus } from '../../error';
+import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '../../netlifyCacheHandler';
+import { CLERK_SATELLITE_URL, CLERK_SUFFIXED_COOKIES, CLERK_SYNCED } from './constants';
 
 const _ClerkQueryParams = [
   '__clerk_status',

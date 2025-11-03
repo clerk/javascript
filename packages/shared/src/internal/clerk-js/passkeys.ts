@@ -1,5 +1,3 @@
-import type { ClerkRuntimeError } from '@clerk/shared/error';
-import { ClerkWebAuthnError } from '@clerk/shared/error';
 import type {
   CredentialReturn,
   PublicKeyCredentialCreationOptionsJSON,
@@ -9,6 +7,9 @@ import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
 } from '@clerk/shared/types';
+
+import type { ClerkRuntimeError } from '../../error';
+import { ClerkWebAuthnError } from '../../error';
 
 type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
 type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
@@ -125,6 +126,7 @@ function handlePublicKeyError(error: Error): ClerkWebAuthnError | ClerkRuntimeEr
 
 /**
  * Map webauthn errors from `navigator.credentials.create()` to Clerk-js errors
+ *
  * @param error
  */
 function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
@@ -140,6 +142,7 @@ function handlePublicKeyCreateError(error: Error): ClerkWebAuthnError | ClerkRun
 
 /**
  * Map webauthn errors from `navigator.credentials.get()` to Clerk-js errors
+ *
  * @param error
  */
 function handlePublicKeyGetError(error: Error): ClerkWebAuthnError | ClerkRuntimeError | Error {
