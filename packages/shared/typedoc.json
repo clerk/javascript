@@ -5,7 +5,8 @@
     "./src/react/types.ts",
     "./src/react/hooks/*.{ts,tsx}",
     "./src/react/commerce.tsx",
-    "./src/react/contexts.tsx"
+    "./src/react/contexts.tsx",
+    "./src/types/*.{ts,tsx}"
   ],
   "compilerOptions": {
     "noImplicitAny": false
