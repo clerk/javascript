@@ -85,7 +85,8 @@ type UseReverification = <
 >(
   /**
    * A function that returns a promise.
-   */ fetcher: Fetcher,
+   */
+  fetcher: Fetcher,
   /**
    * Optional configuration object extending `UseReverificationOptions`.
    */

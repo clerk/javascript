@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
+
 import { eventMethodCalled } from '../../telemetry/events';
-import type { EnvironmentResource, BillingSubscriptionResource, ForPayerType } from '../../types';
+import type { BillingSubscriptionResource, EnvironmentResource, ForPayerType } from '../../types';
 import { useSWR } from '../clerk-swr';
 import {
   useAssertWrappedByClerkProvider,
@@ -16,13 +17,14 @@ const hookName = 'useSubscription';
  */
 export type UseSubscriptionParams = {
   /**
-   * Specifies whether to fetch subscription for an organization or user.
+   * Specifies whether to fetch the subscription for an organization or a user.
    *
    * @default 'user'
    */
   for?: ForPayerType;
   /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched. This helps prevent layout shifts.
+   * If `true`, the previous data will be kept in the cache until new data is fetched.
+   * This helps prevent layout shifts.
    *
    * @default false
    */
