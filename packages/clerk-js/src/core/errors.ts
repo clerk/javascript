@@ -16,8 +16,8 @@ export function clerkNetworkError(url: string, e: Error): never {
   throw new Error(`${errorPrefix} Network error at "${url}" - ${e}. Please try again.`);
 }
 
-export function clerkErrorInitFailed(): never {
-  throw new Error(`${errorPrefix} Something went wrong initializing Clerk.`);
+export function clerkErrorInitFailed(error?: unknown): never {
+  throw new Error(`${errorPrefix} Something went wrong initializing Clerk.`, { cause: error });
 }
 
 export function clerkErrorDevInitFailed(msg = ''): never {
