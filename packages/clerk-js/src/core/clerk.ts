@@ -35,9 +35,9 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   BillingNamespace,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -124,6 +124,7 @@ import {
   isOrganizationId,
   isRedirectForFAPIInitiatedFlow,
   isSignedInAndSingleSessionModeEnabled,
+  joinPaths,
   noOrganizationExists,
   noUserExists,
   processCssLayerNameExtraction,
@@ -1668,14 +1669,16 @@ export class Clerk implements ClerkInterface {
       return customTaskUrl;
     }
 
+    const signInUrl = this.buildSignInUrl(options);
+    const { origin, pathname, searchParams } = new URL(signInUrl, window.location.origin);
+
     return buildURL(
       {
-        base: this.buildSignInUrl(options),
-        hashPath: getTaskEndpoint(currentTask),
+        base: origin,
+        pathname: joinPaths(pathname, getTaskEndpoint(currentTask)),
+        searchParams: searchParams,
       },
-      {
-        stringify: true,
-      },
+      { stringify: true },
     );
   }
 
