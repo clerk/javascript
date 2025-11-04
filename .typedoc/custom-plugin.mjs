@@ -27,7 +27,7 @@ const FILES_WITHOUT_HEADINGS = [
   'use-statements-return.mdx',
   'hook-params.mdx',
   'use-subscription-params.mdx',
-  'use-subscription-return.mdx',
+  'subscription-result.mdx',
   'needs-reverification-parameters.mdx',
   'use-reverification-options.mdx',
   'use-reverification-params.mdx',
