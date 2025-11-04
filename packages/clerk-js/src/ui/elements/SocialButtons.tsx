@@ -87,7 +87,13 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return strategies.includes(strategy as TStrategy);
   };
 
-  const lastAuthenticationStrategy = clientLastAuth && isValidStrategy(clientLastAuth) ? clientLastAuth : null;
+  // Convert SAML strategies to OAuth strategies for consistency when matching last used strategy.
+  const convertedClientLastAuth = clientLastAuth?.startsWith('saml_')
+    ? clientLastAuth.replace('saml_', 'oauth_')
+    : clientLastAuth;
+
+  const lastAuthenticationStrategy =
+    convertedClientLastAuth && isValidStrategy(convertedClientLastAuth) ? convertedClientLastAuth : null;
 
   const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
     [...strategies],

@@ -1,5 +1,47 @@
 # Change Log
 
+## 2.7.11
+
+### Patch Changes
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8), [`5b85ea9`](https://github.com/clerk/javascript/commit/5b85ea9b738def91f7d4a2af7170a041d0a8189b), [`fae192f`](https://github.com/clerk/javascript/commit/fae192fdd4c23c4afd6892bdd0c5a7542ce9bc42), [`02b723d`](https://github.com/clerk/javascript/commit/02b723dc032bef6a8f96b18d39ec8479be4f0225), [`f47b5a3`](https://github.com/clerk/javascript/commit/f47b5a325a5909ca3fa2ab264031243691b14a93), [`61422b2`](https://github.com/clerk/javascript/commit/61422b21198106c48e87dfffba0bf5a383b380bf)]:
+  - @clerk/clerk-js@5.103.2
+  - @clerk/shared@3.30.0
+  - @clerk/clerk-react@5.53.5
+
 ## 2.7.10
 
 ### Patch Changes

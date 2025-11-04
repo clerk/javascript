@@ -460,6 +460,9 @@ importers:
       '@swc/helpers':
         specifier: ^0.5.17
         version: 0.5.17
+      '@tanstack/query-core':
+        specifier: 5.87.4
+        version: 5.87.4
       '@zxcvbn-ts/core':
         specifier: 3.0.4
         version: 3.0.4
@@ -649,9 +652,15 @@ importers:
       '@types/base-64':
         specifier: ^1.0.2
         version: 1.0.2
+      expo-apple-authentication:
+        specifier: ^7.2.4
+        version: 7.2.4(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))
       expo-auth-session:
         specifier: ^5.4.0
         version: 5.4.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
+      expo-crypto:
+        specifier: ^15.0.7
+        version: 15.0.7(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
       expo-local-authentication:
         specifier: ^13.8.0
         version: 13.8.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
@@ -937,6 +946,9 @@ importers:
       '@stripe/stripe-js':
         specifier: 5.6.0
         version: 5.6.0
+      '@tanstack/query-core':
+        specifier: 5.87.4
+        version: 5.87.4
       '@types/glob-to-regexp':
         specifier: 0.4.4
         version: 0.4.4
@@ -2592,7 +2604,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -4994,6 +5006,9 @@ packages:
   '@tanstack/history@1.132.0':
     resolution: {integrity: sha512-GG2R9I6QSlbNR9fEuX2sQCigY6K28w51h2634TWmkaHXlzQw+rWuIWr4nAGM9doA+kWRi1LFSFMvAiG3cOqjXQ==}
     engines: {node: '>=12'}
+
+  '@tanstack/query-core@5.87.4':
+    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
 
   '@tanstack/react-router@1.132.0':
     resolution: {integrity: sha512-tGNmQrFc4zWQZvjqYnC8ib84H/9QokRl73hr0P2XlxCY2KAgPTk2QjdzW03LqXgQZRXg7++vKznJt4LS9/M3iA==}
@@ -8391,6 +8406,12 @@ packages:
     resolution: {integrity: sha512-2Zks0hf1VLFYI1kbh0I5jP3KHHyCHpkfyHBzsSXRFgl/Bg9mWYfMW8oD+PdMPlEwy5HNsR9JutYy6pMeOh61nw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
+  expo-apple-authentication@7.2.4:
+    resolution: {integrity: sha512-T2agaLLPT4Ax97FeXImB7BCCEzEJ0gB+ZwlFa/FXBtbp6WFKcGRlTVKiX2YPYLZzN5QjXcmQ9HHJ17jRthNHMg==}
+    peerDependencies:
+      expo: '*'
+      react-native: '*'
+
   expo-application@5.8.3:
     resolution: {integrity: sha512-IISxzpPX+Xe4ynnwX8yY52T6dm1g9sME1GCj4lvUlrdc5xeTPM6U35x7Wj82V7lLWBaVGe+/Tg9EeKqfylCEwA==}
     peerDependencies:
@@ -8432,6 +8453,11 @@ packages:
 
   expo-crypto@12.8.1:
     resolution: {integrity: sha512-EJEzmfBUSkGfALTlZRKUbh1RMKF7mWI12vkhO2w6bhGO4bjgGB8XzUHgLfrvSjphDFMx/lwaR6bAQDmXKO9UkQ==}
+    peerDependencies:
+      expo: '*'
+
+  expo-crypto@15.0.7:
+    resolution: {integrity: sha512-FUo41TwwGT2e5rA45PsjezI868Ch3M6wbCZsmqTWdF/hr+HyPcrp1L//dsh/hsrsyrQdpY/U96Lu71/wXePJeg==}
     peerDependencies:
       expo: '*'
 
@@ -20346,6 +20372,8 @@ snapshots:
 
   '@tanstack/history@1.132.0': {}
 
+  '@tanstack/query-core@5.87.4': {}
+
   '@tanstack/react-router@1.132.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/history': 1.132.0
@@ -24561,6 +24589,11 @@ snapshots:
       jest-message-util: 29.7.0
       jest-util: 29.7.0
 
+  expo-apple-authentication@7.2.4(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1)):
+    dependencies:
+      expo: 54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
+      react-native: 0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1)
+
   expo-application@5.8.3(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)):
     dependencies:
       expo: 54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
@@ -24625,6 +24658,11 @@ snapshots:
       - supports-color
 
   expo-crypto@12.8.1(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)):
+    dependencies:
+      base64-js: 1.5.1
+      expo: 54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
+
+  expo-crypto@15.0.7(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)):
     dependencies:
       base64-js: 1.5.1
       expo: 54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
