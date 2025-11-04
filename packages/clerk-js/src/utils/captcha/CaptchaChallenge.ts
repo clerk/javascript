@@ -1,4 +1,4 @@
-import type { CaptchaWidgetType } from '@clerk/types';
+import type { CaptchaWidgetType } from '@clerk/shared/types';
 
 import type { Clerk } from '../../core/resources/internal';
 import { getCaptchaToken } from './getCaptchaToken';

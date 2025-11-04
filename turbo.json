@@ -310,17 +310,6 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:tanstack-react-router": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/tanstack-react-start#build",
-        "@clerk/clerk-react#build"
-      ],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
-      "outputLogs": "new-only"
-    },
     "//#test:integration:vue": {
       "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/vue#build"],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],

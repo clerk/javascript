@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { FieldId } from '@clerk/types';
+import type { FieldId } from '@clerk/shared/types';
 import React from 'react';
 
 import type { useFormControl as useFormControlUtil } from '../../utils/useFormControl';
@@ -10,7 +10,7 @@ type FormFieldProviderProps = ReturnType<typeof useFormControlUtil<FieldId>>['pr
 };
 
 type FormFieldContextValue = Omit<FormFieldProviderProps, 'id'> & {
-  errorMessageId?: string;
+  feedbackMessageId?: string;
   id?: string;
   fieldId?: FieldId;
   hasError: boolean;
@@ -49,9 +49,14 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
   // Both html attributes (e.g. data-invalid) and css styles depend on hasError being debounced
   const hasError = debounced.feedbackType === 'error';
 
-  // Track whether the `FormErrorText` has been rendered.
+  // Track whether any feedback message has been rendered.
   // We use this to append its id the `aria-describedby` of the `input`.
-  const errorMessageId = hasError ? `error-${propsId}` : '';
+  // Use legacy pattern for errors (backwards compatible), new pattern for other types
+  const feedbackMessageId = debounced.feedback
+    ? debounced.feedbackType === 'error'
+      ? `error-${propsId}`
+      : `${propsId}-${debounced.feedbackType}-feedback`
+    : '';
   const value = React.useMemo(
     () => ({
       isRequired,
@@ -59,7 +64,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       hasError,
       id,
       fieldId: propsId,
-      errorMessageId,
+      feedbackMessageId,
       setError,
       setSuccess,
       setWarning,
@@ -75,7 +80,7 @@ export const FormFieldContextProvider = (props: React.PropsWithChildren<FormFiel
       hasError,
       id,
       propsId,
-      errorMessageId,
+      feedbackMessageId,
       isDisabled,
       setError,
       setSuccess,
@@ -128,7 +133,7 @@ export const sanitizeInputProps = (
     setSuccess,
     setError,
     setInfo,
-    errorMessageId,
+    feedbackMessageId,
     fieldId,
     label,
     clearFeedback,
@@ -143,7 +148,7 @@ export const sanitizeInputProps = (
     /**
      * Ignore error for the index type as we have defined it explicitly above
      */
-    // @ts-ignore
+    // @ts-ignore - Dynamic property access for form field props
     inputProps[key] = obj[key];
   });
 

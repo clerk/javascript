@@ -1,5 +1,5 @@
+import type { FieldId } from '@clerk/shared/types';
 import { titleize } from '@clerk/shared/underscore';
-import type { FieldId } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
@@ -40,7 +40,7 @@ function useFormTextAnimation() {
         transitionTimingFunction: t.transitionTiming.$common,
       });
     },
-    [prefersReducedMotion],
+    [prefersReducedMotion, appearanceAnimations],
   );
 
   return {
@@ -71,14 +71,13 @@ export type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'succes
 type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: boolean };
 
 export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
-  errorMessageId?: string;
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
   center?: boolean;
   sx?: ThemableCssProp;
 };
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false, errorMessageId } = props;
+  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false } = props;
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
@@ -143,10 +142,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
-      // We only want the id applied when the feedback type is an error
-      // to avoid having multiple elements in the dom with the same id attribute.
-      // We also only have aria-describedby applied to the input when it is an error.
-      id: type === 'error' ? errorMessageId : undefined,
+      // Use legacy pattern for errors (backwards compatible), new pattern for other types
+      id: type === 'error' ? `error-${id}` : `${id}-${type}-feedback`,
     };
   };
 
@@ -182,6 +179,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
         ]}
         localizationKey={titleize(feedbacks.a?.feedback)}
+        aria-live={feedbacks.a?.shouldEnter ? 'polite' : 'off'}
       />
       <InfoComponentB
         {...getElementProps(feedbacks.b?.feedbackType)}
@@ -193,6 +191,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
           getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
         ]}
         localizationKey={titleize(feedbacks.b?.feedback)}
+        aria-live={feedbacks.b?.shouldEnter ? 'polite' : 'off'}
       />
     </Flex>
   );

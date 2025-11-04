@@ -1,10 +1,14 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
+} from '@clerk/shared/types';
 
 type UsePricingFooterStateParams = {
   subscription: BillingSubscriptionItemResource | undefined;
   plan: BillingPlanResource;
   planPeriod: BillingSubscriptionPlanPeriod;
-  forOrganizations?: boolean;
+  for?: 'user' | 'organization';
   hasActiveOrganization: boolean;
 };
 
@@ -13,14 +17,14 @@ type UsePricingFooterStateParams = {
  * @returns [shouldShowFooter, shouldShowFooterNotice]
  */
 const valueResolution = (params: UsePricingFooterStateParams): [boolean, boolean] => {
-  const { subscription, plan, planPeriod, forOrganizations, hasActiveOrganization } = params;
+  const { subscription, plan, planPeriod, for: forWhom, hasActiveOrganization } = params;
   const show_with_notice: [boolean, boolean] = [true, true];
   const show_without_notice: [boolean, boolean] = [true, false];
   const hide: [boolean, boolean] = [false, false];
 
   // No subscription
   if (!subscription) {
-    if (forOrganizations && !hasActiveOrganization) {
+    if (forWhom === 'organization' && !hasActiveOrganization) {
       return hide;
     }
     return show_without_notice;

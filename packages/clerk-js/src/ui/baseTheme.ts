@@ -1,4 +1,4 @@
-import type { Appearance, Elements } from '@clerk/types';
+import type { Appearance, Elements } from '@clerk/shared/types';
 
 import type { InternalTheme } from './foundations';
 
@@ -191,13 +191,13 @@ const clerkTheme: Appearance = {
         appearance: 'none',
         borderRadius: theme.radii.$sm,
         border: 'none',
+        backgroundSize: `${theme.sizes.$2} ${theme.sizes.$2}`,
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         '&:checked': {
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='16' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.25 8L6.5 9.75L9.75 4.25' stroke='${theme.colors.$whiteAlpha900}' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3C/path%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 8 8'%3E%3Cpath fill='${theme.colors.$white}' fill-rule='evenodd' d='M7.712.233a.889.889 0 0 1 .055 1.256C6.742 2.61 6.249 3.291 5.508 4.615c-.279.5-.589 1.194-.835 1.784a36.761 36.761 0 0 0-.382.95l-.021.057-.006.014-.001.003a.89.89 0 0 1-1.504.27L.218 4.765A.889.889 0 1 1 1.56 3.6l1.591 1.834c.235-.548.524-1.181.806-1.685.807-1.445 1.38-2.239 2.499-3.46A.889.889 0 0 1 7.712.234Z' clip-rule='evenodd'/%3E%3C/svg%3E")`,
           borderColor: theme.colors.$transparent,
-          backgroundColor: theme.colors.$primary900,
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundColor: theme.colors.$primary500,
         },
       },
       tagInputContainer: {

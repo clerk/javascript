@@ -32,11 +32,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('renders pricing details of a specific plan', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
-
       const u = createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/plan-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Plan details' }).click();
 
       await u.po.planDetails.waitForMounted();
@@ -82,7 +81,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       page,
       context,
     }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -97,12 +95,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/checkout-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Checkout Now' }).click();
       await u.po.checkout.waitForMounted();
       await u.po.page.getByText(/^Checkout$/).click();
@@ -119,7 +117,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Visa ⋯ 4242')).toBeVisible();
       await u.po.checkout.confirmAndContinue();
 
       // eslint-disable-next-line playwright/no-conditional-in-test
@@ -132,12 +131,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('opens subscription details drawer', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/subscription-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Subscription details' }).click();
 
       await u.po.subscriptionDetails.waitForMounted();
@@ -454,7 +453,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
   test.describe('in UserProfile', () => {
     // test.describe.configure({ mode: 'serial' });
-    test('renders pricing table, subscribes to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+    test('renders pricing table, subscribes to a plan, revalidates payment method on complete and then downgrades to free', async ({
       page,
       context,
     }) => {
@@ -586,7 +585,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
+    test('adds payment method via checkout and resets stripe setup intent after failed payment', async ({
       page,
       context,
     }) => {
@@ -652,6 +651,72 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
             'You cannot subscribe to this plan by paying monthly. To subscribe to this plan, you need to choose to pay annually.',
           ),
       ).toBeVisible();
+
+      await fakeUser.deleteIfExists();
+    });
+
+    test('adds two payment methods and sets the last as default', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      // Add first payment method
+      await u.po.page.getByText('Add new payment method').click();
+      await u.po.checkout.fillCard({
+        number: '4242424242424242',
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.page.getByRole('button', { name: 'Add Payment Method' }).click();
+
+      await expect(u.po.page.getByText(/visa/i)).toBeVisible();
+      await expect(
+        u.po.page
+          .getByText(/visa/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeVisible();
+
+      // Add second payment method
+      await u.po.page.getByText('Add new payment method').click();
+      await u.po.checkout.fillCard({
+        number: '5555555555554444',
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.page.getByRole('button', { name: 'Add Payment Method' }).click();
+
+      await expect(u.po.page.getByText(/mastercard/i)).toBeVisible();
+
+      // Open menu for the last payment method and make it default
+      await u.po.page.locator('.cl-userProfile-root .cl-menuButtonEllipsis').last().click();
+      await u.po.page.getByText('Make default').click();
+
+      // Verify Mastercard is now default and Visa is not
+      await expect(
+        u.po.page
+          .getByText(/mastercard/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(
+        u.po.page
+          .getByText(/visa/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeHidden();
 
       await fakeUser.deleteIfExists();
     });

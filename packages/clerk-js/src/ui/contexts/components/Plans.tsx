@@ -12,7 +12,7 @@ import type {
   BillingPlanResource,
   BillingSubscriptionItemResource,
   BillingSubscriptionPlanPeriod,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useCallback, useMemo } from 'react';
 
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
@@ -123,15 +123,15 @@ export const usePlansContext = () => {
   // Invalidates cache but does not fetch immediately
   const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
 
-  const { revalidate: revalidatePaymentSources } = usePaymentMethods();
+  const { revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
     void revalidateSubscriptions();
     void revalidatePlans();
     void revalidateStatements();
-    void revalidatePaymentSources();
-  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentSources]);
+    void revalidatePaymentMethods();
+  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentMethods]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
@@ -226,7 +226,7 @@ export const usePlansContext = () => {
           const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
 
           if (isSignedOut || isEligibleForTrial) {
-            return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
+            return localizationKeys('billing.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
           }
         }
         return localizationKey;
@@ -237,31 +237,31 @@ export const usePlansContext = () => {
         if (subscription) {
           if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
             if (_selectedPlanPeriod === 'month') {
-              return localizationKeys('commerce.switchToMonthly');
+              return localizationKeys('billing.switchToMonthly');
             }
 
             if (isEligibleForSwitchToAnnual) {
-              return localizationKeys('commerce.switchToAnnual');
+              return localizationKeys('billing.switchToAnnual');
             }
           }
 
           if (subscription.canceledAt) {
-            return localizationKeys('commerce.reSubscribe');
+            return localizationKeys('billing.reSubscribe');
           }
 
           if (_selectedPlanPeriod !== subscription.planPeriod) {
             if (_selectedPlanPeriod === 'month') {
-              return localizationKeys('commerce.switchToMonthly');
+              return localizationKeys('billing.switchToMonthly');
             }
 
             if (isEligibleForSwitchToAnnual) {
-              return localizationKeys('commerce.switchToAnnual');
+              return localizationKeys('billing.switchToAnnual');
             }
 
-            return localizationKeys('commerce.manageSubscription');
+            return localizationKeys('billing.manageSubscription');
           }
 
-          return localizationKeys('commerce.manageSubscription');
+          return localizationKeys('billing.manageSubscription');
         }
 
         // Handle non-subscription cases
@@ -269,8 +269,8 @@ export const usePlansContext = () => {
           subscriptionItems.filter(subscription => !subscription.plan.isDefault).length > 0;
 
         return hasNonDefaultSubscriptions
-          ? localizationKeys('commerce.switchPlan')
-          : freeTrialOr(localizationKeys('commerce.subscribe'));
+          ? localizationKeys('billing.switchPlan')
+          : freeTrialOr(localizationKeys('billing.subscribe'));
       };
 
       return {

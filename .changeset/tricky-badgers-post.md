@@ -4,4 +4,4 @@
 '@clerk/clerk-react': patch
 ---
 
-wip
+Experimental: Ground work for fixing stale data between hooks and components by sharing a single cache. 

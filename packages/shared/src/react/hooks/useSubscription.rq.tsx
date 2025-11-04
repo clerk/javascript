@@ -1,7 +1,7 @@
-import type { BillingSubscriptionResource, EnvironmentResource } from '@clerk/types';
 import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
+import type { BillingSubscriptionResource, EnvironmentResource } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import {

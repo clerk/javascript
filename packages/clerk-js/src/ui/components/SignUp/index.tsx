@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpModalProps, SignUpProps } from '@clerk/types';
+import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
@@ -10,6 +10,7 @@ import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../
 import { Flow } from '../../customizables';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
+import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
 import { SignUpStart } from './SignUpStart';
 import { SignUpVerifyEmail } from './SignUpVerifyEmail';
@@ -81,6 +82,9 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='tasks'>
           <LazySessionTasks redirectUrlComplete={signUpContext.afterSignUpUrl} />
+        </Route>
+        <Route path='enterprise-connections'>
+          <SignUpEnterpriseConnections />
         </Route>
         <Route index>
           <SignUpStart />

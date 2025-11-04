@@ -246,6 +246,8 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   last_name: string;
   verification: VerificationJSON | null;
   saml_connection: SamlAccountConnectionJSON | null;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
@@ -606,6 +608,10 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
   legal_accepted_at: number | null;
+  /**
+   * The locale of the user in BCP-47 format.
+   */
+  locale: string | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -930,6 +936,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
     publicly_visible: boolean;
   } | null;
   plan_id?: string | null;
+  payer?: BillingPayerJSON;
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { ActiveSessionResource, LoadedClerk } from '@clerk/types';
+import type { ActiveSessionResource, LoadedClerk } from '@clerk/shared/types';
 import { type Mocked, vi } from 'vitest';
 
 import { QueryClient } from '../core/query-core';

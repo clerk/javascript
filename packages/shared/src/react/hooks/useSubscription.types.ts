@@ -1,4 +1,4 @@
-import type { ForPayerType } from '@clerk/types';
+import type { ForPayerType } from '../../types';
 
 export type UseSubscriptionParams = {
   for?: ForPayerType;

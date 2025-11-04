@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/types';
+import type { OAuthStrategy, PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -32,6 +32,7 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
   return (
     <SocialButtons
       {...rest}
+      showLastAuthenticationStrategy={false}
       idleAfterDelay={!shouldUsePopup}
       oauthCallback={(strategy: OAuthStrategy) => {
         if (shouldUsePopup) {

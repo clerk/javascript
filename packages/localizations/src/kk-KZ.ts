@@ -68,8 +68,8 @@ export const kkKZ: LocalizationResource = {
   badge__upcomingPlan: 'Алдағы жоспар',
   badge__userDevice: 'Пайдаланушы құрылғысы',
   badge__you: 'Сіз',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +121,7 @@ export const kkKZ: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +135,7 @@ export const kkKZ: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,6 +219,7 @@ export const kkKZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Құпия сөзді енгізіңіз',
   formFieldInputPlaceholder__phoneNumber: 'Телефон нөмірін енгізіңіз',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
   formFieldLabel__apiKeyDescription: undefined,
   formFieldLabel__apiKeyExpiration: undefined,
   formFieldLabel__apiKeyName: undefined,
@@ -282,7 +283,7 @@ export const kkKZ: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Әдепкі ету',
         actionLabel__remove: 'Жою',
         add: 'Жаңа төлем әдісін қосу',
@@ -291,10 +292,10 @@ export const kkKZ: LocalizationResource = {
         formButtonPrimary__add: 'Төлем әдісін қосу',
         formButtonPrimary__pay: '{{amount}} төлеу',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} есептік жазбадан жойылады.',
           messageLine2: 'Бұл төлем әдісін қолдана алмайсыз және оған тәуелді жазылымдар жұмыс істемейді.',
-          successMessage: '{{paymentSource}} жойылды.',
+          successMessage: '{{paymentMethod}} жойылды.',
           title: 'Төлем әдісін жою',
         },
         title: 'Қолжетімді опциялар',
@@ -480,9 +481,11 @@ export const kkKZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
     action__manageOrganization: 'Басқару',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Қосылу сұрауы',
     notSelected: 'Ұйым таңдалмады',
     personalWorkspace: 'Жеке есептік жазба',
@@ -630,6 +633,10 @@ export const kkKZ: LocalizationResource = {
         titleNewTab: 'Басқа бетте кірдіңіз',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Құпия сөзді қалпына келтіру коды',
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',
@@ -750,6 +757,10 @@ export const kkKZ: LocalizationResource = {
         subtitleNewTab: 'Жалғастыру үшін алдыңғы бетке оралыңыз',
         title: 'Электрондық пошта расталды',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -921,7 +932,9 @@ export const kkKZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Есептік жазба қосу',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Есептік жазбаны басқару',
+    action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
   },
@@ -950,7 +963,7 @@ export const kkKZ: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Әдепкі ету',
         actionLabel__remove: 'Жою',
         add: 'Жаңа төлем әдісін қосу',
@@ -959,10 +972,10 @@ export const kkKZ: LocalizationResource = {
         formButtonPrimary__add: 'Төлем әдісін қосу',
         formButtonPrimary__pay: '{{amount}} төлеу',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} есептік жазбадан жойылады.',
           messageLine2: 'Бұл төлем әдісін қолдана алмайсыз және оған тәуелді жазылымдар жұмыс істемейді.',
-          successMessage: '{{paymentSource}} жойылды.',
+          successMessage: '{{paymentMethod}} жойылды.',
           title: 'Төлем әдісін жою',
         },
         title: 'Қолжетімді опциялар',
@@ -1018,7 +1031,7 @@ export const kkKZ: LocalizationResource = {
       actionDescription: 'Жалғастыру үшін "Есептік жазбаны жою" деп енгізіңіз.',
       confirm: 'Есептік жазбаны жою',
       messageLine1:
-        'Clerk-тен есептік жазбаңызды жойғыңыз келетініне сенімдісіз бе? Деректеріңізді олардың қолданбасы мен басқа қызметтерден жою үшін қолданба иесімен байланысыңыз.',
+        'Тіркелгіңізді жойғыңыз келетініне сенімдісіз бе? Кейбір байланысты деректер сақталуы мүмкін. Деректерді толық жою үшін қолдау қызметіне хабарласыңыз.',
       messageLine2: 'Бұл әрекет тұрақты және қайтымсыз.',
       title: 'Есептік жазбаны жою',
     },
