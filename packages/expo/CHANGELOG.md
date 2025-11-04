@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.17.4
+
+### Patch Changes
+
+- Add `x-expo-sdk-version` header to HTTP requests to match iOS and Android SDK patterns. ([#7133](https://github.com/clerk/javascript/pull/7133)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8), [`5b85ea9`](https://github.com/clerk/javascript/commit/5b85ea9b738def91f7d4a2af7170a041d0a8189b), [`fae192f`](https://github.com/clerk/javascript/commit/fae192fdd4c23c4afd6892bdd0c5a7542ce9bc42), [`02b723d`](https://github.com/clerk/javascript/commit/02b723dc032bef6a8f96b18d39ec8479be4f0225), [`f47b5a3`](https://github.com/clerk/javascript/commit/f47b5a325a5909ca3fa2ab264031243691b14a93), [`61422b2`](https://github.com/clerk/javascript/commit/61422b21198106c48e87dfffba0bf5a383b380bf)]:
+  - @clerk/clerk-js@5.103.2
+  - @clerk/shared@3.30.0
+  - @clerk/types@4.97.0
+  - @clerk/clerk-react@5.53.5
+
 ## 2.17.3
 
 ### Patch Changes
