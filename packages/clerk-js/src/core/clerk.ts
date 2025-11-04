@@ -1413,6 +1413,17 @@ export class Clerk implements ClerkInterface {
         this.#options.taskUrls?.[newSession?.currentTask.key];
 
       if (!beforeEmit && (redirectUrl || taskUrl || setActiveNavigate)) {
+        console.log('[TRACE 7] setActive NAVIGATION DETECTED:', {
+          hasRedirectUrl: !!redirectUrl,
+          redirectUrl,
+          hasTaskUrl: !!taskUrl,
+          hasSetActiveNavigate: !!setActiveNavigate,
+          currentSessionId: this.session?.id,
+          newSessionId: newSession?.id,
+          newSessionStatus: newSession?.status,
+          willCallSetTransitiveState: newSession?.status !== 'pending',
+        });
+        
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.
@@ -1420,6 +1431,11 @@ export class Clerk implements ClerkInterface {
           }
 
           if (newSession?.status !== 'pending') {
+            console.log('[TRACE 8] setActive CALLING #setTransitiveState before navigation:', {
+              reason: 'About to navigate with redirectUrl/taskUrl/setActiveNavigate',
+              currentSessionId: this.session?.id,
+              newSessionId: newSession?.id,
+            });
             this.#setTransitiveState();
           }
 
@@ -2358,18 +2374,47 @@ export class Clerk implements ClerkInterface {
   }
 
   updateClient = (newClient: ClientResource): void => {
+    console.log('[TRACE 13] updateClient ENTRY:', {
+      isFirstClient: !this.client,
+      newClientId: newClient.id,
+      newClientSessionsCount: newClient.signedInSessions.length,
+      newClientSessions: newClient.signedInSessions.map(s => ({ id: s.id, status: s.status })),
+      newClientLastActiveSessionId: newClient.lastActiveSessionId,
+    });
+    
     if (!this.client) {
       // This is the first time client is being
       // set, so we also need to set session
       const session = this.#options.selectInitialSession
         ? this.#options.selectInitialSession(newClient)
         : this.#defaultSession(newClient);
+      
+      console.log('[TRACE 14] updateClient FIRST TIME - Selected session:', {
+        selectedSession: session,
+        sessionId: session?.id,
+        sessionIsNull: session === null,
+        reason: session === null ? 'No sessions in client.signedInSessions' : 'Found session',
+      });
+      
       this.#setAccessors(session);
     }
     this.client = newClient;
 
     if (this.session) {
+      console.log('[TRACE 11] updateClient: BEFORE #getSessionFromClient:', {
+        existingSessionId: this.session.id,
+        newClientSessions: newClient.signedInSessions.map(s => s.id),
+        newClientSessionCount: newClient.signedInSessions.length,
+      });
+      
       const session = this.#getSessionFromClient(this.session.id);
+      
+      console.log('[TRACE 12] updateClient: AFTER #getSessionFromClient:', {
+        foundSession: !!session,
+        sessionValue: session,
+        sessionIsNull: session === null,
+        willSetAccessorsWithNull: session === null,
+      });
 
       const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
@@ -2825,13 +2870,22 @@ export class Clerk implements ClerkInterface {
 
   #emit = (): void => {
     if (this.client) {
+      const emittedState = {
+        client: this.client,
+        session: this.session,
+        user: this.user,
+        organization: this.organization,
+      };
+      console.log('[2] #emit SENDING:', { 
+        sessionType: typeof emittedState.session, 
+        sessionValue: emittedState.session,
+        sessionId: emittedState.session?.id,
+        sessionIsUndefined: emittedState.session === undefined,
+        sessionIsNull: emittedState.session === null,
+        listenerCount: this.#listeners.length
+      });
       for (const listener of this.#listeners) {
-        listener({
-          client: this.client,
-          session: this.session,
-          user: this.user,
-          organization: this.organization,
-        });
+        listener(emittedState);
       }
     }
   };
@@ -2848,9 +2902,26 @@ export class Clerk implements ClerkInterface {
    * such as unexpected unmount of control components
    */
   #setTransitiveState = () => {
+    console.log('[TRACE 9] #setTransitiveState CLEARING SESSION:', {
+      beforeClear: {
+        sessionId: this.session?.id,
+        sessionType: typeof this.session,
+      },
+      stackTrace: new Error().stack?.split('\n').slice(1, 4).join('\n'),
+    });
+    
     this.session = undefined;
     this.organization = undefined;
     this.user = undefined;
+    
+    console.log('[TRACE 10] #setTransitiveState AFTER CLEAR:', { 
+      sessionType: typeof this.session, 
+      sessionValue: this.session,
+      sessionIsUndefined: this.session === undefined,
+      sessionIsNull: this.session === null,
+      aboutToEmit: true,
+    });
+    
     this.#emit();
   };
 
@@ -2862,7 +2933,19 @@ export class Clerk implements ClerkInterface {
   };
 
   #setAccessors = (session?: SignedInSessionResource | null) => {
+    console.log('[TRACE 2] #setAccessors INPUT:', {
+      sessionParam: session,
+      sessionParamType: typeof session,
+      sessionParamIsUndefined: session === undefined,
+      sessionParamIsNull: session === null,
+    });
     this.session = session || null;
+    console.log('[TRACE 3] #setAccessors AFTER "session || null":', {
+      thisSessionValue: this.session,
+      thisSessionType: typeof this.session,
+      thisSessionIsUndefined: this.session === undefined,
+      thisSessionIsNull: this.session === null,
+    });
     this.organization = this.#getLastActiveOrganizationFromSession();
     this.user = this.session ? this.session.user : null;
   };

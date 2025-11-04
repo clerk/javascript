@@ -255,7 +255,17 @@ const resolveAuthState = ({
   },
   options: { treatPendingAsSignedOut = true },
 }: AuthStateOptions): UseAuthReturn | undefined => {
+  console.log('[TRACE 7] resolveAuthState INPUT:', {
+    sessionId,
+    sessionIdType: typeof sessionId,
+    sessionIdIsUndefined: sessionId === undefined,
+    sessionIdIsNull: sessionId === null,
+    userId,
+    userIdType: typeof userId,
+  });
+  
   if (sessionId === undefined && userId === undefined) {
+    console.log('[TRACE 8] resolveAuthState: CASE 1 (both undefined)');
     return {
       isLoaded: false,
       isSignedIn: undefined,
@@ -273,6 +283,7 @@ const resolveAuthState = ({
   }
 
   if (sessionId === null && userId === null) {
+    console.log('[TRACE 9] resolveAuthState: CASE 2 (both null)');
     return {
       isLoaded: true,
       isSignedIn: false,
@@ -290,6 +301,9 @@ const resolveAuthState = ({
   }
 
   if (treatPendingAsSignedOut && sessionStatus === 'pending') {
+    console.log('[TRACE 10] resolveAuthState: CASE 3 (pending session)', {
+      forcingSessionIdToNull: true,
+    });
     return {
       isLoaded: true,
       isSignedIn: false,
@@ -307,6 +321,7 @@ const resolveAuthState = ({
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
+    console.log('[TRACE 11] resolveAuthState: CASE 4 (signed in with org)');
     return {
       isLoaded: true,
       isSignedIn: true,
@@ -324,6 +339,7 @@ const resolveAuthState = ({
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
+    console.log('[TRACE 12] resolveAuthState: CASE 5 (signed in no org)');
     return {
       isLoaded: true,
       isSignedIn: true,
@@ -339,6 +355,8 @@ const resolveAuthState = ({
       getToken,
     } as const;
   }
+  
+  console.log('[TRACE 13] resolveAuthState: NO CASE MATCHED - returning undefined');
 };
 
 export { createCheckAuthorization, resolveAuthState, splitByScope, validateReverificationConfig };
