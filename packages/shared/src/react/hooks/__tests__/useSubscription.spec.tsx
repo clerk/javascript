@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/query-core';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -29,7 +30,26 @@ const mockClerk = {
       },
     },
   },
+  on: vi.fn(),
+  off: vi.fn(),
 };
+
+const defaultQueryClient = {
+  __tag: 'clerk-rq-client' as const,
+  client: new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: Infinity,
+      },
+    },
+  }),
+};
+
+Object.defineProperty(mockClerk, '__internal_queryClient', {
+  get: vi.fn(() => defaultQueryClient),
+  configurable: true,
+});
 
 vi.mock('../../contexts', () => {
   return {
@@ -50,6 +70,7 @@ describe('useSubscription', () => {
     mockOrganization = { id: 'org_1' };
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = userBillingEnabled;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
+    defaultQueryClient.client.clear();
   });
 
   it('does not fetch when billing disabled for user', () => {
@@ -97,11 +118,15 @@ describe('useSubscription', () => {
     mockUser = null;
     rerender();
 
-    // Asser that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
-    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(result.current.data).toBeUndefined());
+    } else {
+      // Asser that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
+      await waitFor(() => expect(result.current.isFetching).toBe(true));
+      // The fetcher returns null when userId is falsy, so data should become null
+      await waitFor(() => expect(result.current.data).toBeNull());
+    }
 
-    // The fetcher returns null when userId is falsy, so data should become null
-    await waitFor(() => expect(result.current.data).toBeNull());
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(1);
     expect(result.current.isFetching).toBe(false);
   });
@@ -121,11 +146,16 @@ describe('useSubscription', () => {
     mockUser = null;
     rerender({ kp: true });
 
-    // Asser that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
-    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(result.current.data).toBeUndefined());
+    } else {
+      // Asser that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
+      await waitFor(() => expect(result.current.isFetching).toBe(true));
 
-    // The fetcher returns null when userId is falsy, so data should become null
-    await waitFor(() => expect(result.current.data).toBeNull());
+      // The fetcher returns null when userId is falsy, so data should become null
+      await waitFor(() => expect(result.current.data).toBeNull());
+    }
+
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(1);
     expect(result.current.isFetching).toBe(false);
   });
