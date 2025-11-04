@@ -10,8 +10,17 @@ export type UsePagesOrInfiniteSignature = <
   CacheKeys extends Record<string, unknown> = Record<string, unknown>,
   TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
 >(
+  /**
+   * The parameters will be passed to the fetcher.
+   */
   params: Params,
+  /**
+   * A Promise returning function to fetch your data.
+   */
   fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
+  /**
+   * Internal configuration of the hook.
+   */
   config: TConfig,
   cacheKeys: CacheKeys,
 ) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;

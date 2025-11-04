@@ -1,8 +1,8 @@
 'use client';
 
-import type { ClerkPaginatedResponse } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
+import type { ClerkPaginatedResponse } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
@@ -19,8 +19,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const enabled = config.enabled ?? true;
   const triggerInfinite = config.infinite ?? false;
-  // Support keepPreviousData
-  const _keepPreviousData = config.keepPreviousData ?? false;
+  // TODO: Support keepPreviousData
+  // const _keepPreviousData = config.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
 
