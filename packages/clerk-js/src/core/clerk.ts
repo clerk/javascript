@@ -2405,6 +2405,8 @@ export class Clerk implements ClerkInterface {
         ? this.#options.selectInitialSession(newClient)
         : this.#defaultSession(newClient);
       this.#setAccessors(session);
+
+      eventBus.emit(events.TokenUpdate, { token: session?.lastActiveToken || null });
     }
 
     this.#emit();

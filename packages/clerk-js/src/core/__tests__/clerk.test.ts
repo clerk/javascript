@@ -2619,11 +2619,19 @@ describe('Clerk singleton', () => {
       sut.updateClient(mockInitialClient as any);
       expect(sut.session).toBe(null);
 
+      const eventBusSpy = vi.spyOn(eventBus, 'emit');
+
       sut.updateClient(mockClientWithSession as any);
 
       expect(sut.session).toBeDefined();
       expect(sut.session?.id).toBe('session_1');
       expect(sut.session?.status).toBe('active');
+
+      expect(eventBusSpy).toHaveBeenCalledWith(events.TokenUpdate, {
+        token: mockSession.lastActiveToken,
+      });
+
+      eventBusSpy.mockRestore();
     });
   });
 });
