@@ -62,7 +62,6 @@
   "dependencies": {
     "@base-org/account": "2.0.1",
     "@clerk/shared": "workspace:^",
-    "@clerk/ui": "workspace:^",
     "@coinbase/wallet-sdk": "4.3.0",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.17",
@@ -79,10 +78,8 @@
   "devDependencies": {
     "@clerk/testing": "workspace:^",
     "@rsdoctor/rspack-plugin": "^0.4.13",
-    "@rspack/cli": "^1.4.11",
-    "@rspack/core": "^1.4.11",
-    "@rspack/plugin-react-refresh": "^1.5.0",
-    "@svgr/webpack": "^6.5.1",
+    "@rspack/cli": "^1.6.0",
+    "@rspack/core": "^1.6.0",
     "@types/cloudflare-turnstile": "^0.2.2",
     "@types/node": "^22.18.12",
     "@types/webpack-env": "^1.18.8",

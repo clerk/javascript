@@ -68,9 +68,9 @@
     "swr": "2.3.4"
   },
   "devDependencies": {
-    "@rspack/cli": "^1.4.11",
-    "@rspack/core": "^1.4.11",
-    "@rspack/plugin-react-refresh": "^1.5.0",
+    "@rspack/cli": "^1.6.0",
+    "@rspack/core": "^1.6.0",
+    "@rspack/plugin-react-refresh": "^1.5.2",
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
     "@svgr/webpack": "^6.5.1",
