@@ -79,13 +79,12 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
-  const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
+  const handleCreateApiKey = async (params: OnCreateParams) => {
     try {
       await createApiKey({
         ...params,
         subject,
       });
-      closeCardFn();
       card.setError(undefined);
       setIsCopyModalOpen(true);
     } catch (err: any) {
@@ -157,6 +156,15 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
             </Action.Card>
           </Flex>
         </Action.Open>
+
+        <CopyApiKeyModal
+          isOpen={isCopyModalOpen}
+          onOpen={() => setIsCopyModalOpen(true)}
+          onClose={() => setIsCopyModalOpen(false)}
+          apiKeyName={createdApiKey?.name ?? ''}
+          apiKeySecret={createdApiKey?.secret ?? ''}
+          modalRoot={revokeModalRoot}
+        />
       </Action.Root>
 
       <ApiKeysTable
@@ -188,14 +196,6 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         }}
         apiKeyId={selectedApiKeyId}
         apiKeyName={selectedApiKeyName}
-        modalRoot={revokeModalRoot}
-      />
-      <CopyApiKeyModal
-        isOpen={isCopyModalOpen}
-        onOpen={() => setIsCopyModalOpen(true)}
-        onClose={() => setIsCopyModalOpen(false)}
-        apiKeyName={createdApiKey?.name ?? ''}
-        apiKeySecret={createdApiKey?.secret ?? ''}
         modalRoot={revokeModalRoot}
       />
     </Col>

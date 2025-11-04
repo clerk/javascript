@@ -1,4 +1,5 @@
 import { descriptors } from '@/ui/customizables';
+import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Card } from '@/ui/elements/Card';
 import { ClipboardInput } from '@/ui/elements/ClipboardInput';
 import { Form } from '@/ui/elements/Form';
@@ -35,10 +36,12 @@ export const CopyApiKeyModal = ({
   });
 
   const { onCopy } = useClipboard(apiKeySecret);
+  const { close: closeActionCard } = useActionContext();
 
   const handleSubmit = () => {
     onCopy();
     onClose();
+    closeActionCard();
   };
 
   if (!isOpen) {
