@@ -1,5 +1,47 @@
 # Change Log
 
+## 4.97.0
+
+### Minor Changes
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+### Patch Changes
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+
 ## 4.96.0
 
 ### Minor Changes
