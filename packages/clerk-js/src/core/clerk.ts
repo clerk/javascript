@@ -2398,6 +2398,9 @@ export class Clerk implements ClerkInterface {
       }
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     } else if (!isFirstClientSet && newClient.sessions?.length > 0) {
+      // Handles the case where updateClient() is called (e.g., from a touch() response) with session data,
+      // but this.session is falsy. This commonly occurs after sign-in when the touch() response
+      // includes fresh client data before setActive() completes, preventing a session null flash.
       const session = this.#options.selectInitialSession
         ? this.#options.selectInitialSession(newClient)
         : this.#defaultSession(newClient);
