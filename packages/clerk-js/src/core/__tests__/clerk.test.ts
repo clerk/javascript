@@ -2507,5 +2507,37 @@ describe('Clerk singleton', () => {
         expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
       });
     });
+
+    it('sets session after sign-in when touch() response triggers updateClient', () => {
+      const mockSession = {
+        id: 'session_1',
+        status: 'active',
+        user: { id: 'user_1' },
+        lastActiveToken: { getRawString: () => 'token_1' },
+      };
+
+      const mockInitialClient = {
+        sessions: [],
+        signedInSessions: [],
+        lastActiveSessionId: null,
+      };
+
+      const mockClientWithSession = {
+        sessions: [mockSession],
+        signedInSessions: [mockSession],
+        lastActiveSessionId: 'session_1',
+      };
+
+      const sut = new Clerk(productionPublishableKey);
+
+      sut.updateClient(mockInitialClient as any);
+      expect(sut.session).toBe(null);
+
+      sut.updateClient(mockClientWithSession as any);
+
+      expect(sut.session).toBeDefined();
+      expect(sut.session?.id).toBe('session_1');
+      expect(sut.session?.status).toBe('active');
+    });
   });
 });
