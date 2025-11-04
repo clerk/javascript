@@ -139,7 +139,7 @@ describe('PlainInput', () => {
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
 
-    expect(await findByText(/Some Error/i)).toBeInTheDocument();
+    expect(await findByText(/Some Error/i, { selector: '#error-firstname' })).toBeInTheDocument();
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -163,7 +163,7 @@ describe('PlainInput', () => {
     const { findByLabelText, findByText } = render(<Field actionLabel={'take action'} />, { wrapper });
 
     fireEvent.focus(await findByLabelText(/some label/i));
-    expect(await findByText(/some info/i)).toBeInTheDocument();
+    expect(await findByText(/some info/i, { selector: '#firstname-info-feedback' })).toBeInTheDocument();
   });
 
   it('with success feedback and aria-describedby', async () => {
@@ -178,7 +178,7 @@ describe('PlainInput', () => {
 
     await userEvent.click(getByRole('button', { name: /set success/i }));
 
-    expect(await findByText(/Some Success/i)).toBeInTheDocument();
+    expect(await findByText(/Some Success/i, { selector: '#firstname-success-feedback' })).toBeInTheDocument();
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -202,7 +202,7 @@ describe('PlainInput', () => {
 
     // Start with error
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    expect(await findByText(/Some Error/i)).toBeInTheDocument();
+    expect(await findByText(/Some Error/i, { selector: '#error-firstname' })).toBeInTheDocument();
 
     let input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -210,7 +210,7 @@ describe('PlainInput', () => {
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
-    expect(await findByText(/Some Success/i)).toBeInTheDocument();
+    expect(await findByText(/Some Success/i, { selector: '#firstname-success-feedback' })).toBeInTheDocument();
 
     input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -232,9 +232,24 @@ describe('PlainInput', () => {
 
     const { getByRole, findByText, container } = render(<Field />, { wrapper });
 
+    // Pre-state: aria-live region exists and is empty
+    const preRegions = container.querySelectorAll('[aria-live="polite"]');
+    expect(preRegions.length).toBeGreaterThanOrEqual(1);
+    const preSrOnly = Array.from(preRegions).find(el => {
+      const style = window.getComputedStyle(el);
+      return style.position === 'absolute' && style.width === '1px';
+    });
+    expect(preSrOnly).toBeDefined();
+    expect(preSrOnly?.textContent ?? '').toMatch(/^\s*$/);
+
+    // Input is not in error and not described yet
+    const inputEl = container.querySelector('input#firstname-field');
+    expect(inputEl).toHaveAttribute('aria-invalid', 'false');
+    expect(inputEl).not.toHaveAttribute('aria-describedby');
+
     // Set error feedback
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    expect(await findByText(/Some Error/i)).toBeInTheDocument();
+    expect(await findByText(/Some Error/i, { selector: '#error-firstname' })).toBeInTheDocument();
 
     // Verify there's a screen-reader-only aria-live region with the error content
     const ariaLiveRegions = container.querySelectorAll('[aria-live="polite"]');
@@ -250,7 +265,7 @@ describe('PlainInput', () => {
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
-    expect(await findByText(/Some Success/i)).toBeInTheDocument();
+    expect(await findByText(/Some Success/i, { selector: '#firstname-success-feedback' })).toBeInTheDocument();
 
     // Verify the screen reader only region updated its content
     expect(srOnlyRegion).toHaveTextContent(/Some Success/i);
