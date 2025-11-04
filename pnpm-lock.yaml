@@ -4409,9 +4409,6 @@ packages:
   '@rolldown/pluginutils@1.0.0-beta.9-commit.d91dfb5':
     resolution: {integrity: sha512-8sExkWRK+zVybw3+2/kBkYBFeLnEUWz1fT7BLHplpzmtqkOfTbAQ9gkt4pzwGIIZmg4Qn5US5ACjUBenrhezwQ==}
 
-  '@rolldown/pluginutils@1.0.0-beta.9-commit.d91dfb5':
-    resolution: {integrity: sha512-8sExkWRK+zVybw3+2/kBkYBFeLnEUWz1fT7BLHplpzmtqkOfTbAQ9gkt4pzwGIIZmg4Qn5US5ACjUBenrhezwQ==}
-
   '@rollup/plugin-alias@5.1.1':
     resolution: {integrity: sha512-PR9zDb+rOzkRb2VD+EuKB7UC41vU5DIwZ5qqCpk0KJudcWAyi8rvYOhS7+L5aZCspw1stTViLgN5v6FF1p5cgQ==}
     engines: {node: '>=14.0.0'}
@@ -19724,8 +19721,6 @@ snapshots:
   '@rolldown/pluginutils@1.0.0-beta.29': {}
 
   '@rolldown/pluginutils@1.0.0-beta.43': {}
-
-  '@rolldown/pluginutils@1.0.0-beta.9-commit.d91dfb5': {}
 
   '@rolldown/pluginutils@1.0.0-beta.9-commit.d91dfb5': {}
 
