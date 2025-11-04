@@ -331,7 +331,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : needsPaymentMethod
+                  : totals.totalDueNow.amount > 0
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -386,7 +386,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
@@ -430,14 +430,14 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? paymentMethod
                     ? paymentMethod.paymentType !== 'card'
                       ? `${capitalize(paymentMethod.paymentType)}`
