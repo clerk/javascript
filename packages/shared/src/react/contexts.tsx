@@ -13,8 +13,8 @@ import type {
   SignedInSessionResource,
   UserResource,
 } from '../types';
-import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
+import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
@@ -66,7 +66,7 @@ const OrganizationProvider = ({
   }
 >) => {
   return (
-    <SWRConfig value={swrConfig}>
+    <SWRConfigCompat swrConfig={swrConfig}>
       <OrganizationContextInternal.Provider
         value={{
           value: { organization },
@@ -74,7 +74,7 @@ const OrganizationProvider = ({
       >
         {children}
       </OrganizationContextInternal.Provider>
-    </SWRConfig>
+    </SWRConfigCompat>
   );
 };
 
