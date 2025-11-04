@@ -113,7 +113,7 @@ export interface ClientJSON extends ClerkResourceJSON {
   captcha_bypass?: boolean; // this is used by the @clerk/testing package
   last_active_session_id: string | null;
   last_authentication_strategy: LastAuthenticationStrategy | null;
-  client_trust_state: ClientTrustState | null;
+  client_trust_state?: ClientTrustState;
   cookie_expires_at: number | null;
   created_at: number;
   updated_at: number;
