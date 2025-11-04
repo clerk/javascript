@@ -53,44 +53,6 @@ const common = ({ mode, variant }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          // Component-specific chunks
-          signUp: {
-            test: /[\\/]src[\\/]components[\\/]SignUp[\\/]/,
-            name: 'signup',
-            chunks: 'all',
-            priority: 10,
-          },
-          signIn: {
-            test: /[\\/]src[\\/]components[\\/]SignIn[\\/]/,
-            name: 'signin',
-            chunks: 'all',
-            priority: 10,
-          },
-          userProfile: {
-            test: /[\\/]src[\\/]components[\\/]UserProfile[\\/]/,
-            name: 'user-profile',
-            chunks: 'all',
-            priority: 10,
-          },
-          organizationProfile: {
-            test: /[\\/]src[\\/]components[\\/]OrganizationProfile[\\/]/,
-            name: 'organization-profile',
-            chunks: 'all',
-            priority: 10,
-          },
-          userButton: {
-            test: /[\\/]src[\\/]components[\\/]UserButton[\\/]/,
-            name: 'user-button',
-            chunks: 'all',
-            priority: 10,
-          },
-          organizationSwitcher: {
-            test: /[\\/]src[\\/]components[\\/]OrganizationSwitcher[\\/]/,
-            name: 'organization-switcher',
-            chunks: 'all',
-            priority: 10,
-          },
-          // Vendor chunks
           zxcvbnTSCoreVendor: {
             test: /[\\/]node_modules[\\/](@zxcvbn-ts\/core|fastest-levenshtein)[\\/]/,
             name: 'zxcvbn-ts-core',
@@ -101,21 +63,35 @@ const common = ({ mode, variant }) => {
             name: 'zxcvbn-common',
             chunks: 'all',
           },
-          emotionVendor: {
-            test: /[\\/]node_modules[\\/](@emotion)[\\/]/,
-            name: 'emotion-vendor',
+          baseAccountSDKVendor: {
+            test: /[\\/]node_modules[\\/](@base-org\/account|@noble\/curves|abitype|ox|preact|eventemitter3|viem|zustand)[\\/]/,
+            name: 'base-account-sdk',
             chunks: 'all',
-            priority: 20,
           },
-          floatingUIVendor: {
-            test: /[\\/]node_modules[\\/](@floating-ui)[\\/]/,
-            name: 'floating-ui-vendor',
+          coinbaseWalletSDKVendor: {
+            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
+            name: 'coinbase-wallet-sdk',
             chunks: 'all',
           },
           stripeVendor: {
-            test: /[\\/]node_modules[\\/](@stripe)[\\/]/,
-            name: 'stripe-vendor',
+            test: /[\\/]node_modules[\\/](@stripe\/stripe-js)[\\/]/,
+            name: 'stripe-vendors',
             chunks: 'all',
+            enforce: true,
+          },
+          /**
+           * Sign up is shared between the SignUp component and the SignIn component.
+           */
+          signUp: {
+            minChunks: 1,
+            name: 'signup',
+            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
+          },
+          common: {
+            minChunks: 1,
+            name: 'ui-common',
+            priority: -20,
+            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -125,7 +101,7 @@ const common = ({ mode, variant }) => {
           },
           react: {
             chunks: 'all',
-            test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+            test: /[\\/]node_modules[\\/](react-dom|scheduler)[\\/]/,
             name: 'framework',
             priority: 40,
             enforce: true,
@@ -288,7 +264,7 @@ const devConfig = (mode, env) => {
     // devtool: 'eval-cheap-source-map',
     devtool: false,
     output: {
-      publicPath: `${devUrl.origin}/npm`,
+      publicPath: `${devUrl.origin}/npm/`,
       crossOriginLoading: 'anonymous',
       filename: `[name].js`,
       libraryTarget: 'umd',

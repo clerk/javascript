@@ -69,25 +69,25 @@ const typescriptLoaderProd = ({ targets, useCoreJs = false } = {}) => {
         },
       },
     },
-    ...(useCoreJs
-      ? [
-          {
-            test: /\.m?js$/,
-            exclude: /node_modules[\\/]core-js/,
-            use: {
-              loader: 'builtin:swc-loader',
-              options: {
-                env: {
-                  ...(targets ? { targets } : {}),
+    {
+      test: /\.m?js$/,
+      exclude: /node_modules[\\/]core-js/,
+      use: {
+        loader: 'builtin:swc-loader',
+        options: {
+          env: {
+            ...(targets ? { targets } : {}),
+            ...(useCoreJs
+              ? {
                   mode: 'usage',
                   coreJs: '3.41.0',
-                },
-                isModule: 'unknown',
-              },
-            },
+                }
+              : {}),
           },
-        ]
-      : []),
+          isModule: 'unknown',
+        },
+      },
+    },
   ];
 };
 
