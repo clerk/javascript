@@ -34,7 +34,7 @@ type GetInvitationListParams = ClerkPaginationRequest<{
    * - 'email_address' — recipient email address
    * - 'expires_at' — when the invitation expires
    *
-   * @example:
+   * @example
    * ```ts
    * // Newest first
    * await clerkClient.invitations.getInvitationList({ orderBy: '-created_at' });
