@@ -1,4 +1,4 @@
-import type { ForPayerType } from '../../types';
+import type { BillingSubscriptionResource, ForPayerType } from '../../types';
 
 export type UseSubscriptionParams = {
   for?: ForPayerType;
@@ -9,9 +9,9 @@ export type UseSubscriptionParams = {
   keepPreviousData?: boolean;
 };
 
-export type SubscriptionResult<TData> = {
-  data: TData | undefined | null;
-  error: unknown;
+export type SubscriptionResult = {
+  data: BillingSubscriptionResource | undefined | null;
+  error: Error | undefined;
   isLoading: boolean;
   isFetching: boolean;
   /**
