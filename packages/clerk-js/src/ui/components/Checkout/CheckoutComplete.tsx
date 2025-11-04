@@ -161,7 +161,7 @@ export const CheckoutComplete = () => {
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt, needsPaymentMethod } = checkout;
+  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
 
   const prefersReducedMotion = usePrefersReducedMotion();
