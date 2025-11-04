@@ -233,6 +233,92 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
+      it('does not call setTransitiveState when session ID stays the same during setActive with navigation', async () => {
+        const mockSession1 = {
+          id: 'session_1',
+          status: 'active',
+          user: { id: 'user_1' },
+          touch: vi.fn(() => Promise.resolve()),
+          getToken: vi.fn(() => Promise.resolve('token_1')),
+          lastActiveToken: { getRawString: () => 'token_1' },
+        };
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({ signedInSessions: [mockSession1], isEligibleForTouch: () => false }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession1 as any as ActiveSessionResource });
+        expect(sut.session?.id).toBe('session_1');
+
+        // Track if session becomes undefined (transitive state)
+        let sessionBecameUndefined = false;
+        sut.addListener(state => {
+          if (state.session === undefined) {
+            sessionBecameUndefined = true;
+          }
+        });
+
+        // Call setActive with SAME session ID and redirectUrl
+        // Should NOT trigger setTransitiveState since session ID is not changing
+        await sut.setActive({
+          session: mockSession1 as any as ActiveSessionResource,
+          redirectUrl: '/dashboard',
+        });
+
+        expect(sessionBecameUndefined).toBe(false);
+        expect(sut.session?.id).toBe('session_1');
+      });
+
+      it('calls setTransitiveState when session ID changes during setActive with navigation', async () => {
+        const mockSession1 = {
+          id: 'session_1',
+          status: 'active',
+          user: { id: 'user_1' },
+          touch: vi.fn(() => Promise.resolve()),
+          getToken: vi.fn(() => Promise.resolve('token_1')),
+          lastActiveToken: { getRawString: () => 'token_1' },
+        };
+
+        const mockSession2 = {
+          id: 'session_2',
+          status: 'active',
+          user: { id: 'user_2' },
+          touch: vi.fn(() => Promise.resolve()),
+          getToken: vi.fn(() => Promise.resolve('token_2')),
+          lastActiveToken: { getRawString: () => 'token_2' },
+        };
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({ signedInSessions: [mockSession1, mockSession2], isEligibleForTouch: () => false }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+
+        await sut.setActive({ session: mockSession1 as any as ActiveSessionResource });
+        expect(sut.session?.id).toBe('session_1');
+
+        // Track if session becomes undefined (transitive state)
+        let sessionBecameUndefined = false;
+        sut.addListener(state => {
+          if (state.session === undefined) {
+            sessionBecameUndefined = true;
+          }
+        });
+
+        // Call setActive with different session ID and redirectUrl
+        await sut.setActive({
+          session: mockSession2 as any as ActiveSessionResource,
+          redirectUrl: '/dashboard',
+        });
+
+        expect(sessionBecameUndefined).toBe(true);
+        expect(sut.session?.id).toBe('session_2');
+      });
+
       it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
