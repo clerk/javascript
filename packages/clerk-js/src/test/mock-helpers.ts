@@ -52,7 +52,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
       defaultOptions: {
         queries: {
           retry: false,
-          staleTime: 0,
+          staleTime: Infinity,
         },
       },
     }),

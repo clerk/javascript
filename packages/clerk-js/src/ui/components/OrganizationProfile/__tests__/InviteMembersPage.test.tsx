@@ -30,6 +30,7 @@ describe('InviteMembersPage', () => {
       });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { findByText, getByText } = render(
@@ -56,6 +57,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -115,6 +117,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 1,
         data: [
@@ -152,6 +155,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 1,
         data: [
@@ -203,6 +207,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 3,
         data: [
@@ -266,6 +271,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -320,6 +326,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -377,6 +384,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -437,6 +445,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -493,6 +502,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -563,6 +573,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -629,6 +640,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [

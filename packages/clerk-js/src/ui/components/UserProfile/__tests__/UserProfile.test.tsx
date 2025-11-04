@@ -106,9 +106,15 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = true;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+      fixtures.clerk.billing.getSubscription.mockRejectedValue(null);
+
       render(<UserProfile />, { wrapper });
       const billingElements = await screen.findAllByRole('button', { name: /Billing/i });
       expect(billingElements.length).toBeGreaterThan(0);
+
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
 
     it('includes Billing when enabled and user has a non-free subscription', async () => {
@@ -119,6 +125,7 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [

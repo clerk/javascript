@@ -10,10 +10,12 @@ const { createFixtures } = bindCreateFixtures('SubscriptionDetails');
 
 describe('SubscriptionDetails', () => {
   it('Displays spinner when init loading', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue(null);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -36,6 +38,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -139,6 +145,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -242,6 +252,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -324,6 +338,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const planAnnual = {
       id: 'plan_annual',
@@ -483,6 +502,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const planMonthly = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
@@ -620,6 +644,11 @@ describe('SubscriptionDetails', () => {
 
     const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
       createdAt: new Date('2021-01-01'),
@@ -722,6 +751,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
@@ -823,6 +857,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const plan = {
       id: 'plan_annual',
@@ -929,6 +968,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const plan = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
@@ -1017,6 +1061,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -1125,6 +1174,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
