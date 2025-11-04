@@ -1,4 +1,4 @@
-import type { ForPayerType } from '../../types';
+import type { BillingSubscriptionResource, ForPayerType } from '../../types';
 
 /**
  * @interface
@@ -21,15 +21,15 @@ export type UseSubscriptionParams = {
 /**
  * @interface
  */
-export type SubscriptionResult<TData> = {
+export type SubscriptionResult = {
   /**
    * The subscription object, `undefined` before the first fetch, or `null` if no subscription exists.
    */
-  data: TData | undefined | null;
+  data: BillingSubscriptionResource | undefined | null;
   /**
    * Any error that occurred during the data fetch, or `undefined` if no error occurred.
    */
-  error: unknown;
+  error: Error | undefined;
   /**
    * A boolean that indicates whether the initial data is still being fetched.
    */

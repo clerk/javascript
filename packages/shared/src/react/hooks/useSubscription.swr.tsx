@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import type { BillingSubscriptionResource, EnvironmentResource } from '../../types';
+import type { EnvironmentResource } from '../../types';
 import { useSWR } from '../clerk-swr';
 import {
   useAssertWrappedByClerkProvider,
@@ -14,11 +14,12 @@ import type { SubscriptionResult, UseSubscriptionParams } from './useSubscriptio
 const hookName = 'useSubscription';
 
 /**
- * @internal
  * This is the existing implementation of useSubscription using SWR.
  * It is kept here for backwards compatibility until our next major version.
+ *
+ * @internal
  */
-export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult<BillingSubscriptionResource> {
+export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult {
   useAssertWrappedByClerkProvider(hookName);
 
   const clerk = useClerkInstanceContext();
