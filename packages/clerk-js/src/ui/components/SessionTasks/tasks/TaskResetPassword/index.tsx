@@ -89,6 +89,7 @@ const TaskResetPasswordInternal = () => {
     try {
       await updatePasswordWithReverification(user, [
         {
+          currentPassword: currentPasswordRequired ? currentPasswordField.value : undefined,
           newPassword: passwordField.value,
           signOutOfOtherSessions: sessionsField.checked,
         },
