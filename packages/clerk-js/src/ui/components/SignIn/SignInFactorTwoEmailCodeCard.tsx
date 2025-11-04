@@ -1,4 +1,4 @@
-import type { EmailCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor } from '@clerk/shared/types';
 
 import { useCoreSignIn } from '../../contexts';
 import { Flow, localizationKeys } from '../../customizables';
