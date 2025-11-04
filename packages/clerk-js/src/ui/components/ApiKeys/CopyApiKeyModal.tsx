@@ -41,7 +41,9 @@ export const CopyApiKeyModal = ({
   const handleSubmit = () => {
     onCopy();
     onClose();
-    closeActionCard();
+    setTimeout(() => {
+      closeActionCard();
+    }, 100);
   };
 
   if (!isOpen) {
