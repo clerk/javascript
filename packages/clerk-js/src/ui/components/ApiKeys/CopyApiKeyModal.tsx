@@ -29,7 +29,7 @@ export const CopyApiKeyModal = ({
   apiKeySecret,
   modalRoot,
 }: CopyApiKeyModalProps) => {
-  const apiKeyField = useFormControl('name', apiKeySecret, {
+  const apiKeyField = useFormControl('apiKeySecret', apiKeySecret, {
     type: 'text',
     label: localizationKeys('formFieldLabel__apiKey'),
     isRequired: false,
@@ -77,6 +77,7 @@ export const CopyApiKeyModal = ({
                 sx={{ flex: 1 }}
               >
                 <Form.CommonInputWrapper {...apiKeyField.props}>
+                  {/* TODO: Use unified Input + Appended icon button component */}
                   <ClipboardInput
                     value={apiKeySecret}
                     readOnly
