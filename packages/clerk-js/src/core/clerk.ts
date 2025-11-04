@@ -255,7 +255,7 @@ export class Clerk implements ClerkInterface {
 
     return this.#queryClient
       ? {
-          __tag: 'clerk-rq-client', // make this a symbol
+          __tag: 'clerk-rq-client',
           client: this.#queryClient,
         }
       : undefined;
