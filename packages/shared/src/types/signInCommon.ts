@@ -40,6 +40,7 @@ import type {
   Web3WalletIdentifier,
 } from './identifiers';
 import type {
+  AppleIdTokenStrategy,
   BackupCodeStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
@@ -135,6 +136,10 @@ export type SignInCreateParams = (
     }
   | {
       strategy: GoogleOneTapStrategy;
+      token: string;
+    }
+  | {
+      strategy: AppleIdTokenStrategy;
       token: string;
     }
   | {
