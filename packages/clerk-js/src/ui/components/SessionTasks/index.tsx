@@ -12,10 +12,12 @@ import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import {
   SessionTasksContext,
   TaskChooseOrganizationContext,
+  TaskResetPasswordContext,
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
+import { TaskResetPassword } from './tasks/TaskResetPassword';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
@@ -59,6 +61,13 @@ function SessionTasksRoutes(): JSX.Element {
           >
             <TaskChooseOrganization />
           </TaskChooseOrganizationContext.Provider>
+        </Route>
+        <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['reset-password']}>
+          <TaskResetPasswordContext.Provider
+            value={{ componentName: 'TaskResetPassword', redirectUrlComplete: ctx.redirectUrlComplete }}
+          >
+            <TaskResetPassword />
+          </TaskResetPasswordContext.Provider>
         </Route>
         <Route index>
           <SessionTasksStart />
