@@ -1,9 +1,10 @@
-import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
-import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
+import { getCurrentOrganizationMembership, withOrganizationSettingsEnabled } from '@clerk/shared/organization';
+import type { LoadedClerk, OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
+import { useClerk } from './useClerk';
 import { useClerkContext } from './useClerkContext';
 import { useSession } from './useSession';
 
@@ -52,7 +53,7 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
  *   </div>
  * </template>
  */
-export const useOrganization: UseOrganization = () => {
+const useOrganizationInternal: UseOrganization = () => {
   const { clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
 
@@ -87,3 +88,8 @@ export const useOrganization: UseOrganization = () => {
 
   return toComputedRefs(result);
 };
+
+export const useOrganization = withOrganizationSettingsEnabled(
+  useOrganizationInternal,
+  () => useClerk().value as LoadedClerk,
+);

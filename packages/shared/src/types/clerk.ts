@@ -4,6 +4,7 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
+  EnableOrganizationsTheme,
   OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
@@ -319,6 +320,18 @@ export interface Clerk {
    * Closes the Clerk user verification modal.
    */
   __internal_closeReverification: () => void;
+
+  /**
+   * Opens the Clerk Enable Organizations component in a modal.
+   *
+   * @param props - Optional user verification configuration parameters.
+   */
+  __internal_openEnableOrganizations: (props?: __internal_EnableOrganizationsModalProps) => void;
+
+  /**
+   * Closes the Clerk Enable Organizations modal.
+   */
+  __internal_closeEnableOrganizations: () => void;
 
   /**
    * Opens the Google One Tap component.
@@ -1428,6 +1441,12 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
+
+export type __internal_EnableOrganizationsProps = RoutingOptions & {
+  appearance?: EnableOrganizationsTheme;
+};
+
+export type __internal_EnableOrganizationsModalProps = WithoutRouting<__internal_EnableOrganizationsProps>;
 
 export type __internal_ComponentNavigationContext = {
   /**

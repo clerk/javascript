@@ -1,5 +1,6 @@
 import type {
   __internal_CheckoutProps,
+  __internal_EnableOrganizationsProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
@@ -27,6 +28,7 @@ import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
   CreateOrganizationModal,
+  EnableOrganizationsModal,
   ImpersonationFab,
   KeylessPrompt,
   OrganizationProfileModal,
@@ -79,7 +81,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'enableOrganizations',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -90,7 +93,9 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : UserProfileProps,
+            : T extends 'enableOrganizations'
+              ? __internal_EnableOrganizationsProps
+              : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -102,7 +107,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'enableOrganizations',
     options?: {
       notify?: boolean;
     },
@@ -152,6 +158,7 @@ interface ComponentsState {
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  enableOrganizationsModal: null | __internal_EnableOrganizationsProps;
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
@@ -245,6 +252,7 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
+    enableOrganizationsModal: null,
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
@@ -274,6 +282,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
+    enableOrganizationsModal,
     checkoutDrawer,
     planDetailsDrawer,
     subscriptionDetailsDrawer,
@@ -325,9 +334,10 @@ const Components = (props: ComponentsProps) => {
       clearUrlStateParam();
       setState(s => {
         function handleCloseModalForExperimentalUserVerification() {
-          const modal = s[`${name}Modal`] || {};
+          const modal = s[`${name}Modal`];
           if (modal && typeof modal === 'object' && 'afterVerificationCancelled' in modal && notify) {
-            modal.afterVerificationCancelled?.();
+            // TypeScript doesn't narrow properly with template literal access and 'in' operator
+            (modal as { afterVerificationCancelled?: () => void }).afterVerificationCancelled?.();
           }
         }
 
@@ -484,6 +494,22 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedEnableOrganizationsModal = (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'enableOrganizations'}
+      componentAppearance={enableOrganizationsModal?.appearance}
+      flowName={'enableOrganizations'}
+      onClose={() => componentsControls.closeModal('enableOrganizations')}
+      onExternalNavigate={() => componentsControls.closeModal('enableOrganizations')}
+      startPath={buildVirtualRouterUrl({ base: '/enable-organizations', path: urlStateParam?.path })}
+      componentName={'EnableOrganizationsModal'}
+      modalContainerSx={{ alignItems: 'center' }}
+    >
+      <EnableOrganizationsModal {...enableOrganizationsModal} />
+    </LazyModalRenderer>
+  );
+
   const mountedOrganizationProfileModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -587,6 +613,7 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
+        {enableOrganizationsModal && mountedEnableOrganizationsModal}
 
         <MountedCheckoutDrawer
           appearance={state.appearance}

@@ -1,4 +1,4 @@
-import { getCurrentOrganizationMembership } from '../../organization';
+import { getCurrentOrganizationMembership, withOrganizationSettingsEnabled } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   GetDomainsParams,
@@ -20,6 +20,7 @@ import {
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useClerk } from './useClerk';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -271,7 +272,7 @@ const undefinedPaginatedResource = {
  * }
  * ```
  */
-export function useOrganization<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
+function useOrganizationInternal<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
   const {
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
@@ -494,3 +495,5 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
     invitations,
   };
 }
+
+export const useOrganization = withOrganizationSettingsEnabled(useOrganizationInternal, () => useClerk());

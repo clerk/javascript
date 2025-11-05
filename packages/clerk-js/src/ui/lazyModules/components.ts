@@ -27,6 +27,7 @@ const componentImportPaths = {
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  EnableOrganizations: () => import(/* webpackChunkName: "enableOrganizations" */ '../components/EnableOrganizations'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -42,6 +43,14 @@ export const UserVerification = lazy(() =>
 
 export const UserVerificationModal = lazy(() =>
   componentImportPaths.UserVerification().then(module => ({ default: module.UserVerificationModal })),
+);
+
+export const EnableOrganizations = lazy(() =>
+  componentImportPaths.EnableOrganizations().then(module => ({ default: module.EnableOrganizations })),
+);
+
+export const EnableOrganizationsModal = lazy(() =>
+  componentImportPaths.EnableOrganizations().then(module => ({ default: module.EnableOrganizationsModal })),
 );
 
 export const SignUp = lazy(() => componentImportPaths.SignUp().then(module => ({ default: module.SignUp })));
@@ -144,6 +153,7 @@ export const ClerkComponents = {
   UserButton,
   UserProfile,
   UserVerification,
+  EnableOrganizations,
   OrganizationSwitcher,
   OrganizationList,
   OrganizationProfile,
@@ -154,6 +164,7 @@ export const ClerkComponents = {
   OrganizationProfileModal,
   CreateOrganizationModal,
   UserVerificationModal,
+  EnableOrganizationsModal,
   GoogleOneTap,
   Waitlist,
   WaitlistModal,
