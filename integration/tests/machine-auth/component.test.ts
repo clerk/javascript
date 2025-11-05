@@ -43,6 +43,10 @@ testAgainstRunningApps({
     await u.po.apiKeys.selectExpiration('1d');
     await u.po.apiKeys.clickSaveButton();
 
+    // Close copy modal
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
     await u.po.apiKeys.waitForFormClosed();
 
     // Create API key 2
@@ -52,8 +56,14 @@ testAgainstRunningApps({
     await u.po.apiKeys.selectExpiration('7d');
     await u.po.apiKeys.clickSaveButton();
 
+    // Wait and close copy modal
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
+    await u.po.apiKeys.waitForFormClosed();
+
     // Check if both API keys are created
-    await expect(u.page.locator('.cl-apiKeysTable .cl-tableRow')).toHaveCount(2);
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(2);
   });
 
   test('can revoke api keys', async ({ page, context }) => {
@@ -74,6 +84,11 @@ testAgainstRunningApps({
     await u.po.apiKeys.typeName(apiKeyName);
     await u.po.apiKeys.selectExpiration('1d');
     await u.po.apiKeys.clickSaveButton();
+
+    // Wait and close copy modal
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
     await u.po.apiKeys.waitForFormClosed();
 
     // Retrieve API key
@@ -109,39 +124,27 @@ testAgainstRunningApps({
 
     const apiKeyName = `${fakeAdmin.firstName}-${Date.now()}`;
 
-    // Wait for create API response to get the secret
+    // Create API key and capture the secret from the response
     const createResponsePromise = page.waitForResponse(
       response => response.url().includes('/api_keys') && response.request().method() === 'POST',
     );
-
-    // Create API key
     await u.po.apiKeys.clickAddButton();
     await u.po.apiKeys.waitForFormOpened();
     await u.po.apiKeys.typeName(apiKeyName);
     await u.po.apiKeys.selectExpiration('1d');
     await u.po.apiKeys.clickSaveButton();
 
-    // Get the secret from the create response
     const createResponse = await createResponsePromise;
-    const apiKeyData = await createResponse.json();
-    const secret = apiKeyData.secret;
+    const secret = (await createResponse.json()).secret;
 
-    // Wait for the copy modal to appear
-    const copyModal = page.locator('.cl-apiKeysCopyModal');
-    await copyModal.waitFor({ state: 'attached' });
-
-    // Grant clipboard permissions before clicking the button
+    // Copy secret via modal and verify clipboard contents
+    // Wait and close copy modal
+    await u.po.apiKeys.waitForCopyModalOpened();
     await context.grantPermissions(['clipboard-read']);
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
+    await u.po.apiKeys.waitForFormClosed();
 
-    // Click "Copy & Close" button which will copy the secret and close the modal
-    const copyAndCloseButton = copyModal.locator('.cl-apiKeysCopyModalSubmitButton');
-    await copyAndCloseButton.waitFor({ state: 'attached' });
-    await copyAndCloseButton.click();
-
-    // Wait for modal to close
-    await copyModal.waitFor({ state: 'detached' });
-
-    // Read clipboard contents to verify the secret was copied
     const clipboardText = await page.evaluate('navigator.clipboard.readText()');
     await context.clearPermissions();
     expect(clipboardText).toBe(secret);
