@@ -27,6 +27,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const [queryClient] = useClerkQueryClient();
 
+  // Compute the actual enabled state for queries (considering all conditions)
+  const queriesEnabled = enabled && Boolean(fetcher) && !cacheMode && isSignedIn !== false;
+
   // Force re-render counter for cache-only updates
   const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   const forceUpdate = useCallback((updater: (n: number) => number) => {
@@ -62,14 +65,10 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher(requestParams as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && !triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn !== false,
+    enabled: queriesEnabled && !triggerInfinite,
     // Use placeholderData to keep previous data while fetching new page
     placeholderData: keepPreviousData ? previousData => previousData : undefined,
   });
-
-  // const singlePageQuery = useMemo(() => {
-  //   return __singlePageQuery;
-  // }, [__singlePageQuery.data, forceUpdateCounter]);
 
   // Infinite mode: accumulate pages
   const infiniteQueryKey = useMemo(() => {
@@ -98,21 +97,20 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn !== false,
+    enabled: queriesEnabled && triggerInfinite,
   });
 
   // Track previous isSignedIn state to detect sign-out transitions
   const previousIsSignedIn = usePreviousValue(isSignedIn);
 
-  // Detect sign-out and trigger a brief loading state to mimic SWR behavior
+  // Detect sign-out and clear queries
   useEffect(() => {
-    // TODO(@RQ_MIGRATION): make sure this is not prone to setTransitiveState
-    const isNowSignedOut = !isSignedIn;
+    const isNowSignedOut = isSignedIn === false;
 
     if (previousIsSignedIn && isNowSignedOut) {
       // Clear ALL queries matching the base query keys (including old userId)
       // Use predicate to match queries that start with 'clerk-pages' or 'clerk-pages-infinite'
-      forceUpdate(n => n + 1);
+
       queryClient.removeQueries({
         predicate: query => {
           const key = query.queryKey;
@@ -125,12 +123,11 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
       // Reset paginated page to initial
       setPaginatedPage(initialPageRef.current);
-      forceUpdate(n => n + 1);
 
-      // Clear the transition state after a microtask
+      // Force re-render to reflect cache changes
       void Promise.resolve().then(() => forceUpdate(n => n + 1));
     }
-  }, [isSignedIn, queryClient]);
+  }, [isSignedIn, queryClient, previousIsSignedIn, forceUpdate]);
 
   const page = useMemo(() => {
     if (triggerInfinite) {
@@ -165,15 +162,19 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const data = useMemo(() => {
     if (triggerInfinite) {
       const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
+      // When query is disabled, the hook's data is stale, so only read from cache
+      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
       return pages.map((a: ClerkPaginatedResponse<any>) => a?.data).flat() ?? [];
     }
 
-    // Get current page data from query or cache
-    // placeholderData handles keepPreviousData automatically
-    const pageData = singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
+    // This ensures that after cache clearing, we return empty data
+    const pageData = queriesEnabled
+      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
+      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
     return pageData?.data ?? [];
   }, [
+    queriesEnabled,
     forceUpdateCounter,
     triggerInfinite,
     singlePageQuery.data,
@@ -186,15 +187,27 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const count = useMemo(() => {
     if (triggerInfinite) {
       const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
+      // When query is disabled, the hook's data is stale, so only read from cache
+      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
       return pages[pages.length - 1]?.total_count || 0;
     }
 
-    // Get current page data from query or cache
-    // placeholderData handles keepPreviousData automatically
-    const pageData = singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
+    // This ensures that after cache clearing, we return 0
+    const pageData = queriesEnabled
+      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
+      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
     return pageData?.total_count ?? 0;
-  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data, queryClient, pagesQueryKey, infiniteQueryKey]);
+  }, [
+    queriesEnabled,
+    forceUpdateCounter,
+    triggerInfinite,
+    singlePageQuery.data,
+    infiniteQuery.data,
+    queryClient,
+    pagesQueryKey,
+    infiniteQueryKey,
+  ]);
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
