@@ -18,12 +18,18 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const pageSizeRef = useRef(params.pageSize ?? 10);
 
   const enabled = config.enabled ?? true;
+  const isSignedIn = config.isSignedIn ?? true;
   const triggerInfinite = config.infinite ?? false;
   const cacheMode = config.__experimental_mode === 'cache';
-  // TODO: Support keepPreviousData
-  // const _keepPreviousData = config.keepPreviousData ?? false;
+  const keepPreviousData = config.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
+
+  // Force re-render counter for cache-only updates
+  const [, setForceUpdateCounter] = useState(0);
+  const forceUpdate = useCallback((updater: (n: number) => number) => {
+    setForceUpdateCounter(updater);
+  }, []);
 
   // Non-infinite mode: single page query
   const pagesQueryKey = useMemo(() => {
@@ -54,7 +60,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher(requestParams as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && !triggerInfinite && Boolean(fetcher) && !cacheMode,
+    enabled: enabled && !triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn,
+    // Use placeholderData to keep previous data while fetching new page
+    placeholderData: keepPreviousData ? previousData => previousData : undefined,
   });
 
   // Infinite mode: accumulate pages
@@ -84,22 +92,27 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && triggerInfinite && Boolean(fetcher) && !cacheMode,
+    enabled: enabled && triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn,
   });
 
   const page = useMemo(() => {
     if (triggerInfinite) {
-      return (infiniteQuery.data?.pages?.length ?? 0) || 0;
+      // Read from query data first, fallback to cache
+      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
+      return pages.length || 0;
     }
     return paginatedPage;
-  }, [triggerInfinite, infiniteQuery.data?.pages?.length, paginatedPage]);
+  }, [triggerInfinite, infiniteQuery.data?.pages, paginatedPage, queryClient, infiniteQueryKey]);
 
   const fetchPage: ValueOrSetter<number> = useCallback(
     numberOrgFn => {
       if (triggerInfinite) {
         const next = typeof numberOrgFn === 'function' ? (numberOrgFn as (n: number) => number)(page) : numberOrgFn;
         const targetCount = Math.max(0, next);
-        const currentCount = infiniteQuery.data?.pages?.length ?? 0;
+        const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+        const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
+        const currentCount = pages.length;
         const toFetch = targetCount - currentCount;
         if (toFetch > 0) {
           void infiniteQuery.fetchNextPage({ cancelRefetch: false });
@@ -108,23 +121,34 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       }
       return setPaginatedPage(numberOrgFn);
     },
-    [infiniteQuery, page, triggerInfinite],
+    [infiniteQuery, page, triggerInfinite, queryClient, infiniteQueryKey],
   );
 
   const data = useMemo(() => {
     if (triggerInfinite) {
-      return infiniteQuery.data?.pages?.map(a => a?.data).flat() ?? [];
+      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
+      return pages.map((a: ClerkPaginatedResponse<any>) => a?.data).flat() ?? [];
     }
-    return singlePageQuery.data?.data ?? [];
-  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data]);
+
+    // Get current page data from query or cache
+    // placeholderData handles keepPreviousData automatically
+    const pageData = singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    return pageData?.data ?? [];
+  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data, queryClient, pagesQueryKey, infiniteQueryKey]);
 
   const count = useMemo(() => {
     if (triggerInfinite) {
-      const pages = infiniteQuery.data?.pages ?? [];
+      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
       return pages[pages.length - 1]?.total_count || 0;
     }
-    return singlePageQuery.data?.total_count ?? 0;
-  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data]);
+
+    // Get current page data from query or cache
+    // placeholderData handles keepPreviousData automatically
+    const pageData = singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    return pageData?.total_count ?? 0;
+  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data, queryClient, pagesQueryKey, infiniteQueryKey]);
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
@@ -158,11 +182,24 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const setData: CacheSetter = value => {
     if (triggerInfinite) {
-      return queryClient.setQueryData(infiniteQueryKey, (prevValue: any) => {
-        return { ...prevValue, pages: typeof value === 'function' ? value(prevValue.pages) : value };
-      }) as any;
+      queryClient.setQueryData(infiniteQueryKey, (prevValue: any = {}) => {
+        const prevPages = Array.isArray(prevValue?.pages) ? prevValue.pages : [];
+        const nextPages = (typeof value === 'function' ? value(prevPages) : value) as Array<
+          ClerkPaginatedResponse<any>
+        >;
+        return { ...prevValue, pages: nextPages };
+      });
+      // Force re-render to reflect cache changes
+      forceUpdate(n => n + 1);
+      return Promise.resolve();
     }
-    return queryClient.setQueryData(pagesQueryKey, value) as any;
+    queryClient.setQueryData(pagesQueryKey, (prevValue: any = { data: [], total_count: 0 }) => {
+      const nextValue = (typeof value === 'function' ? value(prevValue) : value) as ClerkPaginatedResponse<any>;
+      return nextValue;
+    });
+    // Force re-render to reflect cache changes
+    forceUpdate(n => n + 1);
+    return Promise.resolve();
   };
 
   const revalidate = () => {
