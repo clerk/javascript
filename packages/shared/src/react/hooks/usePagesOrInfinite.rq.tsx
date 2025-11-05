@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
@@ -12,24 +12,10 @@ import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
-  const [isManuallyFetchingNextPage, setIsManuallyFetchingNextPage] = useState(false);
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(params.initialPage ?? 1);
   const pageSizeRef = useRef(params.pageSize ?? 10);
-  const mountedRef = useRef(true);
-  const resetFetchingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      if (resetFetchingTimeoutRef.current) {
-        clearTimeout(resetFetchingTimeoutRef.current);
-        resetFetchingTimeoutRef.current = null;
-      }
-    };
-  }, []);
 
   const enabled = config.enabled ?? true;
   const triggerInfinite = config.infinite ?? false;
@@ -141,31 +127,12 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
-  // const isFetching = triggerInfinite
-  //   ? infiniteQuery.isFetching || infiniteQuery.isFetchingNextPage || isManuallyFetchingNextPage
-  //   : singlePageQuery.isFetching;
-
   const error = (triggerInfinite ? (infiniteQuery.error as any) : (singlePageQuery.error as any)) ?? null;
   const isError = !!error;
 
   const fetchNext = useCallback(() => {
     if (triggerInfinite) {
-      // void infiniteQuery.fetchNextPage({ cancelRefetch: false });
-      setIsManuallyFetchingNextPage(true);
-      void Promise.resolve(infiniteQuery.fetchNextPage({ cancelRefetch: false })).finally(() => {
-        if (!mountedRef.current) {
-          return;
-        }
-        if (resetFetchingTimeoutRef.current) {
-          clearTimeout(resetFetchingTimeoutRef.current);
-        }
-        resetFetchingTimeoutRef.current = setTimeout(() => {
-          if (mountedRef.current) {
-            setIsManuallyFetchingNextPage(false);
-          }
-          resetFetchingTimeoutRef.current = null;
-        }, 0);
-      });
+      void infiniteQuery.fetchNextPage({ cancelRefetch: false });
       return;
     }
     setPaginatedPage(n => Math.max(0, n + 1));
