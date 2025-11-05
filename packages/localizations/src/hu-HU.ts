@@ -19,8 +19,8 @@ export const huHU: LocalizationResource = {
     action__search: undefined,
     copySecret: {
       formButtonPrimary__copyAndClose: 'Másolás és bezárás',
-      formHint: 'Biztonsági okokból később nem fogjuk tudni újra megengedni, hogy megtekinthesse.',
-      formTitle: 'Másolja le az "{{name}}" API kulcsot most',
+      formHint: 'Biztonsági okokból később nem fogjuk tudni újra megengedni, hogy megtekintsd.',
+      formTitle: 'Másold le az "{{name}}" API kulcsot most',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
