@@ -232,7 +232,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKey: undefined,
+  formFieldLabel__apiKey: 'Chave API',
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',

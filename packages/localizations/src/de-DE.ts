@@ -233,7 +233,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKey: undefined,
+  formFieldLabel__apiKey: 'API-Key',
   formFieldLabel__apiKeyDescription: 'Beschreibung',
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',

@@ -230,7 +230,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKey: undefined,
+  formFieldLabel__apiKey: 'API klíč',
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
