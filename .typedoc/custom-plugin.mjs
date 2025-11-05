@@ -98,8 +98,8 @@ function getRelativeLinkReplacements() {
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /\(setActiveParams\)/g,
-      replace: '([setActiveParams](/docs/reference/javascript/types/set-active-params))',
+      pattern: /(?<!\[)SetActiveParams(?!\]\()/g,
+      replace: '[SetActiveParams](/docs/reference/javascript/types/set-active-params)',
     },
     {
       pattern: /`LoadedClerk`/g,
@@ -110,8 +110,24 @@ function getCatchAllReplacements() {
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /\| `SignInResource` \|/,
-      replace: '| [SignInResource](/docs/reference/javascript/sign-in) |',
+      pattern: /`SignInResource`/g,
+      replace: '[`SignInResource`](/docs/reference/javascript/sign-up)',
+    },
+    {
+      pattern: /`SignUpResource`/g,
+      replace: '[`SignUpResource`](/docs/reference/javascript/sign-up)',
+    },
+    {
+      pattern: /`UserResource`/g,
+      replace: '[`UserResource`](/docs/reference/javascript/user)',
+    },
+    {
+      pattern: /<code>SessionResource(\[\])<\/code>/g,
+      replace: '[`SessionResource`](/docs/reference/javascript/session) [ ]',
+    },
+    {
+      pattern: /`SignedInSessionResource`/g,
+      replace: '[`SignedInSessionResource`](/docs/reference/javascript/session)',
     },
     {
       pattern: /`OrganizationPrivateMetadata`/g,
