@@ -37,7 +37,7 @@ describe('ResetPassword', () => {
 
     const passwordField = screen.getByLabelText(/New password/i);
     fireEvent.focus(passwordField);
-    await screen.findByText(/Your password must contain 8 or more characters/i, { selector: '[id$="-info-feedback"]' });
+    await screen.findByText(/Your password must contain 8 or more characters/i);
   });
 
   it('renders a hidden identifier field', async () => {
@@ -115,10 +115,10 @@ describe('ResetPassword', () => {
       await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
       const confirmField = screen.getByLabelText(/confirm password/i);
       await userEvent.type(confirmField, 'testrwerrwqrwe');
-      await screen.findByText(/Passwords don't match/i, { selector: '[id^="error-"]' });
+      await screen.findByText(`Passwords don't match.`);
 
       await userEvent.clear(confirmField);
-      await screen.findByText(/Passwords don't match/i, { selector: '[id^="error-"]' });
+      await screen.findByText(`Passwords don't match.`);
     });
 
     it('navigates to the root page upon pressing the back link', async () => {

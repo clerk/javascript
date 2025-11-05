@@ -537,13 +537,15 @@ describe('PasswordSection', () => {
       const confirmField = screen.getByLabelText(/confirm password/i);
       await userEvent.type(confirmField, 'test');
       fireEvent.blur(confirmField);
-      await screen.findByText(/or more/i, { selector: '[id^="error-"]' });
+      await waitFor(() => {
+        screen.getByText(/or more/i);
+      });
     });
 
     it('verifies absence of success feedback when passwords do not match and persists after clearing confirm field', async () => {
       const { wrapper } = await createFixtures(initConfig);
 
-      const { userEvent, getByRole } = render(<PasswordSection />, { wrapper });
+      const { userEvent, getByRole, queryByText } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /set password/i }));
       await waitFor(() => getByRole('heading', { name: /set password/i }));
 
@@ -551,10 +553,14 @@ describe('PasswordSection', () => {
       const confirmField = screen.getByLabelText(/confirm password/i);
       await userEvent.type(confirmField, 'testrwerrwqrwe');
       fireEvent.blur(confirmField);
-      expect(screen.queryByText(/Passwords match/i, { selector: '[id$="-success-feedback"]' })).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      });
 
       await userEvent.clear(confirmField);
-      expect(screen.queryByText(/Passwords match/i, { selector: '[id$="-success-feedback"]' })).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      });
     });
 
     it.skip(`Displays "Password match" when password match and removes it if they stop`, async () => {
@@ -566,24 +572,32 @@ describe('PasswordSection', () => {
       // user experience and implementation.
       const { wrapper } = await createFixtures(initConfig);
 
-      const { userEvent, getByRole, getByLabelText } = render(<PasswordSection />, { wrapper });
+      const { userEvent, getByRole, getByLabelText, queryByText } = render(<PasswordSection />, { wrapper });
       await userEvent.click(getByRole('button', { name: /set password/i }));
       await waitFor(() => getByRole('heading', { name: /set password/i }));
       const passwordField = getByLabelText(/new password/i);
 
       await userEvent.type(passwordField, 'testewrewr');
       const confirmField = getByLabelText(/confirm password/i);
-      expect(screen.queryByText(/Passwords match/i, { selector: '[id$="-success-feedback"]' })).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      });
 
       await userEvent.type(confirmField, 'testewrewr');
-      await screen.findByText(/Passwords match/i, { selector: '[id$="-success-feedback"]' });
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).toBeInTheDocument();
+      });
 
       await userEvent.type(confirmField, 'testrwerrwqrwe');
-      expect(screen.queryByText(/Passwords match/i, { selector: '[id$="-success-feedback"]' })).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(queryByText(`Passwords match.`)).not.toBeInTheDocument();
+      });
 
       await userEvent.type(passwordField, 'testrwerrwqrwe');
       fireEvent.blur(confirmField);
-      await screen.findByText(/Passwords match/i, { selector: '[id$="-success-feedback"]' });
+      await waitFor(() => {
+        screen.getByText(`Passwords match.`);
+      });
     });
   });
 });

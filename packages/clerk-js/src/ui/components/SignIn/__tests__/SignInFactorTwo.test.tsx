@@ -183,16 +183,9 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        const { userEvent, container } = render(<SignInFactorTwo />, { wrapper });
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        try {
-          await screen.findByText(/Incorrect authenticator code/i, { selector: '[id^="error-"]' });
-        } catch {
-          // Fallback: check for error state attribute if text element doesn't exist
-          await waitFor(() => {
-            expect(container.querySelector('[data-error="true"].cl-otpCodeField')).toBeInTheDocument();
-          });
-        }
+        expect(await screen.findByText('Incorrect authenticator code')).toBeDefined();
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -279,16 +272,9 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        const { userEvent, container } = render(<SignInFactorTwo />, { wrapper });
+        const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        try {
-          await screen.findByText(/Incorrect phone code/i, { selector: '[id^="error-"]' });
-        } catch {
-          // Fallback: check for error state attribute if text element doesn't exist
-          await waitFor(() => {
-            expect(container.querySelector('[data-error="true"].cl-otpCodeField')).toBeInTheDocument();
-          });
-        }
+        expect(await screen.findByText('Incorrect phone code')).toBeDefined();
       });
     });
 
@@ -378,17 +364,10 @@ describe('SignInFactorTwo', () => {
             status: 422,
           }),
         );
-        const { userEvent, getByLabelText, getByText, container } = render(<SignInFactorTwo />, { wrapper });
+        const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(getByLabelText('Backup code'), '123456');
         await userEvent.click(getByText('Continue'));
-        try {
-          await screen.findByText(/Incorrect backup code/i, { selector: '[id^="error-"]' });
-        } catch {
-          // Fallback: check for error state attribute if text element doesn't exist
-          await waitFor(() => {
-            expect(container.querySelector('[data-error="true"].cl-otpCodeField')).toBeInTheDocument();
-          });
-        }
+        expect(await screen.findByText('Incorrect backup code')).toBeDefined();
       });
 
       it('redirects back to sign-in if the user is locked', async () => {

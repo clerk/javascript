@@ -157,7 +157,7 @@ describe('RadioGroup', () => {
       type: 'radio',
     });
 
-    const { getAllByRole, getByRole } = render(
+    const { getAllByRole, getByRole, container } = render(
       <Field
         radioOptions={[
           { value: 'one', label: 'One' },
@@ -168,7 +168,9 @@ describe('RadioGroup', () => {
     );
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    await screen.findByText(/Some Error/i, { selector: '[id^="error-"]' });
+    await waitFor(() => {
+      expect(container.querySelector('#error-some-radio')).toBeInTheDocument();
+    });
 
     const radios = getAllByRole('radio');
     radios.forEach(radio => {
@@ -188,9 +190,11 @@ describe('RadioGroup', () => {
       infoText: 'some info',
     });
 
-    const { findByLabelText } = render(<Field />, { wrapper });
+    const { findByLabelText, container } = render(<Field />, { wrapper });
 
     fireEvent.focus(await findByLabelText(/One/i));
-    await screen.findByText(/some info/i, { selector: '[id$="-info-feedback"]' });
+    await waitFor(() => {
+      expect(container.querySelector('#some-radio-info-feedback')).toBeInTheDocument();
+    });
   });
 });

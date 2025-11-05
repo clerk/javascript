@@ -54,8 +54,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign up f
     });
 
     // Check if password error is visible
-    await expect(u.page.locator('#error-password')).toBeVisible();
-    await expect(u.page.locator('#error-password')).toContainText(/your password must contain \d+ or more characters/i);
+    await expect(u.page.getByText(/your password must contain \d+ or more characters/i).first()).toBeVisible();
 
     // Check if user is signed out
     await u.po.expect.toBeSignedOut();

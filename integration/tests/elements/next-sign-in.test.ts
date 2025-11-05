@@ -166,8 +166,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.page.waitForAppUrl('/sign-in/continue');
     await u.po.signIn.setPassword('wrong-password');
     await u.po.signIn.continue();
-    await expect(u.page.locator('#error-password')).toBeVisible();
-    await expect(u.page.locator('#error-password')).toContainText(/password is incorrect/i);
+    await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
 
     await u.po.expect.toBeSignedOut();
   });
@@ -182,8 +181,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     await u.po.signIn.setPassword('wrong-password');
     await u.po.signIn.continue();
 
-    await expect(u.page.locator('#error-password')).toBeVisible();
-    await expect(u.page.locator('#error-password')).toContainText(/password is incorrect/i);
+    await expect(u.page.getByText(/^password is incorrect/i)).toBeVisible();
 
     await u.page.getByRole('button', { name: /use another method/i }).click();
     await u.po.signIn.getAltMethodsEmailCodeButton().click();
