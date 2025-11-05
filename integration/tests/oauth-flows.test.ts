@@ -264,8 +264,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
     }) => {
       const u = createTestUtils({ app, page, context, browser });
 
-      // Sign in on the first tab via OAuth
+      // Open sign-in page in both tabs before signing in
       await u.po.signIn.goTo();
+
+      let secondTabUtils: any;
+      await u.tabs.runInNewTab(async u2 => {
+        secondTabUtils = u2;
+        await u2.po.signIn.goTo();
+      });
+
+      // Sign in via OAuth on the first tab
       await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
       await u.page.getByText('Sign in to oauth-provider').waitFor();
       await u.po.signIn.setIdentifier(fakeUser.email);
@@ -274,18 +282,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
       await u.page.getByText('SignedIn').waitFor();
       await u.po.expect.toBeSignedIn();
 
-      // Open a new tab and attempt to sign in again via OAuth with the same user
-      await u.tabs.runInNewTab(async u2 => {
-        await u2.po.signIn.goTo();
-        await u2.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
-        await u2.page.getByText('Sign in to oauth-provider').waitFor();
-        await u2.po.signIn.setIdentifier(fakeUser.email);
-        await u2.po.signIn.continue();
-        await u2.po.signIn.enterTestOtpCode();
+      // Attempt to sign in via OAuth on the second tab (which already has sign-in mounted)
+      await secondTabUtils.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
 
-        // Should redirect and remain signed in instead of showing an error
-        await u2.po.expect.toBeSignedIn();
-      });
+      // Should redirect and be signed in without error
+      await secondTabUtils.po.expect.toBeSignedIn();
     });
   },
 );
