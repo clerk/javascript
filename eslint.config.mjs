@@ -375,6 +375,14 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/react - vitest',
+    files: ['packages/react/src/**/*.test.{ts,tsx}'],
+    rules: {
+      'jest/unbound-method': 'off',
+      '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
     name: 'packages/expo-passkeys',
     files: ['packages/expo-passkeys/src/**/*'],
     rules: {
