@@ -1039,12 +1039,17 @@ describe('Checkout', () => {
         { wrapper },
       );
 
-      await waitFor(async () => {
+      await waitFor(() => {
         expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
-        const addPaymentMethodButton = getByText('Add payment method');
-        expect(addPaymentMethodButton).toBeVisible();
-        await userEvent.click(addPaymentMethodButton);
       });
+
+      const addPaymentMethodButton = await waitFor(() => {
+        const button = getByText('Add payment method');
+        expect(button).toBeVisible();
+        return button;
+      });
+
+      await userEvent.click(addPaymentMethodButton);
 
       await waitFor(() => {
         expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();

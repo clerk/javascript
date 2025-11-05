@@ -721,3 +721,179 @@ describe('usePagesOrInfinite - error propagation', () => {
     expect(result.current.isLoading).toBe(false);
   });
 });
+
+describe('usePagesOrInfinite - query state transitions and remounting', () => {
+  it('pagination mode: isLoading may briefly be true when query key changes, even with cached data', async () => {
+    const fetcher = vi.fn(async (p: any) => ({
+      data: [{ id: `item-${p.filter}` }],
+      total_count: 1,
+    }));
+
+    const params1 = { initialPage: 1, pageSize: 2, filter: 'A' } as const;
+    const config = { infinite: false, enabled: true } as const;
+    const cacheKeys = { type: 't-transition-test' } as const;
+
+    // First render with filter 'A'
+    const { result, rerender } = renderHook(
+      ({ params }: { params: typeof params1 }) =>
+        usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper, initialProps: { params: params1 } },
+    );
+
+    // Wait for initial data to load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'item-A' }]);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+
+    // Change query parameters (simulating tab switch or filter change)
+    const params2 = { initialPage: 1, pageSize: 2, filter: 'B' } as const;
+    rerender({ params: params2 });
+
+    // During the transition, isLoading may briefly be true as RQ processes the new query
+    // This is the behavior that caused the flaky test - components that conditionally
+    // render based on isLoading may show loading state briefly
+    const capturedStates: Array<{ isLoading: boolean; isFetching: boolean }> = [];
+
+    // Capture states during transition
+    let iterations = 0;
+    while (iterations < 10 && result.current.data[0]?.id !== 'item-B') {
+      capturedStates.push({
+        isLoading: result.current.isLoading,
+        isFetching: result.current.isFetching,
+      });
+      await new Promise(resolve => setTimeout(resolve, 10));
+      iterations++;
+    }
+
+    // Wait for new data to settle
+    await waitFor(() => expect(result.current.data).toEqual([{ id: 'item-B' }]));
+    expect(result.current.isLoading).toBe(false);
+
+    // Document that during transition, we may see loading/fetching states
+    // This is expected RQ behavior and tests must account for it
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher).toHaveBeenCalledWith(expect.objectContaining({ filter: 'B' }));
+  });
+
+  it('pagination mode: after data loads, subsequent renders with same params keep isLoading false', async () => {
+    const fetcher = vi.fn(async (_p: any) => ({
+      data: [{ id: 'stable' }],
+      total_count: 1,
+    }));
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: false, enabled: true } as const;
+    const cacheKeys = { type: 't-stable-render' } as const;
+
+    const { result, rerender } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
+    );
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'stable' }]);
+
+    const initialCallCount = fetcher.mock.calls.length;
+
+    // Multiple re-renders with same params should not trigger loading state
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+
+    // Should not have triggered additional fetches
+    expect(fetcher).toHaveBeenCalledTimes(initialCallCount);
+    expect(result.current.data).toEqual([{ id: 'stable' }]);
+  });
+
+  it('infinite mode: isLoading stays false when component re-renders after initial data load', async () => {
+    const fetcher = vi.fn(async (_p: any) => ({
+      data: [{ id: 'inf-1' }, { id: 'inf-2' }],
+      total_count: 2,
+    }));
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: true, enabled: true } as const;
+    const cacheKeys = { type: 't-infinite-stable' } as const;
+
+    const { result, rerender } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
+    );
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'inf-1' }, { id: 'inf-2' }]);
+
+    // Re-render multiple times - isLoading should remain false
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'inf-1' }, { id: 'inf-2' }]);
+
+    rerender();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'inf-1' }, { id: 'inf-2' }]);
+  });
+
+  it('documents the difference between isLoading and isFetching for test authors', async () => {
+    const deferred = createDeferredPromise();
+    let callCount = 0;
+    const fetcher = vi.fn(async (_p: any) => {
+      callCount++;
+      if (callCount === 1) {
+        return { data: [{ id: 'first' }], total_count: 1 };
+      }
+      return deferred.promise.then(() => ({ data: [{ id: 'second' }], total_count: 1 }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: false, enabled: true } as const;
+    const cacheKeys = { type: 't-loading-vs-fetching' } as const;
+
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
+    );
+
+    // On initial mount:
+    // - isLoading: true (first fetch, no data)
+    // - isFetching: true (query is running)
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isFetching).toBe(true);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'first' }]);
+
+    // Trigger refetch
+    act(() => {
+      (result.current as any).revalidate();
+    });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+
+    // After initial load, during refetch:
+    // - isLoading: false (we have data, this is not the first fetch)
+    // - isFetching: true (query is running)
+    // This is CRITICAL for test stability - components that render based on
+    // isLoading should not show loading state during refetches
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(true);
+
+    // Resolve refetch
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+
+    // After refetch completes:
+    // - isLoading: false
+    // - isFetching: false
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([{ id: 'second' }]);
+  });
+});
