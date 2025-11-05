@@ -293,7 +293,9 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const isFetching = triggerInfinite ? swrInfiniteIsValidating : swrIsValidating;
   const error = (triggerInfinite ? swrInfiniteError : swrError) ?? null;
   const isError = !!error;
-
+  /**
+   * Helpers.
+   */
   const fetchNext = useCallback(() => {
     fetchPage(n => Math.max(0, n + 1));
   }, [fetchPage]);
@@ -340,5 +342,3 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     setData: setData as any,
   };
 };
-
-export { useWithSafeValues };
