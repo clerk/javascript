@@ -27,7 +27,7 @@ export type OnCreateParams = {
 };
 
 interface CreateApiKeyFormProps {
-  onCreate: (params: OnCreateParams, closeCardFn: () => void) => void;
+  onCreate: (params: OnCreateParams) => void;
   isSubmitting: boolean;
 }
 
@@ -164,14 +164,11 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate(
-      {
-        name: nameField.value,
-        description: descriptionField.value || undefined,
-        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value),
-      },
-      closeCardFn,
-    );
+    onCreate({
+      name: nameField.value,
+      description: descriptionField.value || undefined,
+      secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value),
+    });
   };
 
   return (
