@@ -119,7 +119,7 @@ export type AttemptFirstFactorParams =
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
+export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
 
 export type SignInCreateParams = (
   | {
