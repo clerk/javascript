@@ -1,48 +1,19 @@
-import { QueryClient } from '@tanstack/query-core';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ClerkResource } from '../../../types';
 import { createBillingPaginatedHook } from '../createBillingPaginatedHook';
+import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
 // Mocks for contexts
-let mockUser: any = { id: 'user_1' };
-let mockOrganization: any = { id: 'org_1' };
+let mockUser: any = createMockUser();
+let mockOrganization: any = createMockOrganization();
 
-const defaultQueryClient = {
-  __tag: 'clerk-rq-client' as const,
-  client: new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: Infinity,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  }),
-};
+const defaultQueryClient = createMockQueryClient();
 
-const mockClerk = {
-  loaded: true,
-  telemetry: { record: vi.fn() },
-  __unstable__environment: {
-    commerceSettings: {
-      billing: {
-        user: { enabled: true },
-        organization: { enabled: true },
-      },
-    },
-  },
-  on: vi.fn(),
-  off: vi.fn(),
-};
-
-Object.defineProperty(mockClerk, '__internal_queryClient', {
-  configurable: true,
-  get: vi.fn(() => defaultQueryClient),
+const mockClerk = createMockClerk({
+  queryClient: defaultQueryClient,
 });
 
 vi.mock('../../contexts', () => {
@@ -85,8 +56,8 @@ describe('createBillingPaginatedHook', () => {
     mockClerk.loaded = true;
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
-    mockUser = { id: 'user_1' };
-    mockOrganization = { id: 'org_1' };
+    mockUser = createMockUser();
+    mockOrganization = createMockOrganization();
     defaultQueryClient.client.clear();
   });
 

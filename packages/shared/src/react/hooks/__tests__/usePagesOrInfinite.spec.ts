@@ -1,36 +1,15 @@
-import { QueryClient } from '@tanstack/query-core';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDeferredPromise } from '../../../utils/createDeferredPromise';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';
+import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
-const defaultQueryClient = {
-  __tag: 'clerk-rq-client' as const,
-  client: new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: Infinity,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  }),
-};
+const defaultQueryClient = createMockQueryClient();
 
-const mockClerk = {
-  loaded: true,
-  telemetry: { record: vi.fn() },
-  on: vi.fn(),
-  off: vi.fn(),
-};
-
-Object.defineProperty(mockClerk, '__internal_queryClient', {
-  configurable: true,
-  get: vi.fn(() => defaultQueryClient),
+const mockClerk = createMockClerk({
+  queryClient: defaultQueryClient,
 });
 
 vi.mock('../../contexts', () => {

@@ -1,10 +1,11 @@
-import { QueryClient } from '@tanstack/query-core';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockUser: any = { id: 'user_1' };
-const mockOrganization: any = { id: 'org_1' };
+import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
+
+const mockUser: any = createMockUser();
+const mockOrganization: any = createMockOrganization();
 
 const getPlansSpy = vi.fn((args: any) =>
   Promise.resolve({
@@ -17,42 +18,13 @@ const getPlansSpy = vi.fn((args: any) =>
   }),
 );
 
-const defaultQueryClient = {
-  __tag: 'clerk-rq-client' as const,
-  client: new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: Infinity,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  }),
-};
+const defaultQueryClient = createMockQueryClient();
 
-const mockClerk = {
-  loaded: true,
+const mockClerk = createMockClerk({
   billing: {
     getPlans: getPlansSpy,
   },
-  telemetry: { record: vi.fn() },
-  __unstable__environment: {
-    commerceSettings: {
-      billing: {
-        user: { enabled: true },
-        organization: { enabled: true },
-      },
-    },
-  },
-  on: vi.fn(),
-  off: vi.fn(),
-};
-
-Object.defineProperty(mockClerk, '__internal_queryClient', {
-  configurable: true,
-  get: vi.fn(() => defaultQueryClient),
+  queryClient: defaultQueryClient,
 });
 
 vi.mock('../../contexts', () => {

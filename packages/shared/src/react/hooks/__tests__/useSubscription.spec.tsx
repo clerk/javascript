@@ -1,13 +1,13 @@
-import { QueryClient } from '@tanstack/query-core';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSubscription } from '../useSubscription';
+import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
 // Dynamic mock state for contexts
-let mockUser: any = { id: 'user_1' };
-let mockOrganization: any = { id: 'org_1' };
+let mockUser: any = createMockUser();
+let mockOrganization: any = createMockOrganization();
 let userBillingEnabled = true;
 let orgBillingEnabled = true;
 
@@ -16,13 +16,13 @@ const getSubscriptionSpy = vi.fn((args?: { orgId?: string }) =>
   Promise.resolve({ id: args?.orgId ? `sub_org_${args.orgId}` : 'sub_user_user_1' }),
 );
 
-const mockClerk = {
-  loaded: true,
+const defaultQueryClient = createMockQueryClient();
+
+const mockClerk = createMockClerk({
   billing: {
     getSubscription: getSubscriptionSpy,
   },
-  telemetry: { record: vi.fn() },
-  __unstable__environment: {
+  environment: {
     commerceSettings: {
       billing: {
         user: { enabled: userBillingEnabled },
@@ -30,28 +30,7 @@ const mockClerk = {
       },
     },
   },
-  on: vi.fn(),
-  off: vi.fn(),
-};
-
-const defaultQueryClient = {
-  __tag: 'clerk-rq-client' as const,
-  client: new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: Infinity,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        refetchOnMount: false,
-      },
-    },
-  }),
-};
-
-Object.defineProperty(mockClerk, '__internal_queryClient', {
-  get: vi.fn(() => defaultQueryClient),
-  configurable: true,
+  queryClient: defaultQueryClient,
 });
 
 vi.mock('../../contexts', () => {
@@ -69,8 +48,8 @@ describe('useSubscription', () => {
     // Reset environment flags and state
     userBillingEnabled = true;
     orgBillingEnabled = true;
-    mockUser = { id: 'user_1' };
-    mockOrganization = { id: 'org_1' };
+    mockUser = createMockUser();
+    mockOrganization = createMockOrganization();
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = userBillingEnabled;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
     defaultQueryClient.client.clear();
