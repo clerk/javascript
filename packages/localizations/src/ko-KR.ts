@@ -18,9 +18,9 @@ export const koKR: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: '복사하고 닫기',
+      formHint: '보안상의 이유로 나중에 다시 볼 수 없습니다.',
+      formTitle: '지금 "{{name}}" API 키를 복사하세요',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

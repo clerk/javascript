@@ -18,9 +18,9 @@ export const skSK: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopírovať a zavrieť',
+      formHint: 'Z bezpečnostných dôvodov vám to neskôr nebudeme môcť znova zobraziť.',
+      formTitle: 'Skopírujte teraz svoj API kľúč "{{name}}"',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

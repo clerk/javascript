@@ -18,9 +18,9 @@ export const arSA: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'نسخ وإغلاق',
+      formHint: 'لأسباب أمنية، لن نسمح لك بعرضه مرة أخرى لاحقاً.',
+      formTitle: 'انسخ مفتاح API الخاص بك "{{name}}" الآن',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

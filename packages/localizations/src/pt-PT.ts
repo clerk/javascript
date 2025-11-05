@@ -18,9 +18,9 @@ export const ptPT: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que visualize novamente mais tarde.',
+      formTitle: 'Copie a sua chave API "{{name}}" agora',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

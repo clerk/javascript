@@ -18,9 +18,9 @@ export const taIN: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'நகலெடுத்து மூடு',
+      formHint: 'பாதுகாப்பு காரணங்களுக்காக, நாங்கள் பின்னர் அதை மீண்டும் பார்க்க அனுமதிக்க மாட்டோம்.',
+      formTitle: 'இப்போது உங்கள் "{{name}}" API விசையை நகலெடுக்கவும்',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

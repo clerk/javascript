@@ -18,9 +18,9 @@ export const trTR: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopyala ve kapat',
+      formHint: 'Güvenlik nedenleriyle, daha sonra tekrar görüntülemenize izin vermeyeceğiz.',
+      formTitle: '"{{name}}" API anahtarınızı şimdi kopyalayın',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

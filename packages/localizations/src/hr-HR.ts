@@ -18,9 +18,9 @@ export const hrHR: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopiraj i zatvori',
+      formHint: 'Iz sigurnosnih razloga, nećemo vam dopustiti da ga ponovo pogledate kasnije.',
+      formTitle: 'Kopirajte svoj API ključ "{{name}}" sada',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

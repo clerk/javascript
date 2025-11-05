@@ -18,9 +18,9 @@ export const frFR: LocalizationResource = {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copier et fermer',
+      formHint: 'Pour des raisons de sécurité, nous ne vous permettrons pas de le consulter à nouveau plus tard.',
+      formTitle: 'Copiez votre clé API "{{name}}" maintenant',
     },
     createdAndExpirationStatus__expiresOn:
       "Créée le {{ createdDate | shortDate('fr-FR') }} • Expire le {{ expiresDate | longDate('fr-FR') }}",

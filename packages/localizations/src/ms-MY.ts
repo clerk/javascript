@@ -18,9 +18,9 @@ export const msMY: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Salin & Tutup',
+      formHint: 'Atas sebab keselamatan, kami tidak akan membenarkan anda melihatnya semula kemudian.',
+      formTitle: 'Salin kunci API "{{name}}" anda sekarang',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

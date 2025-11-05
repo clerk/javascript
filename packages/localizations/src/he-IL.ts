@@ -18,9 +18,9 @@ export const heIL: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'העתק וסגור',
+      formHint: 'מסיבות אבטחה, לא נוכל לאפשר לך לצפות בזה שוב מאוחר יותר.',
+      formTitle: 'העתק את מפתח ה-API "{{name}}" שלך כעת',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

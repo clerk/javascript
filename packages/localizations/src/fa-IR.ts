@@ -18,9 +18,9 @@ export const faIR: LocalizationResource = {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'کپی و بستن',
+      formHint: 'به دلایل امنیتی، ما بعداً به شما اجازه مشاهده دوباره آن را نخواهیم داد.',
+      formTitle: 'اکنون کلید API "{{name}}" خود را کپی کنید',
     },
     createdAndExpirationStatus__expiresOn:
       "ایجاد شده {{ createdDate | shortDate('en-US') }} • منقضی می‌شود {{ expiresDate | longDate('en-US') }}",

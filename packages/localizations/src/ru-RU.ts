@@ -18,9 +18,9 @@ export const ruRU: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Копировать и закрыть',
+      formHint: 'По соображениям безопасности мы не позволим вам просмотреть его позже.',
+      formTitle: 'Скопируйте ваш API-ключ "{{name}}" сейчас',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

@@ -18,9 +18,9 @@ export const kkKZ: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Көшіру және жабу',
+      formHint: 'Қауіпсіздік себептерімен, біз сізге кейінірек оны қайта көруге рұқсат бере алмаймыз.',
+      formTitle: 'API кілтіңізді "{{name}}" қазір көшіріңіз',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

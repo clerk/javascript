@@ -18,9 +18,9 @@ export const ptBR: LocalizationResource = {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que você visualize novamente mais tarde.',
+      formTitle: 'Copie sua chave API "{{name}}" agora',
     },
     createdAndExpirationStatus__expiresOn:
       "Criada {{ createdDate | shortDate('pt-BR') }} • Expira {{ expiresDate | longDate('pt-BR') }}",

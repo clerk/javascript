@@ -18,9 +18,9 @@ export const enGB: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

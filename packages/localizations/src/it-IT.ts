@@ -18,9 +18,9 @@ export const itIT: LocalizationResource = {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copia e chiudi',
+      formHint: 'Per motivi di sicurezza, non ti permetteremo di visualizzarlo di nuovo in seguito.',
+      formTitle: 'Copia la tua chiave API "{{name}}" ora',
     },
     createdAndExpirationStatus__expiresOn:
       "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",

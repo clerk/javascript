@@ -18,9 +18,9 @@ export const mnMN: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Хуулах ба хаах',
+      formHint: 'Аюулгүй байдлын шалтгаанаар бид танд дараа нь үүнийг дахин харах боломж олгохгүй.',
+      formTitle: 'Одоо "{{name}}" API түлхүүрээ хуулаарай',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

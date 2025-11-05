@@ -18,9 +18,9 @@ export const nlBE: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopiëren en sluiten',
+      formHint: 'Om veiligheidsredenen kunnen we u later niet meer toestaan om het te bekijken.',
+      formTitle: 'Kopieer nu uw API-sleutel "{{name}}"',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

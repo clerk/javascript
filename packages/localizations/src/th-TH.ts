@@ -18,9 +18,9 @@ export const thTH: LocalizationResource = {
     action__add: 'เพิ่มคีย์ใหม่',
     action__search: 'ค้นหาคีย์',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'คัดลอกและปิด',
+      formHint: 'ด้วยเหตุผลด้านความปลอดภัย เราจะไม่อนุญาตให้คุณดูอีกครั้งในภายหลัง',
+      formTitle: 'คัดลอกคีย์ API "{{name}}" ของคุณตอนนี้',
     },
     createdAndExpirationStatus__expiresOn:
       "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • หมดอายุ {{ expiresDate | longDate('th-TH') }}",
