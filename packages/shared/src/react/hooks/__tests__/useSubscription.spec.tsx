@@ -121,7 +121,7 @@ describe('useSubscription', () => {
     if (__CLERK_USE_RQ__) {
       await waitFor(() => expect(result.current.data).toBeUndefined());
     } else {
-      // Asser that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
+      // Assert that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
       await waitFor(() => expect(result.current.isFetching).toBe(true));
       // The fetcher returns null when userId is falsy, so data should become null
       await waitFor(() => expect(result.current.data).toBeNull());
@@ -149,7 +149,7 @@ describe('useSubscription', () => {
     if (__CLERK_USE_RQ__) {
       await waitFor(() => expect(result.current.data).toBeUndefined());
     } else {
-      // Asser that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
+      // Assert that SWR will flip to fetching because the fetcherFN runs, but it forces `null` when userId is falsy.
       await waitFor(() => expect(result.current.isFetching).toBe(true));
 
       // The fetcher returns null when userId is falsy, so data should become null
