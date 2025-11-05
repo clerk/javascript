@@ -228,7 +228,7 @@ export const huHU: LocalizationResource = {
   formFieldLabel__apiKey: 'API kulcs',
   formFieldLabel__apiKeyDescription: 'Leírás',
   formFieldLabel__apiKeyExpiration: 'Lejárat',
-  formFieldLabel__apiKeyName: 'Titkos kulcs neve',
+  formFieldLabel__apiKeyName: 'API kulcs neve',
   formFieldLabel__automaticInvitations: 'Automatikus meghívások engedélyezése ezen a domainen',
   formFieldLabel__backupCode: 'Tartalék kód',
   formFieldLabel__confirmDeletion: 'Megerősítés',
