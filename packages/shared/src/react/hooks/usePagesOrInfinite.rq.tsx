@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
@@ -9,16 +9,18 @@ import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
+import { usePreviousValue } from './usePreviousValue';
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
+  // const [isTransitioningSignOut, setIsTransitioningSignOut] = useState(false);
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(params.initialPage ?? 1);
   const pageSizeRef = useRef(params.pageSize ?? 10);
 
   const enabled = config.enabled ?? true;
-  const isSignedIn = config.isSignedIn ?? true;
+  const isSignedIn = config.isSignedIn;
   const triggerInfinite = config.infinite ?? false;
   const cacheMode = config.__experimental_mode === 'cache';
   const keepPreviousData = config.keepPreviousData ?? false;
@@ -26,7 +28,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const [queryClient] = useClerkQueryClient();
 
   // Force re-render counter for cache-only updates
-  const [, setForceUpdateCounter] = useState(0);
+  const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
   const forceUpdate = useCallback((updater: (n: number) => number) => {
     setForceUpdateCounter(updater);
   }, []);
@@ -60,10 +62,14 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher(requestParams as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && !triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn,
+    enabled: enabled && !triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn !== false,
     // Use placeholderData to keep previous data while fetching new page
     placeholderData: keepPreviousData ? previousData => previousData : undefined,
   });
+
+  // const singlePageQuery = useMemo(() => {
+  //   return __singlePageQuery;
+  // }, [__singlePageQuery.data, forceUpdateCounter]);
 
   // Infinite mode: accumulate pages
   const infiniteQueryKey = useMemo(() => {
@@ -92,8 +98,39 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn,
+    enabled: enabled && triggerInfinite && Boolean(fetcher) && !cacheMode && isSignedIn !== false,
   });
+
+  // Track previous isSignedIn state to detect sign-out transitions
+  const previousIsSignedIn = usePreviousValue(isSignedIn);
+
+  // Detect sign-out and trigger a brief loading state to mimic SWR behavior
+  useEffect(() => {
+    // TODO(@RQ_MIGRATION): make sure this is not prone to setTransitiveState
+    const isNowSignedOut = !isSignedIn;
+
+    if (previousIsSignedIn && isNowSignedOut) {
+      // Clear ALL queries matching the base query keys (including old userId)
+      // Use predicate to match queries that start with 'clerk-pages' or 'clerk-pages-infinite'
+      forceUpdate(n => n + 1);
+      queryClient.removeQueries({
+        predicate: query => {
+          const key = query.queryKey;
+          return (
+            (Array.isArray(key) && key[0] === 'clerk-pages') ||
+            (Array.isArray(key) && key[0] === 'clerk-pages-infinite')
+          );
+        },
+      });
+
+      // Reset paginated page to initial
+      setPaginatedPage(initialPageRef.current);
+      forceUpdate(n => n + 1);
+
+      // Clear the transition state after a microtask
+      void Promise.resolve().then(() => forceUpdate(n => n + 1));
+    }
+  }, [isSignedIn, queryClient]);
 
   const page = useMemo(() => {
     if (triggerInfinite) {
@@ -136,7 +173,15 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     // placeholderData handles keepPreviousData automatically
     const pageData = singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
     return pageData?.data ?? [];
-  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data, queryClient, pagesQueryKey, infiniteQueryKey]);
+  }, [
+    forceUpdateCounter,
+    triggerInfinite,
+    singlePageQuery.data,
+    infiniteQuery.data,
+    queryClient,
+    pagesQueryKey,
+    infiniteQueryKey,
+  ]);
 
   const count = useMemo(() => {
     if (triggerInfinite) {
@@ -153,7 +198,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
-  const error = (triggerInfinite ? (infiniteQuery.error as any) : (singlePageQuery.error as any)) ?? null;
+  const error = (triggerInfinite ? (infiniteQuery.error as any) : singlePageQuery.error) ?? null;
   const isError = !!error;
 
   const fetchNext = useCallback(() => {
