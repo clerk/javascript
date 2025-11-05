@@ -1,5 +1,25 @@
 # Change Log
 
+## 2.18.1
+
+### Patch Changes
+
+- Fixed missing declaration files. ([#7149](https://github.com/clerk/javascript/pull/7149)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.18.0
+
+### Minor Changes
+
+- Add native Apple Sign-In support for iOS via `useAppleSignIn()` hook. Requires `expo-apple-authentication` and native build (EAS Build or local prebuild). ([#7053](https://github.com/clerk/javascript/pull/7053)) by [@chriscanin](https://github.com/chriscanin)
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`2738c7e`](https://github.com/clerk/javascript/commit/2738c7eb07c591533802a779e443b5a309ccdcdb), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+  - @clerk/clerk-js@5.104.0
+  - @clerk/clerk-react@5.53.6
+
 ## 2.17.4
 
 ### Patch Changes
