@@ -1124,7 +1124,6 @@ export type Appearance<T = Theme> = T &
     taskChooseOrganization?: T;
     /**
      * Theme overrides that only apply to the `<EnableOrganizations/>` component
-     * TODO -> Change to __internal
      */
     enableOrganizations?: T;
   };

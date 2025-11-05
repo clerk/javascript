@@ -1,4 +1,4 @@
-import type { EnvironmentResource, LoadedClerk, OrganizationMembershipResource } from './types';
+import type { LoadedClerk, OrganizationMembershipResource } from './types';
 
 /**
  * Finds the organization membership for a given organization ID from a list of memberships
@@ -17,15 +17,6 @@ export function getCurrentOrganizationMembership(
 }
 
 /**
- * Clerk instance with unstable environment access
- *
- * @internal
- */
-export type ClerkWithEnvironment = {
-  __unstable__environment?: EnvironmentResource | null;
-};
-
-/**
  * Wraps a hook function in a check to see if organization settings is enabled
  *
  * If not enabled, it will open a dialog with a prompt to enable organizations
@@ -36,6 +27,7 @@ export const withOrganizationSettingsEnabled =
   <TParams extends any[], TReturn>(
     hook: (...args: TParams) => TReturn,
     getLoadedClerk: () => LoadedClerk | null | undefined,
+    callerName?: string,
   ) =>
   (...args: TParams): TReturn => {
     const clerk = getLoadedClerk();
@@ -43,7 +35,9 @@ export const withOrganizationSettingsEnabled =
     const environment = clerk?.__unstable__environment;
 
     if (!environment?.organizationSettings.enabled) {
-      clerk?.__internal_openEnableOrganizations({});
+      clerk?.__internal_openEnableOrganizationsPrompt({
+        callerName,
+      });
     }
 
     return hook(...args);
