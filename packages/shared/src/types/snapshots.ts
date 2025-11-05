@@ -6,6 +6,7 @@ import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
   ClientJSON,
+  ClientTrustState,
   EmailAddressJSON,
   EnterpriseAccountConnectionJSON,
   EnterpriseAccountJSON,
@@ -40,6 +41,7 @@ export type SignInJSONSnapshot = Override<
     first_factor_verification: VerificationJSONSnapshot;
     second_factor_verification: VerificationJSONSnapshot;
     user_data: UserDataJSONSnapshot;
+    client_trust_state?: ClientTrustState;
   }
 >;
 
