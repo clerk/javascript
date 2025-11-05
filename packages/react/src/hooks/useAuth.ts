@@ -99,13 +99,13 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
   const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
+  const isomorphicClerk = useIsomorphicClerkContext();
   let authContext = authContextFromHook;
 
-  if (authContext.sessionId === undefined && authContext.userId === undefined) {
+  if (!isomorphicClerk.loaded && authContext.sessionId === undefined && authContext.userId === undefined) {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const isomorphicClerk = useIsomorphicClerkContext();
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 

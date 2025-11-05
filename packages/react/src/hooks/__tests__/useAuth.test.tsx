@@ -317,4 +317,30 @@ describe('useDerivedAuth', () => {
 
     current.has?.({ permission: 'org:sys_foo' });
   });
+
+  it('returns not loaded state during transitive state (undefined values after being loaded)', () => {
+    const authObject = {
+      sessionId: undefined,
+      userId: undefined,
+      sessionStatus: undefined,
+      sessionClaims: null,
+      actor: undefined,
+      orgId: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      orgPermissions: undefined,
+      factorVerificationAge: null,
+      signOut: vi.fn(),
+      getToken: vi.fn(),
+    };
+
+    const {
+      result: { current },
+    } = renderHook(() => useDerivedAuth(authObject));
+
+    expect(current.isLoaded).toBe(false);
+    expect(current.isSignedIn).toBeUndefined();
+    expect(current.sessionId).toBeUndefined();
+    expect(current.userId).toBeUndefined();
+  });
 });
