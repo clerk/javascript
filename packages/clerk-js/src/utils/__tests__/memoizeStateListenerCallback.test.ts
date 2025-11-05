@@ -4,27 +4,24 @@ import { describe, expect, it, vi } from 'vitest';
 import { User } from '../../core/resources/User';
 import { memoizeListenerCallback } from '../memoizeStateListenerCallback';
 
+function createTestUser(overrides: Partial<UserJSON> = {}): User {
+  const defaultUserJSON: UserJSON = {
+    email_addresses: [],
+    external_accounts: [],
+    first_name: 'clerk',
+    id: 'u1',
+    phone_numbers: [],
+    updated_at: 1,
+    web3_wallets: [],
+  } as unknown as UserJSON;
+
+  return new User({ ...defaultUserJSON, ...overrides } as unknown as UserJSON);
+}
+
 describe('memoizeStateListenerCallback', () => {
   it('returns same user ref if user obj state has not changed', () => {
-    const user1 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
-
-    const user2 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
+    const user1 = createTestUser();
+    const user2 = createTestUser();
 
     let calledWith: Resources | undefined;
     const listener = memoizeListenerCallback(
@@ -40,25 +37,8 @@ describe('memoizeStateListenerCallback', () => {
   });
 
   it('returns new user ref if user obj state has changed', () => {
-    const user1 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
-
-    const user2 = new User({
-      id: 'u1',
-      updated_at: 2,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
+    const user1 = createTestUser();
+    const user2 = createTestUser({ updated_at: 2 });
 
     let calledWith: Resources | undefined;
     const listener = memoizeListenerCallback(
@@ -74,25 +54,8 @@ describe('memoizeStateListenerCallback', () => {
   });
 
   it('returns new user ref if user id has changed', () => {
-    const user1 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
-
-    const user2 = new User({
-      id: 'u2',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
+    const user1 = createTestUser();
+    const user2 = createTestUser({ id: 'u2' });
 
     let calledWith: Resources | undefined;
     const listener = memoizeListenerCallback(
@@ -108,15 +71,7 @@ describe('memoizeStateListenerCallback', () => {
   });
 
   it('handles user becoming null', () => {
-    const user1 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
+    const user1 = createTestUser();
 
     let calledWith: Resources | undefined;
     const listener = memoizeListenerCallback(
@@ -132,15 +87,7 @@ describe('memoizeStateListenerCallback', () => {
   });
 
   it('handles user transitioning from null to defined', () => {
-    const user1 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
+    const user1 = createTestUser();
 
     let calledWith: Resources | undefined;
     const listener = memoizeListenerCallback(
@@ -156,15 +103,7 @@ describe('memoizeStateListenerCallback', () => {
   });
 
   it('calls the callback function each time', () => {
-    const user1 = new User({
-      id: 'u1',
-      updated_at: 1,
-      first_name: 'clerk',
-      email_addresses: [],
-      external_accounts: [],
-      phone_numbers: [],
-      web3_wallets: [],
-    } as unknown as UserJSON);
+    const user1 = createTestUser();
 
     const mockCallback = vi.fn();
     const listener = memoizeListenerCallback(mockCallback);
