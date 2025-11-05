@@ -3,7 +3,7 @@ import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_CheckoutProps,
-  __internal_EnableOrganizationsModalProps,
+  __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -132,7 +132,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preopenOrganizationProfile?: null | OrganizationProfileProps = null;
   private preopenCreateOrganization?: null | CreateOrganizationProps = null;
   private preOpenWaitlist?: null | WaitlistProps = null;
-  private preopenEnableOrganizations?: null | __internal_EnableOrganizationsModalProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps | undefined>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps | undefined>();
   private premountUserAvatarNodes = new Map<HTMLDivElement, UserAvatarProps | undefined>();
@@ -626,10 +625,6 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openWaitlist(this.preOpenWaitlist);
     }
 
-    if (this.preopenEnableOrganizations !== null) {
-      clerkjs.__internal_openEnableOrganizations(this.preopenEnableOrganizations);
-    }
-
     this.premountSignInNodes.forEach((props, node) => {
       clerkjs.mountSignIn(node, props);
     });
@@ -871,19 +866,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_openEnableOrganizations = (props?: __internal_EnableOrganizationsModalProps) => {
+  __internal_openEnableOrganizationsPrompt = (props?: __internal_EnableOrganizationsPromptProps) => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__internal_openEnableOrganizations(props);
-    } else {
-      this.preopenEnableOrganizations = props;
+      this.clerkjs.__internal_openEnableOrganizationsPrompt(props);
     }
   };
 
   __internal_closeEnableOrganizations = () => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.__internal_closeEnableOrganizations();
-    } else {
-      this.preopenEnableOrganizations = null;
     }
   };
 

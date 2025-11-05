@@ -399,4 +399,8 @@ function useOrganizationListInternal<T extends UseOrganizationListParams>(params
   };
 }
 
-export const useOrganizationList = withOrganizationSettingsEnabled(useOrganizationListInternal, () => useClerk());
+export const useOrganizationList = withOrganizationSettingsEnabled(
+  useOrganizationListInternal,
+  () => useClerk(),
+  'useOrganizationList',
+);

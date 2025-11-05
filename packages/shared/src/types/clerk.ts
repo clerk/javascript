@@ -4,7 +4,6 @@ import type {
   Appearance,
   CheckoutTheme,
   CreateOrganizationTheme,
-  EnableOrganizationsTheme,
   OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,
@@ -322,11 +321,9 @@ export interface Clerk {
   __internal_closeReverification: () => void;
 
   /**
-   * Opens the Clerk Enable Organizations component in a modal.
-   *
-   * @param props - Optional user verification configuration parameters.
+   * Opens the Clerk Enable Organizations prompt for development environments
    */
-  __internal_openEnableOrganizations: (props?: __internal_EnableOrganizationsModalProps) => void;
+  __internal_openEnableOrganizationsPrompt: (props?: __internal_EnableOrganizationsPromptProps) => void;
 
   /**
    * Closes the Clerk Enable Organizations modal.
@@ -1442,31 +1439,8 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
-export type __internal_EnableOrganizationsProps = RoutingOptions & {
-  appearance?: EnableOrganizationsTheme;
-};
-
-export type __internal_EnableOrganizationsModalProps = WithoutRouting<__internal_EnableOrganizationsProps>;
-
-export type __internal_ComponentNavigationContext = {
-  /**
-   * The `navigate` reference within the component router context
-   */
-  navigate: (
-    to: string,
-    options?: {
-      searchParams?: URLSearchParams;
-    },
-  ) => Promise<unknown>;
-  /**
-   * This path represents the root route for a specific component type and is used
-   * for internal routing and navigation.
-   *
-   * @example
-   * indexPath: '/sign-in'  // When <SignIn path='/sign-in' />
-   * indexPath: '/sign-up'  // When <SignUp path='/sign-up' />
-   */
-  indexPath: string;
+export type __internal_EnableOrganizationsPromptProps = {
+  callerName?: string;
 };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;

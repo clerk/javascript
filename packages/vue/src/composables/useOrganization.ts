@@ -92,4 +92,5 @@ const useOrganizationInternal: UseOrganization = () => {
 export const useOrganization = withOrganizationSettingsEnabled(
   useOrganizationInternal,
   () => useClerk().value as LoadedClerk,
+  'useOrganization',
 );

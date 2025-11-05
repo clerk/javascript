@@ -4,18 +4,6 @@ const formatWarning = (msg: string) => {
   return `🔒 Clerk:\n${msg.trim()}\n(This notice only appears in development)`;
 };
 
-const createMessageForDisabledOrganizations = (
-  componentName:
-    | 'OrganizationProfile'
-    | 'OrganizationSwitcher'
-    | 'OrganizationList'
-    | 'CreateOrganization'
-    | 'TaskChooseOrganization',
-) => {
-  return formatWarning(
-    `The <${componentName}/> cannot be rendered when the feature is turned off. Visit 'dashboard.clerk.com' to enable the feature. Since the feature is turned off, this is no-op.`,
-  );
-};
 const createMessageForDisabledBilling = (componentName: 'PricingTable' | 'Checkout' | 'PlanDetails') => {
   return formatWarning(
     `The <${componentName}/> component cannot be rendered when billing is disabled. Visit 'https://dashboard.clerk.com/last-active?path=billing/settings' to follow the necessary steps to enable billing. Since billing is disabled, this is no-op.`,
@@ -37,7 +25,6 @@ const warnings = {
   cannotRenderComponentWhenUserDoesNotExist:
     '<UserProfile/> cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
   cannotRenderComponentWhenOrgDoesNotExist: `<OrganizationProfile/> cannot render unless an organization is active. Since no organization is currently active, this is no-op.`,
-  cannotRenderAnyOrganizationComponent: createMessageForDisabledOrganizations,
   cannotRenderAnyBillingComponent: createMessageForDisabledBilling,
   cannotOpenUserProfile:
     'The UserProfile modal cannot render unless a user is signed in. Since no user is signed in, this is no-op.',
