@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.18.1
+
+### Patch Changes
+
+- Fixed missing declaration files. ([#7149](https://github.com/clerk/javascript/pull/7149)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.18.0
 
 ### Minor Changes
