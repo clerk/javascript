@@ -523,7 +523,7 @@ describe('useOrganization', () => {
     });
 
     // TODO: Why is this failing?
-    it.skip('infinite fetch', async () => {
+    it('infinite fetch', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
