@@ -21,15 +21,12 @@ const props = {
 } as const;
 
 describe('SubscriptionsList', () => {
-  // TODO: This passes with RQ and fails with SWR. it could mean that the new implemenation fires a request when it shouldn't.
-  it.skip('shows New subscription CTA and hides Manage when there are no subscriptions', async () => {
+  it('shows New subscription CTA and hides Manage when there are no subscriptions', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
 
-    fixtures.clerk.billing.getPlans.mockRejectedValue(null);
-    fixtures.clerk.billing.getStatements.mockRejectedValue(null);
     fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top_empty',
@@ -51,8 +48,8 @@ describe('SubscriptionsList', () => {
     });
 
     expect(queryByText('Manage')).toBeNull();
-    expect(fixtures.clerk.billing.getPlans).toHaveBeenCalled();
-    expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
+    expect(fixtures.clerk.billing.getPlans).not.toHaveBeenCalled();
+    expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
     expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
     expect(fixtures.clerk.user.getPaymentMethods).toHaveBeenCalled();
   });

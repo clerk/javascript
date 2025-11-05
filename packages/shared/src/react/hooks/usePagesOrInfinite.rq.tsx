@@ -19,6 +19,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const enabled = config.enabled ?? true;
   const triggerInfinite = config.infinite ?? false;
+  const cacheMode = config.__experimental_mode === 'cache';
   // TODO: Support keepPreviousData
   // const _keepPreviousData = config.keepPreviousData ?? false;
 
@@ -53,7 +54,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher(requestParams as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && !triggerInfinite && Boolean(fetcher),
+    enabled: enabled && !triggerInfinite && Boolean(fetcher) && !cacheMode,
   });
 
   // Infinite mode: accumulate pages
@@ -83,7 +84,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && triggerInfinite && Boolean(fetcher),
+    enabled: enabled && triggerInfinite && Boolean(fetcher) && !cacheMode,
   });
 
   const page = useMemo(() => {

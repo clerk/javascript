@@ -309,14 +309,19 @@ describe('Checkout', () => {
     });
   });
 
-  // TODO: Why is this failing?
-  it.skip('renders free trial details during confirmation stage', async () => {
+  it('renders free trial details during confirmation stage', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
+
+    fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    });
+
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
       id: 'chk_trial_1',
       status: 'needs_confirmation',
