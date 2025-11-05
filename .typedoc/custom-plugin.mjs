@@ -122,8 +122,8 @@ function getCatchAllReplacements() {
       replace: '[`UserResource`](/docs/reference/javascript/user)',
     },
     {
-      pattern: /<code>SessionResource(\[\])<\/code>/g,
-      replace: '[`SessionResource`](/docs/reference/javascript/session) [ ]',
+      pattern: /SessionResource(\[\])/g,
+      replace: '[`SessionResource`](/docs/reference/javascript/session) []',
     },
     {
       pattern: /`SignedInSessionResource`/g,
