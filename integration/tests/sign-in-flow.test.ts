@@ -150,4 +150,45 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
 
     await u.po.expect.toBeSignedIn();
   });
+
+  test('redirects when attempting to sign in with existing session', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // First, sign in the user
+    await u.po.signIn.goTo();
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+
+    // Now attempt to go to sign-in page again while already signed in
+    await u.po.signIn.goTo();
+
+    // User should be redirected and remain signed in instead of seeing an error
+    await u.po.expect.toBeSignedIn();
+  });
+
+  test('redirects when attempting to sign in again with instant password and existing session', async ({
+    page,
+    context,
+  }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // First, sign in the user
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    // Clear the page to go back to sign-in
+    await u.page.goToRelative('/');
+    await u.po.expect.toBeSignedIn();
+
+    // Attempt to sign in again with instant password
+    await u.po.signIn.goTo();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+    // Should redirect and remain signed in without error
+    await u.po.expect.toBeSignedIn();
+  });
 });

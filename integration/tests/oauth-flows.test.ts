@@ -256,5 +256,26 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       await u.page.waitForAppUrl('/protected');
     });
+
+    test('redirects when attempting OAuth sign in with existing session', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      // First, sign in the user via OAuth
+      await u.po.signIn.goTo();
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.po.signIn.setIdentifier(fakeUser.email);
+      await u.po.signIn.continue();
+      await u.po.signIn.enterTestOtpCode();
+      await u.page.getByText('SignedIn').waitFor();
+      await u.po.expect.toBeSignedIn();
+
+      // Now attempt to sign in again via OAuth while already signed in
+      await u.po.signIn.goTo();
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+      // Should redirect and remain signed in instead of showing an error
+      await u.po.expect.toBeSignedIn();
+    });
   },
 );
