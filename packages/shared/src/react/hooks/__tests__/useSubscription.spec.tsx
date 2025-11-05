@@ -41,6 +41,9 @@ const defaultQueryClient = {
       queries: {
         retry: false,
         staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
       },
     },
   }),

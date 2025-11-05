@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/query-core';
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -9,8 +10,24 @@ import { wrapper } from './wrapper';
 let mockUser: any = { id: 'user_1' };
 let mockOrganization: any = { id: 'org_1' };
 
+const defaultQueryClient = {
+  __tag: 'clerk-rq-client' as const,
+  client: new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+      },
+    },
+  }),
+};
+
 const mockClerk = {
   loaded: true,
+  telemetry: { record: vi.fn() },
   __unstable__environment: {
     commerceSettings: {
       billing: {
@@ -19,7 +36,14 @@ const mockClerk = {
       },
     },
   },
+  on: vi.fn(),
+  off: vi.fn(),
 };
+
+Object.defineProperty(mockClerk, '__internal_queryClient', {
+  configurable: true,
+  get: vi.fn(() => defaultQueryClient),
+});
 
 vi.mock('../../contexts', () => {
   return {
@@ -52,11 +76,18 @@ const useDummyUnauth = createBillingPaginatedHook<DummyResource, DummyParams>({
 describe('createBillingPaginatedHook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    fetcherMock.mockImplementation(() =>
+      Promise.resolve({
+        data: [],
+        total_count: 0,
+      }),
+    );
     mockClerk.loaded = true;
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
     mockUser = { id: 'user_1' };
     mockOrganization = { id: 'org_1' };
+    defaultQueryClient.client.clear();
   });
 
   it('fetches with default params when called with no params', async () => {
@@ -247,12 +278,16 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
-      // Attention: We are forcing fetcher to be executed instead of setting the key to null
-      // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
-      // This means that SWR will update the loading state to true even if the fetcher is not called,
-      // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
-      await waitFor(() => expect(result.current.isLoading).toBe(true));
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      if (__CLERK_USE_RQ__) {
+        expect(result.current.isLoading).toBe(false);
+      } else {
+        // Attention: We are forcing fetcher to be executed instead of setting the key to null
+        // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
+        // This means that SWR will update the loading state to true even if the fetcher is not called,
+        // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
+        await waitFor(() => expect(result.current.isLoading).toBe(true));
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+      }
 
       // Data should be cleared even with keepPreviousData: true
       // The key difference here vs usePagesOrInfinite test: userId in cache key changes

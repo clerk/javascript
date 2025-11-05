@@ -59,10 +59,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       }
 
       const requestParams = getDifferentKeys(key, cacheKeys);
-      // console.log('-hehe', key, requestParams);
 
       // @ts-ignore - params type differs slightly but is structurally compatible
-      return fetcher(requestParams as Params);
+      return fetcher({ ...params, ...requestParams } as Params);
     },
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,

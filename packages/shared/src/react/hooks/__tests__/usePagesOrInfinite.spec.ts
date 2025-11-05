@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/query-core';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -5,11 +6,49 @@ import { createDeferredPromise } from '../../../utils/createDeferredPromise';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';
 import { wrapper } from './wrapper';
 
-describe('usePagesOrInfinite - basic pagination', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+const defaultQueryClient = {
+  __tag: 'clerk-rq-client' as const,
+  client: new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+      },
+    },
+  }),
+};
 
+const mockClerk = {
+  loaded: true,
+  telemetry: { record: vi.fn() },
+  on: vi.fn(),
+  off: vi.fn(),
+};
+
+Object.defineProperty(mockClerk, '__internal_queryClient', {
+  configurable: true,
+  get: vi.fn(() => defaultQueryClient),
+});
+
+vi.mock('../../contexts', () => {
+  return {
+    useAssertWrappedByClerkProvider: () => {},
+    useClerkInstanceContext: () => mockClerk,
+    useUserContext: () => ({ id: 'user_123' }),
+    useOrganizationContext: () => ({ organization: { id: 'org_123' } }),
+  };
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  defaultQueryClient.client.clear();
+  mockClerk.loaded = true;
+});
+
+describe('usePagesOrInfinite - basic pagination', () => {
   it('uses SWR with merged key and fetcher params; maps data and count', async () => {
     const fetcher = vi.fn(async (p: any) => {
       // simulate API returning paginated response
@@ -277,6 +316,7 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
       () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
       { wrapper },
     );
+    expect(result.current.isLoading).toBe(true);
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
 
@@ -285,8 +325,45 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
     });
     // page updated immediately, data remains previous while fetching
     expect(result.current.page).toBe(2);
+    // expect(result.current.isLoading).toBe(false);
     expect(result.current.isFetching).toBe(true);
     expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
+
+    // resolve next page
+    deferred.resolve(undefined);
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'p2-a' }, { id: 'p2-b' }]);
+  });
+
+  it('empties previous page data when fetching next page (pagination mode)', async () => {
+    const deferred = createDeferredPromise();
+    const fetcher = vi.fn(async (p: any) => {
+      if (p.initialPage === 1) {
+        return { data: [{ id: 'p1-a' }, { id: 'p1-b' }], total_count: 4 };
+      }
+      return deferred.promise.then(() => ({ data: [{ id: 'p2-a' }, { id: 'p2-b' }], total_count: 4 }));
+    });
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: false, keepPreviousData: false, enabled: true } as const;
+    const cacheKeys = { type: 't-keepPrev' } as const;
+
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
+    );
+    expect(result.current.isLoading).toBe(true);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'p1-a' }, { id: 'p1-b' }]);
+
+    act(() => {
+      result.current.fetchNext();
+    });
+    // page updated immediately, data remains previous while fetching
+    expect(result.current.page).toBe(2);
+    // expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(true);
+    expect(result.current.data).toEqual([]);
 
     // resolve next page
     deferred.resolve(undefined);

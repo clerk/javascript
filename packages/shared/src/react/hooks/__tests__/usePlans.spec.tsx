@@ -208,4 +208,26 @@ describe('usePlans', () => {
       ]),
     );
   });
+
+  it('does not clear data after user sign out', async () => {
+    const { result, rerender } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }), { wrapper });
+
+    // Wait for initial data to load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(getPlansSpy).toHaveBeenCalledTimes(1);
+    expect(result.current.data.length).toBe(5);
+    expect(result.current.count).toBe(25);
+
+    const initialData = result.current.data;
+
+    // Simulate user sign out
+    mockUser.id = null;
+    rerender();
+
+    // Data should persist after sign out
+    expect(result.current.data).toEqual(initialData);
+    expect(result.current.data.length).toBe(5);
+    expect(result.current.count).toBe(25);
+  });
 });
