@@ -19,7 +19,7 @@ export const fiFI: LocalizationResource = {
     action__search: undefined,
     copySecret: {
       formButtonPrimary__copyAndClose: 'Kopioi ja sulje',
-      formHint: 'Tietoturussyistä emme voi sallia sen tarkastelua myöhemmin.',
+      formHint: 'Tietoturvasyistä emme voi sallia sen tarkastelua myöhemmin.',
       formTitle: 'Kopioi API-avaimesi "{{name}}" nyt',
     },
     createdAndExpirationStatus__expiresOn: undefined,
