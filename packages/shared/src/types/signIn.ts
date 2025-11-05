@@ -43,6 +43,7 @@ export interface SignInResource extends ClerkResource {
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
+  clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
   identifier: string | null;
