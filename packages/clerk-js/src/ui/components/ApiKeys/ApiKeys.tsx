@@ -2,6 +2,7 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
+import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { useProtect } from '@/ui/common';
@@ -72,7 +73,14 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     data: createdApiKey,
     trigger: createApiKey,
     isMutating,
-  } = useSWRMutation(cacheKey, (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
+  } = useSWRMutation(
+    {
+      ...cacheKey,
+      action: 'create',
+    },
+    (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg),
+  );
+  const { mutate: mutateApiKeys } = useSWRConfig();
   const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
@@ -85,6 +93,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         ...params,
         subject,
       });
+      void mutateApiKeys(cacheKey);
       card.setError(undefined);
       setIsCopyModalOpen(true);
     } catch (err: any) {
