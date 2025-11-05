@@ -100,7 +100,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       // Read from query data first, fallback to cache
       const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
       const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
-      return pages.length || 0;
+      // Return pages.length if > 0, otherwise return initialPage (default 1)
+      return pages.length > 0 ? pages.length : initialPageRef.current;
     }
     return paginatedPage;
   }, [triggerInfinite, infiniteQuery.data?.pages, paginatedPage, queryClient, infiniteQueryKey]);
