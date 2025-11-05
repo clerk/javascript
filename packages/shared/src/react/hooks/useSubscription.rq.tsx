@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import type { BillingSubscriptionResource, EnvironmentResource } from '../../types';
+import type { EnvironmentResource } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
@@ -15,11 +15,12 @@ import type { SubscriptionResult, UseSubscriptionParams } from './useSubscriptio
 const hookName = 'useSubscription';
 
 /**
- * @internal
  * This is the new implementation of useSubscription using React Query.
  * It is exported only if the package is build with the `CLERK_USE_RQ` environment variable set to `true`.
+ *
+ * @internal
  */
-export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult<BillingSubscriptionResource> {
+export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult {
   useAssertWrappedByClerkProvider(hookName);
 
   const clerk = useClerkInstanceContext();
@@ -63,7 +64,9 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   return {
     data: query.data,
-    error: query.error,
+    // Our existing types for SWR return undefined when there is no error, but React Query returns null.
+    // So we need to convert the error to undefined, for backwards compatibility.
+    error: query.error ?? undefined,
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     revalidate,

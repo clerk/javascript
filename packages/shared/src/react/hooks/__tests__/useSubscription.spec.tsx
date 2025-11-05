@@ -85,6 +85,8 @@ describe('useSubscription', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isFetching).toBe(false);
     expect(result.current.data).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.revalidate).toBeInstanceOf(Function);
   });
 
   it('fetches user subscription when billing enabled (no org)', async () => {
@@ -105,6 +107,7 @@ describe('useSubscription', () => {
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(1);
     expect(getSubscriptionSpy).toHaveBeenCalledWith({ orgId: 'org_1' });
     expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
+    expect(result.current.error).toBeUndefined();
   });
 
   it('hides stale data on sign-out', async () => {
