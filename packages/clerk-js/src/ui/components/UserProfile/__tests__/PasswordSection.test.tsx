@@ -538,7 +538,7 @@ describe('PasswordSection', () => {
       await userEvent.type(confirmField, 'test');
       fireEvent.blur(confirmField);
       await waitFor(() => {
-        screen.getByText(/or more/i);
+        screen.getByText(/or more/i, { selector: '#error-newPassword' });
       });
     });
 
