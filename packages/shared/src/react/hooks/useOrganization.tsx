@@ -495,4 +495,8 @@ function useOrganizationInternal<T extends UseOrganizationParams>(params?: T): U
   };
 }
 
-export const useOrganization = withOrganizationSettingsEnabled(useOrganizationInternal, () => useClerk());
+export const useOrganization = withOrganizationSettingsEnabled(
+  useOrganizationInternal,
+  () => useClerk(),
+  'useOrganization',
+);
