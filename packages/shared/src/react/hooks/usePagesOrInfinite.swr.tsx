@@ -13,6 +13,11 @@ const cachingSWROptions = {
   focusThrottleInterval: 1000 * 60 * 2,
 } satisfies Parameters<typeof useSWR>[2];
 
+const cachingSWRInfiniteOptions = {
+  ...cachingSWROptions,
+  revalidateFirstPage: false,
+} satisfies Parameters<typeof useSWRInfinite>[2];
+
 /**
  * A flexible pagination hook that supports both traditional pagination and infinite loading.
  * It provides a unified API for handling paginated data fetching, with built-in caching through SWR.
@@ -140,7 +145,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       // @ts-ignore - fetcher expects Params subset; narrowing at call-site
       return fetcher?.(requestParams);
     },
-    cachingSWROptions,
+    cachingSWRInfiniteOptions,
   );
 
   const page = useMemo(() => {

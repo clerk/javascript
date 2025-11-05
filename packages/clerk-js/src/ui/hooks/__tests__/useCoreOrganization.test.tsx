@@ -1,4 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils/index';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -522,8 +523,7 @@ describe('useOrganization', () => {
       );
     });
 
-    // TODO: Why is this failing?
-    it.skip('infinite fetch', async () => {
+    it('infinite fetch', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
         f.withUser({
@@ -567,52 +567,34 @@ describe('useOrganization', () => {
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
       expect(result.current.invitations?.isFetching).toBe(false);
 
-      fixtures.clerk.organization?.getInvitations.mockReturnValue(
-        Promise.resolve({
-          data: [
-            createFakeOrganizationInvitation({
-              id: '1',
-              emailAddress: 'admin1@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-            createFakeOrganizationInvitation({
-              id: '2',
-              emailAddress: 'member2@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
+      const deferred = createDeferredPromise();
 
-      fixtures.clerk.organization?.getInvitations.mockReturnValue(
-        Promise.resolve({
-          data: [
-            createFakeOrganizationInvitation({
-              id: '3',
-              emailAddress: 'admin3@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-            createFakeOrganizationInvitation({
-              id: '4',
-              emailAddress: 'member4@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
-
+      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(deferred.promise);
       act(() => result.current.invitations?.fetchNext?.());
 
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(true));
       expect(result.current.invitations?.isLoading).toBe(false);
 
+      deferred.resolve({
+        data: [
+          createFakeOrganizationInvitation({
+            id: '3',
+            emailAddress: 'admin3@clerk.com',
+            organizationId: '1',
+            createdAt: new Date('2022-01-01'),
+          }),
+          createFakeOrganizationInvitation({
+            id: '4',
+            emailAddress: 'member4@clerk.com',
+            organizationId: '1',
+            createdAt: new Date('2022-01-01'),
+          }),
+        ],
+        total_count: 4,
+      });
+
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(false));
+
       expect(result.current.invitations?.data).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
