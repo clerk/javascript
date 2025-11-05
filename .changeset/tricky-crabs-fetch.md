@@ -2,4 +2,4 @@
 '@clerk/clerk-expo': patch
 ---
 
-testing
+Fixed missing declaration files.
