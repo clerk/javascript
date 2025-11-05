@@ -1,6 +1,7 @@
 import type { JWT, TokenJSON, TokenJSONSnapshot, TokenResource } from '@clerk/shared/types';
 
 import { decode } from '../../utils';
+import { CLERK_SKIP_CACHE } from '../constants';
 import { BaseResource } from './internal';
 
 export class Token extends BaseResource implements TokenResource {
@@ -8,11 +9,14 @@ export class Token extends BaseResource implements TokenResource {
 
   jwt?: JWT;
 
-  static async create(path: string, body: any = {}): Promise<TokenResource> {
+  static async create(path: string, body: any = {}, skipCache = false): Promise<TokenResource> {
+    const search = skipCache ? { [CLERK_SKIP_CACHE]: 'true' } : undefined;
+
     const json = (await BaseResource._fetch<TokenJSON>({
-      path,
-      method: 'POST',
       body,
+      method: 'POST',
+      path,
+      search,
     })) as unknown as TokenJSON;
 
     return new Token(json, path);
