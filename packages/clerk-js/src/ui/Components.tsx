@@ -1,6 +1,6 @@
 import type {
   __internal_CheckoutProps,
-  __internal_EnableOrganizationsProps,
+  __internal_EnableOrganizationsPromptProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
@@ -28,7 +28,7 @@ import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
   CreateOrganizationModal,
-  EnableOrganizationsModal,
+  EnableOrganizationsPrompt,
   ImpersonationFab,
   KeylessPrompt,
   OrganizationProfileModal,
@@ -82,7 +82,7 @@ export type ComponentControls = {
       | 'userVerification'
       | 'waitlist'
       | 'blankCaptcha'
-      | 'enableOrganizations',
+      | 'enableOrganizationsPrompt',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -93,8 +93,8 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : T extends 'enableOrganizations'
-              ? __internal_EnableOrganizationsProps
+            : T extends 'enableOrganizationsPrompt'
+              ? __internal_EnableOrganizationsPromptProps
               : UserProfileProps,
   ) => void;
   closeModal: (
@@ -108,7 +108,7 @@ export type ComponentControls = {
       | 'userVerification'
       | 'waitlist'
       | 'blankCaptcha'
-      | 'enableOrganizations',
+      | 'enableOrganizationsPrompt',
     options?: {
       notify?: boolean;
     },
@@ -158,7 +158,7 @@ interface ComponentsState {
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
-  enableOrganizationsModal: null | __internal_EnableOrganizationsProps;
+  enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
@@ -252,7 +252,7 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
-    enableOrganizationsModal: null,
+    enableOrganizationsPromptModal: null,
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
@@ -282,7 +282,6 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
-    enableOrganizationsModal,
     checkoutDrawer,
     planDetailsDrawer,
     subscriptionDetailsDrawer,
@@ -352,6 +351,18 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.openModal = (name, props) => {
+      // Prevent opening enableOrganizations modal if it's already open
+      // to avoid duplicate mounting when component is called multiple times
+      if (name === 'enableOrganizationsPrompt') {
+        setState(s => {
+          if (s.enableOrganizationsPromptModal) {
+            return s; // Modal is already open, don't update state
+          }
+          return { ...s, [`${name}Modal`]: props };
+        });
+        return;
+      }
+
       function handleCloseModalForExperimentalUserVerification() {
         if (!('afterVerificationCancelled' in props)) {
           return;
@@ -494,22 +505,6 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
-  const mountedEnableOrganizationsModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'enableOrganizations'}
-      componentAppearance={enableOrganizationsModal?.appearance}
-      flowName={'enableOrganizations'}
-      onClose={() => componentsControls.closeModal('enableOrganizations')}
-      onExternalNavigate={() => componentsControls.closeModal('enableOrganizations')}
-      startPath={buildVirtualRouterUrl({ base: '/enable-organizations', path: urlStateParam?.path })}
-      componentName={'EnableOrganizationsModal'}
-      modalContainerSx={{ alignItems: 'center' }}
-    >
-      <EnableOrganizationsModal {...enableOrganizationsModal} />
-    </LazyModalRenderer>
-  );
-
   const mountedOrganizationProfileModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -613,7 +608,6 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
-        {enableOrganizationsModal && mountedEnableOrganizationsModal}
 
         <MountedCheckoutDrawer
           appearance={state.appearance}
@@ -636,6 +630,15 @@ const Components = (props: ComponentsProps) => {
         {state.impersonationFab && (
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
+          </LazyImpersonationFabProvider>
+        )}
+
+        {state.enableOrganizationsPromptModal && (
+          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
+            <EnableOrganizationsPrompt
+              callerString='useOrganization'
+              {...state.enableOrganizationsPromptModal}
+            />
           </LazyImpersonationFabProvider>
         )}
 
