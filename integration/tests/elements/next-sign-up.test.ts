@@ -79,8 +79,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Next.js S
     });
 
     // Check if password error is visible
-    await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
-    await expect(u.page.getByTestId('form-feedback-error')).toHaveText(/Passwords must be \d+ characters or more/i);
+    await expect(u.page.getByText(/Passwords must be \d+ characters or more/i)).toBeVisible();
 
     await u.po.expect.toBeSignedOut();
 
