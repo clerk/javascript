@@ -110,6 +110,158 @@ describe('useAuth', () => {
     expect(result.current.sessionId).toBeUndefined();
     expect(result.current.userId).toBeUndefined();
   });
+
+  test('triggers suspense mechanism when suspense option is true and Clerk is not loaded', () => {
+    const listeners: Array<(payload: any) => void> = [];
+    const mockIsomorphicClerk = {
+      loaded: false,
+      telemetry: { record: vi.fn() },
+      addListener: vi.fn((callback: any) => {
+        listeners.push(callback);
+        return () => {
+          const index = listeners.indexOf(callback);
+          if (index > -1) {
+            listeners.splice(index, 1);
+          }
+        };
+      }),
+    };
+
+    const mockAuthContext = {
+      actor: undefined,
+      factorVerificationAge: null,
+      orgId: undefined,
+      orgPermissions: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      sessionClaims: null,
+      sessionId: undefined,
+      sessionStatus: undefined,
+      userId: undefined,
+    };
+
+    try {
+      renderHook(() => useAuth({ suspense: true }), {
+        wrapper: ({ children }) => (
+          <ClerkInstanceContext.Provider value={{ value: mockIsomorphicClerk as any }}>
+            <AuthContext.Provider value={{ value: mockAuthContext as any }}>{children}</AuthContext.Provider>
+          </ClerkInstanceContext.Provider>
+        ),
+      });
+    } catch {
+      // renderHook may handle Suspense internally, so we check addListener was called instead
+    }
+
+    // Verify that the suspense mechanism was triggered by checking if addListener was called
+    expect(mockIsomorphicClerk.addListener).toHaveBeenCalled();
+  });
+
+  test('does not suspend when suspense option is true and Clerk is loaded', () => {
+    const mockIsomorphicClerk = {
+      loaded: true,
+      telemetry: { record: vi.fn() },
+    };
+
+    const mockAuthContext = {
+      actor: null,
+      factorVerificationAge: null,
+      orgId: null,
+      orgPermissions: undefined,
+      orgRole: null,
+      orgSlug: null,
+      sessionClaims: null,
+      sessionId: null,
+      sessionStatus: undefined,
+      userId: null,
+    };
+
+    const { result } = renderHook(() => useAuth({ suspense: true }), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: mockIsomorphicClerk as any }}>
+          <AuthContext.Provider value={{ value: mockAuthContext as any }}>{children}</AuthContext.Provider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    expect(result.current.isLoaded).toBe(true);
+    expect(result.current.isSignedIn).toBe(false);
+  });
+
+  test('does not suspend when suspense option is false and Clerk is not loaded', () => {
+    const mockIsomorphicClerk = {
+      loaded: false,
+      telemetry: { record: vi.fn() },
+    };
+
+    const mockAuthContext = {
+      actor: undefined,
+      factorVerificationAge: null,
+      orgId: undefined,
+      orgPermissions: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      sessionClaims: null,
+      sessionId: undefined,
+      sessionStatus: undefined,
+      userId: undefined,
+    };
+
+    const { result } = renderHook(() => useAuth({ suspense: false }), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: mockIsomorphicClerk as any }}>
+          <AuthContext.Provider value={{ value: mockAuthContext as any }}>{children}</AuthContext.Provider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    expect(result.current.isLoaded).toBe(false);
+    expect(result.current.isSignedIn).toBeUndefined();
+  });
+
+  test('triggers suspense mechanism when suspense option is true and in transitive state', () => {
+    const listeners: Array<(payload: any) => void> = [];
+    const mockIsomorphicClerk = {
+      loaded: true,
+      telemetry: { record: vi.fn() },
+      addListener: vi.fn((callback: any) => {
+        listeners.push(callback);
+        return () => {
+          const index = listeners.indexOf(callback);
+          if (index > -1) {
+            listeners.splice(index, 1);
+          }
+        };
+      }),
+    };
+
+    const mockAuthContext = {
+      actor: undefined,
+      factorVerificationAge: null,
+      orgId: undefined,
+      orgPermissions: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      sessionClaims: null,
+      sessionId: undefined,
+      sessionStatus: undefined,
+      userId: undefined,
+    };
+
+    try {
+      renderHook(() => useAuth({ suspense: true }), {
+        wrapper: ({ children }) => (
+          <ClerkInstanceContext.Provider value={{ value: mockIsomorphicClerk as any }}>
+            <AuthContext.Provider value={{ value: mockAuthContext as any }}>{children}</AuthContext.Provider>
+          </ClerkInstanceContext.Provider>
+        ),
+      });
+    } catch {
+      // renderHook may handle Suspense internally
+    }
+
+    // Verify that the suspense mechanism was triggered for transitive state
+    expect(mockIsomorphicClerk.addListener).toHaveBeenCalled();
+  });
 });
 
 describe('useDerivedAuth', () => {

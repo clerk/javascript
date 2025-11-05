@@ -153,9 +153,8 @@ describe('useAuth type tests', () => {
 
     it('do not allow invalid option types', () => {
       const invalidValue = 5;
-      expectTypeOf({ treatPendingAsSignedOut: invalidValue } satisfies Record<
-        keyof PendingSessionOptions,
-        any
+      expectTypeOf({ treatPendingAsSignedOut: invalidValue } satisfies Partial<
+        Record<keyof PendingSessionOptions, any>
       >).toMatchTypeOf<UseAuthParameters>();
     });
   });

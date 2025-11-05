@@ -38,6 +38,12 @@ export type PendingSessionOptions = {
    * @default true
    */
   treatPendingAsSignedOut?: boolean;
+  /**
+   * When true, the hook will suspend while Clerk is loading instead of returning `isLoaded: false`.
+   * Requires a React Suspense boundary to be present in the component tree.
+   * @default false
+   */
+  suspense?: boolean;
 };
 
 type DisallowSystemPermissions<P extends string> = P extends `${OrganizationSystemPermissionPrefix}${string}`

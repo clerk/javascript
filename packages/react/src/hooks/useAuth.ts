@@ -5,6 +5,7 @@ import type {
   GetToken,
   JwtPayload,
   PendingSessionOptions,
+  Resources,
   SignOut,
   UseAuthReturn,
 } from '@clerk/shared/types';
@@ -14,8 +15,80 @@ import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
+import type { IsomorphicClerk } from '../isomorphicClerk';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
+
+const clerkLoadedSuspenseCache = new WeakMap<IsomorphicClerk, Promise<void>>();
+const transitiveStateSuspenseCache = new WeakMap<IsomorphicClerk, Promise<void>>();
+
+function createClerkLoadedSuspensePromise(clerk: IsomorphicClerk): Promise<void> {
+  if (clerk.loaded) {
+    return Promise.resolve();
+  }
+
+  const existingPromise = clerkLoadedSuspenseCache.get(clerk);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  const promise = new Promise<void>(resolve => {
+    if (clerk.loaded) {
+      resolve();
+      return;
+    }
+
+    const unsubscribe = clerk.addListener((payload: Resources) => {
+      if (
+        payload.client ||
+        payload.session !== undefined ||
+        payload.user !== undefined ||
+        payload.organization !== undefined
+      ) {
+        if (clerk.loaded) {
+          clerkLoadedSuspenseCache.delete(clerk);
+          unsubscribe();
+          resolve();
+        }
+      }
+    });
+  });
+
+  clerkLoadedSuspenseCache.set(clerk, promise);
+  return promise;
+}
+
+function createTransitiveStateSuspensePromise(
+  clerk: IsomorphicClerk,
+  authContext: { sessionId?: string | null; userId?: string | null },
+): Promise<void> {
+  if (authContext.sessionId !== undefined || authContext.userId !== undefined) {
+    return Promise.resolve();
+  }
+
+  const existingPromise = transitiveStateSuspenseCache.get(clerk);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  const promise = new Promise<void>(resolve => {
+    if (authContext.sessionId !== undefined || authContext.userId !== undefined) {
+      resolve();
+      return;
+    }
+
+    const unsubscribe = clerk.addListener((payload: Resources) => {
+      if (payload.session !== undefined || payload.user !== undefined) {
+        transitiveStateSuspenseCache.delete(clerk);
+        unsubscribe();
+        resolve();
+      }
+    });
+  });
+
+  transitiveStateSuspenseCache.set(clerk, promise);
+  return promise;
+}
 
 /**
  * @inline
@@ -35,7 +108,7 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * @unionReturnHeadings
  * ["Initialization", "Signed out", "Signed in (no active organization)", "Signed in (with active organization)"]
  *
- * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`.
+ * @param [initialAuthStateOrOptions] - An object containing the initial authentication state or options for the `useAuth()` hook. If not provided, the hook will attempt to derive the state from the context. `treatPendingAsSignedOut` is a boolean that indicates whether pending sessions are considered as signed out or not. Defaults to `true`. `suspense` is a boolean that enables React Suspense behavior - when `true`, the hook will suspend instead of returning `isLoaded: false`. Requires a Suspense boundary. Defaults to `false`.
  *
  * @function
  *
@@ -95,21 +168,38 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
 export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
+  const options = initialAuthStateOrOptions ?? {};
+  const suspense = Boolean((options as any).suspense);
+  const treatPendingAsSignedOut =
+    'treatPendingAsSignedOut' in options ? (options.treatPendingAsSignedOut as boolean | undefined) : undefined;
+
+  const { suspense: _s, treatPendingAsSignedOut: _t, ...rest } = options as Record<string, any>;
   const initialAuthState = rest as any;
 
   const authContextFromHook = useAuthContext();
   const isomorphicClerk = useIsomorphicClerkContext();
   let authContext = authContextFromHook;
 
+  if (suspense) {
+    if (!isomorphicClerk.loaded) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- React Suspense requires throwing a promise
+      throw createClerkLoadedSuspensePromise(isomorphicClerk);
+    }
+
+    if (authContext.sessionId === undefined && authContext.userId === undefined) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- React Suspense requires throwing a promise
+      throw createTransitiveStateSuspensePromise(isomorphicClerk, authContext);
+    }
+  }
+
   if (!isomorphicClerk.loaded && authContext.sessionId === undefined && authContext.userId === undefined) {
     authContext = initialAuthState != null ? initialAuthState : {};
   }
 
-  const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
-  const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
+  const getToken: GetToken = useCallback(opts => createGetToken(isomorphicClerk)(opts), [isomorphicClerk]);
+  const signOut: SignOut = useCallback(opts => createSignOut(isomorphicClerk)(opts), [isomorphicClerk]);
 
-  isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { treatPendingAsSignedOut }));
+  isomorphicClerk.telemetry?.record(eventMethodCalled('useAuth', { suspense, treatPendingAsSignedOut }));
 
   return useDerivedAuth(
     {
