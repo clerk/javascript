@@ -151,10 +151,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.expect.toBeSignedIn();
   });
 
-  test('redirects when attempting to sign in with existing session', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
+  test('redirects when attempting to sign in with existing session in another tab', async ({
+    page,
+    context,
+    browser,
+  }) => {
+    const u = createTestUtils({ app, page, context, browser });
 
-    // First, sign in the user
+    // Sign in on the first tab
     await u.po.signIn.goTo();
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();
@@ -162,33 +166,38 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     await u.po.signIn.continue();
     await u.po.expect.toBeSignedIn();
 
-    // Now attempt to go to sign-in page again while already signed in
-    await u.po.signIn.goTo();
+    // Open a new tab and attempt to sign in again with the same user
+    await u.tabs.runInNewTab(async u2 => {
+      await u2.po.signIn.goTo();
+      await u2.po.signIn.setIdentifier(fakeUser.email);
+      await u2.po.signIn.continue();
+      await u2.po.signIn.setPassword(fakeUser.password);
+      await u2.po.signIn.continue();
 
-    // User should be redirected and remain signed in instead of seeing an error
-    await u.po.expect.toBeSignedIn();
+      // Should redirect and be signed in without error
+      await u2.po.expect.toBeSignedIn();
+    });
   });
 
-  test('redirects when attempting to sign in again with instant password and existing session', async ({
+  test('redirects when attempting to sign in again with instant password in another tab', async ({
     page,
     context,
+    browser,
   }) => {
-    const u = createTestUtils({ app, page, context });
+    const u = createTestUtils({ app, page, context, browser });
 
-    // First, sign in the user
+    // Sign in on the first tab
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
-    // Clear the page to go back to sign-in
-    await u.page.goToRelative('/');
-    await u.po.expect.toBeSignedIn();
+    // Open a new tab and attempt to sign in again with instant password
+    await u.tabs.runInNewTab(async u2 => {
+      await u2.po.signIn.goTo();
+      await u2.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
 
-    // Attempt to sign in again with instant password
-    await u.po.signIn.goTo();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-
-    // Should redirect and remain signed in without error
-    await u.po.expect.toBeSignedIn();
+      // Should redirect and remain signed in without error
+      await u2.po.expect.toBeSignedIn();
+    });
   });
 });
