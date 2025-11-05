@@ -183,6 +183,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
       >
         <InfoComponentA
           {...getElementProps(feedbacks.a?.feedbackType)}
+          {...(feedbacks.a?.feedbackType && { 'data-testid': `form-feedback-${feedbacks.a.feedbackType}` })}
           ref={calculateHeightA}
           sx={[
             () => ({
@@ -194,6 +195,7 @@ export const FormFeedback = (props: FormFeedbackProps) => {
         />
         <InfoComponentB
           {...getElementProps(feedbacks.b?.feedbackType)}
+          {...(feedbacks.b?.feedbackType && { 'data-testid': `form-feedback-${feedbacks.b.feedbackType}` })}
           ref={calculateHeightB}
           sx={[
             () => ({
