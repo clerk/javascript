@@ -61,12 +61,12 @@ function replaceGenericTypesInParamsTable(content) {
 /**
  * Extracts the "## Parameters" section from a markdown file and writes it to a separate file.
  * @param {string} filePath - The path to the markdown file
- * @param {string} dirName - The directory containing the files
  * @returns {boolean} True if a file was created
  */
-function extractParametersSection(filePath, dirName) {
+function extractParametersSection(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
   const fileName = path.basename(filePath, '.mdx');
+  const dirName = path.dirname(filePath);
 
   // Always use -params suffix
   const suffix = '-params';
@@ -168,7 +168,7 @@ function main() {
       }
 
       // Extract Parameters sections
-      if (extractParametersSection(filePath, dir)) {
+      if (extractParametersSection(filePath)) {
         paramsCount++;
       }
     }
