@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/query-core';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -16,6 +17,21 @@ const getPlansSpy = vi.fn((args: any) =>
   }),
 );
 
+const defaultQueryClient = {
+  __tag: 'clerk-rq-client' as const,
+  client: new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchOnMount: false,
+      },
+    },
+  }),
+};
+
 const mockClerk = {
   loaded: true,
   billing: {
@@ -30,7 +46,14 @@ const mockClerk = {
       },
     },
   },
+  on: vi.fn(),
+  off: vi.fn(),
 };
+
+Object.defineProperty(mockClerk, '__internal_queryClient', {
+  configurable: true,
+  get: vi.fn(() => defaultQueryClient),
+});
 
 vi.mock('../../contexts', () => {
   return {
@@ -51,6 +74,7 @@ describe('usePlans', () => {
     mockClerk.loaded = true;
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    defaultQueryClient.client.clear();
   });
 
   it('does not call fetcher when clerk.loaded is false', () => {
@@ -115,6 +139,8 @@ describe('usePlans', () => {
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     // orgId must not leak to fetcher
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'organization', pageSize: 3, initialPage: 1 });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data.length).toBe(3);
   });
 
