@@ -143,7 +143,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       // @ts-ignore - remove cache-only keys from request params
       const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
       // @ts-ignore - fetcher expects Params subset; narrowing at call-site
-      return fetcher?.(requestParams);
+      return fetcher?.({ ...params, ...requestParams });
     },
     cachingSWRInfiniteOptions,
   );

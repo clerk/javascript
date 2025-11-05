@@ -189,6 +189,31 @@ describe('createBillingPaginatedHook', () => {
     });
   });
 
+  it('when for=organization orgId should be forwarded to fetcher (infinite mode)', async () => {
+    fetcherMock.mockImplementation((params: any) =>
+      Promise.resolve({
+        data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `item-${params.initialPage}-${i}` })),
+        total_count: 20,
+      }),
+    );
+
+    const { result } = renderHook(
+      () => useDummyAuth({ initialPage: 1, pageSize: 4, for: 'organization', infinite: true } as any),
+      {
+        wrapper,
+      },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(useFetcherMock).toHaveBeenCalledWith('organization');
+    expect(fetcherMock.mock.calls[0][0]).toStrictEqual({
+      initialPage: 1,
+      pageSize: 4,
+      orgId: 'org_1',
+    });
+    expect(result.current.data.length).toBe(4);
+  });
+
   it('does not fetch in organization mode when organization billing disabled', async () => {
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
 
