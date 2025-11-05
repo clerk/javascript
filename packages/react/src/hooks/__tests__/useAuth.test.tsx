@@ -77,6 +77,39 @@ describe('useAuth', () => {
       );
     }).not.toThrow();
   });
+
+  test('returns isLoaded false when isomorphicClerk is loaded but in transitive state', () => {
+    const mockIsomorphicClerk = {
+      loaded: true,
+      telemetry: { record: vi.fn() },
+    };
+
+    const mockAuthContext = {
+      actor: undefined,
+      factorVerificationAge: null,
+      orgId: undefined,
+      orgPermissions: undefined,
+      orgRole: undefined,
+      orgSlug: undefined,
+      sessionClaims: null,
+      sessionId: undefined,
+      sessionStatus: undefined,
+      userId: undefined,
+    };
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <ClerkInstanceContext.Provider value={{ value: mockIsomorphicClerk as any }}>
+          <AuthContext.Provider value={{ value: mockAuthContext as any }}>{children}</AuthContext.Provider>
+        </ClerkInstanceContext.Provider>
+      ),
+    });
+
+    expect(result.current.isLoaded).toBe(false);
+    expect(result.current.isSignedIn).toBeUndefined();
+    expect(result.current.sessionId).toBeUndefined();
+    expect(result.current.userId).toBeUndefined();
+  });
 });
 
 describe('useDerivedAuth', () => {
@@ -316,31 +349,5 @@ describe('useDerivedAuth', () => {
     } = renderHook(() => useDerivedAuth({ sessionId: null, userId: null }));
 
     current.has?.({ permission: 'org:sys_foo' });
-  });
-
-  it('returns not loaded state during transitive state', () => {
-    const authObject = {
-      actor: undefined,
-      factorVerificationAge: null,
-      orgId: undefined,
-      orgPermissions: undefined,
-      orgRole: undefined,
-      orgSlug: undefined,
-      sessionClaims: null,
-      sessionId: undefined,
-      sessionStatus: undefined,
-      userId: undefined,
-      signOut: vi.fn(),
-      getToken: vi.fn(),
-    };
-
-    const {
-      result: { current },
-    } = renderHook(() => useDerivedAuth(authObject));
-
-    expect(current.isLoaded).toBe(false);
-    expect(current.isSignedIn).toBeUndefined();
-    expect(current.sessionId).toBeUndefined();
-    expect(current.userId).toBeUndefined();
   });
 });
