@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -157,7 +157,7 @@ describe('RadioGroup', () => {
       type: 'radio',
     });
 
-    const { getAllByRole, getByRole, container } = render(
+    const { getAllByRole, getByRole, findByText } = render(
       <Field
         radioOptions={[
           { value: 'one', label: 'One' },
@@ -168,9 +168,7 @@ describe('RadioGroup', () => {
     );
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    await waitFor(() => {
-      expect(container.querySelector('#error-some-radio')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Error/i)).toBeInTheDocument();
 
     const radios = getAllByRole('radio');
     radios.forEach(radio => {
@@ -190,11 +188,9 @@ describe('RadioGroup', () => {
       infoText: 'some info',
     });
 
-    const { findByLabelText, container } = render(<Field />, { wrapper });
+    const { findByLabelText, findByText } = render(<Field />, { wrapper });
 
     fireEvent.focus(await findByLabelText(/One/i));
-    await waitFor(() => {
-      expect(container.querySelector('#some-radio-info-feedback')).toBeInTheDocument();
-    });
+    expect(await findByText(/some info/i)).toBeInTheDocument();
   });
 });

@@ -663,7 +663,7 @@ describe('SignInFactorOne', () => {
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await screen.findByText('Incorrect code');
+        await screen.findByText('Incorrect phone code');
       });
 
       it('redirects back to sign-in if the user is locked', async () => {

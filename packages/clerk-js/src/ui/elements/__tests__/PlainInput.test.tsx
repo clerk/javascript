@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -135,13 +135,11 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, container } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByText, container } = render(<Field />, { wrapper });
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
 
-    await waitFor(() => {
-      expect(container.querySelector('#error-firstname')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Error/i)).toBeInTheDocument();
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -162,12 +160,10 @@ describe('PlainInput', () => {
       infoText: 'some info',
     });
 
-    const { findByLabelText, container } = render(<Field actionLabel={'take action'} />, { wrapper });
+    const { findByLabelText, findByText } = render(<Field actionLabel={'take action'} />, { wrapper });
 
     fireEvent.focus(await findByLabelText(/some label/i));
-    await waitFor(() => {
-      expect(container.querySelector('#firstname-info-feedback')).toBeInTheDocument();
-    });
+    expect(await findByText(/some info/i)).toBeInTheDocument();
   });
 
   it('with success feedback and aria-describedby', async () => {
@@ -178,13 +174,11 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, container } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByText, container } = render(<Field />, { wrapper });
 
     await userEvent.click(getByRole('button', { name: /set success/i }));
 
-    await waitFor(() => {
-      expect(container.querySelector('#firstname-success-feedback')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Success/i)).toBeInTheDocument();
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -204,13 +198,11 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, container } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByText, container } = render(<Field />, { wrapper });
 
     // Start with error
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    await waitFor(() => {
-      expect(container.querySelector('#error-firstname')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Error/i)).toBeInTheDocument();
 
     let input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -218,9 +210,7 @@ describe('PlainInput', () => {
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
-    await waitFor(() => {
-      expect(container.querySelector('#firstname-success-feedback')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Success/i)).toBeInTheDocument();
 
     input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -232,7 +222,7 @@ describe('PlainInput', () => {
     expect(successElement).toHaveTextContent(/Some Success/i);
   });
 
-  it('screen reader only live region announces feedback changes', async () => {
+  it('aria-live attribute is correctly applied', async () => {
     const { wrapper } = await createFixtures();
     const { Field } = createField('firstname', 'init value', {
       type: 'text',
@@ -240,59 +230,27 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, container } = render(<Field />, { wrapper });
-
-    // Pre-state: aria-live region exists and is empty
-    const preRegions = container.querySelectorAll('[aria-live="polite"]');
-    expect(preRegions.length).toBeGreaterThanOrEqual(1);
-    const preSrOnly = Array.from(preRegions).find(el => {
-      const style = window.getComputedStyle(el);
-      return style.position === 'absolute' && style.width === '1px';
-    });
-    expect(preSrOnly).toBeDefined();
-    expect(preSrOnly?.textContent ?? '').toMatch(/^\s*$/);
-
-    // Input is not in error and not described yet
-    const inputEl = container.querySelector('input#firstname-field');
-    expect(inputEl).toHaveAttribute('aria-invalid', 'false');
-    expect(inputEl).not.toHaveAttribute('aria-describedby');
+    const { getByRole, findByText, container } = render(<Field />, { wrapper });
 
     // Set error feedback
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    await waitFor(() => {
-      expect(container.querySelector('#error-firstname')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Error/i)).toBeInTheDocument();
 
-    // Verify there's a screen-reader-only aria-live region with the error content
-    const ariaLiveRegions = container.querySelectorAll('[aria-live="polite"]');
-    expect(ariaLiveRegions.length).toBeGreaterThanOrEqual(1);
-
-    // Find the screen reader only region (it will have the visually hidden styles)
-    const srOnlyRegion = Array.from(ariaLiveRegions).find(el => {
-      const style = window.getComputedStyle(el);
-      return style.position === 'absolute' && style.width === '1px';
-    });
-    expect(srOnlyRegion).toBeDefined();
-    expect(srOnlyRegion).toHaveTextContent(/Some Error/i);
+    // Verify the visible error message has aria-live="polite"
+    const errorElement = container.querySelector('#error-firstname');
+    expect(errorElement).toHaveAttribute('aria-live', 'polite');
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
-    await waitFor(() => {
-      expect(container.querySelector('#firstname-success-feedback')).toBeInTheDocument();
-    });
+    expect(await findByText(/Some Success/i)).toBeInTheDocument();
 
-    // Verify the screen reader only region updated its content
-    expect(srOnlyRegion).toHaveTextContent(/Some Success/i);
-
-    // Verify the visible error/success elements exist with proper IDs for aria-describedby
-    const errorElement = container.querySelector('#error-firstname');
+    // Verify the visible success message has aria-live="polite"
     const successElement = container.querySelector('#firstname-success-feedback');
+    expect(successElement).toHaveAttribute('aria-live', 'polite');
 
-    // One should be visible, the other hidden (for animation)
-    const errorVisible = errorElement && window.getComputedStyle(errorElement).visibility === 'visible';
-    const successVisible = successElement && window.getComputedStyle(successElement).visibility === 'visible';
-
-    // At least one should be visible (might be both during transition)
-    expect(errorVisible || successVisible).toBe(true);
+    // The previous error message should now have aria-live="off" (though it might still exist in DOM but hidden)
+    // Verify exactly one element has aria-live="polite" at a time
+    const allAriaLivePolite = container.querySelectorAll('[aria-live="polite"]');
+    expect(allAriaLivePolite.length).toBe(1);
   });
 });
