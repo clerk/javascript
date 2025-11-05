@@ -98,7 +98,7 @@ function getRelativeLinkReplacements() {
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /(?<!\[)SetActiveParams(?!\]\()/g,
+      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
       replace: '[SetActiveParams](/docs/reference/javascript/types/set-active-params)',
     },
     {
@@ -110,23 +110,23 @@ function getCatchAllReplacements() {
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /`SignInResource`/g,
-      replace: '[`SignInResource`](/docs/reference/javascript/sign-up)',
+      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
+      replace: '[`SignInResource`](/docs/reference/javascript/sign-in)',
     },
     {
-      pattern: /`SignUpResource`/g,
+      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
       replace: '[`SignUpResource`](/docs/reference/javascript/sign-up)',
     },
     {
-      pattern: /`UserResource`/g,
+      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
       replace: '[`UserResource`](/docs/reference/javascript/user)',
     },
     {
-      pattern: /SessionResource(\[\])/g,
-      replace: '[`SessionResource`](/docs/reference/javascript/session) []',
+      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[`SessionResource`](/docs/reference/javascript/session)$1',
     },
     {
-      pattern: /`SignedInSessionResource`/g,
+      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
       replace: '[`SignedInSessionResource`](/docs/reference/javascript/session)',
     },
     {
