@@ -85,7 +85,7 @@ export type SignInFirstFactor =
   | SamlFactor
   | EnterpriseSSOFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
+export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor;
 
 export interface UserData {
   firstName?: string;
