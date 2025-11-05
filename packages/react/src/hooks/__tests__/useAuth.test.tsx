@@ -318,7 +318,7 @@ describe('useDerivedAuth', () => {
     current.has?.({ permission: 'org:sys_foo' });
   });
 
-  it('returns not loaded state during transitive state (undefined values after being loaded)', () => {
+  it('returns not loaded state during transitive state', () => {
     const authObject = {
       actor: undefined,
       factorVerificationAge: null,
