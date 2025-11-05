@@ -23,6 +23,7 @@ import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
   __internal_CheckoutProps,
+  __internal_EnableOrganizationsModalProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -35,9 +36,9 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   BillingNamespace,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -743,6 +744,18 @@ export class Clerk implements ClerkInterface {
   public __internal_closeReverification = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
+  };
+
+  public __internal_openEnableOrganizations = (props?: __internal_EnableOrganizationsModalProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls
+      .ensureMounted({ preloadHint: 'EnableOrganizations' })
+      .then(controls => controls.openModal('enableOrganizations', props || {}));
+  };
+
+  public __internal_closeEnableOrganizations = (): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls => controls.closeModal('enableOrganizations'));
   };
 
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
