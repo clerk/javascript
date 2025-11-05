@@ -630,6 +630,9 @@ export type ElementsConfig = {
   apiKeysRevokeModal: WithOptions;
   apiKeysRevokeModalInput: WithOptions;
   apiKeysRevokeModalSubmitButton: WithOptions;
+  apiKeysCopyModal: WithOptions;
+  apiKeysCopyModalInput: WithOptions;
+  apiKeysCopyModalSubmitButton: WithOptions;
 
   subscriptionDetailsCard: WithOptions;
   subscriptionDetailsCardHeader: WithOptions;

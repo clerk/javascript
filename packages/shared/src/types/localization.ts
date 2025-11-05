@@ -3,6 +3,7 @@ import type { CamelToSnake, DeepPartial } from './utils';
 
 /**
  * @internal
+ *
  * @example
  * type PageTitle = LocalizationValue<'name', 'greeting'>;
  *     // ?^
@@ -69,6 +70,7 @@ export type __internal_LocalizationResource = {
   maintenanceMode: LocalizationValue;
   /**
    * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   *
    * @experimental
    */
   roles: {
@@ -107,6 +109,7 @@ export type __internal_LocalizationResource = {
   formFieldLabel__confirmDeletion: LocalizationValue;
   formFieldLabel__role: LocalizationValue;
   formFieldLabel__passkeyName: LocalizationValue;
+  formFieldLabel__apiKey: LocalizationValue;
   formFieldLabel__apiKeyName: LocalizationValue;
   formFieldLabel__apiKeyDescription: LocalizationValue;
   formFieldLabel__apiKeyExpiration: LocalizationValue;
@@ -1236,6 +1239,11 @@ export type __internal_LocalizationResource = {
     createdAndExpirationStatus__expiresOn: LocalizationValue<'createdDate' | 'expiresDate'>;
     formFieldCaption__expiration__never: LocalizationValue;
     formFieldCaption__expiration__expiresOn: LocalizationValue<'date'>;
+    copySecret: {
+      formTitle: LocalizationValue<'name'>;
+      formHint: LocalizationValue;
+      formButtonPrimary__copyAndClose: LocalizationValue;
+    };
   };
   taskChooseOrganization: {
     title: LocalizationValue;
