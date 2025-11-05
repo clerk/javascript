@@ -2,7 +2,7 @@ import { buildErrorThrower, ClerkRuntimeError } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
-import type { ClerkOptions, SDKMetadata, Without } from './types';
+import type { SDKMetadata } from './types';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
 
@@ -10,7 +10,7 @@ const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 
 const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 
-export type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
+export type LoadClerkJsScriptOptions = {
   publishableKey: string;
   clerkJSUrl?: string;
   clerkJSVariant?: 'headless' | '';
@@ -27,7 +27,7 @@ export type LoadClerkJsScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
   scriptLoadTimeout?: number;
 };
 
-export type LoadClerkUiScriptOptions = Without<ClerkOptions, 'isSatellite'> & {
+export type LoadClerkUiScriptOptions = {
   publishableKey: string;
   clerkUiUrl?: string;
   proxyUrl?: string;
@@ -104,7 +104,7 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
-    beforeLoad: applyClerkJsScriptAttributes(opts),
+    beforeLoad: applyAttributesToScript(buildClerkJsScriptAttributes(opts)),
   }).catch(error => {
     throw rejectWith(error);
   });
@@ -113,8 +113,6 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
 };
 
 export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promise<HTMLScriptElement | null> => {
-  console.log('here?');
-
   const timeout = opts?.scriptLoadTimeout ?? 15000;
   const rejectWith = (error?: Error) =>
     new ClerkRuntimeError('Failed to load Clerk UI' + (error?.message ? `, ${error.message}` : ''), {
@@ -142,8 +140,8 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
+    beforeLoad: applyAttributesToScript(buildClerkUiScriptAttributes(opts)),
   }).catch(error => {
-    console.log('nikos 2', error);
     throw rejectWith(error);
   });
 
@@ -167,13 +165,11 @@ export const clerkUiScriptUrl = (opts: LoadClerkUiScriptOptions) => {
   const { clerkUiUrl, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkUiUrl) {
-    console.log('got clerk ui url', clerkUiUrl);
-
     return clerkUiUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  // TODO @nikos add version selector
+  // TODO: add version selector for clerk/ui similar to clerk-js
   return `https://${scriptHost}/npm/@clerk/ui@latest/dist/ui.browser.js`;
 };
 
@@ -199,8 +195,12 @@ export const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) 
   return obj;
 };
 
-const applyClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => (script: HTMLScriptElement) => {
-  const attributes = buildClerkJsScriptAttributes(options);
+export const buildClerkUiScriptAttributes = (options: LoadClerkUiScriptOptions) => {
+  // TODO @nikos do we need this?
+  return buildClerkJsScriptAttributes(options);
+};
+
+const applyAttributesToScript = (attributes: Record<string, string>) => (script: HTMLScriptElement) => {
   for (const attribute in attributes) {
     script.setAttribute(attribute, attributes[attribute]);
   }
