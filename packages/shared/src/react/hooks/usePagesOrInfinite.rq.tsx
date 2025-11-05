@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import type { InfiniteData, QueryKey } from '@tanstack/query-core';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
@@ -12,6 +13,7 @@ import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
+  const [cacheTick, forceCacheTick] = useState(0);
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(params.initialPage ?? 1);
@@ -19,6 +21,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const enabled = config.enabled ?? true;
   const triggerInfinite = config.infinite ?? false;
+  const cacheMode = config.__experimental_mode === 'cache';
+  const signedInConstraint = config.isSignedIn ?? true;
   // TODO: Support keepPreviousData
   // const _keepPreviousData = config.keepPreviousData ?? false;
 
@@ -37,6 +41,12 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     ];
   }, [cacheKeys, params, paginatedPage]);
 
+  const serializedPagesQueryKey = useMemo(() => JSON.stringify(pagesQueryKey), [pagesQueryKey]);
+
+  const cachedSinglePageData = cacheMode
+    ? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey)
+    : undefined;
+
   const singlePageQuery = useClerkQuery({
     queryKey: pagesQueryKey,
     queryFn: ({ queryKey }) => {
@@ -53,7 +63,13 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher(requestParams as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && !triggerInfinite && Boolean(fetcher),
+    enabled: enabled && !cacheMode && !triggerInfinite && Boolean(fetcher) && signedInConstraint,
+    ...(cacheMode && cachedSinglePageData
+      ? {
+          initialData: cachedSinglePageData,
+          placeholderData: cachedSinglePageData,
+        }
+      : {}),
   });
 
   // Infinite mode: accumulate pages
@@ -66,6 +82,12 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       },
     ];
   }, [cacheKeys, params]);
+
+  const serializedInfiniteQueryKey = useMemo(() => JSON.stringify(infiniteQueryKey), [infiniteQueryKey]);
+
+  const cachedInfiniteData = cacheMode
+    ? queryClient.getQueryData<InfiniteData<ClerkPaginatedResponse<any>>>(infiniteQueryKey)
+    : undefined;
 
   const infiniteQuery = useClerkInfiniteQuery<ClerkPaginatedResponse<any>>({
     queryKey: infiniteQueryKey,
@@ -83,7 +105,13 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
     },
     staleTime: 60_000,
-    enabled: enabled && triggerInfinite && Boolean(fetcher),
+    enabled: enabled && !cacheMode && triggerInfinite && Boolean(fetcher) && signedInConstraint,
+    ...(cacheMode && cachedInfiniteData
+      ? {
+          initialData: cachedInfiniteData,
+          placeholderData: cachedInfiniteData,
+        }
+      : {}),
   });
 
   const page = useMemo(() => {
@@ -110,20 +138,67 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     [infiniteQuery, page, triggerInfinite],
   );
 
+  const resolvedSinglePageData = cacheMode ? (cachedSinglePageData ?? singlePageQuery.data) : singlePageQuery.data;
+
+  const resolvedInfiniteData: InfiniteData<ClerkPaginatedResponse<any>> | undefined = cacheMode
+    ? (cachedInfiniteData ?? infiniteQuery.data)
+    : infiniteQuery.data;
+
   const data = useMemo(() => {
     if (triggerInfinite) {
-      return infiniteQuery.data?.pages?.map(a => a?.data).flat() ?? [];
+      const pages = resolvedInfiniteData?.pages ?? [];
+      return pages.map(a => a?.data).flat() ?? [];
     }
-    return singlePageQuery.data?.data ?? [];
-  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data]);
+    return resolvedSinglePageData?.data ?? [];
+  }, [triggerInfinite, resolvedSinglePageData, resolvedInfiniteData, cacheTick]);
 
   const count = useMemo(() => {
     if (triggerInfinite) {
-      const pages = infiniteQuery.data?.pages ?? [];
+      const pages = resolvedInfiniteData?.pages ?? [];
       return pages[pages.length - 1]?.total_count || 0;
     }
-    return singlePageQuery.data?.total_count ?? 0;
-  }, [triggerInfinite, singlePageQuery.data, infiniteQuery.data]);
+    return resolvedSinglePageData?.total_count ?? 0;
+  }, [triggerInfinite, resolvedSinglePageData, resolvedInfiniteData, cacheTick]);
+
+  useEffect(() => {
+    if (!cacheMode) {
+      return;
+    }
+
+    const queryCache = queryClient.getQueryCache();
+
+    const unsubscribe = queryCache.subscribe(event => {
+      if (event.type !== 'queryUpdated' && event.type !== 'queryAdded') {
+        return;
+      }
+
+      const key = event.query.queryKey as QueryKey | undefined;
+      if (!key) {
+        return;
+      }
+
+      const keyString = (() => {
+        try {
+          return JSON.stringify(key);
+        } catch (_err) {
+          return undefined;
+        }
+      })();
+
+      if (!keyString) {
+        return;
+      }
+
+      if (
+        (serializedPagesQueryKey && keyString === serializedPagesQueryKey) ||
+        (serializedInfiniteQueryKey && keyString === serializedInfiniteQueryKey)
+      ) {
+        forceCacheTick(t => t + 1);
+      }
+    });
+
+    return unsubscribe;
+  }, [cacheMode, queryClient, serializedPagesQueryKey, serializedInfiniteQueryKey, triggerInfinite]);
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
@@ -155,13 +230,68 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     ? Boolean(infiniteQuery.hasPreviousPage)
     : (page - 1) * pageSizeRef.current > offsetCount * pageSizeRef.current;
 
-  const setData: CacheSetter = value => {
+  const setData: CacheSetter = async updater => {
     if (triggerInfinite) {
-      return queryClient.setQueryData(infiniteQueryKey, (prevValue: any) => {
-        return { ...prevValue, pages: typeof value === 'function' ? value(prevValue.pages) : value };
-      }) as any;
+      const previous = queryClient.getQueryData<InfiniteData<ClerkPaginatedResponse<any>> | undefined>(
+        infiniteQueryKey,
+      );
+
+      const currentPages = previous?.pages;
+      const nextPages =
+        typeof updater === 'function'
+          ? await (
+              updater as (
+                existing?: (ClerkPaginatedResponse<any> | undefined)[],
+              ) =>
+                | Promise<(ClerkPaginatedResponse<any> | undefined)[] | undefined>
+                | (ClerkPaginatedResponse<any> | undefined)[]
+                | undefined
+            )(currentPages)
+          : (updater as (ClerkPaginatedResponse<any> | undefined)[] | undefined);
+
+      if (typeof nextPages === 'undefined') {
+        return previous;
+      }
+
+      const result = queryClient.setQueryData<InfiniteData<ClerkPaginatedResponse<any>> | undefined>(
+        infiniteQueryKey,
+        prev => {
+          const base = prev ?? { pages: [], pageParams: [] };
+          return {
+            ...base,
+            pages: nextPages,
+          };
+        },
+      );
+
+      if (cacheMode) {
+        forceCacheTick(t => t + 1);
+      }
+
+      return result;
     }
-    return queryClient.setQueryData(pagesQueryKey, value) as any;
+
+    const previous = queryClient.getQueryData<ClerkPaginatedResponse<any> | undefined>(pagesQueryKey);
+    const nextValue =
+      typeof updater === 'function'
+        ? await (
+            updater as (
+              existing?: ClerkPaginatedResponse<any> | undefined,
+            ) => Promise<ClerkPaginatedResponse<any> | undefined> | ClerkPaginatedResponse<any> | undefined
+          )(previous)
+        : (updater as ClerkPaginatedResponse<any> | undefined);
+
+    if (typeof nextValue === 'undefined') {
+      return previous;
+    }
+
+    const result = queryClient.setQueryData<ClerkPaginatedResponse<any> | undefined>(pagesQueryKey, nextValue);
+
+    if (cacheMode) {
+      forceCacheTick(t => t + 1);
+    }
+
+    return result;
   };
 
   const revalidate = () => {
