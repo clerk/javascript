@@ -1,12 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "rootDir": "./src",
     "skipLibCheck": true,
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
     "declarationMap": true,
     "sourceMap": false,
+    "incremental": false,
     "declarationDir": "./dist"
   },
   "exclude": ["**/__tests__/**/*"]
