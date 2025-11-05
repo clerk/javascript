@@ -1,5 +1,14 @@
 # Change Log
 
+## 4.97.1
+
+### Patch Changes
+
+- Add native Apple Sign-In support for iOS via `useAppleSignIn()` hook. Requires `expo-apple-authentication` and native build (EAS Build or local prebuild). ([#7053](https://github.com/clerk/javascript/pull/7053)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/shared@3.31.0
+
 ## 4.97.0
 
 ### Minor Changes
