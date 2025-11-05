@@ -320,16 +320,16 @@ describe('useDerivedAuth', () => {
 
   it('returns not loaded state during transitive state (undefined values after being loaded)', () => {
     const authObject = {
-      sessionId: undefined,
-      userId: undefined,
-      sessionStatus: undefined,
-      sessionClaims: null,
       actor: undefined,
+      factorVerificationAge: null,
       orgId: undefined,
+      orgPermissions: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      orgPermissions: undefined,
-      factorVerificationAge: null,
+      sessionClaims: null,
+      sessionId: undefined,
+      sessionStatus: undefined,
+      userId: undefined,
       signOut: vi.fn(),
       getToken: vi.fn(),
     };
