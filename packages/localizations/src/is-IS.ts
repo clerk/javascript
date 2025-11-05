@@ -18,9 +18,9 @@ export const isIS: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Afrita og loka',
+      formHint: 'Af öryggisástæðum munum við ekki leyfa þér að skoða það aftur síðar.',
+      formTitle: 'Afritaðu API-lykilinn "{{name}}" þinn núna',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

@@ -18,9 +18,9 @@ export const zhCN: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: '复制并关闭',
+      formHint: '出于安全原因，我们不会允许您稍后再次查看。',
+      formTitle: '立即复制您的"{{name}}" API密钥',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

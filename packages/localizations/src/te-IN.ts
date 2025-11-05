@@ -18,9 +18,9 @@ export const teIN: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'కాపీ చేసి మూసివేయి',
+      formHint: 'భద్రత కారణాల కోసం, మేము మీకు తర్వాత దాన్ని మళ్లీ చూడడానికి అనుమతించము.',
+      formTitle: 'ఇప్పుడే మీ "{{name}}" API కీని కాపీ చేయండి',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

@@ -18,9 +18,9 @@ export const csCZ: LocalizationResource = {
     action__add: 'Přidat nový klíč',
     action__search: 'Vyhledat klíče',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopírovat a zavřít',
+      formHint: 'Z bezpečnostních důvodů vám to později nebudeme moci znovu zobrazit.',
+      formTitle: 'Zkopírujte nyní svůj API klíč "{{name}}"',
     },
     createdAndExpirationStatus__expiresOn:
       "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Platí do {{ expiresDate | longDate('cs-CZ') }}",

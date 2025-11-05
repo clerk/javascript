@@ -18,9 +18,9 @@ export const nbNO: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopier og lukk',
+      formHint: 'Av sikkerhetshensyn kan vi ikke tillate deg å se det igjen senere.',
+      formTitle: 'Kopier API-nøkkelen "{{name}}" din nå',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

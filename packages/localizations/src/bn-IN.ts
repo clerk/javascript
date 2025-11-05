@@ -18,9 +18,9 @@ export const bnIN: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'কপি করুন এবং বন্ধ করুন',
+      formHint: 'নিরাপত্তার কারণে, আমরা আপনাকে পরে এটি আবার দেখতে অনুমতি দেব না।',
+      formTitle: 'এখনই আপনার "{{name}}" API কী কপি করুন',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

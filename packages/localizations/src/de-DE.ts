@@ -18,9 +18,9 @@ export const deDE: LocalizationResource = {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopieren und schließen',
+      formHint: 'Aus Sicherheitsgründen können Sie es später nicht mehr einsehen.',
+      formTitle: 'Kopieren Sie jetzt Ihren API-Key "{{name}}"',
     },
     createdAndExpirationStatus__expiresOn:
       "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft ab {{ expiresDate | longDate('de-DE') }}",

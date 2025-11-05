@@ -18,9 +18,9 @@ export const hiIN: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'कॉपी करें और बंद करें',
+      formHint: 'सुरक्षा कारणों से, हम आपको बाद में इसे फिर से देखने की अनुमति नहीं देंगे।',
+      formTitle: 'अभी अपना "{{name}}" API कुंजी कॉपी करें',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

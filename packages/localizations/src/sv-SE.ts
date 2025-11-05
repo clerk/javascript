@@ -18,9 +18,9 @@ export const svSE: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopiera och stäng',
+      formHint: 'Av säkerhetsskäl kommer vi inte att tillåta dig att se det igen senare.',
+      formTitle: 'Kopiera din API-nyckel "{{name}}" nu',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

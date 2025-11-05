@@ -18,9 +18,9 @@ export const daDK: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Kopiér og luk',
+      formHint: 'Af sikkerhedsmæssige årsager kan vi ikke tillade dig at se det igen senere.',
+      formTitle: 'Kopiér din API-nøgle "{{name}}" nu',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

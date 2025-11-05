@@ -18,9 +18,9 @@ export const srRS: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Копирај и затвори',
+      formHint: 'Из безбедносних разлога, нећемо вам дозволити да га поново погледате касније.',
+      formTitle: 'Копирајте свој API кључ "{{name}}" сада',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

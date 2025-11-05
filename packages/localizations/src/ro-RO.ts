@@ -18,9 +18,9 @@ export const roRO: LocalizationResource = {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copiază și închide',
+      formHint: 'Din motive de securitate, nu vă vom permite să îl vizualizați din nou mai târziu.',
+      formTitle: 'Copiați acum cheia API "{{name}}"',
     },
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",

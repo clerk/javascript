@@ -18,9 +18,9 @@ export const elGR: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Αντιγραφή και κλείσιμο',
+      formHint: 'Για λόγους ασφαλείας, δεν θα σας επιτρέψουμε να το δείτε ξανά αργότερα.',
+      formTitle: 'Αντιγράψτε το κλειδί API "{{name}}" σας τώρα',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,

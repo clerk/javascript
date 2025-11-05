@@ -18,9 +18,9 @@ export const caES: LocalizationResource = {
     action__add: undefined,
     action__search: undefined,
     copySecret: {
-      formButtonPrimary__copyAndClose: undefined,
-      formHint: undefined,
-      formTitle: undefined,
+      formButtonPrimary__copyAndClose: 'Copiar i tancar',
+      formHint: 'Per raons de seguretat, no podràs veure-ho de nou més tard.',
+      formTitle: 'Copia la teva clau API "{{name}}" ara',
     },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
