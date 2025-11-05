@@ -8,6 +8,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  ClientTrustState,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailCodeFactor,
@@ -109,6 +110,7 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+  clientTrustState?: ClientTrustState;
 
   /**
    * The current status of the sign-in process.
@@ -532,6 +534,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
+      this.clientTrustState = data.client_trust_state ?? undefined;
     }
 
     eventBus.emit('resource:update', { resource: this });
