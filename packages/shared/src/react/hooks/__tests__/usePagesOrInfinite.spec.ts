@@ -729,13 +729,14 @@ describe('usePagesOrInfinite - query state transitions and remounting', () => {
       total_count: 1,
     }));
 
-    const params1 = { initialPage: 1, pageSize: 2, filter: 'A' } as const;
+    type TestParams = { initialPage: number; pageSize: number; filter: string };
+    const params1: TestParams = { initialPage: 1, pageSize: 2, filter: 'A' };
     const config = { infinite: false, enabled: true } as const;
     const cacheKeys = { type: 't-transition-test' } as const;
 
     // First render with filter 'A'
     const { result, rerender } = renderHook(
-      ({ params }: { params: typeof params1 }) =>
+      ({ params }: { params: TestParams }) =>
         usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
       { wrapper, initialProps: { params: params1 } },
     );
@@ -746,7 +747,7 @@ describe('usePagesOrInfinite - query state transitions and remounting', () => {
     expect(fetcher).toHaveBeenCalledTimes(1);
 
     // Change query parameters (simulating tab switch or filter change)
-    const params2 = { initialPage: 1, pageSize: 2, filter: 'B' } as const;
+    const params2: TestParams = { initialPage: 1, pageSize: 2, filter: 'B' };
     rerender({ params: params2 });
 
     // During the transition, isLoading may briefly be true as RQ processes the new query
