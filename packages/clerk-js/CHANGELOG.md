@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.105.1
+
+### Patch Changes
+
+- Add aria live region to ensure feedback messages are read to screen readers when feedback changes. ([#7111](https://github.com/clerk/javascript/pull/7111)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.105.0
 
 ### Minor Changes
