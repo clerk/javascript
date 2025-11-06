@@ -73,7 +73,7 @@ export function useSignInWithApple() {
 
     try {
       [AppleAuthentication, Crypto] = await Promise.all([import('expo-apple-authentication'), import('expo-crypto')]);
-    } catch (error) {
+    } catch {
       return errorThrower.throw(
         'expo-apple-authentication is required to use Sign in with Apple. ' +
           'Please install it by running: npx expo install expo-apple-authentication expo-crypto',
