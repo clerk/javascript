@@ -14,6 +14,7 @@ export interface APIKeyResource extends ClerkResource {
   expiration: Date | null;
   createdBy: string | null;
   description: string | null;
+  secret?: string;
   lastUsedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -26,12 +27,6 @@ export interface APIKeysNamespace {
    * Retrieves all API keys for the current user or organization.
    */
   getAll(params?: GetAPIKeysParams): Promise<APIKeyResource[]>;
-  /**
-   * @experimental This API is in early access and may change in future releases.
-   *
-   * Retrieves the secret for a given API key ID.
-   */
-  getSecret(id: string): Promise<string>;
   /**
    * @experimental This API is in early access and may change in future releases.
    *

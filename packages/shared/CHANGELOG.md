@@ -1,5 +1,13 @@
 # Change Log
 
+## 3.31.1
+
+### Patch Changes
+
+- Move clientTrustState to SignIn ([#7163](https://github.com/clerk/javascript/pull/7163)) by [@tmilewski](https://github.com/tmilewski)
+
+- Avoid revalidating first page on infinite pagination. ([#7153](https://github.com/clerk/javascript/pull/7153)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.31.0
 
 ### Minor Changes
