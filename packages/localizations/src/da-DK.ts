@@ -17,6 +17,11 @@ export const daDK: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiér og luk',
+      formHint: 'Af sikkerhedsmæssige årsager kan vi ikke tillade dig at se det igen senere.',
+      formTitle: 'Kopiér din API-nøgle "{{name}}" nu',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const daDK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const daDK: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const daDK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Indtast adgangskode',
   formFieldInputPlaceholder__phoneNumber: 'Indtast telefonnummer',
   formFieldInputPlaceholder__username: 'Indtast brugernavn',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-nøgle',
+  formFieldLabel__apiKeyDescription: 'Beskrivelse',
+  formFieldLabel__apiKeyExpiration: 'Udløb',
+  formFieldLabel__apiKeyName: 'Navn på hemmelig nøgle',
   formFieldLabel__automaticInvitations: 'Aktiver automatiske invitationer for dette domæne',
   formFieldLabel__backupCode: 'Sikkerhedskode',
   formFieldLabel__confirmDeletion: 'Bekræftelse',
@@ -488,9 +495,11 @@ export const daDK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opret organisation',
     action__invitationAccept: 'Deltag',
     action__manageOrganization: 'Administrer organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Anmod om at deltage',
     notSelected: 'Ingen organisation valgt',
     personalWorkspace: 'Personligt arbejdsområde',
@@ -638,6 +647,10 @@ export const daDK: LocalizationResource = {
         titleNewTab: 'Logget ind på anden fane',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nulstil adgangskode',
       resendButton: 'Modtog du ikke en kode? Send igen',
@@ -757,6 +770,10 @@ export const daDK: LocalizationResource = {
         subtitleNewTab: 'Vend tilbage til forrige fane for at fortsætte',
         title: 'E-mail er bekræftet',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -929,7 +946,9 @@ export const daDK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tilføj konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
   },

@@ -114,6 +114,7 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
                 variant='ghost'
                 colorScheme='danger'
                 onClick={handleRemove}
+                size='xs'
               />
             )}
           </Flex>

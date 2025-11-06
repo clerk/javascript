@@ -17,6 +17,11 @@ export const hrHR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiraj i zatvori',
+      formHint: 'Iz sigurnosnih razloga, nećemo vam dopustiti da ga ponovo pogledate kasnije.',
+      formTitle: 'Kopirajte svoj API ključ "{{name}}" sada',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const hrHR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const hrHR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const hrHR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API ključ',
+  formFieldLabel__apiKeyDescription: 'Opis',
+  formFieldLabel__apiKeyExpiration: 'Istječe',
+  formFieldLabel__apiKeyName: 'Naziv tajnog ključa',
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovu domenu',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -487,9 +494,11 @@ export const hrHR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
     notSelected: 'Nije odabrana organizacija',
     personalWorkspace: 'Osobni račun',
@@ -639,6 +648,10 @@ export const hrHR: LocalizationResource = {
         titleNewTab: 'Prijavljeni na drugoj kartici',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod za resetiranje lozinke',
       resendButton: 'Niste primili kod? Pošalji ponovno',
@@ -760,6 +773,10 @@ export const hrHR: LocalizationResource = {
         subtitleNewTab: 'Vratite se na prethodnu karticu za nastavak',
         title: 'Uspješno potvrđena e-pošta',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -937,7 +954,9 @@ export const hrHR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj račun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Upravljaj računom',
+    action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
   },

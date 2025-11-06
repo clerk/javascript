@@ -17,6 +17,11 @@ export const koKR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '복사하고 닫기',
+      formHint: '보안상의 이유로 나중에 다시 볼 수 없습니다.',
+      formTitle: '지금 "{{name}}" API 키를 복사하세요',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const koKR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const koKR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API 키',
+  formFieldLabel__apiKeyDescription: '설명',
+  formFieldLabel__apiKeyExpiration: '만료',
+  formFieldLabel__apiKeyName: '시크릿 키 이름',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: '백업 코드',
   formFieldLabel__confirmDeletion: '확인',
@@ -485,9 +492,11 @@ export const koKR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '조직 만들기',
     action__invitationAccept: 'Join',
     action__manageOrganization: '조직 관리',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: '선택한 조직 없음',
     personalWorkspace: '개인 워크스페이스',
@@ -634,6 +643,10 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '비밀번호 재설정 코드',
       resendButton: '코드 재전송',
@@ -753,6 +766,10 @@ export const koKR: LocalizationResource = {
         subtitleNewTab: '계속하려면 이전 탭으로 돌아가기',
         title: '이메일 인증 성공',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -925,7 +942,9 @@ export const koKR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '계정 추가',
+    action__closeUserMenu: '사용자 메뉴 닫기',
     action__manageAccount: '계정 관리',
+    action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
   },

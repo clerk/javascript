@@ -17,6 +17,11 @@ export const nlNL: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiëren en sluiten',
+      formHint: 'Om veiligheidsredenen kunnen we je dit later niet meer laten zien.',
+      formTitle: 'Kopieer nu je API-sleutel "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const nlNL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const nlNL: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-sleutel',
+  formFieldLabel__apiKeyDescription: 'Beschrijving',
+  formFieldLabel__apiKeyExpiration: 'Vervaldatum',
+  formFieldLabel__apiKeyName: 'Naam geheime sleutel',
   formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
@@ -489,9 +496,11 @@ export const nlNL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
@@ -639,6 +648,10 @@ export const nlNL: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -758,6 +771,10 @@ export const nlNL: LocalizationResource = {
         subtitleNewTab: 'Ga naar de vorige tab om verder te gaan',
         title: 'E-mail bevestigd',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +948,9 @@ export const nlNL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
+    action__closeUserMenu: 'Gebruikersmenu sluiten',
     action__manageAccount: 'Account beheren',
+    action__openUserMenu: 'Gebruikersmenu openen',
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },

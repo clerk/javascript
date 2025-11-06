@@ -17,6 +17,11 @@ export const taIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'நகலெடுத்து மூடு',
+      formHint: 'பாதுகாப்பு காரணங்களுக்காக, நாங்கள் பின்னர் அதை மீண்டும் பார்க்க அனுமதிக்க மாட்டோம்.',
+      formTitle: 'இப்போது உங்கள் "{{name}}" API விசையை நகலெடுக்கவும்',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const taIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const taIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const taIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   formFieldInputPlaceholder__phoneNumber: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API விசை',
+  formFieldLabel__apiKeyDescription: 'விளக்கம்',
+  formFieldLabel__apiKeyExpiration: 'காலாவதி',
+  formFieldLabel__apiKeyName: 'இரகசிய விசையின் பெயர்',
   formFieldLabel__automaticInvitations: 'இந்த டொமைனுக்கு தானியங்கி அழைப்புகளை இயக்கவும்',
   formFieldLabel__backupCode: 'காப்புக் குறியீடு',
   formFieldLabel__confirmDeletion: 'உறுதிப்படுத்தல்',
@@ -491,9 +498,11 @@ export const taIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'நிறுவனத்தை உருவாக்கு',
     action__invitationAccept: 'சேரவும்',
     action__manageOrganization: 'நிர்வகி',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'சேர கோரிக்கை',
     notSelected: 'நிறுவனம் எதுவும் தேர்ந்தெடுக்கப்படவில்லை',
     personalWorkspace: 'தனிப்பட்ட கணக்கு',
@@ -643,6 +652,10 @@ export const taIN: LocalizationResource = {
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'கடவுச்சொல் மீட்டமைப்பு குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -763,6 +776,10 @@ export const taIN: LocalizationResource = {
         subtitleNewTab: 'தொடர முந்தைய தாவலுக்குத் திரும்பவும்',
         title: 'மின்னஞ்சல் வெற்றிகரமாக சரிபார்க்கப்பட்டது',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -947,7 +964,9 @@ export const taIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'கணக்கைச் சேர்',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'கணக்கை நிர்வகி',
+    action__openUserMenu: undefined,
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
   },

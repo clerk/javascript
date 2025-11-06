@@ -1,4 +1,4 @@
-import type { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -37,7 +37,8 @@ describe('ResetPassword', () => {
 
     const passwordField = screen.getByLabelText(/New password/i);
     fireEvent.focus(passwordField);
-    await screen.findByText(/Your password must contain 8 or more characters/i);
+    const infoElement = await screen.findByTestId('form-feedback-info');
+    expect(infoElement).toHaveTextContent(/Your password must contain 8 or more characters/i);
   });
 
   it('renders a hidden identifier field', async () => {
@@ -115,10 +116,12 @@ describe('ResetPassword', () => {
       await userEvent.type(screen.getByLabelText(/new password/i), 'testewrewr');
       const confirmField = screen.getByLabelText(/confirm password/i);
       await userEvent.type(confirmField, 'testrwerrwqrwe');
-      await screen.findByText(`Passwords don't match.`);
+      const errorElement = await screen.findByTestId('form-feedback-error');
+      expect(errorElement).toHaveTextContent(/Passwords don't match/i);
 
       await userEvent.clear(confirmField);
-      await screen.findByText(`Passwords don't match.`);
+      const errorElementAfterClear = await screen.findByTestId('form-feedback-error');
+      expect(errorElementAfterClear).toHaveTextContent(/Passwords don't match/i);
     });
 
     it('navigates to the root page upon pressing the back link', async () => {

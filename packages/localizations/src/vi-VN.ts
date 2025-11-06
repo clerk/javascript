@@ -17,6 +17,11 @@ export const viVN: LocalizationResource = {
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Sao chép và đóng',
+      formHint: 'Vì lý do bảo mật, chúng tôi sẽ không cho phép bạn xem lại sau này.',
+      formTitle: 'Sao chép khóa API "{{name}}" của bạn ngay bây giờ',
+    },
     createdAndExpirationStatus__expiresOn:
       "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
@@ -125,7 +130,6 @@ export const viVN: LocalizationResource = {
     monthly: 'Hàng tháng',
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
-    paymentMethods__label: 'Phương thức thanh toán',
     paymentMethod: {
       applePayDescription: {
         annual: 'Thanh toán hàng năm',
@@ -140,6 +144,7 @@ export const viVN: LocalizationResource = {
         testCardInfo: 'Thông tin thử nghiệm',
       },
     },
+    paymentMethods__label: 'Phương thức thanh toán',
     popular: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
@@ -224,6 +229,8 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Nhập mật khẩu của bạn',
   formFieldInputPlaceholder__phoneNumber: 'Nhập số điện thoại của bạn',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Khóa API',
   formFieldLabel__apiKeyDescription: 'Mô tả',
   formFieldLabel__apiKeyExpiration: 'Hết hạn',
   formFieldLabel__apiKeyName: 'Tên khoá bí mật',
@@ -493,9 +500,11 @@ export const viVN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Tạo tổ chức',
     action__invitationAccept: 'Tham gia',
     action__manageOrganization: 'Quản lý',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
@@ -645,6 +654,10 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -765,6 +778,10 @@ export const viVN: LocalizationResource = {
         subtitleNewTab: 'Quay lại tab trước để tiếp tục',
         title: 'Xác minh email thành công',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -938,7 +955,9 @@ export const viVN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Thêm tài khoản',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Quản lý tài khoản',
+    action__openUserMenu: undefined,
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
   },

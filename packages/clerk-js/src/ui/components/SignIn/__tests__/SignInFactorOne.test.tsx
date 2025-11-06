@@ -1,5 +1,5 @@
 import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
-import type { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -186,7 +186,8 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
-        await screen.findByText('Incorrect Password');
+        const errorElement = await screen.findByTestId('form-feedback-error');
+        expect(errorElement).toHaveTextContent(/Incorrect Password/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -558,7 +559,8 @@ describe('SignInFactorOne', () => {
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await screen.findByText('Incorrect code');
+        const errorElement = await screen.findByTestId('form-feedback-error');
+        expect(errorElement).toHaveTextContent(/Incorrect code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -663,7 +665,8 @@ describe('SignInFactorOne', () => {
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await screen.findByText('Incorrect phone code');
+        const errorElement = await screen.findByTestId('form-feedback-error');
+        expect(errorElement).toHaveTextContent(/Incorrect phone code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {

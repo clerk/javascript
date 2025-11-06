@@ -17,6 +17,11 @@ export const arSA: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'نسخ وإغلاق',
+      formHint: 'لأسباب أمنية، لن نسمح لك بعرضه مرة أخرى لاحقاً.',
+      formTitle: 'انسخ مفتاح API الخاص بك "{{name}}" الآن',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const arSA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const arSA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'مفتاح API',
+  formFieldLabel__apiKeyDescription: 'الوصف',
+  formFieldLabel__apiKeyExpiration: 'الانتهاء',
+  formFieldLabel__apiKeyName: 'اسم المفتاح السري',
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
@@ -486,9 +493,11 @@ export const arSA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'أنشاء منظمة',
     action__invitationAccept: 'أنضمام',
     action__manageOrganization: 'أدارة المنظمة',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'طلب أنضمام',
     notSelected: 'لم يتم أختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
@@ -636,6 +645,10 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'رمز تحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
@@ -757,6 +770,10 @@ export const arSA: LocalizationResource = {
         subtitleNewTab: 'ارجع إلى علامة التبويب السابقة للمتابعة',
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -929,7 +946,9 @@ export const arSA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'إضافة حساب',
+    action__closeUserMenu: 'إغلاق قائمة المستخدم',
     action__manageAccount: 'إدارة الحساب',
+    action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },

@@ -17,6 +17,11 @@ export const trTR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopyala ve kapat',
+      formHint: 'Güvenlik nedenleriyle, daha sonra tekrar görüntülemenize izin vermeyeceğiz.',
+      formTitle: '"{{name}}" API anahtarınızı şimdi kopyalayın',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const trTR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const trTR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Şifrenizi girin',
   formFieldInputPlaceholder__phoneNumber: 'Telefon numaranızı girin',
   formFieldInputPlaceholder__username: 'Kullanıcı adınızı girin',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API anahtarı',
+  formFieldLabel__apiKeyDescription: 'Açıklama',
+  formFieldLabel__apiKeyExpiration: 'Son kullanma',
+  formFieldLabel__apiKeyName: 'Gizli anahtar adı',
   formFieldLabel__automaticInvitations: 'Bu alan adı için otomatik davetleri etkinleştir',
   formFieldLabel__backupCode: 'Yedekleme kodu',
   formFieldLabel__confirmDeletion: 'Onayla',
@@ -488,9 +495,11 @@ export const trTR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organizasyon oluştur',
     action__invitationAccept: 'Katıl',
     action__manageOrganization: 'Organizasyonu yönet',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Katılmak için talepte bulun',
     notSelected: 'Organizasyon seçilmedi',
     personalWorkspace: 'Kişisel Çalışma Alanı',
@@ -639,6 +648,10 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Şifre sıfırlama kodu',
       resendButton: 'Tekrar gönder',
@@ -759,6 +772,10 @@ export const trTR: LocalizationResource = {
         subtitleNewTab: 'Devam etmek için önceki sekmeye dönün',
         title: 'E-posta adresiniz başarıyla doğrulandı',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -935,7 +952,9 @@ export const trTR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Hesap ekle',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hesabı yönet',
+    action__openUserMenu: undefined,
     action__signOut: 'Çıkış yap',
     action__signOutAll: 'Tüm hesaplardan çıkış yap',
   },

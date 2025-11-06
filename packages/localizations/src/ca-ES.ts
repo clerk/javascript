@@ -17,6 +17,11 @@ export const caES: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar i tancar',
+      formHint: 'Per raons de seguretat, no podràs veure-ho de nou més tard.',
+      formTitle: 'Copia la teva clau API "{{name}}" ara',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -122,7 +127,6 @@ export const caES: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -137,6 +141,7 @@ export const caES: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const caES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Contrasenya',
   formFieldInputPlaceholder__phoneNumber: 'Número de telèfon',
   formFieldInputPlaceholder__username: "Nom d'usuari",
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Clau API',
+  formFieldLabel__apiKeyDescription: 'Descripció',
+  formFieldLabel__apiKeyExpiration: 'Expiració',
+  formFieldLabel__apiKeyName: 'Nom de clau secreta',
   formFieldLabel__automaticInvitations: 'Activa invitacions automàtiques per a aquest domini',
   formFieldLabel__backupCode: 'Codi de seguretat',
   formFieldLabel__confirmDeletion: 'Confirmació',
@@ -489,9 +496,11 @@ export const caES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea organització',
     action__invitationAccept: 'Uneix-te',
     action__manageOrganization: 'Gestiona',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Sol·licita unir-te',
     notSelected: "No s'ha seleccionat cap organització",
     personalWorkspace: 'Compte personal',
@@ -639,6 +648,10 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codi de restabliment de contrasenya',
       resendButton: 'No has rebut el codi? Reenvia',
@@ -759,6 +772,10 @@ export const caES: LocalizationResource = {
         subtitleNewTab: 'Torna a la pestanya anterior per continuar',
         title: 'Correu electrònic verificat amb èxit',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -933,7 +950,9 @@ export const caES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Afegeix compte',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestiona compte',
+    action__openUserMenu: undefined,
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },

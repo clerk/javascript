@@ -17,6 +17,11 @@ export const mnMN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Хуулах ба хаах',
+      formHint: 'Аюулгүй байдлын шалтгаанаар бид танд дараа нь үүнийг дахин харах боломж олгохгүй.',
+      formTitle: 'Одоо "{{name}}" API түлхүүрээ хуулаарай',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const mnMN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const mnMN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API түлхүүр',
+  formFieldLabel__apiKeyDescription: 'Тодорхойлолт',
+  formFieldLabel__apiKeyExpiration: 'Хугацаа дуусах',
+  formFieldLabel__apiKeyName: 'Нууц түлхүүрийн нэр',
   formFieldLabel__automaticInvitations: 'Энэ домэйны автомат урилгыг идэвхжүүлэх',
   formFieldLabel__backupCode: 'Нөөц код',
   formFieldLabel__confirmDeletion: 'Баталгаажуулалт',
@@ -489,9 +496,11 @@ export const mnMN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Байгууллага үүсгэх',
     action__invitationAccept: 'Нэгдэх',
     action__manageOrganization: 'Удирдах',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Нэгдэх хүсэлт',
     notSelected: 'Байгууллага сонгогдоогүй байна',
     personalWorkspace: 'Хувийн бүртгэл',
@@ -639,6 +648,10 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
@@ -759,6 +772,10 @@ export const mnMN: LocalizationResource = {
         subtitleNewTab: 'Үргэлжлүүлэхийн тулд өмнөх таб руу буцна уу',
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -932,7 +949,9 @@ export const mnMN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Бүртгэл нэмэх',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Бүртгэлийг удирдах',
+    action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },

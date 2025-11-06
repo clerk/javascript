@@ -1,4 +1,4 @@
-import type { FeatureJSON, FeatureResource } from '@clerk/types';
+import type { FeatureJSON, FeatureResource } from '@clerk/shared/types';
 
 import { BaseResource } from './internal';
 

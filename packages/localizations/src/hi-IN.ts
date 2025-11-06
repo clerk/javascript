@@ -17,6 +17,11 @@ export const hiIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'कॉपी करें और बंद करें',
+      formHint: 'सुरक्षा कारणों से, हम आपको बाद में इसे फिर से देखने की अनुमति नहीं देंगे।',
+      formTitle: 'अभी अपना "{{name}}" API कुंजी कॉपी करें',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const hiIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const hiIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const hiIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'अपना पासवर्ड दर्ज करें',
   formFieldInputPlaceholder__phoneNumber: 'अपना फोन नंबर दर्ज करें',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API कुंजी',
+  formFieldLabel__apiKeyDescription: 'विवरण',
+  formFieldLabel__apiKeyExpiration: 'समाप्ति',
+  formFieldLabel__apiKeyName: 'गुप्त कुंजी का नाम',
   formFieldLabel__automaticInvitations: 'इस डोमेन के लिए स्वचालित आमंत्रण सक्षम करें',
   formFieldLabel__backupCode: 'बैकअप कोड',
   formFieldLabel__confirmDeletion: 'पुष्टिकरण',
@@ -488,9 +495,11 @@ export const hiIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'संगठन बनाएँ',
     action__invitationAccept: 'शामिल हों',
     action__manageOrganization: 'प्रबंधित करें',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
     notSelected: 'कोई संगठन चयनित नहीं',
     personalWorkspace: 'व्यक्तिगत खाता',
@@ -640,6 +649,10 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'पासवर्ड रीसेट कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -761,6 +774,10 @@ export const hiIN: LocalizationResource = {
         subtitleNewTab: 'जारी रखने के लिए पिछले टैब पर वापस जाएं',
         title: 'सफलतापूर्वक ईमेल सत्यापित किया गया',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -942,7 +959,9 @@ export const hiIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'खाता जोड़ें',
+    action__closeUserMenu: 'उपयोगकर्ता मेनू बंद करें',
     action__manageAccount: 'खाता प्रबंधित करें',
+    action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
   },

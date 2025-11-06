@@ -1,11 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
-import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
-import {
-  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
-  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
-} from '@clerk/shared/webauthn';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -13,6 +8,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  ClientTrustState,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailCodeFactor,
@@ -59,7 +55,12 @@ import type {
   Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
+import {
+  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 
 import { debugLogger } from '@/utils/debug';
 
@@ -69,6 +70,7 @@ import {
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
   getBaseIdentifier,
+  getBrowserLocale,
   getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
@@ -112,6 +114,7 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+  clientTrustState?: ClientTrustState;
 
   /**
    * The current status of the sign-in process.
@@ -168,9 +171,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
   create = (params: SignInCreateParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
+    const locale = getBrowserLocale();
     return this._basePost({
       path: this.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   };
 
@@ -534,6 +538,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
+      this.clientTrustState = data.client_trust_state ?? undefined;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -712,9 +717,10 @@ class SignInFuture implements SignInFutureResource {
   }
 
   private async _create(params: SignInFutureCreateParams): Promise<void> {
+    const locale = getBrowserLocale();
     await this.resource.__internal_basePost({
       path: this.resource.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   }
 
@@ -733,9 +739,14 @@ class SignInFuture implements SignInFutureResource {
       // TODO @userland-errors:
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
+      const locale = getBrowserLocale();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { identifier: identifier || previousIdentifier, password: params.password },
+        body: {
+          identifier: identifier || previousIdentifier,
+          password: params.password,
+          ...(locale ? { locale } : {}),
+        },
       });
     });
   }

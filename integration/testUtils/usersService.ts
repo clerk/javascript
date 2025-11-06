@@ -204,11 +204,9 @@ export const createUserService = (clerkClient: ClerkClient) => {
         secondsUntilExpiration: TWENTY_MINUTES,
       });
 
-      const { secret } = await clerkClient.apiKeys.getSecret(apiKey.id);
-
       return {
         apiKey,
-        secret,
+        secret: apiKey.secret ?? '',
         revoke: () => clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' }),
       } satisfies FakeAPIKey;
     },

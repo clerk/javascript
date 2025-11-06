@@ -1,6 +1,23 @@
 {
-  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "incremental": true
-  }
+    "outDir": "dist",
+    "baseUrl": ".",
+    "lib": ["es6", "dom"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "importHelpers": true,
+    "declaration": true,
+    "declarationMap": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "sourceMap": false,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "target": "es2020"
+  },
+  "include": ["src"]
 }

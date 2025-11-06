@@ -1,5 +1,88 @@
 # Change Log
 
+## 2.18.2
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`d88ea99`](https://github.com/clerk/javascript/commit/d88ea99755e605673111cccb41eb93391e1e68dd), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/clerk-js@5.105.0
+  - @clerk/shared@3.31.1
+  - @clerk/clerk-react@5.53.7
+  - @clerk/types@4.97.2
+
+## 2.18.1
+
+### Patch Changes
+
+- Fixed missing declaration files. ([#7149](https://github.com/clerk/javascript/pull/7149)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 2.18.0
+
+### Minor Changes
+
+- Add native Apple Sign-In support for iOS via `useAppleSignIn()` hook. Requires `expo-apple-authentication` and native build (EAS Build or local prebuild). ([#7053](https://github.com/clerk/javascript/pull/7053)) by [@chriscanin](https://github.com/chriscanin)
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`2738c7e`](https://github.com/clerk/javascript/commit/2738c7eb07c591533802a779e443b5a309ccdcdb), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+  - @clerk/clerk-js@5.104.0
+  - @clerk/clerk-react@5.53.6
+
+## 2.17.4
+
+### Patch Changes
+
+- Add `x-expo-sdk-version` header to HTTP requests to match iOS and Android SDK patterns. ([#7133](https://github.com/clerk/javascript/pull/7133)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8), [`5b85ea9`](https://github.com/clerk/javascript/commit/5b85ea9b738def91f7d4a2af7170a041d0a8189b), [`fae192f`](https://github.com/clerk/javascript/commit/fae192fdd4c23c4afd6892bdd0c5a7542ce9bc42), [`02b723d`](https://github.com/clerk/javascript/commit/02b723dc032bef6a8f96b18d39ec8479be4f0225), [`f47b5a3`](https://github.com/clerk/javascript/commit/f47b5a325a5909ca3fa2ab264031243691b14a93), [`61422b2`](https://github.com/clerk/javascript/commit/61422b21198106c48e87dfffba0bf5a383b380bf)]:
+  - @clerk/clerk-js@5.103.2
+  - @clerk/shared@3.30.0
+  - @clerk/types@4.97.0
+  - @clerk/clerk-react@5.53.5
+
+## 2.17.3
+
+### Patch Changes
+
+- Updated dependencies [[`3410bc6`](https://github.com/clerk/javascript/commit/3410bc6f85d1d87c9ed35c9aa4ec764a684cc4ec)]:
+  - @clerk/clerk-js@5.103.1
+
+## 2.17.2
+
+### Patch Changes
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`8bc5652`](https://github.com/clerk/javascript/commit/8bc5652d34966301ce62bf36cf7c7c88597f40f4), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/shared@3.29.0
+  - @clerk/clerk-js@5.103.0
+  - @clerk/types@4.96.0
+  - @clerk/clerk-react@5.53.4
+
+## 2.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911), [`64d3135`](https://github.com/clerk/javascript/commit/64d31350ca2db82e63a0ef84584219cc95ee34d2), [`3235626`](https://github.com/clerk/javascript/commit/32356263ab1f64de68fba5bd443f5b8cc69c4c35), [`ca00881`](https://github.com/clerk/javascript/commit/ca008815d3c4b15ebd6c584cb9ccbb8dc537a170)]:
+  - @clerk/clerk-js@5.102.1
+  - @clerk/types@4.95.1
+  - @clerk/clerk-react@5.53.3
+  - @clerk/shared@3.28.3
+
+## 2.17.0
+
+### Minor Changes
+
+- Make UserAvatar available to Expo Web ([#7007](https://github.com/clerk/javascript/pull/7007)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`6503405`](https://github.com/clerk/javascript/commit/65034057f7498102df107c16017225304a498ac6), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035), [`fed1d94`](https://github.com/clerk/javascript/commit/fed1d946cee4fb519d099e636b43287b16c3851e)]:
+  - @clerk/clerk-js@5.102.0
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+  - @clerk/clerk-react@5.53.2
+
 ## 2.16.4
 
 ### Patch Changes

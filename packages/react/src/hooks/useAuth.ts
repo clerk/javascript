@@ -7,7 +7,7 @@ import type {
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -171,7 +171,7 @@ export function useDerivedAuth(
         plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
       })(params);
     },
-    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims],
   );
 
   const payload = resolveAuthState({

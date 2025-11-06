@@ -17,6 +17,11 @@ export const bgBG: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копирай и затвори',
+      formHint: 'От съображения за сигурност няма да можем да ви позволим да го видите отново по-късно.',
+      formTitle: 'Копирайте вашия API ключ "{{name}}" сега',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -122,7 +127,6 @@ export const bgBG: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -137,6 +141,7 @@ export const bgBG: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Парола',
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Изтичане',
+  formFieldLabel__apiKeyName: 'Име на таен ключ',
   formFieldLabel__automaticInvitations: 'Включи автоматични покани за този домейн',
   formFieldLabel__backupCode: 'Резервен код',
   formFieldLabel__confirmDeletion: 'Потвърждение',
@@ -489,9 +496,11 @@ export const bgBG: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Създаване на организация',
     action__invitationAccept: 'Присъединяване',
     action__manageOrganization: 'Управление',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Заявка за присъединяване',
     notSelected: 'Няма избрана организация',
     personalWorkspace: 'Личен акаунт',
@@ -639,6 +648,10 @@ export const bgBG: LocalizationResource = {
         titleNewTab: 'Влезнали сте в друг таб',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код за нулиране на парола',
       resendButton: 'Не сте получили код? Изпрати отново',
@@ -759,6 +772,10 @@ export const bgBG: LocalizationResource = {
         subtitleNewTab: 'Върнете се към предходния таб, за да продължите',
         title: 'Успешно потвърден имейл',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -930,7 +947,9 @@ export const bgBG: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавяне на акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управление на акаунта',
+    action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
   },
