@@ -1,4 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
+import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
@@ -350,7 +351,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : totals.totalDueNow.amount > 0
+                  : totals.totalDueNow
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -405,7 +406,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                totals.totalDueNow.amount > 0
+                totals.totalDueNow
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
@@ -455,14 +456,14 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
+                totals.totalDueNow || freeTrialEndsAt !== null
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
+                totals.totalDueNow || freeTrialEndsAt !== null
                   ? paymentMethod
                     ? formatPaymentMethodLabel(paymentMethod)
                     : '–'
