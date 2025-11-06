@@ -125,15 +125,30 @@ export const createUserService = (clerkClient: ClerkClient) => {
       };
     },
     createBapiUser: async fakeUser => {
-      return await clerkClient.users.createUser({
-        emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
-        password: fakeUser.password,
-        firstName: fakeUser.firstName,
-        lastName: fakeUser.lastName,
-        phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
-        username: fakeUser.username,
-        skipPasswordRequirement: fakeUser.password === undefined,
-      });
+      try {
+        return await clerkClient.users.createUser({
+          emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
+          firstName: fakeUser.firstName,
+          lastName: fakeUser.lastName,
+          password: fakeUser.password,
+          phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
+          skipPasswordRequirement: fakeUser.password === undefined,
+          username: fakeUser.username,
+        });
+      } catch (error: any) {
+        if (error?.status === 429) {
+          const details = [
+            `Retry-After: ${error.retryAfter ?? 'not provided'} seconds`,
+            error.clerkTraceId ? `Trace ID: ${error.clerkTraceId}` : null,
+            error.errors?.length > 0 ? `API Errors: ${error.errors.map((e: any) => e.message).join(', ')}` : null,
+          ]
+            .filter(Boolean)
+            .join(' | ');
+
+          throw new Error(`Rate limit exceeded (HTTP 429) during createBapiUser. ${details}`);
+        }
+        throw error;
+      }
     },
     getOrCreateUser: async fakeUser => {
       const existingUser = await self.getUser({ email: fakeUser.email });
@@ -186,13 +201,13 @@ export const createUserService = (clerkClient: ClerkClient) => {
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();
       const organization = await clerkClient.organizations.createOrganization({
-        name: faker.animal.dog(),
         createdBy: userId,
+        name: faker.animal.dog(),
       });
       return {
+        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
         name,
         organization,
-        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
       } satisfies FakeOrganization;
     },
     createFakeAPIKey: async (userId: string) => {
