@@ -200,7 +200,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
 
       const apiKey = await clerkClient.apiKeys.create({
         subject: userId,
-        name: `Integration Test - ${userId} - ${Date.now()}`,
+        name: `Integration Test - ${faker.string.uuid()}`,
         secondsUntilExpiration: TWENTY_MINUTES,
       });
 
