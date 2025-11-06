@@ -3,6 +3,8 @@
 // otherwise chunk loading will not work
 import './utils/setWebpackChunkPublicPath';
 
+// import 'react-dom';
+// import 'scheduler';
 /**
  * Browser bundle entry point for @clerk/ui
  *
@@ -18,7 +20,7 @@ if (!window.__unstable_ClerkUi) {
   };
 }
 
-// // Hot module replacement for development
-// if (module.hot) {
-//   module.hot.accept();
-// }
+// Hot module replacement for development
+if (module.hot) {
+  module.hot.accept();
+}
