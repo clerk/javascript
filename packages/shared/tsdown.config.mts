@@ -42,6 +42,7 @@ export default defineConfig(({ watch }) => {
         './src/workerTimers/index.ts',
         './src/types/index.ts',
         './src/dom/*.ts',
+        './src/ui/index.ts',
         './src/internal/clerk-js/*.ts',
         './src/internal/clerk-js/**/*.ts',
         '!./src/**/*.{test,spec}.{ts,tsx}',
