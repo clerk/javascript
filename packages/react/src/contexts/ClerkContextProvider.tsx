@@ -10,6 +10,7 @@ import type { ClientResource, InitialState, Resources } from '@clerk/shared/type
 import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
+import { authStore } from '../stores/authStore';
 import type { IsomorphicClerkOptions } from '../types';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
@@ -25,6 +26,7 @@ export type ClerkContextProviderState = Resources;
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
   const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const previousAuthSnapshotRef = React.useRef<string>('');
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -38,6 +40,27 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   }, []);
 
   const derivedState = deriveState(clerk.loaded, state, initialState);
+
+  React.useLayoutEffect(() => {
+    if (initialState && !clerk.loaded) {
+      authStore.setInitialServerSnapshot({
+        actor: initialState.actor,
+        factorVerificationAge: initialState.factorVerificationAge,
+        orgId: initialState.orgId,
+        orgPermissions: initialState.orgPermissions,
+        orgRole: initialState.orgRole,
+        orgSlug: initialState.orgSlug,
+        sessionClaims: initialState.sessionClaims,
+        sessionId: initialState.sessionId,
+        sessionStatus: initialState.sessionStatus,
+        userId: initialState.userId,
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    authStore.markHydrated();
+  }, []);
   const clerkCtx = React.useMemo(
     () => ({ value: clerk }),
     [
@@ -63,21 +86,42 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     factorVerificationAge,
   } = derivedState;
 
-  const authCtx = React.useMemo(() => {
-    const value = {
-      sessionId,
-      sessionStatus,
-      sessionClaims,
-      userId,
+  const authValue = React.useMemo(
+    () => ({
       actor,
+      factorVerificationAge,
       orgId,
+      orgPermissions,
       orgRole,
       orgSlug,
-      orgPermissions,
-      factorVerificationAge,
-    };
-    return { value };
-  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge, sessionClaims?.__raw]);
+      sessionClaims,
+      sessionId,
+      sessionStatus,
+      userId,
+    }),
+    [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge, sessionClaims?.__raw],
+  );
+
+  React.useLayoutEffect(() => {
+    const snapshotKey = JSON.stringify({
+      actor: authValue.actor,
+      factorVerificationAge: authValue.factorVerificationAge,
+      orgId: authValue.orgId,
+      orgPermissions: authValue.orgPermissions,
+      orgRole: authValue.orgRole,
+      orgSlug: authValue.orgSlug,
+      sessionId: authValue.sessionId,
+      sessionStatus: authValue.sessionStatus,
+      userId: authValue.userId,
+    });
+
+    if (previousAuthSnapshotRef.current !== snapshotKey) {
+      previousAuthSnapshotRef.current = snapshotKey;
+      authStore.setSnapshot(authValue);
+    }
+  }, [authValue]);
+
+  const authCtx = React.useMemo(() => ({ value: authValue }), [authValue]);
 
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);

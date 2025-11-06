@@ -8,12 +8,12 @@ import type {
   SignOut,
   UseAuthReturn,
 } from '@clerk/shared/types';
-import { useCallback } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
+import { authStore } from '../stores/authStore';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
@@ -98,11 +98,15 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
   const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
   const initialAuthState = rest as any;
 
-  const authContextFromHook = useAuthContext();
-  let authContext = authContextFromHook;
+  const authContext = useSyncExternalStore(
+    authStore.subscribe,
+    authStore.getClientSnapshot,
+    authStore.getServerSnapshot,
+  );
 
+  let authContextToUse = authContext;
   if (authContext.sessionId === undefined && authContext.userId === undefined) {
-    authContext = initialAuthState != null ? initialAuthState : {};
+    authContextToUse = initialAuthState != null ? initialAuthState : {};
   }
 
   const isomorphicClerk = useIsomorphicClerkContext();
@@ -113,7 +117,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 
   return useDerivedAuth(
     {
-      ...authContext,
+      ...authContextToUse,
       getToken,
       signOut,
     },
