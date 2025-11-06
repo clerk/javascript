@@ -89,12 +89,14 @@ testAgainstRunningApps({
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
 
     // Navigate to second page
-    await u.page.getByRole('button', { name: /next/i }).click();
+    const pagination = u.page.locator('.cl-paginationButton').filter({ hasText: /^Next$/i });
+    await pagination.click();
     await expect(u.page.getByText(/Displaying 6 – 6 of 6/i)).toBeVisible();
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(1);
 
     // Navigate back to first page
-    await u.page.getByRole('button', { name: /previous/i }).click();
+    const previousButton = u.page.locator('.cl-paginationButton').filter({ hasText: /^Previous$/i });
+    await previousButton.click();
     await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
 
