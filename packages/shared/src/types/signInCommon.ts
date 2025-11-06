@@ -85,7 +85,7 @@ export type SignInFirstFactor =
   | SamlFactor
   | EnterpriseSSOFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor;
+export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor;
 
 export interface UserData {
   firstName?: string;
@@ -119,7 +119,7 @@ export type AttemptFirstFactorParams =
 
 export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt;
+export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
 
 export type SignInCreateParams = (
   | {
