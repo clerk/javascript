@@ -6,6 +6,26 @@ const { merge } = require('webpack-merge');
 const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
 const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
 
+const enableReactCompiler = process.env.CLERK_REACT_COMPILER !== '0';
+const toPosixPath = value => value.replace(/\\/g, '/');
+const reactCompilerSourceRoots = [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'sandbox')].map(toPosixPath);
+const shouldCompileWithReactCompiler = filename => {
+  if (!enableReactCompiler) {
+    return false;
+  }
+
+  if (typeof filename !== 'string') {
+    return false;
+  }
+
+  const normalized = toPosixPath(filename);
+  if (normalized.includes('/node_modules/')) {
+    return false;
+  }
+
+  return reactCompilerSourceRoots.some(root => normalized.startsWith(root));
+};
+
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
@@ -173,43 +193,93 @@ const svgLoader = () => {
   };
 };
 
+/** @type {(options: { mode: 'development' | 'production' }) => import('@rspack/core').RuleSetUseItem | undefined} */
+const createReactCompilerLoader = ({ mode }) => {
+  if (!enableReactCompiler) {
+    return undefined;
+  }
+
+  return {
+    loader: require.resolve('babel-loader'),
+    options: {
+      babelrc: false,
+      configFile: false,
+      cacheDirectory: true,
+      cacheCompression: false,
+      envName: mode,
+      parserOpts: {
+        sourceType: 'module',
+        plugins: [
+          'typescript',
+          'jsx',
+          'importAssertions',
+          'importMeta',
+          'classProperties',
+          'classPrivateProperties',
+          'classPrivateMethods',
+          'topLevelAwait',
+        ],
+      },
+      plugins: [
+        [require.resolve('@babel/plugin-syntax-typescript'), { isTSX: true }],
+        [
+          require.resolve('babel-plugin-react-compiler'),
+          {
+            target: '18',
+            compilationMode: 'annotation',
+            sources: shouldCompileWithReactCompiler,
+            panicThreshold: mode === 'development' ? 'none' : 'critical_errors',
+          },
+        ],
+      ],
+    },
+  };
+};
+
 /** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
 const typescriptLoaderProd = (
-  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
+  {
+    targets = packageJSON.browserslist,
+    useCoreJs = false,
+    mode = 'production',
+  } = { targets: packageJSON.browserslist, useCoreJs: false, mode: 'production' },
 ) => {
   return [
     {
       test: /\.(jsx?|tsx?)$/,
       exclude: /node_modules/,
-      use: {
-        loader: 'builtin:swc-loader',
-        options: {
-          env: {
-            targets,
-            ...(useCoreJs
-              ? {
-                  mode: 'usage',
-                  coreJs: require('core-js/package.json').version,
-                }
-              : {}),
-          },
-          jsc: {
-            parser: {
-              syntax: 'typescript',
-              tsx: true,
+      use: [
+        createReactCompilerLoader({ mode }),
+        {
+          loader: 'builtin:swc-loader',
+          options: {
+            env: {
+              targets,
+              ...(useCoreJs
+                ? {
+                    mode: 'usage',
+                    coreJs: require('core-js/package.json').version,
+                  }
+                : {}),
             },
-            externalHelpers: true,
-            transform: {
-              react: {
-                runtime: 'automatic',
-                importSource: '@emotion/react',
-                development: false,
-                refresh: false,
+            jsc: {
+              parser: {
+                syntax: 'typescript',
+                tsx: true,
+              },
+              externalHelpers: true,
+              transform: {
+                react: {
+                  runtime: 'automatic',
+                  importSource: '@emotion/react',
+                  development: false,
+                  refresh: false,
+                },
               },
             },
           },
         },
-      },
+      ].filter(Boolean),
     },
     {
       test: /\.m?js$/,
@@ -234,30 +304,35 @@ const typescriptLoaderProd = (
 };
 
 /** @type { () => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderDev = () => {
+const typescriptLoaderDev = ({ mode = 'development' } = {}) => {
   return [
     {
       test: /\.(jsx?|tsx?)$/,
       exclude: /node_modules/,
-      loader: 'builtin:swc-loader',
-      options: {
-        jsc: {
-          target: 'esnext',
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          externalHelpers: true,
-          transform: {
-            react: {
-              runtime: 'automatic',
-              importSource: '@emotion/react',
-              development: true,
-              refresh: true,
+      use: [
+        createReactCompilerLoader({ mode }),
+        {
+          loader: 'builtin:swc-loader',
+          options: {
+            jsc: {
+              target: 'esnext',
+              parser: {
+                syntax: 'typescript',
+                tsx: true,
+              },
+              externalHelpers: true,
+              transform: {
+                react: {
+                  runtime: 'automatic',
+                  importSource: '@emotion/react',
+                  development: true,
+                  refresh: true,
+                },
+              },
             },
           },
         },
-      },
+      ].filter(Boolean),
     },
   ];
 };
@@ -271,7 +346,7 @@ const commonForProdChunked = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs, mode: 'production' })],
     },
   };
 };
@@ -285,7 +360,7 @@ const commonForProdBundled = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs, mode: 'production' })],
     },
   };
 };
@@ -575,7 +650,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), ...typescriptLoaderDev()],
+        rules: [svgLoader(), ...typescriptLoaderDev({ mode })],
       },
       plugins: [
         new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
