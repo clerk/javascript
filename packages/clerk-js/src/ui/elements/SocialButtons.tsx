@@ -20,7 +20,7 @@ import {
   useAppearance,
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { mqu, type PropsOfComponent } from '../styledSystem';
+import { type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils/sleep';
 import { LastAuthenticationStrategyBadge } from './Badge';
 import { useCardState } from './contexts';
@@ -28,7 +28,7 @@ import { distributeStrategiesIntoRows } from './utils';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
-const MAX_STRATEGIES_PER_ROW = 6;
+const MAX_STRATEGIES_PER_ROW = 5;
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -150,9 +150,6 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           gap={2}
           sx={t => ({
             justifyContent: 'center',
-            [mqu.sm]: {
-              gridTemplateColumns: 'repeat(1, 1fr)',
-            },
             gridTemplateColumns:
               strategies.length < 1
                 ? `repeat(1, 1fr)`
