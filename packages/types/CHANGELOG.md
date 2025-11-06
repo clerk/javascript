@@ -1,5 +1,63 @@
 # Change Log
 
+## 4.97.2
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+
+## 4.97.1
+
+### Patch Changes
+
+- Add native Apple Sign-In support for iOS via `useAppleSignIn()` hook. Requires `expo-apple-authentication` and native build (EAS Build or local prebuild). ([#7053](https://github.com/clerk/javascript/pull/7053)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/shared@3.31.0
+
+## 4.97.0
+
+### Minor Changes
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+### Patch Changes
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+
 ## 4.96.0
 
 ### Minor Changes

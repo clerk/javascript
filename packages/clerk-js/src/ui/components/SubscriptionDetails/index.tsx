@@ -4,7 +4,7 @@ import type {
   __internal_SubscriptionDetailsProps,
   BillingPlanResource,
   BillingSubscriptionItemResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 

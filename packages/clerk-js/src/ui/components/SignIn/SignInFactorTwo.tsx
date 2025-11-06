@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';

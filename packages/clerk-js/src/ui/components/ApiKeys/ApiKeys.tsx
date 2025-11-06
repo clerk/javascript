@@ -1,7 +1,8 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { CreateAPIKeyParams } from '@clerk/types';
+import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
+import { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import { useProtect } from '@/ui/common';
@@ -42,6 +43,12 @@ const RevokeAPIKeyConfirmationModal = lazy(() =>
   })),
 );
 
+const CopyApiKeyModal = lazy(() =>
+  import(/* webpackChunkName: "copy-api-key-modal"*/ './CopyApiKeyModal').then(module => ({
+    default: module.CopyApiKeyModal,
+  })),
+);
+
 export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
   const isOrg = isOrganizationId(subject);
   const canReadAPIKeys = useProtect({ permission: 'org:sys_api_keys:read' });
@@ -61,23 +68,34 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     cacheKey,
   } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
   const card = useCardState();
-  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
-    clerk.apiKeys.create(arg),
-  );
-  const { t } = useLocalizations();
   const clerk = useClerk();
+  const {
+    data: createdApiKey,
+    trigger: createApiKey,
+    isMutating,
+  } = useSWRMutation(
+    {
+      ...cacheKey,
+      action: 'create',
+    },
+    (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg),
+  );
+  const { mutate: mutateApiKeys } = useSWRConfig();
+  const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
-  const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
+  const handleCreateApiKey = async (params: OnCreateParams) => {
     try {
       await createApiKey({
         ...params,
         subject,
       });
-      closeCardFn();
+      void mutateApiKeys(cacheKey);
       card.setError(undefined);
+      setIsCopyModalOpen(true);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
@@ -147,7 +165,17 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
             </Action.Card>
           </Flex>
         </Action.Open>
+
+        <CopyApiKeyModal
+          isOpen={isCopyModalOpen}
+          onOpen={() => setIsCopyModalOpen(true)}
+          onClose={() => setIsCopyModalOpen(false)}
+          apiKeyName={createdApiKey?.name ?? ''}
+          apiKeySecret={createdApiKey?.secret ?? ''}
+          modalRoot={revokeModalRoot}
+        />
       </Action.Root>
+
       <ApiKeysTable
         rows={apiKeys}
         isLoading={isLoading}
@@ -164,6 +192,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           rowInfo={{ allRowsCount: itemCount, startingRow, endingRow }}
         />
       )}
+
+      {/* Modals */}
       <RevokeAPIKeyConfirmationModal
         subject={subject}
         isOpen={isRevokeModalOpen}

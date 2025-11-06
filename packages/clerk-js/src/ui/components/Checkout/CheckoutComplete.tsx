@@ -180,7 +180,7 @@ export const CheckoutComplete = () => {
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt, needsPaymentMethod } = checkout;
+  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
 
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -350,7 +350,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : needsPaymentMethod
+                  : totals.totalDueNow.amount > 0
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -405,7 +405,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
@@ -455,14 +455,14 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
             <LineItems.Description
               text={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? paymentMethod
                     ? formatPaymentMethodLabel(paymentMethod)
                     : '–'

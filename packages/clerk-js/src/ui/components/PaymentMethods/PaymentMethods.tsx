@@ -1,5 +1,5 @@
 import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { BillingPaymentMethodResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

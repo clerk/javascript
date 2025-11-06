@@ -1,6 +1,6 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { ClerkInstanceContext } from '@clerk/shared/react';
-import type { LoadedClerk, UseAuthReturn } from '@clerk/types';
+import type { LoadedClerk, UseAuthReturn } from '@clerk/shared/types';
 import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
@@ -284,7 +284,6 @@ describe('useDerivedAuth', () => {
     };
     renderHook(() => useDerivedAuth(authObject));
 
-    // eslint-disable-next-line jest/unbound-method
     expect(errorThrower.throw).toHaveBeenCalledWith(invalidStateError);
   });
 

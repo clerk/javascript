@@ -4,7 +4,7 @@ import type {
   PendingSessionOptions,
   ProtectProps as _ProtectProps,
   RedirectOptions,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { defineComponent } from 'vue';
 
 import { useAuth } from '../composables/useAuth';
