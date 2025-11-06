@@ -73,7 +73,7 @@ export const useApiKeys = ({
   // Only do this when not loading to avoid interfering with page changes during refetch
   useEffect(() => {
     if (!isLoading && pageCount > 0 && currentPage > pageCount) {
-      setCurrentPage(Math.max(1, currentPage - 1));
+      setCurrentPage(Math.max(1, pageCount));
     }
   }, [pageCount, currentPage, isLoading]);
 
