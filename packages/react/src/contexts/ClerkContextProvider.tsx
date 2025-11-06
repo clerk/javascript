@@ -41,26 +41,23 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 
   const derivedState = deriveState(clerk.loaded, state, initialState);
 
-  React.useLayoutEffect(() => {
-    if (initialState && !clerk.loaded) {
-      console.log('[ClerkProvider] Setting SSR snapshot');
-      authStore.setInitialServerSnapshot({
-        actor: initialState.actor,
-        factorVerificationAge: initialState.factorVerificationAge,
-        orgId: initialState.orgId,
-        orgPermissions: initialState.orgPermissions,
-        orgRole: initialState.orgRole,
-        orgSlug: initialState.orgSlug,
-        sessionClaims: initialState.sessionClaims,
-        sessionId: initialState.sessionId,
-        sessionStatus: initialState.sessionStatus,
-        userId: initialState.userId,
-      });
-    }
-  }, []);
+  // Set initial server snapshot BEFORE first render (runs during SSR AND browser hydration)
+  if (initialState) {
+    authStore.setInitialServerSnapshot({
+      actor: initialState.actor,
+      factorVerificationAge: initialState.factorVerificationAge,
+      orgId: initialState.orgId,
+      orgPermissions: initialState.orgPermissions,
+      orgRole: initialState.orgRole,
+      orgSlug: initialState.orgSlug,
+      sessionClaims: initialState.sessionClaims,
+      sessionId: initialState.sessionId,
+      sessionStatus: initialState.sessionStatus,
+      userId: initialState.userId,
+    });
+  }
 
   React.useEffect(() => {
-    console.log('[ClerkProvider] Hydration complete');
     authStore.markHydrated();
   }, []);
   const clerkCtx = React.useMemo(

@@ -8,38 +8,39 @@ class AuthStore {
   private currentSnapshot: AuthSnapshot | null = null;
   private initialServerSnapshot: AuthSnapshot | null = null;
   private isHydrated = false;
+  private cachedEmptySnapshot: AuthSnapshot;
+  private cachedServerSnapshot: AuthSnapshot | null = null;
+
+  constructor() {
+    this.cachedEmptySnapshot = this.getEmptySnapshot();
+  }
 
   getClientSnapshot = (): AuthSnapshot => {
-    console.log('[authStore] getClientSnapshot ->', { userId: this.currentSnapshot?.userId });
-    return this.currentSnapshot || this.getEmptySnapshot();
+    return this.currentSnapshot || this.cachedEmptySnapshot;
   };
 
   getServerSnapshot = (): AuthSnapshot => {
     const useServerSnapshot = !this.isHydrated && this.initialServerSnapshot;
-    console.log('[authStore] getServerSnapshot ->', {
-      isHydrated: this.isHydrated,
-      useServerSnapshot,
-      userId: useServerSnapshot ? this.initialServerSnapshot?.userId : this.currentSnapshot?.userId,
-    });
     if (useServerSnapshot) {
-      return this.initialServerSnapshot;
+      if (!this.cachedServerSnapshot) {
+        this.cachedServerSnapshot = this.initialServerSnapshot;
+      }
+      return this.cachedServerSnapshot;
     }
-    return this.currentSnapshot || this.getEmptySnapshot();
+    return this.currentSnapshot || this.cachedEmptySnapshot;
   };
 
   setInitialServerSnapshot(snapshot: AuthSnapshot): void {
-    console.log('[authStore] setInitialServerSnapshot', { userId: snapshot.userId });
     this.initialServerSnapshot = snapshot;
+    this.cachedServerSnapshot = snapshot;
   }
 
   setSnapshot(snapshot: AuthSnapshot): void {
-    console.log('[authStore] setSnapshot', { userId: snapshot.userId, listeners: this.listeners.size });
     this.currentSnapshot = snapshot;
     this.notifyListeners();
   }
 
   subscribe = (listener: Listener): (() => void) => {
-    console.log('[authStore] subscribe', { total: this.listeners.size + 1 });
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
@@ -47,7 +48,6 @@ class AuthStore {
   };
 
   markHydrated(): void {
-    console.log('[authStore] markHydrated - now using client snapshots');
     this.isHydrated = true;
   }
 
