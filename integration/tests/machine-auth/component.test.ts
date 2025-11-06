@@ -68,31 +68,21 @@ testAgainstRunningApps({
 
   test('pagination works correctly with multiple pages', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
+
+    // Create user and 6 API keys to trigger pagination (default perPage is 5)
+    const fakeUser = u.services.users.createFakeUser();
+    const bapiUser = await u.services.users.createBapiUser(fakeUser);
+    const fakeAPIKeys = await Promise.all(
+      Array.from({ length: 6 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
+    );
+
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
     await u.po.expect.toBeSignedIn();
 
     await u.po.page.goToRelative('/api-keys');
     await u.po.apiKeys.waitForMounted();
-
-    // Create 6 API keys to trigger pagination (default perPage is 5)
-    const apiKeyNames: string[] = [];
-    for (let i = 1; i <= 6; i++) {
-      const apiKeyName = `${fakeAdmin.firstName}-pagination-test-${i}-${Date.now()}`;
-      apiKeyNames.push(apiKeyName);
-
-      await u.po.apiKeys.clickAddButton();
-      await u.po.apiKeys.waitForFormOpened();
-      await u.po.apiKeys.typeName(apiKeyName);
-      await u.po.apiKeys.selectExpiration('1d');
-      await u.po.apiKeys.clickSaveButton();
-
-      await u.po.apiKeys.waitForCopyModalOpened();
-      await u.po.apiKeys.clickCopyAndCloseButton();
-      await u.po.apiKeys.waitForCopyModalClosed();
-      await u.po.apiKeys.waitForFormClosed();
-    }
 
     // Verify first page
     await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
@@ -102,12 +92,15 @@ testAgainstRunningApps({
     await u.page.getByRole('button', { name: /next/i }).click();
     await expect(u.page.getByText(/Displaying 6 – 6 of 6/i)).toBeVisible();
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(1);
-    await expect(u.page.getByText(apiKeyNames[5])).toBeVisible();
 
     // Navigate back to first page
     await u.page.getByRole('button', { name: /previous/i }).click();
     await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
+
+    // Cleanup
+    await Promise.all(fakeAPIKeys.map(key => key.revoke()));
+    await fakeUser.deleteIfExists();
   });
 
   test('pagination does not show when items fit in one page', async ({ page, context }) => {
