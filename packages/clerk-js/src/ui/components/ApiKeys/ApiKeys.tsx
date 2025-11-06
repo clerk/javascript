@@ -72,7 +72,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     data: createdApiKey,
     trigger: createApiKey,
     isMutating,
-  } = useSWRMutation(`api-keys-create`, (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
+  } = useSWRMutation('api-keys-create', (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
   const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');

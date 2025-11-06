@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { APIKey } from '../internal';
 
 describe('APIKey', () => {
