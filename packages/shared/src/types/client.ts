@@ -1,4 +1,4 @@
-import type { ClientTrustState, LastAuthenticationStrategy } from './json';
+import type { LastAuthenticationStrategy } from './json';
 import type { ClerkResource } from './resource';
 import type { ActiveSessionResource, SessionResource, SignedInSessionResource } from './session';
 import type { SignInResource } from './signIn';
@@ -20,7 +20,6 @@ export interface ClientResource extends ClerkResource {
   lastActiveSessionId: string | null;
   /** Last authentication strategy used by this client; `null` when unknown or feature disabled. */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null;
-  clientTrustState?: ClientTrustState;
   captchaBypass: boolean;
   cookieExpiresAt: Date | null;
   createdAt: Date | null;

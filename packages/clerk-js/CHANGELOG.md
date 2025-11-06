@@ -1,5 +1,19 @@
 # Change Log
 
+## 5.105.0
+
+### Minor Changes
+
+- Replaced the persistent key column in the API keys table with a one-time modal that displays the secret immediately after creation. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Move clientTrustState to SignIn ([#7163](https://github.com/clerk/javascript/pull/7163)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`d88ea99`](https://github.com/clerk/javascript/commit/d88ea99755e605673111cccb41eb93391e1e68dd), [`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/localizations@3.27.0
+  - @clerk/shared@3.31.1
+
 ## 5.104.0
 
 ### Minor Changes

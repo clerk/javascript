@@ -317,7 +317,6 @@ describe('useDerivedAuth', () => {
     };
     renderHook(() => useDerivedAuth(authObject));
 
-    // eslint-disable-next-line jest/unbound-method
     expect(errorThrower.throw).toHaveBeenCalledWith(invalidStateError);
   });
 
