@@ -1969,6 +1969,7 @@ export type APIKeysProps = {
 
 export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;
+  query?: string;
 }>;
 
 export type CreateAPIKeyParams = {

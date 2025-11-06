@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { render, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
+
 import { APIKeys } from '../ApiKeys';
 
 const { createFixtures } = bindCreateFixtures('APIKeys');

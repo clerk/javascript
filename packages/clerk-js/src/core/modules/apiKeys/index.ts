@@ -45,12 +45,10 @@ export class APIKeys implements APIKeysNamespace {
       search: convertPageToOffsetSearchParams({
         ...params,
         subject: params?.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
+        query: params?.query ?? '',
       }),
     }).then(res => {
-      const { api_keys: apiKeys, total_count } = res as unknown as {
-        api_keys: ApiKeyJSON[];
-        total_count: number;
-      };
+      const { data: apiKeys, total_count } = res as unknown as ClerkPaginatedResponse<ApiKeyJSON>;
 
       return {
         total_count,

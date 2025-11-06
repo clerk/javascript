@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import { useSWRConfig } from 'swr';
 
 import { descriptors } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
@@ -10,6 +9,7 @@ import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { ApiKeyModal } from './ApiKeyModal';
+import { useInvalidateApiKeys } from './useApiKeys';
 
 type RevokeAPIKeyConfirmationModalProps = {
   subject: string;
@@ -31,7 +31,7 @@ export const RevokeAPIKeyConfirmationModal = ({
   modalRoot,
 }: RevokeAPIKeyConfirmationModalProps) => {
   const clerk = useClerk();
-  const { mutate } = useSWRConfig();
+  const invalidateApiKeys = useInvalidateApiKeys(subject);
   const { t } = useLocalizations();
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
@@ -55,9 +55,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     }
 
     await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    const cacheKey = { key: 'api-keys', subject };
-
-    void mutate(cacheKey);
+    invalidateApiKeys();
     handleClose();
   };
 
