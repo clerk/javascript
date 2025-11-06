@@ -66,6 +66,75 @@ testAgainstRunningApps({
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(2);
   });
 
+  test('pagination works correctly with multiple pages', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    // Create 6 API keys to trigger pagination (default perPage is 5)
+    const apiKeyNames: string[] = [];
+    for (let i = 1; i <= 6; i++) {
+      const apiKeyName = `${fakeAdmin.firstName}-pagination-test-${i}-${Date.now()}`;
+      apiKeyNames.push(apiKeyName);
+
+      await u.po.apiKeys.clickAddButton();
+      await u.po.apiKeys.waitForFormOpened();
+      await u.po.apiKeys.typeName(apiKeyName);
+      await u.po.apiKeys.selectExpiration('1d');
+      await u.po.apiKeys.clickSaveButton();
+
+      await u.po.apiKeys.waitForCopyModalOpened();
+      await u.po.apiKeys.clickCopyAndCloseButton();
+      await u.po.apiKeys.waitForCopyModalClosed();
+      await u.po.apiKeys.waitForFormClosed();
+    }
+
+    // Verify first page
+    await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
+
+    // Navigate to second page
+    await u.page.getByRole('button', { name: /next/i }).click();
+    await expect(u.page.getByText(/Displaying 6 – 6 of 6/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(1);
+    await expect(u.page.getByText(apiKeyNames[5])).toBeVisible();
+
+    // Navigate back to first page
+    await u.page.getByRole('button', { name: /previous/i }).click();
+    await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
+  });
+
+  test('pagination does not show when items fit in one page', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    const apiKeyName = `${fakeAdmin.firstName}-single-page-${Date.now()}`;
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName(apiKeyName);
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
+    await u.po.apiKeys.waitForFormClosed();
+
+    await expect(u.page.getByText(/Displaying.*of.*/i)).toBeHidden();
+  });
+
   test('can revoke api keys', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();

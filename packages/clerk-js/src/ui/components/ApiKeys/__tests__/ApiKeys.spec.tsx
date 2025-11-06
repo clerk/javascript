@@ -63,60 +63,6 @@ describe('APIKeys', () => {
     });
   });
 
-  it('displays pagination when there are more items than per page', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'] });
-    });
-
-    fixtures.clerk.apiKeys.getAll = vi.fn().mockResolvedValue({
-      data: Array.from({ length: 10 }, (_, i) =>
-        createFakeAPIKey({
-          id: `ak_${i}`,
-          name: `API Key ${i}`,
-          createdAt: new Date('2024-01-01'),
-        }),
-      ),
-      total_count: 10,
-    });
-
-    const { getByText } = render(<APIKeys />, { wrapper });
-
-    await waitFor(() => {
-      expect(
-        getByText((_, element) => {
-          return element?.textContent === 'Displaying 1 – 5 of 10';
-        }),
-      ).toBeVisible();
-    });
-  });
-
-  it('does not display pagination when items fit in one page', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({ email_addresses: ['test@clerk.com'] });
-    });
-
-    fixtures.clerk.apiKeys.getAll = vi.fn().mockResolvedValue({
-      data: [
-        createFakeAPIKey({
-          id: 'ak_123',
-          name: 'Test API Key',
-          createdAt: new Date('2024-01-01'),
-        }),
-      ],
-      total_count: 1,
-    });
-
-    const { queryByText } = render(<APIKeys />, { wrapper });
-
-    await waitFor(() => {
-      expect(
-        queryByText((_, element) => {
-          return element?.textContent === 'Displaying 1 – 1 of 1';
-        }),
-      ).not.toBeInTheDocument();
-    });
-  });
-
   it('handles empty API keys list', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
