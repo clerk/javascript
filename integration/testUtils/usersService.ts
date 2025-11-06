@@ -135,17 +135,23 @@ export const createUserService = (clerkClient: ClerkClient) => {
           skipPasswordRequirement: fakeUser.password === undefined,
           username: fakeUser.username,
         });
-      } catch (error: any) {
-        if (error?.status === 429) {
+      } catch (error: unknown) {
+        if (typeof error === 'object' && error !== null && 'status' in error && error.status === 429) {
+          const clerkError = error as {
+            status: number;
+            retryAfter?: number;
+            clerkTraceId?: string;
+            errors?: Array<{ message: string }>;
+          };
           const details = [
-            `Retry-After: ${error.retryAfter ?? 'not provided'} seconds`,
-            error.clerkTraceId ? `Trace ID: ${error.clerkTraceId}` : null,
-            error.errors?.length > 0 ? `API Errors: ${error.errors.map((e: any) => e.message).join(', ')}` : null,
+            `Retry-After: ${clerkError.retryAfter ?? 'not provided'} seconds`,
+            clerkError.clerkTraceId ? `Trace ID: ${clerkError.clerkTraceId}` : null,
+            clerkError.errors?.length > 0 ? `API Errors: ${clerkError.errors.map(e => e.message).join(', ')}` : null,
           ]
             .filter(Boolean)
             .join(' | ');
 
-          throw new Error(`Rate limit exceeded (HTTP 429) during createBapiUser. ${details}`);
+          throw new Error(`Rate limit exceeded (HTTP 429) during createBapiUser. ${details}`, { cause: error });
         }
         throw error;
       }
@@ -202,7 +208,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       const name = faker.animal.dog();
       const organization = await clerkClient.organizations.createOrganization({
         createdBy: userId,
-        name: faker.animal.dog(),
+        name,
       });
       return {
         delete: () => clerkClient.organizations.deleteOrganization(organization.id),
