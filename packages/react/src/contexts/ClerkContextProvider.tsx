@@ -43,6 +43,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 
   React.useLayoutEffect(() => {
     if (initialState && !clerk.loaded) {
+      console.log('[ClerkProvider] Setting SSR snapshot');
       authStore.setInitialServerSnapshot({
         actor: initialState.actor,
         factorVerificationAge: initialState.factorVerificationAge,
@@ -59,6 +60,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   }, []);
 
   React.useEffect(() => {
+    console.log('[ClerkProvider] Hydration complete');
     authStore.markHydrated();
   }, []);
   const clerkCtx = React.useMemo(
@@ -99,7 +101,18 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
       sessionStatus,
       userId,
     }),
-    [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, orgPermissions, factorVerificationAge, sessionClaims?.__raw],
+    [
+      sessionId,
+      sessionStatus,
+      userId,
+      actor,
+      orgId,
+      orgRole,
+      orgSlug,
+      orgPermissions,
+      factorVerificationAge,
+      sessionClaims?.__raw,
+    ],
   );
 
   React.useLayoutEffect(() => {
