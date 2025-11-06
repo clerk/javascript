@@ -127,7 +127,6 @@ function getCatchAllReplacements() {
       pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
       replace: '[`SessionStatusClaim`](/docs/reference/javascript/types/session-status)',
     },
-
     {
       pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
       replace: '[SetActiveParams](/docs/reference/javascript/types/set-active-params)',
