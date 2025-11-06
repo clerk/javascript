@@ -895,7 +895,7 @@ class SignInFuture implements SignInFutureResource {
         actionCompleteRedirectUrl = window.location.origin + redirectUrl;
       }
 
-      let routes = { redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl), actionCompleteRedirectUrl };
+      const routes = { redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl), actionCompleteRedirectUrl };
       if (popup) {
         const wrappedRoutes = wrapWithPopupRoutes(SignIn.clerk, {
           redirectCallbackUrl: routes.redirectUrl,
