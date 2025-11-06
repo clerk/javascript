@@ -95,8 +95,9 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
 export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
-  const initialAuthState = rest as any;
+  const { treatPendingAsSignedOut } = initialAuthStateOrOptions ?? {};
+
+  const isomorphicClerk = useIsomorphicClerkContext();
 
   const authContext = useSyncExternalStore(
     authStore.subscribe,
@@ -104,12 +105,6 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
     authStore.getServerSnapshot,
   );
 
-  let authContextToUse = authContext;
-  if (authContext.sessionId === undefined && authContext.userId === undefined) {
-    authContextToUse = initialAuthState != null ? initialAuthState : {};
-  }
-
-  const isomorphicClerk = useIsomorphicClerkContext();
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
@@ -117,7 +112,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 
   return useDerivedAuth(
     {
-      ...authContextToUse,
+      ...authContext,
       getToken,
       signOut,
     },
