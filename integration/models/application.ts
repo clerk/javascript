@@ -92,6 +92,11 @@ export const application = (
           buildOutput += `\n${msg}`;
           log(msg);
         },
+        // Only ignore stdio locally to work around Next.js .Trash folder EPERM errors on macOS.
+        // In CI we want to see the full build output for debugging.
+        // See https://github.com/vercel/next.js/issues/60334
+        // eslint-disable-next-line turbo/no-undeclared-env-vars
+        stdio: process.env.CI ? undefined : 'ignore',
       });
     },
     get buildOutput() {
