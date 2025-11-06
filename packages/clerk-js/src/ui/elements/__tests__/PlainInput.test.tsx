@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -135,11 +135,12 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, findByText, container } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByTestId, container } = render(<Field />, { wrapper });
 
     await userEvent.click(getByRole('button', { name: /set error/i }));
 
-    expect(await findByText(/Some Error/i)).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-error')).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-error')).toHaveTextContent(/Some Error/i);
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -160,10 +161,11 @@ describe('PlainInput', () => {
       infoText: 'some info',
     });
 
-    const { findByLabelText, findByText } = render(<Field actionLabel={'take action'} />, { wrapper });
+    const { findByLabelText, findByTestId } = render(<Field actionLabel={'take action'} />, { wrapper });
 
     fireEvent.focus(await findByLabelText(/some label/i));
-    expect(await findByText(/some info/i)).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-info')).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-info')).toHaveTextContent(/some info/i);
   });
 
   it('with success feedback and aria-describedby', async () => {
@@ -174,11 +176,12 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, findByText, container } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByTestId, container } = render(<Field />, { wrapper });
 
     await userEvent.click(getByRole('button', { name: /set success/i }));
 
-    expect(await findByText(/Some Success/i)).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-success')).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-success')).toHaveTextContent(/Some Success/i);
 
     const input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -198,11 +201,12 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, getByLabelText, findByText, container } = render(<Field />, { wrapper });
+    const { getByRole, getByLabelText, findByTestId, container } = render(<Field />, { wrapper });
 
     // Start with error
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    expect(await findByText(/Some Error/i)).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-error')).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-error')).toHaveTextContent(/Some Error/i);
 
     let input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'true');
@@ -210,7 +214,8 @@ describe('PlainInput', () => {
 
     // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
-    expect(await findByText(/Some Success/i)).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-success')).toBeInTheDocument();
+    expect(await findByTestId('form-feedback-success')).toHaveTextContent(/Some Success/i);
 
     input = getByLabelText(/some label/i);
     expect(input).toHaveAttribute('aria-invalid', 'false');
@@ -222,7 +227,7 @@ describe('PlainInput', () => {
     expect(successElement).toHaveTextContent(/Some Success/i);
   });
 
-  it('aria-live attribute is correctly applied', async () => {
+  it('renders the aria-live region for screen reader support', async () => {
     const { wrapper } = await createFixtures();
     const { Field } = createField('firstname', 'init value', {
       type: 'text',
@@ -230,27 +235,34 @@ describe('PlainInput', () => {
       placeholder: 'some placeholder',
     });
 
-    const { getByRole, findByText, container } = render(<Field />, { wrapper });
+    const { getByRole, container } = render(<Field />, { wrapper });
 
-    // Set error feedback
+    const ariaLiveRegion = container.querySelector('[aria-live="polite"]');
+    expect(ariaLiveRegion).toBeInTheDocument();
+
+    expect(ariaLiveRegion).toHaveAttribute('aria-live', 'polite');
+    expect(ariaLiveRegion).toHaveAttribute('aria-atomic', 'true');
+
+    // It is visually hidden
+    expect(ariaLiveRegion).toHaveStyle({
+      position: 'absolute',
+      width: '1px',
+      height: '1px',
+      overflow: 'hidden',
+    });
+
+    expect(ariaLiveRegion).toHaveTextContent('');
+
     await userEvent.click(getByRole('button', { name: /set error/i }));
-    expect(await findByText(/Some Error/i)).toBeInTheDocument();
+    await waitFor(() => {
+      const ariaLiveRegion = container.querySelector('[aria-live="polite"]');
+      expect(ariaLiveRegion?.textContent).toMatch(/Some Error/i);
+    });
 
-    // Verify the visible error message has aria-live="polite"
-    const errorElement = container.querySelector('#error-firstname');
-    expect(errorElement).toHaveAttribute('aria-live', 'polite');
-
-    // Transition to success
     await userEvent.click(getByRole('button', { name: /set success/i }));
-    expect(await findByText(/Some Success/i)).toBeInTheDocument();
-
-    // Verify the visible success message has aria-live="polite"
-    const successElement = container.querySelector('#firstname-success-feedback');
-    expect(successElement).toHaveAttribute('aria-live', 'polite');
-
-    // The previous error message should now have aria-live="off" (though it might still exist in DOM but hidden)
-    // Verify exactly one element has aria-live="polite" at a time
-    const allAriaLivePolite = container.querySelectorAll('[aria-live="polite"]');
-    expect(allAriaLivePolite.length).toBe(1);
+    await waitFor(() => {
+      const ariaLiveRegion = container.querySelector('[aria-live="polite"]');
+      expect(ariaLiveRegion?.textContent).toMatch(/Some Success/i);
+    });
   });
 });
