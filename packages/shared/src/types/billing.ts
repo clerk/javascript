@@ -407,7 +407,7 @@ export interface BillingPaymentResource extends ClerkResource {
   /**
    * The payment method being used for the payment, such as credit card or bank account.
    */
-  paymentMethod: BillingPaymentMethodResource;
+  paymentMethod: BillingPaymentMethodResource | null;
   /**
    * The subscription item being paid for.
    */
@@ -506,11 +506,6 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    * The unique identifier for the subscription item.
    */
   id: string;
-  /**
-   * The unique identifier for the payment method being used for the subscription item.
-   */
-  //TODO(@COMMERCE): should this be nullable ?
-  paymentMethodId: string;
   /**
    * The plan associated with the subscription item.
    */
@@ -700,6 +695,7 @@ export interface BillingCheckoutTotals {
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface BillingStatementTotals extends Omit<BillingCheckoutTotals, 'totalDueNow' | 'totalDueAfterFreeTrial'> {}
 
 /**
