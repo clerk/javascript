@@ -1,4 +1,4 @@
-import type { ClerkError } from '../types/errors';
+import type { ClerkError } from './clerkError';
 import { isClerkApiResponseError } from './clerkApiResponseError';
 import { isClerkRuntimeError } from './clerkRuntimeError';
 
