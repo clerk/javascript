@@ -99,11 +99,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
 
   const isomorphicClerk = useIsomorphicClerkContext();
 
-  const authContext = useSyncExternalStore(
-    authStore.subscribe,
-    authStore.getClientSnapshot,
-    authStore.getServerSnapshot,
-  );
+  const authContext = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getServerSnapshot);
 
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
