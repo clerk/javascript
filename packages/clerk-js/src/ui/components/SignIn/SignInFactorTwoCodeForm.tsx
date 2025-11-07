@@ -30,6 +30,12 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   resendButton?: LocalizationKey;
 };
 
+const isResettingPassword = (resource: SignInResource) =>
+  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
+  resource.firstFactorVerification?.status === 'verified';
+
+const isNewDevice = (resource: SignInResource) => resource.clientTrustState === 'new';
+
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const signIn = useCoreSignIn();
   const card = useCardState();
@@ -62,10 +68,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
           });
       }
     : undefined;
-
-  const isResettingPassword = (resource: SignInResource) =>
-    isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-    resource.firstFactorVerification?.status === 'verified';
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
@@ -105,6 +107,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       cardSubtitle={
         isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
       }
+      cardNotice={isNewDevice(signIn) ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
       resendButton={props.resendButton}
       inputLabel={props.inputLabel}
       onCodeEntryFinishedAction={action}

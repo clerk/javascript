@@ -485,6 +485,13 @@ export type __internal_LocalizationResource = {
       formTitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
+    emailLinkMfa: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      formTitle: LocalizationValue;
+      resendButton: LocalizationValue;
+    };
+    newDeviceVerificationNotice: LocalizationValue;
     phoneCodeMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

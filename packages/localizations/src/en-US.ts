@@ -611,11 +611,19 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     emailCodeMfa: {
-      formTitle: 'Verification code',
+      formTitle: 'Check your email',
       resendButton: "Didn't receive a code? Resend",
-      subtitle: 'Enter the code sent to your email to continue',
-      title: 'Verification required',
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
     },
+    emailLinkMfa: {
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     emailLink: {
       clientMismatch: {
         subtitle:
