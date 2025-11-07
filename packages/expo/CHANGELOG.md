@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.18.3
+
+### Patch Changes
+
+- Fix module resolution error for users not using Sign in with Apple by removing static imports of `expo-apple-authentication` and `expo-crypto`, replacing them with dynamic imports that only load when the `useSignInWithApple()` hook is actually called. ([#7171](https://github.com/clerk/javascript/pull/7171)) by [@chriscanin](https://github.com/chriscanin)
+
+- Updated dependencies [[`f0c3a55`](https://github.com/clerk/javascript/commit/f0c3a5510569e66f3298294e93c59669d1eb33fd), [`92fba5d`](https://github.com/clerk/javascript/commit/92fba5d2874bf8a740f21ab0a4e21e63beb099f9)]:
+  - @clerk/clerk-js@5.105.1
+  - @clerk/clerk-react@5.53.8
+
 ## 2.18.2
 
 ### Patch Changes
