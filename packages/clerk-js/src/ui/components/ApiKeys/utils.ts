@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 
-type UseApiKeysPaginationParams = {
+type UseAPIKeysPaginationParams = {
   query: string;
   page: number;
   pageCount: number;
@@ -23,7 +23,7 @@ export const useAPIKeysPagination = ({
   isFetching,
   subject,
   fetchPage,
-}: UseApiKeysPaginationParams) => {
+}: UseAPIKeysPaginationParams) => {
   const { mutate } = useSWRConfig();
 
   // Invalidate all cache entries for this user or organization
