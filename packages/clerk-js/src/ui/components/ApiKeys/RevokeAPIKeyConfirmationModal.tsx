@@ -9,29 +9,27 @@ import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { ApiKeyModal } from './ApiKeyModal';
-import { useInvalidateApiKeys } from './useApiKeys';
 
 type RevokeAPIKeyConfirmationModalProps = {
-  subject: string;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
   apiKeyId?: string;
   apiKeyName: string;
+  onRevokeSuccess?: () => void;
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
 };
 
 export const RevokeAPIKeyConfirmationModal = ({
-  subject,
   isOpen,
   onOpen,
   onClose,
   apiKeyId,
   apiKeyName,
+  onRevokeSuccess,
   modalRoot,
 }: RevokeAPIKeyConfirmationModalProps) => {
   const clerk = useClerk();
-  const invalidateApiKeys = useInvalidateApiKeys(subject);
   const { t } = useLocalizations();
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
@@ -55,7 +53,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     }
 
     await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    invalidateApiKeys();
+    onRevokeSuccess?.();
     handleClose();
   };
 

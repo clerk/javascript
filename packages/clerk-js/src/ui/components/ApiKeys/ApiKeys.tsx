@@ -1,5 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { __experimental_useAPIKeys as useAPIKeys, useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
@@ -21,6 +21,7 @@ import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
+import { useDebounce } from '@/ui/hooks';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
@@ -28,7 +29,7 @@ import { isOrganizationId } from '@/utils';
 import { ApiKeysTable } from './ApiKeysTable';
 import type { OnCreateParams } from './CreateApiKeyForm';
 import { CreateApiKeyForm } from './CreateApiKeyForm';
-import { useApiKeys } from './useApiKeys';
+import { useAPIKeysPagination } from './utils';
 
 type APIKeysPageProps = {
   subject: string;
@@ -48,24 +49,47 @@ const CopyApiKeyModal = lazy(() =>
   })),
 );
 
+const apiKeysSearchDebounceMs = 500;
+
 export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
   const isOrg = isOrganizationId(subject);
   const canReadAPIKeys = useProtect({ permission: 'org:sys_api_keys:read' });
   const canManageAPIKeys = useProtect({ permission: 'org:sys_api_keys:manage' });
 
+  const [searchValue, setSearchValue] = useState('');
+  const debouncedSearchValue = useDebounce(searchValue, apiKeysSearchDebounceMs);
+  const query = debouncedSearchValue.trim();
+
   const {
-    apiKeys,
+    data: apiKeys,
     isLoading,
-    searchValue,
-    setSearchValue,
+    isFetching,
     page,
-    setPage,
+    fetchPage,
+    pageCount,
+    count: itemCount,
+  } = useAPIKeys({
+    subject,
+    pageSize: perPage ?? 5,
+    query,
+    keepPreviousData: true,
+    enabled: isOrg ? canReadAPIKeys : true,
+  });
+
+  const { startingRow, endingRow, invalidateAll } = useAPIKeysPagination({
+    query,
+    page,
     pageCount,
     itemCount,
-    startingRow,
-    endingRow,
-    invalidateAll,
-  } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
+    isFetching,
+    perPage: perPage ?? 5,
+    subject,
+    fetchPage,
+  });
+
+  const handlePageChange = (newPage: number) => {
+    fetchPage(newPage);
+  };
   const card = useCardState();
   const clerk = useClerk();
   const {
@@ -183,15 +207,14 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
       {(itemCount > (perPage ?? 5) || pageCount > 1) && (
         <Pagination
           count={pageCount}
-          page={page}
-          onChange={setPage}
+          page={Math.min(page, pageCount)}
+          onChange={handlePageChange}
           siblingCount={1}
           rowInfo={{ allRowsCount: itemCount, startingRow, endingRow }}
         />
       )}
 
       <RevokeAPIKeyConfirmationModal
-        subject={subject}
         isOpen={isRevokeModalOpen}
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {
@@ -201,6 +224,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         }}
         apiKeyId={selectedApiKeyId}
         apiKeyName={selectedApiKeyName}
+        onRevokeSuccess={invalidateAll}
         modalRoot={revokeModalRoot}
       />
     </Col>
