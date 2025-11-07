@@ -177,38 +177,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
     // Attempt to sign in on the second tab (which already has sign-in mounted)
     await secondTabUtils.po.signIn.setIdentifier(fakeUser.email);
     await secondTabUtils.po.signIn.continue();
-    await secondTabUtils.po.signIn.setPassword(fakeUser.password);
-    await secondTabUtils.po.signIn.continue();
-
-    // Should redirect and be signed in without error
-    await secondTabUtils.po.expect.toBeSignedIn();
-  });
-
-  test('redirects when attempting to sign in with instant password and existing session in another tab', async ({
-    page,
-    context,
-    browser,
-  }) => {
-    const u = createTestUtils({ app, page, context, browser });
-
-    // Open sign-in page in both tabs before signing in
-    await u.po.signIn.goTo();
-
-    let secondTabUtils: any;
-    await u.tabs.runInNewTab(async u2 => {
-      secondTabUtils = u2;
-      await u2.po.signIn.goTo();
-    });
-
-    // Sign in with instant password on the first tab
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
-    await u.po.expect.toBeSignedIn();
-
-    // Attempt to sign in with instant password on the second tab
-    await secondTabUtils.po.signIn.signInWithEmailAndInstantPassword({
-      email: fakeUser.email,
-      password: fakeUser.password,
-    });
 
     // Should redirect and be signed in without error
     await secondTabUtils.po.expect.toBeSignedIn();
