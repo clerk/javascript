@@ -50,6 +50,7 @@ const CopyApiKeyModal = lazy(() =>
 );
 
 const apiKeysSearchDebounceMs = 500;
+const API_KEYS_PAGE_SIZE = 10;
 
 export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
   const isOrg = isOrganizationId(subject);
@@ -70,7 +71,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     count: itemCount,
   } = useAPIKeys({
     subject,
-    pageSize: perPage ?? 5,
+    pageSize: perPage,
     query,
     keepPreviousData: true,
     enabled: isOrg ? canReadAPIKeys : true,
@@ -85,8 +86,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     fetchPage,
   });
 
-  const startingRow = itemCount > 0 ? Math.max(0, (page - 1) * (perPage ?? 5)) + 1 : 0;
-  const endingRow = Math.min(page * (perPage ?? 5), itemCount);
+  const startingRow = itemCount > 0 ? Math.max(0, (page - 1) * (perPage ?? API_KEYS_PAGE_SIZE)) + 1 : 0;
+  const endingRow = Math.min(page * (perPage ?? API_KEYS_PAGE_SIZE), itemCount);
 
   const handlePageChange = (newPage: number) => {
     fetchPage(newPage);
@@ -205,7 +206,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         elementDescriptor={descriptors.apiKeysTable}
         canManageAPIKeys={(isOrg && canManageAPIKeys) || !isOrg}
       />
-      {(itemCount > (perPage ?? 5) || pageCount > 1) && (
+      {pageCount > 1 && (
         <Pagination
           count={pageCount}
           page={Math.min(page, pageCount)}
