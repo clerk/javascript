@@ -66,25 +66,28 @@ function errorsToParsedErrors(error: ClerkError | null): Errors {
     return parsedErrors;
   }
 
-  error.errors.forEach(error => {
-    if (parsedErrors.raw) {
-      parsedErrors.raw.push(error);
-    } else {
-      parsedErrors.raw = [error];
-    }
+  const hasFieldErrors = error.errors.some(error => 'meta' in error && error.meta && 'paramName' in error.meta);
+  if (hasFieldErrors) {
+    error.errors.forEach(error => {
+      if (parsedErrors.raw) {
+        parsedErrors.raw.push(error);
+      } else {
+        parsedErrors.raw = [error];
+      }
+      if ('meta' in error && error.meta && 'paramName' in error.meta) {
+        const name = snakeToCamel(error.meta.paramName);
+        parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
+      }
+      // Note that this assumes a given ClerkAPIResponseError will only have either field errors or global errors, but
+      // not both. If a global error is present, it will be discarded.
+    });
 
-    if ('meta' in error && error.meta && 'paramName' in error.meta) {
-      const name = snakeToCamel(error.meta.paramName);
-      parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
-      return;
-    }
+    return parsedErrors;
+  }
 
-    if (parsedErrors.global) {
-      parsedErrors.global.push(createClerkGlobalHookError(error));
-    } else {
-      parsedErrors.global = [createClerkGlobalHookError(error)];
-    }
-  });
+  // At this point, we know that `error` is a ClerkAPIResponseError and that it has no field errors.
+  parsedErrors.raw = [error];
+  parsedErrors.global = [createClerkGlobalHookError(error)];
 
   return parsedErrors;
 }
