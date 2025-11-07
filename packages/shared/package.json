@@ -12,62 +12,62 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/runtime/index.d.mts",
-        "default": "./dist/runtime/index.mjs"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/index.d.ts",
-        "default": "./dist/runtime/index.js"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
       }
     },
     "./*": {
       "import": {
-        "types": "./dist/runtime/*.d.mts",
-        "default": "./dist/runtime/*.mjs"
+        "types": "./dist/*.d.mts",
+        "default": "./dist/*.mjs"
       },
       "require": {
-        "types": "./dist/runtime/*.d.ts",
-        "default": "./dist/runtime/*.js"
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
       }
     },
     "./react": {
       "import": {
-        "types": "./dist/runtime/react/index.d.mts",
-        "default": "./dist/runtime/react/index.mjs"
+        "types": "./dist/react/index.d.mts",
+        "default": "./dist/react/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/react/index.d.ts",
-        "default": "./dist/runtime/react/index.js"
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
       }
     },
     "./utils": {
       "import": {
-        "types": "./dist/runtime/utils/index.d.mts",
-        "default": "./dist/runtime/utils/index.mjs"
+        "types": "./dist/utils/index.d.mts",
+        "default": "./dist/utils/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/utils/index.d.ts",
-        "default": "./dist/runtime/utils/index.js"
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
       }
     },
     "./workerTimers": {
       "import": {
-        "types": "./dist/runtime/workerTimers/index.d.mts",
-        "default": "./dist/runtime/workerTimers/index.mjs"
+        "types": "./dist/workerTimers/index.d.mts",
+        "default": "./dist/workerTimers/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/workerTimers/index.d.ts",
-        "default": "./dist/runtime/workerTimers/index.js"
+        "types": "./dist/workerTimers/index.d.ts",
+        "default": "./dist/workerTimers/index.js"
       }
     },
     "./dom": {
       "import": {
-        "types": "./dist/runtime/dom/index.d.mts",
-        "default": "./dist/runtime/dom/index.mjs"
+        "types": "./dist/dom/index.d.mts",
+        "default": "./dist/dom/index.mjs"
       },
       "require": {
-        "types": "./dist/runtime/dom/index.d.ts",
-        "default": "./dist/runtime/dom/index.js"
+        "types": "./dist/dom/index.d.ts",
+        "default": "./dist/dom/index.js"
       }
     },
     "./types": {
@@ -137,7 +137,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs shared dist/runtime",
+    "postbuild": "node ../../scripts/subpath-workaround.mjs shared dist",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:publish": "pnpm dev -- --env.publish",
