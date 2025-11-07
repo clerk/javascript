@@ -59,7 +59,7 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
       });
     }
 
-    authStore.connectToClerk(clerk);
+    authStore.connect(clerk);
 
     return () => {
       authStore.disconnect();

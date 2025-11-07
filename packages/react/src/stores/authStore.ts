@@ -14,10 +14,7 @@ class AuthStore {
     this.currentSnapshot = this.createEmptySnapshot();
   }
 
-  /**
-   * Connect to Clerk and sync state
-   */
-  connectToClerk(clerk: IsomorphicClerk) {
+  connect(clerk: IsomorphicClerk) {
     this.disconnect();
 
     this.clerkUnsubscribe = clerk.addListener(() => {
@@ -58,17 +55,11 @@ class AuthStore {
     return this.serverSnapshot || this.currentSnapshot;
   };
 
-  /**
-   * Subscribe to changes
-   */
   subscribe = (listener: Listener): (() => void) => {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   };
 
-  /**
-   * Update state from Clerk
-   */
   private updateFromClerk(clerk: IsomorphicClerk) {
     const newSnapshot = this.transformClerkState(clerk);
 
@@ -80,18 +71,22 @@ class AuthStore {
   }
 
   private transformClerkState(clerk: IsomorphicClerk): AuthSnapshot {
-    // Transform Clerk's state to AuthSnapshot format
+    const orgId = clerk.organization?.id;
+    const membership = clerk.organization
+      ? clerk.user?.organizationMemberships?.find(om => om.organization.id === orgId)
+      : undefined;
+
     return {
-      userId: clerk.user?.id,
-      sessionId: clerk.session?.id,
-      sessionStatus: clerk.session?.status,
-      sessionClaims: clerk.session?.claims,
-      orgId: clerk.organization?.id,
-      orgSlug: clerk.organization?.slug,
-      orgRole: clerk.organization?.role,
-      orgPermissions: clerk.organization?.permissions,
       actor: clerk.session?.actor,
       factorVerificationAge: clerk.session?.factorVerificationAge ?? null,
+      orgId,
+      orgPermissions: membership?.permissions,
+      orgRole: membership?.role,
+      orgSlug: clerk.organization?.slug,
+      sessionClaims: clerk.session?.lastActiveToken?.jwt?.claims,
+      sessionId: clerk.session?.id,
+      sessionStatus: clerk.session?.status,
+      userId: clerk.user?.id,
     };
   }
 
