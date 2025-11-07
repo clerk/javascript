@@ -1,4 +1,5 @@
 import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '../types';
+import { ClerkError } from './clerkError';
 import { createErrorTypeGuard } from './createErrorTypeGuard';
 
 export type ClerkApiErrorMeta = Record<string, unknown>;
@@ -6,7 +7,7 @@ export type ClerkApiErrorMeta = Record<string, unknown>;
 /**
  * This error contains the specific error message, code, and any additional metadata that was returned by the Clerk API.
  */
-export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements ClerkAPIErrorInterface {
+export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> extends ClerkError implements ClerkAPIErrorInterface {
   static kind = 'ClerkApiError';
   readonly code: string;
   readonly message: string;
@@ -14,6 +15,7 @@ export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements Cler
   readonly meta: Meta;
 
   constructor(json: ClerkAPIErrorJSON) {
+    super(json);
     const parsedError = this.parseJsonError(json);
     this.code = parsedError.code;
     this.message = parsedError.message;

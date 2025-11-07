@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
@@ -7,7 +7,7 @@ import type { SignIn } from './resources/SignIn';
 import type { SignUp } from './resources/SignUp';
 
 export const signInResourceSignal = signal<{ resource: SignIn | null }>({ resource: null });
-export const signInErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signInErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
 export const signInFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
 export const signInComputedSignal: SignInSignal = computed(() => {
@@ -21,7 +21,7 @@ export const signInComputedSignal: SignInSignal = computed(() => {
 });
 
 export const signUpResourceSignal = signal<{ resource: SignUp | null }>({ resource: null });
-export const signUpErrorSignal = signal<{ error: unknown }>({ error: null });
+export const signUpErrorSignal = signal<{ error: ClerkError | null }>({ error: null });
 export const signUpFetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
 
 export const signUpComputedSignal: SignUpSignal = computed(() => {
@@ -38,7 +38,7 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
  * generic non-API errors into the global array.
  */
-function errorsToParsedErrors(error: unknown): Errors {
+function errorsToParsedErrors(error: ClerkError | null): Errors {
   const parsedErrors: Errors = {
     fields: {
       firstName: null,
@@ -62,7 +62,7 @@ function errorsToParsedErrors(error: unknown): Errors {
 
   if (!isClerkAPIResponseError(error)) {
     parsedErrors.raw = [error];
-    parsedErrors.global = [error];
+    parsedErrors.global = [createClerkGlobalHookError(error)];
     return parsedErrors;
   }
 
@@ -80,9 +80,9 @@ function errorsToParsedErrors(error: unknown): Errors {
     }
 
     if (parsedErrors.global) {
-      parsedErrors.global.push(error);
+      parsedErrors.global.push(createClerkGlobalHookError(error));
     } else {
-      parsedErrors.global = [error];
+      parsedErrors.global = [createClerkGlobalHookError(error)];
     }
   });
 
