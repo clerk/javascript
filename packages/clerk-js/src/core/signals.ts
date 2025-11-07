@@ -1,4 +1,4 @@
-import { ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { type ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';

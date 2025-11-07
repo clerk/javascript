@@ -1,5 +1,5 @@
+import type { ClerkError } from '@clerk/shared/error';
 import { createEventBus } from '@clerk/shared/eventBus';
-import { ClerkError } from '@clerk/shared/error';
 import type { TokenResource } from '@clerk/shared/types';
 
 import type { BaseResource } from './resources/Base';

@@ -1,4 +1,4 @@
-import { ClerkError } from '@clerk/shared/error';
+import type { ClerkError } from '@clerk/shared/error';
 import type { State as StateInterface } from '@clerk/shared/types';
 import { computed, effect } from 'alien-signals';
 

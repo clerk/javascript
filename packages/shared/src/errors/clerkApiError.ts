@@ -1,5 +1,4 @@
 import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '../types';
-import { ClerkError } from './clerkError';
 import { createErrorTypeGuard } from './createErrorTypeGuard';
 
 export type ClerkApiErrorMeta = Record<string, unknown>;
@@ -7,7 +6,7 @@ export type ClerkApiErrorMeta = Record<string, unknown>;
 /**
  * This error contains the specific error message, code, and any additional metadata that was returned by the Clerk API.
  */
-export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> extends ClerkError implements ClerkAPIErrorInterface {
+export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements ClerkAPIErrorInterface {
   static kind = 'ClerkApiError';
   readonly code: string;
   readonly message: string;
@@ -15,16 +14,7 @@ export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> extends ClerkEr
   readonly meta: Meta;
 
   constructor(json: ClerkAPIErrorJSON) {
-    super(json);
-    const parsedError = this.parseJsonError(json);
-    this.code = parsedError.code;
-    this.message = parsedError.message;
-    this.longMessage = parsedError.longMessage;
-    this.meta = parsedError.meta;
-  }
-
-  private parseJsonError(json: ClerkAPIErrorJSON) {
-    return {
+    const parsedError = {
       code: json.code,
       message: json.message,
       longMessage: json.long_message,
@@ -38,6 +28,10 @@ export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> extends ClerkEr
         isPlanUpgradePossible: json.meta?.is_plan_upgrade_possible,
       } as unknown as Meta,
     };
+    this.code = parsedError.code;
+    this.message = parsedError.message;
+    this.longMessage = parsedError.longMessage;
+    this.meta = parsedError.meta;
   }
 }
 
