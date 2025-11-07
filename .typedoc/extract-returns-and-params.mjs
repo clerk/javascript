@@ -97,12 +97,10 @@ function extractParametersSection(filePath) {
 
   // Extract the Parameters section and trim trailing whitespace
   const paramsContent = content.slice(paramsStart, paramsEnd).trimEnd();
+  const processedParams = replaceGenericTypesInParamsTable(paramsContent);
 
   // Write to new file
   const newFilePath = path.join(dirName, targetFileName);
-  fs.writeFileSync(newFilePath, paramsContent, 'utf-8');
-
-  const processedParams = replaceGenericTypesInParamsTable(fs.readFileSync(newFilePath, 'utf-8'));
   fs.writeFileSync(newFilePath, processedParams, 'utf-8');
 
   console.log(`[extract-returns] Created ${path.relative(process.cwd(), newFilePath)}`);
