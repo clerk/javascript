@@ -29,6 +29,15 @@ export default defineConfig(({ watch }) => {
     {
       ...common,
       entry: [
+        //
+        './src/types/index.ts',
+      ],
+      unbundle: false,
+      outDir: './dist/types',
+    },
+    {
+      ...common,
+      entry: [
         './src/*.{ts,tsx}',
         './src/react/index.ts',
         './src/utils/index.ts',
@@ -37,8 +46,8 @@ export default defineConfig(({ watch }) => {
         './src/dom/*.ts',
         '!./src/**/*.{test,spec}.{ts,tsx}',
       ],
-      outDir: './dist',
-      unbundle: true,
+      outDir: './dist/runtime',
+      unbundle: false,
       plugins: [HookAliasPlugin()],
     },
   ];
