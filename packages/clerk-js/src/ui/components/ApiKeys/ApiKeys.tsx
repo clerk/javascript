@@ -71,7 +71,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     count: itemCount,
   } = useAPIKeys({
     subject,
-    pageSize: perPage,
+    pageSize: perPage ?? API_KEYS_PAGE_SIZE,
     query,
     keepPreviousData: true,
     enabled: isOrg ? canReadAPIKeys : true,
