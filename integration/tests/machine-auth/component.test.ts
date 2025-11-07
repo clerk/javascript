@@ -69,11 +69,11 @@ testAgainstRunningApps({
   test('pagination works correctly with multiple pages', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    // Create user and 6 API keys to trigger pagination (default perPage is 5)
+    // Create user and 11 API keys to trigger pagination (default perPage is 10)
     const fakeUser = u.services.users.createFakeUser();
     const bapiUser = await u.services.users.createBapiUser(fakeUser);
     const fakeAPIKeys = await Promise.all(
-      Array.from({ length: 6 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
+      Array.from({ length: 11 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
     );
 
     await u.po.signIn.goTo();
@@ -85,20 +85,20 @@ testAgainstRunningApps({
     await u.po.apiKeys.waitForMounted();
 
     // Verify first page
-    await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
-    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
+    await expect(u.page.getByText(/Displaying 1 – 10 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(10);
 
     // Navigate to second page
     const page2Button = u.page.locator('.cl-paginationButton').filter({ hasText: /^2$/ });
     await page2Button.click();
-    await expect(u.page.getByText(/Displaying 6 – 6 of 6/i)).toBeVisible();
+    await expect(u.page.getByText(/Displaying 11 – 11 of 11/i)).toBeVisible();
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(1);
 
     // Navigate back to first page
     const page1Button = u.page.locator('.cl-paginationButton').filter({ hasText: /^1$/ });
     await page1Button.click();
-    await expect(u.page.getByText(/Displaying 1 – 5 of 6/i)).toBeVisible();
-    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(5);
+    await expect(u.page.getByText(/Displaying 1 – 10 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(10);
 
     // Cleanup
     await Promise.all(fakeAPIKeys.map(key => key.revoke()));
