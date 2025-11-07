@@ -8,7 +8,7 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { ApiKeyModal } from './ApiKeyModal';
+import { APIKeyModal } from './APIKeyModal';
 
 type RevokeAPIKeyConfirmationModalProps = {
   isOpen: boolean;
@@ -62,7 +62,7 @@ export const RevokeAPIKeyConfirmationModal = ({
   }
 
   return (
-    <ApiKeyModal
+    <APIKeyModal
       handleOpen={onOpen}
       handleClose={handleClose}
       canCloseModal={false}
@@ -100,6 +100,6 @@ export const RevokeAPIKeyConfirmationModal = ({
           </FormContainer>
         </Card.Content>
       </Card.Root>
-    </ApiKeyModal>
+    </APIKeyModal>
   );
 };

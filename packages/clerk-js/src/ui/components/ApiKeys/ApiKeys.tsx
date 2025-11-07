@@ -5,7 +5,7 @@ import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import { useProtect } from '@/ui/common';
-import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
+import { useAPIKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
   Box,
   Button,
@@ -26,9 +26,9 @@ import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
 
-import { ApiKeysTable } from './ApiKeysTable';
-import type { OnCreateParams } from './CreateApiKeyForm';
-import { CreateApiKeyForm } from './CreateApiKeyForm';
+import { APIKeysTable } from './APIKeysTable';
+import type { OnCreateParams } from './CreateAPIKeyForm';
+import { CreateAPIKeyForm } from './CreateAPIKeyForm';
 import { useAPIKeysPagination } from './utils';
 
 type APIKeysPageProps = {
@@ -43,9 +43,9 @@ const RevokeAPIKeyConfirmationModal = lazy(() =>
   })),
 );
 
-const CopyApiKeyModal = lazy(() =>
-  import(/* webpackChunkName: "copy-api-key-modal"*/ './CopyApiKeyModal').then(module => ({
-    default: module.CopyApiKeyModal,
+const CopyAPIKeyModal = lazy(() =>
+  import(/* webpackChunkName: "copy-api-key-modal"*/ './CopyAPIKeyModal').then(module => ({
+    default: module.CopyAPIKeyModal,
   })),
 );
 
@@ -95,8 +95,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const card = useCardState();
   const clerk = useClerk();
   const {
-    data: createdApiKey,
-    trigger: createApiKey,
+    data: createdAPIKey,
+    trigger: createAPIKey,
     isMutating,
   } = useSWRMutation('api-keys-create', (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
   const { t } = useLocalizations();
@@ -105,9 +105,9 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
-  const handleCreateApiKey = async (params: OnCreateParams) => {
+  const handleCreateAPIKey = async (params: OnCreateParams) => {
     try {
-      await createApiKey({
+      await createAPIKey({
         ...params,
         subject,
       });
@@ -181,25 +181,25 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         <Action.Open value='add-api-key'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
             <Action.Card sx={{ width: '100%' }}>
-              <CreateApiKeyForm
-                onCreate={handleCreateApiKey}
+              <CreateAPIKeyForm
+                onCreate={handleCreateAPIKey}
                 isSubmitting={isMutating}
               />
             </Action.Card>
           </Flex>
         </Action.Open>
 
-        <CopyApiKeyModal
+        <CopyAPIKeyModal
           isOpen={isCopyModalOpen}
           onOpen={() => setIsCopyModalOpen(true)}
           onClose={() => setIsCopyModalOpen(false)}
-          apiKeyName={createdApiKey?.name ?? ''}
-          apiKeySecret={createdApiKey?.secret ?? ''}
+          apiKeyName={createdAPIKey?.name ?? ''}
+          apiKeySecret={createdAPIKey?.secret ?? ''}
           modalRoot={revokeModalRoot}
         />
       </Action.Root>
 
-      <ApiKeysTable
+      <APIKeysTable
         rows={apiKeys}
         isLoading={isLoading}
         onRevoke={handleRevoke}
@@ -234,7 +234,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 };
 
 const _APIKeys = () => {
-  const ctx = useApiKeysContext();
+  const ctx = useAPIKeysContext();
   const { user } = useUser();
   const { organization } = useOrganization();
 
