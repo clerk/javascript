@@ -10,9 +10,9 @@ import { Check, ClipboardOutline } from '@/ui/icons';
 import { localizationKeys } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { ApiKeyModal } from './ApiKeyModal';
+import { APIKeyModal } from './APIKeyModal';
 
-type CopyApiKeyModalProps = {
+type CopyAPIKeyModalProps = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
@@ -21,14 +21,14 @@ type CopyApiKeyModalProps = {
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
 };
 
-export const CopyApiKeyModal = ({
+export const CopyAPIKeyModal = ({
   isOpen,
   onOpen,
   onClose,
   apiKeyName,
   apiKeySecret,
   modalRoot,
-}: CopyApiKeyModalProps) => {
+}: CopyAPIKeyModalProps) => {
   const apiKeyField = useFormControl('apiKeySecret', apiKeySecret, {
     type: 'text',
     label: localizationKeys('formFieldLabel__apiKey'),
@@ -51,7 +51,7 @@ export const CopyApiKeyModal = ({
   }
 
   return (
-    <ApiKeyModal
+    <APIKeyModal
       handleOpen={onOpen}
       handleClose={onClose}
       canCloseModal={false}
@@ -96,6 +96,6 @@ export const CopyApiKeyModal = ({
           </FormContainer>
         </Card.Content>
       </Card.Root>
-    </ApiKeyModal>
+    </APIKeyModal>
   );
 };

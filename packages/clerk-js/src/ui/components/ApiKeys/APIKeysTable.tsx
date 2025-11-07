@@ -19,7 +19,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { mqu } from '@/ui/styledSystem';
 import { timeAgo } from '@/ui/utils/timeAgo';
 
-export const ApiKeysTable = ({
+export const APIKeysTable = ({
   rows,
   isLoading,
   onRevoke,
