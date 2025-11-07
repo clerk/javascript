@@ -102,10 +102,6 @@ function getCatchAllReplacements() {
       replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
-      pattern: /(?<![\[\w`])`?BillingMoneyAmount`?(?![\]\w`])/g,
-      replace: '[`BillingMoneyAmount`](/docs/reference/javascript/types/billing-money-amount)',
-    },
-    {
       pattern: /\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
