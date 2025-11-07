@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 
 type UseApiKeysPaginationParams = {
   query: string;
   page: number;
   pageCount: number;
-  itemCount: number;
   isFetching: boolean;
-  perPage: number;
   subject: string;
   fetchPage: (page: number) => void;
 };
@@ -16,16 +14,13 @@ type UseApiKeysPaginationParams = {
  * Hook that manages pagination logic for API keys:
  * - Resets to page 1 when query changes
  * - Adjusts page when current page exceeds available pages (e.g., after deletion)
- * - Calculates row information for pagination display
  * - Provides cache invalidation function for mutations
  */
 export const useAPIKeysPagination = ({
   query,
   page,
   pageCount,
-  itemCount,
   isFetching,
-  perPage,
   subject,
   fetchPage,
 }: UseApiKeysPaginationParams) => {
@@ -60,21 +55,7 @@ export const useAPIKeysPagination = ({
     }
   }, [pageCount, page, isFetching, fetchPage]);
 
-  // Calculate row info for pagination display
-  const startingRow = useMemo(() => {
-    if (itemCount === 0) {
-      return 0;
-    }
-    return (page - 1) * perPage + 1;
-  }, [itemCount, page, perPage]);
-
-  const endingRow = useMemo(() => {
-    return Math.min(page * perPage, itemCount);
-  }, [page, perPage, itemCount]);
-
   return {
-    startingRow,
-    endingRow,
     invalidateAll,
   };
 };

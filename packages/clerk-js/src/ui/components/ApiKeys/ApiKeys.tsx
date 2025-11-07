@@ -76,16 +76,17 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     enabled: isOrg ? canReadAPIKeys : true,
   });
 
-  const { startingRow, endingRow, invalidateAll } = useAPIKeysPagination({
+  const { invalidateAll } = useAPIKeysPagination({
     query,
     page,
     pageCount,
-    itemCount,
     isFetching,
-    perPage: perPage ?? 5,
     subject,
     fetchPage,
   });
+
+  const startingRow = itemCount > 0 ? Math.max(0, (page - 1) * (perPage ?? 5)) + 1 : 0;
+  const endingRow = Math.min(page * (perPage ?? 5), itemCount);
 
   const handlePageChange = (newPage: number) => {
     fetchPage(newPage);
