@@ -17,8 +17,7 @@ export function getCurrentOrganizationMembership(
 }
 
 /**
- * Wraps a hook function in a check to see if organization settings is enabled
- *
+ * Wraps a function in a check to see if organization settings is enabled
  * If not enabled, it will open a dialog with a prompt to enable organizations
  *
  * @internal

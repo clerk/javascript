@@ -17,7 +17,7 @@ const componentImportPaths = {
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
-  KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
+  KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/devPrompts/KeylessPrompt'),
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
@@ -28,7 +28,7 @@ const componentImportPaths = {
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
   EnableOrganizationsPrompt: () =>
-    import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/EnableOrganizationsPrompt'),
+    import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));

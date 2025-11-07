@@ -42,6 +42,7 @@ import {
 import { MountedCheckoutDrawer, MountedPlanDetailDrawer, MountedSubscriptionDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
+  LazyEnableOrganizationsPromptProvider,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -351,14 +352,16 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.openModal = (name, props) => {
-      // Prevent opening enableOrganizations modal if it's already open
+      // Prevent opening enableOrganizations prompt if it's already open
       // to avoid duplicate mounting when component is called multiple times
       if (name === 'enableOrganizationsPrompt') {
-        setState(s => {
-          if (s.enableOrganizationsPromptModal) {
-            return s; // Modal is already open, don't update state
+        setState(prev => {
+          // Modal is already open, don't update state
+          if (prev.enableOrganizationsPromptModal) {
+            return prev;
           }
-          return { ...s, [`${name}Modal`]: props };
+
+          return { ...prev, [`${name}Modal`]: props };
         });
         return;
       }
@@ -634,12 +637,9 @@ const Components = (props: ComponentsProps) => {
         )}
 
         {state.enableOrganizationsPromptModal && (
-          <LazyImpersonationFabProvider globalAppearance={state.appearance}>
-            <EnableOrganizationsPrompt
-              callerString='useOrganization'
-              {...state.enableOrganizationsPromptModal}
-            />
-          </LazyImpersonationFabProvider>
+          <LazyEnableOrganizationsPromptProvider globalAppearance={state.appearance}>
+            <EnableOrganizationsPrompt {...state.enableOrganizationsPromptModal} />
+          </LazyEnableOrganizationsPromptProvider>
         )}
 
         {state.options?.__internal_keyless_claimKeylessApplicationUrl &&

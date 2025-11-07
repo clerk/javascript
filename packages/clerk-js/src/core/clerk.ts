@@ -745,7 +745,7 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('userVerification'));
   };
 
-  public __internal_openEnableOrganizationsPrompt = (props?: __internal_EnableOrganizationsPromptProps): void => {
+  public __internal_openEnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls
       .ensureMounted({ preloadHint: 'EnableOrganizationsPrompt' })

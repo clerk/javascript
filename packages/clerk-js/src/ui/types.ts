@@ -1,6 +1,5 @@
 import type {
   __internal_CheckoutProps,
-  __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -73,11 +72,6 @@ export type SignInCtx = SignInProps & {
 
 export type UserVerificationCtx = __internal_UserVerificationProps & {
   componentName: 'UserVerification';
-  mode?: ComponentMode;
-};
-
-export type EnableOrganizationsCtx = __internal_EnableOrganizationsPromptProps & {
-  componentName: 'EnableOrganizations';
   mode?: ComponentMode;
 };
 

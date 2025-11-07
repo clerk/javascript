@@ -209,6 +209,23 @@ export const LazyImpersonationFabProvider = (
   );
 };
 
+export const LazyEnableOrganizationsPromptProvider = (
+  props: React.PropsWithChildren<{ globalAppearance: Appearance | undefined }>,
+) => {
+  return (
+    <Suspense>
+      <VirtualRouter startPath=''>
+        <AppearanceProvider
+          globalAppearance={props.globalAppearance}
+          appearanceKey={'enableOrganizationsPrompt'}
+        >
+          {props.children}
+        </AppearanceProvider>
+      </VirtualRouter>
+    </Suspense>
+  );
+};
+
 type LazyOneTapRendererProps = React.PropsWithChildren<
   {
     componentProps: any;

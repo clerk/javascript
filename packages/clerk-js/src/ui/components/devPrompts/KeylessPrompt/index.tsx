@@ -5,9 +5,10 @@ import type { PropsWithChildren } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Flex, Link } from '../../customizables';
-import { Portal } from '../../elements/Portal';
-import { InternalThemeProvider } from '../../styledSystem';
+import { Flex, Link } from '../../../customizables';
+import { Portal } from '../../../elements/Portal';
+import { InternalThemeProvider } from '../../../styledSystem';
+import { basePromptElementStyles, PromptContainer } from '../shared';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
 import { KeySlashIcon } from './KeySlashIcon';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
@@ -21,30 +22,6 @@ type KeylessPromptProps = {
 const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
 const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
-
-const baseElementStyles = css`
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  background: none;
-  border: none;
-  line-height: 1.5;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    avenir next,
-    avenir,
-    segoe ui,
-    helvetica neue,
-    helvetica,
-    Cantarell,
-    Ubuntu,
-    roboto,
-    noto,
-    arial,
-    sans-serif;
-  text-decoration: none;
-`;
 
 /**
  * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
@@ -122,7 +99,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   }, [_props.copyKeysUrl]);
 
   const mainCTAStyles = css`
-    ${baseElementStyles};
+    ${basePromptElementStyles};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,22 +127,9 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 
   return (
     <Portal>
-      <Flex
+      <PromptContainer
         data-expanded={isForcedExpanded}
         sx={t => ({
-          position: 'fixed',
-          bottom: '1.25rem',
-          right: '1.25rem',
-          height: `${t.sizes.$10}`,
-          minWidth: '13.4rem',
-          paddingLeft: `${t.space.$3}`,
-          borderRadius: '1.25rem',
-          fontFamily: t.fonts.$main,
-          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
-          boxShadow:
-            '0px 0px 0px 0.5px #2F3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.20) inset, 0px 0px 0px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.20);',
-          transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
-
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           },
@@ -192,7 +156,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
           css={css`
-            ${baseElementStyles};
+            ${basePromptElementStyles};
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -315,7 +279,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
               }
               css={css`
-                ${baseElementStyles};
+                ${basePromptElementStyles};
                 color: #d9d9d9;
                 font-size: 0.875rem;
                 font-weight: 500;
@@ -381,7 +345,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           >
             <p
               css={css`
-                ${baseElementStyles};
+                ${basePromptElementStyles};
                 color: #b4b4b4;
                 font-size: 0.8125rem;
                 font-weight: 400;
@@ -532,7 +496,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       target='_blank'
                       rel='noopener noreferrer'
                       css={css`
-                        ${baseElementStyles};
+                        ${basePromptElementStyles};
                         color: #ffffff9e;
                         font-size: 0.75rem;
                         transition: color 120ms ease-out;
@@ -565,7 +529,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               </Flex>
             ))}
         </Flex>
-      </Flex>
+      </PromptContainer>
       <BodyPortal>
         <a
           href={`#${buttonIdentifier}`}

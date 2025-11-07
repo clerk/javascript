@@ -1,9 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import { useEffect, useReducer, useRef } from 'react';
 
-import type { Clerk } from '../../../core/clerk';
-import type { Environment } from '../../../core/resources';
-import { useEnvironment } from '../../contexts';
+import type { Clerk } from '../../../../core/clerk';
+import type { Environment } from '../../../../core/resources';
+import { useEnvironment } from '../../../contexts';
 
 const THROTTLE_DURATION_MS = 10 * 1000;
 
