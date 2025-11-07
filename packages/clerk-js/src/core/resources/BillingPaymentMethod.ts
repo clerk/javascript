@@ -17,7 +17,7 @@ import { BaseResource, DeletedObject } from './internal';
 export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
   id!: string;
   last4: string | null = null;
-  paymentType?: 'card' | 'link';
+  paymentType?: 'card';
   cardType: string | null = null;
   isDefault?: boolean;
   isRemovable?: boolean;
@@ -39,20 +39,17 @@ export class BillingPaymentMethod extends BaseResource implements BillingPayment
     }
 
     this.id = data.id;
-    this.last4 = data.last4 ?? null;
-    const rawPaymentType = data.payment_type ?? data.payment_method;
-    this.paymentType = rawPaymentType === undefined ? undefined : (rawPaymentType as 'card' | 'link');
-    this.cardType = data.card_type ?? null;
-    this.isDefault = data.is_default ?? undefined;
-    this.isRemovable = data.is_removable ?? undefined;
+    this.last4 = data.last4;
+    this.paymentType = data.payment_type;
+    this.cardType = data.card_type;
+    this.isDefault = data.is_default;
+    this.isRemovable = data.is_removable;
     this.status = data.status;
-    this.walletType = data.wallet_type === undefined ? undefined : data.wallet_type;
-    this.expiryYear = data.expiry_year ?? null;
-    this.expiryMonth = data.expiry_month ?? null;
-    this.createdAt =
-      data.created_at === undefined ? undefined : data.created_at === null ? null : unixEpochToDate(data.created_at);
-    this.updatedAt =
-      data.updated_at === undefined ? undefined : data.updated_at === null ? null : unixEpochToDate(data.updated_at);
+    this.walletType = data.wallet_type;
+    this.expiryYear = data.expiry_year;
+    this.expiryMonth = data.expiry_month;
+    this.createdAt = data.created_at == null ? data.created_at : unixEpochToDate(data.created_at);
+    this.updatedAt = data.updated_at == null ? data.updated_at : unixEpochToDate(data.updated_at);
 
     return this;
   }

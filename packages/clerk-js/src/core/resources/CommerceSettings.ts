@@ -7,7 +7,7 @@ import { BaseResource } from './internal';
  */
 export class CommerceSettings extends BaseResource implements CommerceSettingsResource {
   billing: CommerceSettingsResource['billing'] = {
-    stripePublishableKey: '',
+    stripePublishableKey: null,
     organization: {
       enabled: false,
       hasPaidPlans: false,
@@ -28,11 +28,11 @@ export class CommerceSettings extends BaseResource implements CommerceSettingsRe
       return this;
     }
 
-    this.billing.stripePublishableKey = data.billing.stripe_publishable_key || '';
-    this.billing.organization.enabled = data.billing.organization.enabled || false;
-    this.billing.organization.hasPaidPlans = data.billing.organization.has_paid_plans || false;
-    this.billing.user.enabled = data.billing.user.enabled || false;
-    this.billing.user.hasPaidPlans = data.billing.user.has_paid_plans || false;
+    this.billing.stripePublishableKey = data.billing.stripe_publishable_key;
+    this.billing.organization.enabled = data.billing.organization.enabled;
+    this.billing.organization.hasPaidPlans = data.billing.organization.has_paid_plans;
+    this.billing.user.enabled = data.billing.user.enabled;
+    this.billing.user.hasPaidPlans = data.billing.user.has_paid_plans;
 
     return this;
   }

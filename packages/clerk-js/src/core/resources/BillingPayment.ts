@@ -15,8 +15,8 @@ import { BaseResource, BillingPaymentMethod, BillingSubscriptionItem } from './i
 export class BillingPayment extends BaseResource implements BillingPaymentResource {
   id!: string;
   amount!: BillingMoneyAmount;
-  failedAt?: Date;
-  paidAt?: Date;
+  failedAt: Date | null = null;
+  paidAt: Date | null = null;
   updatedAt!: Date;
   paymentMethod: BillingPaymentMethodResource | null = null;
   subscriptionItem!: BillingSubscriptionItemResource;
@@ -35,8 +35,8 @@ export class BillingPayment extends BaseResource implements BillingPaymentResour
 
     this.id = data.id;
     this.amount = billingMoneyAmountFromJSON(data.amount);
-    this.paidAt = data.paid_at ? unixEpochToDate(data.paid_at) : undefined;
-    this.failedAt = data.failed_at ? unixEpochToDate(data.failed_at) : undefined;
+    this.paidAt = data.paid_at ? unixEpochToDate(data.paid_at) : null;
+    this.failedAt = data.failed_at ? unixEpochToDate(data.failed_at) : null;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.paymentMethod = data.payment_method ? new BillingPaymentMethod(data.payment_method) : null;
     this.subscriptionItem = new BillingSubscriptionItem(data.subscription_item);

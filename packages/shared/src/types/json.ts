@@ -638,14 +638,6 @@ export interface BillingPlanJSON extends ClerkResourceJSON {
   fee: BillingMoneyAmountJSON;
   annual_fee: BillingMoneyAmountJSON | null;
   annual_monthly_fee: BillingMoneyAmountJSON | null;
-  amount?: number;
-  amount_formatted?: string;
-  annual_amount?: number;
-  annual_amount_formatted?: string;
-  annual_monthly_amount?: number;
-  annual_monthly_amount_formatted?: string;
-  currency_symbol?: string;
-  currency?: string;
   description: string | null;
   is_default: boolean;
   is_recurring: boolean;
@@ -666,8 +658,7 @@ export interface BillingPaymentMethodJSON extends ClerkResourceJSON {
   object: 'commerce_payment_method';
   id: string;
   last4: string | null;
-  payment_type?: 'card' | 'link';
-  payment_method?: string;
+  payment_type?: 'card';
   card_type: string | null;
   is_default?: boolean;
   is_removable?: boolean;
@@ -717,11 +708,10 @@ export interface BillingPaymentJSON extends ClerkResourceJSON {
   object: 'commerce_payment';
   id: string;
   amount: BillingMoneyAmountJSON;
-  paid_at?: number;
-  failed_at?: number;
+  paid_at: number | null;
+  failed_at: number | null;
   updated_at: number;
   payment_method?: BillingPaymentMethodJSON | null;
-  subscription: BillingSubscriptionItemJSON;
   subscription_item: BillingSubscriptionItemJSON;
   charge_type: BillingPaymentChargeType;
   status: BillingPaymentStatus;
@@ -748,8 +738,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   period_end: number | null;
   canceled_at: number | null;
   past_due_at: number | null;
-  // TODO(@COMMERCE): Remove optional after GA.
-  is_free_trial?: boolean;
+  is_free_trial: boolean;
 }
 
 /**
@@ -774,7 +763,7 @@ export interface BillingSubscriptionJSON extends ClerkResourceJSON {
   updated_at: number | null;
   past_due_at: number | null;
   subscription_items: BillingSubscriptionItemJSON[] | null;
-  eligible_for_free_trial?: boolean;
+  eligible_for_free_trial: boolean;
 }
 
 /**
@@ -794,21 +783,20 @@ export interface BillingCheckoutTotalsJSON {
   grand_total: BillingMoneyAmountJSON;
   subtotal: BillingMoneyAmountJSON;
   tax_total: BillingMoneyAmountJSON;
-  total_due_now?: BillingMoneyAmountJSON | null;
-  credit?: BillingMoneyAmountJSON | null;
-  past_due?: BillingMoneyAmountJSON | null;
-  total_due_after_free_trial?: BillingMoneyAmountJSON | null;
-  proration?: {
-    credit: BillingMoneyAmountJSON | null;
-  } | null;
+  total_due_now: BillingMoneyAmountJSON;
+  credit: BillingMoneyAmountJSON | null;
+  past_due: BillingMoneyAmountJSON | null;
+  total_due_after_free_trial: BillingMoneyAmountJSON | null;
 }
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BillingStatementTotalsJSON
-  extends Omit<BillingCheckoutTotalsJSON, 'total_due_now' | 'total_due_after_free_trial'> {}
+export interface BillingStatementTotalsJSON {
+  grand_total: BillingMoneyAmountJSON;
+  subtotal: BillingMoneyAmountJSON;
+  tax_total: BillingMoneyAmountJSON;
+}
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -818,15 +806,14 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
   id: string;
   external_client_secret: string;
   external_gateway_id: string;
-  payment_method?: BillingPaymentMethodJSON | null;
+  payment_method?: BillingPaymentMethodJSON;
   plan: BillingPlanJSON;
   plan_period: BillingSubscriptionPlanPeriod;
   plan_period_start?: number;
   status: 'needs_confirmation' | 'completed';
   totals: BillingCheckoutTotalsJSON;
   is_immediate_plan_change: boolean;
-  // TODO(@COMMERCE): Remove optional after GA.
-  free_trial_ends_at: number | null;
+  free_trial_ends_at?: number;
   payer: BillingPayerJSON;
   needs_payment_method: boolean;
 }
@@ -837,18 +824,18 @@ export interface BillingCheckoutJSON extends ClerkResourceJSON {
 export interface BillingPayerJSON extends ClerkResourceJSON {
   object: 'commerce_payer';
   id: string;
-  created_at?: number | null;
-  updated_at?: number | null;
-  image_url?: string | null;
+  created_at?: number;
+  updated_at?: number;
+  image_url?: string;
 
   // User attributes
-  user_id?: string | null;
+  user_id: string | null;
   email?: string | null;
   first_name?: string | null;
   last_name?: string | null;
 
   // Organization attributes
-  organization_id?: string | null;
+  organization_id: string | null;
   organization_name?: string | null;
 }
 
