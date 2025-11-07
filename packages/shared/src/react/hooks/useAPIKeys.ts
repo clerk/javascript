@@ -83,20 +83,17 @@ export function useApiKeys<T extends UseApiKeysParams>(params?: T): UseApiKeysRe
 
   clerk.telemetry?.record(eventMethodCalled('useApiKeys'));
 
-  const hookParams =
-    typeof params === 'undefined'
-      ? undefined
-      : ({
-          initialPage: safeValues.initialPage,
-          pageSize: safeValues.pageSize,
-          subject: safeValues.subject,
-          query: safeValues.query,
-        } as GetAPIKeysParams);
+  const hookParams: GetAPIKeysParams = {
+    initialPage: safeValues.initialPage,
+    pageSize: safeValues.pageSize,
+    ...(safeValues.subject ? { subject: safeValues.subject } : {}),
+    ...(safeValues.query ? { query: safeValues.query } : {}),
+  };
 
-  const isEnabled = (safeValues.enabled ?? true) && !!hookParams && clerk.loaded;
+  const isEnabled = (safeValues.enabled ?? true) && clerk.loaded;
 
   return usePagesOrInfinite<GetAPIKeysParams, ClerkPaginatedResponse<APIKeyResource>>(
-    hookParams || {},
+    hookParams,
     clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
     {
       keepPreviousData: safeValues.keepPreviousData,
