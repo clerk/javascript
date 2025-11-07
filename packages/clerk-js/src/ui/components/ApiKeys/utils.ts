@@ -26,14 +26,13 @@ export const useAPIKeysPagination = ({
 }: UseApiKeysPaginationParams) => {
   const { mutate } = useSWRConfig();
 
-  // Invalidate all cache entries for this subject
-  // SWR will automatically refetch any invalidated entries that are currently in use
+  // Invalidate all cache entries for this user or organization
   const invalidateAll = useCallback(() => {
     void mutate(key => {
       if (!key || typeof key !== 'object') {
         return false;
       }
-      // Match all apiKeys cache entries for this subject, regardless of page, pageSize, or query
+      // Match all apiKeys cache entries for this user or organization, regardless of page, pageSize, or query
       return 'type' in key && key.type === 'apiKeys' && 'subject' in key && key.subject === subject;
     });
   }, [mutate, subject]);
