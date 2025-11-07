@@ -24,7 +24,8 @@ export type FieldId =
   | 'legalAccepted'
   | 'apiKeyDescription'
   | 'apiKeyExpirationDate'
-  | 'apiKeyRevokeConfirmation';
+  | 'apiKeyRevokeConfirmation'
+  | 'apiKeySecret';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

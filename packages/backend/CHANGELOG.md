@@ -1,5 +1,32 @@
 # Change Log
 
+## 2.20.0
+
+### Minor Changes
+
+- Fixed API keys `list` method return type ([#7162](https://github.com/clerk/javascript/pull/7162)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  const apiKeys = await clerkClient.apiKeys.list({ subject: 'user_xxxxx' });
+
+  apiKeys.data;
+  apiKeys.totalCount;
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+  - @clerk/types@4.97.2
+
+## 2.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+
 ## 2.19.2
 
 ### Patch Changes

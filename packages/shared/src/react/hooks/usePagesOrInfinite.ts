@@ -98,6 +98,11 @@ const cachingSWROptions = {
   focusThrottleInterval: 1000 * 60 * 2,
 } satisfies Parameters<typeof useSWR>[2];
 
+const cachingSWRInfiniteOptions = {
+  ...cachingSWROptions,
+  revalidateFirstPage: false,
+} satisfies Parameters<typeof useSWRInfinite>[2];
+
 type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? ElementType : never;
 type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
 
@@ -249,7 +254,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       // @ts-ignore - fetcher expects Params subset; narrowing at call-site
       return fetcher?.(requestParams);
     },
-    cachingSWROptions,
+    cachingSWRInfiniteOptions,
   );
 
   const page = useMemo(() => {

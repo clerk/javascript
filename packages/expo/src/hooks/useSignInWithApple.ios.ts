@@ -1,7 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
-import * as AppleAuthentication from 'expo-apple-authentication';
-import * as Crypto from 'expo-crypto';
 
 import { errorThrower } from '../utils/errors';
 
@@ -67,6 +65,19 @@ export function useSignInWithApple() {
         signUp,
         setActive,
       };
+    }
+
+    // Dynamically import expo-apple-authentication only when needed
+    let AppleAuthentication;
+    let Crypto;
+
+    try {
+      [AppleAuthentication, Crypto] = await Promise.all([import('expo-apple-authentication'), import('expo-crypto')]);
+    } catch {
+      return errorThrower.throw(
+        'expo-apple-authentication is required to use Sign in with Apple. ' +
+          'Please install it by running: npx expo install expo-apple-authentication expo-crypto',
+      );
     }
 
     // Check if Apple Authentication is available on the device
