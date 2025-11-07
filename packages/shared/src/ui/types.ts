@@ -1,29 +1,39 @@
-/**
- * UI-related types and utilities
- */
+import type { Appearance, Clerk, ClerkOptions, EnvironmentResource } from '../types';
 
-// Placeholder - Add UI-specific types and utilities here
 export type UIVersion = string;
 
-// TODO: replace with a proper interface
-export type MountComponentRenderer = (
-  clerk: any,
-  environment: any,
-  options: any,
-) => {
-  ensureMounted: (options?: { preloadHint?: string }) => Promise<{
-    mountImpersonationFab: () => void;
-    updateProps: (props: any) => void;
-    openModal: (name: string, props: any) => void;
-    closeModal: (name: string) => void;
-    openDrawer: (name: string, props: any) => void;
-    closeDrawer: (name: string) => void;
-    mountComponent: (config: any) => void;
-    unmountComponent: (config: any) => void;
-    prefetch: (name: string) => void;
-  }>;
+export type ComponentControls = {
+  mountComponent: (params: { appearanceKey: string; name: string; node: HTMLDivElement; props?: any }) => void;
+  unmountComponent: (params: { node: HTMLDivElement }) => void;
+  updateProps: (params: {
+    appearance?: Appearance | undefined;
+    options?: ClerkOptions | undefined;
+    node?: HTMLDivElement;
+    props?: unknown;
+  }) => void;
+  openModal: (modal: string, props?: any) => void;
+  closeModal: (modal: string, options?: { notify?: boolean }) => void;
+  openDrawer: (drawer: string, props?: any) => void;
+  closeDrawer: (drawer: string, options?: { notify?: boolean }) => void;
+  prefetch: (component: 'organizationSwitcher') => void;
+  mountImpersonationFab: () => void;
 };
 
-export interface ClerkUiEntry {
-  resolve: () => Promise<MountComponentRenderer>;
+// Instance shape that the class will implement
+export interface ClerkUiInstance {
+  version: string;
+  ensureMounted: (opts?: { preloadHint?: string }) => Promise<ComponentControls>;
 }
+
+// Constructor type
+export interface ClerkUiConstructor {
+  new (
+    getClerk: () => Clerk,
+    getEnvironment: () => EnvironmentResource | null | undefined,
+    options: ClerkOptions,
+    importModule: (module: string) => Promise<any>,
+  ): ClerkUiInstance;
+  version: string;
+}
+
+export type ClerkUi = ClerkUiInstance;

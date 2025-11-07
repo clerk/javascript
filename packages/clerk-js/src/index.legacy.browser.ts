@@ -7,11 +7,6 @@ import 'regenerator-runtime/runtime';
 
 import { Clerk } from './core/clerk';
 
-// Load UI components from window (injected by @clerk/ui browser bundle)
-if (window.__unstable_ClerkUi) {
-  Clerk.mountComponentRenderer = window.__unstable_ClerkUi.mountComponentRenderer;
-}
-
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||
   window.__clerk_publishable_key ||
@@ -29,7 +24,6 @@ const domain =
 if (!window.Clerk) {
   window.Clerk = new Clerk(publishableKey, {
     proxyUrl,
-    // @ts-expect-error
     domain,
   });
 }

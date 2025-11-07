@@ -50,12 +50,15 @@ import { buildVirtualRouterUrl } from './utils/buildVirtualRouterUrl';
 import { disambiguateRedirectOptions } from './utils/disambiguateRedirectOptions';
 import { extractCssLayerNameFromAppearance } from './utils/extractCssLayerNameFromAppearance';
 
+// Re-export for ClerkUi
+export { extractCssLayerNameFromAppearance };
+
 /**
  * Avoid importing from `@clerk/shared/react` to prevent extra dependencies being added to the bundle.
  */
 const useSafeLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
-const ROOT_ELEMENT_ID = 'clerk-components';
+export const ROOT_ELEMENT_ID = 'clerk-components';
 
 export type ComponentControls = {
   mountComponent: (params: {
@@ -138,8 +141,8 @@ interface HtmlNodeOptions {
 }
 
 interface ComponentsProps {
-  clerk: Clerk;
-  environment: EnvironmentResource;
+  getClerk: () => Clerk;
+  getEnvironment: () => EnvironmentResource | null | undefined;
   options: ClerkOptions;
   onComponentsMounted: () => void;
 }
@@ -181,7 +184,11 @@ function assertDOMElement(element: HTMLElement): asserts element {
   }
 }
 
-export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentResource, _options: ClerkOptions) => {
+export const mountComponentRenderer = (
+  getClerk: () => Clerk,
+  getEnvironment: () => EnvironmentResource | null | undefined,
+  _options: ClerkOptions,
+) => {
   const options = { ..._options };
   // Extract cssLayerName from baseTheme if present and move it to appearance level
   if (options.appearance) {
@@ -215,8 +222,8 @@ export const mountComponentRenderer = (clerk: Clerk, environment: EnvironmentRes
         componentsControlsResolver = import('./lazyModules/common').then(({ createRoot }) => {
           createRoot(clerkRoot).render(
             <Components
-              clerk={clerk}
-              environment={environment}
+              getClerk={getClerk}
+              getEnvironment={getEnvironment}
               options={options}
               onComponentsMounted={deferredPromise.resolve}
             />,
@@ -568,8 +575,8 @@ const Components = (props: ComponentsProps) => {
   return (
     <Suspense fallback={''}>
       <LazyProviders
-        clerk={props.clerk}
-        environment={props.environment}
+        clerk={props.getClerk()}
+        environment={props.getEnvironment()}
         options={state.options}
       >
         {[...nodes].map(([node, component]) => {

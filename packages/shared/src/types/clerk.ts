@@ -1,4 +1,4 @@
-import type { ClerkUiEntry } from '../ui/types';
+import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -1037,7 +1037,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Clerk UI entrypoint.
      */
-    clerkUiEntry?: ClerkUiEntry;
+    clerkUiCtor?: Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */

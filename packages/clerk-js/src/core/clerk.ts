@@ -116,7 +116,7 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/shared/types';
-import type { ClerkUiEntry, MountComponentRenderer } from '@clerk/shared/ui/index';
+import type { ClerkUi } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 
@@ -233,8 +233,7 @@ export class Clerk implements ClerkInterface {
   #authService?: AuthCookieService;
   #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: BroadcastChannel | null = null;
-  #clerkUiEntry?: ClerkUiEntry;
-  #componentRenderer: ReturnType<MountComponentRenderer> | undefined;
+  #clerkUi?: Promise<ClerkUi>;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
@@ -357,22 +356,6 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
-  #componentControls({ preloadHint }: { preloadHint?: string } = {}) {
-    if (!this.#clerkUiEntry) {
-      throw new Error('Clerk was loaded without Ui Components.');
-    }
-
-    return this.#clerkUiEntry
-      .resolve()
-      .then(mountComponentRenderer => {
-        if (!this.#componentRenderer) {
-          this.#componentRenderer = mountComponentRenderer(this, this.environment, this.#options);
-        }
-        return this.#componentRenderer;
-      })
-      .then(e => e.ensureMounted({ preloadHint }));
-  }
-
   __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
     if (!this._checkout) {
       this._checkout = params => createCheckoutInstance(this, params);
@@ -433,10 +416,6 @@ export class Clerk implements ClerkInterface {
   public getFapiClient = (): FapiClient => this.#fapiClient;
 
   public load = async (options?: ClerkOptions): Promise<void> => {
-    if (options?.clerkUiEntry) {
-      this.#clerkUiEntry = options.clerkUiEntry;
-    }
-
     debugLogger.info('load() start', {}, 'clerk');
     if (this.loaded) {
       return;
@@ -450,6 +429,19 @@ export class Clerk implements ClerkInterface {
     }
 
     this.#options = this.#initOptions(options);
+
+    // Initialize ClerkUi if it was provided
+    if (this.#options.clerkUiCtor) {
+      this.#clerkUi = this.#options.clerkUiCtor.then(
+        ClerkUI =>
+          new ClerkUI(
+            () => this,
+            () => this.environment,
+            this.#options,
+            (module: string) => import(module),
+          ),
+      );
+    }
 
     // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided
     if (
@@ -620,16 +612,15 @@ export class Clerk implements ClerkInterface {
   };
 
   public openGoogleOneTap = (props?: GoogleOneTapProps): void => {
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'GoogleOneTap';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.openModal('googleOneTap', props || {}),
-    );
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('googleOneTap', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened(component, props));
   };
 
   public closeGoogleOneTap = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('googleOneTap'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('googleOneTap'));
   };
 
   public openSignIn = (props?: SignInProps): void => {
@@ -641,17 +632,16 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'SignIn';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.openModal('signIn', props || {}),
-    );
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signIn', props || {}));
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
     this.telemetry?.record(eventPrebuiltComponentOpened(component, props, additionalData));
   };
 
   public closeSignIn = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('signIn'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('signIn'));
   };
 
   public __internal_openCheckout = (props?: __internal_CheckoutProps): void => {
@@ -672,13 +662,12 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    void this.#componentControls({ preloadHint: 'Checkout' }).then(controls =>
-      controls.openDrawer('checkout', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openDrawer('checkout', props || {}));
   };
 
   public __internal_closeCheckout = (): void => {
-    void this.#componentControls().then(controls => controls.closeDrawer('checkout'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeDrawer('checkout'));
   };
 
   public __internal_openPlanDetails = (props: __internal_PlanDetailsProps): void => {
@@ -690,26 +679,26 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'PlanDetails';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.openDrawer('planDetails', props || {}),
-    );
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openDrawer('planDetails', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened(component, props));
   };
 
   public __internal_closePlanDetails = (): void => {
-    void this.#componentControls().then(controls => controls.closeDrawer('planDetails'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeDrawer('planDetails'));
   };
 
   public __internal_openSubscriptionDetails = (props?: __internal_SubscriptionDetailsProps): void => {
-    void this.#componentControls({ preloadHint: 'SubscriptionDetails' }).then(controls =>
-      controls.openDrawer('subscriptionDetails', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls => controls.openDrawer('subscriptionDetails', props || {}));
   };
 
   public __internal_closeSubscriptionDetails = (): void => {
-    void this.#componentControls().then(controls => controls.closeDrawer('subscriptionDetails'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeDrawer('subscriptionDetails'));
   };
 
   public __internal_openReverification = (props?: __internal_UserVerificationModalProps): void => {
@@ -721,27 +710,26 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'UserVerification' }).then(controls =>
-      controls.openModal('userVerification', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls => controls.openModal('userVerification', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened(`UserVerification`, props));
   };
 
   public __internal_closeReverification = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('userVerification'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('userVerification'));
   };
 
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
-    return this.#componentControls({ preloadHint: 'BlankCaptchaModal' }).then(controls =>
-      controls.openModal('blankCaptcha', {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    return this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('blankCaptcha', {}));
   };
 
   public __internal_closeBlankCaptchaModal = (): Promise<unknown> => {
-    return this.#componentControls({ preloadHint: 'BlankCaptchaModal' }).then(controls =>
-      controls.closeModal('blankCaptcha'),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    return this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('blankCaptcha'));
   };
 
   public __internal_loadStripeJs = async () => {
@@ -763,13 +751,14 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'SignUp' }).then(controls => controls.openModal('signUp', props || {}));
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('signUp', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('SignUp', props));
   };
 
   public closeSignUp = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('signUp'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('signUp'));
   };
 
   public openUserProfile = (props?: UserProfileProps): void => {
@@ -781,16 +770,15 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'UserProfile' }).then(controls =>
-      controls.openModal('userProfile', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('userProfile', props || {}));
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentOpened('UserProfile', props, additionalData));
   };
 
   public closeUserProfile = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('userProfile'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('userProfile'));
   };
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
@@ -810,15 +798,16 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'OrganizationProfile' }).then(controls =>
-      controls.openModal('organizationProfile', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls => controls.openModal('organizationProfile', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('OrganizationProfile', props));
   };
 
   public closeOrganizationProfile = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('organizationProfile'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('organizationProfile'));
   };
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
@@ -830,94 +819,91 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'CreateOrganization' }).then(controls =>
-      controls.openModal('createOrganization', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls => controls.openModal('createOrganization', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('CreateOrganization', props));
   };
 
   public closeCreateOrganization = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('createOrganization'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('createOrganization'));
   };
 
   public openWaitlist = (props?: WaitlistProps): void => {
-    void this.#componentControls({ preloadHint: 'Waitlist' }).then(controls =>
-      controls.openModal('waitlist', props || {}),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('waitlist', props || {}));
 
     this.telemetry?.record(eventPrebuiltComponentOpened('Waitlist', props));
   };
 
   public closeWaitlist = (): void => {
-    void this.#componentControls().then(controls => controls.closeModal('waitlist'));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('waitlist'));
   };
 
   public mountSignIn = (node: HTMLDivElement, props?: SignInProps): void => {
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'SignIn';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.mountComponent({
-        name: component,
-        appearanceKey: 'signIn',
-        node,
-        props,
-      }),
-    );
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'signIn',
+          node,
+          props,
+        }),
+      );
 
     const additionalData = { withSignUp: props?.withSignUp ?? this.#isCombinedSignInOrUpFlow() };
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData));
   };
 
   public unmountSignIn = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps): void => {
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'UserAvatar';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.mountComponent({
-        name: component,
-        appearanceKey: 'userAvatar',
-        node,
-        props,
-      }),
-    );
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'userAvatar',
+          node,
+          props,
+        }),
+      );
 
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountUserAvatar = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'SignUp';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.mountComponent({
-        name: component,
-        appearanceKey: 'signUp',
-        node,
-        props,
-      }),
-    );
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'signUp',
+          node,
+          props,
+        }),
+      );
 
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountSignUp = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountUserProfile = (node: HTMLDivElement, props?: UserProfileProps): void => {
@@ -929,26 +915,25 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    this.assertComponentsReady(this.#clerkUi);
     const component = 'UserProfile';
-    void this.#componentControls({ preloadHint: component }).then(controls =>
-      controls.mountComponent({
-        name: component,
-        appearanceKey: 'userProfile',
-        node,
-        props,
-      }),
-    );
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'userProfile',
+          node,
+          props,
+        }),
+      );
 
     const additionalData = (props?.customPages?.length || 0) > 0 ? { customPages: true } : undefined;
     this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData));
   };
 
   public unmountUserProfile = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
@@ -969,24 +954,24 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'OrganizationProfile' }).then(controls =>
-      controls.mountComponent({
-        name: 'OrganizationProfile',
-        appearanceKey: 'userProfile',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'OrganizationProfile';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'userProfile',
+          node,
+          props,
+        }),
+      );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('OrganizationProfile', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountOrganizationProfile = (node: HTMLDivElement) => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
@@ -998,24 +983,24 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'CreateOrganization' }).then(controls =>
-      controls.mountComponent({
-        name: 'CreateOrganization',
-        appearanceKey: 'createOrganization',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'CreateOrganization';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'createOrganization',
+          node,
+          props,
+        }),
+      );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('CreateOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountCreateOrganization = (node: HTMLDivElement) => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
@@ -1027,17 +1012,21 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
-      controls.mountComponent({
-        name: 'OrganizationSwitcher',
-        appearanceKey: 'organizationSwitcher',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'OrganizationSwitcher';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'organizationSwitcher',
+          node,
+          props,
+        }),
+      );
 
     this.telemetry?.record(
-      eventPrebuiltComponentMounted('OrganizationSwitcher', {
+      eventPrebuiltComponentMounted(component, {
         ...props,
         forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
       }),
@@ -1045,13 +1034,12 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountOrganizationSwitcher = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public __experimental_prefetchOrganizationSwitcher = () => {
-    void this.#componentControls({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
-      controls.prefetch('organizationSwitcher'),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.prefetch('organizationSwitcher'));
   };
 
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
@@ -1063,17 +1051,21 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    void this.#componentControls({ preloadHint: 'OrganizationList' }).then(controls =>
-      controls.mountComponent({
-        name: 'OrganizationList',
-        appearanceKey: 'organizationList',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'OrganizationList';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'organizationList',
+          node,
+          props,
+        }),
+      );
 
     this.telemetry?.record(
-      eventPrebuiltComponentMounted('OrganizationList', {
+      eventPrebuiltComponentMounted(component, {
         ...props,
         forceOrganizationSelection: this.environment?.organizationSettings.forceOrganizationSelection,
       }),
@@ -1081,46 +1073,54 @@ export class Clerk implements ClerkInterface {
   };
 
   public unmountOrganizationList = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountUserButton = (node: HTMLDivElement, props?: UserButtonProps) => {
-    void this.#componentControls({ preloadHint: 'UserButton' }).then(controls =>
-      controls.mountComponent({
-        name: 'UserButton',
-        appearanceKey: 'userButton',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'UserButton';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'userButton',
+          node,
+          props,
+        }),
+      );
 
     const additionalData = {
       ...(props?.customMenuItems?.length || 0 > 0 ? { customItems: true } : undefined),
       ...(props?.__experimental_asStandalone ? { standalone: true } : undefined),
     };
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('UserButton', props, additionalData));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props, additionalData));
   };
 
   public unmountUserButton = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountWaitlist = (node: HTMLDivElement, props?: WaitlistProps) => {
-    void this.#componentControls({ preloadHint: 'Waitlist' }).then(controls =>
-      controls.mountComponent({
-        name: 'Waitlist',
-        appearanceKey: 'waitlist',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'Waitlist';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'waitlist',
+          node,
+          props,
+        }),
+      );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('Waitlist', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountWaitlist = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountPricingTable = (node: HTMLDivElement, props?: PricingTableProps): void => {
@@ -1140,39 +1140,43 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    void this.#componentControls({ preloadHint: 'PricingTable' }).then(controls =>
-      controls.mountComponent({
-        name: 'PricingTable',
-        appearanceKey: 'pricingTable',
-        node,
-        props: nextProps,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'PricingTable';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'pricingTable',
+          node,
+          props: nextProps,
+        }),
+      );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', nextProps));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, nextProps));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
-    void this.#componentControls().then(controls =>
-      controls.unmountComponent({
-        node,
-      }),
-    );
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public __internal_mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
-    void this.#componentControls({ preloadHint: 'OAuthConsent' }).then(controls =>
-      controls.mountComponent({
-        name: 'OAuthConsent',
-        appearanceKey: '__internal_oauthConsent',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'OAuthConsent';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: '__internal_oauthConsent',
+          node,
+          props,
+        }),
+      );
   };
 
   public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -1203,16 +1207,20 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    void this.#componentControls({ preloadHint: 'APIKeys' }).then(controls =>
-      controls.mountComponent({
-        name: 'APIKeys',
-        appearanceKey: 'apiKeys',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'APIKeys';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'apiKeys',
+          node,
+          props,
+        }),
+      );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('APIKeys', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   /**
@@ -1224,7 +1232,7 @@ export class Clerk implements ClerkInterface {
    * @param targetNode Target node to unmount the ApiKeys component from.
    */
   public unmountApiKeys = (node: HTMLDivElement) => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
@@ -1237,20 +1245,24 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    void this.#componentControls({ preloadHint: 'TaskChooseOrganization' }).then(controls =>
-      controls.mountComponent({
-        name: 'TaskChooseOrganization',
-        appearanceKey: 'taskChooseOrganization',
-        node,
-        props,
-      }),
-    );
+    this.assertComponentsReady(this.#clerkUi);
+    const component = 'TaskChooseOrganization';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'taskChooseOrganization',
+          node,
+          props,
+        }),
+      );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('TaskChooseOrganization', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountTaskChooseOrganization = (node: HTMLDivElement) => {
-    void this.#componentControls().then(controls => controls.unmountComponent({ node }));
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -2394,7 +2406,7 @@ export class Clerk implements ClerkInterface {
       options: this.#initOptions({ ...this.#options, ..._props.options }),
     };
 
-    return this.#componentRenderer?.ensureMounted().then(controls => controls.updateProps(props));
+    return this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.updateProps(props));
   };
 
   __internal_navigateWithError(to: string, err: ClerkAPIError) {
@@ -2813,23 +2825,26 @@ export class Clerk implements ClerkInterface {
     this.addListener(({ session }) => {
       const isImpersonating = !!session?.actor;
       if (isImpersonating) {
-        void this.#componentRenderer?.ensureMounted().then(controls => controls.mountImpersonationFab());
+        void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.mountImpersonationFab());
       }
     });
   };
 
   #handleKeylessPrompt = () => {
     if (this.#options.__internal_keyless_claimKeylessApplicationUrl) {
-      void this.#componentRenderer?.ensureMounted().then(controls => {
-        // TODO(@pantelis): Investigate if this resets existing props
-        controls.updateProps({
-          options: {
-            __internal_keyless_claimKeylessApplicationUrl: this.#options.__internal_keyless_claimKeylessApplicationUrl,
-            __internal_keyless_copyInstanceKeysUrl: this.#options.__internal_keyless_copyInstanceKeysUrl,
-            __internal_keyless_dismissPrompt: this.#options.__internal_keyless_dismissPrompt,
-          },
+      void this.#clerkUi
+        ?.then(ui => ui.ensureMounted())
+        .then(controls => {
+          // TODO(@pantelis): Investigate if this resets existing props
+          controls.updateProps({
+            options: {
+              __internal_keyless_claimKeylessApplicationUrl:
+                this.#options.__internal_keyless_claimKeylessApplicationUrl,
+              __internal_keyless_copyInstanceKeysUrl: this.#options.__internal_keyless_copyInstanceKeysUrl,
+              __internal_keyless_dismissPrompt: this.#options.__internal_keyless_dismissPrompt,
+            },
+          });
         });
-      });
     }
   };
 
@@ -2860,14 +2875,10 @@ export class Clerk implements ClerkInterface {
     return this.buildUrlWithAuth(url);
   };
 
-  assertComponentsReady(controls: unknown): asserts controls is ReturnType<MountComponentRenderer> {
-    return; // noop for now
-    // if (!Clerk.mountComponentRenderer) {
-    //   throw new Error('ClerkJS was loaded without UI components.');
-    // }
-    // if (!controls) {
-    //   throw new Error('ClerkJS components are not ready yet.');
-    // }
+  assertComponentsReady(val: unknown): asserts val is ClerkUi {
+    if (!val) {
+      throw new Error('Clerk was not loaded with Ui components');
+    }
   }
 
   #redirectFAPIInitiatedFlow = async (): Promise<boolean> => {

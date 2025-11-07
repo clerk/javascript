@@ -42,17 +42,17 @@ export type LoadClerkUiScriptOptions = {
  *
  * @returns `true` if window.Clerk exists and has the expected structure with a load method.
  */
-function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__unstable_ClerkUi'): boolean {
+function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__unstable_ClerkUiCtor'): boolean {
   if (typeof window === 'undefined' || !(window as any)[prop]) {
     return false;
   }
 
   // Basic validation that window.Clerk has the expected structure
   const val = (window as any)[prop];
-  return typeof val === 'object' && (val.load ? typeof val.load === 'function' : true);
+  return !!val;
 }
 const isClerkProperlyLoaded = () => isClerkGlobalProperlyLoaded('Clerk');
-const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__unstable_ClerkUi');
+const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__unstable_ClerkUiCtor');
 
 /**
  * Hotloads the Clerk JS script with robust failure detection.

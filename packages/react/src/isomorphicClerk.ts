@@ -54,7 +54,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
-import type { MountComponentRenderer } from '@clerk/shared/ui';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -82,10 +82,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __unstable_ClerkUi?: {
-    mountComponentRenderer: MountComponentRenderer;
-    version: string;
-  };
+  __unstable_ClerkUiCtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -453,19 +450,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      console.log('yo');
-
       const clerkPromise = this.loadClerkJsEntryChunk();
-      const clerkUiEntry = { resolve: () => this.loadClerkUiEntryChunk().then(a => a.mountComponentRenderer) };
+      const clerkUiCtor = this.loadClerkUiEntryChunk();
       await clerkPromise;
 
       if (!global.Clerk) {
         // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
         throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
       }
+
       if (!global.Clerk.loaded) {
         this.beforeLoad(global.Clerk);
-        await global.Clerk.load({ ...this.options, clerkUiEntry });
+        await global.Clerk.load({ ...this.options, clerkUiCtor });
       }
       if (global.Clerk.loaded) {
         this.replayInterceptedInvocations(global.Clerk);
@@ -508,10 +504,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       domain: this.domain,
       nonce: this.options.nonce,
     });
-    if (!global.__unstable_ClerkUi) {
+    if (!global.__unstable_ClerkUiCtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
-    return global.__unstable_ClerkUi;
+    return global.__unstable_ClerkUiCtor;
   }
 
   public on: Clerk['on'] = (...args) => {

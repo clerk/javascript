@@ -1,6 +1,6 @@
 import type { Clerk } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 
-import type { MountComponentRenderer } from './Components';
 declare module '*.svg' {
   const value: React.FC<React.SVGAttributes<SVGElement>>;
   export default value;
@@ -20,9 +20,6 @@ declare global {
      * Unstable API for accessing UI components separately from clerk-js.
      * This is injected by the @clerk/ui browser bundle.
      */
-    __unstable_ClerkUi?: {
-      mountComponentRenderer: MountComponentRenderer;
-      version: string;
-    };
+    __unstable_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
