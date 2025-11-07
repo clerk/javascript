@@ -42,14 +42,14 @@ export class BillingPlan extends BaseResource implements BillingPlanResource {
     this.fee = billingMoneyAmountFromJSON(data.fee);
     this.annualFee = data.annual_fee ? billingMoneyAmountFromJSON(data.annual_fee) : null;
     this.annualMonthlyFee = data.annual_monthly_fee ? billingMoneyAmountFromJSON(data.annual_monthly_fee) : null;
-    this.description = data.description ?? null;
+    this.description = data.description;
     this.isDefault = data.is_default;
     this.isRecurring = data.is_recurring;
     this.hasBaseFee = data.has_base_fee;
     this.forPayerType = data.for_payer_type;
     this.publiclyVisible = data.publicly_visible;
     this.slug = data.slug;
-    this.avatarUrl = data.avatar_url ?? null;
+    this.avatarUrl = data.avatar_url;
     this.freeTrialDays = this.withDefault(data.free_trial_days, null);
     this.freeTrialEnabled = this.withDefault(data.free_trial_enabled, false);
     this.features = (data.features || []).map(feature => new Feature(feature));

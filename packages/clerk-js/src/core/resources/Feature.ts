@@ -21,9 +21,9 @@ export class Feature extends BaseResource implements FeatureResource {
 
     this.id = data.id;
     this.name = data.name;
-    this.description = data.description ?? null;
+    this.description = data.description;
     this.slug = data.slug;
-    this.avatarUrl = data.avatar_url ?? null;
+    this.avatarUrl = data.avatar_url;
 
     return this;
   }

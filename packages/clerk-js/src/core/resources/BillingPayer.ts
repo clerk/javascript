@@ -34,12 +34,12 @@ export class BillingPayer extends BaseResource implements BillingPayerResource {
       this.updatedAt = unixEpochToDate(data.updated_at);
     }
     this.imageUrl = data.image_url;
-    this.userId = data.user_id ?? null;
-    this.email = data.email ?? null;
-    this.firstName = data.first_name ?? null;
-    this.lastName = data.last_name ?? null;
-    this.organizationId = data.organization_id ?? null;
-    this.organizationName = data.organization_name ?? null;
+    this.userId = data.user_id;
+    this.email = data.email;
+    this.firstName = data.first_name;
+    this.lastName = data.last_name;
+    this.organizationId = data.organization_id;
+    this.organizationName = data.organization_name;
     return this;
   }
 }

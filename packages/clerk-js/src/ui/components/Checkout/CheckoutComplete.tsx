@@ -1,5 +1,4 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
@@ -12,26 +11,8 @@ import { transitionDurationValues, transitionTiming } from '../../foundations/tr
 import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
 
-const capitalize = (name?: string | null, fallback = '') => {
-  if (!name) {
-    return fallback;
-  }
+const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
-  return name.charAt(0).toUpperCase() + name.slice(1);
-};
-
-const formatPaymentMethodLabel = (method: BillingPaymentMethodResource) => {
-  const paymentType = method.paymentType ?? 'card';
-
-  if (paymentType !== 'card') {
-    return capitalize(paymentType, 'Payment');
-  }
-
-  const brand = capitalize(method.cardType, 'Card');
-  const suffix = method.last4 ? ` ⋯ ${method.last4}` : '';
-
-  return `${brand}${suffix}`;
-};
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
 const SuccessRing = ({ positionX, positionY }: { positionX: number; positionY: number }) => {
@@ -351,7 +332,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : totals.totalDueNow
+                  : totals.totalDueNow.amount > 0
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -406,7 +387,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                totals.totalDueNow
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
@@ -438,13 +419,7 @@ export const CheckoutComplete = () => {
         <LineItems.Root>
           <LineItems.Group variant='secondary'>
             <LineItems.Title title={localizationKeys('billing.checkout.lineItems.title__totalPaid')} />
-            <LineItems.Description
-              text={
-                totals.totalDueNow
-                  ? `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`
-                  : `${totals.grandTotal.currencySymbol}0.00`
-              }
-            />
+            <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
 
           {freeTrialEndsAt ? (
@@ -456,16 +431,23 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                totals.totalDueNow || freeTrialEndsAt !== null
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
+
             <LineItems.Description
               text={
-                totals.totalDueNow || freeTrialEndsAt !== null
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? paymentMethod
-                    ? formatPaymentMethodLabel(paymentMethod)
+                    ? paymentMethod.paymentType !== 'card'
+                      ? paymentMethod.paymentType
+                        ? `${capitalize(paymentMethod.paymentType)}`
+                        : '–'
+                      : paymentMethod.cardType
+                        ? `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
+                        : '–'
                     : '–'
                   : planPeriodStart
                     ? formatDate(new Date(planPeriodStart))
