@@ -38,13 +38,24 @@ export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.enabled;
 };
 
-export const canViewOrManageAPIKeys: ComponentGuard = clerk => {
-  if (!clerk.session) {
-    return false;
-  }
+export const disabledUserAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.user_api_keys_enabled || !environment?.apiKeysSettings?.show_in_user_profile;
+};
 
-  return (
-    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:read' }) ||
-    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:manage' })
-  );
+export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.orgs_api_keys_enabled || !environment?.apiKeysSettings?.show_in_org_profile;
+};
+
+/**
+ * For standalone <APIKeys /> component - only checks if user API keys are enabled (not show_in_profile)
+ */
+export const disabledUserAPIKeysStandaloneFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.user_api_keys_enabled;
+};
+
+/**
+ * For standalone <APIKeys /> component - checks if org API keys are enabled (not show_in_profile)
+ */
+export const disabledOrganizationAPIKeysStandaloneFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.orgs_api_keys_enabled;
 };

@@ -102,14 +102,14 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
   disabledAllBillingFeatures,
-  disabledAPIKeysFeature,
+  disabledOrganizationAPIKeysStandaloneFeature,
   disabledOrganizationsFeature,
+  disabledUserAPIKeysStandaloneFeature,
   errorThrower,
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -1233,22 +1233,24 @@ export class Clerk implements ClerkInterface {
 
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
-    if (disabledAPIKeysFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
-          code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
-        });
+    if (this.organization) {
+      if (disabledOrganizationAPIKeysStandaloneFeature(this, this.environment)) {
+        if (this.#instanceType === 'development') {
+          throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
+            code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+          });
+        }
+        return;
       }
-      return;
-    }
-
-    if (this.organization && !canViewOrManageAPIKeys(this)) {
-      if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
-          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
-        });
+    } else {
+      if (disabledUserAPIKeysStandaloneFeature(this, this.environment)) {
+        if (this.#instanceType === 'development') {
+          throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
+            code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
+          });
+        }
+        return;
       }
-      return;
     }
 
     void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>

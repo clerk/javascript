@@ -117,7 +117,7 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         ) : null}
-        {apiKeysSettings.enabled && (
+        {apiKeysSettings.orgs_api_keys_enabled && apiKeysSettings.show_in_org_profile && (
           <Protect
             condition={has =>
               has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })

@@ -108,7 +108,7 @@ export const UserProfileRoutes = () => {
             </Switch>
           </Route>
         ) : null}
-        {apiKeysSettings.enabled && (
+        {apiKeysSettings.user_api_keys_enabled && apiKeysSettings.show_in_user_profile && (
           <Route path={isAPIKeysPageRoot ? undefined : 'api-keys'}>
             <Switch>
               <Route index>
