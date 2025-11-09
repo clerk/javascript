@@ -672,9 +672,53 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         await u.po.userProfile.waitForMounted();
         await u.po.userProfile.switchToBillingTab();
 
-        await u.po.userProfile.openBillingStatementsTab();
-        await u.po.userProfile.waitForBillingTableRows();
-        await expect(u.po.userProfile.getBillingEmptyStateMessage('No statements to display')).toBeVisible();
+        const openBillingTab = async (label: RegExp) => {
+          await page.getByRole('tab', { name: label }).click();
+          await page
+            .locator('.cl-userProfile-root [role="tabpanel"] .cl-table')
+            .waitFor({ state: 'visible', timeout: 15000 });
+        };
+        const getBillingTableRows = () => {
+          return page.locator('.cl-userProfile-root .cl-tableBody .cl-tableRow');
+        };
+        const waitForBillingTableRows = async (options?: { hasText?: string | RegExp }) => {
+          const rows = getBillingTableRows();
+          if (options?.hasText) {
+            await rows
+              .filter({
+                hasText: options.hasText,
+              })
+              .first()
+              .waitFor({ state: 'visible', timeout: 15000 });
+          } else {
+            await rows.first().waitFor({ state: 'visible', timeout: 15000 });
+          }
+          return rows;
+        };
+        const getBillingEmptyStateMessage = (text: string | RegExp) => {
+          return page.locator('.cl-userProfile-root .cl-table').getByText(text);
+        };
+        const waitForStatementPage = async () => {
+          const statementRoot = page.locator('.cl-statementRoot');
+          await statementRoot.waitFor({ state: 'visible', timeout: 15000 });
+          return statementRoot;
+        };
+        const waitForPaymentAttemptPage = async () => {
+          const paymentAttemptRoot = page.locator('.cl-paymentAttemptRoot');
+          await paymentAttemptRoot.waitFor({ state: 'visible', timeout: 15000 });
+          return paymentAttemptRoot;
+        };
+        const goBackToPaymentsList = async () => {
+          const paymentAttemptRoot = page.locator('.cl-paymentAttemptRoot');
+          await Promise.all([
+            page.waitForURL(/tab=payments/, { timeout: 15000 }),
+            page.getByRole('link', { name: /Payments/i }).click(),
+          ]);
+          await paymentAttemptRoot.waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
+        };
+
+        await openBillingTab(/Statements/i);
+        await expect(getBillingEmptyStateMessage('No statements to display')).toBeVisible();
 
         await u.po.page.goToRelative('/user');
         await u.po.userProfile.waitForMounted();
@@ -711,49 +755,56 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         await u.po.userProfile.waitForMounted();
         await u.po.userProfile.switchToBillingTab();
 
-        await u.po.userProfile.openBillingStatementsTab();
+        await openBillingTab(/Statements/i);
         const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-        await u.po.userProfile.waitForBillingTableRows({ hasText: new RegExp(date, 'i') });
-        // await u.po.userProfile.waitForBillingTableRows();
-        await expect(u.po.userProfile.getBillingEmptyStateMessage('No statements to display')).toBeHidden();
+        await waitForBillingTableRows({ hasText: new RegExp(date, 'i') });
+        await expect(getBillingEmptyStateMessage('No statements to display')).toBeHidden();
 
-        const firstStatementRow = u.po.userProfile.getActiveBillingTableRows().first();
+        const firstStatementRow = getBillingTableRows().first();
         await firstStatementRow.click();
 
-        await u.po.statement.waitForMounted();
-        await expect(u.po.statement.getPlanLineItems().filter({ hasText: /Plus/i }).first()).toBeVisible();
+        const statementRoot = await waitForStatementPage();
+        await expect(
+          statementRoot.locator('.cl-statementSectionContentDetailsHeaderTitle').filter({ hasText: /Plus/i }).first(),
+        ).toBeVisible();
 
-        const statementTotalText = (await u.po.statement.getTotalPaidValue().textContent())?.trim();
+        const statementTotalText = (await statementRoot.locator('.cl-statementFooterValue').textContent())?.trim();
         expect(statementTotalText).toBeTruthy();
 
-        await u.po.statement.clickViewPaymentButton();
-        await u.po.paymentAttempt.waitForMounted();
-        await expect(u.po.paymentAttempt.getStatusBadge()).toHaveText(/paid/i);
+        await statementRoot
+          .getByRole('button', { name: /View payment/i })
+          .first()
+          .click();
+        const paymentAttemptRoot = await waitForPaymentAttemptPage();
+        await expect(paymentAttemptRoot.locator('.cl-paymentAttemptHeaderBadge')).toHaveText(/paid/i);
 
-        const paymentTotalText = (await u.po.paymentAttempt.getTotalAmount().textContent())?.trim();
+        const paymentTotalText = (
+          await paymentAttemptRoot.locator('.cl-paymentAttemptFooterValue').textContent()
+        )?.trim();
         expect(paymentTotalText).toBe(statementTotalText);
 
-        await expect(u.po.paymentAttempt.getLineItemTitles().filter({ hasText: /Plus/i }).first()).toBeVisible();
+        await expect(
+          paymentAttemptRoot.locator('.cl-lineItemsTitle').filter({ hasText: /Plus/i }).first(),
+        ).toBeVisible();
 
-        await u.po.paymentAttempt.goBackToPaymentsList();
-        await u.po.userProfile.waitForMounted();
-        await u.po.userProfile.waitForBillingTableRows({ hasText: /paid/i });
+        await goBackToPaymentsList();
+        await openBillingTab(/Payments/i);
+        await waitForBillingTableRows({ hasText: /paid/i });
+        await waitForBillingTableRows({ hasText: /Failed/i });
+        await expect(getBillingEmptyStateMessage('No payment history')).toBeHidden();
 
-        await u.po.userProfile.openBillingPaymentsTab();
-        await u.po.userProfile.waitForBillingTableRows({ hasText: /Failed/i });
-        await expect(u.po.userProfile.getBillingEmptyStateMessage('No payment history')).toBeHidden();
-
-        const failedPaymentRow = u.po.userProfile
-          .getActiveBillingTableRows()
+        const failedPaymentRow = getBillingTableRows()
           .filter({ hasText: /Failed/i })
           .first();
         await failedPaymentRow.click();
 
-        await u.po.paymentAttempt.waitForMounted();
-        await expect(u.po.paymentAttempt.getStatusBadge()).toHaveText(/failed/i);
-        await expect(u.po.paymentAttempt.getLineItemTitles().filter({ hasText: /Pro/i }).first()).toBeVisible();
+        const failedPaymentAttemptRoot = await waitForPaymentAttemptPage();
+        await expect(failedPaymentAttemptRoot.locator('.cl-paymentAttemptHeaderBadge')).toHaveText(/failed/i);
+        await expect(
+          failedPaymentAttemptRoot.locator('.cl-lineItemsTitle').filter({ hasText: /Pro/i }).first(),
+        ).toBeVisible();
 
-        await u.po.paymentAttempt.goBackToPaymentsList();
+        await goBackToPaymentsList();
       } finally {
         await fakeUser.deleteIfExists();
       }
