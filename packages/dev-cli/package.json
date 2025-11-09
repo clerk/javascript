@@ -24,7 +24,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "commander": "^14.0.1",
+    "commander": "^14.0.2",
     "concurrently": "^9.2.1",
     "dotenv": "^17.2.3",
     "globby": "^14.1.0",
