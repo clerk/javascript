@@ -34,16 +34,16 @@ export const disabledAllBillingFeatures: ComponentGuard = (_, environment) => {
   return disabledUserBillingFeature(_, environment) && disabledOrganizationBillingFeature(_, environment);
 };
 
-export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings?.enabled;
-};
-
 export const disabledUserAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.user_api_keys_enabled;
 };
 
 export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.orgs_api_keys_enabled;
+};
+
+export const disabledAllAPIKeysFeatures: ComponentGuard = (_, environment) => {
+  return disabledUserAPIKeysFeature(_, environment) && disabledOrganizationAPIKeysFeature(_, environment);
 };
 
 export const disabledUserProfileAPIKeysFeature: ComponentGuard = (_, environment) => {

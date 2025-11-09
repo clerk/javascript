@@ -106,6 +106,7 @@ import {
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
@@ -179,6 +180,7 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
+const CANNOT_RENDER_API_KEYS_USER_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_user_unauthorized';
 const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
 const defaultOptions: ClerkOptions = {
   polling: true,
@@ -1233,24 +1235,31 @@ export class Clerk implements ClerkInterface {
 
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
-    if (this.organization) {
-      if (disabledOrganizationAPIKeysFeature(this, this.environment)) {
-        if (this.#instanceType === 'development') {
-          throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
-            code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
-          });
-        }
-        return;
+    if (disabledAllAPIKeysFeatures(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
+          code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
+        });
       }
-    } else {
-      if (disabledUserAPIKeysFeature(this, this.environment)) {
-        if (this.#instanceType === 'development') {
-          throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
-            code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
-          });
-        }
-        return;
+      return;
+    }
+
+    if (this.organization && disabledOrganizationAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
+          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        });
       }
+      return;
+    }
+
+    if (disabledUserAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
+          code: CANNOT_RENDER_API_KEYS_USER_UNAUTHORIZED_ERROR_CODE,
+        });
+      }
+      return;
     }
 
     void this.#componentControls.ensureMounted({ preloadHint: 'APIKeys' }).then(controls =>
