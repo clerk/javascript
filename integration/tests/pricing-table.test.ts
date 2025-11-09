@@ -714,7 +714,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
             page.waitForURL(/tab=payments/, { timeout: 15000 }),
             page.getByRole('link', { name: /Payments/i }).click(),
           ]);
-          await paymentAttemptRoot.waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
+          await paymentAttemptRoot.waitFor({ state: 'detached', timeout: 15000 });
         };
 
         await openBillingTab(/Statements/i);
