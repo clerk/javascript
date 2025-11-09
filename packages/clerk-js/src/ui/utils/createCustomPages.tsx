@@ -1,10 +1,10 @@
 import type { CustomPage, EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
 
 import {
-  disabledOrganizationAPIKeysFeature,
   disabledOrganizationBillingFeature,
-  disabledUserAPIKeysFeature,
+  disabledOrganizationProfileAPIKeysFeature,
   disabledUserBillingFeature,
+  disabledUserProfileAPIKeysFeature,
   isValidUrl,
 } from '../../utils';
 import { ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID, USER_PROFILE_NAVBAR_ROUTE_ID } from '../constants';
@@ -105,8 +105,8 @@ const createCustomPages = (
       ? !disabledOrganizationBillingFeature(clerk, environment) && shouldShowBilling
       : !disabledUserBillingFeature(clerk, environment) && shouldShowBilling,
     apiKeys: organization
-      ? !disabledOrganizationAPIKeysFeature(clerk, environment)
-      : !disabledUserAPIKeysFeature(clerk, environment),
+      ? !disabledOrganizationProfileAPIKeysFeature(clerk, environment)
+      : !disabledUserProfileAPIKeysFeature(clerk, environment),
   });
 
   if (isDevelopmentSDK(clerk)) {

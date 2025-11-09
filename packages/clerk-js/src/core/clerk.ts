@@ -107,9 +107,9 @@ import {
   createBeforeUnloadTracker,
   createPageLifecycle,
   disabledAllBillingFeatures,
-  disabledOrganizationAPIKeysStandaloneFeature,
+  disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
-  disabledUserAPIKeysStandaloneFeature,
+  disabledUserAPIKeysFeature,
   errorThrower,
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -1234,7 +1234,7 @@ export class Clerk implements ClerkInterface {
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
     if (this.organization) {
-      if (disabledOrganizationAPIKeysStandaloneFeature(this, this.environment)) {
+      if (disabledOrganizationAPIKeysFeature(this, this.environment)) {
         if (this.#instanceType === 'development') {
           throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
             code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
@@ -1243,7 +1243,7 @@ export class Clerk implements ClerkInterface {
         return;
       }
     } else {
-      if (disabledUserAPIKeysStandaloneFeature(this, this.environment)) {
+      if (disabledUserAPIKeysFeature(this, this.environment)) {
         if (this.#instanceType === 'development') {
           throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
             code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,

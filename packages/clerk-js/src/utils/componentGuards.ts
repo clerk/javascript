@@ -39,23 +39,17 @@ export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
 };
 
 export const disabledUserAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings?.user_api_keys_enabled || !environment?.apiKeysSettings?.show_in_user_profile;
-};
-
-export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings?.orgs_api_keys_enabled || !environment?.apiKeysSettings?.show_in_org_profile;
-};
-
-/**
- * For standalone <APIKeys /> component - only checks if user API keys are enabled (not show_in_profile)
- */
-export const disabledUserAPIKeysStandaloneFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.user_api_keys_enabled;
 };
 
-/**
- * For standalone <APIKeys /> component - checks if org API keys are enabled (not show_in_profile)
- */
-export const disabledOrganizationAPIKeysStandaloneFeature: ComponentGuard = (_, environment) => {
+export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environment) => {
   return !environment?.apiKeysSettings?.orgs_api_keys_enabled;
+};
+
+export const disabledUserProfileAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.user_api_keys_enabled || !environment?.apiKeysSettings?.show_in_user_profile;
+};
+
+export const disabledOrganizationProfileAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.orgs_api_keys_enabled || !environment?.apiKeysSettings?.show_in_org_profile;
 };
