@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
-import { APIKeys } from '../ApiKeys';
+import { APIKeys } from '../APIKeys';
 
 const { createFixtures } = bindCreateFixtures('APIKeys');
 

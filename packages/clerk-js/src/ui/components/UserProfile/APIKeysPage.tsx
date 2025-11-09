@@ -5,7 +5,7 @@ import { Col, descriptors, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
 
-import { APIKeysPage as APIKeysPageInternal } from '../ApiKeys/ApiKeys';
+import { APIKeysPage as APIKeysPageInternal } from '../APIKeys/APIKeys';
 
 export const APIKeysPage = () => {
   const { user } = useUser();

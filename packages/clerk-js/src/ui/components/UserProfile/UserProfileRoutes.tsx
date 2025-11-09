@@ -14,7 +14,7 @@ const BillingPage = lazy(() =>
 );
 
 const APIKeysPage = lazy(() =>
-  import(/* webpackChunkName: "up-api-keys-page"*/ './ApiKeysPage').then(module => ({
+  import(/* webpackChunkName: "up-api-keys-page"*/ './APIKeysPage').then(module => ({
     default: module.APIKeysPage,
   })),
 );

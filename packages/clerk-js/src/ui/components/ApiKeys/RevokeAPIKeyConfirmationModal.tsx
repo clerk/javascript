@@ -14,7 +14,7 @@ type RevokeAPIKeyConfirmationModalProps = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  apiKeyId?: string;
+  apiKeyID?: string;
   apiKeyName: string;
   onRevokeSuccess?: () => void;
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
@@ -24,7 +24,7 @@ export const RevokeAPIKeyConfirmationModal = ({
   isOpen,
   onOpen,
   onClose,
-  apiKeyId,
+  apiKeyID,
   apiKeyName,
   onRevokeSuccess,
   modalRoot,
@@ -48,11 +48,11 @@ export const RevokeAPIKeyConfirmationModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!apiKeyId || !canSubmit) {
+    if (!apiKeyID || !canSubmit) {
       return;
     }
 
-    await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
+    await clerk.apiKeys.revoke({ apiKeyID: apiKeyID });
     onRevokeSuccess?.();
     handleClose();
   };

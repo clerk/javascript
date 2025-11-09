@@ -9,7 +9,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 /**
  * @interface
  */
-export type UseApiKeysParams = PaginatedHookConfig<
+export type UseAPIKeysParams = PaginatedHookConfig<
   GetAPIKeysParams & {
     /**
      * If `true`, a request will be triggered when the hook is mounted.
@@ -23,19 +23,19 @@ export type UseApiKeysParams = PaginatedHookConfig<
 /**
  * @interface
  */
-export type UseApiKeysReturn<T extends UseApiKeysParams> = PaginatedResources<
+export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
   APIKeyResource,
   T extends { infinite: true } ? true : false
 >;
 
 /**
- * The `useApiKeys()` hook provides access to paginated API keys for the current user or organization.
+ * The `useAPIKeys()` hook provides access to paginated API keys for the current user or organization.
  *
  * @example
  * ### Basic usage with default pagination
  *
  * ```tsx
- * const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useApiKeys({
+ * const { data, isLoading, page, pageCount, fetchNext, fetchPrevious } = useAPIKeys({
  *   subject: 'user_123',
  *   pageSize: 10,
  *   initialPage: 1,
@@ -49,7 +49,7 @@ export type UseApiKeysReturn<T extends UseApiKeysParams> = PaginatedResources<
  * const [searchValue, setSearchValue] = useState('');
  * const debouncedSearch = useDebounce(searchValue, 500);
  *
- * const { data, isLoading } = useApiKeys({
+ * const { data, isLoading } = useAPIKeys({
  *   subject: 'user_123',
  *   query: debouncedSearch.trim(),
  *   pageSize: 10,
@@ -60,14 +60,14 @@ export type UseApiKeysReturn<T extends UseApiKeysParams> = PaginatedResources<
  * ### Infinite scroll
  *
  * ```tsx
- * const { data, isLoading, fetchNext, hasNextPage } = useApiKeys({
+ * const { data, isLoading, fetchNext, hasNextPage } = useAPIKeys({
  *   subject: 'user_123',
  *   infinite: true,
  * });
  * ```
  */
-export function useApiKeys<T extends UseApiKeysParams>(params?: T): UseApiKeysReturn<T> {
-  useAssertWrappedByClerkProvider('useApiKeys');
+export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysReturn<T> {
+  useAssertWrappedByClerkProvider('useAPIKeys');
 
   const safeValues = useWithSafeValues(params, {
     initialPage: 1,
@@ -77,11 +77,11 @@ export function useApiKeys<T extends UseApiKeysParams>(params?: T): UseApiKeysRe
     subject: '',
     query: '',
     enabled: true,
-  } as UseApiKeysParams);
+  } as UseAPIKeysParams);
 
   const clerk = useClerkInstanceContext();
 
-  clerk.telemetry?.record(eventMethodCalled('useApiKeys'));
+  clerk.telemetry?.record(eventMethodCalled('useAPIKeys'));
 
   const hookParams: GetAPIKeysParams = {
     initialPage: safeValues.initialPage,
@@ -104,5 +104,5 @@ export function useApiKeys<T extends UseApiKeysParams>(params?: T): UseApiKeysRe
       type: 'apiKeys',
       subject: safeValues.subject || '',
     },
-  ) as UseApiKeysReturn<T>;
+  ) as UseAPIKeysReturn<T>;
 }
