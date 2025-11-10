@@ -164,9 +164,11 @@ function getImportPath(reflection) {
  * Parse exports from a TypeScript file (recursively follows re-export chains)
  * @param {string} filePath - Path to the TypeScript file
  * @param {Set<string>} visited - Set of visited paths to prevent infinite loops
+ * @param {string | null} packagesDir - Path to packages directory
+ * @param {{ [key: string]: string } | null} packageFolderMap - Map of package names to folder names
  * @returns {{name: string, isReExport: boolean}[]} - Array of export info
  */
-function parseExportsFromFile(filePath, visited = new Set()) {
+function parseExportsFromFile(filePath, visited = new Set(), packagesDir = null, packageFolderMap = null) {
   if (!fs.existsSync(filePath) || visited.has(filePath)) {
     return [];
   }
@@ -252,7 +254,21 @@ function parseExportsFromFile(filePath, visited = new Set()) {
     const sourceModule = match[1];
     const isExternalReExport = sourceModule.startsWith('@clerk/');
 
-    if (!isExternalReExport) {
+    if (isExternalReExport) {
+      // Handle wildcard re-exports from other @clerk/ packages in the monorepo
+      if (packagesDir && packageFolderMap) {
+        const resolvedPath = resolveClerkPackageImport(sourceModule, packagesDir, packageFolderMap);
+        if (resolvedPath) {
+          const nestedExports = parseExportsFromFile(resolvedPath, visited, packagesDir, packageFolderMap);
+          for (const nestedExport of nestedExports) {
+            if (!exports.find(e => e.name === nestedExport.name)) {
+              // Mark as re-export from external package
+              exports.push({ name: nestedExport.name, isReExport: true });
+            }
+          }
+        }
+      }
+    } else {
       // Follow the chain to local modules
       const modulePath = path.join(path.dirname(filePath), sourceModule);
       const possiblePaths = [
@@ -265,7 +281,7 @@ function parseExportsFromFile(filePath, visited = new Set()) {
       for (const possiblePath of possiblePaths) {
         if (fs.existsSync(possiblePath)) {
           // Recursively parse the referenced module
-          const nestedExports = parseExportsFromFile(possiblePath, visited);
+          const nestedExports = parseExportsFromFile(possiblePath, visited, packagesDir, packageFolderMap);
           for (const nestedExport of nestedExports) {
             // Avoid duplicates
             if (!exports.find(e => e.name === nestedExport.name)) {
@@ -314,7 +330,10 @@ function getPackageEntryPoints(packagePath) {
           // Convert dist path back to src path
           // e.g., "./dist/internal.d.ts" -> "src/internal.ts"
           // e.g., "./dist/jwt/index.d.ts" -> "src/jwt/index.ts"
-          const srcPath = typesPath.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts');
+          // e.g., "./dist/types/experimental.d.ts" -> "src/experimental.ts"
+          let srcPath = typesPath.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts');
+          // Handle case where dist has types/ subdirectory but src doesn't
+          srcPath = srcPath.replace(/^src\/types\//, 'src/');
 
           const fullPath = path.join(packagePath, srcPath);
           if (fs.existsSync(fullPath)) {
@@ -337,17 +356,60 @@ function getPackageEntryPoints(packagePath) {
 }
 
 /**
+ * Resolve an @clerk/ package import to its source file path in the monorepo
+ * @param {string} importPath - e.g., '@clerk/clerk-react/experimental'
+ * @param {string} packagesDir - Path to packages directory
+ * @param {{ [key: string]: string }} packageFolderMap - Map of package names to folder names
+ * @returns {string | null} - Resolved file path or null
+ */
+function resolveClerkPackageImport(importPath, packagesDir, packageFolderMap) {
+  // Parse: '@clerk/clerk-react/experimental' -> package: '@clerk/clerk-react', subpath: 'experimental'
+  const parts = importPath.split('/');
+  const packageName = `${parts[0]}/${parts[1]}`; // @clerk/clerk-react
+  const subpath = parts.slice(2).join('/'); // experimental
+
+  const packageFolderName = packageFolderMap[packageName];
+  if (!packageFolderName) return null;
+
+  const packagePath = path.join(packagesDir, packageFolderName);
+
+  // If no subpath, return main index
+  if (!subpath) {
+    const mainIndex = path.join(packagePath, 'src', 'index.ts');
+    return fs.existsSync(mainIndex) ? mainIndex : null;
+  }
+
+  // Try to find the subpath file
+  const possiblePaths = [
+    path.join(packagePath, 'src', `${subpath}.ts`),
+    path.join(packagePath, 'src', `${subpath}.tsx`),
+    path.join(packagePath, 'src', subpath, 'index.ts'),
+    path.join(packagePath, 'src', subpath, 'index.tsx'),
+  ];
+
+  for (const possiblePath of possiblePaths) {
+    if (fs.existsSync(possiblePath)) {
+      return possiblePath;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Parse a package's entry point files to find all exports
  * @param {string} packagePath - Path to the package directory
+ * @param {string | null} packagesDir - Path to packages directory
+ * @param {{ [key: string]: string } | null} packageFolderMap - Map of package names to folder names
  * @returns {{name: string, isReExport: boolean}[]} - Array of export info
  */
-function parsePackageExports(packagePath) {
+function parsePackageExports(packagePath, packagesDir, packageFolderMap) {
   const entryPoints = getPackageEntryPoints(packagePath);
   const allExports = [];
   const seen = new Set();
 
   for (const entryPoint of entryPoints) {
-    const exports = parseExportsFromFile(entryPoint);
+    const exports = parseExportsFromFile(entryPoint, new Set(), packagesDir, packageFolderMap);
     for (const exp of exports) {
       // Avoid duplicates
       if (!seen.has(exp.name)) {
@@ -469,9 +531,11 @@ function findOriginalExportPackage(exportName, allPackageData, excludePackage, p
  * Check if an export is publicly available (re-exported from an entry point)
  * @param {string} packagePath - Path to the package directory
  * @param {string} exportName - The export name to check
+ * @param {string | null} packagesDir - Path to packages directory
+ * @param {{ [key: string]: string } | null} packageFolderMap - Map of package names to folder names
  * @returns {boolean} - Whether this export is public
  */
-function isPublicExport(packagePath, exportName) {
+function isPublicExport(packagePath, exportName, packagesDir = null, packageFolderMap = null) {
   const srcPath = path.join(packagePath, 'src');
   if (!fs.existsSync(srcPath)) {
     return false;
@@ -550,26 +614,42 @@ function isPublicExport(packagePath, exportName) {
       }
     }
 
-    // Check for wildcard re-exports: export * from './somewhere'
+    // Check for wildcard re-exports: export * from './somewhere' or '@clerk/...'
     const wildcardRegex = /export\s+\*\s+from\s+['"]([^'"]+)['"]/g;
     while ((match = wildcardRegex.exec(content)) !== null) {
       const referencedModule = match[1];
-      const modulePath = path.join(path.dirname(entryPointPath), referencedModule);
+      const isExternalReExport = referencedModule.startsWith('@clerk/');
 
-      const possiblePaths = [
-        `${modulePath}.ts`,
-        `${modulePath}.tsx`,
-        `${modulePath}/index.ts`,
-        `${modulePath}/index.tsx`,
-      ];
-
-      for (const possiblePath of possiblePaths) {
-        if (fs.existsSync(possiblePath)) {
-          // Recursively check the wildcard re-export
-          if (checkEntryPoint(possiblePath, visited)) {
-            return true;
+      if (isExternalReExport) {
+        // Handle wildcard re-exports from other @clerk/ packages in the monorepo
+        if (packagesDir && packageFolderMap) {
+          const resolvedPath = resolveClerkPackageImport(referencedModule, packagesDir, packageFolderMap);
+          if (resolvedPath) {
+            // Recursively check if the export exists in the referenced package
+            if (checkEntryPoint(resolvedPath, visited)) {
+              return true;
+            }
           }
-          break;
+        }
+      } else {
+        // Handle local wildcard re-exports
+        const modulePath = path.join(path.dirname(entryPointPath), referencedModule);
+
+        const possiblePaths = [
+          `${modulePath}.ts`,
+          `${modulePath}.tsx`,
+          `${modulePath}/index.ts`,
+          `${modulePath}/index.tsx`,
+        ];
+
+        for (const possiblePath of possiblePaths) {
+          if (fs.existsSync(possiblePath)) {
+            // Recursively check the wildcard re-export
+            if (checkEntryPoint(possiblePath, visited)) {
+              return true;
+            }
+            break;
+          }
         }
       }
     }
@@ -592,9 +672,11 @@ function isPublicExport(packagePath, exportName) {
  * Detect if an export comes from a subpath entry point (like /server)
  * @param {string} packagePath - Path to the package directory
  * @param {string} exportName - The export name to analyze
+ * @param {string | null} packagesDir - Path to packages directory
+ * @param {{ [key: string]: string } | null} packageFolderMap - Map of package names to folder names
  * @returns {string | null} - The subpath (e.g., "server", "internal", "webhooks") or null
  */
-function detectSubpath(packagePath, exportName) {
+function detectSubpath(packagePath, exportName, packagesDir = null, packageFolderMap = null) {
   try {
     const packageJsonPath = path.join(packagePath, 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
@@ -618,18 +700,42 @@ function detectSubpath(packagePath, exportName) {
 
         if (typesPath) {
           // Convert dist path to src path
-          const srcPath = typesPath.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts');
+          // Handle case where dist has types/ subdirectory but src doesn't
+          let srcPath = typesPath.replace(/^\.\/dist\//, 'src/').replace(/\.d\.ts$/, '.ts');
+          srcPath = srcPath.replace(/^src\/types\//, 'src/');
 
           const fullPath = path.join(packagePath, srcPath);
           if (fs.existsSync(fullPath)) {
             const content = fs.readFileSync(fullPath, 'utf-8');
-            // Check if this entry point exports our symbol
+            // Check if this entry point exports our symbol directly
             const exportRegex = new RegExp(
               `export\\s+(?:\\{[^}]*(?:\\b${exportName}\\b|\\w+\\s+as\\s+${exportName}\\b)[^}]*\\}|(?:const|function|class|async\\s+function)\\s+${exportName}\\b)`,
             );
             if (exportRegex.test(content)) {
               // Return the subpath without the leading "./"
               return key.replace(/^\.\//, '');
+            }
+            // Check if this entry point has a wildcard re-export that might include our symbol
+            const wildcardRegex = /export\s+\*\s+from\s+['"]([^'"]+)['"]/g;
+            let wildcardMatch;
+            while ((wildcardMatch = wildcardRegex.exec(content)) !== null) {
+              const referencedModule = wildcardMatch[1];
+              // If it's a wildcard re-export from an external package, check if the export exists in that package
+              if (referencedModule.startsWith('@clerk/') && packagesDir && packageFolderMap) {
+                const resolvedPath = resolveClerkPackageImport(referencedModule, packagesDir, packageFolderMap);
+                if (resolvedPath && fs.existsSync(resolvedPath)) {
+                  const referencedContent = fs.readFileSync(resolvedPath, 'utf-8');
+                  // Check if the export exists in the referenced package
+                  // Match: export { ExportName } or export const/function/class ExportName
+                  const exportExistsRegex = new RegExp(
+                    `export\\s+(?:\\{[^}]*(?:\\b${exportName}\\b|\\w+\\s+as\\s+${exportName}\\b)[^}]*\\}|(?:const|function|class|async\\s+function)\\s+${exportName}\\b)`,
+                  );
+                  if (exportExistsRegex.test(referencedContent)) {
+                    // Return the subpath without the leading "./"
+                    return key.replace(/^\.\//, '');
+                  }
+                }
+              }
             }
           }
         }
@@ -845,7 +951,7 @@ export function load(app) {
       }
 
       // Parse the source exports from this package
-      const sourceExports = parsePackageExports(packagePath);
+      const sourceExports = parsePackageExports(packagePath, packagesDir, packageFolderMap);
 
       if (sourceExports.length === 0) {
         continue;
@@ -900,7 +1006,7 @@ export function load(app) {
             const originalExport = outputData[originalPackage]?.[exportName];
 
             // Detect if this export is from a subpath (e.g., /server)
-            const subpath = detectSubpath(packagePath, exportName);
+            const subpath = detectSubpath(packagePath, exportName, packagesDir, packageFolderMap);
             const fullImportPath = subpath ? `${packageName}/${subpath}` : packageName;
 
             if (originalExport) {
@@ -985,7 +1091,7 @@ export function load(app) {
 
       for (const exportName of Object.keys(outputData[packageName])) {
         // Check if this export is publicly available
-        if (!isPublicExport(packagePath, exportName)) {
+        if (!isPublicExport(packagePath, exportName, packagesDir, packageFolderMap)) {
           exportsToRemove.push(exportName);
           removedCount++;
         }
@@ -1012,7 +1118,7 @@ export function load(app) {
 
       for (const [exportName, exportData] of Object.entries(outputData[packageName])) {
         // Check if this export should have a subpath
-        const subpath = detectSubpath(packagePath, exportName);
+        const subpath = detectSubpath(packagePath, exportName, packagesDir, packageFolderMap);
         if (subpath) {
           const expectedPath = `${packageName}/${subpath}`;
           if (exportData.importPath !== expectedPath) {
