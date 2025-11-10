@@ -2,7 +2,7 @@
 
 import { useAuth } from '@clerk/clerk-react';
 import { useDerivedAuth } from '@clerk/clerk-react/internal';
-import type { InitialState } from '@clerk/types';
+import type { InitialState } from '@clerk/shared/types';
 import { useRouter } from 'next/compat/router';
 import React from 'react';
 

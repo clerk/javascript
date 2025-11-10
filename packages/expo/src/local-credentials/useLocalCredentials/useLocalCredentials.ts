@@ -1,5 +1,5 @@
 import { useClerk, useSignIn, useUser } from '@clerk/clerk-react';
-import type { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { AuthenticationType, isEnrolledAsync, supportedAuthenticationTypesAsync } from 'expo-local-authentication';
 import {
   deleteItemAsync,

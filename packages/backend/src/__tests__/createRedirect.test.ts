@@ -1,4 +1,4 @@
-import type { SessionStatusClaim } from '@clerk/types';
+import type { SessionStatusClaim } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createRedirect } from '../createRedirect';

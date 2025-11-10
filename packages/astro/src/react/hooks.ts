@@ -9,7 +9,7 @@ import type {
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { Store, StoreValue } from 'nanostores';
 import { useCallback, useSyncExternalStore } from 'react';
 

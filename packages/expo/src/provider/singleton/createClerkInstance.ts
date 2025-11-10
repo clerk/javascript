@@ -7,7 +7,7 @@ import type {
   EnvironmentJSONSnapshot,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';

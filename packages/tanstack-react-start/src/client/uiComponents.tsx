@@ -6,7 +6,7 @@ import {
   UserProfile as BaseUserProfile,
 } from '@clerk/clerk-react';
 import { useRoutingProps } from '@clerk/clerk-react/internal';
-import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/types';
+import type { OrganizationProfileProps, SignInProps, SignUpProps, UserProfileProps } from '@clerk/shared/types';
 import { useLocation, useParams } from '@tanstack/react-router';
 
 const usePathnameWithoutSplatRouteParams = () => {
