@@ -1,0 +1,99 @@
+{
+  "name": "@clerk/tanstack-solid-start",
+  "version": "0.0.0",
+  "description": "Clerk SDK for TanStack Solid Start",
+  "keywords": [
+    "clerk",
+    "solid",
+    "typescript",
+    "tanstack start",
+    "auth",
+    "authentication",
+    "passwordless",
+    "session",
+    "jwt"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/tanstack-solid-start"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "default": "./dist/errors.js"
+    },
+    "./webhooks": {
+      "types": "./dist/webhooks.d.ts",
+      "default": "./dist/webhooks.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "errors",
+    "server",
+    "webhooks",
+    "experimental"
+  ],
+  "scripts": {
+    "build": "pnpm clean && tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "dev:publish": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "lint:attw": "attw --pack . --profile esm-only",
+    "lint:publint": "publint",
+    "publish:local": "pnpm yalc push --replace --sig",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@clerk/backend": "workspace:^",
+    "@clerk/shared": "workspace:^",
+    "@clerk/types": "workspace:^",
+    "clerk-solidjs": "^2.0.10",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@tanstack/solid-router": "1.132.0",
+    "@tanstack/solid-start": "1.132.0",
+    "esbuild-plugin-file-path-extensions": "^2.1.4"
+  },
+  "peerDependencies": {
+    "@tanstack/solid-router": "^1.132.0",
+    "@tanstack/solid-start": "^1.132.0",
+    "solid-js": "^1.9.10"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
