@@ -1,4 +1,4 @@
-import type { Serializable } from '../../types';
+import type { Serializable } from '@/types';
 
 const formatWarning = (msg: string) => {
   return `🔒 Clerk:\n${msg.trim()}\n(This notice only appears in development)`;

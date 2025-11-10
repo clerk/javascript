@@ -227,7 +227,7 @@ export function getSearchParameterFromHash({
   return dummyUrlForHash.searchParams.get(paramName);
 }
 
-export function isValidUrl<T extends string | URL | undefined>(val: T): val is NonNullable<T> {
+export function isValidUrl(val: string | URL | undefined | null): boolean {
   if (!val) {
     return false;
   }
@@ -275,7 +275,7 @@ export function isProblematicUrl(url: URL): boolean {
 }
 
 export function isDataUri(val?: string): val is string {
-  if (!isValidUrl(val)) {
+  if (!val || !isValidUrl(val)) {
     return false;
   }
 

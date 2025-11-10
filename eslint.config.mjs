@@ -375,6 +375,29 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/shared',
+    files: ['packages/shared/src/**/*'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@clerk/shared', '@clerk/shared/*'],
+              message:
+                'Do not import from @clerk/shared package exports within the package itself. Use the @/ alias or relative imports from source files instead (e.g., import from "@/types" or "../../types").',
+            },
+            {
+              group: ['../../../*'],
+              message:
+                'Relative imports should not traverse more than 2 levels up (../../). Use the @/ path alias instead (e.g., import from "@/types").',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     name: 'packages/expo-passkeys',
     files: ['packages/expo-passkeys/src/**/*'],
     rules: {
