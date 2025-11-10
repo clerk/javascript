@@ -13,7 +13,7 @@ export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
   const { organization } = useOrganization();
-  const { pages } = useOrganizationProfileContext();
+  const { apiKeysProps, pages } = useOrganizationProfileContext();
 
   const allowMembersRoute = useProtect(
     has =>
@@ -28,8 +28,6 @@ export const OrganizationProfileNavbar = (
         permission: 'org:sys_billing:read',
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
-
-  const { apiKeysProps } = useOrganizationProfileContext();
 
   const routes = pages.routes
     .filter(

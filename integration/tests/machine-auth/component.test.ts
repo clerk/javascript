@@ -301,6 +301,7 @@ testAgainstRunningApps({
     await u.po.page.goToRelative('/api-keys');
     await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
     expect(apiKeysRequestWasMade).toBe(false);
+    await u.page.unroute('**/api_keys*');
 
     // user_api_keys_enabled: true should allow standalone component to render
     await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true });
@@ -329,6 +330,7 @@ testAgainstRunningApps({
     await u.po.page.goToRelative('/api-keys');
     await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
     expect(apiKeysRequestWasMade).toBe(false);
+    await u.page.unroute('**/api_keys*');
 
     // orgs_api_keys_enabled: true should allow standalone component to render in org context
     await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true });
