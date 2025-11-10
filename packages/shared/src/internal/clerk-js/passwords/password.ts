@@ -1,10 +1,4 @@
-import type {
-  PasswordSettingsData,
-  PasswordValidation,
-  ValidatePasswordCallbacks,
-  ZxcvbnResult,
-} from '@clerk/shared/types';
-
+import type { PasswordSettingsData, PasswordValidation, ValidatePasswordCallbacks, ZxcvbnResult } from '../../../types';
 import { noop } from '../../../utils';
 import { createValidateComplexity } from './complexity';
 import { createValidatePasswordStrength } from './strength';

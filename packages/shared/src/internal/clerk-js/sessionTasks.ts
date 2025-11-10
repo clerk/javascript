@@ -1,4 +1,4 @@
-import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '@clerk/shared/types';
+import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '../../../types';
 
 import { logger } from '../../logger';
 import { forwardClerkQueryParams } from './queryParams';

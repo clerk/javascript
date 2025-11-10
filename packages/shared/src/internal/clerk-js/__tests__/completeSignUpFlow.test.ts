@@ -1,6 +1,6 @@
-import type { SignUpField, SignUpResource } from '@clerk/shared/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { SignUpField, SignUpResource } from '../../../types';
 import { completeSignUpFlow } from '../completeSignUpFlow';
 
 const mockHandleComplete = vi.fn();

@@ -1,4 +1,4 @@
-import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/shared/types';
+import type { Clerk, ClerkOptions, EnvironmentResource } from '../../../types';
 
 export type ComponentGuard = (
   clerk: Clerk,

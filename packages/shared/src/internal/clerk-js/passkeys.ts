@@ -6,7 +6,7 @@ import type {
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/shared/types';
+} from '../../../types';
 
 import type { ClerkRuntimeError } from '../../error';
 import { ClerkWebAuthnError } from '../../error';

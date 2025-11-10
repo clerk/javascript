@@ -1,5 +1,4 @@
-import type { SignUpResource } from '@clerk/shared/types';
-
+import type { SignUpResource } from '../../../types';
 import { globs } from '../../globs';
 import { createDevOrStagingUrlCache } from '../../keys';
 import { logger } from '../../logger';
@@ -228,7 +227,7 @@ export function getSearchParameterFromHash({
   return dummyUrlForHash.searchParams.get(paramName);
 }
 
-export function isValidUrl(val: unknown) {
+export function isValidUrl<T extends string | URL | undefined>(val: T): val is NonNullable<T> {
   if (!val) {
     return false;
   }

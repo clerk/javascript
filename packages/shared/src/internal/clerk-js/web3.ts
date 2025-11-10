@@ -1,4 +1,4 @@
-import type { Web3Provider } from '@clerk/shared/types';
+import type { Web3Provider } from '../../../types';
 
 import { clerkUnsupportedEnvironmentWarning } from './errors';
 import { toHex } from './hex';

@@ -1,4 +1,4 @@
-import type { UserResource } from '@clerk/shared/types';
+import type { UserResource } from '../../../types';
 
 type NameHelperParams = {
   firstName?: string | null;

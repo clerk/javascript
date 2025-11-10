@@ -1,11 +1,9 @@
-import type {
-  PublicKeyCredentialCreationOptionsJSON,
-  PublicKeyCredentialRequestOptionsJSON,
-  PublicKeyCredentialWithAuthenticatorAssertionResponse,
-  PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
+import type {
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  PublicKeyCredentialWithAuthenticatorAttestationResponse,
+} from '../../../types';
 import {
   bufferToBase64Url,
   convertJSONToPublicKeyCreateOptions,

@@ -1,7 +1,7 @@
-import { logger } from '@clerk/shared/logger';
-import type { SignUpResource } from '@clerk/shared/types';
 import { afterAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
+import { logger } from '../../../logger';
+import type { SignUpResource } from '../../../types';
 import {
   buildURL,
   createAllowedRedirectOrigins,

@@ -1,4 +1,4 @@
-import type { MetamaskWeb3Provider, OKXWalletWeb3Provider } from '@clerk/shared/types';
+import type { MetamaskWeb3Provider, OKXWalletWeb3Provider } from '../../../types';
 
 //https://eips.ethereum.org/EIPS/eip-6963
 
