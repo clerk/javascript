@@ -20,7 +20,7 @@ import {
   useAppearance,
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
-import { type PropsOfComponent } from '../styledSystem';
+import { mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils/sleep';
 import { LastAuthenticationStrategyBadge } from './Badge';
 import { useCardState } from './contexts';
@@ -150,6 +150,12 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           gap={2}
           sx={t => ({
             justifyContent: 'center',
+            [mqu.sm]: {
+              // Force single-column on mobile when 2 strategies are present (without last auth) to prevent
+              // label overflow. When last auth is present, only 1 strategy remains here, so overflow isn't a concern.
+              gridTemplateColumns:
+                !lastAuthenticationStrategyPresent && strategies.length === 2 ? 'repeat(1, minmax(0, 1fr))' : undefined,
+            },
             gridTemplateColumns:
               strategies.length < 1
                 ? `repeat(1, minmax(0, 1fr))`
