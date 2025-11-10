@@ -120,45 +120,18 @@ function isBeta(reflection) {
 }
 
 /**
- * Extract public methods and accessors from a class
- * @param {import('typedoc').DeclarationReflection} reflection
- * @returns {string[]}
- */
-function getClassMethods(reflection) {
-  // If the target is not a class or does not have children, return an empty array
-  if (reflection.kind !== ReflectionKind.Class || !reflection.children) {
-    return [];
-  }
-
-  /** @type {string[]} */
-  const methods = [];
-
-  for (const child of reflection.children) {
-    // Include both methods and accessors (getters/setters)
-    if (child.kind === ReflectionKind.Method || child.kind === ReflectionKind.Accessor) {
-      // Skip private methods
-      if (child.flags?.isPrivate) {
-        continue;
-      }
-
-      methods.push(child.name);
-    }
-  }
-
-  return methods.sort();
-}
-
-/**
  * Build the import path for a reflection
  * @param {import('typedoc').DeclarationReflection} reflection
  * @returns {string | null}
  */
 function getImportPath(reflection) {
+  /** @type {string[]} */
   const pathParts = [];
+  /** @type {import('typedoc').Reflection | undefined} */
   let current = reflection.parent;
 
   // Traverse up the parent chain
-  while (current) {
+  while (current !== undefined) {
     const name = current.name;
 
     // If we hit the package name (starts with @clerk/)
@@ -176,6 +149,7 @@ function getImportPath(reflection) {
       }
     }
 
+    // once we've reached the root, stop
     current = current.parent;
   }
 
@@ -183,20 +157,7 @@ function getImportPath(reflection) {
     return null;
   }
 
-  // Build the import path
-  // First element is the package name, rest are subpaths
-  const packageName = pathParts[0];
-  const subPaths = pathParts.slice(1).filter(p => {
-    // Filter out common non-import-path module names
-    const skip = ['src', 'components', 'hooks', 'types', 'utils', 'internal'];
-    return !skip.includes(p);
-  });
-
-  if (subPaths.length > 0) {
-    return `${packageName}/${subPaths.join('/')}`;
-  }
-
-  return packageName;
+  return pathParts.join('/');
 }
 
 /**
@@ -847,14 +808,6 @@ export function load(app) {
       }
       if (beta) {
         exportData.beta = true;
-      }
-
-      // If it's a class, include its public methods (if any)
-      if (exportType === 'class') {
-        const methods = getClassMethods(decl);
-        if (methods.length > 0) {
-          exportData.methods = methods;
-        }
       }
 
       // Group by base package
