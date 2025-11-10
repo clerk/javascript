@@ -1,4 +1,4 @@
-import type { LoadedClerk, OrganizationMembershipResource } from './types';
+import type { __internal_EnableOrganizationsPromptProps, LoadedClerk, OrganizationMembershipResource } from './types';
 
 /**
  * Finds the organization membership for a given organization ID from a list of memberships
@@ -26,7 +26,7 @@ export const withOrganizationSettingsEnabled =
   <TParams extends any[], TReturn>(
     hook: (...args: TParams) => TReturn,
     getLoadedClerk: () => LoadedClerk | null | undefined,
-    callerName?: string,
+    utilityName?: __internal_EnableOrganizationsPromptProps['utilityName'],
   ) =>
   (...args: TParams): TReturn => {
     const clerk = getLoadedClerk();
@@ -35,7 +35,7 @@ export const withOrganizationSettingsEnabled =
 
     if (!environment?.organizationSettings.enabled) {
       clerk?.__internal_openEnableOrganizationsPrompt({
-        callerName,
+        utilityName,
       });
     }
 
