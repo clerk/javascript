@@ -180,8 +180,8 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
-const CANNOT_RENDER_API_KEYS_USER_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_user_unauthorized';
-const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
+const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -1247,7 +1247,7 @@ export class Clerk implements ClerkInterface {
     if (this.organization && disabledOrganizationAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
-          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+          code: CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -1256,7 +1256,7 @@ export class Clerk implements ClerkInterface {
     if (disabledUserAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
-          code: CANNOT_RENDER_API_KEYS_USER_UNAUTHORIZED_ERROR_CODE,
+          code: CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE,
         });
       }
       return;
