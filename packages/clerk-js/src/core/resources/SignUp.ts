@@ -55,7 +55,11 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
-import { _authenticateWithPopup, wrapWithPopupRoutes } from '../../utils/authenticateWithPopup';
+import {
+  _authenticateWithPopup,
+  _futureAuthenticateWithPopup,
+  wrapWithPopupRoutes,
+} from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -852,10 +856,14 @@ class SignUpFuture implements SignUpFutureResource {
 
       const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
 
-      if (status === 'unverified' && !!externalVerificationRedirectURL) {
-        windowNavigate(externalVerificationRedirectURL);
-      } else {
-        clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+      if (status === 'unverified' && externalVerificationRedirectURL) {
+        if (popup) {
+          await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
+          // Pick up the modified SignUp resource
+          await this.resource.reload();
+        } else {
+          windowNavigate(externalVerificationRedirectURL);
+        }
       }
     });
   }
