@@ -845,17 +845,16 @@ export interface FeatureJSON extends ClerkResourceJSON {
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingPlan;
   id: string;
-  product_id: string;
   name: string;
   slug: string;
-  description?: string | null;
+  description: string | null;
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   publicly_visible: boolean;
   fee: BillingMoneyAmountJSON;
-  annual_fee?: BillingMoneyAmountJSON | null;
-  annual_monthly_fee?: BillingMoneyAmountJSON | null;
+  annual_fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
   features?: FeatureJSON[];
 }
@@ -877,7 +876,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscriptionItem;
   status: BillingSubscriptionItemStatus;
   plan_period: 'month' | 'annual';
-  payer_id: string;
+  payer_id?: string;
   period_start: number;
   period_end: number | null;
   is_free_trial?: boolean;
@@ -887,11 +886,11 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   canceled_at: number | null;
   past_due_at: number | null;
   lifetime_paid: BillingMoneyAmountJSON | null;
-  next_payment: {
+  next_payment?: {
     amount: number;
     date: number;
   } | null;
-  amount: BillingMoneyAmountJSON | null;
+  amount: BillingMoneyAmountJSON;
   plan?: BillingPlanJSON | null;
   plan_id?: string | null;
 }

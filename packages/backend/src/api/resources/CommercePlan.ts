@@ -1,4 +1,4 @@
-import type { BillingMoneyAmount } from '@clerk/types';
+import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/shared/types';
 
 import { Feature } from './Feature';
 import type { BillingPlanJSON } from './JSON';
@@ -14,10 +14,6 @@ export class BillingPlan {
      * The unique identifier for the plan.
      */
     readonly id: string,
-    /**
-     * The ID of the product the plan belongs to.
-     */
-    readonly productId: string,
     /**
      * The name of the plan.
      */
@@ -69,21 +65,22 @@ export class BillingPlan {
   ) {}
 
   static fromJSON(data: BillingPlanJSON): BillingPlan {
-    const formatAmountJSON = (fee: BillingPlanJSON['fee'] | null | undefined): BillingMoneyAmount | null => {
-      if (!fee) {
-        return null;
-      }
-
-      return {
-        amount: fee.amount,
-        amountFormatted: fee.amount_formatted,
-        currency: fee.currency,
-        currencySymbol: fee.currency_symbol,
-      };
+    const formatAmountJSON = <T extends BillingMoneyAmountJSON | null>(
+      fee: T,
+    ): T extends null ? null : BillingMoneyAmount => {
+      return (
+        fee
+          ? {
+              amount: fee.amount,
+              amountFormatted: fee.amount_formatted,
+              currency: fee.currency,
+              currencySymbol: fee.currency_symbol,
+            }
+          : null
+      ) as T extends null ? null : BillingMoneyAmount;
     };
     return new BillingPlan(
       data.id,
-      data.product_id,
       data.name,
       data.slug,
       data.description ?? null,
@@ -91,9 +88,7 @@ export class BillingPlan {
       data.is_recurring,
       data.has_base_fee,
       data.publicly_visible,
-      // fee is required and should not be null in API responses
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      formatAmountJSON(data.fee)!,
+      formatAmountJSON(data.fee),
       formatAmountJSON(data.annual_fee),
       formatAmountJSON(data.annual_monthly_fee),
       data.for_payer_type,
