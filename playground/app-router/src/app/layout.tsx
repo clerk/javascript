@@ -1,7 +1,7 @@
-import { Links } from '@/common/Links';
-import { ClerkProvider } from '@clerk/nextjs';
-import { Inter } from 'next/font/google';
 import './globals.css';
+import { Inter } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
+import { Links } from '@/common/Links';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,13 +15,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider clerkJSUrl={'https://js.lclclerk.com/npm/clerk.browser.js'}>
       <html lang='en'>
-      <body className={inter.className}>
-      <Links />
-      <div style={{ margin: '1rem', padding: '1rem', border: '1px solid green' }}>
-        <h2>Root layout</h2>
-        {children}
-      </div>
-      </body>
+        <body className={inter.className}>
+          <Links />
+          <div style={{ margin: '1rem', padding: '1rem', border: '1px solid green' }}>
+            <h2>Root layout</h2>
+            {children}
+          </div>
+        </body>
       </html>
     </ClerkProvider>
   );

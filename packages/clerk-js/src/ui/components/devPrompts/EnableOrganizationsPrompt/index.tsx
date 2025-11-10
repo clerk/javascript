@@ -1,3 +1,4 @@
+import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 import { css } from '@emotion/react';
 
 import { Modal } from '@/ui/elements/Modal';
@@ -7,11 +8,9 @@ import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, PromptContainer } from '../shared';
 
-type EnableOrganizationsPromptProps = {
-  callerName: string;
-};
+const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizationsPromptProps) => {
+  const ctaText = 'componentName' in props ? `<${props.componentName} /> component` : props.utilityName;
 
-const EnableOrganizationsPromptInternal = (_props: EnableOrganizationsPromptProps) => {
   return (
     <Portal>
       <Modal
@@ -114,7 +113,7 @@ const EnableOrganizationsPromptInternal = (_props: EnableOrganizationsPromptProp
                     color: white;
                   `}
                 >
-                  useOrganization
+                  {ctaText}
                 </code>{' '}
                 hook,
                 <br />
@@ -219,7 +218,7 @@ const EnableOrganizationsPromptInternal = (_props: EnableOrganizationsPromptProp
  * A prompt that allows the user to enable the Organizations feature for their development instance
  * @internal
  */
-export const EnableOrganizationsPrompt = (props: EnableOrganizationsPromptProps) => {
+export const EnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps) => {
   return (
     <InternalThemeProvider>
       <EnableOrganizationsPromptInternal {...props} />
