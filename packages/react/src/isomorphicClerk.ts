@@ -436,7 +436,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
   }
 
-  async loadClerkEntryChunks(): Promise<unknown> {
+  async loadClerkEntryChunks(): Promise<void> {
     if (this.mode !== 'browser' || this.loaded) {
       return;
     }
