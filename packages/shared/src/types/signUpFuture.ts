@@ -188,7 +188,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
   code: string;
 }
 
-export interface SignUpFutureSSOParams {
+export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
    * The strategy to use for authentication.
    */
@@ -202,6 +202,34 @@ export interface SignUpFutureSSOParams {
    * TODO @revamp-hooks: This should be handled by FAPI instead.
    */
   redirectCallbackUrl: string;
+  /**
+   * If provided, a `Window` to use for the OAuth flow. Useful in instances where you cannot navigate to an
+   * OAuth provider.
+   *
+   * @example
+   * ```ts
+   * const popup = window.open('about:blank', '', 'width=600,height=800');
+   * if (!popup) {
+   *   throw new Error('Failed to open popup');
+   * }
+   * await signIn.sso({ popup, strategy: 'oauth_google', redirectUrl: '/dashboard' });
+   * ```
+   */
+  popup?: Window;
+  /**
+   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the
+   * [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.)
+   * in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
+  /**
+   * @experimental
+   */
+  enterpriseConnectionId?: string;
+  /**
+   * Email address to use for targeting an enterprise connection at sign-up.
+   */
+  emailAddress?: string;
 }
 
 export interface SignUpFutureTicketParams extends SignUpFutureAdditionalParams {
