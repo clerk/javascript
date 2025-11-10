@@ -3,20 +3,18 @@ declare module '*.svg' {
   export default value;
 }
 
-declare global {
-  const __PKG_NAME__: string;
-  const __PKG_VERSION__: string;
-  const __DEV__: boolean;
+const __PKG_NAME__: string;
+const __PKG_VERSION__: string;
+const __DEV__: boolean;
 
-  /**
-   * Build time feature flags.
-   */
-  const __BUILD_DISABLE_RHC__: string;
-  const __BUILD_VARIANT_CHANNEL__: boolean;
-  const __BUILD_VARIANT_CHIPS__: boolean;
+/**
+ * Build time feature flags.
+ */
+const __BUILD_DISABLE_RHC__: string;
+const __BUILD_VARIANT_CHANNEL__: boolean;
+const __BUILD_VARIANT_CHIPS__: boolean;
 
-  interface Window {
-    __unstable__onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
-    __unstable__onAfterSetActive: () => Promise<void> | void;
-  }
+interface Window {
+  __unstable__onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
+  __unstable__onAfterSetActive: () => Promise<void> | void;
 }

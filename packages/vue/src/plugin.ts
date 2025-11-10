@@ -5,6 +5,7 @@ import type {
   Clerk,
   ClientResource,
   InitialState,
+  IsomorphicClerkOptions,
   MultiDomainAndOrProxy,
   Resources,
   Without,
@@ -14,7 +15,7 @@ import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
 
-export type PluginOptions = Without<LoadClerkJsScriptOptions, 'domain' | 'proxyUrl'> &
+export type PluginOptions = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl'> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
   };

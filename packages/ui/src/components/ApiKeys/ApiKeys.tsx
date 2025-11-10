@@ -1,7 +1,6 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import { __experimental_useAPIKeys as useAPIKeys } from '@clerk/shared/react';
+import { __experimental_useAPIKeys as useAPIKeys, useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
@@ -27,9 +26,9 @@ import { useDebounce } from '@/ui/hooks';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 
-import { APIKeysTable } from './APIKeysTable';
-import type { OnCreateParams } from './CreateAPIKeyForm';
-import { CreateAPIKeyForm } from './CreateAPIKeyForm';
+import { APIKeysTable } from './ApiKeysTable';
+import type { OnCreateParams } from './CreateApiKeyForm';
+import { CreateAPIKeyForm } from './CreateApiKeyForm';
 import { useAPIKeysPagination } from './utils';
 
 type APIKeysPageProps = {
