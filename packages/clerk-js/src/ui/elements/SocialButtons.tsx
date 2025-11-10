@@ -100,7 +100,9 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     MAX_STRATEGIES_PER_ROW,
     lastAuthenticationStrategy,
   );
+  const strategiesCount = lastAuthenticationStrategyPresent ? strategies.length - 1 : strategies.length;
   const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
+  const shouldForceSingleColumnOnMobile = !lastAuthenticationStrategyPresent && strategies.length === 2;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -153,8 +155,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
             [mqu.sm]: {
               // Force single-column on mobile when 2 strategies are present (without last auth) to prevent
               // label overflow. When last auth is present, only 1 strategy remains here, so overflow isn't a concern.
-              gridTemplateColumns:
-                !lastAuthenticationStrategyPresent && strategies.length === 2 ? 'repeat(1, minmax(0, 1fr))' : undefined,
+              gridTemplateColumns: shouldForceSingleColumnOnMobile ? 'repeat(1, minmax(0, 1fr))' : undefined,
             },
             gridTemplateColumns:
               strategies.length < 1
@@ -169,19 +170,21 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           })}
         >
           {row.map(strategy => {
-            const label =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? `Continue with ${strategyToDisplayData[strategy].name}`
-                : strategyToDisplayData[strategy].name;
+            const shouldShowPreText =
+              strategiesCount === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
+              (strategy === lastAuthenticationStrategy && row.length === 1);
 
-            const localizedText =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? localizationKeys('socialButtonsBlockButton', {
-                    provider: strategyToDisplayData[strategy].name,
-                  })
-                : localizationKeys('socialButtonsBlockButtonManyInView', {
-                    provider: strategyToDisplayData[strategy].name,
-                  });
+            const label = shouldShowPreText
+              ? `Continue with ${strategyToDisplayData[strategy].name}`
+              : strategyToDisplayData[strategy].name;
+
+            const localizedText = shouldShowPreText
+              ? localizationKeys('socialButtonsBlockButton', {
+                  provider: strategyToDisplayData[strategy].name,
+                })
+              : localizationKeys('socialButtonsBlockButtonManyInView', {
+                  provider: strategyToDisplayData[strategy].name,
+                });
 
             const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
               <Image

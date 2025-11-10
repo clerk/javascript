@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-js': patch
+'@clerk/clerk-js': minor
 ---
 
-Update SocialButtons layout to be consistent across desktop and mobile.
+Update SocialButtons to show "Continue with" prefix for last auth strategy, and improve mobile layout consistency.
