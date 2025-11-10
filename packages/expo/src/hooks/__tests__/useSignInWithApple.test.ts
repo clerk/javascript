@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('@clerk/clerk-react', () => {
+vi.mock('@clerk/react/legacy', () => {
   return {
     useSignIn: mocks.useSignIn,
     useSignUp: mocks.useSignUp,
