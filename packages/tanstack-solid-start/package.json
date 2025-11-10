@@ -83,7 +83,8 @@
   "devDependencies": {
     "@tanstack/solid-router": "1.132.0",
     "@tanstack/solid-start": "1.132.0",
-    "esbuild-plugin-file-path-extensions": "^2.1.4"
+    "esbuild-plugin-file-path-extensions": "^2.1.4",
+    "esbuild-plugin-solid": "^0.5.0"
   },
   "peerDependencies": {
     "@tanstack/solid-router": "^1.132.0",

@@ -19,7 +19,7 @@ const SDK_METADATA = {
 
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
-export function ClerkProvider({ children, ...providerProps }: TanstackStartClerkProviderProps): JSXElement {
+export function ClerkProvider2({ children, ...providerProps }: TanstackStartClerkProviderProps): JSXElement {
   const awaitableNavigate = useAwaitableNavigate();
   // @ts-expect-error: Untyped internal Clerk initial state
   const clerkInitialState = getGlobalStartContext()?.clerkInitialState ?? {};
@@ -64,4 +64,4 @@ export function ClerkProvider({ children, ...providerProps }: TanstackStartClerk
     </>
   );
 }
-ClerkProvider.displayName = 'ClerkProvider';
+ClerkProvider2.displayName = 'ClerkProvider';
