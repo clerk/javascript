@@ -13,7 +13,6 @@ import { usePreviousValue } from './usePreviousValue';
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
-  // const [isTransitioningSignOut, setIsTransitioningSignOut] = useState(false);
 
   // Cache initialPage and initialPageSize until unmount
   const initialPageRef = useRef(params.initialPage ?? 1);
