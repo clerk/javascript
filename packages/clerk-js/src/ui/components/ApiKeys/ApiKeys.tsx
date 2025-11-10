@@ -1,11 +1,11 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import { __experimental_useAPIKeys as useAPIKeys, useClerk, useOrganization, useUser } from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import { useProtect } from '@/ui/common';
-import { useApiKeysContext, withCoreUserGuard } from '@/ui/contexts';
+import { useAPIKeysContext, withCoreUserGuard } from '@/ui/contexts';
 import {
   Box,
   Button,
@@ -21,14 +21,15 @@ import { Action } from '@/ui/elements/Action';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { InputWithIcon } from '@/ui/elements/InputWithIcon';
 import { Pagination } from '@/ui/elements/Pagination';
+import { useDebounce } from '@/ui/hooks';
 import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 import { isOrganizationId } from '@/utils';
 
-import { ApiKeysTable } from './ApiKeysTable';
-import type { OnCreateParams } from './CreateApiKeyForm';
-import { CreateApiKeyForm } from './CreateApiKeyForm';
-import { useApiKeys } from './useApiKeys';
+import { APIKeysTable } from './APIKeysTable';
+import type { OnCreateParams } from './CreateAPIKeyForm';
+import { CreateAPIKeyForm } from './CreateAPIKeyForm';
+import { useAPIKeysPagination } from './utils';
 
 type APIKeysPageProps = {
   subject: string;
@@ -42,42 +43,77 @@ const RevokeAPIKeyConfirmationModal = lazy(() =>
   })),
 );
 
+const CopyAPIKeyModal = lazy(() =>
+  import(/* webpackChunkName: "copy-api-key-modal"*/ './CopyAPIKeyModal').then(module => ({
+    default: module.CopyAPIKeyModal,
+  })),
+);
+
+const apiKeysSearchDebounceMs = 500;
+const API_KEYS_PAGE_SIZE = 10;
+
 export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPageProps) => {
   const isOrg = isOrganizationId(subject);
   const canReadAPIKeys = useProtect({ permission: 'org:sys_api_keys:read' });
   const canManageAPIKeys = useProtect({ permission: 'org:sys_api_keys:manage' });
 
+  const [searchValue, setSearchValue] = useState('');
+  const debouncedSearchValue = useDebounce(searchValue, apiKeysSearchDebounceMs);
+  const query = debouncedSearchValue.trim();
+
   const {
-    apiKeys,
+    data: apiKeys,
     isLoading,
-    search,
-    setSearch,
+    isFetching,
     page,
-    setPage,
+    fetchPage,
     pageCount,
-    itemCount,
-    startingRow,
-    endingRow,
-    cacheKey,
-  } = useApiKeys({ subject, perPage, enabled: isOrg ? canReadAPIKeys : true });
+    count: itemCount,
+  } = useAPIKeys({
+    subject,
+    pageSize: perPage ?? API_KEYS_PAGE_SIZE,
+    query,
+    keepPreviousData: true,
+    enabled: isOrg ? canReadAPIKeys : true,
+  });
+
+  const { invalidateAll } = useAPIKeysPagination({
+    query,
+    page,
+    pageCount,
+    isFetching,
+    subject,
+    fetchPage,
+  });
+
+  const startingRow = itemCount > 0 ? Math.max(0, (page - 1) * (perPage ?? API_KEYS_PAGE_SIZE)) + 1 : 0;
+  const endingRow = Math.min(page * (perPage ?? API_KEYS_PAGE_SIZE), itemCount);
+
+  const handlePageChange = (newPage: number) => {
+    fetchPage(newPage);
+  };
   const card = useCardState();
-  const { trigger: createApiKey, isMutating } = useSWRMutation(cacheKey, (_, { arg }: { arg: CreateAPIKeyParams }) =>
-    clerk.apiKeys.create(arg),
-  );
-  const { t } = useLocalizations();
   const clerk = useClerk();
+  const {
+    data: createdAPIKey,
+    trigger: createAPIKey,
+    isMutating,
+  } = useSWRMutation('api-keys-create', (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
+  const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
   const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
+  const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
-  const handleCreateApiKey = async (params: OnCreateParams, closeCardFn: () => void) => {
+  const handleCreateAPIKey = async (params: OnCreateParams) => {
     try {
-      await createApiKey({
+      await createAPIKey({
         ...params,
         subject,
       });
-      closeCardFn();
+      invalidateAll();
       card.setError(undefined);
+      setIsCopyModalOpen(true);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
@@ -115,12 +151,17 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           <Box elementDescriptor={descriptors.apiKeysSearchBox}>
             <InputWithIcon
               placeholder={t(localizationKeys('apiKeys.action__search'))}
-              leftIcon={<Icon icon={MagnifyingGlass} />}
-              value={search}
-              onChange={e => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              leftIcon={
+                <Icon
+                  icon={MagnifyingGlass}
+                  sx={t => ({ color: t.colors.$colorMutedForeground })}
+                />
+              }
+              value={searchValue}
+              type='search'
+              autoCapitalize='none'
+              spellCheck={false}
+              onChange={e => setSearchValue(e.target.value)}
               elementDescriptor={descriptors.apiKeysSearchInput}
             />
           </Box>
@@ -140,32 +181,42 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         <Action.Open value='add-api-key'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
             <Action.Card sx={{ width: '100%' }}>
-              <CreateApiKeyForm
-                onCreate={handleCreateApiKey}
+              <CreateAPIKeyForm
+                onCreate={handleCreateAPIKey}
                 isSubmitting={isMutating}
               />
             </Action.Card>
           </Flex>
         </Action.Open>
+
+        <CopyAPIKeyModal
+          isOpen={isCopyModalOpen}
+          onOpen={() => setIsCopyModalOpen(true)}
+          onClose={() => setIsCopyModalOpen(false)}
+          apiKeyName={createdAPIKey?.name ?? ''}
+          apiKeySecret={createdAPIKey?.secret ?? ''}
+          modalRoot={revokeModalRoot}
+        />
       </Action.Root>
-      <ApiKeysTable
+
+      <APIKeysTable
         rows={apiKeys}
         isLoading={isLoading}
         onRevoke={handleRevoke}
         elementDescriptor={descriptors.apiKeysTable}
         canManageAPIKeys={(isOrg && canManageAPIKeys) || !isOrg}
       />
-      {itemCount > (perPage ?? 5) && (
+      {pageCount > 1 && (
         <Pagination
           count={pageCount}
-          page={page}
-          onChange={setPage}
+          page={Math.min(page, pageCount)}
+          onChange={handlePageChange}
           siblingCount={1}
           rowInfo={{ allRowsCount: itemCount, startingRow, endingRow }}
         />
       )}
+
       <RevokeAPIKeyConfirmationModal
-        subject={subject}
         isOpen={isRevokeModalOpen}
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {
@@ -175,6 +226,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         }}
         apiKeyId={selectedApiKeyId}
         apiKeyName={selectedApiKeyName}
+        onRevokeSuccess={invalidateAll}
         modalRoot={revokeModalRoot}
       />
     </Col>
@@ -182,7 +234,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 };
 
 const _APIKeys = () => {
-  const ctx = useApiKeysContext();
+  const ctx = useAPIKeysContext();
   const { user } = useUser();
   const { organization } = useOrganization();
 
