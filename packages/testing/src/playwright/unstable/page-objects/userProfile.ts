@@ -17,40 +17,6 @@ export const createUserProfileComponentPageObject = (testArgs: { page: EnhancedP
     switchToBillingTab: async () => {
       await page.getByText(/Billing/i).click();
     },
-    openBillingStatementsTab: async () => {
-      await page.getByRole('tab', { name: /Statements/i }).click();
-      await self.waitForActiveBillingTabPanel();
-    },
-    openBillingPaymentsTab: async () => {
-      await page.getByRole('tab', { name: /Payments/i }).click();
-      await self.waitForActiveBillingTabPanel();
-    },
-    waitForActiveBillingTabPanel: () => {
-      return page.locator('.cl-userProfile-root .cl-profilePage .cl-table').waitFor({
-        state: 'visible',
-        timeout: 15000,
-      });
-    },
-    getActiveBillingTableRows: () => {
-      return page.locator('.cl-userProfile-root .cl-profilePage .cl-tableBody .cl-tableRow');
-    },
-    waitForBillingTableRows: async (options?: { hasText?: string | RegExp }) => {
-      const rows = self.getActiveBillingTableRows();
-      if (options?.hasText) {
-        await rows
-          .filter({
-            hasText: options.hasText,
-          })
-          .first()
-          .waitFor({ state: 'visible', timeout: 15000 });
-      } else {
-        await rows.first().waitFor({ state: 'visible', timeout: 15000 });
-      }
-      return rows;
-    },
-    getBillingEmptyStateMessage: (text: string | RegExp) => {
-      return page.locator('.cl-userProfile-root .cl-table').getByText(text);
-    },
     waitForMounted: () => {
       return page.waitForSelector('.cl-userProfile-root', { state: 'attached' });
     },

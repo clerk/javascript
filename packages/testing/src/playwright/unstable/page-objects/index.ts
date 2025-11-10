@@ -9,8 +9,6 @@ import { createImpersonationPageObject } from './impersonation';
 import { createKeylessPopoverPageObject } from './keylessPopover';
 import { createOrganizationSwitcherComponentPageObject } from './organizationSwitcher';
 import { createPlanDetailsPageObject } from './planDetails';
-import { createStatementPageObject } from './statement';
-import { createPaymentAttemptPageObject } from './paymentAttempt';
 import { createPricingTablePageObject } from './pricingTable';
 import { createSessionTaskComponentPageObject } from './sessionTask';
 import { createSignInComponentPageObject } from './signIn';
@@ -44,8 +42,6 @@ export const createPageObjects = ({
     keylessPopover: createKeylessPopoverPageObject(testArgs),
     organizationSwitcher: createOrganizationSwitcherComponentPageObject(testArgs),
     pricingTable: createPricingTablePageObject(testArgs),
-    statement: createStatementPageObject(testArgs),
-    paymentAttempt: createPaymentAttemptPageObject(testArgs),
     sessionTask: createSessionTaskComponentPageObject(testArgs),
     signIn: createSignInComponentPageObject(testArgs),
     signUp: createSignUpComponentPageObject(testArgs),
