@@ -1,5 +1,96 @@
 # Change Log
 
+## 5.105.1
+
+### Patch Changes
+
+- Add aria live region to ensure feedback messages are read to screen readers when feedback changes. ([#7111](https://github.com/clerk/javascript/pull/7111)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.105.0
+
+### Minor Changes
+
+- Replaced the persistent key column in the API keys table with a one-time modal that displays the secret immediately after creation. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Move clientTrustState to SignIn ([#7163](https://github.com/clerk/javascript/pull/7163)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`d88ea99`](https://github.com/clerk/javascript/commit/d88ea99755e605673111cccb41eb93391e1e68dd), [`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/localizations@3.27.0
+  - @clerk/shared@3.31.1
+
+## 5.104.0
+
+### Minor Changes
+
+- Adds `client_trust_state` field to Client and SignIn resources to support new fraud protection feature. ([#7096](https://github.com/clerk/javascript/pull/7096)) by [@chriscanin](https://github.com/chriscanin)
+
+### Patch Changes
+
+- fix: Appropriately handle last-used SAML strategies ([#7135](https://github.com/clerk/javascript/pull/7135)) by [@tmilewski](https://github.com/tmilewski)
+
+- Experimental: Ground work for fixing stale data between hooks and components by sharing a single cache. ([#6913](https://github.com/clerk/javascript/pull/6913)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/shared@3.31.0
+  - @clerk/localizations@3.26.6
+
+## 5.103.2
+
+### Patch Changes
+
+- Propagate locale from ClerkProvider to PaymentElement ([#6885](https://github.com/clerk/javascript/pull/6885)) by [@aeliox](https://github.com/aeliox)
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+- Add debug logging to session update flows when browser is offline ([#7113](https://github.com/clerk/javascript/pull/7113)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove last used badge from rendering on sign-up. ([#7100](https://github.com/clerk/javascript/pull/7100)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Bug fix for Checkout success screen to not mention payment if a payment was not made. ([#7140](https://github.com/clerk/javascript/pull/7140)) by [@panteliselef](https://github.com/panteliselef)
+
+- Optimize Session.#hydrateCache to only cache token if it's new/different ([#7105](https://github.com/clerk/javascript/pull/7105)) by [@jacekradko](https://github.com/jacekradko)
+
+- Navigates to `/sign-up/continue` on sign-up with `missing_requirements` status using `ticket` as strategy ([#7101](https://github.com/clerk/javascript/pull/7101)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It fixes IdP-initiated flows with missing requirements such as accepting legal consent
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/localizations@3.26.5
+
 ## 5.103.1
 
 ### Patch Changes

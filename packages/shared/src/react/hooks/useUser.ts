@@ -1,6 +1,5 @@
-import type { UseUserReturn } from '@clerk/types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { UseUserReturn } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
 
 const hookName = 'useUser';

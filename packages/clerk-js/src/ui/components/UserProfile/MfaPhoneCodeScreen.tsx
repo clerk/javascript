@@ -1,5 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import type { PhoneNumberResource } from '@clerk/types';
+import type { PhoneNumberResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

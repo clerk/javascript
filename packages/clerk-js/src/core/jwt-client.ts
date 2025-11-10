@@ -7,7 +7,7 @@ import type {
   SessionJSON,
   TokenJSON,
   UserJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { Token } from './resources';
 import { Client } from './resources/Client';

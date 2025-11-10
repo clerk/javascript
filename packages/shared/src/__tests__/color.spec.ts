@@ -1,7 +1,7 @@
-import type { Color } from '@clerk/types';
 import { describe, expect, it } from 'vitest';
 
 import { colorToSameTypeString, hexStringToRgbaColor, stringToHslaColor, stringToSameTypeColor } from '../color';
+import type { Color } from '../types';
 
 describe('stringToHslaColor(color)', function () {
   const hsla = { h: 195, s: 1, l: 0.5 };
