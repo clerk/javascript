@@ -1,6 +1,6 @@
 import { buildAccountsBaseUrl } from '@clerk/shared/buildAccountsBaseUrl';
-import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 import type { Jwt } from '@clerk/shared/types';
+import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '@clerk/shared/url';
 
 import { constants } from '../constants';
 import { decodeJwt } from '../jwt/verifyJwt';

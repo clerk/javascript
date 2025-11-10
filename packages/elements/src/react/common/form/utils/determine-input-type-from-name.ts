@@ -1,4 +1,4 @@
-import type { Autocomplete } from '@clerk/types';
+import type { Autocomplete } from '@clerk/shared/types';
 import type { FormFieldProps as RadixFormFieldProps } from '@radix-ui/react-form';
 
 import type { ClerkFieldId, FieldStates } from '../types';

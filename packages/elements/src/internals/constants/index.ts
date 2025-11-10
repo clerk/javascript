@@ -1,4 +1,4 @@
-import type { SignUpModes } from '@clerk/types';
+import type { SignUpModes } from '@clerk/shared/types';
 
 import { safeAccess } from '~/utils/safe-access';
 

@@ -12,8 +12,8 @@ import { withClerk } from './withClerk';
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/clerk-react';
- * import { CheckoutButton } from '@clerk/clerk-react/experimental';
+ * import { SignedIn } from '@clerk/react';
+ * import { CheckoutButton } from '@clerk/react/experimental';
  *
  * // Basic usage with default "Checkout" text
  * function BasicCheckout() {

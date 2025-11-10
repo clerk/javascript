@@ -13,7 +13,7 @@ import { getMajorVersion } from '../versionSelector';
 
 vi.mock('../loadScript');
 
-setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
+setClerkJsLoadingErrorPackageName('@clerk/react');
 const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
 
 const mockClerk = {
@@ -41,7 +41,7 @@ describe('loadClerkJsScript(options)', () => {
 
   test('throws error when publishableKey is missing', async () => {
     await expect(loadClerkJsScript({} as any)).rejects.toThrow(
-      '@clerk/clerk-react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+      '@clerk/react: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
     );
   });
 

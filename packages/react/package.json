@@ -1,5 +1,5 @@
 {
-  "name": "@clerk/clerk-react",
+  "name": "@clerk/react",
   "version": "5.53.8",
   "description": "Clerk React library",
   "keywords": [
@@ -63,18 +63,24 @@
         "default": "./dist/experimental.js"
       }
     },
+    "./legacy": {
+      "import": {
+        "types": "./dist/legacy.d.mts",
+        "default": "./dist/legacy.mjs"
+      },
+      "require": {
+        "types": "./dist/legacy.d.ts",
+        "default": "./dist/legacy.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "files": [
-    "dist",
-    "internal",
-    "errors",
-    "experimental"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs react",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
@@ -102,7 +108,7 @@
     "react-dom": "catalog:peer-react"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

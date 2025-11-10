@@ -1,4 +1,4 @@
-import { useRoutingProps } from '@clerk/clerk-react/internal';
+import { useRoutingProps } from '@clerk/react/internal';
 import type { RoutingOptions } from '@clerk/shared/types';
 
 import { useEnforceCatchAllRoute } from './useEnforceCatchAllRoute';

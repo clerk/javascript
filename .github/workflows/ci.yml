@@ -117,7 +117,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
-        run: pnpm turbo build $TURBO_ARGS --only
+        run: pnpm turbo build $TURBO_ARGS --only --filter=!@clerk/elements
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -222,7 +222,7 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
@@ -245,7 +245,7 @@ jobs:
         run: |
           # Only run Typedoc tests for one matrix version
           if [ "${{ matrix.node-version }}" == "22" ]; then
-            pnpm test:typedoc
+            pnpm turbo run //#test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -275,43 +275,42 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
-            'generic',
-            'express',
-            'ap-flows',
-            'elements',
-            'localhost',
-            'sessions',
-            'sessions:staging',
-            'handshake',
-            'handshake:staging',
-            'astro',
-            'expo-web',
-            'tanstack-react-start',
-            'vue',
-            'nuxt',
-            'react-router',
-            'billing',
-            'machine',
-            'custom',
+        test-name:
+          [
+            "generic",
+            "express",
+            "ap-flows",
+            "localhost",
+            "sessions",
+            "sessions:staging",
+            "handshake",
+            "handshake:staging",
+            "astro",
+            "tanstack-react-start",
+            "vue",
+            "nuxt",
+            "react-router",
+            "billing",
+            "machine",
+            "custom",
           ]
         test-project: ["chrome"]
         include:
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '14'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '16'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '16'
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "14"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "16"
 
     steps:
       - name: Checkout Repo

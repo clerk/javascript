@@ -47,7 +47,7 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * <Tab>
  *
  * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
- * import { useAuth } from '@clerk/clerk-react'
+ * import { useAuth } from '@clerk/react'
  *
  * export default function ExternalDataPage() {
  *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()

@@ -1,4 +1,4 @@
-import type { SignInResource, Web3Strategy } from '@clerk/types';
+import type { SignInResource, Web3Strategy } from '@clerk/shared/types';
 import { assertEvent, enqueueActions, fromPromise, not, sendTo, setup } from 'xstate';
 
 import { SIGN_IN_DEFAULT_BASE_PATH } from '~/internals/constants';

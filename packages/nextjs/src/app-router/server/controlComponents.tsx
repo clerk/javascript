@@ -1,4 +1,4 @@
-import type { ProtectProps } from '@clerk/clerk-react';
+import type { ProtectProps } from '@clerk/react';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import React from 'react';
 

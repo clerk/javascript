@@ -1,5 +1,5 @@
+import type { SignUpResource } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { SignUpResource } from '@clerk/types';
 import type { DoneActorEvent } from 'xstate';
 import { fromPromise, not, or, setup } from 'xstate';
 

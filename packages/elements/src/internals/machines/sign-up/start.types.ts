@@ -1,5 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy, Web3Strategy } from '@clerk/shared/types';
 import type { ActorRefFrom, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';

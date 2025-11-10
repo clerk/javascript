@@ -4,7 +4,7 @@ import type {
   OAuthStrategy,
   SamlStrategy,
   SignInStrategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { SetRequired, Simplify } from 'type-fest';
 import type { ActorRefFrom } from 'xstate';
 

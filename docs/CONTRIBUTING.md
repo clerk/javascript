@@ -44,8 +44,7 @@ All packages of the monorepo are inside [packages](../packages). For package spe
 
 - [`@clerk/backend`](../packages/backend): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
 - [`@clerk/clerk-js`](../packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
-- [`@clerk/clerk-react`](../packages/react) Clerk package for React applications.
-- [`@clerk/types`](../packages/types): Main TypeScript typings for Clerk libraries.
+- [`@clerk/react`](../packages/react) Clerk package for React applications.
 - Browse [packages](../packages) to see more
 
 Additionally there are packages which act as shared utilities or building blocks.
@@ -186,10 +185,10 @@ To review your changes locally, you can run `pnpm run typedoc:generate` to gener
 
 Create a PR that includes your changes to any Typedoc comments. Once the PR has been merged and a release is published, a PR will [automatically](https://github.com/clerk/clerk-docs/blob/main/.github/workflows/typedoc.yml) be opened in `clerk-docs` to merge in the Typedoc changes.
 
-Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` component. For example, if you updated Typedoc comments for the `useAuth()` hook in `clerk/javascript`, you'll need to make sure that in `clerk-docs`, in the `/hooks/use-auth.mdx` file, there's a `<Typedoc />` component linked to the `./clerk-typedoc/clerk-react/use-auth.mdx` file, like:
+Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` component. For example, if you updated Typedoc comments for the `useAuth()` hook in `clerk/javascript`, you'll need to make sure that in `clerk-docs`, in the `/hooks/use-auth.mdx` file, there's a `<Typedoc />` component linked to the `./clerk-typedoc/react/use-auth.mdx` file, like:
 
 ```mdx
-<Typedoc src='clerk-react/use-auth' />
+<Typedoc src='react/use-auth' />
 ```
 
 Read more about this in the [`clerk-docs` CONTRIBUTING.md](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#typedoc-).

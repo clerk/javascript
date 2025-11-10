@@ -63,8 +63,7 @@
     "test:watch": "vitest watch"
   },
   "dependencies": {
-    "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",

@@ -76,7 +76,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "dotenv": "17.2.2"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import type { SignInStrategy } from '@clerk/types';
+import type { SignInStrategy } from '@clerk/shared/types';
 import { createContext, useContext } from 'react';
 
 import { ClerkElementsRuntimeError } from '~/internals/errors';

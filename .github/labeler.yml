@@ -39,9 +39,6 @@ react:
 react-router:
   - packages/react-router/**
 
-remix:
-  - packages/remix/**
-
 tanstack:
   - packages/tanstack-react-start/**
 
@@ -50,9 +47,6 @@ testing:
 
 themes:
   - packages/themes/**
-
-types:
-  - packages/types/**
 
 vue:
   - packages/vue/**

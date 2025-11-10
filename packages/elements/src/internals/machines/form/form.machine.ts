@@ -1,6 +1,6 @@
 import { isClerkAPIResponseError, isKnownError, isMetamaskError } from '@clerk/shared/error';
+import type { ClerkAPIError } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
-import type { ClerkAPIError } from '@clerk/types';
 import type { MachineContext } from 'xstate';
 import { assign, enqueueActions, setup } from 'xstate';
 

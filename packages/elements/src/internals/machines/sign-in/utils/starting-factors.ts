@@ -1,13 +1,13 @@
 // These utilities are ported from: packages/clerk-js/src/ui/components/SignIn/utils.ts
 // They should be functionally identical.
-import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   PreferredSignInStrategy,
   SignInFactor,
   SignInFirstFactor,
   SignInSecondFactor,
   SignInStrategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 // Factor sorting - https://github.com/clerk/javascript/blob/5764e2911790051589bb5c4f3b1a2c79f7f30c7e/packages/clerk-js/src/ui/utils/factorSorting.ts
 const makeSortingOrderMap = <T extends string>(arr: T[]): Record<T, number> =>

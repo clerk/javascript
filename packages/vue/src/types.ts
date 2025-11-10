@@ -37,13 +37,13 @@ export interface VueClerkInjectionKeyType {
   treatPendingAsSignedOut?: boolean;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;

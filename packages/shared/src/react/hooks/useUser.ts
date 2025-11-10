@@ -15,7 +15,7 @@ const hookName = 'useUser';
  * The following example uses the `useUser()` hook to access the [`User`](https://clerk.com/docs/reference/javascript/user) object, which contains the current user's data such as their full name. The `isLoaded` and `isSignedIn` properties are used to handle the loading state and to check if the user is signed in, respectively.
  *
  * ```tsx {{ filename: 'src/Example.tsx' }}
- * import { useUser } from '@clerk/clerk-react'
+ * import { useUser } from '@clerk/react'
  *
  * export default function Example() {
  *   const { isSignedIn, user, isLoaded } = useUser()
@@ -41,7 +41,7 @@ const hookName = 'useUser';
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useUser } from '@clerk/clerk-react'
+ * import { useUser } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isSignedIn, isLoaded, user } = useUser()
@@ -86,7 +86,7 @@ const hookName = 'useUser';
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useUser } from '@clerk/clerk-react'
+ * import { useUser } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isSignedIn, isLoaded, user } = useUser();

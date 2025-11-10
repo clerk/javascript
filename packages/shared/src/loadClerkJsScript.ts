@@ -17,10 +17,10 @@ const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 /**
  * Sets the package name for error messages during ClerkJS script loading.
  *
- * @param packageName - The name of the package to use in error messages (e.g., '@clerk/clerk-react').
+ * @param packageName - The name of the package to use in error messages (e.g., '@clerk/react').
  * @example
  * ```typescript
- * setClerkJsLoadingErrorPackageName('@clerk/clerk-react');
+ * setClerkJsLoadingErrorPackageName('@clerk/react');
  * ```
  */
 export function setClerkJsLoadingErrorPackageName(packageName: string) {

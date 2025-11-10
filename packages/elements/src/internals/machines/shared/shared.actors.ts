@@ -1,4 +1,4 @@
-import type { Clerk, LoadedClerk } from '@clerk/types';
+import type { Clerk, LoadedClerk } from '@clerk/shared/types';
 import type { EventObject } from 'xstate';
 import { fromCallback } from 'xstate';
 

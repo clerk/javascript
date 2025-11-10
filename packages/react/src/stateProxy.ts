@@ -105,6 +105,9 @@ export class StateProxy implements State {
             },
           });
         },
+        get hasBeenFinalized() {
+          return gateProperty(target, 'hasBeenFinalized', false);
+        },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
@@ -206,6 +209,9 @@ export class StateProxy implements State {
         },
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
+        },
+        get hasBeenFinalized() {
+          return gateProperty(target, 'hasBeenFinalized', false);
         },
 
         create: gateMethod(target, 'create'),

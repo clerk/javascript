@@ -1,4 +1,4 @@
-import type { ClerkProviderProps } from '@clerk/clerk-react';
+import type { ClerkProviderProps } from '@clerk/react';
 import type { Without } from '@clerk/shared/types';
 
 export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey'> & {

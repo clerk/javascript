@@ -1,4 +1,4 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 import { ScriptOnce } from '@tanstack/react-router';
 import { getGlobalStartContext } from '@tanstack/react-start';
 import { useEffect } from 'react';
@@ -9,7 +9,7 @@ import type { TanstackStartClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 import { mergeWithPublicEnvs, pickFromClerkInitState } from './utils';
 
-export * from '@clerk/clerk-react';
+export * from '@clerk/react';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,

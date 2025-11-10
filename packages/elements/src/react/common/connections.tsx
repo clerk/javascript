@@ -1,4 +1,4 @@
-import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/shared/types';
 import { Slot } from '@radix-ui/react-slot';
 import { createContext, useContext } from 'react';
 

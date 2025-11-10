@@ -2,7 +2,6 @@
 
 import { iconImageUrl } from '@clerk/shared/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 import type {
   EnterpriseSSOStrategy,
   EnvironmentResource,
@@ -11,7 +10,8 @@ import type {
   SamlStrategy,
   Web3Provider,
   Web3Strategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { fromEntries } from './clerk-js';
 

@@ -216,6 +216,7 @@ export interface FeatureResource extends ClerkResource {
 
 /**
  * The status of a payment method.
+ *
  * @inline
  */
 export type BillingPaymentMethodStatus = 'active' | 'expired' | 'disconnected';

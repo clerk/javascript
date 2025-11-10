@@ -18,7 +18,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
   const runtimeConfig = useRuntimeConfig();
 
-  nuxtApp.vueApp.use(clerkPlugin, {
+  nuxtApp.vueApp.use(clerkPlugin as any, {
     ...(runtimeConfig.public.clerk ?? {}),
     sdkMetadata: {
       name: PACKAGE_NAME,

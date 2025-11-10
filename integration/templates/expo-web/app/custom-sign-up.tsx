@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { TextInput, Button, View } from 'react-native';
-import { useSignUp } from '@clerk/clerk-expo';
+import { useSignUp } from '@clerk/expo';
 import { useRouter } from 'expo-router';
 
 export default function SignUpScreen() {
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { signUp } = useSignUp();
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = React.useState('');
@@ -13,46 +13,19 @@ export default function SignUpScreen() {
   const [code, setCode] = React.useState('');
 
   const onSignUpPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
-
-    try {
-      await signUp.create({
-        emailAddress,
-        password,
-      });
-
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
-      setPendingVerification(true);
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
-    }
+    await signUp.password({ emailAddress, password });
+    await signUp.verifications.sendEmailCode({ emailAddress });
+    setPendingVerification(true);
   };
 
   const onPressVerify = async () => {
-    if (!isLoaded) {
-      return;
-    }
-
-    try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
+    await signUp.verifications.verifyEmailCode({ code });
+    if (signUp.status === 'complete') {
+      await signUp.finalize({
+        navigate: async () => {
+          router.replace('/');
+        },
       });
-
-      if (completeSignUp.status === 'complete') {
-        await setActive({ session: completeSignUp.createdSessionId });
-        router.replace('/');
-      } else {
-        console.error(JSON.stringify(completeSignUp, null, 2));
-      }
-    } catch (err: any) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
     }
   };
 

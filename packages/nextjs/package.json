@@ -54,6 +54,11 @@
       "types": "./dist/types/experimental.d.ts",
       "import": "./dist/esm/experimental.js",
       "require": "./dist/cjs/experimental.js"
+    },
+    "./legacy": {
+      "types": "./dist/types/legacy.d.ts",
+      "import": "./dist/esm/legacy.js",
+      "require": "./dist/cjs/legacy.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -80,9 +85,8 @@
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "server-only": "0.0.1",
     "tslib": "catalog:repo"
   },
@@ -96,7 +100,7 @@
     "react-dom": "catalog:peer-react"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"
