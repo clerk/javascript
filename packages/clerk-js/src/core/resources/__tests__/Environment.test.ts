@@ -9,7 +9,10 @@ describe('Environment', () => {
 
     expect(environment).toMatchObject({
       apiKeysSettings: expect.objectContaining({
-        enabled: false,
+        orgs_api_keys_enabled: false,
+        show_in_org_profile: false,
+        show_in_user_profile: false,
+        user_api_keys_enabled: false,
         pathRoot: '',
       }),
       authConfig: expect.objectContaining({
