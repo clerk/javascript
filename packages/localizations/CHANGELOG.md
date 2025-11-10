@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.27.0
+
+### Minor Changes
+
+- Added localization entry for the API key copy modal component. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.97.2
+
+## 3.26.6
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293)]:
+  - @clerk/types@4.97.1
+
 ## 3.26.5
 
 ### Patch Changes

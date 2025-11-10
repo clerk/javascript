@@ -1,15 +1,9 @@
-import { useClerk } from '@clerk/shared/react';
 import type { APIKeyResource } from '@clerk/shared/types';
-import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 
 import {
   Box,
-  Button,
   descriptors,
   Flex,
-  Icon,
-  Input,
   localizationKeys,
   Spinner,
   Table,
@@ -22,91 +16,10 @@ import {
 } from '@/ui/customizables';
 import type { ElementDescriptor } from '@/ui/customizables/elementDescriptors';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
-import { useClipboard } from '@/ui/hooks';
-import { Check, ClipboardOutline, Eye, EyeSlash } from '@/ui/icons';
-import { common, mqu } from '@/ui/styledSystem';
+import { mqu } from '@/ui/styledSystem';
 import { timeAgo } from '@/ui/utils/timeAgo';
 
-const useApiKeySecret = ({ apiKeyID, enabled }: { apiKeyID: string; enabled: boolean }) => {
-  const clerk = useClerk();
-
-  return useSWR(enabled ? ['api-key-secret', apiKeyID] : null, () => clerk.apiKeys.getSecret(apiKeyID));
-};
-
-const CopySecretButton = ({ apiKeyID }: { apiKeyID: string }) => {
-  const [enabled, setEnabled] = useState(false);
-  const { data: apiKeySecret } = useApiKeySecret({ apiKeyID, enabled });
-  const { onCopy, hasCopied } = useClipboard(apiKeySecret ?? '');
-
-  useEffect(() => {
-    if (enabled && apiKeySecret) {
-      onCopy();
-      setEnabled(false);
-    }
-  }, [enabled, apiKeySecret, onCopy]);
-
-  return (
-    <Button
-      variant='ghost'
-      aria-label={hasCopied ? 'Copied API key to clipboard' : 'Copy API key'}
-      onClick={() => setEnabled(true)}
-      focusRing={false}
-      elementDescriptor={descriptors.apiKeysCopyButton}
-    >
-      <Icon
-        size='sm'
-        icon={hasCopied ? Check : ClipboardOutline}
-        sx={t => ({ color: t.colors.$primary500 })}
-      />
-    </Button>
-  );
-};
-
-const SecretInputWithToggle = ({ apiKeyID }: { apiKeyID: string }) => {
-  const [revealed, setRevealed] = useState(false);
-  const { data: apiKeySecret } = useApiKeySecret({ apiKeyID, enabled: revealed });
-
-  return (
-    <Flex
-      center
-      sx={{
-        width: '100%',
-        position: 'relative',
-      }}
-    >
-      <Input
-        type={revealed ? 'text' : 'password'}
-        value={revealed && apiKeySecret ? apiKeySecret : `•`.repeat(25)}
-        readOnly
-        aria-label='API key (hidden)'
-        sx={t => ({
-          paddingInlineEnd: t.sizes.$12,
-        })}
-      />
-      <Button
-        variant='ghost'
-        sx={t => ({
-          position: 'absolute',
-          right: 0,
-          '&:focus-visible': {
-            ...common.focusRingStyles(t),
-          },
-        })}
-        focusRing={false}
-        aria-label={'Show key'}
-        elementDescriptor={descriptors.apiKeysRevealButton}
-        onClick={() => setRevealed(!revealed)}
-      >
-        <Icon
-          icon={revealed ? EyeSlash : Eye}
-          sx={t => ({ color: t.colors.$colorMutedForeground })}
-        />
-      </Button>
-    </Flex>
-  );
-};
-
-export const ApiKeysTable = ({
+export const APIKeysTable = ({
   rows,
   isLoading,
   onRevoke,
@@ -129,14 +42,13 @@ export const ApiKeysTable = ({
           <Tr>
             <Th>Name</Th>
             <Th>Last used</Th>
-            <Th>Key</Th>
             {canManageAPIKeys && <Th>Actions</Th>}
           </Tr>
         </Thead>
         <Tbody>
           {isLoading ? (
             <Tr>
-              <Td colSpan={4}>
+              <Td colSpan={3}>
                 <Spinner
                   colorScheme='primary'
                   sx={{ margin: 'auto', display: 'block' }}
@@ -184,20 +96,6 @@ export const ApiKeysTable = ({
                   >
                     <Text localizationKey={apiKey.lastUsedAt ? timeAgo(apiKey.lastUsedAt) : '-'} />
                   </Box>
-                </Td>
-                <Td>
-                  <Flex
-                    direction='row'
-                    gap={1}
-                    sx={{
-                      [mqu.sm]: {
-                        minWidth: '25ch',
-                      },
-                    }}
-                  >
-                    <SecretInputWithToggle apiKeyID={apiKey.id} />
-                    <CopySecretButton apiKeyID={apiKey.id} />
-                  </Flex>
                 </Td>
                 {canManageAPIKeys && (
                   <Td>
