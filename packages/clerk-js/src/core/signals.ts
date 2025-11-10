@@ -38,7 +38,7 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
  * generic non-API errors into the global array.
  */
-function errorsToParsedErrors<T extends Record<string, unknown>>(
+export function errorsToParsedErrors<T extends Record<string, unknown>>(
   error: ClerkError | null,
   initialFields: T,
 ): Errors<T> {
