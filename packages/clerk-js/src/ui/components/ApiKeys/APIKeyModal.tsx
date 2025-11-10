@@ -3,7 +3,7 @@ import React from 'react';
 import { Modal } from '@/ui/elements/Modal';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 
-type ApiKeyModalProps = React.ComponentProps<typeof Modal> & {
+type APIKeyModalProps = React.ComponentProps<typeof Modal> & {
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
 };
 
@@ -33,7 +33,7 @@ const getScopedPortalContainerStyles = (modalRoot?: React.MutableRefObject<HTMLE
   ];
 };
 
-export const ApiKeyModal = ({ modalRoot, containerSx, ...modalProps }: ApiKeyModalProps) => {
+export const APIKeyModal = ({ modalRoot, containerSx, ...modalProps }: APIKeyModalProps) => {
   return (
     <Modal
       {...modalProps}

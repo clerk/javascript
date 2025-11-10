@@ -77,7 +77,11 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
-import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
+import {
+  _authenticateWithPopup,
+  _futureAuthenticateWithPopup,
+  wrapWithPopupRoutes,
+} from '../../utils/authenticateWithPopup';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -893,12 +897,8 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
-    const { flow = 'auto', strategy, redirectUrl, redirectCallbackUrl } = params;
+    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId } = params;
     return runAsyncResourceTask(this.resource, async () => {
-      if (flow !== 'auto') {
-        throw new Error('modal flow is not supported yet');
-      }
-
       let actionCompleteRedirectUrl = redirectUrl;
       try {
         new URL(redirectUrl);
@@ -906,16 +906,43 @@ class SignInFuture implements SignInFutureResource {
         actionCompleteRedirectUrl = window.location.origin + redirectUrl;
       }
 
+      const routes = { redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl), actionCompleteRedirectUrl };
+      if (popup) {
+        const wrappedRoutes = wrapWithPopupRoutes(SignIn.clerk, {
+          redirectCallbackUrl: routes.redirectUrl,
+          redirectUrl: actionCompleteRedirectUrl,
+        });
+        routes.redirectUrl = wrappedRoutes.redirectCallbackUrl;
+        routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
+      }
+
       await this._create({
         strategy,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
-        actionCompleteRedirectUrl,
+        ...routes,
       });
+
+      if (strategy === 'enterprise_sso') {
+        await this.resource.__internal_basePost({
+          body: {
+            ...routes,
+            oidcPrompt,
+            enterpriseConnectionId,
+            strategy: 'enterprise_sso',
+          },
+          action: 'prepare_first_factor',
+        });
+      }
 
       const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
 
       if (status === 'unverified' && externalVerificationRedirectURL) {
-        windowNavigate(externalVerificationRedirectURL);
+        if (popup) {
+          await _futureAuthenticateWithPopup(SignIn.clerk, { popup, externalVerificationRedirectURL });
+          // Pick up the modified SignIn resource
+          await this.resource.reload();
+        } else {
+          windowNavigate(externalVerificationRedirectURL);
+        }
       }
     });
   }

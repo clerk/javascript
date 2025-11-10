@@ -655,6 +655,161 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
+    test('displays billing history and navigates through statement and payment attempt details', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      try {
+        await u.po.signIn.goTo();
+        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+        await u.po.page.goToRelative('/user');
+        await u.po.userProfile.waitForMounted();
+        await u.po.userProfile.switchToBillingTab();
+
+        const openBillingTab = async (label: RegExp) => {
+          await page.getByRole('tab', { name: label }).click();
+          await page
+            .locator('.cl-userProfile-root [role="tabpanel"] .cl-table')
+            .waitFor({ state: 'visible', timeout: 15000 });
+        };
+        const getBillingTableRows = () => {
+          return page.locator('.cl-userProfile-root .cl-tableBody .cl-tableRow');
+        };
+        const waitForBillingTableRows = async (options?: { hasText?: string | RegExp }) => {
+          const rows = getBillingTableRows();
+          if (options?.hasText) {
+            await rows
+              .filter({
+                hasText: options.hasText,
+              })
+              .first()
+              .waitFor({ state: 'visible', timeout: 15000 });
+          } else {
+            await rows.first().waitFor({ state: 'visible', timeout: 15000 });
+          }
+          return rows;
+        };
+        const getBillingEmptyStateMessage = (text: string | RegExp) => {
+          return page.locator('.cl-userProfile-root .cl-table').getByText(text);
+        };
+        const waitForStatementPage = async () => {
+          const statementRoot = page.locator('.cl-statementRoot');
+          await statementRoot.waitFor({ state: 'visible', timeout: 15000 });
+          return statementRoot;
+        };
+        const waitForPaymentAttemptPage = async () => {
+          const paymentAttemptRoot = page.locator('.cl-paymentAttemptRoot');
+          await paymentAttemptRoot.waitFor({ state: 'visible', timeout: 15000 });
+          return paymentAttemptRoot;
+        };
+        const goBackToPaymentsList = async () => {
+          const paymentAttemptRoot = page.locator('.cl-paymentAttemptRoot');
+          await Promise.all([
+            page.waitForURL(/tab=payments/, { timeout: 15000 }),
+            page.getByRole('link', { name: /Payments/i }).click(),
+          ]);
+          await paymentAttemptRoot.waitFor({ state: 'detached', timeout: 15000 });
+        };
+
+        await openBillingTab(/Statements/i);
+        await expect(getBillingEmptyStateMessage('No statements to display')).toBeVisible();
+
+        await u.po.page.goToRelative('/user');
+        await u.po.userProfile.waitForMounted();
+        await u.po.userProfile.switchToBillingTab();
+        await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+
+        await u.po.pricingTable.waitForMounted();
+        await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+        await u.po.checkout.waitForMounted();
+        await u.po.checkout.fillTestCard();
+        await u.po.checkout.clickPayOrSubscribe();
+        await expect(u.po.page.getByText('Payment was successful!')).toBeVisible({
+          timeout: 15000,
+        });
+        await u.po.checkout.confirmAndContinue();
+
+        await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true });
+        await u.po.checkout.waitForMounted();
+        await u.po.checkout.root.getByText('Add payment method').click();
+        await u.po.checkout.fillCard({
+          number: '4100000000000019',
+          expiration: '1234',
+          cvc: '123',
+          country: 'United States',
+          zip: '12345',
+        });
+        await u.po.checkout.clickPayOrSubscribe();
+        await expect(u.po.checkout.root.getByText('The card was declined.').first()).toBeVisible({
+          timeout: 15000,
+        });
+        await u.po.checkout.closeDrawer();
+
+        await u.po.page.goToRelative('/user');
+        await u.po.userProfile.waitForMounted();
+        await u.po.userProfile.switchToBillingTab();
+
+        await openBillingTab(/Statements/i);
+        const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        await waitForBillingTableRows({ hasText: new RegExp(date, 'i') });
+        await expect(getBillingEmptyStateMessage('No statements to display')).toBeHidden();
+
+        const firstStatementRow = getBillingTableRows().first();
+        await firstStatementRow.click();
+
+        const statementRoot = await waitForStatementPage();
+        await expect(
+          statementRoot.locator('.cl-statementSectionContentDetailsHeaderTitle').filter({ hasText: /Plus/i }).first(),
+        ).toBeVisible();
+
+        const statementTotalText = (await statementRoot.locator('.cl-statementFooterValue').textContent())?.trim();
+        expect(statementTotalText).toBeTruthy();
+
+        await statementRoot
+          .getByRole('button', { name: /View payment/i })
+          .first()
+          .click();
+        const paymentAttemptRoot = await waitForPaymentAttemptPage();
+        await expect(paymentAttemptRoot.locator('.cl-paymentAttemptHeaderBadge')).toHaveText(/paid/i);
+
+        const paymentTotalText = (
+          await paymentAttemptRoot.locator('.cl-paymentAttemptFooterValue').textContent()
+        )?.trim();
+        expect(paymentTotalText).toBe(statementTotalText);
+
+        await expect(
+          paymentAttemptRoot.locator('.cl-lineItemsTitle').filter({ hasText: /Plus/i }).first(),
+        ).toBeVisible();
+
+        await goBackToPaymentsList();
+        await openBillingTab(/Payments/i);
+        await waitForBillingTableRows({ hasText: /paid/i });
+        await waitForBillingTableRows({ hasText: /Failed/i });
+        await expect(getBillingEmptyStateMessage('No payment history')).toBeHidden();
+
+        const failedPaymentRow = getBillingTableRows()
+          .filter({ hasText: /Failed/i })
+          .first();
+        await failedPaymentRow.click();
+
+        const failedPaymentAttemptRoot = await waitForPaymentAttemptPage();
+        await expect(failedPaymentAttemptRoot.locator('.cl-paymentAttemptHeaderBadge')).toHaveText(/failed/i);
+        await expect(
+          failedPaymentAttemptRoot.locator('.cl-lineItemsTitle').filter({ hasText: /Pro/i }).first(),
+        ).toBeVisible();
+
+        await goBackToPaymentsList();
+      } finally {
+        await fakeUser.deleteIfExists();
+      }
+    });
+
     test('adds two payment methods and sets the last as default', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 

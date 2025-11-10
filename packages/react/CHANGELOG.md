@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.53.9
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+
+## 5.53.8
+
+### Patch Changes
+
+- Add sessionClaims to the useCallback dependency array which creates derivedHas in useAuth() ([#7165](https://github.com/clerk/javascript/pull/7165)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 5.53.7
 
 ### Patch Changes

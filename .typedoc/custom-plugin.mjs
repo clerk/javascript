@@ -98,20 +98,50 @@ function getRelativeLinkReplacements() {
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /\(setActiveParams\)/g,
-      replace: '([setActiveParams](/docs/reference/javascript/types/set-active-params))',
-    },
-    {
-      pattern: /`LoadedClerk`/g,
-      replace: '[Clerk](/docs/reference/javascript/clerk)',
+      pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
+      replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
       pattern: /\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /\| `SignInResource` \|/,
-      replace: '| [SignInResource](/docs/reference/javascript/sign-in) |',
+      pattern: /`LoadedClerk`/g,
+      replace: '[Clerk](/docs/reference/javascript/clerk)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?LocalizationResource`?(?![\]\w`])/g,
+      replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      // SessionResource appears in plain text, with an array next to it, with backticks, etc.
+      // e.g. `SessionResource[]`
+      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[`SessionResource`](/docs/reference/javascript/session)$1',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
+      replace: '[`SessionStatusClaim`](/docs/reference/javascript/types/session-status)',
+    },
+    {
+      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
+      replace: '[SetActiveParams](/docs/reference/javascript/types/set-active-params)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
+      replace: '[`SignInResource`](/docs/reference/javascript/sign-in)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
+      replace: '[`SignedInSessionResource`](/docs/reference/javascript/session)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
+      replace: '[`SignUpResource`](/docs/reference/javascript/sign-up)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
+      replace: '[`OrganizationResource`](/docs/reference/javascript/organization)',
     },
     {
       pattern: /`OrganizationPrivateMetadata`/g,
@@ -141,6 +171,10 @@ function getCatchAllReplacements() {
       pattern: /`OrganizationMembershipPublicMetadata`/g,
       replace:
         '[`OrganizationMembershipPublicMetadata`](/docs/reference/javascript/types/metadata#organization-membership-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
+      replace: '[`UserResource`](/docs/reference/javascript/user)',
     },
     {
       /**
