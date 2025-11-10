@@ -1439,9 +1439,13 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
-export type __internal_EnableOrganizationsPromptProps = {
-  callerName: string;
-};
+export type __internal_EnableOrganizationsPromptProps =
+  | {
+      componentName: 'OrganizationSwitcher' | 'OrganizationProfile' | 'OrganizationList';
+    }
+  | {
+      utilityName: 'useOrganizationList' | 'useOrganization';
+    };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
