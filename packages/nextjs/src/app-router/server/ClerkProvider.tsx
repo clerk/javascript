@@ -7,7 +7,6 @@ import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthPr
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { getKeylessStatus, KeylessProvider } from './keyless-provider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
@@ -37,26 +36,12 @@ export async function ClerkProvider(
     if (!dynamic) {
       return Promise.resolve(null);
     }
-    if (isNext13) {
-      /**
-       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-       * Without the await here, Next will throw a DynamicServerError during build.
-       */
-      return Promise.resolve(await getDynamicClerkState());
-    }
     return getDynamicClerkState();
   }
 
   async function generateNonce() {
     if (!dynamic) {
       return Promise.resolve('');
-    }
-    if (isNext13) {
-      /**
-       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-       * Without the await here, Next will throw a DynamicServerError during build.
-       */
-      return Promise.resolve(await getNonceHeaders());
     }
     return getNonceHeaders();
   }
