@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.53.8
+
+### Patch Changes
+
+- Add sessionClaims to the useCallback dependency array which creates derivedHas in useAuth() ([#7165](https://github.com/clerk/javascript/pull/7165)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 5.53.7
 
 ### Patch Changes

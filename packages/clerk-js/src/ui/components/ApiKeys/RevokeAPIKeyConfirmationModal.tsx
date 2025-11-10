@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import { useSWRConfig } from 'swr';
 
 import { descriptors } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
@@ -9,29 +8,28 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { ApiKeyModal } from './ApiKeyModal';
+import { APIKeyModal } from './APIKeyModal';
 
 type RevokeAPIKeyConfirmationModalProps = {
-  subject: string;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
   apiKeyId?: string;
   apiKeyName: string;
+  onRevokeSuccess?: () => void;
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
 };
 
 export const RevokeAPIKeyConfirmationModal = ({
-  subject,
   isOpen,
   onOpen,
   onClose,
   apiKeyId,
   apiKeyName,
+  onRevokeSuccess,
   modalRoot,
 }: RevokeAPIKeyConfirmationModalProps) => {
   const clerk = useClerk();
-  const { mutate } = useSWRConfig();
   const { t } = useLocalizations();
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
@@ -55,9 +53,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     }
 
     await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    const cacheKey = { key: 'api-keys', subject };
-
-    void mutate(cacheKey);
+    onRevokeSuccess?.();
     handleClose();
   };
 
@@ -66,7 +62,7 @@ export const RevokeAPIKeyConfirmationModal = ({
   }
 
   return (
-    <ApiKeyModal
+    <APIKeyModal
       handleOpen={onOpen}
       handleClose={handleClose}
       canCloseModal={false}
@@ -104,6 +100,6 @@ export const RevokeAPIKeyConfirmationModal = ({
           </FormContainer>
         </Card.Content>
       </Card.Root>
-    </ApiKeyModal>
+    </APIKeyModal>
   );
 };

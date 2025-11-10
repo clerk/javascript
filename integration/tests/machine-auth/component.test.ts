@@ -66,6 +66,70 @@ testAgainstRunningApps({
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(2);
   });
 
+  test('pagination works correctly with multiple pages', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Create user and 11 API keys to trigger pagination (default perPage is 10)
+    const fakeUser = u.services.users.createFakeUser();
+    const bapiUser = await u.services.users.createBapiUser(fakeUser);
+    const fakeAPIKeys = await Promise.all(
+      Array.from({ length: 11 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
+    );
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    // Verify first page
+    await expect(u.page.getByText(/Displaying 1 – 10 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(10);
+
+    // Navigate to second page
+    const page2Button = u.page.locator('.cl-paginationButton').filter({ hasText: /^2$/ });
+    await page2Button.click();
+    await expect(u.page.getByText(/Displaying 11 – 11 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(1);
+
+    // Navigate back to first page
+    const page1Button = u.page.locator('.cl-paginationButton').filter({ hasText: /^1$/ });
+    await page1Button.click();
+    await expect(u.page.getByText(/Displaying 1 – 10 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(10);
+
+    // Cleanup
+    await Promise.all(fakeAPIKeys.map(key => key.revoke()));
+    await fakeUser.deleteIfExists();
+  });
+
+  test('pagination does not show when items fit in one page', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    const apiKeyName = `${fakeAdmin.firstName}-single-page-${Date.now()}`;
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName(apiKeyName);
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
+    await u.po.apiKeys.waitForFormClosed();
+
+    await expect(u.page.getByText(/Displaying.*of.*/i)).toBeHidden();
+  });
+
   test('can revoke api keys', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
