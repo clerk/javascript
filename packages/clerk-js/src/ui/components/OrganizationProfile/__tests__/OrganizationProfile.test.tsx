@@ -378,6 +378,92 @@ describe('OrganizationProfile', () => {
       expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
   });
+
+  describe('API Keys visibility', () => {
+    it('does not include API Keys when hide prop is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: true } });
+
+      render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+    });
+
+    it('includes API Keys when hide prop is false and orgs_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('API keys')).toBeDefined();
+    });
+
+    it('includes API Keys when hide prop is not set and orgs_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('API keys')).toBeDefined();
+    });
+
+    it('does not include API Keys when orgs_api_keys_enabled is false even if hide is false', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = false;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+    });
+  });
+
   it('removes member nav item if user is lacking permissions', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
