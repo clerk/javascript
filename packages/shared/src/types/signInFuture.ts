@@ -203,6 +203,10 @@ export interface SignInFutureSSOParams {
    * @experimental
    */
   enterpriseConnectionId?: string;
+  /**
+   * The unique identifier of the user. Only supported with the `enterprise_sso` strategy.
+   */
+  identifier?: string;
 }
 
 export interface SignInFutureMFAPhoneCodeVerifyParams {

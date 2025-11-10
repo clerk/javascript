@@ -897,7 +897,8 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
-    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId } = params;
+    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId, identifier } =
+      params;
     return runAsyncResourceTask(this.resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
       try {
@@ -919,6 +920,7 @@ class SignInFuture implements SignInFutureResource {
       await this._create({
         strategy,
         ...routes,
+        identifier,
       });
 
       if (strategy === 'enterprise_sso') {
