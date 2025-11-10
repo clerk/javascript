@@ -21,9 +21,46 @@ export interface FieldError {
 }
 
 /**
- * Represents the collection of possible errors on known fields.
+ * Represents the errors that occurred during the last fetch of the parent resource.
  */
-export interface FieldErrors {
+export interface Errors<T> {
+  /**
+   * Represents the collection of possible errors on known fields.
+   */
+  fields: T;
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
+   */
+  global: ClerkGlobalHookError[] | null;
+}
+
+/**
+ * Fields available for SignIn errors.
+ */
+export interface SignInFields {
+  /**
+   * The error for the identifier field.
+   */
+  identifier: FieldError | null;
+  /**
+   * The error for the password field.
+   */
+  password: FieldError | null;
+  /**
+   * The error for the code field.
+   */
+  code: FieldError | null;
+}
+
+/**
+ * Fields available for SignUp errors.
+ */
+export interface SignUpFields {
   /**
    * The error for the first name field.
    */
@@ -36,10 +73,6 @@ export interface FieldErrors {
    * The error for the email address field.
    */
   emailAddress: FieldError | null;
-  /**
-   * The error for the identifier field.
-   */
-  identifier: FieldError | null;
   /**
    * The error for the phone number field.
    */
@@ -67,23 +100,14 @@ export interface FieldErrors {
 }
 
 /**
- * Represents the errors that occurred during the last fetch of the parent resource.
+ * Errors type for SignIn operations.
  */
-export interface Errors {
-  /**
-   * Represents the collection of possible errors on known fields.
-   */
-  fields: FieldErrors;
-  /**
-   * The raw, unparsed errors from the Clerk API.
-   */
-  raw: unknown[] | null;
-  /**
-   * Parsed errors that are not related to any specific field.
-   * Does not include any errors that could be parsed as a field error
-   */
-  global: ClerkGlobalHookError[] | null;
-}
+export type SignInErrors = Errors<SignInFields>;
+
+/**
+ * Errors type for SignUp operations.
+ */
+export type SignUpErrors = Errors<SignUpFields>;
 
 /**
  * The value returned by the `useSignInSignal` hook.
@@ -92,7 +116,7 @@ export interface SignInSignalValue {
   /**
    * Represents the errors that occurred during the last fetch of the parent resource.
    */
-  errors: Errors;
+  errors: SignInErrors;
   /**
    * The fetch status of the underlying `SignIn` resource.
    */
@@ -113,7 +137,7 @@ export interface SignUpSignalValue {
   /**
    * The errors that occurred during the last fetch of the underlying `SignUp` resource.
    */
-  errors: Errors;
+  errors: SignUpErrors;
   /**
    * The fetch status of the underlying `SignUp` resource.
    */
