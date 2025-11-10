@@ -1,9 +1,8 @@
-import type { InitialState, Without } from '@clerk/shared/types';
+import type { Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 import React from 'react';
 
-import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -104,13 +103,5 @@ export async function ClerkProvider(
     );
   }
 
-  if (dynamic) {
-    return (
-      // TODO: fix types so AuthObject is compatible with InitialState
-      <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
-        {output}
-      </PromisifiedAuthProvider>
-    );
-  }
   return output;
 }
