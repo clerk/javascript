@@ -1,6 +1,6 @@
 ---
 "@clerk/clerk-js": minor
-"@clerk/shared": patch
+"@clerk/shared": minor
 ---
 
-Added granular API keys settings for user and organization profiles
+Support granular API keys settings for user and organization profiles
