@@ -30,7 +30,7 @@ const mockAPIKeysEnvironmentSettings = async (
 testAgainstRunningApps({
   withEnv: [appConfigs.envs.withAPIKeys],
   withPattern: ['withMachine.next.appRouter'],
-})('api keys component @machine', ({ app }) => {
+})('api keys component @xmachine', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;
@@ -258,6 +258,8 @@ testAgainstRunningApps({
     await u.po.userProfile.waitForMounted();
     await u.po.page.goToRelative('/user#/api-keys');
     await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
+
+    await u.page.unrouteAll();
   });
 
   test('OrganizationProfile API keys page visibility', async ({ page, context }) => {
@@ -279,6 +281,8 @@ testAgainstRunningApps({
     await page.reload();
     await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
     await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
+
+    await u.page.unrouteAll();
   });
 
   test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {
@@ -301,13 +305,14 @@ testAgainstRunningApps({
     await u.po.page.goToRelative('/api-keys');
     await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
     expect(apiKeysRequestWasMade).toBe(false);
-    await u.page.unroute('**/api_keys*');
 
     // user_api_keys_enabled: true should allow standalone component to render
     await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true });
     await page.reload();
     await u.po.apiKeys.waitForMounted();
     await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
+
+    await u.page.unrouteAll();
   });
 
   test('standalone API keys component in org context based on orgs_api_keys_enabled', async ({ page, context }) => {
@@ -330,12 +335,13 @@ testAgainstRunningApps({
     await u.po.page.goToRelative('/api-keys');
     await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
     expect(apiKeysRequestWasMade).toBe(false);
-    await u.page.unroute('**/api_keys*');
 
     // orgs_api_keys_enabled: true should allow standalone component to render in org context
     await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true });
     await page.reload();
     await u.po.apiKeys.waitForMounted();
     await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
+
+    await u.page.unrouteAll();
   });
 });
