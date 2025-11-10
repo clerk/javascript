@@ -29,6 +29,8 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
+  const { apiKeysProps } = useOrganizationProfileContext();
+
   const routes = pages.routes
     .filter(
       r =>
@@ -39,7 +41,8 @@ export const OrganizationProfileNavbar = (
       r =>
         r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
         (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoutes),
-    );
+    )
+    .filter(r => r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS || !apiKeysProps?.hide);
   if (!organization) {
     return null;
   }
