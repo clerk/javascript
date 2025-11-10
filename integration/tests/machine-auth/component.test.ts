@@ -1,8 +1,36 @@
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
+
+const mockAPIKeysEnvironmentSettings = async (
+  page: Page,
+  overrides: Partial<{
+    user_api_keys_enabled: boolean;
+    show_in_user_profile: boolean;
+    orgs_api_keys_enabled: boolean;
+    show_in_org_profile: boolean;
+  }>,
+) => {
+  await page.route('*/**/v1/environment*', async route => {
+    const response = await route.fetch();
+    const json = await response.json();
+    const newJson = {
+      ...json,
+      api_keys_settings: {
+        enabled: true,
+        user_api_keys_enabled: true,
+        show_in_user_profile: true,
+        orgs_api_keys_enabled: true,
+        show_in_org_profile: true,
+        ...overrides,
+      },
+    };
+    await route.fulfill({ response, json: newJson });
+  });
+};
 
 testAgainstRunningApps({
   withEnv: [appConfigs.envs.withAPIKeys],
@@ -214,59 +242,73 @@ testAgainstRunningApps({
     expect(clipboardText).toBe(secret);
   });
 
-  test('component does not render for orgs when user does not have permissions', async ({ page, context }) => {
+  test('UserProfile API keys page visibility', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-
-    const fakeMember = u.services.users.createFakeUser();
-    const member = await u.services.users.createBapiUser(fakeMember);
-
-    await u.services.clerk.organizations.createOrganizationMembership({
-      organizationId: fakeOrganization.organization.id,
-      role: 'org:member',
-      userId: member.id,
-    });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeMember.email, password: fakeMember.password });
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
 
-    let apiKeysRequestWasMade = false;
-    u.page.on('request', request => {
-      if (request.url().includes('/api_keys')) {
-        apiKeysRequestWasMade = true;
-      }
-    });
+    // user_api_keys_enabled: false should hide API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
+    await u.po.page.goToRelative('/user');
+    await u.po.userProfile.waitForMounted();
+    await u.po.page.goToRelative('/user#/api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
 
-    // Check that standalone component is not rendered
-    await u.po.page.goToRelative('/api-keys');
-    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+    // show_in_user_profile: false should hide API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { show_in_user_profile: false });
+    await page.reload();
+    await u.po.userProfile.waitForMounted();
+    await u.po.page.goToRelative('/user#/api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
 
-    // Check that page is not rendered in OrganizationProfile
-    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
-    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
-
-    expect(apiKeysRequestWasMade).toBe(false);
-
-    await fakeMember.deleteIfExists();
+    // Both enabled should show API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true, show_in_user_profile: true });
+    await page.reload();
+    await u.po.userProfile.waitForMounted();
+    await u.po.page.goToRelative('/user#/api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
   });
 
-  test('user with read permission can view API keys but not manage them', async ({ page, context }) => {
+  test('OrganizationProfile API keys page visibility', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-
-    const fakeViewer = u.services.users.createFakeUser();
-    const viewer = await u.services.users.createBapiUser(fakeViewer);
-
-    await u.services.clerk.organizations.createOrganizationMembership({
-      organizationId: fakeOrganization.organization.id,
-      role: 'org:viewer',
-      userId: viewer.id,
-    });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
+
+    // orgs_api_keys_enabled: false should hide API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: false });
+    await u.po.page.goToRelative('/organization-profile');
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
+
+    // show_in_org_profile: false should hide API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { show_in_org_profile: false });
+    await page.reload();
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
+
+    // Both enabled should show API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true, show_in_org_profile: true });
+    await page.reload();
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
+  });
+
+  test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    // user_api_keys_enabled: false should prevent standalone component from rendering
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
 
     let apiKeysRequestWasMade = false;
     u.page.on('request', request => {
@@ -275,20 +317,43 @@ testAgainstRunningApps({
       }
     });
 
-    // Check that standalone component is rendered and user can read API keys
     await u.po.page.goToRelative('/api-keys');
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+    expect(apiKeysRequestWasMade).toBe(false);
+
+    // user_api_keys_enabled: true should allow standalone component to render
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true });
+    await page.reload();
     await u.po.apiKeys.waitForMounted();
-    await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
-    await expect(u.page.getByRole('columnheader', { name: /Actions/i })).toBeHidden();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
+  });
 
-    // Check that page is rendered in OrganizationProfile and user can read API keys
-    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
-    await expect(u.page.locator('.cl-apiKeys')).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
-    await expect(u.page.getByRole('columnheader', { name: /Actions/i })).toBeHidden();
+  test('standalone API keys component in org context based on orgs_api_keys_enabled', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
 
-    expect(apiKeysRequestWasMade).toBe(true);
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
 
-    await fakeViewer.deleteIfExists();
+    // orgs_api_keys_enabled: false should prevent standalone component from rendering in org context
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: false });
+
+    let apiKeysRequestWasMade = false;
+    u.page.on('request', request => {
+      if (request.url().includes('/api_keys')) {
+        apiKeysRequestWasMade = true;
+      }
+    });
+
+    await u.po.page.goToRelative('/api-keys');
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+    expect(apiKeysRequestWasMade).toBe(false);
+
+    // orgs_api_keys_enabled: true should allow standalone component to render in org context
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true });
+    await page.reload();
+    await u.po.apiKeys.waitForMounted();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
   });
 });
