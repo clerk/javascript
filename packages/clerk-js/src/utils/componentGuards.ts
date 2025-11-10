@@ -45,11 +45,3 @@ export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environmen
 export const disabledAllAPIKeysFeatures: ComponentGuard = (_, environment) => {
   return disabledUserAPIKeysFeature(_, environment) && disabledOrganizationAPIKeysFeature(_, environment);
 };
-
-export const disabledUserProfileAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings?.user_api_keys_enabled || !environment?.apiKeysSettings?.show_in_user_profile;
-};
-
-export const disabledOrganizationProfileAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings?.orgs_api_keys_enabled || !environment?.apiKeysSettings?.show_in_org_profile;
-};

@@ -10,8 +10,6 @@ describe('Environment', () => {
     expect(environment).toMatchObject({
       apiKeysSettings: expect.objectContaining({
         orgs_api_keys_enabled: false,
-        show_in_org_profile: false,
-        show_in_user_profile: false,
         user_api_keys_enabled: false,
         pathRoot: '',
       }),
@@ -57,8 +55,6 @@ describe('Environment', () => {
       id: '',
       api_keys_settings: {
         orgs_api_keys_enabled: false,
-        show_in_org_profile: false,
-        show_in_user_profile: false,
         user_api_keys_enabled: false,
         id: undefined,
         path_root: '',
@@ -585,8 +581,6 @@ describe('Environment', () => {
       object: 'environment',
       api_keys_settings: expect.objectContaining({
         orgs_api_keys_enabled: false,
-        show_in_org_profile: false,
-        show_in_user_profile: false,
         user_api_keys_enabled: false,
       }),
       auth_config: expect.objectContaining({

@@ -7,9 +7,7 @@ import { BaseResource } from './internal';
  */
 export class APIKeySettings extends BaseResource implements APIKeysSettingsResource {
   public user_api_keys_enabled: boolean = false;
-  public show_in_user_profile: boolean = false;
   public orgs_api_keys_enabled: boolean = false;
-  public show_in_org_profile: boolean = false;
 
   public constructor(data: APIKeysSettingsJSON | APIKeysSettingsJSONSnapshot | null = null) {
     super();
@@ -23,9 +21,7 @@ export class APIKeySettings extends BaseResource implements APIKeysSettingsResou
     }
 
     this.user_api_keys_enabled = data.user_api_keys_enabled;
-    this.show_in_user_profile = data.show_in_user_profile;
     this.orgs_api_keys_enabled = data.orgs_api_keys_enabled;
-    this.show_in_org_profile = data.show_in_org_profile;
 
     return this;
   }
@@ -33,9 +29,7 @@ export class APIKeySettings extends BaseResource implements APIKeysSettingsResou
   public __internal_toSnapshot(): APIKeysSettingsJSONSnapshot {
     return {
       user_api_keys_enabled: this.user_api_keys_enabled,
-      show_in_user_profile: this.show_in_user_profile,
       orgs_api_keys_enabled: this.orgs_api_keys_enabled,
-      show_in_org_profile: this.show_in_org_profile,
     } as APIKeysSettingsJSONSnapshot;
   }
 }

@@ -1564,7 +1564,14 @@ export type UserProfileProps = RoutingOptions & {
    *
    * @experimental
    */
-  apiKeysProps?: APIKeysProps;
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1600,7 +1607,14 @@ export type OrganizationProfileProps = RoutingOptions & {
    *
    * @experimental
    */
-  apiKeysProps?: APIKeysProps;
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;

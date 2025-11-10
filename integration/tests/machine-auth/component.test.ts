@@ -9,9 +9,7 @@ const mockAPIKeysEnvironmentSettings = async (
   page: Page,
   overrides: Partial<{
     user_api_keys_enabled: boolean;
-    show_in_user_profile: boolean;
     orgs_api_keys_enabled: boolean;
-    show_in_org_profile: boolean;
   }>,
 ) => {
   await page.route('*/**/v1/environment*', async route => {
@@ -21,9 +19,7 @@ const mockAPIKeysEnvironmentSettings = async (
       ...json,
       api_keys_settings: {
         user_api_keys_enabled: true,
-        show_in_user_profile: true,
         orgs_api_keys_enabled: true,
-        show_in_org_profile: true,
         ...overrides,
       },
     };
@@ -256,15 +252,8 @@ testAgainstRunningApps({
     await u.po.page.goToRelative('/user#/api-keys');
     await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
 
-    // show_in_user_profile: false should hide API keys page
-    await mockAPIKeysEnvironmentSettings(u.page, { show_in_user_profile: false });
-    await page.reload();
-    await u.po.userProfile.waitForMounted();
-    await u.po.page.goToRelative('/user#/api-keys');
-    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
-
-    // Both enabled should show API keys page
-    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true, show_in_user_profile: true });
+    // user_api_keys_enabled: true should show API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true });
     await page.reload();
     await u.po.userProfile.waitForMounted();
     await u.po.page.goToRelative('/user#/api-keys');
@@ -285,14 +274,8 @@ testAgainstRunningApps({
     await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
     await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
 
-    // show_in_org_profile: false should hide API keys page
-    await mockAPIKeysEnvironmentSettings(u.page, { show_in_org_profile: false });
-    await page.reload();
-    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
-    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
-
-    // Both enabled should show API keys page
-    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true, show_in_org_profile: true });
+    // orgs_api_keys_enabled: true should show API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true });
     await page.reload();
     await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
     await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
@@ -310,10 +293,9 @@ testAgainstRunningApps({
     await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
 
     let apiKeysRequestWasMade = false;
-    u.page.on('request', request => {
-      if (request.url().includes('/api_keys')) {
-        apiKeysRequestWasMade = true;
-      }
+    await u.page.route('**/api_keys*', async route => {
+      apiKeysRequestWasMade = true;
+      await route.abort();
     });
 
     await u.po.page.goToRelative('/api-keys');
@@ -339,10 +321,9 @@ testAgainstRunningApps({
     await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: false });
 
     let apiKeysRequestWasMade = false;
-    u.page.on('request', request => {
-      if (request.url().includes('/api_keys')) {
-        apiKeysRequestWasMade = true;
-      }
+    await u.page.route('**/api_keys*', async route => {
+      apiKeysRequestWasMade = true;
+      await route.abort();
     });
 
     await u.po.page.goToRelative('/api-keys');
