@@ -55,16 +55,6 @@ const __dirname = path.dirname(__filename);
  */
 
 /**
- * Check if a reflection is a reference (re-export)
- * @param {import('typedoc').DeclarationReflection} reflection
- * @returns {reflection is ReferenceReflection}
- */
-function isReference(reflection) {
-  // Kind 16777216 is Reference - this is when a package re-exports something from another package
-  return reflection.kind === /** @type {*} */ (16777216);
-}
-
-/**
  * Check if a reflection is a function or class that should be included in the output
  * @param {import('typedoc').DeclarationReflection} reflection
  * @returns {boolean}
@@ -84,22 +74,6 @@ function isExportableFunction(reflection) {
     return true;
   }
 
-  // Include References (re-exports)
-  // e.g., export { UserButton } from '@clerk/clerk-react'
-  if (isReference(reflection)) {
-    // Check if the target is a function or class
-    const target = reflection.target;
-    if (target) {
-      if (
-        target.kind === ReflectionKind.Function ||
-        target.kind === ReflectionKind.Class ||
-        target.kind === ReflectionKind.Variable
-      ) {
-        return true;
-      }
-    }
-  }
-
   return false;
 }
 
@@ -109,14 +83,6 @@ function isExportableFunction(reflection) {
  * @returns {'function' | 'class'}
  */
 function getExportType(reflection) {
-  // Handle References (re-exports) by checking the target
-  if (isReference(reflection) && reflection.target) {
-    if (reflection.target.kind === ReflectionKind.Class) {
-      return 'class';
-    }
-    return 'function';
-  }
-
   if (reflection.kind === ReflectionKind.Class) {
     return 'class';
   }
@@ -129,19 +95,8 @@ function getExportType(reflection) {
  * @returns {boolean}
  */
 function isDeprecated(reflection) {
-  // For References, check the target
-  const target = isReference(reflection) ? reflection.target : reflection;
-  if (!target) return false;
-
   // Check for @deprecated tag in comments
-  if (target.comment?.blockTags?.some(/** @param {*} t */ t => t.tag === '@deprecated')) {
-    return true;
-  }
-  // Also check the deprecated flag
-  if (target.flags?.isDeprecated) {
-    return true;
-  }
-  return false;
+  return reflection.comment?.blockTags?.some(t => t.tag === '@deprecated') ?? false;
 }
 
 /**
@@ -150,9 +105,8 @@ function isDeprecated(reflection) {
  * @returns {boolean}
  */
 function isExperimental(reflection) {
-  const target = isReference(reflection) ? reflection.target : reflection;
-  if (!target) return false;
-  return target.comment?.blockTags?.some(/** @param {*} t */ t => t.tag === '@experimental') || false;
+  // Check for @experimental tag in comments
+  return reflection.comment?.blockTags?.some(t => t.tag === '@experimental') ?? false;
 }
 
 /**
@@ -161,9 +115,8 @@ function isExperimental(reflection) {
  * @returns {boolean}
  */
 function isBeta(reflection) {
-  const target = isReference(reflection) ? reflection.target : reflection;
-  if (!target) return false;
-  return target.comment?.blockTags?.some(/** @param {*} t */ t => t.tag === '@beta') || false;
+  // Check for @beta tag in comments
+  return reflection.comment?.blockTags?.some(t => t.tag === '@beta') ?? false;
 }
 
 /**
@@ -172,20 +125,16 @@ function isBeta(reflection) {
  * @returns {string[]}
  */
 function getClassMethods(reflection) {
+  // If the target is not a class or does not have children, return an empty array
+  if (reflection.kind !== ReflectionKind.Class || !reflection.children) {
+    return [];
+  }
+
   /** @type {string[]} */
   const methods = [];
 
-  // For References, check the target
-  const target = isReference(reflection) ? reflection.target : reflection;
-  if (!target) return methods;
-
-  if (target.kind !== ReflectionKind.Class || !target.children) {
-    return methods;
-  }
-
-  for (const child of target.children) {
+  for (const child of reflection.children) {
     // Include both methods and accessors (getters/setters)
-    // Methods: 2048, Accessors: 262144
     if (child.kind === ReflectionKind.Method || child.kind === ReflectionKind.Accessor) {
       // Skip private methods
       if (child.flags?.isPrivate) {
