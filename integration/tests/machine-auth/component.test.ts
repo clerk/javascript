@@ -20,7 +20,6 @@ const mockAPIKeysEnvironmentSettings = async (
     const newJson = {
       ...json,
       api_keys_settings: {
-        enabled: true,
         user_api_keys_enabled: true,
         show_in_user_profile: true,
         orgs_api_keys_enabled: true,
