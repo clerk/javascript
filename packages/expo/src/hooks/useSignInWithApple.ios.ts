@@ -1,5 +1,5 @@
-import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import { useSignIn, useSignUp } from '@clerk/react/legacy';
+import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
 
