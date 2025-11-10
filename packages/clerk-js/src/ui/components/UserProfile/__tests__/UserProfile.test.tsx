@@ -241,4 +241,55 @@ describe('UserProfile', () => {
       expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
   });
+
+  describe('API Keys visibility', () => {
+    it('does not include API Keys when hide prop is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: true } });
+
+      render(<UserProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByRole('button', { name: /API keys/i })).toBeNull());
+    });
+
+    it('includes API Keys when hide prop is false and user_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<UserProfile />, { wrapper });
+      const apiKeysElements = await screen.findAllByRole('button', { name: /API keys/i });
+      expect(apiKeysElements.length).toBeGreaterThan(0);
+    });
+
+    it('includes API Keys when hide prop is not set and user_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = true;
+
+      render(<UserProfile />, { wrapper });
+      const apiKeysElements = await screen.findAllByRole('button', { name: /API keys/i });
+      expect(apiKeysElements.length).toBeGreaterThan(0);
+    });
+
+    it('does not include API Keys when user_api_keys_enabled is false even if hide is false', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = false;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<UserProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByRole('button', { name: /API keys/i })).toBeNull());
+    });
+  });
 });
