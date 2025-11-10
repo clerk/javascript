@@ -1,3 +1,4 @@
+import type { ClerkError } from '@clerk/shared/error';
 import type { State as StateInterface } from '@clerk/shared/types';
 import { computed, effect } from 'alien-signals';
 
@@ -36,7 +37,7 @@ export class State implements StateInterface {
     eventBus.on('resource:fetch', this.onResourceFetch);
   }
 
-  private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {
+  private onResourceError = (payload: { resource: BaseResource; error: ClerkError | null }) => {
     if (payload.resource instanceof SignIn) {
       this.signInErrorSignal({ error: payload.error });
     }

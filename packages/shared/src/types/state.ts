@@ -1,3 +1,4 @@
+import type { ClerkGlobalHookError } from '../errors/globalHookError';
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
 
@@ -79,8 +80,9 @@ export interface Errors {
   raw: unknown[] | null;
   /**
    * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
    */
-  global: unknown[] | null; // does not include any errors that could be parsed as a field error
+  global: ClerkGlobalHookError[] | null;
 }
 
 /**

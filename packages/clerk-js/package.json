@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.103.1",
+  "version": "5.105.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -65,6 +65,7 @@
     "@coinbase/wallet-sdk": "4.3.0",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.17",
+    "@tanstack/query-core": "5.87.4",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
     "alien-signals": "2.0.6",
