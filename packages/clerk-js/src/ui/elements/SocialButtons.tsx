@@ -100,7 +100,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     MAX_STRATEGIES_PER_ROW,
     lastAuthenticationStrategy,
   );
-  const strategiesCount = lastAuthenticationStrategyPresent ? strategies.length - 1 : strategies.length;
+  const strategiesLength = lastAuthenticationStrategyPresent ? strategies.length - 1 : strategies.length;
   const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
   const shouldForceSingleColumnOnMobile = !lastAuthenticationStrategyPresent && strategies.length === 2;
 
@@ -171,7 +171,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
         >
           {row.map(strategy => {
             const shouldShowPreText =
-              strategiesCount === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
+              strategiesLength === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
               (strategy === lastAuthenticationStrategy && row.length === 1);
 
             const label = shouldShowPreText
