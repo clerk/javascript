@@ -28,38 +28,41 @@ const getNonceHeaders = React.cache(async function getNonceHeaders() {
       getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
 });
 
+async function generateStatePromise(dynamic: boolean) {
+  if (!dynamic) {
+    return Promise.resolve(null);
+  }
+  if (isNext13) {
+    /**
+     * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+     * Without the await here, Next will throw a DynamicServerError during build.
+     */
+    return Promise.resolve(await getDynamicClerkState());
+  }
+  return getDynamicClerkState();
+}
+
+async function generateNonce(dynamic: boolean) {
+  if (!dynamic) {
+    return Promise.resolve('');
+  }
+  if (isNext13) {
+    /**
+     * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
+     * Without the await here, Next will throw a DynamicServerError during build.
+     */
+    return Promise.resolve(await getNonceHeaders());
+  }
+  return getNonceHeaders();
+}
+
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
 
-  async function generateStatePromise() {
-    if (!dynamic) {
-      return Promise.resolve(null);
-    }
-    if (isNext13) {
-      /**
-       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-       * Without the await here, Next will throw a DynamicServerError during build.
-       */
-      return Promise.resolve(await getDynamicClerkState());
-    }
-    return getDynamicClerkState();
-  }
-
-  async function generateNonce() {
-    if (!dynamic) {
-      return Promise.resolve('');
-    }
-    if (isNext13) {
-      /**
-       * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-       * Without the await here, Next will throw a DynamicServerError during build.
-       */
-      return Promise.resolve(await getNonceHeaders());
-    }
-    return getNonceHeaders();
-  }
+  const statePromise = generateStatePromise(!!dynamic);
+  const noncePromise = generateNonce(!!dynamic);
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
@@ -82,8 +85,8 @@ export async function ClerkProvider(
     output = (
       <KeylessProvider
         rest={propsWithEnvs}
-        generateNonce={generateNonce}
-        generateStatePromise={generateStatePromise}
+        noncePromise={noncePromise}
+        statePromise={statePromise}
         runningWithClaimedKeys={runningWithClaimedKeys}
       >
         {children}
@@ -93,8 +96,8 @@ export async function ClerkProvider(
     output = (
       <ClientClerkProvider
         {...propsWithEnvs}
-        nonce={await generateNonce()}
-        initialState={await generateStatePromise()}
+        nonce={await noncePromise}
+        initialState={await statePromise}
       >
         {children}
       </ClientClerkProvider>
@@ -104,7 +107,7 @@ export async function ClerkProvider(
   if (dynamic) {
     return (
       // TODO: fix types so AuthObject is compatible with InitialState
-      <PromisifiedAuthProvider authPromise={generateStatePromise() as unknown as Promise<InitialState>}>
+      <PromisifiedAuthProvider authPromise={statePromise as unknown as Promise<InitialState>}>
         {output}
       </PromisifiedAuthProvider>
     );
