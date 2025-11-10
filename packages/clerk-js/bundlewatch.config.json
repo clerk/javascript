@@ -24,7 +24,7 @@
     { "path": "./dist/waitlist*.js", "maxSize": "1.5KB" },
     { "path": "./dist/keylessPrompt*.js", "maxSize": "6.5KB" },
     { "path": "./dist/pricingTable*.js", "maxSize": "4.02KB" },
-    { "path": "./dist/checkout*.js", "maxSize": "8.8KB" },
+    { "path": "./dist/checkout*.js", "maxSize": "8.82KB" },
     { "path": "./dist/up-billing-page*.js", "maxSize": "3.0KB" },
     { "path": "./dist/op-billing-page*.js", "maxSize": "3.0KB" },
     { "path": "./dist/up-plans-page*.js", "maxSize": "1.0KB" },
