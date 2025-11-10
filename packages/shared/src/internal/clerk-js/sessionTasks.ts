@@ -1,6 +1,5 @@
-import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '../../../types';
-
 import { logger } from '../../logger';
+import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '../../types';
 import { forwardClerkQueryParams } from './queryParams';
 import { buildURL } from './url';
 

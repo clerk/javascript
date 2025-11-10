@@ -1,6 +1,6 @@
-import type { MetamaskWeb3Provider, OKXWalletWeb3Provider } from '../../../types';
-
 //https://eips.ethereum.org/EIPS/eip-6963
+
+import type { MetamaskWeb3Provider, OKXWalletWeb3Provider } from '../../types';
 
 interface EIP6963ProviderInfo {
   walletId: string;
@@ -61,6 +61,7 @@ class InjectedWeb3Providers {
     // In case we weren't able to find the requested provider, fallback to the
     // global injected provider instead, if any, to allow the user to continue
     // the flow rather than blocking it
+    // @ts-expect-error missing types
     return window.ethereum;
   };
 

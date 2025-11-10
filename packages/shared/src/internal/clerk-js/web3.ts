@@ -1,5 +1,4 @@
-import type { Web3Provider } from '../../../types';
-
+import type { Web3Provider } from '../../types';
 import { clerkUnsupportedEnvironmentWarning } from './errors';
 import { toHex } from './hex';
 import { getInjectedWeb3Providers } from './injectedWeb3Providers';
@@ -109,6 +108,7 @@ async function getEthereumProvider(provider: Web3Provider) {
       const sdk = createBaseAccountSDK({
         appName:
           (typeof window !== 'undefined' &&
+            // @ts-expect-error missing types
             (window.Clerk as any)?.__unstable__environment?.displayConfig?.applicationName) ||
           (typeof document !== 'undefined' && document.title) ||
           'Web3 Application',

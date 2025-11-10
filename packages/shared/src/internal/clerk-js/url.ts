@@ -1,7 +1,7 @@
-import type { SignUpResource } from '../../../types';
 import { globs } from '../../globs';
 import { createDevOrStagingUrlCache } from '../../keys';
 import { logger } from '../../logger';
+import type { SignUpResource } from '../../types';
 import { camelToSnake } from '../../underscore';
 import { isCurrentDevAccountPortalOrigin, isLegacyDevAccountPortalOrigin } from '../../url';
 import { joinPaths } from './path';
@@ -460,7 +460,7 @@ export function createAllowedRedirectOrigins(
     return allowedRedirectOrigins;
   }
 
-  const origins = [];
+  const origins: string[] = [];
   if (typeof window !== 'undefined' && !!window.location) {
     origins.push(window.location.origin);
   }

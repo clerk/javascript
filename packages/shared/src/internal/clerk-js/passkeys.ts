@@ -1,3 +1,5 @@
+import type { ClerkRuntimeError } from '../../error';
+import { ClerkWebAuthnError } from '../../error';
 import type {
   CredentialReturn,
   PublicKeyCredentialCreationOptionsJSON,
@@ -6,10 +8,7 @@ import type {
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '../../../types';
-
-import type { ClerkRuntimeError } from '../../error';
-import { ClerkWebAuthnError } from '../../error';
+} from '../../types';
 
 type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
 type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;
@@ -55,7 +54,7 @@ async function webAuthnCreateCredential(
 
     return { publicKeyCredential: credential, error: null };
   } catch (e) {
-    return { error: handlePublicKeyCreateError(e), publicKeyCredential: null };
+    return { error: handlePublicKeyCreateError(e as Error), publicKeyCredential: null };
   }
 }
 
@@ -110,7 +109,7 @@ async function webAuthnGetCredential({
 
     return { publicKeyCredential: credential, error: null };
   } catch (e) {
-    return { error: handlePublicKeyGetError(e), publicKeyCredential: null };
+    return { error: handlePublicKeyGetError(e as Error), publicKeyCredential: null };
   }
 }
 

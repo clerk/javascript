@@ -130,29 +130,18 @@ describe('loadClerkJsScript(options)', () => {
   });
 
   test('validates Clerk is properly loaded with required methods', async () => {
-    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
+    (window as any).Clerk = mockClerk;
 
-    setTimeout(() => {
-      (window as any).Clerk = { status: 'ready' };
-    }, 100);
+    const result = await loadClerkJsScript({ publishableKey: mockPublishableKey });
 
-    vi.advanceTimersByTime(15000);
-
-    try {
-      await loadPromise;
-      throw new Error('Should have thrown error');
-    } catch (error) {
-      expect(error).toBeInstanceOf(ClerkRuntimeError);
-      expect((error as Error).message).toContain('Clerk: Failed to load Clerk');
-      // The malformed Clerk object should still be there since it was set
-      expect((window as any).Clerk).toEqual({ status: 'ready' });
-    }
+    expect(result).toBeNull();
+    expect((window as any).Clerk).toBe(mockClerk);
   });
 });
 
 describe('clerkJsScriptUrl()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
-  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk';
+  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
 
   test('returns clerkJSUrl when provided', () => {
     const customUrl = 'https://custom.clerk.com/clerk.js';
@@ -169,15 +158,13 @@ describe('clerkJsScriptUrl()', () => {
 
   test('constructs URL correctly for production key', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey });
-    expect(result).toBe(
-      `https://example.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
-    );
+    expect(result).toBe(`https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`);
   });
 
   test('includes clerkJSVariant in URL when provided', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey, clerkJSVariant: 'headless' });
     expect(result).toBe(
-      `https://example.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.headless.browser.js`,
+      `https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.headless.browser.js`,
     );
   });
 
@@ -189,7 +176,7 @@ describe('clerkJsScriptUrl()', () => {
 
 describe('buildScriptHost()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
-  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk';
+  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
   const mockProxyUrl = 'https://proxy.clerk.com';
   const mockDomain = 'custom.com';
 

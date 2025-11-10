@@ -1,4 +1,4 @@
-import type { SignUpResource } from '../../../types';
+import type { SignUpResource } from '../../types';
 import { forwardClerkQueryParams } from './queryParams';
 
 type CompleteSignUpFlowProps = {
