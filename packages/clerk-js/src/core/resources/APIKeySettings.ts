@@ -6,10 +6,10 @@ import { BaseResource } from './internal';
  * @internal
  */
 export class APIKeySettings extends BaseResource implements APIKeysSettingsResource {
-  user_api_keys_enabled: boolean = false;
-  show_in_user_profile: boolean = false;
-  orgs_api_keys_enabled: boolean = false;
-  show_in_org_profile: boolean = false;
+  public user_api_keys_enabled: boolean = false;
+  public show_in_user_profile: boolean = false;
+  public orgs_api_keys_enabled: boolean = false;
+  public show_in_org_profile: boolean = false;
 
   public constructor(data: APIKeysSettingsJSON | APIKeysSettingsJSONSnapshot | null = null) {
     super();
@@ -22,10 +22,10 @@ export class APIKeySettings extends BaseResource implements APIKeysSettingsResou
       return this;
     }
 
-    this.user_api_keys_enabled = this.withDefault(data.user_api_keys_enabled, false);
-    this.show_in_user_profile = this.withDefault(data.show_in_user_profile, false);
-    this.orgs_api_keys_enabled = this.withDefault(data.orgs_api_keys_enabled, false);
-    this.show_in_org_profile = this.withDefault(data.show_in_org_profile, false);
+    this.user_api_keys_enabled = data.user_api_keys_enabled;
+    this.show_in_user_profile = data.show_in_user_profile;
+    this.orgs_api_keys_enabled = data.orgs_api_keys_enabled;
+    this.show_in_org_profile = data.show_in_org_profile;
 
     return this;
   }
