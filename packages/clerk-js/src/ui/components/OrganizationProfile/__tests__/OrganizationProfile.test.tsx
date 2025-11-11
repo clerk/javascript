@@ -70,6 +70,9 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
+      fixtures.clerk.billing.getSubscription.mockRejectedValue(null);
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
@@ -105,6 +108,10 @@ describe('OrganizationProfile', () => {
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
+
+      // TODO(@RQ_MIGRATION): Offer a way to disable these, because they fire unnecessary requests.
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
     it('does not include Billing when organization billing is disabled', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -168,8 +175,13 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = true;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+      fixtures.clerk.billing.getSubscription.mockRejectedValue(null);
+
       render(<OrganizationProfile />, { wrapper });
       expect(await screen.findByText('Billing')).toBeDefined();
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
 
     it('does not include Billing in organization when user billing has paid plans but organization billing is disabled', async () => {
@@ -213,6 +225,7 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [

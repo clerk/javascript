@@ -316,6 +316,12 @@ describe('Checkout', () => {
     });
 
     const freeTrialEndsAt = new Date('2025-08-19');
+
+    fixtures.clerk.user?.getPaymentMethods.mockResolvedValue({
+      data: [],
+      total_count: 0,
+    });
+
     fixtures.clerk.billing.startCheckout.mockResolvedValue({
       id: 'chk_trial_1',
       status: 'needs_confirmation',
@@ -1034,12 +1040,17 @@ describe('Checkout', () => {
         { wrapper },
       );
 
-      await waitFor(async () => {
+      await waitFor(() => {
         expect(getByRole('heading', { name: 'Checkout' })).toBeVisible();
-        const addPaymentMethodButton = getByText('Add payment method');
-        expect(addPaymentMethodButton).toBeVisible();
-        await userEvent.click(addPaymentMethodButton);
       });
+
+      const addPaymentMethodButton = await waitFor(() => {
+        const button = getByText('Add payment method');
+        expect(button).toBeVisible();
+        return button;
+      });
+
+      await userEvent.click(addPaymentMethodButton);
 
       await waitFor(() => {
         expect(getByRole('button', { name: 'Start free trial' })).toBeInTheDocument();
