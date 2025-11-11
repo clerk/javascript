@@ -1,4 +1,5 @@
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
+// eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
 
 import { Modal } from '@/ui/elements/Modal';
@@ -90,6 +91,7 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
               direction='col'
               sx={t => ({
                 gap: t.sizes.$0x5,
+                maxWidth: '18.75rem',
               })}
             >
               <span
@@ -99,7 +101,7 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                     color: #b4b4b4;
                     font-size: 0.8125rem;
                     font-weight: 400;
-                    line-height: 1rem;
+                    line-height: 1.23;
                   `,
                 ]}
               >
@@ -109,15 +111,14 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                     basePromptElementStyles,
                     css`
                       color: white;
+                      font-family: monospace;
+                      line-height: 1.23;
                     `,
                   ]}
                 >
                   {ctaText}
                 </code>{' '}
-                {'componentName' in props ? 'component' : 'hook'},
-                <br />
-                you’ll need to enable the Organizations feature
-                <br />
+                {'componentName' in props ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations feature
                 for your app first.
               </span>
 
@@ -128,7 +129,7 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                     color: #a8a8ff;
                     font-size: inherit;
                     font-weight: 500;
-                    line-height: 1rem;
+                    line-height: 1.5;
                     font-size: 0.8125rem;
                   `,
                 ]}
