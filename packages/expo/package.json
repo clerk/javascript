@@ -90,9 +90,11 @@
   },
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
+    "@react-native-google-signin/google-signin": "^16.0.0",
     "@types/base-64": "^1.0.2",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
+    "expo-constants": "^18.0.0",
     "expo-crypto": "^15.0.7",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
@@ -101,9 +103,10 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
-    "expo": ">=53 <55",
+    "@react-native-google-signin/google-signin": ">=14.0.0",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
+    "expo-constants": ">=12",
     "expo-crypto": ">=12",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
@@ -116,7 +119,13 @@
     "@clerk/expo-passkeys": {
       "optional": true
     },
+    "@react-native-google-signin/google-signin": {
+      "optional": true
+    },
     "expo-apple-authentication": {
+      "optional": true
+    },
+    "expo-constants": {
       "optional": true
     },
     "expo-crypto": {
