@@ -1,11 +1,4 @@
 ---
-'@clerk/react': major
-'@clerk/expo': major
-'@clerk/nextjs': major
-'@clerk/react-router': major
-'@clerk/tanstack-react-start': major
-'@clerk/chrome-extension': patch
-'@clerk/elements': patch
 ---
 
 Remove `initialAuthState` option from `useAuth` hook.
