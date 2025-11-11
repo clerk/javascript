@@ -22,7 +22,7 @@
       ]
     },
     "build:sandbox": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "@clerk/localizations#build"],
       "inputs": ["sandbox/**"],
       "outputs": ["dist/**"]
     },
