@@ -103,6 +103,10 @@ describe('useOrganization', () => {
         });
       });
 
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
       fixtures.clerk.organization?.getMemberships.mockReturnValue(
         Promise.resolve({
           data: [
@@ -226,6 +230,10 @@ describe('useOrganization', () => {
         });
       });
 
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
       fixtures.clerk.organization?.getDomains.mockReturnValue(
         Promise.resolve({
           data: [
@@ -321,6 +329,10 @@ describe('useOrganization', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
 
       fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
         Promise.resolve({
@@ -425,6 +437,10 @@ describe('useOrganization', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
 
       fixtures.clerk.organization?.getInvitations.mockReturnValue(
         Promise.resolve({

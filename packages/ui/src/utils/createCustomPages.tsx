@@ -1,7 +1,7 @@
 import {
-  canViewOrManageAPIKeys,
-  disabledAPIKeysFeature,
+  disabledOrganizationAPIKeysFeature,
   disabledOrganizationBillingFeature,
+  disabledUserAPIKeysFeature,
   disabledUserBillingFeature,
 } from '@clerk/shared/internal/clerk-js/componentGuards';
 import { isValidUrl } from '@clerk/shared/internal/clerk-js/url';
@@ -103,7 +103,9 @@ const createCustomPages = (
     commerce: organization
       ? !disabledOrganizationBillingFeature(clerk, environment) && shouldShowBilling
       : !disabledUserBillingFeature(clerk, environment) && shouldShowBilling,
-    apiKeys: !disabledAPIKeysFeature(clerk, environment) && (organization ? canViewOrManageAPIKeys(clerk) : true),
+    apiKeys: organization
+      ? !disabledOrganizationAPIKeysFeature(clerk, environment)
+      : !disabledUserAPIKeysFeature(clerk, environment),
   });
 
   if (isDevelopmentSDK(clerk)) {
