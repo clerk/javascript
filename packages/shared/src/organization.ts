@@ -33,7 +33,7 @@ export const withOrganizationSettingsEnabled =
     // @ts-expect-error - __unstable__environment is not typed
     const environment = clerk?.__unstable__environment;
 
-    if (!environment?.organizationSettings.enabled) {
+    if (environment?.isDevelopment?.() && !environment?.organizationSettings.enabled) {
       clerk?.__internal_openEnableOrganizationsPrompt({
         utilityName,
       });
