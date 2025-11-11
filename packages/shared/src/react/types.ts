@@ -86,20 +86,27 @@ export type PaginatedResourcesWithDefault<T> = {
 /**
  * @inline
  */
-export type PaginatedHookConfig<T> = T & {
-  /**
-   * If `true`, newly fetched data will be appended to the existing list rather than replacing it. Useful for implementing infinite scroll functionality.
-   *
-   * @default false
-   */
-  infinite?: boolean;
-  /**
-   * If `true`, the previous data will be kept in the cache until new data is fetched.
-   *
-   * @default false
-   */
-  keepPreviousData?: boolean;
-};
+export type PaginatedHookConfig<T> = T &
+  (
+    | {
+        /**
+         * If `true`, newly fetched data will be appended to the existing list rather than replacing it. Useful for implementing infinite scroll functionality.
+         *
+         * @default false
+         */
+        infinite?: boolean;
+        keepPreviousData?: never;
+      }
+    | {
+        /**
+         * If `true`, the previous data will be kept in the cache until new data is fetched.
+         *
+         * @default false
+         */
+        keepPreviousData?: boolean;
+        infinite?: never;
+      }
+  );
 
 export type PagesOrInfiniteConfig = PaginatedHookConfig<{
   /**
