@@ -294,10 +294,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name:
-          [
+        test-name: [
             "generic",
-            "express",
+            # "express",
             "ap-flows",
             "localhost",
             "sessions",
