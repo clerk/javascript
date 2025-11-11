@@ -9,46 +9,40 @@ import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, PromptContainer } from '../shared';
 
 const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizationsPromptProps) => {
-  const ctaText = 'componentName' in props ? `<${props.componentName} /> component` : props.utilityName;
+  const ctaText = 'componentName' in props ? `<${props.componentName} />` : props.utilityName;
 
   return (
     <Portal>
       <Modal
         canCloseModal={false}
-        contentSx={() => ({ animation: 'unset' })}
+        containerSx={() => ({ alignItems: 'center' })}
       >
         <PromptContainer
           sx={() => ({
-            top: '50%',
-            left: '50%',
-            bottom: 'auto',
-            right: 'auto',
-            padding: 'unset',
-            transform: 'translate(-50%, -50%)',
+            display: 'flex',
             flexDirection: 'column',
-            height: 'fit-content',
           })}
         >
           <Flex
+            direction='col'
             sx={t => ({
-              display: 'flex',
-              flexDirection: 'column',
-              padding: `${t.space.$5} ${t.space.$6}`,
-              paddingBottom: t.space.$4,
-              gap: t.space.$2,
+              padding: `${t.sizes.$4} ${t.sizes.$6}`,
+              paddingBottom: t.sizes.$4,
+              gap: t.sizes.$2,
             })}
           >
             <Flex
               as='header'
+              align='center'
               sx={t => ({
-                display: 'flex',
-                alignItems: 'center',
-                gap: t.space.$2,
+                gap: t.sizes.$2,
               })}
             >
               <svg
-                width='20'
-                height='20'
+                css={css`
+                  width: 1.25rem;
+                  height: 1.25rem;
+                `}
                 viewBox='0 0 20 20'
                 fill='none'
                 xmlns='http://www.w3.org/2000/svg'
@@ -79,43 +73,48 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
               </svg>
 
               <h1
-                css={css`
-                  ${basePromptElementStyles};
-                  color: white;
-                  font-size: 0.875rem;
-                  font-weight: 500;
-                `}
+                css={[
+                  basePromptElementStyles,
+                  css`
+                    color: white;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                  `,
+                ]}
               >
                 Organizations feature required
               </h1>
             </Flex>
 
             <Flex
+              direction='col'
               sx={t => ({
-                display: 'flex',
-                flexDirection: 'column',
-                gap: t.space.$0x5,
+                gap: t.sizes.$0x5,
               })}
             >
               <span
-                css={css`
-                  ${basePromptElementStyles};
-                  color: #b4b4b4;
-                  font-size: 0.8125rem;
-                  font-weight: 400;
-                  line-height: 1rem;
-                `}
+                css={[
+                  basePromptElementStyles,
+                  css`
+                    color: #b4b4b4;
+                    font-size: 0.8125rem;
+                    font-weight: 400;
+                    line-height: 1rem;
+                  `,
+                ]}
               >
                 To use the{' '}
                 <code
-                  css={css`
-                    ${basePromptElementStyles};
-                    color: white;
-                  `}
+                  css={[
+                    basePromptElementStyles,
+                    css`
+                      color: white;
+                    `,
+                  ]}
                 >
                   {ctaText}
                 </code>{' '}
-                hook,
+                {'componentName' in props ? 'component' : 'hook'},
                 <br />
                 you’ll need to enable the Organizations feature
                 <br />
@@ -123,14 +122,16 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
               </span>
 
               <a
-                css={css`
-                  ${basePromptElementStyles};
-                  color: #a8a8ff;
-                  font-size: inherit;
-                  font-weight: 500;
-                  line-height: 1rem;
-                  font-size: 0.8125rem;
-                `}
+                css={[
+                  basePromptElementStyles,
+                  css`
+                    color: #a8a8ff;
+                    font-size: inherit;
+                    font-weight: 500;
+                    line-height: 1rem;
+                    font-size: 0.8125rem;
+                  `,
+                ]}
                 href='https://clerk.com/docs/guides/organizations'
                 target='_blank'
                 rel='noopener noreferrer'
@@ -152,11 +153,11 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
 
           {/* TODO -> Introduce FAPI mutation to enable organizations */}
           <Flex
+            direction='col'
+            justify='center'
             sx={t => ({
-              padding: `${t.space.$4} ${t.space.$6}`,
-              flexDirection: 'column',
-              gap: t.space.$3,
-              justifyContent: 'center',
+              padding: `${t.sizes.$4} ${t.sizes.$6}`,
+              gap: t.sizes.$3,
             })}
           >
             <button

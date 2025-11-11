@@ -130,6 +130,14 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
       <PromptContainer
         data-expanded={isForcedExpanded}
         sx={t => ({
+          position: 'fixed',
+          bottom: '1.25rem',
+          right: '1.25rem',
+          height: `${t.sizes.$10}`,
+          minWidth: '13.4rem',
+          paddingLeft: `${t.space.$3}`,
+          borderRadius: '1.25rem',
+
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
           },
