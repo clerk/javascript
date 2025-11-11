@@ -657,6 +657,13 @@ export const teIN: LocalizationResource = {
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'మీ ఇమెయిల్‌కు పంపబడిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
+      formTitle: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+      resendButton: 'లింక్ రాలేదా? మళ్లీ పంపండి',
+      subtitle: '{{applicationName}} కు కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -674,6 +681,7 @@ export const teIN: LocalizationResource = {
       label__alternativeMethods: 'లేదా, మరొక పద్ధతితో సైన్ ఇన్ చేయండి',
       title: 'పాస్‌వర్డ్ మర్చిపోయారా?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.',
       subtitle: 'లోపం సంభవించింది',

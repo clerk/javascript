@@ -651,6 +651,13 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',
+      formTitle: 'تحقق من بريدك الإلكتروني',
+      resendButton: 'لم تستلم الرابط؟ إعادة الإرسال',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'تحقق من بريدك الإلكتروني',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -668,6 +675,7 @@ export const arSA: LocalizationResource = {
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'لا يمكن متابعة تسجيل الدخول. لا يوجد وسيلة مصادقة متاحة.',
       subtitle: 'حدث خطأ',

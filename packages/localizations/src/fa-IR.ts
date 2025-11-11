@@ -662,6 +662,13 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
+      formTitle: 'ایمیل خود را بررسی کنید',
+      resendButton: 'لینک را دریافت نکردید؟ ارسال مجدد',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -679,6 +686,7 @@ export const faIR: LocalizationResource = {
       label__alternativeMethods: 'یا با روش دیگری وارد شوید',
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',

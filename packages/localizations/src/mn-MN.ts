@@ -654,6 +654,13 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Имэйлдээ илгээсэн баталгаажуулах холбоосыг ашиглана уу',
+      formTitle: 'Имэйлээ шалгана уу',
+      resendButton: 'Холбоос хүлээн авсангүй? Дахин илгээх',
+      subtitle: '{{applicationName}} руу үргэлжлүүлэх',
+      title: 'Имэйлээ шалгана уу',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +678,7 @@ export const mnMN: LocalizationResource = {
       label__alternativeMethods: 'Эсвэл өөр аргаар нэвтэрнэ үү',
       title: 'Нууц үгээ мартсан?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Нэвтрэхийг үргэлжлүүлэх боломжгүй. Баталгаажуулах хүчин зүйл алга.',
       subtitle: 'Алдаа гарлаа',

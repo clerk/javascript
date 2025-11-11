@@ -658,6 +658,13 @@ export const taIN: LocalizationResource = {
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',
+      formTitle: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+      resendButton: 'இணைப்பு கிடைக்கவில்லையா? மீண்டும் அனுப்பவும்',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -675,6 +682,7 @@ export const taIN: LocalizationResource = {
       label__alternativeMethods: 'அல்லது, வேறு முறையில் உள்நுழையவும்',
       title: 'கடவுச்சொல் மறந்துவிட்டதா?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'உள்நுழைவைத் தொடர முடியாது. எந்த அங்கீகார காரணியும் கிடைக்கவில்லை.',
       subtitle: 'பிழை ஏற்பட்டது',

@@ -643,6 +643,13 @@ export const zhTW: LocalizationResource = {
         titleNewTab: '已在其他分頁登入',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '使用發送到您電子郵件的驗證連結',
+      formTitle: '查看您的電子郵件',
+      resendButton: '沒有收到連結？重新發送',
+      subtitle: '繼續使用 {{applicationName}}',
+      title: '查看您的電子郵件',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +667,7 @@ export const zhTW: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登入。',
       title: '忘記密碼？',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: '無法繼續登入。沒有可用的驗證方式。',
       subtitle: '發生錯誤',

@@ -653,6 +653,13 @@ export const jaJP: LocalizationResource = {
         titleNewTab: '他のタブでサインイン済み',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'メールに送信された確認リンクを使用してください',
+      formTitle: 'メールを確認してください',
+      resendButton: 'リンクが届いていませんか？再送信',
+      subtitle: '{{applicationName}} に続行',
+      title: 'メールを確認してください',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -670,6 +677,7 @@ export const jaJP: LocalizationResource = {
       label__alternativeMethods: 'または、別の方法でサインインしてください。',
       title: 'パスワードをお忘れですか？',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'サインインできません。利用可能な認証方法がありません。',
       subtitle: 'エラーが発生しました',

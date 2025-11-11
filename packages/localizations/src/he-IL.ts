@@ -647,6 +647,13 @@ export const heIL: LocalizationResource = {
         titleNewTab: 'נכנס בכרטיסייה אחרת',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'השתמש בקישור האימות שנשלח לדוא״ל שלך',
+      formTitle: 'בדוק את הדוא״ל שלך',
+      resendButton: 'לא קיבלת את הקישור? שלח שוב',
+      subtitle: 'כדי להמשיך ל-{{applicationName}}',
+      title: 'בדוק את הדוא״ל שלך',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -664,6 +671,7 @@ export const heIL: LocalizationResource = {
       label__alternativeMethods: 'או, התחבר באמצעות שיטה אחרת.',
       title: 'שכחת סיסמה?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'לא ניתן להמשיך בהתחברות. אין גורם אימות זמין.',
       subtitle: 'אירעה שגיאה',

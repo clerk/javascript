@@ -658,6 +658,13 @@ export const msMY: LocalizationResource = {
         titleNewTab: 'Didaftarkan masuk pada tab lain',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gunakan pautan pengesahan yang dihantar ke e-mel anda',
+      formTitle: 'Semak e-mel anda',
+      resendButton: 'Tidak menerima pautan? Hantar semula',
+      subtitle: 'untuk meneruskan ke {{applicationName}}',
+      title: 'Semak e-mel anda',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -675,6 +682,7 @@ export const msMY: LocalizationResource = {
       label__alternativeMethods: 'Atau, daftar masuk dengan kaedah lain',
       title: 'Lupa Kata Laluan?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Tidak dapat meneruskan pendaftaran masuk. Tiada faktor pengesahan yang tersedia.',
       subtitle: 'Ralat berlaku',

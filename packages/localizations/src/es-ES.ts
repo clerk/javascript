@@ -655,6 +655,13 @@ export const esES: LocalizationResource = {
         titleNewTab: 'Inició sesión en otra pestaña',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',
+      formTitle: 'Revisa tu correo electrónico',
+      resendButton: '¿No recibiste el enlace? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revisa tu correo electrónico',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +679,7 @@ export const esES: LocalizationResource = {
       label__alternativeMethods: 'O, inicia sesión con otro método',
       title: '¿Olvidaste tu contraseña?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'No se puede continuar con el inicio de sesión. No hay ningún factor de autenticación disponible.',
       subtitle: 'Ocurrió un error',

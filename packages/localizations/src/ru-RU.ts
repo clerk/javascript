@@ -662,6 +662,13 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
+      formTitle: 'Проверьте свою электронную почту',
+      resendButton: 'Не получили ссылку? Отправить повторно',
+      subtitle: 'чтобы продолжить в {{applicationName}}',
+      title: 'Проверьте свою электронную почту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -679,6 +686,7 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',

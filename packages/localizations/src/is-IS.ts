@@ -655,6 +655,13 @@ export const isIS: LocalizationResource = {
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',
+      formTitle: 'Athugaðu tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki tengilinn? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +679,7 @@ export const isIS: LocalizationResource = {
       label__alternativeMethods: 'Eða, skráðu þig inn með annarri aðferð',
       title: 'Gleymt lykilorð?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.',
       subtitle: 'Villa kom upp',

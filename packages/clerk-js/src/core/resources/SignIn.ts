@@ -272,16 +272,34 @@ export class SignIn extends BaseResource implements SignInResource {
       if (!this.id) {
         clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
       }
-      await this.prepareFirstFactor({
+
+      const params: PrepareFirstFactorParams | PrepareSecondFactorParams = {
         strategy: 'email_link',
         emailAddressId: emailAddressId,
         redirectUrl: redirectUrl,
-      });
+      };
+
+      const verification: {
+        prepareFn: typeof SignIn.prototype.prepareSecondFactor | typeof SignIn.prototype.prepareFirstFactor;
+        key: 'firstFactorVerification' | 'secondFactorVerification';
+      } =
+        this.status === 'needs_second_factor'
+          ? {
+              prepareFn: this.prepareSecondFactor,
+              key: 'secondFactorVerification',
+            }
+          : {
+              prepareFn: this.prepareFirstFactor,
+              key: 'firstFactorVerification',
+            };
+
+      await verification.prepareFn(params);
+
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.reload()
             .then(res => {
-              const status = res.firstFactorVerification.status;
+              const status = res[verification.key].status;
               if (status === 'verified' || status === 'expired') {
                 stop();
                 resolve(res);
@@ -293,6 +311,28 @@ export class SignIn extends BaseResource implements SignInResource {
             });
         });
       });
+
+      // await this.prepareFirstFactor({
+      //   strategy: 'email_link',
+      //   emailAddressId: emailAddressId,
+      //   redirectUrl: redirectUrl,
+      // });
+      // return new Promise((resolve, reject) => {
+      //   void run(() => {
+      //     return this.reload()
+      //       .then(res => {
+      //         const status = res.firstFactorVerification.status;
+      //         if (status === 'verified' || status === 'expired') {
+      //           stop();
+      //           resolve(res);
+      //         }
+      //       })
+      //       .catch(err => {
+      //         stop();
+      //         reject(err);
+      //       });
+      //   });
+      // });
     };
 
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };

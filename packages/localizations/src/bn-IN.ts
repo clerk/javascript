@@ -656,6 +656,13 @@ export const bnIN: LocalizationResource = {
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',
+      formTitle: 'আপনার ইমেইল পরীক্ষা করুন',
+      resendButton: 'লিঙ্ক পাননি? আবার পাঠান',
+      subtitle: '{{applicationName}} এ চালিয়ে যেতে',
+      title: 'আপনার ইমেইল পরীক্ষা করুন',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -673,6 +680,7 @@ export const bnIN: LocalizationResource = {
       label__alternativeMethods: 'অথবা, অন্য পদ্ধতি দিয়ে সাইন ইন করুন',
       title: 'পাসওয়ার্ড ভুলে গেছেন?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।',
       subtitle: 'একটি ত্রুটি ঘটেছে',

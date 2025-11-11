@@ -489,6 +489,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
       formTitle: LocalizationValue;
+      formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };
     newDeviceVerificationNotice: LocalizationValue;

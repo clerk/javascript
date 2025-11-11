@@ -655,6 +655,13 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',
+      formTitle: 'अपना ईमेल जांचें',
+      resendButton: 'लिंक नहीं मिला? पुनः भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +679,7 @@ export const hiIN: LocalizationResource = {
       label__alternativeMethods: 'या, दूसरी विधि से साइन इन करें',
       title: 'पासवर्ड भूल गए?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'साइन इन जारी नहीं रख सकते। कोई उपलब्ध प्रमाणीकरण कारक नहीं है।',
       subtitle: 'एक त्रुटि हुई',

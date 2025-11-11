@@ -655,6 +655,13 @@ export const plPL: LocalizationResource = {
         titleNewTab: 'Zalogowano na innej karcie',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Użyj linku weryfikacyjnego wysłanego na Twój e-mail',
+      formTitle: 'Sprawdź swoją pocztę',
+      resendButton: 'Nie otrzymałeś linku? Wyślij ponownie',
+      subtitle: 'aby kontynuować do {{applicationName}}',
+      title: 'Sprawdź swoją pocztę',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +679,7 @@ export const plPL: LocalizationResource = {
       label__alternativeMethods: 'Lub zaloguj się za pomocą innej metody',
       title: 'Zapomniałeś hasła?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Nie można kontynuować logowania. Brak dostępnych czynników uwierzytelniających.',
       subtitle: 'Wystąpił błąd',

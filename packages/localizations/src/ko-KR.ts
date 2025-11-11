@@ -649,6 +649,13 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',
+      formTitle: '이메일을 확인하세요',
+      resendButton: '링크를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}(으)로 계속',
+      title: '이메일을 확인하세요',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +673,7 @@ export const koKR: LocalizationResource = {
       label__alternativeMethods: '또는 다른 방법으로 로그인',
       title: '비밀번호를 잊으셨나요?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: '로그인을 계속할 수 없습니다. 사용 가능한 인증 방법이 없습니다.',
       subtitle: '오류가 발생했습니다',

@@ -616,14 +616,6 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
-    emailLinkMfa: {
-      formTitle: 'Check your email',
-      resendButton: "Didn't receive a link? Resend",
-      subtitle: 'to continue to {{applicationName}}',
-      title: 'Check your email',
-    },
-    newDeviceVerificationNotice:
-      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -660,6 +652,13 @@ export const enUS: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use the verification link sent to your email',
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     enterpriseConnections: {
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
@@ -677,6 +676,8 @@ export const enUS: LocalizationResource = {
       label__alternativeMethods: 'Or, sign in with another method',
       title: 'Forgot Password?',
     },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     noAvailableMethods: {
       message: "Cannot proceed with sign in. There's no available authentication factor.",
       subtitle: 'An error occurred',

@@ -654,6 +654,13 @@ export const hrHR: LocalizationResource = {
         titleNewTab: 'Prijavljeni na drugoj kartici',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Koristite vezu za provjeru poslanu na vašu e-poštu',
+      formTitle: 'Provjerite svoju e-poštu',
+      resendButton: 'Niste primili vezu? Ponovno pošalji',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +678,7 @@ export const hrHR: LocalizationResource = {
       label__alternativeMethods: 'Ili se prijavite na drugi način',
       title: 'Zaboravili ste lozinku?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Nije moguće nastaviti s prijavom. Nema dostupnog faktora autentifikacije.',
       subtitle: 'Došlo je do pogreške',

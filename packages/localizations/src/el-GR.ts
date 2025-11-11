@@ -654,6 +654,13 @@ export const elGR: LocalizationResource = {
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
+      formTitle: 'Ελέγξτε το email σας',
+      resendButton: 'Δεν λάβατε τον σύνδεσμο; Επανάληψη αποστολής',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +678,7 @@ export const elGR: LocalizationResource = {
       label__alternativeMethods: 'Ή, συνδεθείτε με μια άλλη μέθοδο.',
       title: 'Ξεχάσατε τον κωδικό πρόσβασης;',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Δεν είναι δυνατή η σύνδεση. Δεν υπάρχει διαθέσιμος παράγοντας αυθεντικοποίησης.',
       subtitle: 'Προέκυψε σφάλμα',

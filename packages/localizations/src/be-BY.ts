@@ -658,6 +658,13 @@ export const beBY: LocalizationResource = {
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Выкарыстоўвайце спасылку для пацвярджэння, адпраўленую на вашу электронную пошту',
+      formTitle: 'Праверце сваю электронную пошту',
+      resendButton: 'Не атрымалі спасылку? Адправіць зноў',
+      subtitle: 'каб працягнуць да {{applicationName}}',
+      title: 'Праверце сваю электронную пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -675,6 +682,7 @@ export const beBY: LocalizationResource = {
       label__alternativeMethods: 'Або ўвайдзіце іншым спосабам',
       title: 'Забыўся пароль?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Немагчыма ўвайсці. Няма даступных фактараў аўтэнтыфікацыі.',
       subtitle: 'Адбылася памылка',

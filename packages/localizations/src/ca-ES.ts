@@ -654,6 +654,13 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: "Utilitzeu l'enllaç de verificació enviat al vostre correu electrònic",
+      formTitle: 'Comproveu el vostre correu electrònic',
+      resendButton: "No heu rebut l'enllaç? Reenviar",
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comproveu el vostre correu electrònic',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +678,7 @@ export const caES: LocalizationResource = {
       label__alternativeMethods: 'O bé, inicia sessió amb un altre mètode',
       title: 'Has oblidat la contrasenya?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: "No es pot procedir amb l'inici de sessió. No hi ha cap factor d'autenticació disponible.",
       subtitle: "S'ha produït un error",

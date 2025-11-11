@@ -652,6 +652,13 @@ export const srRS: LocalizationResource = {
         titleNewTab: 'Prijavljen na drugom tabu',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Користите везу за верификацију послату на вашу е-пошту',
+      formTitle: 'Проверите своју е-пошту',
+      resendButton: 'Нисте примили везу? Пошаљи поново',
+      subtitle: 'да наставите на {{applicationName}}',
+      title: 'Проверите своју е-пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -669,6 +676,7 @@ export const srRS: LocalizationResource = {
       label__alternativeMethods: 'Ili, prijavi se drugom metodom',
       title: 'Zaboravljena lozinka?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
       subtitle: 'Došlo je do greške',

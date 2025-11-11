@@ -662,6 +662,13 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use o link de verificação enviado para o seu e-mail',
+      formTitle: 'Verifique seu e-mail',
+      resendButton: 'Não recebeu o link? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -679,6 +686,7 @@ export const ptBR: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu a senha?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',

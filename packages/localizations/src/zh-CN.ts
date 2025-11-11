@@ -643,6 +643,13 @@ export const zhCN: LocalizationResource = {
         titleNewTab: '在其他标签页上登录',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '使用发送到您电子邮件的验证链接',
+      formTitle: '查看您的电子邮件',
+      resendButton: '没有收到链接？重新发送',
+      subtitle: '继续使用 {{applicationName}}',
+      title: '查看您的电子邮件',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +667,7 @@ export const zhCN: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登录。',
       title: '忘记密码？',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: '无法继续登录。没有可用的身份验证因素。',
       subtitle: '出现错误',

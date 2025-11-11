@@ -654,6 +654,13 @@ export const nlNL: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gebruik de verificatielink die naar je e-mail is verzonden',
+      formTitle: 'Controleer je e-mail',
+      resendButton: 'Geen link ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Controleer je e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +678,7 @@ export const nlNL: LocalizationResource = {
       label__alternativeMethods: 'Of log in met een andere methode',
       title: 'Wachtwoord vergeten?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Het is niet mogelijk om door te gaan met inloggen. Er is geen beschikbare authenticatiefactor.',
       subtitle: 'Er heeft zich een fout voorgedaan',

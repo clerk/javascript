@@ -653,6 +653,13 @@ export const daDK: LocalizationResource = {
         titleNewTab: 'Logget ind på anden fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Brug bekræftelseslinket, der er sendt til din e-mail',
+      formTitle: 'Tjek din e-mail',
+      resendButton: 'Har du ikke modtaget linket? Send igen',
+      subtitle: 'for at fortsætte til {{applicationName}}',
+      title: 'Tjek din e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -670,6 +677,7 @@ export const daDK: LocalizationResource = {
       label__alternativeMethods: 'Eller, log ind med en anden metode',
       title: 'Glemt Adgangskode?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Kan ikke fortsætte med login. Der er ingen tilgængelige godkendelsesfaktorer.',
       subtitle: 'En fejl opstod',

@@ -118,7 +118,7 @@ export type AttemptFirstFactorParams =
   | ResetPasswordPhoneCodeAttempt
   | ResetPasswordEmailCodeAttempt;
 
-export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig;
+export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig | EmailLinkConfig;
 
 export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
 

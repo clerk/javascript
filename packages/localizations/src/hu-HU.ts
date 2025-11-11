@@ -653,6 +653,13 @@ export const huHU: LocalizationResource = {
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Használja az e-mail címére küldött megerősítő linket',
+      formTitle: 'Ellenőrizze az e-mailjét',
+      resendButton: 'Nem kapta meg a linket? Újraküldés',
+      subtitle: 'a folytatáshoz a {{applicationName}} alkalmazásban',
+      title: 'Ellenőrizze az e-mailjét',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -670,6 +677,7 @@ export const huHU: LocalizationResource = {
       label__alternativeMethods: 'Vagy jelentkezz be más módon',
       title: 'Efelejtetted a jelszavad?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Nem lehet bejelentkezni. Nincs elérhető hitelesítő tényező.',
       subtitle: 'Hiba történt',

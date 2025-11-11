@@ -661,6 +661,13 @@ export const itIT: LocalizationResource = {
         titleNewTab: "Accedi da un'altra scheda",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Usa il link di verifica inviato alla tua email',
+      formTitle: 'Controlla la tua email',
+      resendButton: 'Non hai ricevuto il link? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -678,6 +685,7 @@ export const itIT: LocalizationResource = {
       label__alternativeMethods: 'Oppure, accedi con un altro metodo',
       title: 'Hai dimenticato la password?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: "Impossibile procedere con l'accesso. Non ci sono strumenti di autenticazione disponibili.",
       subtitle: 'Si è verificato un errore',

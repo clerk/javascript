@@ -664,6 +664,13 @@ export const roRO: LocalizationResource = {
         titleNewTab: 'Autentificat în altă filă',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Folosiți linkul de verificare trimis la adresa dvs. de e-mail',
+      formTitle: 'Verificați-vă e-mailul',
+      resendButton: 'Nu ați primit linkul? Retrimiteți',
+      subtitle: 'pentru a continua către {{applicationName}}',
+      title: 'Verificați-vă e-mailul',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -681,6 +688,7 @@ export const roRO: LocalizationResource = {
       label__alternativeMethods: 'Sau autentifică-te cu altă metodă',
       title: 'Ai uitat parola?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
       subtitle: 'A apărut o eroare',

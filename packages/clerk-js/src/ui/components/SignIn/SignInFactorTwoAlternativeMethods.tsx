@@ -107,6 +107,10 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
       return localizationKeys('signIn.alternativeMethods.blockButton__emailCode', {
         identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
       });
+    case 'email_link':
+      return localizationKeys('signIn.alternativeMethods.blockButton__emailLink', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     default:
       throw new Error(`Invalid sign in strategy: "${factor.strategy}"`);
   }

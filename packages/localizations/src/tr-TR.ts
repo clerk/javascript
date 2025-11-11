@@ -654,6 +654,13 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',
+      formTitle: 'E-postanızı kontrol edin',
+      resendButton: 'Bağlantıyı almadınız mı? Yeniden gönder',
+      subtitle: '{{applicationName}} uygulamasına devam etmek için',
+      title: 'E-postanızı kontrol edin',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +678,7 @@ export const trTR: LocalizationResource = {
       label__alternativeMethods: 'Veya başka bir yöntem kullanın:',
       title: 'Şifremi unuttum',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Hesabınızda giriş yapmak için kullanabileceğiniz bir yöntem bulunmuyor.',
       subtitle: 'Bir hata oluştu',

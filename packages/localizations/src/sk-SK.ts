@@ -655,6 +655,13 @@ export const skSK: LocalizationResource = {
         titleNewTab: 'Prihlásené v inom okne',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použite overovací odkaz odoslaný na váš e-mail',
+      formTitle: 'Skontrolujte svoj e-mail',
+      resendButton: 'Nedostali ste odkaz? Znovu odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +679,7 @@ export const skSK: LocalizationResource = {
       label__alternativeMethods: 'Alebo sa prihláste pomocou inej metódy.',
       title: 'Zabudli ste heslo?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Nemožno pokračovať v prihlásení. Nie je k dispozícii žiadna dostupná autentifikačná metóda.',
       subtitle: 'Došlo k chybe',

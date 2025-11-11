@@ -660,6 +660,13 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',
+      formTitle: 'Kiểm tra email của bạn',
+      resendButton: 'Không nhận được liên kết? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email của bạn',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -677,6 +684,7 @@ export const viVN: LocalizationResource = {
       label__alternativeMethods: 'Hoặc, đăng nhập với phương thức khác',
       title: 'Quên mật khẩu?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Không thể tiếp tục đăng nhập. Không có yếu tố xác thực phù hợp được cấu hình',
       subtitle: 'Đã xảy ra lỗi',

@@ -645,6 +645,13 @@ export const kkKZ: LocalizationResource = {
         titleNewTab: 'Басқа бетте кірдіңіз',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Электрондық поштаңызға жіберілген растау сілтемесін пайдаланыңыз',
+      formTitle: 'Электрондық поштаңызды тексеріңіз',
+      resendButton: 'Сілтеме алмадыңыз ба? Қайта жіберу',
+      subtitle: '{{applicationName}} қосымшасына жалғастыру үшін',
+      title: 'Электрондық поштаңызды тексеріңіз',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -662,6 +669,7 @@ export const kkKZ: LocalizationResource = {
       label__alternativeMethods: 'Немесе басқа әдісті қолданыңыз',
       title: 'Құпия сөзді ұмыттыңыз ба?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Кіру мүмкін емес. Аутентификация әдісі қолжетімсіз.',
       subtitle: 'Қате орын алды',

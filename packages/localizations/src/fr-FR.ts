@@ -668,6 +668,13 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
+      formTitle: 'Vérifiez votre messagerie',
+      resendButton: "Vous n'avez pas reçu de lien ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -685,6 +692,7 @@ export const frFR: LocalizationResource = {
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       title: 'Mot de passe oublié ?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
       subtitle: "Une erreur s'est produite",

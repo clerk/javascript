@@ -652,6 +652,13 @@ export const ukUA: LocalizationResource = {
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',
+      formTitle: 'Перевірте свою електронну пошту',
+      resendButton: 'Не отримали посилання? Надіслати знову',
+      subtitle: 'щоб продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -669,6 +676,7 @@ export const ukUA: LocalizationResource = {
       label__alternativeMethods: 'Або, увійти іншим способом',
       title: 'Забули пароль?',
     },
+    newDeviceVerificationNotice: undefined,
     noAvailableMethods: {
       message: 'Не вдається виконати вхід. Немає доступного фактору автентифікації.',
       subtitle: 'Виникла помилка',
