@@ -1,12 +1,10 @@
 import type { Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
-import type { ReactNode } from 'react';
 import React from 'react';
 
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { getKeylessStatus, KeylessProvider } from './keyless-provider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
@@ -31,26 +29,12 @@ async function generateStatePromise(dynamic: boolean) {
   if (!dynamic) {
     return Promise.resolve(null);
   }
-  if (isNext13) {
-    /**
-     * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-     * Without the await here, Next will throw a DynamicServerError during build.
-     */
-    return Promise.resolve(await getDynamicClerkState());
-  }
   return getDynamicClerkState();
 }
 
 async function generateNonce(dynamic: boolean) {
   if (!dynamic) {
     return Promise.resolve('');
-  }
-  if (isNext13) {
-    /**
-     * For some reason, Next 13 requires that functions which call `headers()` are awaited where they are invoked.
-     * Without the await here, Next will throw a DynamicServerError during build.
-     */
-    return Promise.resolve(await getNonceHeaders());
   }
   return getNonceHeaders();
 }
@@ -69,8 +53,6 @@ export async function ClerkProvider(
 
   const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
 
-  let output: ReactNode;
-
   try {
     const detectKeylessEnvDrift = await import('../../server/keyless-telemetry.js').then(
       mod => mod.detectKeylessEnvDrift,
@@ -81,7 +63,7 @@ export async function ClerkProvider(
   }
 
   if (shouldRunAsKeyless) {
-    output = (
+    return (
       <KeylessProvider
         rest={propsWithEnvs}
         noncePromise={noncePromise}
@@ -91,17 +73,15 @@ export async function ClerkProvider(
         {children}
       </KeylessProvider>
     );
-  } else {
-    output = (
-      <ClientClerkProvider
-        {...propsWithEnvs}
-        nonce={await noncePromise}
-        initialState={await statePromise}
-      >
-        {children}
-      </ClientClerkProvider>
-    );
   }
 
-  return output;
+  return (
+    <ClientClerkProvider
+      {...propsWithEnvs}
+      nonce={await noncePromise}
+      initialState={await statePromise}
+    >
+      {children}
+    </ClientClerkProvider>
+  );
 }
