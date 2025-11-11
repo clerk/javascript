@@ -166,7 +166,7 @@ function getImportPath(reflection) {
  * @param {Set<string>} visited - Set of visited paths to prevent infinite loops
  * @param {string | null} packagesDir - Path to packages directory
  * @param {{ [key: string]: string } | null} packageFolderMap - Map of package names to folder names
- * @returns {{name: string, isReExport: boolean}[]} - Array of export info
+ * @returns {{name: string, originalName: string, isReExport: boolean}[]} - Array of export info
  */
 function parseExportsFromFile(filePath, visited = new Set(), packagesDir = null, packageFolderMap = null) {
   if (!fs.existsSync(filePath) || visited.has(filePath)) {
@@ -186,17 +186,21 @@ function parseExportsFromFile(filePath, visited = new Set(), packagesDir = null,
       .split(',')
       .map(n => {
         const trimmed = n.trim();
-        // Handle aliases: "Something as Alias" -> extract "Alias"
+        // Handle aliases: "Something as Alias" -> track both names
         const aliasMatch = trimmed.match(/(\w+)\s+as\s+(\w+)/);
-        return aliasMatch ? aliasMatch[2] : trimmed;
+        if (aliasMatch) {
+          return { name: aliasMatch[2], originalName: aliasMatch[1] };
+        }
+        return { name: trimmed, originalName: trimmed };
       })
       .filter(Boolean);
     const source = match[2];
     const isExternalReExport = source.startsWith('@clerk/');
 
     exports.push(
-      ...names.map(name => ({
+      ...names.map(({ name, originalName }) => ({
         name,
+        originalName,
         isReExport: isExternalReExport,
       })),
     );
@@ -217,11 +221,11 @@ function parseExportsFromFile(filePath, visited = new Set(), packagesDir = null,
 
     // If the names match AND it's imported from an external @clerk package, it's a re-export
     if (exportName === moduleProp && importMatch) {
-      exports.push({ name: exportName, isReExport: true });
+      exports.push({ name: exportName, originalName: exportName, isReExport: true });
     } else {
       // Otherwise, treat as local export
       if (!exports.find(e => e.name === exportName)) {
-        exports.push({ name: exportName, isReExport: false });
+        exports.push({ name: exportName, originalName: exportName, isReExport: false });
       }
     }
   }
@@ -232,20 +236,20 @@ function parseExportsFromFile(filePath, visited = new Set(), packagesDir = null,
     const name = match[1];
     // Check if we already added this (from module re-export pattern)
     if (!exports.find(e => e.name === name)) {
-      exports.push({ name, isReExport: false });
+      exports.push({ name, originalName: name, isReExport: false });
     }
   }
 
   // Match: export async function something() (local exports)
   const asyncFuncExportRegex = /export\s+async\s+function\s+(\w+)/g;
   while ((match = asyncFuncExportRegex.exec(content)) !== null) {
-    exports.push({ name: match[1], isReExport: false });
+    exports.push({ name: match[1], originalName: match[1], isReExport: false });
   }
 
   // Match: export function something() (local exports)
   const funcExportRegex = /export\s+function\s+(\w+)/g;
   while ((match = funcExportRegex.exec(content)) !== null) {
-    exports.push({ name: match[1], isReExport: false });
+    exports.push({ name: match[1], originalName: match[1], isReExport: false });
   }
 
   // Match: export * from './somewhere' (wildcard re-exports)
@@ -263,7 +267,11 @@ function parseExportsFromFile(filePath, visited = new Set(), packagesDir = null,
           for (const nestedExport of nestedExports) {
             if (!exports.find(e => e.name === nestedExport.name)) {
               // Mark as re-export from external package
-              exports.push({ name: nestedExport.name, isReExport: true });
+              exports.push({
+                name: nestedExport.name,
+                originalName: nestedExport.originalName || nestedExport.name,
+                isReExport: true,
+              });
             }
           }
         }
@@ -401,7 +409,7 @@ function resolveClerkPackageImport(importPath, packagesDir, packageFolderMap) {
  * @param {string} packagePath - Path to the package directory
  * @param {string | null} packagesDir - Path to packages directory
  * @param {{ [key: string]: string } | null} packageFolderMap - Map of package names to folder names
- * @returns {{name: string, isReExport: boolean}[]} - Array of export info
+ * @returns {{name: string, originalName: string, isReExport: boolean}[]} - Array of export info
  */
 function parsePackageExports(packagePath, packagesDir, packageFolderMap) {
   const entryPoints = getPackageEntryPoints(packagePath);
@@ -461,13 +469,9 @@ function findOriginalExportPackage(exportName, allPackageData, excludePackage, p
   for (const [packageName, exports] of Object.entries(allPackageData)) {
     if (packageName === excludePackage) continue;
     if (exports[exportName]) {
-      // Make sure this isn't also a re-export (check if it has dependencies)
-      const hasReExportDependency = exports[exportName].dependencies?.some(
-        /** @param {{ type: string }} d */ d => d.type === 'reExport',
-      );
-      if (!hasReExportDependency) {
-        return packageName;
-      }
+      // Return the first package that has this export
+      // Even if it's also a re-export, we want to build the dependency chain
+      return packageName;
     }
   }
 
@@ -776,10 +780,12 @@ function analyzeExportDependencies(packagePath, exportName) {
         // Match: export const ExportName: ... = Object.assign
         // Match: export { ExportName } from '...'
         // Match: export { Something as ExportName } from '...'
+        // Match: export * from '...' (wildcard re-exports)
         const exportRegex = new RegExp(
           `(?:export\\s+(?:const|function|class|async\\s+function)\\s+${exportName}\\b|` +
             `export\\s+const\\s+${exportName}\\s*:\\s*[^=]+=\\s*Object\\.assign|` +
-            `export\\s+\\{[^}]*(?:\\b${exportName}\\b|\\w+\\s+as\\s+${exportName}\\b)[^}]*\\}\\s+from)`,
+            `export\\s+\\{[^}]*(?:\\b${exportName}\\b|\\w+\\s+as\\s+${exportName}\\b)[^}]*\\}\\s+from|` +
+            `export\\s+\\*\\s+from)`,
         );
 
         if (exportRegex.test(content)) {
@@ -962,13 +968,13 @@ export function load(app) {
       let copiedCount = 0;
       let addedCount = 0;
 
-      for (const { name: exportName, isReExport } of sourceExports) {
+      for (const { name: exportName, originalName, isReExport } of sourceExports) {
         // Don't overwrite if it already exists (it's already been documented by TypeDoc)
         if (outputData[packageName][exportName]) {
           // If it's a re-export, mark it as such and find the source
           if (isReExport) {
             const originalPackage = findOriginalExportPackage(
-              exportName,
+              originalName || exportName,
               outputData,
               packageName,
               packagesDir,
@@ -994,7 +1000,7 @@ export function load(app) {
         if (isReExport) {
           // It's a re-export, try to find it in other packages and copy metadata
           const originalPackage = findOriginalExportPackage(
-            exportName,
+            originalName || exportName,
             outputData,
             packageName,
             packagesDir,
@@ -1003,7 +1009,7 @@ export function load(app) {
 
           if (originalPackage) {
             // Copy from the original package with updated import path
-            const originalExport = outputData[originalPackage]?.[exportName];
+            const originalExport = outputData[originalPackage]?.[originalName || exportName];
 
             // Detect if this export is from a subpath (e.g., /server)
             const subpath = detectSubpath(packagePath, exportName, packagesDir, packageFolderMap);
@@ -1130,6 +1136,65 @@ export function load(app) {
     }
 
     app.logger.info(`[exports-json-plugin] Fixed ${fixedPaths} import paths for subpath exports`);
+
+    // Fix missing dependencies for re-exports that were processed before their source packages
+    app.logger.info(`[exports-json-plugin] Fixing re-export dependencies...`);
+    let fixedDependencies = 0;
+
+    // Re-parse all packages to find exports that need dependency information
+    for (const packageName of Object.keys(outputData)) {
+      const packageFolderName = packageFolderMap[packageName];
+      if (!packageFolderName) continue;
+
+      const packagePath = path.join(packagesDir, packageFolderName);
+      if (!fs.existsSync(packagePath)) continue;
+
+      // Re-parse exports to get originalName information
+      const sourceExports = parsePackageExports(packagePath, packagesDir, packageFolderMap);
+
+      for (const { name: exportName, originalName, isReExport } of sourceExports) {
+        // Only process re-exports that exist in outputData but are missing dependencies
+        if (
+          isReExport &&
+          outputData[packageName][exportName] &&
+          (!outputData[packageName][exportName].dependencies ||
+            outputData[packageName][exportName].dependencies.length === 0)
+        ) {
+          const originalPackage = findOriginalExportPackage(
+            originalName || exportName,
+            outputData,
+            packageName,
+            packagesDir,
+            packageFolderMap,
+          );
+
+          if (originalPackage) {
+            const originalExport = outputData[originalPackage]?.[originalName || exportName];
+            if (originalExport) {
+              // Initialize dependencies array
+              outputData[packageName][exportName].dependencies = [
+                {
+                  package: originalPackage,
+                  type: 'reExport',
+                },
+              ];
+              fixedDependencies++;
+            }
+          } else {
+            // Couldn't find in any package's main exports
+            // Analyze source to find the dependency
+            const packageDependencies = analyzeExportDependencies(packagePath, exportName);
+            if (packageDependencies.length > 0) {
+              // Use the first dependency found
+              outputData[packageName][exportName].dependencies = packageDependencies;
+              fixedDependencies++;
+            }
+          }
+        }
+      }
+    }
+
+    app.logger.info(`[exports-json-plugin] Fixed ${fixedDependencies} re-export dependencies`);
 
     // Analyze dependencies for all exports (check if they're built on top of other @clerk packages)
     app.logger.info(`[exports-json-plugin] Analyzing dependencies for all exports...`);
