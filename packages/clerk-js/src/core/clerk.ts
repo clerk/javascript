@@ -102,14 +102,15 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
-  disabledAPIKeysFeature,
+  disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledUserAPIKeysFeature,
   errorThrower,
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -179,7 +180,8 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
-const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
+const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -1233,7 +1235,7 @@ export class Clerk implements ClerkInterface {
 
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
-    if (disabledAPIKeysFeature(this, this.environment)) {
+    if (disabledAllAPIKeysFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
           code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
@@ -1242,10 +1244,19 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (this.organization && !canViewOrManageAPIKeys(this)) {
+    if (this.organization && disabledOrganizationAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
-          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenDisabled, {
+          code: CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledUserAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForUserWhenDisabled, {
+          code: CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE,
         });
       }
       return;
