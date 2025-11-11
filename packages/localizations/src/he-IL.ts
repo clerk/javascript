@@ -1036,7 +1036,7 @@ export const heIL: LocalizationResource = {
       title: 'הוסף חשבון מחובר',
     },
     deletePage: {
-      actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
+      actionDescription: 'הקלד "מחיקת חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
       messageLine1:
         'האם אתה בטוח שברצונך למחוק את החשבון שלך? חלק מהנתונים המשויכים עשויים להישמר. כדי לבקש מחיקת נתונים מלאה, אנא צור קשר עם התמיכה.',
@@ -1278,16 +1278,16 @@ export const heIL: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'התחבר',
+      actionText: 'כבר יש לך גישה?',
+      formButton: 'הצטרף לרשימת ההמתנה',
+      subtitle: 'הזן את כתובת הדוא"ל שלך ואנו נודיע לך כשהמקום שלך יהיה מוכן',
+      title: 'הצטרף לרשימת ההמתנה',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'תועבר בקרוב...',
+      subtitle: 'אנו ניצור איתך קשר כשהמקום שלך יהיה מוכן',
+      title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
   },
 } as const;
