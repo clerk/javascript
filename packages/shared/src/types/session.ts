@@ -61,11 +61,11 @@ type WithReverification<T> = T & {
 export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
+       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
+       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
@@ -103,11 +103,11 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 type CheckAuthorizationParams = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
+       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
+       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
@@ -155,11 +155,11 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
+       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
+       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
        */
       permission?: never;
       /**

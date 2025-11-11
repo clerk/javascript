@@ -29,7 +29,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enrollment-mode).</li>
+   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/verified-domains#enrollment-mode).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
    */
