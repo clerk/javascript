@@ -96,8 +96,10 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
       (hookParams || {}) as TParams,
       fetchFn,
       {
-        keepPreviousData: safeValues.keepPreviousData,
-        infinite: safeValues.infinite,
+        ...({
+          keepPreviousData: safeValues.keepPreviousData,
+          infinite: safeValues.infinite,
+        } as PaginatedHookConfig<unknown>),
         enabled: isEnabled,
         ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
         __experimental_mode: safeValues.__experimental_mode,
