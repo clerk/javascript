@@ -12,7 +12,7 @@ import {
 } from '../contexts';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
-const hookName = 'useSubscription';
+const HOOK_NAME = 'useSubscription';
 
 /**
  * This is the new implementation of useSubscription using React Query.
@@ -21,7 +21,7 @@ const hookName = 'useSubscription';
  * @internal
  */
 export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult {
-  useAssertWrappedByClerkProvider(hookName);
+  useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
@@ -30,7 +30,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   // @ts-expect-error `__unstable__environment` is not typed
   const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
 
-  clerk.telemetry?.record(eventMethodCalled(hookName));
+  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const isOrganization = params?.for === 'organization';
   const billingEnabled = isOrganization
