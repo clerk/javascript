@@ -12,7 +12,7 @@ import {
 } from '../contexts';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
-const hookName = 'useSubscription';
+const HOOK_NAME = 'useSubscription';
 
 /**
  * This is the new implementation of useSubscription using React Query.
@@ -21,7 +21,7 @@ const hookName = 'useSubscription';
  * @internal
  */
 export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult {
-  useAssertWrappedByClerkProvider(hookName);
+  useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
@@ -30,7 +30,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   // @ts-expect-error `__unstable__environment` is not typed
   const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
 
-  clerk.telemetry?.record(eventMethodCalled(hookName));
+  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const isOrganization = params?.for === 'organization';
   const billingEnabled = isOrganization
@@ -49,6 +49,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     ];
   }, [user?.id, isOrganization, organization?.id]);
 
+  const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
+
   const query = useClerkQuery({
     queryKey,
     queryFn: ({ queryKey }) => {
@@ -56,7 +58,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
       return clerk.billing.getSubscription(obj.args);
     },
     staleTime: 1_000 * 60,
-    enabled: Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true),
+    enabled: queriesEnabled,
     // TODO(@RQ_MIGRATION): Add support for keepPreviousData
   });
 

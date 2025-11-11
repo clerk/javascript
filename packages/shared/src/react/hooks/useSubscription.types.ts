@@ -7,6 +7,12 @@ export type UseSubscriptionParams = {
    * Defaults to false.
    */
   keepPreviousData?: boolean;
+  /**
+   * If `true`, a request will be triggered when the hook is mounted.
+   *
+   * @default true
+   */
+  enabled?: boolean;
 };
 
 export type SubscriptionResult = {
