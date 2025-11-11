@@ -21,6 +21,11 @@
         "!node_modules/**"
       ]
     },
+    "build:sandbox": {
+      "dependsOn": ["^build"],
+      "inputs": ["sandbox/**"],
+      "outputs": ["dist/**"]
+    },
     "test": {
       "inputs": [
         "*.d.ts",
