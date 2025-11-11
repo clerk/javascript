@@ -1,16 +1,40 @@
+import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
+import { useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
 import { InternalThemeProvider } from '@/ui/styledSystem';
 
+import { DevTools } from '../../../../core/resources/DevTools';
 import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, PromptContainer } from '../shared';
 
 const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizationsPromptProps) => {
   const ctaText = 'componentName' in props ? `<${props.componentName} />` : props.utilityName;
+  const clerk = useClerk();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleEnableOrganizations = () => {
+    setIsLoading(true);
+
+    void new DevTools()
+      .__internal_enableEnvironmentSetting({
+        enable_organizations: true,
+      })
+      .then(() => {
+        // Re-fetch environment to get updated settings
+        // @ts-expect-error - __unstable__environment is not typed
+        const environment = clerk?.__unstable__environment;
+        environment.fetch?.();
+        clerk?.__internal_closeEnableOrganizationsPrompt?.();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   return (
     <Portal>
@@ -152,7 +176,6 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
             `}
           />
 
-          {/* TODO -> Introduce FAPI mutation to enable organizations */}
           <Flex
             direction='col'
             justify='center'
@@ -163,6 +186,8 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
           >
             <button
               type='button'
+              onClick={handleEnableOrganizations}
+              disabled={isLoading}
               css={css`
                 ${mainCTAStyles};
                 min-width: 100%;
@@ -175,13 +200,18 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                   0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
                   0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-                &:hover {
+                &:hover:not(:disabled) {
                   box-shadow:
                     0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(0, 0, 0, 0.1),
                     0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+                }
+
+                &:disabled {
+                  opacity: 0.6;
+                  cursor: not-allowed;
                 }
               `}
             >
