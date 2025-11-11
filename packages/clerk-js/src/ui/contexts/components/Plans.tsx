@@ -44,7 +44,7 @@ const useBillingHookParams = () => {
     for: subscriberType,
     keepPreviousData: true,
     // If the user is in an organization, only fetch billing data if they have the necessary permissions
-    enabled: organization ? allowBillingRoutes : true,
+    enabled: subscriberType === 'organization' ? Boolean(organization) && allowBillingRoutes : true,
   };
 };
 
@@ -85,6 +85,7 @@ export const usePlans = (params?: { mode: 'cache' }) => {
     initialPage: 1,
     pageSize: 50,
     keepPreviousData: true,
+    enabled: true,
     __experimental_mode: params?.mode,
   });
 };
