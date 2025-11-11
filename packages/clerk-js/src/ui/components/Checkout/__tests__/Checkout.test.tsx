@@ -327,6 +327,7 @@ describe('Checkout', () => {
         taxTotal: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         credit: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
         pastDue: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
+        totalDueAfterFreeTrial: { amount: 1000, amountFormatted: '10.00', currency: 'USD', currencySymbol: '$' },
         totalDueNow: { amount: 0, amountFormatted: '0.00', currency: 'USD', currencySymbol: '$' },
       },
       isImmediatePlanChange: true,

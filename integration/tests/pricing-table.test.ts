@@ -1,3 +1,4 @@
+import type { Locator } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
@@ -278,7 +279,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       // Verify checkout shows trial details
       await expect(u.po.checkout.root.getByText('Checkout')).toBeVisible();
       await expect(u.po.checkout.root.getByText('Free trial')).toBeVisible();
-      await expect(u.po.checkout.root.getByText('Total Due after')).toBeVisible();
+      const title = /^Total Due after trial ends in \d+ days$/i;
+      await expect(matchLineItem(u.po.checkout.root, title, '$999.00')).toBeVisible();
 
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
@@ -286,6 +288,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible({
         timeout: 15_000,
       });
+
+      const footer = u.po.checkout.root.locator('.cl-drawerFooter');
+      await expect(matchLineItem(footer, 'Total paid', '$0.00')).toBeVisible();
+      await expect(matchLineItem(footer, 'Trial ends on')).toBeVisible();
+      await expect(matchLineItem(footer, 'Payment method', 'Visa ⋯ 4242')).toBeVisible();
+      expect(await countLineItems(footer)).toBe(3);
+
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/pricing-table');
@@ -344,12 +353,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       // Verify checkout shows trial details
       await expect(u.po.checkout.root.getByText('Checkout')).toBeVisible();
       await expect(u.po.checkout.root.getByText('Free trial')).toBeHidden();
-      await expect(u.po.checkout.root.getByText('Total Due after')).toBeHidden();
-      await expect(u.po.checkout.root.getByText('Total Due Today')).toBeVisible();
+
+      await expect(matchLineItem(u.po.checkout.root, 'Total Due after')).toBeHidden();
+      await expect(matchLineItem(u.po.checkout.root, 'Subtotal', '$999.00')).toBeVisible();
+      await expect(matchLineItem(u.po.checkout.root, 'Total Due Today', '$999.00')).toBeVisible();
+      expect(await countLineItems(u.po.checkout.root)).toBe(3);
 
       await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Payment was successful!')).toBeVisible();
+      await expect(matchLineItem(footer, 'Total paid', '$999.00')).toBeVisible();
+      await expect(matchLineItem(footer, 'Payment method', 'Visa ⋯ 4242')).toBeVisible();
+      expect(await countLineItems(footer)).toBe(2);
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/user');
@@ -877,3 +892,34 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
   });
 });
+
+/**
+ * Helper to match a line item by its title and optionally its description.
+ * Line items are rendered as Clerk LineItems components with element descriptors:
+ * - .cl-lineItemsTitle contains the title
+ * - .cl-lineItemsDescription contains the description (immediately following the title)
+ */
+function matchLineItem(root: Locator, title: string | RegExp, description?: string | RegExp): Locator {
+  // Find the title element using the Clerk-generated class
+  const titleElement = root.locator('.cl-lineItemsTitle').filter({ hasText: title });
+
+  // If no description is provided, return the title element
+  if (description === undefined) {
+    return titleElement;
+  }
+
+  // Get the next sibling description element using the Clerk-generated class
+  const descriptionElement = titleElement
+    .locator('xpath=following-sibling::*[1][contains(@class, "cl-lineItemsDescription")]')
+    .filter({ hasText: description });
+
+  return descriptionElement;
+}
+
+/**
+ * Helper to count the number of line items within a given root element.
+ * Line items are rendered as Clerk LineItems components where each .cl-lineItemsTitle represents a line item.
+ */
+async function countLineItems(root: Locator): Promise<number> {
+  return await root.locator('.cl-lineItemsTitle').count();
+}
