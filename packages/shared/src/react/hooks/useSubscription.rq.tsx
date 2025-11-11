@@ -50,7 +50,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     ];
   }, [user?.id, isOrganization, organization?.id]);
 
-  const queriesEnabled = Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true);
+  const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
 
   const query = useClerkQuery({
     queryKey,
