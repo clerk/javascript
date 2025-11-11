@@ -1,5 +1,35 @@
 # Change Log
 
+## 5.107.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/localizations@3.27.2
+
+## 5.106.0
+
+### Minor Changes
+
+- Implemented server-side pagination and filtering for API keys ([#6453](https://github.com/clerk/javascript/pull/6453)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add types for errors used in new custom flow APIs ([#7174](https://github.com/clerk/javascript/pull/7174)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- [Experimental] Add support for modal SSO sign-ins to new APIs ([#7026](https://github.com/clerk/javascript/pull/7026)) by [@dstaley](https://github.com/dstaley)
+
+- Support granular API keys settings for user and organization profiles ([#7179](https://github.com/clerk/javascript/pull/7179)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/localizations@3.27.1
+
 ## 5.105.1
 
 ### Patch Changes
