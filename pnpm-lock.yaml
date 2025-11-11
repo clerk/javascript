@@ -649,6 +649,9 @@ importers:
       '@clerk/expo-passkeys':
         specifier: workspace:*
         version: link:../expo-passkeys
+      '@react-native-google-signin/google-signin':
+        specifier: ^16.0.0
+        version: 16.0.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
       '@types/base-64':
         specifier: ^1.0.2
         version: 1.0.2
@@ -658,6 +661,9 @@ importers:
       expo-auth-session:
         specifier: ^5.4.0
         version: 5.4.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
+      expo-constants:
+        specifier: ^18.0.0
+        version: 18.0.9(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))
       expo-crypto:
         specifier: ^15.0.7
         version: 15.0.7(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
@@ -4141,6 +4147,16 @@ packages:
     resolution: {integrity: sha512-7+mOhk+3+X3BjSJZZvYrDJynA00gPYTlvT28ZjiLlbuVGfqfNiBKaxuF7rty+gjjpch4iKGvLhIhSN5cuOsdHQ==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@react-native-google-signin/google-signin@16.0.0':
+    resolution: {integrity: sha512-jVuzPo8odREekFc0b4RK3YsqCvedtLIM2P6NSszFr9cYyhKrUNikffPapL6LmkL9qkb8K6pDeb5CXg4qALOc0g==}
+    peerDependencies:
+      expo: '>=52.0.40'
+      react: 18.3.1
+      react-native: '*'
+    peerDependenciesMeta:
+      expo:
+        optional: true
 
   '@react-native/assets-registry@0.81.4':
     resolution: {integrity: sha512-AMcDadefBIjD10BRqkWw+W/VdvXEomR6aEZ0fhQRAv7igrBzb4PTn4vHKYg+sUK0e3wa74kcMy2DLc/HtnGcMA==}
@@ -19415,6 +19431,13 @@ snapshots:
       - supports-color
       - utf-8-validate
     optional: true
+
+  '@react-native-google-signin/google-signin@16.0.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      react: 18.3.1
+      react-native: 0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1)
+    optionalDependencies:
+      expo: 54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
 
   '@react-native/assets-registry@0.81.4': {}
 
