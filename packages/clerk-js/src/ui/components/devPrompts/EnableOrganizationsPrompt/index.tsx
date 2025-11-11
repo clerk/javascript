@@ -24,12 +24,13 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
       .__internal_enableEnvironmentSetting({
         enable_organizations: true,
       })
-      .then(() => {
+      .then(async () => {
         // Re-fetch environment to get updated settings
         // @ts-expect-error - __unstable__environment is not typed
         const environment = clerk?.__unstable__environment;
-        environment.fetch?.();
+        await environment.fetch?.();
         clerk?.__internal_closeEnableOrganizationsPrompt?.();
+        props.onComplete?.();
       })
       .finally(() => {
         setIsLoading(false);

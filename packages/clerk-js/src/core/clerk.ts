@@ -36,9 +36,9 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   BillingNamespace,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -832,6 +832,9 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationProfile',
+          onComplete: () => {
+            this.openOrganizationProfile();
+          },
         });
       }
       return;
@@ -862,6 +865,9 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationSwitcher',
+          onComplete: () => {
+            this.openCreateOrganization();
+          },
         });
       }
       return;
@@ -1004,6 +1010,9 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationProfile',
+          onComplete: () => {
+            this.mountOrganizationProfile(node, props);
+          },
         });
       }
       return;
@@ -1044,6 +1053,9 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationSwitcher',
+          onComplete: () => {
+            this.mountCreateOrganization();
+          },
         });
       }
       return;
@@ -1075,6 +1087,9 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationSwitcher',
+          onComplete: () => {
+            this.mountOrganizationSwitcher(node, props);
+          },
         });
       }
       return;
@@ -1111,9 +1126,14 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.environment)) {
+      debugger;
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationList',
+          onComplete: () => {
+            debugger;
+            this.mountOrganizationList(node, props);
+          },
         });
       }
       return;
@@ -1310,6 +1330,9 @@ export class Clerk implements ClerkInterface {
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationSwitcher',
+          onComplete: () => {
+            this.mountTaskChooseOrganization(node, props);
+          },
         });
       }
       return;
