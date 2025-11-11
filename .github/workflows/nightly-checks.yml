@@ -44,6 +44,10 @@ jobs:
         working-directory: ${{runner.temp}}
         run: mkdir clerk-js && cd clerk-js && pnpm init && pnpm add @clerk/clerk-js
 
+      - name: Install @clerk/ui in os temp
+        working-directory: ${{runner.temp}}
+        run: mkdir clerk-ui && cd clerk-ui && pnpm init && pnpm add @clerk/ui
+
       - name: Run Integration Tests
         id: integration_tests
         continue-on-error: true
@@ -59,6 +63,7 @@ jobs:
           echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: 'latest'
           E2E_NEXTJS_VERSION: 'canary'
           E2E_NPM_FORCE: 'true'
@@ -78,6 +83,7 @@ jobs:
             integration/test-results/
             integration/.next/
             ${{runner.temp}}/clerk-js/node_modules/
+            ${{runner.temp}}/clerk-ui/node_modules/
           retention-days: 7
 
       - name: Report Status

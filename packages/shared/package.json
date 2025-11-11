@@ -70,6 +70,26 @@
         "default": "./dist/runtime/dom/index.js"
       }
     },
+    "./ui": {
+      "import": {
+        "types": "./dist/runtime/ui/index.d.mts",
+        "default": "./dist/runtime/ui/index.mjs"
+      },
+      "require": {
+        "types": "./dist/runtime/ui/index.d.ts",
+        "default": "./dist/runtime/ui/index.js"
+      }
+    },
+    "./import": {
+      "import": {
+        "types": "./dist/runtime/import/index.d.mts",
+        "default": "./dist/runtime/import/index.mjs"
+      },
+      "require": {
+        "types": "./dist/runtime/import/index.d.ts",
+        "default": "./dist/runtime/import/index.js"
+      }
+    },
     "./types": {
       "import": {
         "types": "./dist/types/index.d.mts",
@@ -78,6 +98,16 @@
       "require": {
         "types": "./dist/types/index.d.ts",
         "default": "./dist/types/index.js"
+      }
+    },
+    "./internal/clerk-js/*": {
+      "import": {
+        "types": "./dist/runtime/internal/clerk-js/*.d.mts",
+        "default": "./dist/runtime/internal/clerk-js/*.mjs"
+      },
+      "require": {
+        "types": "./dist/runtime/internal/clerk-js/*.d.ts",
+        "default": "./dist/runtime/internal/clerk-js/*.js"
       }
     },
     "./package.json": "./package.json"

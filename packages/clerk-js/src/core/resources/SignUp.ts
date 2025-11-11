@@ -1,4 +1,16 @@
 import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import {
+  generateSignatureWithBase,
+  generateSignatureWithCoinbaseWallet,
+  generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
+  getBaseIdentifier,
+  getCoinbaseWalletIdentifier,
+  getMetamaskIdentifier,
+  getOKXWalletIdentifier,
+} from '@clerk/shared/internal/clerk-js/web3';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -42,24 +54,12 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { getBrowserLocale, getClerkQueryParam } from '../../utils';
 import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -463,7 +463,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
+      return createValidatePassword(loadZxcvbn, {
         ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);

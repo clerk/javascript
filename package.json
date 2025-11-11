@@ -166,7 +166,8 @@
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3",
       "react": "catalog:react",
-      "react-dom": "catalog:react"
+      "react-dom": "catalog:react",
+      "rolldown": "catalog:repo"
     }
   }
 }

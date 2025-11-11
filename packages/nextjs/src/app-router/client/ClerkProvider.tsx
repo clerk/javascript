@@ -7,7 +7,7 @@ import React from 'react';
 import { useSafeLayoutEffect } from '../../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider, useClerkNextOptions } from '../../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../../types';
-import { ClerkJSScript } from '../../utils/clerk-js-script';
+import { ClerkScripts } from '../../utils/clerk-script';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { RouterTelemetry } from '../../utils/router-telemetry';
@@ -101,7 +101,7 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
         <RouterTelemetry />
-        <ClerkJSScript router='app' />
+        <ClerkScripts router='app' />
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

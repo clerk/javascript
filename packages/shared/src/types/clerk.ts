@@ -1,3 +1,4 @@
+import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -35,6 +36,7 @@ import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
+import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
@@ -60,7 +62,7 @@ import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
@@ -1034,6 +1036,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
   ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
+    /**
+     * Clerk UI entrypoint.
+     */
+    clerkUiCtor?: Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
@@ -2297,6 +2303,60 @@ export interface AuthenticateWithBaseParams {
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
+
+export interface HeadlessBrowserClerkConstructor {
+  new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
+}
+
+export interface BrowserClerkConstructor {
+  new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
+}
+
+export interface HeadlessBrowserClerk extends Clerk {
+  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  updateClient: (client: ClientResource) => void;
+}
+
+export interface BrowserClerk extends HeadlessBrowserClerk {
+  onComponentsReady: Promise<void>;
+  components: any;
+}
+
+export type ClerkProp =
+  | BrowserClerkConstructor
+  | BrowserClerk
+  | HeadlessBrowserClerk
+  | HeadlessBrowserClerkConstructor
+  | undefined
+  | null;
+
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
+  Clerk?: ClerkProp;
+  /**
+   * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   */
+  clerkJSUrl?: string;
+  /**
+   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
+   */
+  clerkJSVariant?: 'headless' | '';
+  /**
+   * The npm version for `@clerk/clerk-js`.
+   */
+  clerkJSVersion?: string;
+  /**
+   * The URL that `@clerk/ui` should be hot-loaded from.
+   */
+  clerkUiUrl?: string;
+  /**
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   */
+  publishableKey: string;
+  /**
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/guides/secure/best-practices/csp-headers#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
+   */
+  nonce?: string;
+} & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {
   client: ClientResource;

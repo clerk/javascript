@@ -95,6 +95,7 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __signUpFallbackRedirectUrl: requestState.signUpFallbackRedirectUrl,
     __clerk_debug: debugRequestState(requestState),
     __clerkJSUrl: getPublicEnvVariables(context).clerkJsUrl,
+    __clerkUiUrl: getPublicEnvVariables(context).clerkUiUrl,
     __clerkJSVersion: getPublicEnvVariables(context).clerkJsVersion,
     __telemetryDisabled: getPublicEnvVariables(context).telemetryDisabled,
     __telemetryDebug: getPublicEnvVariables(context).telemetryDebug,

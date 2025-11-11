@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { ClerkRuntimeError } from '../error';
 import {
   buildClerkJsScriptAttributes,
+  buildScriptHost,
   clerkJsScriptUrl,
   loadClerkJsScript,
   setClerkJsLoadingErrorPackageName,
@@ -129,29 +130,18 @@ describe('loadClerkJsScript(options)', () => {
   });
 
   test('validates Clerk is properly loaded with required methods', async () => {
-    const loadPromise = loadClerkJsScript({ publishableKey: mockPublishableKey });
+    (window as any).Clerk = mockClerk;
 
-    setTimeout(() => {
-      (window as any).Clerk = { status: 'ready' };
-    }, 100);
+    const result = await loadClerkJsScript({ publishableKey: mockPublishableKey });
 
-    vi.advanceTimersByTime(15000);
-
-    try {
-      await loadPromise;
-      throw new Error('Should have thrown error');
-    } catch (error) {
-      expect(error).toBeInstanceOf(ClerkRuntimeError);
-      expect((error as Error).message).toContain('Clerk: Failed to load Clerk');
-      // The malformed Clerk object should still be there since it was set
-      expect((window as any).Clerk).toEqual({ status: 'ready' });
-    }
+    expect(result).toBeNull();
+    expect((window as any).Clerk).toBe(mockClerk);
   });
 });
 
 describe('clerkJsScriptUrl()', () => {
   const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
-  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk';
+  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
 
   test('returns clerkJSUrl when provided', () => {
     const customUrl = 'https://custom.clerk.com/clerk.js';
@@ -168,21 +158,78 @@ describe('clerkJsScriptUrl()', () => {
 
   test('constructs URL correctly for production key', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey });
-    expect(result).toBe(
-      `https://example.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`,
-    );
+    expect(result).toBe(`https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.browser.js`);
   });
 
   test('includes clerkJSVariant in URL when provided', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockProdPublishableKey, clerkJSVariant: 'headless' });
     expect(result).toBe(
-      `https://example.clerk.accounts.dev/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.headless.browser.js`,
+      `https://example.clerk.com/npm/@clerk/clerk-js@${jsPackageMajorVersion}/dist/clerk.headless.browser.js`,
     );
   });
 
   test('uses provided clerkJSVersion', () => {
     const result = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey, clerkJSVersion: '6' });
     expect(result).toContain('/npm/@clerk/clerk-js@6/');
+  });
+});
+
+describe('buildScriptHost()', () => {
+  const mockDevPublishableKey = 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk';
+  const mockProdPublishableKey = 'pk_live_ZXhhbXBsZS5jbGVyay5jb20k'; // example.clerk.com
+  const mockProxyUrl = 'https://proxy.clerk.com';
+  const mockDomain = 'custom.com';
+
+  test('returns frontendApi from publishableKey when no proxyUrl or domain', () => {
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey });
+    expect(result).toBe('foo-bar-13.clerk.accounts.dev');
+  });
+
+  test('returns proxyUrl host when proxyUrl is provided and valid', () => {
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey, proxyUrl: mockProxyUrl });
+    expect(result).toBe('proxy.clerk.com');
+  });
+
+  test('returns domain with clerk prefix when domain is provided for production key', () => {
+    const result = buildScriptHost({ publishableKey: mockProdPublishableKey, domain: mockDomain });
+    expect(result).toBe('clerk.custom.com');
+  });
+
+  test('returns frontendApi when domain is provided for development key', () => {
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey, domain: mockDomain });
+    expect(result).toBe('foo-bar-13.clerk.accounts.dev');
+  });
+
+  test('prioritizes proxyUrl over domain', () => {
+    const result = buildScriptHost({
+      publishableKey: mockProdPublishableKey,
+      proxyUrl: mockProxyUrl,
+      domain: mockDomain,
+    });
+    expect(result).toBe('proxy.clerk.com');
+  });
+
+  test('handles relative proxyUrl', () => {
+    // Mock window.location for relative URL conversion
+    const originalLocation = global.window.location;
+    Object.defineProperty(global.window, 'location', {
+      get() {
+        return {
+          origin: 'https://example.com',
+        };
+      },
+      configurable: true,
+    });
+
+    const result = buildScriptHost({ publishableKey: mockDevPublishableKey, proxyUrl: '/__clerk' });
+    // Relative URLs are converted to absolute, then protocol is stripped
+    expect(result).toBe('example.com/__clerk');
+
+    // Restore original location
+    Object.defineProperty(global.window, 'location', {
+      value: originalLocation,
+      writable: true,
+    });
   });
 });
 

@@ -32,7 +32,7 @@ import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
   webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '@/utils/passkeys';
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';

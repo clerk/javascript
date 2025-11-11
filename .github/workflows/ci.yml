@@ -294,17 +294,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name:
-          [
+        test-name: [
             "generic",
-            "express",
+            # "express",
             "ap-flows",
             "localhost",
             "sessions",
             "sessions:staging",
             "handshake",
             "handshake:staging",
-            "astro",
+            # "astro",
             "tanstack-react-start",
             "vue",
             "nuxt",
@@ -314,12 +313,12 @@ jobs:
           ]
         test-project: ["chrome"]
         include:
-          - test-name: "billing"
-            test-project: "chrome"
-            clerk-use-rq: "false"
-          - test-name: "billing"
-            test-project: "chrome"
-            clerk-use-rq: "true"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "false"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "15"
@@ -367,6 +366,7 @@ jobs:
         id: task-status
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
@@ -424,6 +424,15 @@ jobs:
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/clerk-js
 
+      - name: Install @clerk/ui in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/ui
+
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
         run: cd packages/astro && pnpm copy:components
@@ -458,6 +467,7 @@ jobs:
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}

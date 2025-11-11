@@ -27,7 +27,8 @@ const base = environmentConfig()
   .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', true)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withKeyless = base
   .clone()
@@ -56,7 +57,8 @@ const sessionsProd1 = base
   .setId('sessionsProd1')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('sessions-prod-1').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('sessions-prod-1').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', '');
+  .setEnvVariable('public', 'CLERK_JS_URL', '')
+  .setEnvVariable('public', 'CLERK_UI_URL', '');
 
 const withEmailCodes_destroy_client = withEmailCodes
   .clone()
@@ -91,7 +93,8 @@ const withAPCore1ClerkLatest = environmentConfig()
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withAPCore1ClerkV4 = environmentConfig()
   .setId('withAPCore1ClerkV4')
@@ -104,7 +107,8 @@ const withAPCore2ClerkLatest = environmentConfig()
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withAPCore2ClerkV4 = environmentConfig()
   .setId('withAPCore2ClerkV4')

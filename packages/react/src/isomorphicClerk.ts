@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJsScript, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
@@ -54,6 +54,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -81,6 +82,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
+  __unstable_ClerkUiCtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -264,7 +266,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
-      void this.loadClerkJS();
+      void this.loadClerkEntryChunks();
     }
   }
 
@@ -434,7 +436,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
   }
 
-  async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
+  async loadClerkEntryChunks(): Promise<void> {
     if (this.mode !== 'browser' || this.loaded) {
       return;
     }
@@ -442,10 +444,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Store frontendAPI value on window as a fallback. This value can be used as a
     // fallback during ClerkJS hot loading in case ClerkJS fails to find the
     // "data-clerk-frontend-api" attribute on its script tag.
-
     // This can happen when the DOM is altered completely during client rehydration.
     // For example, in Remix with React 18 the document changes completely via `hydrateRoot(document)`.
-
     // For more information refer to:
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
@@ -456,59 +456,64 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      if (this.Clerk) {
-        // Set a fixed Clerk version
-        let c: ClerkProp;
+      const clerkPromise = this.loadClerkJsEntryChunk();
+      const clerkUiCtor = this.loadClerkUiEntryChunk();
+      await clerkPromise;
 
-        if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.Clerk)) {
-          // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.#publishableKey, {
-            proxyUrl: this.proxyUrl,
-            domain: this.domain,
-          } as any);
+      if (!global.Clerk) {
+        // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
+        throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+      }
 
-          this.beforeLoad(c);
-          await c.load(this.options);
-        } else {
-          // Otherwise use the instantiated Clerk object
-          c = this.Clerk;
-          if (!c.loaded) {
-            this.beforeLoad(c);
-            await c.load(this.options);
-          }
-        }
-
-        global.Clerk = c;
-      } else if (!__BUILD_DISABLE_RHC__) {
-        // Hot-load latest ClerkJS from Clerk CDN
-        if (!global.Clerk) {
-          await loadClerkJsScript({
-            ...this.options,
-            publishableKey: this.#publishableKey,
-            proxyUrl: this.proxyUrl,
-            domain: this.domain,
-            nonce: this.options.nonce,
-          });
-        }
-
-        if (!global.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
-        }
-
+      if (!global.Clerk.loaded) {
         this.beforeLoad(global.Clerk);
-        await global.Clerk.load(this.options);
+        await global.Clerk.load({ ...this.options, clerkUiCtor });
       }
-
-      if (global.Clerk?.loaded) {
-        return this.hydrateClerkJS(global.Clerk);
+      if (global.Clerk.loaded) {
+        this.replayInterceptedInvocations(global.Clerk);
       }
-      return;
     } catch (err) {
       const error = err as Error;
       this.#eventBus.emit(clerkEvents.Status, 'error');
       console.error(error.stack || error.message || error);
       return;
     }
+  }
+
+  private async loadClerkJsEntryChunk() {
+    // Hotload bundle
+    if (!this.Clerk && !__BUILD_DISABLE_RHC__) {
+      // the UMD script sets the global.Clerk instance
+      await loadClerkJsScript({
+        ...this.options,
+        publishableKey: this.#publishableKey,
+        proxyUrl: this.proxyUrl,
+        domain: this.domain,
+        nonce: this.options.nonce,
+      });
+    }
+
+    // Otherwise, set global.Clerk to the bundled ctor or instance
+    if (this.Clerk) {
+      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.Clerk)
+        ? new this.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+        : this.Clerk;
+    }
+    return global.Clerk;
+  }
+
+  private async loadClerkUiEntryChunk() {
+    await loadClerkUiScript({
+      ...this.options,
+      publishableKey: this.#publishableKey,
+      proxyUrl: this.proxyUrl,
+      domain: this.domain,
+      nonce: this.options.nonce,
+    });
+    if (!global.__unstable_ClerkUiCtor) {
+      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+    }
+    return global.__unstable_ClerkUiCtor;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -556,7 +561,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+  private replayInterceptedInvocations = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
