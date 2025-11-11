@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-react': major
+'@clerk/react': major
 '@clerk/expo': major
 '@clerk/nextjs': major
 '@clerk/react-router': major
