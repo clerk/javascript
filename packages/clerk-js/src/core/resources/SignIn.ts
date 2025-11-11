@@ -273,33 +273,27 @@ export class SignIn extends BaseResource implements SignInResource {
         clerkVerifyEmailAddressCalledBeforeCreate('SignIn');
       }
 
-      const params: PrepareFirstFactorParams | PrepareSecondFactorParams = {
+      const emailLinkParams: EmailLinkConfig = {
         strategy: 'email_link',
-        emailAddressId: emailAddressId,
-        redirectUrl: redirectUrl,
+        emailAddressId,
+        redirectUrl,
       };
+      const isSecondFactor = this.status === 'needs_second_factor';
+      const verificationKey: 'firstFactorVerification' | 'secondFactorVerification' = isSecondFactor
+        ? 'secondFactorVerification'
+        : 'firstFactorVerification';
 
-      const verification: {
-        prepareFn: typeof SignIn.prototype.prepareSecondFactor | typeof SignIn.prototype.prepareFirstFactor;
-        key: 'firstFactorVerification' | 'secondFactorVerification';
-      } =
-        this.status === 'needs_second_factor'
-          ? {
-              prepareFn: this.prepareSecondFactor,
-              key: 'secondFactorVerification',
-            }
-          : {
-              prepareFn: this.prepareFirstFactor,
-              key: 'firstFactorVerification',
-            };
-
-      await verification.prepareFn(params);
+      if (isSecondFactor) {
+        await this.prepareSecondFactor(emailLinkParams);
+      } else {
+        await this.prepareFirstFactor(emailLinkParams);
+      }
 
       return new Promise((resolve, reject) => {
         void run(() => {
           return this.reload()
             .then(res => {
-              const status = res[verification.key].status;
+              const status = res[verificationKey].status;
               if (status === 'verified' || status === 'expired') {
                 stop();
                 resolve(res);
