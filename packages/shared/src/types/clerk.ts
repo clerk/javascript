@@ -328,7 +328,7 @@ export interface Clerk {
   /**
    * Closes the Clerk Enable Organizations modal.
    */
-  __internal_closeEnableOrganizations: () => void;
+  __internal_closeEnableOrganizationsPrompt: () => void;
 
   /**
    * Opens the Google One Tap component.
