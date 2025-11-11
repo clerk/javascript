@@ -36,6 +36,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const billingEnabled = isOrganization
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
+  const keepPreviousData = params?.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
 
@@ -49,6 +50,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     ];
   }, [user?.id, isOrganization, organization?.id]);
 
+  const queriesEnabled = Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true);
+
   const query = useClerkQuery({
     queryKey,
     queryFn: ({ queryKey }) => {
@@ -56,8 +59,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
       return clerk.billing.getSubscription(obj.args);
     },
     staleTime: 1_000 * 60,
-    enabled: Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true),
-    // TODO(@RQ_MIGRATION): Add support for keepPreviousData
+    enabled: queriesEnabled,
+    placeholderData: keepPreviousData && queriesEnabled ? previousData => previousData : undefined,
   });
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
