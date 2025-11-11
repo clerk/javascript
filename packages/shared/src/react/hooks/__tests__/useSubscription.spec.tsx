@@ -167,11 +167,44 @@ describe('useSubscription', () => {
     rerender({ orgId: 'org_2', keepPreviousData: true });
 
     await waitFor(() => expect(result.current.isFetching).toBe(true));
+    expect(result.current.isLoading).toBe(false);
     expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
 
     deferred.resolve({ id: 'sub_org_org_2' });
 
     await waitFor(() => expect(result.current.data).toEqual({ id: 'sub_org_org_2' }));
+    expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('clears data while refetching when keepPreviousData=false', async () => {
+    const { result, rerender } = renderHook(
+      ({ orgId, keepPreviousData }) => {
+        mockOrganization = createMockOrganization({ id: orgId });
+        return useSubscription({ for: 'organization', keepPreviousData });
+      },
+      {
+        wrapper,
+        initialProps: { orgId: 'org_1', keepPreviousData: false },
+      },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
+
+    const deferred = createDeferredPromise();
+    getSubscriptionSpy.mockImplementationOnce(() => deferred.promise as Promise<{ id: string }>);
+
+    rerender({ orgId: 'org_2', keepPreviousData: false });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data).toBeUndefined();
+
+    deferred.resolve({ id: 'sub_org_org_2' });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_org_org_2' });
+    expect(result.current.isLoading).toBe(false);
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
   });
 });
