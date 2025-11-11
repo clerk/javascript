@@ -838,6 +838,60 @@ function analyzeExportDependencies(packagePath, exportName) {
 }
 
 /**
+ * Find which package a wildcard re-export comes from
+ * @param {string} packagePath - Path to the package directory
+ * @param {string} exportName - The export name to find
+ * @param {string} packagesDir - Path to packages directory
+ * @param {{ [key: string]: string }} packageFolderMap - Map of package names to folder names
+ * @returns {string | null} - The base package name (e.g., "@clerk/clerk-react") or null
+ */
+function findWildcardReExportSource(packagePath, exportName, packagesDir, packageFolderMap) {
+  const srcPath = path.join(packagePath, 'src');
+  if (!fs.existsSync(srcPath)) {
+    return null;
+  }
+
+  try {
+    const files = getAllFiles(srcPath);
+    for (const file of files) {
+      if (file.match(/\.(ts|tsx|js|jsx)$/)) {
+        const content = fs.readFileSync(file, 'utf-8');
+
+        // Find wildcard re-exports from @clerk packages
+        const wildcardRegex = /export\s+\*\s+from\s+['"](@clerk\/[^'"]+)['"]/g;
+        let match;
+
+        while ((match = wildcardRegex.exec(content)) !== null) {
+          const referencedModule = match[1]; // e.g., "@clerk/clerk-react/experimental"
+
+          // Resolve the module path
+          const resolvedPath = resolveClerkPackageImport(referencedModule, packagesDir, packageFolderMap);
+          if (resolvedPath && fs.existsSync(resolvedPath)) {
+            const referencedContent = fs.readFileSync(resolvedPath, 'utf-8');
+
+            // Check if this export exists in the referenced module
+            const exportExistsRegex = new RegExp(
+              `export\\s+(?:\\{[^}]*(?:\\b${exportName}\\b|\\w+\\s+as\\s+${exportName}\\b)[^}]*\\}|(?:const|function|class|async\\s+function)\\s+${exportName}\\b|\\*\\s+from)`,
+            );
+
+            if (exportExistsRegex.test(referencedContent)) {
+              // Extract base package name: "@clerk/clerk-react/experimental" -> "@clerk/clerk-react"
+              const parts = referencedModule.split('/');
+              const basePackage = `${parts[0]}/${parts[1]}`;
+              return basePackage;
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    // Ignore errors
+  }
+
+  return null;
+}
+
+/**
  * Recursively get all files in a directory
  * @param {string} dirPath - Directory path
  * @returns {string[]} - Array of file paths
@@ -1182,10 +1236,31 @@ export function load(app) {
             }
           } else {
             // Couldn't find in any package's main exports
-            // Analyze source to find the dependency
+            // Check if this comes from a wildcard re-export
+            const wildcardPackage = findWildcardReExportSource(packagePath, exportName, packagesDir, packageFolderMap);
+
+            // Also get wrapper dependencies from imports
             const packageDependencies = analyzeExportDependencies(packagePath, exportName);
-            if (packageDependencies.length > 0) {
-              // Use the first dependency found
+
+            if (wildcardPackage) {
+              // Initialize dependencies with the re-export relationship
+              outputData[packageName][exportName].dependencies = [
+                {
+                  package: wildcardPackage,
+                  type: 'reExport',
+                },
+              ];
+
+              // Add any wrapper dependencies (e.g., @clerk/types)
+              for (const dep of packageDependencies) {
+                if (dep.package !== wildcardPackage) {
+                  outputData[packageName][exportName].dependencies.push(dep);
+                }
+              }
+
+              fixedDependencies++;
+            } else if (packageDependencies.length > 0) {
+              // No wildcard found, use wrapper dependencies
               outputData[packageName][exportName].dependencies = packageDependencies;
               fixedDependencies++;
             }
