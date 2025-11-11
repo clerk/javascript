@@ -36,9 +36,9 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   BillingNamespace,
+  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
-  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -752,7 +752,7 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.openModal('enableOrganizationsPrompt', props || {}));
   };
 
-  public __internal_closeEnableOrganizations = (): void => {
+  public __internal_closeEnableOrganizationsPrompt = (): void => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.closeModal('enableOrganizationsPrompt'));
   };
