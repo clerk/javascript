@@ -15,3 +15,5 @@ export * from './setup';
 export * from './waitForServer';
 export { awaitableTreekill } from './awaitableTreekill';
 export { startClerkJsHttpServer, killClerkJsHttpServer } from './clerkJsServer';
+export { startClerkUiHttpServer, killClerkUiHttpServer } from './clerkUiServer';
+export { startHttpServer, killHttpServer, getTempDir } from './httpServer';
