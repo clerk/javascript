@@ -79,7 +79,7 @@ type UserButtonPropsWithoutCustomPages = Without<
   UserButtonProps,
   'userProfileProps' | '__experimental_asStandalone'
 > & {
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'apiKeysProps'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
    *
