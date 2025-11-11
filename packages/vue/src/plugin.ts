@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { deriveState } from '@clerk/shared/deriveState';
-import { loadClerkJsScript, type LoadClerkJsScriptOptions } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJsScript, type LoadClerkJsScriptOptions, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
   ClientResource,
@@ -10,10 +10,17 @@ import type {
   Resources,
   Without,
 } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
+
+declare global {
+  interface Window {
+    __unstable_ClerkUiCtor?: ClerkUiConstructor;
+  }
+}
 
 export type PluginOptions = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl'> &
   MultiDomainAndOrProxy & {
@@ -66,24 +73,42 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
     // We need this check for SSR apps like Nuxt as it will try to run this code on the server
     // and loadClerkJsScript contains browser-specific code
     if (inBrowser()) {
-      void loadClerkJsScript(options).then(async () => {
-        if (!window.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+      void (async () => {
+        try {
+          const clerkPromise = loadClerkJsScript(options);
+          const clerkUiCtorPromise = (async () => {
+            await loadClerkUiScript(options);
+            if (!window.__unstable_ClerkUiCtor) {
+              throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+            }
+            return window.__unstable_ClerkUiCtor;
+          })();
+
+          await clerkPromise;
+
+          if (!window.Clerk) {
+            throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+          }
+
+          clerk.value = window.Clerk;
+          await window.Clerk.load({ ...options, clerkUiCtor: clerkUiCtorPromise });
+          loaded.value = true;
+
+          if (clerk.value) {
+            clerk.value.addListener(payload => {
+              resources.value = payload;
+            });
+
+            // When Clerk updates its state internally, Vue's reactivity system doesn't detect
+            // the change since it's an external object being mutated. triggerRef() forces Vue
+            // to re-evaluate all dependencies regardless of how the value was changed.
+            triggerRef(clerk);
+          }
+        } catch (err) {
+          const error = err as Error;
+          console.error(error.stack || error.message || error);
         }
-
-        clerk.value = window.Clerk;
-        await window.Clerk.load(options);
-        loaded.value = true;
-
-        clerk.value.addListener(payload => {
-          resources.value = payload;
-        });
-
-        // When Clerk updates its state internally, Vue's reactivity system doesn't detect
-        // the change since it's an external object being mutated. triggerRef() forces Vue
-        // to re-evaluate all dependencies regardless of how the value was changed.
-        triggerRef(clerk);
-      });
+      })();
     }
 
     const derivedState = computed(() => deriveState(loaded.value, resources.value, initialState));

@@ -5,7 +5,7 @@ export function encodeB64(input: string) {
 // https://stackoverflow.com/questions/30106476/
 export function decodeB64(input: string) {
   return decodeURIComponent(
-    global
+    globalThis
       .atob(input)
       .split('')
       .map(c => {
