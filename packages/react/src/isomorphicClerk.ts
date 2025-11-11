@@ -872,9 +872,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __internal_closeEnableOrganizations = () => {
+  __internal_closeEnableOrganizationsPrompt = () => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.__internal_closeEnableOrganizations();
+      this.clerkjs.__internal_closeEnableOrganizationsPrompt();
     }
   };
 
