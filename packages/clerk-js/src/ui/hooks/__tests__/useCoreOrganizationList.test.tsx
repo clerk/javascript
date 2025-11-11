@@ -1,4 +1,5 @@
 import { useOrganizationList } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils/index';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -65,6 +66,9 @@ describe('useOrganizationList', () => {
         });
       });
 
+      fixtures.clerk.user?.getOrganizationInvitations.mockRejectedValue(null);
+      fixtures.clerk.user?.getOrganizationSuggestions.mockRejectedValue(null);
+
       fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
         Promise.resolve({
           data: [
@@ -102,6 +106,8 @@ describe('useOrganizationList', () => {
       expect(result.current.userMemberships.count).toBe(0);
 
       await waitFor(() => expect(result.current.userMemberships.isLoading).toBe(false));
+      await waitFor(() => expect(fixtures.clerk.user?.getOrganizationInvitations).toHaveBeenCalled());
+      await waitFor(() => expect(fixtures.clerk.user?.getOrganizationSuggestions).toHaveBeenCalled());
 
       expect(result.current.userMemberships.count).toBe(4);
       expect(result.current.userMemberships.page).toBe(1);
@@ -174,7 +180,7 @@ describe('useOrganizationList', () => {
         });
       });
 
-      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
         Promise.resolve({
           data: [
             createFakeUserOrganizationMembership({
@@ -221,74 +227,43 @@ describe('useOrganizationList', () => {
       await waitFor(() => expect(result.current.userMemberships.isLoading).toBe(false));
       expect(result.current.userMemberships.isFetching).toBe(false);
 
-      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeUserOrganizationMembership({
-              id: '1',
-              organization: {
-                id: '1',
-                name: 'Org1',
-                slug: 'org1',
-                membersCount: 1,
-                adminDeleteEnabled: false,
-                maxAllowedMemberships: 0,
-                pendingInvitationsCount: 1,
-              },
-            }),
-            createFakeUserOrganizationMembership({
-              id: '2',
-              organization: {
-                id: '2',
-                name: 'Org2',
-                slug: 'org2',
-                membersCount: 1,
-                adminDeleteEnabled: false,
-                maxAllowedMemberships: 0,
-                pendingInvitationsCount: 1,
-              },
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
-
-      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeUserOrganizationMembership({
-              id: '3',
-              organization: {
-                id: '3',
-                name: 'Org3',
-                slug: 'org3',
-                membersCount: 1,
-                adminDeleteEnabled: false,
-                maxAllowedMemberships: 0,
-                pendingInvitationsCount: 1,
-              },
-            }),
-            createFakeUserOrganizationMembership({
-              id: '4',
-              organization: {
-                id: '4',
-                name: 'Org4',
-                slug: 'org4',
-                membersCount: 1,
-                adminDeleteEnabled: false,
-                maxAllowedMemberships: 0,
-                pendingInvitationsCount: 1,
-              },
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
+      const deferred = createDeferredPromise();
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(deferred.promise);
 
       act(() => result.current.userMemberships?.fetchNext?.());
 
       await waitFor(() => expect(result.current.userMemberships?.isFetching).toBe(true));
       expect(result.current.userMemberships?.isLoading).toBe(false);
+
+      deferred.resolve({
+        data: [
+          createFakeUserOrganizationMembership({
+            id: '3',
+            organization: {
+              id: '3',
+              name: 'Org3',
+              slug: 'org3',
+              membersCount: 1,
+              adminDeleteEnabled: false,
+              maxAllowedMemberships: 0,
+              pendingInvitationsCount: 1,
+            },
+          }),
+          createFakeUserOrganizationMembership({
+            id: '4',
+            organization: {
+              id: '4',
+              name: 'Org4',
+              slug: 'org4',
+              membersCount: 1,
+              adminDeleteEnabled: false,
+              maxAllowedMemberships: 0,
+              pendingInvitationsCount: 1,
+            },
+          }),
+        ],
+        total_count: 4,
+      });
 
       await waitFor(() => expect(result.current.userMemberships?.isFetching).toBe(false));
       expect(result.current.userMemberships.data).toEqual(
@@ -319,6 +294,9 @@ describe('useOrganizationList', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockRejectedValue(null);
+      fixtures.clerk.user?.getOrganizationSuggestions.mockRejectedValue(null);
 
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
         Promise.resolve({
@@ -399,7 +377,7 @@ describe('useOrganizationList', () => {
         });
       });
 
-      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
         Promise.resolve({
           data: [
             createFakeUserOrganizationInvitation({
@@ -431,42 +409,27 @@ describe('useOrganizationList', () => {
       await waitFor(() => expect(result.current.userInvitations.isLoading).toBe(false));
       expect(result.current.userInvitations.isFetching).toBe(false);
 
-      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeUserOrganizationInvitation({
-              id: '1',
-              emailAddress: 'one@clerk.com',
-            }),
-            createFakeUserOrganizationInvitation({
-              id: '2',
-              emailAddress: 'two@clerk.com',
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
-
-      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeUserOrganizationInvitation({
-              id: '3',
-              emailAddress: 'three@clerk.com',
-            }),
-            createFakeUserOrganizationInvitation({
-              id: '4',
-              emailAddress: 'four@clerk.com',
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
+      const deferred = createDeferredPromise();
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(deferred.promise);
 
       act(() => result.current.userInvitations.fetchNext?.());
 
       await waitFor(() => expect(result.current.userInvitations.isFetching).toBe(true));
       expect(result.current.userInvitations.isLoading).toBe(false);
+
+      deferred.resolve({
+        data: [
+          createFakeUserOrganizationInvitation({
+            id: '3',
+            emailAddress: 'three@clerk.com',
+          }),
+          createFakeUserOrganizationInvitation({
+            id: '4',
+            emailAddress: 'four@clerk.com',
+          }),
+        ],
+        total_count: 4,
+      });
 
       await waitFor(() => expect(result.current.userInvitations.isFetching).toBe(false));
       expect(result.current.userInvitations.data).toEqual(
@@ -497,6 +460,9 @@ describe('useOrganizationList', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockRejectedValue(null);
+      fixtures.clerk.user?.getOrganizationInvitations.mockRejectedValue(null);
 
       fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValue(
         Promise.resolve({
@@ -575,7 +541,7 @@ describe('useOrganizationList', () => {
         });
       });
 
-      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValue(
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
         Promise.resolve({
           data: [
             createFakeUserOrganizationSuggestion({
@@ -606,42 +572,27 @@ describe('useOrganizationList', () => {
       await waitFor(() => expect(result.current.userSuggestions.isLoading).toBe(false));
       expect(result.current.userSuggestions.isFetching).toBe(false);
 
-      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeUserOrganizationSuggestion({
-              id: '1',
-              emailAddress: 'one@clerk.com',
-            }),
-            createFakeUserOrganizationSuggestion({
-              id: '2',
-              emailAddress: 'two@clerk.com',
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
+      const deferred = createDeferredPromise();
 
-      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeUserOrganizationSuggestion({
-              id: '3',
-              emailAddress: 'three@clerk.com',
-            }),
-            createFakeUserOrganizationSuggestion({
-              id: '4',
-              emailAddress: 'four@clerk.com',
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
-
+      fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValueOnce(deferred.promise);
       act(() => result.current.userSuggestions.fetchNext?.());
 
       await waitFor(() => expect(result.current.userSuggestions.isFetching).toBe(true));
       expect(result.current.userSuggestions.isLoading).toBe(false);
+
+      deferred.resolve({
+        data: [
+          createFakeUserOrganizationSuggestion({
+            id: '3',
+            emailAddress: 'three@clerk.com',
+          }),
+          createFakeUserOrganizationSuggestion({
+            id: '4',
+            emailAddress: 'four@clerk.com',
+          }),
+        ],
+        total_count: 4,
+      });
 
       await waitFor(() => expect(result.current.userSuggestions.isFetching).toBe(false));
       expect(result.current.userSuggestions.data).toEqual(

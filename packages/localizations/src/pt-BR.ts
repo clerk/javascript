@@ -17,6 +17,11 @@ export const ptBR: LocalizationResource = {
   apiKeys: {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que você visualize novamente mais tarde.',
+      formTitle: 'Copie sua chave API "{{name}}" agora',
+    },
     createdAndExpirationStatus__expiresOn:
       "Criada {{ createdDate | shortDate('pt-BR') }} • Expira {{ expiresDate | longDate('pt-BR') }}",
     createdAndExpirationStatus__never: "Criada {{ createdDate | shortDate('pt-BR') }} • Nunca expira",
@@ -227,6 +232,7 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Chave API',
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',

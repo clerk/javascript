@@ -38,6 +38,7 @@ import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type { ClerkPaginationParams } from './pagination';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -249,6 +250,7 @@ export interface Clerk {
 
   /**
    * Signs out the current user on single-session instances, or all users on multi-session instances
+   *
    * @param signOutCallback - Optional A callback that runs after sign out completes.
    * @param options - Optional Configuration options, see {@link SignOutOptions}
    * @returns A promise that resolves when the sign out process completes.
@@ -257,7 +259,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk SignIn component in a modal.
-   * @param props Optional sign in configuration parameters.
+   *
+   * @param props - Optional sign in configuration parameters.
    */
   openSignIn: (props?: SignInModalProps) => void;
 
@@ -268,7 +271,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Checkout component in a drawer.
-   * @param props Optional checkout configuration parameters.
+   *
+   * @param props - Optional checkout configuration parameters.
    */
   __internal_openCheckout: (props?: __internal_CheckoutProps) => void;
 
@@ -279,7 +283,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk PlanDetails drawer component in a drawer.
-   * @param props `plan` or `planId` parameters are required.
+   *
+   * @param props - `plan` or `planId` parameters are required.
    */
   __internal_openPlanDetails: (props: __internal_PlanDetailsProps) => void;
 
@@ -290,7 +295,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk SubscriptionDetails drawer component in a drawer.
-   * @param props Optional configuration parameters.
+   *
+   * @param props - Optional configuration parameters.
    */
   __internal_openSubscriptionDetails: (props?: __internal_SubscriptionDetailsProps) => void;
 
@@ -301,7 +307,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk UserVerification component in a modal.
-   * @param props Optional user verification configuration parameters.
+   *
+   * @param props - Optional user verification configuration parameters.
    */
   __internal_openReverification: (props?: __internal_UserVerificationModalProps) => void;
 
@@ -312,7 +319,8 @@ export interface Clerk {
 
   /**
    * Opens the Google One Tap component.
-   * @param props Optional props that will be passed to the GoogleOneTap component.
+   *
+   * @param props - Optional props that will be passed to the GoogleOneTap component.
    */
   openGoogleOneTap: (props?: GoogleOneTapProps) => void;
 
@@ -324,7 +332,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk SignUp component in a modal.
-   * @param props Optional props that will be passed to the SignUp component.
+   *
+   * @param props - Optional props that will be passed to the SignUp component.
    */
   openSignUp: (props?: SignUpModalProps) => void;
 
@@ -335,7 +344,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk UserProfile modal.
-   * @param props Optional props that will be passed to the UserProfile component.
+   *
+   * @param props - Optional props that will be passed to the UserProfile component.
    */
   openUserProfile: (props?: UserProfileModalProps) => void;
 
@@ -346,7 +356,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk OrganizationProfile modal.
-   * @param props Optional props that will be passed to the OrganizationProfile component.
+   *
+   * @param props - Optional props that will be passed to the OrganizationProfile component.
    */
   openOrganizationProfile: (props?: OrganizationProfileModalProps) => void;
 
@@ -357,7 +368,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk CreateOrganization modal.
-   * @param props Optional props that will be passed to the CreateOrganization component.
+   *
+   * @param props - Optional props that will be passed to the CreateOrganization component.
    */
   openCreateOrganization: (props?: CreateOrganizationModalProps) => void;
 
@@ -368,7 +380,8 @@ export interface Clerk {
 
   /**
    * Opens the Clerk Waitlist modal.
-   * @param props Optional props that will be passed to the Waitlist component.
+   *
+   * @param props - Optional props that will be passed to the Waitlist component.
    */
   openWaitlist: (props?: WaitlistModalProps) => void;
 
@@ -379,8 +392,9 @@ export interface Clerk {
 
   /**
    * Mounts a sign in flow component at the target element.
-   * @param targetNode Target node to mount the SignIn component.
-   * @param signInProps sign in configuration parameters.
+   *
+   * @param targetNode - Target node to mount the SignIn component.
+   * @param signInProps - sign in configuration parameters.
    */
   mountSignIn: (targetNode: HTMLDivElement, signInProps?: SignInProps) => void;
 
@@ -388,15 +402,15 @@ export interface Clerk {
    * Unmount a sign in flow component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the SignIn component from.
+   * @param targetNode - Target node to unmount the SignIn component from.
    */
   unmountSignIn: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a sign up flow component at the target element.
    *
-   * @param targetNode Target node to mount the SignUp component.
-   * @param signUpProps sign up configuration parameters.
+   * @param targetNode - Target node to mount the SignUp component.
+   * @param signUpProps - sign up configuration parameters.
    */
   mountSignUp: (targetNode: HTMLDivElement, signUpProps?: SignUpProps) => void;
 
@@ -404,14 +418,14 @@ export interface Clerk {
    * Unmount a sign up flow component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the SignUp component from.
+   * @param targetNode - Target node to unmount the SignUp component from.
    */
   unmountSignUp: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a user avatar component at the target element.
    *
-   * @param targetNode Target node to mount the UserAvatar component.
+   * @param targetNode - Target node to mount the UserAvatar component.
    */
   mountUserAvatar: (targetNode: HTMLDivElement, userAvatarProps?: UserAvatarProps) => void;
 
@@ -419,15 +433,15 @@ export interface Clerk {
    * Unmount a user avatar component at the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the UserAvatar component from.
+   * @param targetNode - Target node to unmount the UserAvatar component from.
    */
   unmountUserAvatar: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a user button component at the target element.
    *
-   * @param targetNode Target node to mount the UserButton component.
-   * @param userButtonProps User button configuration parameters.
+   * @param targetNode - Target node to mount the UserButton component.
+   * @param userButtonProps - User button configuration parameters.
    */
   mountUserButton: (targetNode: HTMLDivElement, userButtonProps?: UserButtonProps) => void;
 
@@ -435,15 +449,15 @@ export interface Clerk {
    * Unmount a user button component at the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the UserButton component from.
+   * @param targetNode - Target node to unmount the UserButton component from.
    */
   unmountUserButton: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a user profile component at the target element.
    *
-   * @param targetNode Target to mount the UserProfile component.
-   * @param userProfileProps User profile configuration parameters.
+   * @param targetNode - Target to mount the UserProfile component.
+   * @param userProfileProps - User profile configuration parameters.
    */
   mountUserProfile: (targetNode: HTMLDivElement, userProfileProps?: UserProfileProps) => void;
 
@@ -451,46 +465,52 @@ export interface Clerk {
    * Unmount a user profile component at the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the UserProfile component from.
+   * @param targetNode - Target node to unmount the UserProfile component from.
    */
   unmountUserProfile: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount an organization profile component at the target element.
-   * @param targetNode Target to mount the OrganizationProfile component.
-   * @param props Configuration parameters.
+   *
+   * @param targetNode - Target to mount the OrganizationProfile component.
+   * @param props - Configuration parameters.
    */
   mountOrganizationProfile: (targetNode: HTMLDivElement, props?: OrganizationProfileProps) => void;
 
   /**
    * Unmount the organization profile component from the target node.
-   * @param targetNode Target node to unmount the OrganizationProfile component from.
+   *
+   * @param targetNode - Target node to unmount the OrganizationProfile component from.
    */
   unmountOrganizationProfile: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a CreateOrganization component at the target element.
-   * @param targetNode Target to mount the CreateOrganization component.
-   * @param props Configuration parameters.
+   *
+   * @param targetNode - Target to mount the CreateOrganization component.
+   * @param props - Configuration parameters.
    */
   mountCreateOrganization: (targetNode: HTMLDivElement, props?: CreateOrganizationProps) => void;
 
   /**
    * Unmount the CreateOrganization component from the target node.
-   * @param targetNode Target node to unmount the CreateOrganization component from.
+   *
+   * @param targetNode - Target node to unmount the CreateOrganization component from.
    */
   unmountCreateOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount an organization switcher component at the target element.
-   * @param targetNode Target to mount the OrganizationSwitcher component.
-   * @param props Configuration parameters.
+   *
+   * @param targetNode - Target to mount the OrganizationSwitcher component.
+   * @param props - Configuration parameters.
    */
   mountOrganizationSwitcher: (targetNode: HTMLDivElement, props?: OrganizationSwitcherProps) => void;
 
   /**
    * Unmount the organization profile component from the target node.*
-   * @param targetNode Target node to unmount the OrganizationSwitcher component from.
+   *
+   * @param targetNode - Target node to unmount the OrganizationSwitcher component from.
    */
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
@@ -499,40 +519,46 @@ export interface Clerk {
    * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
    *
    * @experimental This experimental API is subject to change.
-   * @param props Optional user verification configuration parameters.
+   *
+   * @param props - Optional user verification configuration parameters.
    */
   __experimental_prefetchOrganizationSwitcher: () => void;
 
   /**
    * Mount an organization list component at the target element.
-   * @param targetNode Target to mount the OrganizationList component.
-   * @param props Configuration parameters.
+   *
+   * @param targetNode - Target to mount the OrganizationList component.
+   * @param props - Configuration parameters.
    */
   mountOrganizationList: (targetNode: HTMLDivElement, props?: OrganizationListProps) => void;
 
   /**
    * Unmount the organization list component from the target node.*
-   * @param targetNode Target node to unmount the OrganizationList component from.
+   *
+   * @param targetNode - Target node to unmount the OrganizationList component from.
    */
   unmountOrganizationList: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mount a waitlist at the target element.
-   * @param targetNode Target to mount the Waitlist component.
-   * @param props Configuration parameters.
+   *
+   * @param targetNode - Target to mount the Waitlist component.
+   * @param props - Configuration parameters.
    */
   mountWaitlist: (targetNode: HTMLDivElement, props?: WaitlistProps) => void;
 
   /**
    * Unmount the Waitlist component from the target node.
-   * @param targetNode Target node to unmount the Waitlist component from.
+   *
+   * @param targetNode - Target node to unmount the Waitlist component from.
    */
   unmountWaitlist: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a pricing table component at the target element.
-   * @param targetNode Target node to mount the PricingTable component.
-   * @param props configuration parameters.
+   *
+   * @param targetNode - Target node to mount the PricingTable component.
+   * @param props - configuration parameters.
    */
   mountPricingTable: (targetNode: HTMLDivElement, props?: PricingTableProps) => void;
 
@@ -540,7 +566,7 @@ export interface Clerk {
    * Unmount a pricing table component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the PricingTable component from.
+   * @param targetNode - Target node to unmount the PricingTable component from.
    */
   unmountPricingTable: (targetNode: HTMLDivElement) => void;
 
@@ -548,9 +574,11 @@ export interface Clerk {
    * This API is in early access and may change in future releases.
    *
    * Mount a api keys component at the target element.
+   *
    * @experimental
-   * @param targetNode Target to mount the APIKeys component.
-   * @param props Configuration parameters.
+   *
+   * @param targetNode - Target to mount the APIKeys component.
+   * @param props - Configuration parameters.
    */
   mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
@@ -559,28 +587,33 @@ export interface Clerk {
    *
    * Unmount a api keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
+   *
    * @experimental
-   * @param targetNode Target node to unmount the ApiKeys component from.
+   *
+   * @param targetNode - Target node to unmount the ApiKeys component from.
    */
   unmountApiKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a OAuth consent component at the target element.
-   * @param targetNode Target node to mount the OAuth consent component.
-   * @param oauthConsentProps OAuth consent configuration parameters.
+   *
+   * @param targetNode - Target node to mount the OAuth consent component.
+   * @param oauthConsentProps - OAuth consent configuration parameters.
    */
   __internal_mountOAuthConsent: (targetNode: HTMLDivElement, oauthConsentProps?: __internal_OAuthConsentProps) => void;
 
   /**
    * Unmounts a OAuth consent component from the target element.
-   * @param targetNode Target node to unmount the OAuth consent component from.
+   *
+   * @param targetNode - Target node to unmount the OAuth consent component from.
    */
   __internal_unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
-   * @param targetNode Target node to mount the TaskChooseOrganization component.
-   * @param props configuration parameters.
+   *
+   * @param targetNode - Target node to mount the TaskChooseOrganization component.
+   * @param props - configuration parameters.
    */
   mountTaskChooseOrganization: (targetNode: HTMLDivElement, props?: TaskChooseOrganizationProps) => void;
 
@@ -588,7 +621,7 @@ export interface Clerk {
    * Unmount a TaskChooseOrganization component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the TaskChooseOrganization component from.
+   * @param targetNode - Target node to unmount the TaskChooseOrganization component from.
    */
   unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
 
@@ -607,13 +640,14 @@ export interface Clerk {
    *    When there is no active session, user and session will both be null.
    *    When a session is loading, user and session will be undefined.
    *
-   * @param callback Callback function receiving the most updated Clerk resources after a change.
+   * @param callback - Callback function receiving the most updated Clerk resources after a change.
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
+   *
    * @param event - The event name to subscribe to
    * @param handler - The callback function to execute when the event is dispatched
    * @param opt - Optional configuration object
@@ -623,6 +657,7 @@ export interface Clerk {
 
   /**
    * Removes an event handler for a specific Clerk event.
+   *
    * @param event - The event name to unsubscribe from
    * @param handler - The callback function to remove
    */
@@ -631,6 +666,7 @@ export interface Clerk {
   /**
    * Registers an internal listener that triggers a callback each time `Clerk.navigate` is called.
    * Its purpose is to notify modal UI components when a navigation event occurs, allowing them to close if necessary.
+   *
    * @internal
    */
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
@@ -651,21 +687,21 @@ export interface Clerk {
   /**
    * Decorates the provided url with the auth token for development instances.
    *
-   * @param {string} to
+   * @param to
    */
   buildUrlWithAuth(to: string): string;
 
   /**
    * Returns the configured url where `<SignIn/>` is mounted or a custom sign-in page is rendered.
    *
-   * @param opts A {@link RedirectOptions} object
+   * @param opts - A {@link RedirectOptions} object
    */
   buildSignInUrl(opts?: RedirectOptions): string;
 
   /**
    * Returns the configured url where `<SignUp/>` is mounted or a custom sign-up page is rendered.
    *
-   * @param opts A {@link RedirectOptions} object
+   * @param opts - A {@link RedirectOptions} object
    */
   buildSignUpUrl(opts?: RedirectOptions): string;
 
@@ -723,21 +759,21 @@ export interface Clerk {
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
-   * @param {string} to
+   * @param to
    */
   redirectWithAuth(to: string): Promise<unknown>;
 
   /**
    * Redirects to the configured URL where `<SignIn/>` is mounted.
    *
-   * @param opts A {@link RedirectOptions} object
+   * @param opts - A {@link RedirectOptions} object
    */
   redirectToSignIn(opts?: SignInRedirectOptions): Promise<unknown>;
 
   /**
    * Redirects to the configured URL where `<SignUp/>` is mounted.
    *
-   * @param opts A {@link RedirectOptions} object
+   * @param opts - A {@link RedirectOptions} object
    */
   redirectToSignUp(opts?: SignUpRedirectOptions): Promise<unknown>;
 
@@ -779,7 +815,7 @@ export interface Clerk {
   /**
    * Redirects to the configured URL where tasks are mounted.
    *
-   * @param opts A {@link RedirectOptions} object
+   * @param opts - A {@link RedirectOptions} object
    */
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
@@ -862,6 +898,7 @@ export interface Clerk {
   /**
    * This is an optional function.
    * This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
+   *
    * @internal
    */
   __internal_getCachedResources:
@@ -870,6 +907,7 @@ export interface Clerk {
 
   /**
    * This function is used to reload the initial resources (Environment/Client) from the Frontend API.
+   *
    * @internal
    */
   __internal_reloadInitialResources: () => Promise<void>;
@@ -882,6 +920,7 @@ export interface Clerk {
 
   /**
    * API Keys Object
+   *
    * @experimental
    * This API is in early access and may change in future releases.
    */
@@ -889,6 +928,7 @@ export interface Clerk {
 
   /**
    * Checkout API
+   *
    * @experimental
    * This API is in early access and may change in future releases.
    */
@@ -1052,6 +1092,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
           debug?: boolean;
           /**
            * If false, the sampling rates provided per telemetry event will be ignored and all events will be sent.
+           *
            * @default true
            */
           perEventSampling?: boolean;
@@ -1072,6 +1113,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
       {
         /**
          * Persist the Clerk client to match the user's device with a client.
+         *
          * @default true
          */
         persistClient: boolean;
@@ -1086,12 +1128,14 @@ export type ClerkOptions = ClerkOptionsNavigation &
 
     /**
      * The URL a developer should be redirected to in order to claim an instance created in Keyless mode.
+     *
      * @internal
      */
     __internal_keyless_claimKeylessApplicationUrl?: string;
 
     /**
      * After a developer has claimed their instance created by Keyless mode, they can use this URL to find their instance's keys
+     *
      * @internal
      */
     __internal_keyless_copyInstanceKeysUrl?: string;
@@ -1099,6 +1143,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Pass a function that will trigger the unmounting of the Keyless Prompt.
      * It should cause the values of `__internal_claimKeylessApplicationUrl` and `__internal_copyInstanceKeysUrl` to become undefined.
+     *
      * @internal
      */
     __internal_keyless_dismissPrompt?: (() => Promise<void>) | null;
@@ -1108,6 +1153,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * session tasks need to be completed.
      *
      * When `undefined`, it uses Clerk's default task flow URLs.
+     *
      * @default undefined
      */
     taskUrls?: Record<SessionTask['key'], string>;
@@ -1213,6 +1259,7 @@ export type SignUpRedirectOptions = RedirectOptions &
 
 /**
  * The parameters for the `setActive()` method.
+ *
  * @interface
  */
 export type SetActiveParams = {
@@ -1276,12 +1323,14 @@ export type SignInProps = RoutingOptions & {
    * Full URL or path to navigate to after successful sign in.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
+   *
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
    * Full URL or path to navigate to after successful sign in.
    * This value is used when no other redirect props, environment variables or search params are present.
+   *
    * @default undefined
    */
   fallbackRedirectUrl?: string | null;
@@ -1340,6 +1389,7 @@ export interface TransferableOption {
   /**
    * Indicates whether or not sign in attempts are transferable to the sign up flow.
    * When set to false, prevents opaque sign ups when a user attempts to sign in via OAuth with an email that doesn't exist.
+   *
    * @default true
    */
   transferable?: boolean;
@@ -1361,6 +1411,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
   /**
    * Defines the steps of the verification flow.
    * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+   *
    * @default `'secondFactor'`
    */
   level?: SessionVerificationLevel;
@@ -1401,12 +1452,14 @@ type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirect
 export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
   /**
    * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
+   *
    * @default true
    */
   cancelOnTapOutside?: boolean;
   /**
    * Enables upgraded One Tap UX on ITP browsers.
    * Turning this options off, would hide any One Tap UI in such browsers.
+   *
    * @default true
    */
   itpSupport?: boolean;
@@ -1414,6 +1467,7 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
    * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
    * Backwards compatible with browsers that still support third-party cookies.
+   *
    * @default true
    */
   fedCmSupport?: boolean;
@@ -1425,12 +1479,14 @@ export type SignUpProps = RoutingOptions & {
    * Full URL or path to navigate to after successful sign up.
    * This value has precedence over other redirect props, environment variables or search params.
    * Use this prop to override the redirect URL when needed.
+   *
    * @default undefined
    */
   forceRedirectUrl?: string | null;
   /**
    * Full URL or path to navigate to after successful sign up.
    * This value is used when no other redirect props, environment variables or search params are present.
+   *
    * @default undefined
    */
   fallbackRedirectUrl?: string | null;
@@ -1496,16 +1552,26 @@ export type UserProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the user profile modal will open.
+   *
    * @example __experimental_startPath: '/members'
+   *
    * @experimental
-   **/
+   */
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
    * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+   *
    * @experimental
-   **/
-  apiKeysProps?: APIKeysProps;
+   */
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1513,6 +1579,7 @@ export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
 export type OrganizationProfileProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after the user leaves the currently active organization.
+   *
    * @default undefined
    */
   afterLeaveOrganizationUrl?: string;
@@ -1528,16 +1595,26 @@ export type OrganizationProfileProps = RoutingOptions & {
   customPages?: CustomPage[];
   /**
    * Specify on which page the organization profile modal will open.
+   *
    * @example __experimental_startPath: '/organization-members'
+   *
    * @experimental
-   **/
+   */
   __experimental_startPath?: string;
   /**
    * Specify options for the underlying <APIKeys /> component.
    * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+   *
    * @experimental
-   **/
-  apiKeysProps?: APIKeysProps;
+   */
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1545,6 +1622,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
 export type CreateOrganizationProps = RoutingOptions & {
   /**
    * Full URL or path to navigate to after creating a new organization.
+   *
    * @default undefined
    */
   afterCreateOrganizationUrl?:
@@ -1552,6 +1630,7 @@ export type CreateOrganizationProps = RoutingOptions & {
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
    * Hides the screen for sending invitations after an organization is created.
+   *
    * @default undefined When left undefined Clerk will automatically hide the screen if
    * the number of max allowed members is equal to 1
    */
@@ -1598,18 +1677,21 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Enables developers to implement a custom dialog.
    *
    * @default undefined
+   *
    * @experimental This API is experimental and may change at any moment.
    */
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
    * Full URL or path to navigate to after sign out is complete
+   *
    * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
    */
   afterSignOutUrl?: string;
   /**
    * Full URL or path to navigate to after signing out the current user is complete.
    * This option applies to multi-session applications.
+   *
    * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
    */
   afterMultiSessionSingleSignOutUrl?: string;
@@ -1673,6 +1755,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Enables developers to implement a custom dialog.
      *
      * @default undefined
+     *
      * @experimental This API is experimental and may change at any moment.
      */
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
@@ -1682,17 +1765,21 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * This option controls whether OrganizationSwitcher will include the user's personal account
      * in the organization list. Setting this to `false` will hide the personal account entry,
      * and users will only be able to switch between organizations.
+     *
      * @default true
      */
     hidePersonal?: boolean;
     /**
      * Full URL or path to navigate to after a successful organization switch.
+     *
      * @default undefined
+     *
      * @deprecated Use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`.
      */
     afterSwitchOrganizationUrl?: string;
     /**
      * Full URL or path to navigate to after creating a new organization.
+     *
      * @default undefined
      */
     afterCreateOrganizationUrl?:
@@ -1701,6 +1788,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Full URL or path to navigate to after a successful organization selection.
      * Accepts a function that returns URL or path
+     *
      * @default undefined`
      */
     afterSelectOrganizationUrl?:
@@ -1709,16 +1797,19 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     /**
      * Full URL or path to navigate to after a successful selection of personal workspace.
      * Accepts a function that returns URL or path
+     *
      * @default undefined
      */
     afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
     /**
      * Full URL or path to navigate to after the user leaves the currently active organization.
+     *
      * @default undefined
      */
     afterLeaveOrganizationUrl?: string;
     /**
      * Hides the screen for sending invitations after an organization is created.
+     *
      * @default undefined When left undefined Clerk will automatically hide the screen if
      * the number of max allowed members is equal to 1
      */
@@ -1745,6 +1836,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 export type OrganizationListProps = {
   /**
    * Full URL or path to navigate to after creating a new organization.
+   *
    * @default undefined
    */
   afterCreateOrganizationUrl?:
@@ -1753,6 +1845,7 @@ export type OrganizationListProps = {
   /**
    * Full URL or path to navigate to after a successful organization selection.
    * Accepts a function that returns URL or path
+   *
    * @default undefined`
    */
   afterSelectOrganizationUrl?:
@@ -1766,6 +1859,7 @@ export type OrganizationListProps = {
   appearance?: OrganizationListTheme;
   /**
    * Hides the screen for sending invitations after an organization is created.
+   *
    * @default undefined When left undefined Clerk will automatically hide the screen if
    * the number of max allowed members is equal to 1
    */
@@ -1775,12 +1869,14 @@ export type OrganizationListProps = {
    * This option controls whether OrganizationList will include the user's personal account
    * in the organization list. Setting this to `false` will hide the personal account entry,
    * and users will only be able to switch between organizations.
+   *
    * @default true
    */
   hidePersonal?: boolean;
   /**
    * Full URL or path to navigate to after a successful selection of personal workspace.
    * Accepts a function that returns URL or path
+   *
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
@@ -1814,16 +1910,19 @@ export type WaitlistModalProps = WaitlistProps;
 type PricingTableDefaultProps = {
   /**
    * The position of the CTA button.
+   *
    * @default 'bottom'
    */
   ctaPosition?: 'top' | 'bottom';
   /**
    * Whether to collapse features on the pricing table.
+   *
    * @default false
    */
   collapseFeatures?: boolean;
   /**
    * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   *
    * @default undefined
    */
   newSubscriptionRedirectUrl?: string;
@@ -1833,6 +1932,7 @@ type PricingTableBaseProps = {
   /**
    * The subscriber type to display plans for.
    * If `organization`, show plans for the active organization; otherwise for the user.
+   *
    * @default 'user'
    */
   for?: ForPayerType;
@@ -1857,11 +1957,13 @@ export type APIKeysProps = {
   /**
    * The type of API key to filter by.
    * Currently, only 'api_key' is supported.
+   *
    * @default 'api_key'
    */
   type?: 'api_key';
   /**
    * The number of API keys to show per page.
+   *
    * @default 5
    */
   perPage?: number;
@@ -1873,14 +1975,16 @@ export type APIKeysProps = {
   appearance?: APIKeysTheme;
   /**
    * Whether to show the description field in the API key creation form.
+   *
    * @default false
    */
   showDescription?: boolean;
 };
 
-export type GetAPIKeysParams = {
+export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;
-};
+  query?: string;
+}>;
 
 export type CreateAPIKeyParams = {
   type?: 'api_key';
@@ -1908,6 +2012,7 @@ export type __internal_CheckoutProps = {
   portalRoot?: PortalRoot;
   /**
    * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   *
    * @default undefined
    */
   newSubscriptionRedirectUrl?: string;
@@ -1930,6 +2035,7 @@ export type __experimental_CheckoutButtonProps = {
   };
   /**
    * Full URL or path to navigate to after checkout is complete and the user clicks the "Continue" button.
+   *
    * @default undefined
    */
   newSubscriptionRedirectUrl?: string;
@@ -1988,6 +2094,7 @@ export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
    * If `organization` is provided, the subscription details will be displayed for the active organization.
+   *
    * @default 'user'
    */
   for?: ForPayerType;
@@ -2004,6 +2111,7 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   /**
    * The subscriber type to display the subscription details for.
    * If `organization` is provided, the subscription details will be displayed for the active organization.
+   *
    * @default 'user'
    */
   for?: ForPayerType;

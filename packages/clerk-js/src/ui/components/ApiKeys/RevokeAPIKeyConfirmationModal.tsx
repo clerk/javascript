@@ -1,36 +1,35 @@
 import { useClerk } from '@clerk/shared/react';
-import { useSWRConfig } from 'swr';
 
 import { descriptors } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
-import { Modal } from '@/ui/elements/Modal';
 import { localizationKeys, useLocalizations } from '@/ui/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
+import { APIKeyModal } from './APIKeyModal';
+
 type RevokeAPIKeyConfirmationModalProps = {
-  subject: string;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
   apiKeyId?: string;
   apiKeyName: string;
+  onRevokeSuccess?: () => void;
   modalRoot?: React.MutableRefObject<HTMLElement | null>;
 };
 
 export const RevokeAPIKeyConfirmationModal = ({
-  subject,
   isOpen,
   onOpen,
   onClose,
   apiKeyId,
   apiKeyName,
+  onRevokeSuccess,
   modalRoot,
 }: RevokeAPIKeyConfirmationModalProps) => {
   const clerk = useClerk();
-  const { mutate } = useSWRConfig();
   const { t } = useLocalizations();
 
   const revokeField = useFormControl('apiKeyRevokeConfirmation', '', {
@@ -54,9 +53,7 @@ export const RevokeAPIKeyConfirmationModal = ({
     }
 
     await clerk.apiKeys.revoke({ apiKeyID: apiKeyId });
-    const cacheKey = { key: 'api-keys', subject };
-
-    void mutate(cacheKey);
+    onRevokeSuccess?.();
     handleClose();
   };
 
@@ -65,29 +62,11 @@ export const RevokeAPIKeyConfirmationModal = ({
   }
 
   return (
-    <Modal
+    <APIKeyModal
       handleOpen={onOpen}
       handleClose={handleClose}
       canCloseModal={false}
-      portalRoot={modalRoot}
-      containerSx={[
-        { alignItems: 'center' },
-        modalRoot
-          ? t => ({
-              position: 'absolute',
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'inherit',
-              backdropFilter: `blur(${t.sizes.$2})`,
-              display: 'flex',
-              justifyContent: 'center',
-              minHeight: '100%',
-              height: '100%',
-              width: '100%',
-              borderRadius: t.radii.$lg,
-            })
-          : {},
-      ]}
+      modalRoot={modalRoot}
     >
       <Card.Root
         role='alertdialog'
@@ -121,6 +100,6 @@ export const RevokeAPIKeyConfirmationModal = ({
           </FormContainer>
         </Card.Content>
       </Card.Root>
-    </Modal>
+    </APIKeyModal>
   );
 };

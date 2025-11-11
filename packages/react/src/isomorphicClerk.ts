@@ -146,6 +146,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
+
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -281,6 +282,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get isStandardBrowser() {
     return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
+  }
+
+  get __internal_queryClient() {
+    // @ts-expect-error - __internal_queryClient is not typed
+    return this.clerkjs?.__internal_queryClient;
   }
 
   get isSatellite() {
@@ -565,6 +571,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
       // Since clerkjs exists it will call `this.clerkjs.on('status', listener)`
       this.on('status', listener, { notify: true });
+    });
+
+    // @ts-expect-error - queryClientStatus is not typed
+    this.#eventBus.internal.retrieveListeners('queryClientStatus')?.forEach(listener => {
+      // Since clerkjs exists it will call `this.clerkjs.on('queryClientStatus', listener)`
+      // @ts-expect-error - queryClientStatus is not typed
+      this.on('queryClientStatus', listener, { notify: true });
     });
 
     if (this.preopenSignIn !== null) {

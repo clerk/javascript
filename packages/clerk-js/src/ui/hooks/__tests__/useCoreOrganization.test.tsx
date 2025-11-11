@@ -1,4 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils/index';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -42,7 +43,7 @@ const undefinedPaginatedResource = {
 
 describe('useOrganization', () => {
   it('returns default values', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.com'],
@@ -65,10 +66,15 @@ describe('useOrganization', () => {
     expect(result.current.memberships).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.domains).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.membershipRequests).toEqual(expect.objectContaining(undefinedPaginatedResource));
+
+    expect(fixtures.clerk.organization?.getMemberships).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getDomains).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
   });
 
-  it('returns null when a organization is not active ', async () => {
-    const { wrapper } = await createFixtures(f => {
+  it('returns null when a organization is not active', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.com'],
@@ -83,6 +89,8 @@ describe('useOrganization', () => {
     expect(result.current.memberships).toBeNull();
     expect(result.current.domains).toBeNull();
     expect(result.current.membershipRequests).toBeNull();
+
+    expect(fixtures.clerk.organization).toBeNull();
   });
 
   describe('memberships', () => {
@@ -94,6 +102,10 @@ describe('useOrganization', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
 
       fixtures.clerk.organization?.getMemberships.mockReturnValue(
         Promise.resolve({
@@ -218,6 +230,10 @@ describe('useOrganization', () => {
         });
       });
 
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
       fixtures.clerk.organization?.getDomains.mockReturnValue(
         Promise.resolve({
           data: [
@@ -313,6 +329,10 @@ describe('useOrganization', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
 
       fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
         Promise.resolve({
@@ -417,6 +437,10 @@ describe('useOrganization', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
 
       fixtures.clerk.organization?.getInvitations.mockReturnValue(
         Promise.resolve({
@@ -543,52 +567,34 @@ describe('useOrganization', () => {
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
       expect(result.current.invitations?.isFetching).toBe(false);
 
-      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeOrganizationInvitation({
-              id: '1',
-              emailAddress: 'admin1@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-            createFakeOrganizationInvitation({
-              id: '2',
-              emailAddress: 'member2@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
+      const deferred = createDeferredPromise();
 
-      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeOrganizationInvitation({
-              id: '3',
-              emailAddress: 'admin3@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-            createFakeOrganizationInvitation({
-              id: '4',
-              emailAddress: 'member4@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
-
+      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(deferred.promise);
       act(() => result.current.invitations?.fetchNext?.());
 
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(true));
       expect(result.current.invitations?.isLoading).toBe(false);
 
+      deferred.resolve({
+        data: [
+          createFakeOrganizationInvitation({
+            id: '3',
+            emailAddress: 'admin3@clerk.com',
+            organizationId: '1',
+            createdAt: new Date('2022-01-01'),
+          }),
+          createFakeOrganizationInvitation({
+            id: '4',
+            emailAddress: 'member4@clerk.com',
+            organizationId: '1',
+            createdAt: new Date('2022-01-01'),
+          }),
+        ],
+        total_count: 4,
+      });
+
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(false));
+
       expect(result.current.invitations?.data).toEqual(
         expect.arrayContaining([
           expect.objectContaining({

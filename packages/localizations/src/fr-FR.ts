@@ -17,6 +17,11 @@ export const frFR: LocalizationResource = {
   apiKeys: {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copier et fermer',
+      formHint: 'Pour des raisons de sécurité, nous ne vous permettrons pas de le consulter à nouveau plus tard.',
+      formTitle: 'Copiez votre clé API "{{name}}" maintenant',
+    },
     createdAndExpirationStatus__expiresOn:
       "Créée le {{ createdDate | shortDate('fr-FR') }} • Expire le {{ expiresDate | longDate('fr-FR') }}",
     createdAndExpirationStatus__never: "Créée le {{ createdDate | shortDate('fr-FR') }} • N’expire jamais",
@@ -229,6 +234,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Clé API',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Nom de la clé secrète',

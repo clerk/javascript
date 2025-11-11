@@ -495,6 +495,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysRevokeModal',
   'apiKeysRevokeModalInput',
   'apiKeysRevokeModalSubmitButton',
+  'apiKeysCopyModal',
+  'apiKeysCopyModalInput',
+  'apiKeysCopyModalSubmitButton',
 
   'subscriptionDetailsCard',
   'subscriptionDetailsCardHeader',

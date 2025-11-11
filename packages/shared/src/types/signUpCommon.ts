@@ -9,6 +9,7 @@ import type {
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpVerificationJSONSnapshot, SignUpVerificationsJSONSnapshot } from './snapshots';
 import type {
+  AppleIdTokenStrategy,
   EmailCodeStrategy,
   EmailLinkStrategy,
   EnterpriseSSOStrategy,
@@ -89,6 +90,7 @@ export type SignUpCreateParams = Partial<
       | EnterpriseSSOStrategy
       | TicketStrategy
       | GoogleOneTapStrategy
+      | AppleIdTokenStrategy
       | PhoneCodeStrategy;
     redirectUrl: string;
     actionCompleteRedirectUrl: string;

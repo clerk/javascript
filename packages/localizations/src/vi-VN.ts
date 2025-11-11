@@ -17,6 +17,11 @@ export const viVN: LocalizationResource = {
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Sao chép và đóng',
+      formHint: 'Vì lý do bảo mật, chúng tôi sẽ không cho phép bạn xem lại sau này.',
+      formTitle: 'Sao chép khóa API "{{name}}" của bạn ngay bây giờ',
+    },
     createdAndExpirationStatus__expiresOn:
       "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
@@ -225,6 +230,7 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Nhập số điện thoại của bạn',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Khóa API',
   formFieldLabel__apiKeyDescription: 'Mô tả',
   formFieldLabel__apiKeyExpiration: 'Hết hạn',
   formFieldLabel__apiKeyName: 'Tên khoá bí mật',

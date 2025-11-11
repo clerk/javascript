@@ -1,5 +1,44 @@
 # Change Log
 
+## 3.27.2
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/types@4.99.0
+
+## 3.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa)]:
+  - @clerk/types@4.98.0
+
+## 3.27.0
+
+### Minor Changes
+
+- Added localization entry for the API key copy modal component. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.97.2
+
+## 3.26.6
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293)]:
+  - @clerk/types@4.97.1
+
+## 3.26.5
+
+### Patch Changes
+
+- Updated dependencies [[`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/types@4.97.0
+
 ## 3.26.4
 
 ### Patch Changes

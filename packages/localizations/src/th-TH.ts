@@ -17,6 +17,11 @@ export const thTH: LocalizationResource = {
   apiKeys: {
     action__add: 'เพิ่มคีย์ใหม่',
     action__search: 'ค้นหาคีย์',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'คัดลอกและปิด',
+      formHint: 'ด้วยเหตุผลด้านความปลอดภัย เราจะไม่อนุญาตให้คุณดูอีกครั้งในภายหลัง',
+      formTitle: 'คัดลอกคีย์ API "{{name}}" ของคุณตอนนี้',
+    },
     createdAndExpirationStatus__expiresOn:
       "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • หมดอายุ {{ expiresDate | longDate('th-TH') }}",
     createdAndExpirationStatus__never: "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • ไม่มีวันหมดอายุ",
@@ -224,6 +229,7 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'คีย์ API',
   formFieldLabel__apiKeyDescription: 'คำอธิบาย',
   formFieldLabel__apiKeyExpiration: 'วันหมดอายุ',
   formFieldLabel__apiKeyName: 'ชื่อคีย์ลับ',

@@ -17,6 +17,11 @@ export const faIR: LocalizationResource = {
   apiKeys: {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'کپی و بستن',
+      formHint: 'به دلایل امنیتی، ما بعداً به شما اجازه مشاهده دوباره آن را نخواهیم داد.',
+      formTitle: 'اکنون کلید API "{{name}}" خود را کپی کنید',
+    },
     createdAndExpirationStatus__expiresOn:
       "ایجاد شده {{ createdDate | shortDate('en-US') }} • منقضی می‌شود {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "ایجاد شده {{ createdDate | shortDate('en-US') }} • هرگز منقضی نمی‌شود",
@@ -226,6 +231,7 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'کلید API',
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',

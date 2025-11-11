@@ -17,6 +17,11 @@ export const csCZ: LocalizationResource = {
   apiKeys: {
     action__add: 'Přidat nový klíč',
     action__search: 'Vyhledat klíče',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopírovat a zavřít',
+      formHint: 'Z bezpečnostních důvodů vám to později nebudeme moci znovu zobrazit.',
+      formTitle: 'Zkopírujte nyní svůj API klíč "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Platí do {{ expiresDate | longDate('cs-CZ') }}",
     createdAndExpirationStatus__never: "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Nikdy nevyprší",
@@ -225,6 +230,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API klíč',
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
