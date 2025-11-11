@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.33.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.32.0
 
 ### Minor Changes
