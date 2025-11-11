@@ -298,9 +298,6 @@ jobs:
         include:
           - test-name: "nextjs"
             test-project: "chrome"
-            next-version: "14"
-          - test-name: "nextjs"
-            test-project: "chrome"
             next-version: "15"
           - test-name: "nextjs"
             test-project: "chrome"

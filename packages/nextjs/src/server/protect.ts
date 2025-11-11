@@ -246,14 +246,9 @@ const isPagePathAvailable = () => {
     return false;
   }
 
-  const { page, pagePath } = __fetch.__nextGetStaticStore().getStore() || {};
+  const { page } = __fetch.__nextGetStaticStore().getStore() || {};
 
-  return Boolean(
-    // available on next@14
-    pagePath ||
-      // available on next@15
-      page,
-  );
+  return Boolean(page);
 };
 
 const isPagesRouterInternalNavigation = (req: Request) => !!req.headers.get(nextConstants.Headers.NextjsData);
