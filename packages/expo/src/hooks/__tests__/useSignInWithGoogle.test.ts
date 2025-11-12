@@ -36,6 +36,25 @@ vi.mock('react-native', () => {
   };
 });
 
+vi.mock('expo-modules-core', () => {
+  return {
+    EventEmitter: vi.fn(),
+  };
+});
+
+vi.mock('expo-constants', () => {
+  return {
+    default: {
+      expoConfig: {
+        extra: {
+          EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID: 'mock-web-client-id.apps.googleusercontent.com',
+          EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID: 'mock-android-client-id.apps.googleusercontent.com',
+        },
+      },
+    },
+  };
+});
+
 describe('useSignInWithGoogle', () => {
   const mockSignIn = {
     create: vi.fn(),
