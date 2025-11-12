@@ -685,7 +685,8 @@ export const faIR: LocalizationResource = {
       label__alternativeMethods: 'یا با روش دیگری وارد شوید',
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'شما از یک دستگاه جدید وارد می‌شوید. برای حفظ امنیت حساب کاربری شما، درخواست تأیید می‌کنیم.',
     noAvailableMethods: {
       message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',

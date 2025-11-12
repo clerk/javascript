@@ -677,7 +677,8 @@ export const hrHR: LocalizationResource = {
       label__alternativeMethods: 'Ili se prijavite na drugi način',
       title: 'Zaboravili ste lozinku?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Prijavljujete se s novog uređaja. Tražimo provjeru kako bismo zadržali vaš račun sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti s prijavom. Nema dostupnog faktora autentifikacije.',
       subtitle: 'Došlo je do pogreške',

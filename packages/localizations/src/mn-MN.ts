@@ -677,7 +677,8 @@ export const mnMN: LocalizationResource = {
       label__alternativeMethods: 'Эсвэл өөр аргаар нэвтэрнэ үү',
       title: 'Нууц үгээ мартсан?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Та шинэ төхөөрөмжөөс нэвтэрч байна. Бид таны дансыг аюулгүй байлгахын тулд баталгаажуулалт хүсч байна.',
     noAvailableMethods: {
       message: 'Нэвтрэхийг үргэлжлүүлэх боломжгүй. Баталгаажуулах хүчин зүйл алга.',
       subtitle: 'Алдаа гарлаа',

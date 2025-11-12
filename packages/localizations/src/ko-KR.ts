@@ -672,7 +672,7 @@ export const koKR: LocalizationResource = {
       label__alternativeMethods: '또는 다른 방법으로 로그인',
       title: '비밀번호를 잊으셨나요?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice: '새로운 기기에서 로그인하고 있습니다. 계정 보안을 위해 확인을 요청하고 있습니다.',
     noAvailableMethods: {
       message: '로그인을 계속할 수 없습니다. 사용 가능한 인증 방법이 없습니다.',
       subtitle: '오류가 발생했습니다',

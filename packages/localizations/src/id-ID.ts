@@ -679,7 +679,8 @@ export const idID: LocalizationResource = {
       label__alternativeMethods: 'Atau, masuk dengan metode lain',
       title: 'Lupa Kata Sandi?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Anda masuk dari perangkat baru. Kami meminta verifikasi untuk menjaga keamanan akun Anda.',
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan masuk. Tidak ada faktor autentikasi yang tersedia.',
       subtitle: 'Terjadi kesalahan',

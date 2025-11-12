@@ -678,7 +678,8 @@ export const plPL: LocalizationResource = {
       label__alternativeMethods: 'Lub zaloguj się za pomocą innej metody',
       title: 'Zapomniałeś hasła?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Logujesz się z nowego urządzenia. Prosimy o weryfikację, aby zapewnić bezpieczeństwo Twojego konta.',
     noAvailableMethods: {
       message: 'Nie można kontynuować logowania. Brak dostępnych czynników uwierzytelniających.',
       subtitle: 'Wystąpił błąd',

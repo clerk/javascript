@@ -681,7 +681,8 @@ export const beBY: LocalizationResource = {
       label__alternativeMethods: 'Або ўвайдзіце іншым спосабам',
       title: 'Забыўся пароль?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Вы ўваходзіце з новай прылады. Мы просім пацверджанне для забеспячэння бяспекі вашага акаўнта.',
     noAvailableMethods: {
       message: 'Немагчыма ўвайсці. Няма даступных фактараў аўтэнтыфікацыі.',
       subtitle: 'Адбылася памылка',

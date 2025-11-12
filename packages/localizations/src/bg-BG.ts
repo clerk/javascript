@@ -677,7 +677,8 @@ export const bgBG: LocalizationResource = {
       label__alternativeMethods: 'Или, влезте с друг метод',
       title: 'Забравена парола?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Влизате от ново устройство. Искаме потвърждение, за да запазим акаунта ви в безопасност.',
     noAvailableMethods: {
       message: 'Не може да се продължи с влизането. Няма наличен метод за удостоверяване.',
       subtitle: 'Възникна грешка',

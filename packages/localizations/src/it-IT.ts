@@ -684,7 +684,8 @@ export const itIT: LocalizationResource = {
       label__alternativeMethods: 'Oppure, accedi con un altro metodo',
       title: 'Hai dimenticato la password?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      "Stai effettuando l'accesso da un nuovo dispositivo. Richiediamo la verifica per mantenere il tuo account sicuro.",
     noAvailableMethods: {
       message: "Impossibile procedere con l'accesso. Non ci sono strumenti di autenticazione disponibili.",
       subtitle: 'Si è verificato un errore',

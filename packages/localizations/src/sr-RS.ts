@@ -675,7 +675,8 @@ export const srRS: LocalizationResource = {
       label__alternativeMethods: 'Ili, prijavi se drugom metodom',
       title: 'Zaboravljena lozinka?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Prijavljuješ se sa novog uređaja. Tražimo verifikaciju kako bismo zadržali tvoj nalog sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
       subtitle: 'Došlo je do greške',

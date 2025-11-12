@@ -681,7 +681,8 @@ export const taIN: LocalizationResource = {
       label__alternativeMethods: 'அல்லது, வேறு முறையில் உள்நுழையவும்',
       title: 'கடவுச்சொல் மறந்துவிட்டதா?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'நீங்கள் ஒரு புதிய சாதனத்திலிருந்து உள்நுழைகிறீர்கள். உங்கள் கணக்கை பாதுகாப்பாக வைத்திருக்க நாங்கள் சரிபார்ப்பு கோருகிறோம்.',
     noAvailableMethods: {
       message: 'உள்நுழைவைத் தொடர முடியாது. எந்த அங்கீகார காரணியும் கிடைக்கவில்லை.',
       subtitle: 'பிழை ஏற்பட்டது',

@@ -678,7 +678,8 @@ export const svSE: LocalizationResource = {
       label__alternativeMethods: 'Eller, logga in med en annan metod',
       title: 'Glömt lösenord?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Du loggar in från en ny enhet. Vi ber om verifiering för att hålla ditt konto säkert.',
     noAvailableMethods: {
       message: 'Kan inte fortsätta med inloggning. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',

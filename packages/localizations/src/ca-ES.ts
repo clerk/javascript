@@ -677,7 +677,8 @@ export const caES: LocalizationResource = {
       label__alternativeMethods: 'O bé, inicia sessió amb un altre mètode',
       title: 'Has oblidat la contrasenya?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      "Estàs iniciant sessió des d'un dispositiu nou. Demanem verificació per mantenir el compte segur.",
     noAvailableMethods: {
       message: "No es pot procedir amb l'inici de sessió. No hi ha cap factor d'autenticació disponible.",
       subtitle: "S'ha produït un error",

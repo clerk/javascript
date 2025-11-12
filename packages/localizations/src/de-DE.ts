@@ -689,7 +689,8 @@ export const deDE: LocalizationResource = {
       label__alternativeMethods: 'Oder melden Sie sich mit einer anderen Methode an',
       title: 'Passwort vergessen?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Sie melden sich von einem neuen Gerät an. Wir bitten um eine Überprüfung, um Ihr Konto sicher zu halten.',
     noAvailableMethods: {
       message: 'Die Anmeldung kann nicht fortgesetzt werden. Es ist kein Authentifizierungsfaktor verfügbar.',
       subtitle: 'Ein Fehler ist aufgetreten',

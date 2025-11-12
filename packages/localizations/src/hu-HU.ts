@@ -676,7 +676,8 @@ export const huHU: LocalizationResource = {
       label__alternativeMethods: 'Vagy jelentkezz be más módon',
       title: 'Efelejtetted a jelszavad?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Új eszközről jelentkezel be. Kérünk egy ellenőrzést, hogy fiókod biztonságban maradjon.',
     noAvailableMethods: {
       message: 'Nem lehet bejelentkezni. Nincs elérhető hitelesítő tényező.',
       subtitle: 'Hiba történt',

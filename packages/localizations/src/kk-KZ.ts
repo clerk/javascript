@@ -668,7 +668,8 @@ export const kkKZ: LocalizationResource = {
       label__alternativeMethods: 'Немесе басқа әдісті қолданыңыз',
       title: 'Құпия сөзді ұмыттыңыз ба?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Сіз жаңа құрылғыдан кірудесіз. Біз сіздің есептік жазбаңызды қауіпсіз сақтау үшін растау сұраймыз.',
     noAvailableMethods: {
       message: 'Кіру мүмкін емес. Аутентификация әдісі қолжетімсіз.',
       subtitle: 'Қате орын алды',

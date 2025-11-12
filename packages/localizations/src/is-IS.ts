@@ -678,7 +678,8 @@ export const isIS: LocalizationResource = {
       label__alternativeMethods: 'Eða, skráðu þig inn með annarri aðferð',
       title: 'Gleymt lykilorð?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Þú ert að skrá þig inn frá nýjum tæki. Við biðjum um staðfestingu til að halda reikningnum þínum öruggum.',
     noAvailableMethods: {
       message: 'Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.',
       subtitle: 'Villa kom upp',

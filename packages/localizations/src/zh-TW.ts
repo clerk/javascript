@@ -666,7 +666,7 @@ export const zhTW: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登入。',
       title: '忘記密碼？',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice: '您正在從新裝置登入。我們需要驗證以保護您的帳戶安全。',
     noAvailableMethods: {
       message: '無法繼續登入。沒有可用的驗證方式。',
       subtitle: '發生錯誤',

@@ -681,7 +681,8 @@ export const msMY: LocalizationResource = {
       label__alternativeMethods: 'Atau, daftar masuk dengan kaedah lain',
       title: 'Lupa Kata Laluan?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Anda sedang mendaftar masuk dari peranti baharu. Kami meminta pengesahan untuk menjaga keselamatan akaun anda.',
     noAvailableMethods: {
       message: 'Tidak dapat meneruskan pendaftaran masuk. Tiada faktor pengesahan yang tersedia.',
       subtitle: 'Ralat berlaku',

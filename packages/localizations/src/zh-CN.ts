@@ -666,7 +666,7 @@ export const zhCN: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登录。',
       title: '忘记密码？',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice: '您正在从新设备登录。我们需要验证以保护您的账户安全。',
     noAvailableMethods: {
       message: '无法继续登录。没有可用的身份验证因素。',
       subtitle: '出现错误',

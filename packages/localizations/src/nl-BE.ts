@@ -677,7 +677,8 @@ export const nlBE: LocalizationResource = {
       label__alternativeMethods: 'Of log in met een andere methode',
       title: 'Wachtwoord vergeten?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Je meldt je aan vanaf een nieuw apparaat. We vragen om verificatie om je account veilig te houden.',
     noAvailableMethods: {
       message: 'Het is niet mogelijk om door te gaan met inloggen. Er is geen beschikbare authenticatiefactor.',
       subtitle: 'Er heeft zich een fout voorgedaan',

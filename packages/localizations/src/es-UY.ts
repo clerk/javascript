@@ -680,7 +680,8 @@ export const esUY: LocalizationResource = {
       label__alternativeMethods: 'O, ingresá con otro método',
       title: '¿Olvidaste tu contraseña?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Estás iniciando sesión desde un dispositivo nuevo. Estamos pidiendo verificación para mantener tu cuenta segura.',
     noAvailableMethods: {
       message: 'No se puede continuar con el inicio de sesión. No hay un factor de autenticación disponible.',
       subtitle: 'Ocurrió un error',

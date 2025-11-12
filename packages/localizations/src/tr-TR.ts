@@ -677,7 +677,8 @@ export const trTR: LocalizationResource = {
       label__alternativeMethods: 'Veya başka bir yöntem kullanın:',
       title: 'Şifremi unuttum',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Yeni bir cihazdan oturum açıyorsunuz. Hesabınızın güvenliğini sağlamak için doğrulama istiyoruz.',
     noAvailableMethods: {
       message: 'Hesabınızda giriş yapmak için kullanabileceğiniz bir yöntem bulunmuyor.',
       subtitle: 'Bir hata oluştu',

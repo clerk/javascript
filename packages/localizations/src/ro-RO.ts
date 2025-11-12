@@ -687,7 +687,8 @@ export const roRO: LocalizationResource = {
       label__alternativeMethods: 'Sau autentifică-te cu altă metodă',
       title: 'Ai uitat parola?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Te conectezi de pe un dispozitiv nou. Solicităm verificarea pentru a menține contul tău sigur.',
     noAvailableMethods: {
       message: 'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
       subtitle: 'A apărut o eroare',

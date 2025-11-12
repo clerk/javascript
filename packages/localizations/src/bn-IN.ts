@@ -679,7 +679,8 @@ export const bnIN: LocalizationResource = {
       label__alternativeMethods: 'অথবা, অন্য পদ্ধতি দিয়ে সাইন ইন করুন',
       title: 'পাসওয়ার্ড ভুলে গেছেন?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'আপনি একটি নতুন ডিভাইস থেকে সাইন ইন করছেন। আমরা আপনার অ্যাকাউন্ট নিরাপদ রাখতে যাচাইকরণ চাইছি।',
     noAvailableMethods: {
       message: 'সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।',
       subtitle: 'একটি ত্রুটি ঘটেছে',

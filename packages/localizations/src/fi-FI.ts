@@ -677,7 +677,8 @@ export const fiFI: LocalizationResource = {
       label__alternativeMethods: 'tai kirjaudu sisään toisella tavalla',
       title: 'Unohditko salasanasi?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Kirjaudut sisään uudesta laitteesta. Pyydämme vahvistusta tilisi turvallisuuden varmistamiseksi.',
     noAvailableMethods: {
       message: 'Kirjautuminen ei onnistu. Käytettävissä ei ole yhtään todennusmenetelmää.',
       subtitle: 'Tapahtui virhe',

@@ -677,7 +677,8 @@ export const elGR: LocalizationResource = {
       label__alternativeMethods: 'Ή, συνδεθείτε με μια άλλη μέθοδο.',
       title: 'Ξεχάσατε τον κωδικό πρόσβασης;',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Συνδέεστε από μια νέα συσκευή. Ζητάμε επαλήθευση για να διατηρήσουμε τον λογαριασμό σας ασφαλή.',
     noAvailableMethods: {
       message: 'Δεν είναι δυνατή η σύνδεση. Δεν υπάρχει διαθέσιμος παράγοντας αυθεντικοποίησης.',
       subtitle: 'Προέκυψε σφάλμα',

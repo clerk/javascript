@@ -685,7 +685,8 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Вы входите с нового устройства. Мы просим подтверждение для обеспечения безопасности вашего аккаунта.',
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',

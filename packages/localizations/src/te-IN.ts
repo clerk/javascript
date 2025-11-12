@@ -680,7 +680,8 @@ export const teIN: LocalizationResource = {
       label__alternativeMethods: 'లేదా, మరొక పద్ధతితో సైన్ ఇన్ చేయండి',
       title: 'పాస్‌వర్డ్ మర్చిపోయారా?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'మీరు కొత్త పరికరం నుండి సైన్ ఇన్ చేస్తున్నారు. మీ ఖాతాను సురక్షితంగా ఉంచడానికి మేము ధృవీకరణను అభ్యర్థిస్తున్నాము.',
     noAvailableMethods: {
       message: 'సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.',
       subtitle: 'లోపం సంభవించింది',

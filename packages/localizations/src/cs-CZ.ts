@@ -684,7 +684,8 @@ export const csCZ: LocalizationResource = {
       label__alternativeMethods: 'Nebo se přihlaste jinou metodou',
       title: 'Zapomněli jste heslo?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Přihlašujete se z nového zařízení. Žádáme o ověření, abychom udrželi váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nelze pokračovat v přihlášení. Není k dispozici žádný autentizační faktor.',
       subtitle: 'Došlo k chybě',

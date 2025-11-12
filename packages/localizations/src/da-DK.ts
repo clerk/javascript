@@ -676,7 +676,8 @@ export const daDK: LocalizationResource = {
       label__alternativeMethods: 'Eller, log ind med en anden metode',
       title: 'Glemt Adgangskode?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Du logger ind fra en ny enhed. Vi beder om verifikation for at holde din konto sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsætte med login. Der er ingen tilgængelige godkendelsesfaktorer.',
       subtitle: 'En fejl opstod',

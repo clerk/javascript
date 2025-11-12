@@ -670,7 +670,7 @@ export const heIL: LocalizationResource = {
       label__alternativeMethods: 'או, התחבר באמצעות שיטה אחרת.',
       title: 'שכחת סיסמה?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice: 'אתה נכנס מכשיר חדש. אנו מבקשים אימות כדי לשמור על החשבון שלך מאובטח.',
     noAvailableMethods: {
       message: 'לא ניתן להמשיך בהתחברות. אין גורם אימות זמין.',
       subtitle: 'אירעה שגיאה',

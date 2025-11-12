@@ -675,7 +675,8 @@ export const ukUA: LocalizationResource = {
       label__alternativeMethods: 'Або, увійти іншим способом',
       title: 'Забули пароль?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Ви входите з нового пристрою. Ми просимо підтвердження для забезпечення безпеки вашого облікового запису.',
     noAvailableMethods: {
       message: 'Не вдається виконати вхід. Немає доступного фактору автентифікації.',
       subtitle: 'Виникла помилка',

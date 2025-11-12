@@ -674,7 +674,7 @@ export const arSA: LocalizationResource = {
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice: 'أنت تسجل الدخول من جهاز جديد. نحن نطلب التحقق للحفاظ على أمان حسابك.',
     noAvailableMethods: {
       message: 'لا يمكن متابعة تسجيل الدخول. لا يوجد وسيلة مصادقة متاحة.',
       subtitle: 'حدث خطأ',

@@ -678,7 +678,8 @@ export const skSK: LocalizationResource = {
       label__alternativeMethods: 'Alebo sa prihláste pomocou inej metódy.',
       title: 'Zabudli ste heslo?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Prihlasujete sa z nového zariadenia. Žiadame o overenie, aby sme udržali váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nemožno pokračovať v prihlásení. Nie je k dispozícii žiadna dostupná autentifikačná metóda.',
       subtitle: 'Došlo k chybe',

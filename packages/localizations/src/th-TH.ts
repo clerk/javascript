@@ -678,7 +678,8 @@ export const thTH: LocalizationResource = {
       label__alternativeMethods: 'หรือ เข้าสู่ระบบด้วยวิธีอื่น',
       title: 'ลืมรหัสผ่าน?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'คุณกำลังเข้าสู่ระบบจากอุปกรณ์ใหม่ เรากำลังขอการยืนยันเพื่อรักษาความปลอดภัยของบัญชีของคุณ',
     noAvailableMethods: {
       message: 'ไม่สามารถดำเนินการเข้าสู่ระบบได้ ไม่มีปัจจัยการยืนยันตัวตนที่สามารถใช้ได้',
       subtitle: 'เกิดข้อผิดพลาด',

@@ -676,7 +676,8 @@ export const nbNO: LocalizationResource = {
       label__alternativeMethods: 'Eller logg inn med en annen metode.',
       title: 'Glemt passord?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Du logger inn fra en ny enhet. Vi ber om verifisering for å holde kontoen din sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsette med innloggingen. Det er ingen tilgjengelige autentiseringsfaktorer.',
       subtitle: 'En feil oppstod',

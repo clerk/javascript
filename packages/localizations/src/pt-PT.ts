@@ -675,7 +675,8 @@ export const ptPT: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu-se da palavra-passe?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Está a iniciar sessão a partir de um novo dispositivo. Estamos a solicitar verificação para manter a sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Ocorreu um erro',

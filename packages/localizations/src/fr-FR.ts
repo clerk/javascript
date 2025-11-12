@@ -691,7 +691,8 @@ export const frFR: LocalizationResource = {
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       title: 'Mot de passe oublié ?',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      'Vous vous connectez depuis un nouvel appareil. Nous demandons une vérification pour sécuriser votre compte.',
     noAvailableMethods: {
       message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
       subtitle: "Une erreur s'est produite",

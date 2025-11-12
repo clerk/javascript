@@ -676,7 +676,8 @@ export const jaJP: LocalizationResource = {
       label__alternativeMethods: 'または、別の方法でサインインしてください。',
       title: 'パスワードをお忘れですか？',
     },
-    newDeviceVerificationNotice: undefined,
+    newDeviceVerificationNotice:
+      '新しいデバイスからサインインしています。アカウントのセキュリティを保つため、確認をお願いしています。',
     noAvailableMethods: {
       message: 'サインインできません。利用可能な認証方法がありません。',
       subtitle: 'エラーが発生しました',
