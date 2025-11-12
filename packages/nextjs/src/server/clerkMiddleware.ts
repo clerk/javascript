@@ -188,7 +188,13 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         createAuthenticateRequestOptions(clerkRequest, options),
       );
 
-      console.log('requestState', Object.fromEntries(requestState.headers.entries()));
+      console.log('------');
+
+      for (const [key, value] of requestState.headers.entries()) {
+        console.log('key', key, 'value', value);
+      }
+
+      console.log('------');
 
       logger.debug('requestState', () => ({
         status: requestState.status,

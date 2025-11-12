@@ -16,7 +16,7 @@ import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithE
 import { RouterTelemetry } from '../../utils/router-telemetry';
 import { isNextWithUnstableServerActions } from '../../utils/sdk-versions';
 import { detectKeylessEnvDriftAction } from '../keyless-actions';
-import { invalidateCacheAction } from '../server-actions';
+import { handleSync, invalidateCacheAction } from '../server-actions';
 import { useAwaitablePush } from './useAwaitablePush';
 import { useAwaitableReplace } from './useAwaitableReplace';
 
@@ -56,6 +56,12 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   if (isNested) {
     return props.children;
   }
+
+  useSafeLayoutEffect(() => {
+    if (props.signalForSync) {
+      void handleSync();
+    }
+  }, [props.signalForSync]);
 
   useEffect(() => {
     if (!isPending) {
@@ -125,6 +131,10 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
     // @ts-expect-error Error because of the stricter types of internal `replace`
     routerReplace: replace,
   });
+
+  if (props.signalForSync) {
+    return <h1>Syncing...</h1>;
+  }
 
   return (
     <ClerkNextOptionsProvider options={mergedProps}>

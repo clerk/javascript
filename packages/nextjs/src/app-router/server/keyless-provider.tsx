@@ -37,10 +37,11 @@ type KeylessProviderProps = PropsWithChildren<{
   runningWithClaimedKeys: boolean;
   generateStatePromise: () => Promise<AuthObject | null>;
   generateNonce: () => Promise<string>;
+  signalForSync: boolean;
 }>;
 
 export const KeylessProvider = async (props: KeylessProviderProps) => {
-  const { rest, runningWithClaimedKeys, generateNonce, generateStatePromise, children } = props;
+  const { rest, runningWithClaimedKeys, generateNonce, generateStatePromise, children, signalForSync } = props;
 
   // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
   const newOrReadKeys = await import('../../server/keyless-node.js')
@@ -59,6 +60,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         nonce={await generateNonce()}
         initialState={await generateStatePromise()}
         disableKeyless
+        signalForSync={signalForSync}
       >
         {children}
       </ClientClerkProvider>
@@ -77,6 +79,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
       })}
       nonce={await generateNonce()}
       initialState={await generateStatePromise()}
+      signalForSync={signalForSync}
     >
       {children}
     </ClientClerkProvider>

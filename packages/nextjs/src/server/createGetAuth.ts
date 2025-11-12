@@ -27,8 +27,9 @@ import { detectClerkMiddleware } from './headers-utils';
 import type { RequestLike } from './types';
 import { assertAuthStatus, assertKey } from './utils';
 
-async function _getAuthDataByAuthenticatingRequest(logger: LoggerNoCommit<Logger<Log>>) {
+async function _getAuthDataByAuthenticatingRequest(logger?: LoggerNoCommit<Logger<Log>>) {
   const request = await buildRequestLike();
+
   const publishableKey = assertKey(PUBLISHABLE_KEY, () => errorThrower.throwMissingPublishableKeyError());
 
   const secretKey = assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
@@ -45,15 +46,16 @@ async function _getAuthDataByAuthenticatingRequest(logger: LoggerNoCommit<Logger
   const resolvedClerkClient = await clerkClient();
 
   const clerkRequest = createClerkRequest(request);
+  console.log('clerkRequest.url', clerkRequest.url);
 
   const authHeader = request.headers.get(constants.Headers.Authorization);
   if (authHeader && authHeader.startsWith('Basic ')) {
-    logger.debug('Basic Auth detected');
+    logger?.debug('Basic Auth detected');
   }
 
   const cspHeader = request.headers.get(constants.Headers.ContentSecurityPolicy);
   if (cspHeader) {
-    logger.debug('Content-Security-Policy detected', () => ({
+    logger?.debug('Content-Security-Policy detected', () => ({
       value: cspHeader,
     }));
   }
@@ -63,14 +65,25 @@ async function _getAuthDataByAuthenticatingRequest(logger: LoggerNoCommit<Logger
     createAuthenticateRequestOptions(clerkRequest, options),
   );
 
-  logger.debug('requestState', () => ({
+  console.log('------');
+  for (const [key, value] of requestState.headers.entries()) {
+    console.log('key', key, 'value', value);
+  }
+  console.log('------');
+
+  logger?.debug('requestState', () => ({
     status: requestState.status,
     headers: JSON.stringify(Object.fromEntries(requestState.headers)),
     reason: requestState.reason,
   }));
 
   const locationHeader = requestState.headers.get(constants.Headers.Location);
-  if (locationHeader) {
+
+  const cloneURL = new URL(clerkRequest.url);
+  cloneURL.search = '';
+
+  if (locationHeader && locationHeader !== cloneURL.toString()) {
+    console.log('redirecting to', locationHeader);
     redirect(locationHeader);
     // const res = NextResponse.redirect(locationHeader);
     // requestState.headers.forEach((value, key) => {
@@ -84,17 +97,34 @@ async function _getAuthDataByAuthenticatingRequest(logger: LoggerNoCommit<Logger
     throw new Error('Clerk: handshake status without redirect');
   }
 
-  const authObject = requestState.toAuth();
+  // const authObject = requestState.toAuth();
 
   // if (isRedirect(handlerResult)) {
   //   logger.debug('handlerResult is redirect');
   //   return serverRedirectWithAuth(clerkRequest, handlerResult, options);
   // }
 
-  return authObject;
+  return requestState;
 }
 
-const getAuthDataByAuthenticatingRequest = cache(_getAuthDataByAuthenticatingRequest);
+export const getAuthDataByAuthenticatingRequest = cache(_getAuthDataByAuthenticatingRequest);
+
+export const checkHandshake = cache(async () => {
+  const request = await buildRequestLike();
+
+  if (!detectClerkMiddleware(request)) {
+    const requestState = await getAuthDataByAuthenticatingRequest();
+    console.log('hehehe requestState.headers.getSetCookie()', requestState.headers.getSetCookie());
+    if (requestState.headers.getSetCookie().length > 0) {
+      console.log('needs_sync');
+      throw new Error('needs_sync');
+    }
+    console.log('no needs_sync');
+    return requestState.toAuth();
+  }
+
+  return null;
+});
 
 export type GetAuthOptions = {
   acceptsToken?: GetAuthDataFromRequestOptions['acceptsToken'];
@@ -114,7 +144,7 @@ export const createAsyncGetAuth = ({
   withLogger(debugLoggerName, logger => {
     return async (req: RequestLike, opts?: { secretKey?: string } & GetAuthOptions): Promise<AuthObject> => {
       // if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
-      // logger.enable();
+      logger.enable();
       // }
 
       console.log('noAuthStatusMessage', noAuthStatusMessage[0]);
@@ -135,9 +165,9 @@ export const createAsyncGetAuth = ({
       // }
       // still throw there is no suggested move location
 
-      assertAuthStatus(req, noAuthStatusMessage);
+      // assertAuthStatus(req, noAuthStatusMessage);
       if (!detectClerkMiddleware(req)) {
-        return getAuthDataByAuthenticatingRequest(logger);
+        return (await getAuthDataByAuthenticatingRequest(logger)).toAuth();
       }
 
       const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {

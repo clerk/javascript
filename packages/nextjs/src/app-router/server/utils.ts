@@ -25,7 +25,8 @@ export async function buildRequestLike(): Promise<NextRequest> {
     // @ts-expect-error: Cannot find module 'next/headers' or its corresponding type declarations.ts(2307)
     const { headers } = await import('next/headers');
     const resolvedHeaders = await headers();
-    return new NextRequest('https://placeholder.com', { headers: resolvedHeaders });
+    const potentialUrl = resolvedHeaders.get('x-pantelis-url');
+    return new NextRequest(potentialUrl || 'https://placeholder.com', { headers: resolvedHeaders });
   } catch (e: any) {
     // rethrow the error when react throws a prerendering bailout
     // https://nextjs.org/docs/messages/ppr-caught-error

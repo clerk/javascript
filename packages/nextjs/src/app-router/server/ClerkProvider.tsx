@@ -5,6 +5,8 @@ import React from 'react';
 
 import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthProvider';
 import { getDynamicAuthData } from '../../server/buildClerkProps';
+import { checkHandshake } from '../../server/createGetAuth';
+import { isNextjsRedirectError } from '../../server/nextErrors';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
 import { isNext13 } from '../../utils/sdk-versions';
@@ -78,6 +80,19 @@ export async function ClerkProvider(
     // ignore
   }
 
+  let signalForSync = false;
+  if (dynamic) {
+    signalForSync = await checkHandshake()
+      .then(() => false)
+      .catch(e => {
+        if (isNextjsRedirectError(e)) {
+          throw e;
+        }
+
+        return true;
+      });
+  }
+
   if (shouldRunAsKeyless) {
     output = (
       <KeylessProvider
@@ -85,6 +100,7 @@ export async function ClerkProvider(
         generateNonce={generateNonce}
         generateStatePromise={generateStatePromise}
         runningWithClaimedKeys={runningWithClaimedKeys}
+        signalForSync={signalForSync}
       >
         {children}
       </KeylessProvider>
@@ -95,6 +111,7 @@ export async function ClerkProvider(
         {...propsWithEnvs}
         nonce={await generateNonce()}
         initialState={await generateStatePromise()}
+        signalForSync={signalForSync}
       >
         {children}
       </ClientClerkProvider>
