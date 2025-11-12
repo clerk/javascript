@@ -14,6 +14,7 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     domain: paramDomain,
     publishableKey: paramPublishableKey,
     telemetry: paramTelemetry,
+    clerkUiUrl: paramClerkUiUrl,
     ...rest
   } = params || {};
 
@@ -24,6 +25,7 @@ const mergeEnvVarsWithParams = (params?: AstroClerkIntegrationParams & { publish
     proxyUrl: paramProxy || import.meta.env.PUBLIC_CLERK_PROXY_URL,
     domain: paramDomain || import.meta.env.PUBLIC_CLERK_DOMAIN,
     publishableKey: paramPublishableKey || import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+    clerkUiUrl: paramClerkUiUrl || import.meta.env.PUBLIC_CLERK_UI_URL,
     telemetry: paramTelemetry || {
       disabled: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DISABLED),
       debug: isTruthy(import.meta.env.PUBLIC_CLERK_TELEMETRY_DEBUG),

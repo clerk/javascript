@@ -294,7 +294,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
+        test-name:
+          [
             "generic",
             "express",
             "ap-flows",
@@ -303,7 +304,7 @@ jobs:
             "sessions:staging",
             "handshake",
             "handshake:staging",
-            # "astro",
+            "astro",
             "tanstack-react-start",
             "vue",
             "nuxt",
