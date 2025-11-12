@@ -216,8 +216,8 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__emailAddress_username: '이메일 주소 또는 사용자명을 입력하세요',
   formFieldInputPlaceholder__emailAddresses:
     '하나 이상의 이메일 주소를 공백 또는 쉼표로 구분하여 입력하거나 붙여넣습니다',
-  formFieldInputPlaceholder__firstName: '성',
-  formFieldInputPlaceholder__lastName: '이름',
+  formFieldInputPlaceholder__firstName: '이름',
+  formFieldInputPlaceholder__lastName: '성',
   formFieldInputPlaceholder__organizationDomain: undefined,
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
   formFieldInputPlaceholder__organizationName: undefined,
