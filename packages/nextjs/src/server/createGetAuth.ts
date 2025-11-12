@@ -1,19 +1,100 @@
 import type { AuthObject } from '@clerk/backend';
-import { constants, type SignedInAuthObject, type SignedOutAuthObject } from '@clerk/backend/internal';
-import { isTruthy } from '@clerk/shared/underscore';
+import {
+  AuthStatus,
+  constants,
+  createClerkRequest,
+  type SignedInAuthObject,
+  type SignedOutAuthObject,
+} from '@clerk/backend/internal';
 import type { PendingSessionOptions } from '@clerk/types';
+import { redirect } from 'next/navigation';
+import { cache } from 'react';
 
+import { buildRequestLike } from '../app-router/server/utils';
+import type { Log, Logger, LoggerNoCommit } from '../utils/debugLogger';
 import { withLogger } from '../utils/debugLogger';
-import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
+import { clerkClient } from './clerkClient';
+import { createAuthenticateRequestOptions } from './clerkMiddleware';
+import { PUBLISHABLE_KEY, SECRET_KEY, SIGN_IN_URL, SIGN_UP_URL } from './constants';
 import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
 import {
   getAuthDataFromRequest as getAuthDataFromRequestOriginal,
   getSessionAuthDataFromRequest as getSessionAuthDataFromRequestOriginal,
 } from './data/getAuthDataFromRequest';
 import { getAuthAuthHeaderMissing } from './errors';
-import { detectClerkMiddleware, getHeader } from './headers-utils';
+import { errorThrower } from './errorThrower';
+import { detectClerkMiddleware } from './headers-utils';
 import type { RequestLike } from './types';
-import { assertAuthStatus } from './utils';
+import { assertAuthStatus, assertKey } from './utils';
+
+async function _getAuthDataByAuthenticatingRequest(logger: LoggerNoCommit<Logger<Log>>) {
+  const request = await buildRequestLike();
+  const publishableKey = assertKey(PUBLISHABLE_KEY, () => errorThrower.throwMissingPublishableKeyError());
+
+  const secretKey = assertKey(SECRET_KEY, () => errorThrower.throwMissingSecretKeyError());
+  const signInUrl = SIGN_IN_URL;
+  const signUpUrl = SIGN_UP_URL;
+
+  const options = {
+    publishableKey,
+    secretKey,
+    signInUrl,
+    signUpUrl,
+  };
+
+  const resolvedClerkClient = await clerkClient();
+
+  const clerkRequest = createClerkRequest(request);
+
+  const authHeader = request.headers.get(constants.Headers.Authorization);
+  if (authHeader && authHeader.startsWith('Basic ')) {
+    logger.debug('Basic Auth detected');
+  }
+
+  const cspHeader = request.headers.get(constants.Headers.ContentSecurityPolicy);
+  if (cspHeader) {
+    logger.debug('Content-Security-Policy detected', () => ({
+      value: cspHeader,
+    }));
+  }
+
+  const requestState = await resolvedClerkClient.authenticateRequest(
+    clerkRequest,
+    createAuthenticateRequestOptions(clerkRequest, options),
+  );
+
+  logger.debug('requestState', () => ({
+    status: requestState.status,
+    headers: JSON.stringify(Object.fromEntries(requestState.headers)),
+    reason: requestState.reason,
+  }));
+
+  const locationHeader = requestState.headers.get(constants.Headers.Location);
+  if (locationHeader) {
+    redirect(locationHeader);
+    // const res = NextResponse.redirect(locationHeader);
+    // requestState.headers.forEach((value, key) => {
+    //   if (key === constants.Headers.Location) {
+    //     return;
+    //   }
+    //   res.headers.append(key, value);
+    // });
+    // return res;
+  } else if (requestState.status === AuthStatus.Handshake) {
+    throw new Error('Clerk: handshake status without redirect');
+  }
+
+  const authObject = requestState.toAuth();
+
+  // if (isRedirect(handlerResult)) {
+  //   logger.debug('handlerResult is redirect');
+  //   return serverRedirectWithAuth(clerkRequest, handlerResult, options);
+  // }
+
+  return authObject;
+}
+
+const getAuthDataByAuthenticatingRequest = cache(_getAuthDataByAuthenticatingRequest);
 
 export type GetAuthOptions = {
   acceptsToken?: GetAuthDataFromRequestOptions['acceptsToken'];
@@ -32,26 +113,31 @@ export const createAsyncGetAuth = ({
 }) =>
   withLogger(debugLoggerName, logger => {
     return async (req: RequestLike, opts?: { secretKey?: string } & GetAuthOptions): Promise<AuthObject> => {
-      if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
-        logger.enable();
-      }
+      // if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
+      // logger.enable();
+      // }
 
+      console.log('noAuthStatusMessage', noAuthStatusMessage[0]);
+
+      // if (!detectClerkMiddleware(req)) {
+      //   // Keep the same behaviour for versions that may have issues with bundling `node:fs`
+      //   if (isNextWithUnstableServerActions) {
+      //     assertAuthStatus(req, noAuthStatusMessage);
+      //   }
+
+      //   const missConfiguredMiddlewareLocation = await import('./fs/middleware-location.js')
+      //     .then(m => m.suggestMiddlewareLocation())
+      //     .catch(() => undefined);
+
+      //   if (missConfiguredMiddlewareLocation) {
+      //     throw new Error(missConfiguredMiddlewareLocation);
+      //   }
+      // }
+      // still throw there is no suggested move location
+
+      assertAuthStatus(req, noAuthStatusMessage);
       if (!detectClerkMiddleware(req)) {
-        // Keep the same behaviour for versions that may have issues with bundling `node:fs`
-        if (isNextWithUnstableServerActions) {
-          assertAuthStatus(req, noAuthStatusMessage);
-        }
-
-        const missConfiguredMiddlewareLocation = await import('./fs/middleware-location.js')
-          .then(m => m.suggestMiddlewareLocation())
-          .catch(() => undefined);
-
-        if (missConfiguredMiddlewareLocation) {
-          throw new Error(missConfiguredMiddlewareLocation);
-        }
-
-        // still throw there is no suggested move location
-        assertAuthStatus(req, noAuthStatusMessage);
+        return getAuthDataByAuthenticatingRequest(logger);
       }
 
       const getAuthDataFromRequest = (req: RequestLike, opts: GetAuthDataFromRequestOptions = {}) => {
@@ -79,9 +165,9 @@ export const createSyncGetAuth = ({
       req: RequestLike,
       opts?: { secretKey?: string } & GetAuthOptions,
     ): SignedInAuthObject | SignedOutAuthObject => {
-      if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
-        logger.enable();
-      }
+      // if (isTruthy(getHeader(req, constants.Headers.EnableDebug))) {
+      logger.enable();
+      // }
 
       assertAuthStatus(req, noAuthStatusMessage);
 

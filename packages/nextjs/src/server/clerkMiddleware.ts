@@ -188,6 +188,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
         createAuthenticateRequestOptions(clerkRequest, options),
       );
 
+      console.log('requestState', Object.fromEntries(requestState.headers.entries()));
+
       logger.debug('requestState', () => ({
         status: requestState.status,
         headers: JSON.stringify(Object.fromEntries(requestState.headers)),
@@ -252,7 +254,8 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
               value,
             }));
           }
-          handlerResult.headers.append(key, value);
+          // THIS
+          // handlerResult.headers.append(key, value);
         });
       }
 
