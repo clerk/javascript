@@ -1126,12 +1126,10 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
     if (disabledOrganizationsFeature(this, this.environment)) {
-      debugger;
       if (this.#instanceType === 'development') {
         this.__internal_openEnableOrganizationsPrompt({
           componentName: 'OrganizationList',
           onComplete: () => {
-            debugger;
             this.mountOrganizationList(node, props);
           },
         });
