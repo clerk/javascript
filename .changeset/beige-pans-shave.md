@@ -1,5 +1,5 @@
 ---
-'@clerk/localizations': minor
+'@clerk/localizations': patch
 ---
 
 Add Hebrew translations for waitlist component
