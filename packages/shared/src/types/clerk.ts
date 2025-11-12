@@ -1716,7 +1716,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
   /*
    * Provide custom menu actions and links to be rendered inside the UserButton.
