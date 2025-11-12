@@ -5,7 +5,7 @@ import { render, renderHook } from '@testing-library/react';
 import React from 'react';
 import { afterAll, beforeAll, beforeEach, describe, expect, expectTypeOf, it, test, vi } from 'vitest';
 
-import { AuthContext } from '../../contexts/AuthContext';
+import { AuthContext, InitialAuthContext } from '../../contexts/AuthContext';
 import { errorThrower } from '../../errors/errorThrower';
 import { invalidStateError } from '../../errors/messages';
 import { useAuth, useDerivedAuth } from '../useAuth';
@@ -70,9 +70,11 @@ describe('useAuth', () => {
     expect(() => {
       render(
         <ClerkInstanceContext.Provider value={{ value: {} as LoadedClerk }}>
-          <AuthContext.Provider value={{ value: {} as any }}>
-            <TestComponent />
-          </AuthContext.Provider>
+          <InitialAuthContext.Provider value={{ value: {} as any }}>
+            <AuthContext.Provider value={{ value: {} as any }}>
+              <TestComponent />
+            </AuthContext.Provider>
+          </InitialAuthContext.Provider>
         </ClerkInstanceContext.Provider>,
       );
     }).not.toThrow();
