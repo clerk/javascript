@@ -10,12 +10,15 @@ import { InternalThemeProvider } from '@/ui/styledSystem';
 import { DevTools } from '../../../../core/resources/DevTools';
 import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
-import { basePromptElementStyles, PromptContainer } from '../shared';
+import { basePromptElementStyles, PromptContainer, PromptSuccessIcon } from '../shared';
 
 const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizationsPromptProps) => {
   const ctaText = 'componentName' in props ? `<${props.componentName} />` : props.utilityName;
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
+
+  // @ts-expect-error - __unstable__environment is not typed
+  const environment = clerk?.__unstable__environment as EnvironmentResource;
 
   const handleEnableOrganizations = () => {
     setIsLoading(true);
@@ -24,18 +27,19 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
       .__internal_enableEnvironmentSetting({
         enable_organizations: true,
       })
-      .then(async () => {
-        // Re-fetch environment to get updated settings
-        // @ts-expect-error - __unstable__environment is not typed
-        const environment = clerk?.__unstable__environment;
-        await environment.fetch?.();
-        clerk?.__internal_closeEnableOrganizationsPrompt?.();
+      .then(() => {
+        // The above mutation doesn't return an environment due to API caching, so we need to enable it in memory
+        // as a persistent state
+        // By the time the user refreshes the page, the environment will be updated and the prompt will not be shown again
+        environment.organizationSettings.__internal_enableInMemory();
         props.onComplete?.();
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+
+  const isEnabled = !!environment?.organizationSettings.enabled;
 
   return (
     <Portal>
@@ -64,39 +68,43 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                 gap: t.sizes.$2,
               })}
             >
-              <svg
-                css={css`
-                  width: 1.25rem;
-                  height: 1.25rem;
-                `}
-                viewBox='0 0 20 20'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <path
-                  opacity='0.2'
-                  d='M17.25 10C17.25 14.0041 14.0041 17.25 10 17.25C5.99594 17.25 2.75 14.0041 2.75 10C2.75 5.99594 5.99594 2.75 10 2.75C14.0041 2.75 17.25 5.99594 17.25 10Z'
-                  fill='#EAB308'
-                />
-                <path
-                  fillRule='evenodd'
-                  clipRule='evenodd'
-                  d='M10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 13.5899 6.41015 16.5 10 16.5C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z'
-                  fill='#EAB308'
-                />
-                <path
-                  fillRule='evenodd'
-                  clipRule='evenodd'
-                  d='M10 6C10.5523 6 11 6.44772 11 7V9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9V7C9 6.44772 9.44772 6 10 6Z'
-                  fill='#EAB308'
-                />
-                <path
-                  fillRule='evenodd'
-                  clipRule='evenodd'
-                  d='M10 12C10.5523 12 11 12.4477 11 13V13.01C11 13.5623 10.5523 14.01 10 14.01C9.44772 14.01 9 13.5623 9 13.01V13C9 12.4477 9.44772 12 10 12Z'
-                  fill='#EAB308'
-                />
-              </svg>
+              {isEnabled ? (
+                <PromptSuccessIcon />
+              ) : (
+                <svg
+                  css={css`
+                    width: 1.25rem;
+                    height: 1.25rem;
+                  `}
+                  viewBox='0 0 20 20'
+                  fill='none'
+                  xmlns='http://www.w3.org/2000/svg'
+                >
+                  <path
+                    opacity='0.2'
+                    d='M17.25 10C17.25 14.0041 14.0041 17.25 10 17.25C5.99594 17.25 2.75 14.0041 2.75 10C2.75 5.99594 5.99594 2.75 10 2.75C14.0041 2.75 17.25 5.99594 17.25 10Z'
+                    fill='#EAB308'
+                  />
+                  <path
+                    fillRule='evenodd'
+                    clipRule='evenodd'
+                    d='M10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 13.5899 6.41015 16.5 10 16.5C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z'
+                    fill='#EAB308'
+                  />
+                  <path
+                    fillRule='evenodd'
+                    clipRule='evenodd'
+                    d='M10 6C10.5523 6 11 6.44772 11 7V9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9V7C9 6.44772 9.44772 6 10 6Z'
+                    fill='#EAB308'
+                  />
+                  <path
+                    fillRule='evenodd'
+                    clipRule='evenodd'
+                    d='M10 12C10.5523 12 11 12.4477 11 13V13.01C11 13.5623 10.5523 14.01 10 14.01C9.44772 14.01 9 13.5623 9 13.01V13C9 12.4477 9.44772 12 10 12Z'
+                    fill='#EAB308'
+                  />
+                </svg>
+              )}
 
               <h1
                 css={[
@@ -108,7 +116,7 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                   `,
                 ]}
               >
-                Organizations feature required
+                {isEnabled ? 'Organizations feature enabled' : 'Organizations feature required'}
               </h1>
             </Flex>
 
@@ -119,52 +127,90 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                 maxWidth: '18.75rem',
               })}
             >
-              <span
-                css={[
-                  basePromptElementStyles,
-                  css`
-                    color: #b4b4b4;
-                    font-size: 0.8125rem;
-                    font-weight: 400;
-                    line-height: 1.23;
-                  `,
-                ]}
-              >
-                To use the{' '}
-                <code
+              {isEnabled ? (
+                <span
                   css={[
                     basePromptElementStyles,
                     css`
-                      color: white;
-                      font-family: monospace;
+                      color: #b4b4b4;
+                      font-size: 0.8125rem;
+                      font-weight: 400;
                       line-height: 1.23;
                     `,
                   ]}
                 >
-                  {ctaText}
-                </code>{' '}
-                {'componentName' in props ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations feature
-                for your app first.
-              </span>
+                  The Organizations feature has been enabled for your application. You can manage or rename it in your{' '}
+                  <a
+                    css={[
+                      basePromptElementStyles,
+                      css`
+                        color: #a8a8ff;
+                        font-size: inherit;
+                        font-weight: 500;
+                        line-height: 1.5;
+                        font-size: 0.8125rem;
+                      `,
+                    ]}
+                    /* TODO - Generate URL to Dashboard */
+                    href='https://clerk.com/docs/guides/organizations'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    tabIndex={-1}
+                  >
+                    dashboard
+                  </a>
+                  .
+                </span>
+              ) : (
+                <>
+                  <span
+                    css={[
+                      basePromptElementStyles,
+                      css`
+                        color: #b4b4b4;
+                        font-size: 0.8125rem;
+                        font-weight: 400;
+                        line-height: 1.23;
+                      `,
+                    ]}
+                  >
+                    To use the{' '}
+                    <code
+                      css={[
+                        basePromptElementStyles,
+                        css`
+                          color: white;
+                          font-family: monospace;
+                          line-height: 1.23;
+                        `,
+                      ]}
+                    >
+                      {ctaText}
+                    </code>{' '}
+                    {'componentName' in props ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations
+                    feature for your app first.
+                  </span>
 
-              <a
-                css={[
-                  basePromptElementStyles,
-                  css`
-                    color: #a8a8ff;
-                    font-size: inherit;
-                    font-weight: 500;
-                    line-height: 1.5;
-                    font-size: 0.8125rem;
-                  `,
-                ]}
-                href='https://clerk.com/docs/guides/organizations'
-                target='_blank'
-                rel='noopener noreferrer'
-                tabIndex={-1}
-              >
-                Learn more about this add-on.
-              </a>
+                  <a
+                    css={[
+                      basePromptElementStyles,
+                      css`
+                        color: #a8a8ff;
+                        font-size: inherit;
+                        font-weight: 500;
+                        line-height: 1.5;
+                        font-size: 0.8125rem;
+                      `,
+                    ]}
+                    href='https://clerk.com/docs/guides/organizations'
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    tabIndex={-1}
+                  >
+                    Learn more about this add-on.
+                  </a>
+                </>
+              )}
             </Flex>
           </Flex>
 
@@ -185,61 +231,99 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
               gap: t.sizes.$3,
             })}
           >
-            <button
-              type='button'
-              onClick={handleEnableOrganizations}
-              disabled={isLoading}
-              css={css`
-                ${mainCTAStyles};
-                min-width: 100%;
-                color: white;
-                background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-                box-shadow:
-                  0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                  0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                  0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                  0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-                  0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
-
-                &:hover:not(:disabled) {
+            {isEnabled ? (
+              <button
+                type='button'
+                onClick={() => clerk?.__internal_closeEnableOrganizationsPrompt?.()}
+                css={css`
+                  ${mainCTAStyles};
+                  min-width: 100%;
+                  color: white;
+                  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
                   box-shadow:
-                    0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
                     0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
                     0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                    0px 0px 0px 1px rgba(0, 0, 0, 0.1),
-                    0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-                }
+                    0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                    0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+                    0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-                &:disabled {
-                  opacity: 0.6;
-                  cursor: not-allowed;
-                }
-              `}
-            >
-              Enable Organizations
-            </button>
+                  &:hover:not(:disabled) {
+                    box-shadow:
+                      0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
+                      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                      0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+                      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+                  }
 
-            <button
-              type='button'
-              css={css`
-                ${mainCTAStyles};
-                min-width: 100%;
-                color: white;
-                background: rgba(69, 69, 69, 0.1);
-                border: 1px solid rgba(118, 118, 132, 0.25);
+                  &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                  }
+                `}
+              >
+                Continue
+              </button>
+            ) : (
+              <>
+                <button
+                  type='button'
+                  onClick={handleEnableOrganizations}
+                  disabled={isLoading}
+                  css={css`
+                    ${mainCTAStyles};
+                    min-width: 100%;
+                    color: white;
+                    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+                    box-shadow:
+                      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+                      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+                      0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
 
-                &:hover {
-                  box-shadow:
-                    0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
-                    0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                    0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                    0px 0px 0px 1px rgba(0, 0, 0, 0.1),
-                    0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-                }
-              `}
-            >
-              I&apos;ll remove it myself
-            </button>
+                    &:hover:not(:disabled) {
+                      box-shadow:
+                        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
+                        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+                        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+                    }
+
+                    &:disabled {
+                      opacity: 0.6;
+                      cursor: not-allowed;
+                    }
+                  `}
+                >
+                  Enable Organizations
+                </button>
+
+                <button
+                  type='button'
+                  onClick={() => clerk?.__internal_closeEnableOrganizationsPrompt?.()}
+                  css={css`
+                    ${mainCTAStyles};
+                    min-width: 100%;
+                    color: white;
+                    background: rgba(69, 69, 69, 0.1);
+                    border: 1px solid rgba(118, 118, 132, 0.25);
+
+                    &:hover {
+                      box-shadow:
+                        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
+                        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+                        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+                        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+                        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+                    }
+                  `}
+                >
+                  I&apos;ll remove it myself
+                </button>
+              </>
+            )}
           </Flex>
         </PromptContainer>
       </Modal>
