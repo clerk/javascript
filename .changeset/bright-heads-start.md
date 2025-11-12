@@ -4,4 +4,4 @@
 '@clerk/types': minor
 ---
 
-Prep work to support `email_code` as a second factor when necessary. (Note: Currently behind a feature flag.)
+Support for `email_code` and `email_link` as a second factor when user is signing in on a new device.

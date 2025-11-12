@@ -126,7 +126,6 @@ export const DUMMY_CLERK_CLIENT_RESOURCE = {
   last_active_session_id: null,
   cookie_expires_at: null,
   last_authentication_strategy: null,
-  client_trust_state: 'new',
   created_at: new Date().getTime(),
   updated_at: new Date().getTime(),
 } as unknown as ClientJSONSnapshot;

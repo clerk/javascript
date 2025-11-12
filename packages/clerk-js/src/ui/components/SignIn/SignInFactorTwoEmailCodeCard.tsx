@@ -11,13 +11,10 @@ export const SignInFactorTwoEmailCodeCard = (props: SignInFactorTwoEmailCodeCard
   const signIn = useCoreSignIn();
 
   const prepare = () => {
-    // TODO: Why does the BE throw an error if I simply pass
-    // the whole factor?
     const { emailAddressId, strategy } = props.factor;
     return signIn.prepareSecondFactor({ emailAddressId, strategy });
   };
 
-  // TODO: Update the part, card title, etc.
   return (
     <Flow.Part part='emailCode2Fa'>
       <SignInFactorTwoCodeForm

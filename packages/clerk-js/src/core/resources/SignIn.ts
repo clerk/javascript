@@ -305,28 +305,6 @@ export class SignIn extends BaseResource implements SignInResource {
             });
         });
       });
-
-      // await this.prepareFirstFactor({
-      //   strategy: 'email_link',
-      //   emailAddressId: emailAddressId,
-      //   redirectUrl: redirectUrl,
-      // });
-      // return new Promise((resolve, reject) => {
-      //   void run(() => {
-      //     return this.reload()
-      //       .then(res => {
-      //         const status = res.firstFactorVerification.status;
-      //         if (status === 'verified' || status === 'expired') {
-      //           stop();
-      //           resolve(res);
-      //         }
-      //       })
-      //       .catch(err => {
-      //         stop();
-      //         reject(err);
-      //       });
-      //   });
-      // });
     };
 
     return { startEmailLinkFlow, cancelEmailLinkFlow: stop };
