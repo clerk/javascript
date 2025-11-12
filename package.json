@@ -64,9 +64,6 @@
     "version-packages:snapshot": "./scripts/snapshot.mjs",
     "yalc:all": "for d in packages/*/; do echo $d; cd $d; pnpm yalc push --replace --sig; cd '../../'; done"
   },
-  "dependencies": {
-    "@clerk/clerk-expo": "file:.yalc/@clerk/clerk-expo"
-  },
   "devDependencies": {
     "@actions/core": "^1.11.1",
     "@arethetypeswrong/cli": "0.17.4",
