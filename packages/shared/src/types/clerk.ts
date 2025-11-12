@@ -321,7 +321,14 @@ export interface Clerk {
   __internal_closeReverification: () => void;
 
   /**
-   * Opens the Clerk Enable Organizations prompt for development environments
+   * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   */
+  __internal_attemptToEnableEnvironmentSetting: (options: __internal_AttemptToEnableEnvironmentSettingParams) => {
+    status: 'enabled' | 'prompt-shown' | 'rejected';
+  };
+
+  /**
+   * Opens the Clerk Enable Organizations prompt for development instance
    */
   __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
 
@@ -1440,15 +1447,29 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
 export type __internal_EnableOrganizationsPromptProps = {
-  onComplete?: () => void;
-} & (
-  | {
-      componentName: 'OrganizationSwitcher' | 'OrganizationProfile' | 'OrganizationList';
-    }
-  | {
-      utilityName: 'useOrganizationList' | 'useOrganization';
-    }
-);
+  onSuccess?: () => void;
+  onClose?: () => void;
+} & {
+  caller:
+    | 'OrganizationSwitcher'
+    | 'OrganizationProfile'
+    | 'OrganizationList'
+    | 'useOrganizationList'
+    | 'useOrganization';
+};
+
+export type __internal_AttemptToEnableEnvironmentSettingParams = {
+  for: 'organizations';
+  caller:
+    | 'OrganizationSwitcher'
+    | 'OrganizationProfile'
+    | 'OrganizationList'
+    | 'CreateOrganization'
+    | 'TaskChooseOrganization'
+    | 'useOrganizationList'
+    | 'useOrganization';
+  onSuccess: () => void;
+};
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 

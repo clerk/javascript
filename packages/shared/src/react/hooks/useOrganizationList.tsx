@@ -1,4 +1,4 @@
-import { withOrganizationSettingsEnabled } from '../../organization';
+import { useAttemptToEnableOrganizations } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   CreateOrganizationParams,
@@ -15,7 +15,6 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContex
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
-import { useClerk } from './useClerk';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -249,10 +248,11 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * export default UserInvitationsTable
  * ```
  */
-function useOrganizationListInternal<T extends UseOrganizationListParams>(params?: T): UseOrganizationListReturn<T> {
+export function useOrganizationList<T extends UseOrganizationListParams>(params?: T): UseOrganizationListReturn<T> {
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
+  useAttemptToEnableOrganizations('useOrganizationList');
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,
@@ -398,9 +398,3 @@ function useOrganizationListInternal<T extends UseOrganizationListParams>(params
     userSuggestions: suggestions,
   };
 }
-
-export const useOrganizationList = withOrganizationSettingsEnabled(
-  useOrganizationListInternal,
-  () => useClerk(),
-  'useOrganizationList',
-);

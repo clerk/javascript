@@ -1,10 +1,9 @@
-import { getCurrentOrganizationMembership, withOrganizationSettingsEnabled } from '@clerk/shared/organization';
-import type { LoadedClerk, OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
-import { computed } from 'vue';
+import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
+import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
+import { computed, watch } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
-import { useClerk } from './useClerk';
 import { useClerkContext } from './useClerkContext';
 import { useSession } from './useSession';
 
@@ -53,9 +52,24 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
  *   </div>
  * </template>
  */
-const useOrganizationInternal: UseOrganization = () => {
+export const useOrganization: UseOrganization = () => {
   const { clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
+
+  const unwatch = watch(
+    clerk,
+    value => {
+      if (value) {
+        value.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'useOrganization',
+          onSuccess: () => {},
+        });
+        unwatch();
+      }
+    },
+    { immediate: true },
+  );
 
   const result = computed<UseOrganizationReturn>(() => {
     if (organizationCtx.value === undefined) {
@@ -88,9 +102,3 @@ const useOrganizationInternal: UseOrganization = () => {
 
   return toComputedRefs(result);
 };
-
-export const useOrganization = withOrganizationSettingsEnabled(
-  useOrganizationInternal,
-  () => useClerk().value as LoadedClerk,
-  'useOrganization',
-);

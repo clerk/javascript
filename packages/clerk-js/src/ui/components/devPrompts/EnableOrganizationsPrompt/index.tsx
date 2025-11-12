@@ -12,8 +12,11 @@ import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, PromptContainer, PromptSuccessIcon } from '../shared';
 
-const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizationsPromptProps) => {
-  const ctaText = 'componentName' in props ? `<${props.componentName} />` : props.utilityName;
+const EnableOrganizationsPromptInternal = ({
+  caller,
+  onSuccess,
+  onClose,
+}: __internal_EnableOrganizationsPromptProps) => {
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,7 +35,6 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
         // as a persistent state
         // By the time the user refreshes the page, the environment will be updated and the prompt will not be shown again
         environment.organizationSettings.__internal_enableInMemory();
-        props.onComplete?.();
       })
       .finally(() => {
         setIsLoading(false);
@@ -174,7 +176,7 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                       `,
                     ]}
                   >
-                    To use the{' '}
+                    To use{' '}
                     <code
                       css={[
                         basePromptElementStyles,
@@ -185,10 +187,9 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                         `,
                       ]}
                     >
-                      {ctaText}
-                    </code>{' '}
-                    {'componentName' in props ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations
-                    feature for your app first.
+                      {caller}
+                    </code>
+                    , you&apos;ll need to enable the Organizations feature for your app first.
                   </span>
 
                   <a
@@ -202,12 +203,12 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
                         font-size: 0.8125rem;
                       `,
                     ]}
-                    href='https://clerk.com/docs/guides/organizations'
+                    href='https://clerk.com/docs/guides/organizations/overview'
                     target='_blank'
                     rel='noopener noreferrer'
                     tabIndex={-1}
                   >
-                    Learn more about this add-on.
+                    Learn more about Organizations.
                   </a>
                 </>
               )}
@@ -234,7 +235,7 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
             {isEnabled ? (
               <PromptButton
                 variant='outline'
-                onClick={() => clerk?.__internal_closeEnableOrganizationsPrompt?.()}
+                onClick={() => onSuccess?.()}
               >
                 Continue
               </PromptButton>
@@ -250,7 +251,10 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
 
                 <PromptButton
                   variant='outline'
-                  onClick={() => clerk?.__internal_closeEnableOrganizationsPrompt?.()}
+                  onClick={() => {
+                    clerk?.__internal_closeEnableOrganizationsPrompt?.();
+                    onClose?.();
+                  }}
                 >
                   I&apos;ll remove it myself
                 </PromptButton>

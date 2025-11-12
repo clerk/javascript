@@ -1,4 +1,4 @@
-import { getCurrentOrganizationMembership, withOrganizationSettingsEnabled } from '../../organization';
+import { getCurrentOrganizationMembership, useAttemptToEnableOrganizations } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   GetDomainsParams,
@@ -20,7 +20,6 @@ import {
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
-import { useClerk } from './useClerk';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -272,7 +271,7 @@ const undefinedPaginatedResource = {
  * }
  * ```
  */
-function useOrganizationInternal<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
+export function useOrganization<T extends UseOrganizationParams>(params?: T): UseOrganizationReturn<T> {
   const {
     domains: domainListParams,
     membershipRequests: membershipRequestsListParams,
@@ -281,6 +280,7 @@ function useOrganizationInternal<T extends UseOrganizationParams>(params?: T): U
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization');
 
   const { organization } = useOrganizationContext();
   const session = useSessionContext();
@@ -495,9 +495,3 @@ function useOrganizationInternal<T extends UseOrganizationParams>(params?: T): U
     invitations,
   };
 }
-
-export const useOrganization = withOrganizationSettingsEnabled(
-  useOrganizationInternal,
-  () => useClerk(),
-  'useOrganization',
-);
