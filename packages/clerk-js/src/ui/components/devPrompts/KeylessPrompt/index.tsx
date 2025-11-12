@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import { Flex, Link } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { InternalThemeProvider } from '../../../styledSystem';
-import { basePromptElementStyles, PromptContainer, PromptSuccessIcon } from '../shared';
+import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
 import { ClerkLogoIcon } from './ClerkLogoIcon';
 import { KeySlashIcon } from './KeySlashIcon';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
@@ -32,25 +32,6 @@ function withLastActiveFallback(cb: () => string): string {
   } catch {
     return 'https://dashboard.clerk.com/last-active';
   }
-}
-
-function handleDashboardUrlParsing(url: string) {
-  // make sure this is a valid url
-  const __url = new URL(url);
-  const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
-
-  const match = __url.href.match(regex);
-
-  if (!match) {
-    throw new Error('invalid value dashboard url structure');
-  }
-
-  // Extracting base domain, app ID with prefix, and instanceId with prefix
-  return {
-    baseDomain: `https://${match[1]}`,
-    appId: `app_${match[2]}`,
-    instanceId: `ins_${match[3]}`,
-  };
 }
 
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {

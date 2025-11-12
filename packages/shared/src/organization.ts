@@ -38,7 +38,6 @@ export function useAttemptToEnableOrganizations(caller: 'useOrganization' | 'use
     clerk.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller,
-      onSuccess: () => {},
     });
   }, [clerk, caller]);
 }

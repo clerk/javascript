@@ -752,7 +752,7 @@ export class Clerk implements ClerkInterface {
   ): { status: 'enabled' | 'prompt-shown' } => {
     const { for: setting, caller } = params;
 
-    // If not in development instance, return enabled status in order to not open the in-app prompt
+    // If not in development instance, return enabled status in order to not open the prompt
     if (this.#instanceType !== 'development') {
       return { status: 'enabled' };
     }

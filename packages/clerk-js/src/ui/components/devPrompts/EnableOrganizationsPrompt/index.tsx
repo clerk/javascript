@@ -2,15 +2,27 @@ import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
 import { InternalThemeProvider } from '@/ui/styledSystem';
 
 import { DevTools } from '../../../../core/resources/DevTools';
+import type { Environment } from '../../../../core/resources/Environment';
 import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
-import { basePromptElementStyles, PromptContainer, PromptSuccessIcon } from '../shared';
+import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
+
+/**
+ * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
+ */
+function withLastActiveFallback(cb: () => string): string {
+  try {
+    return cb();
+  } catch {
+    return 'https://dashboard.clerk.com/last-active?path=organization-settings';
+  }
+}
 
 const EnableOrganizationsPromptInternal = ({
   caller,
@@ -20,6 +32,28 @@ const EnableOrganizationsPromptInternal = ({
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+
+  // @ts-expect-error - __unstable__environment is not typed
+  const environment = clerk?.__unstable__environment as Environment | undefined;
+
+  const organizationsDashboardUrl = useMemo(() => {
+    return withLastActiveFallback(() => {
+      const currentUrl = window.location.href;
+      try {
+        const redirectUrlParts = handleDashboardUrlParsing(currentUrl);
+        const url = new URL(
+          `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/organizations`,
+        );
+        return url.href;
+      } catch {
+        if (!environment?.id) {
+          throw new Error('Cannot construct dashboard URL');
+        }
+
+        return 'https://dashboard.clerk.com/last-active?path=organization-settings';
+      }
+    });
+  }, [environment?.id]);
 
   const handleEnableOrganizations = () => {
     setIsLoading(true);
@@ -181,7 +215,8 @@ const EnableOrganizationsPromptInternal = ({
                     `,
                   ]}
                 >
-                  The Organizations feature has been enabled for your application. You can manage or rename it in your{' '}
+                  The Organizations feature has been enabled for your application. A default organization named &quot;My
+                  Organization&quot; was created automatically. You can manage or rename it in your{' '}
                   <a
                     css={[
                       basePromptElementStyles,
@@ -193,8 +228,7 @@ const EnableOrganizationsPromptInternal = ({
                         font-size: 0.8125rem;
                       `,
                     ]}
-                    /* TODO - Generate URL to Dashboard */
-                    href='https://clerk.com/docs/guides/organizations'
+                    href={organizationsDashboardUrl}
                     target='_blank'
                     rel='noopener noreferrer'
                     tabIndex={-1}

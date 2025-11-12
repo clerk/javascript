@@ -81,3 +81,21 @@ export function PromptSuccessIcon(props: React.ComponentProps<'svg'>) {
     </svg>
   );
 }
+
+export function handleDashboardUrlParsing(url: string) {
+  const __url = new URL(url);
+  const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
+
+  const match = __url.href.match(regex);
+
+  if (!match) {
+    throw new Error('Invalid value Dashboard URL structure');
+  }
+
+  // Extracting base domain, app ID with prefix, and instanceId with prefix
+  return {
+    baseDomain: `https://${match[1]}`,
+    appId: `app_${match[2]}`,
+    instanceId: `ins_${match[3]}`,
+  };
+}
