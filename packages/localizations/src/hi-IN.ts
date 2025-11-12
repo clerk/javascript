@@ -615,10 +615,10 @@ export const hiIN: LocalizationResource = {
       title: 'अपना ईमेल जांचें',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'अपना ईमेल जांचें',
+      resendButton: 'कोड नहीं मिला? फिर से भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
     },
     emailLink: {
       clientMismatch: {
@@ -657,7 +657,6 @@ export const hiIN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',
-      formTitle: 'अपना ईमेल जांचें',
       resendButton: 'लिंक नहीं मिला? पुनः भेजें',
       subtitle: '{{applicationName}} पर जारी रखने के लिए',
       title: 'अपना ईमेल जांचें',

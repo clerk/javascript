@@ -621,10 +621,10 @@ export const faIR: LocalizationResource = {
       title: 'ایمیل خود را بررسی کنید',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'ایمیل خود را بررسی کنید',
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
     },
     emailLink: {
       clientMismatch: {
@@ -664,7 +664,6 @@ export const faIR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
-      formTitle: 'ایمیل خود را بررسی کنید',
       resendButton: 'لینک را دریافت نکردید؟ ارسال مجدد',
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',

@@ -615,10 +615,10 @@ export const skSK: LocalizationResource = {
       title: 'Skontrolujte svoj email',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Skontrolujte svoj email',
+      resendButton: 'Nedostali ste kód? Znova odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj email',
     },
     emailLink: {
       clientMismatch: {
@@ -657,7 +657,6 @@ export const skSK: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Použite overovací odkaz odoslaný na váš e-mail',
-      formTitle: 'Skontrolujte svoj e-mail',
       resendButton: 'Nedostali ste odkaz? Znovu odoslať',
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Skontrolujte svoj e-mail',

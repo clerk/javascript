@@ -621,10 +621,10 @@ export const ruRU: LocalizationResource = {
       title: 'Проверьте Вашу почту',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Проверьте Вашу почту',
+      resendButton: 'Не получили код? Отправить снова.',
+      subtitle: 'для продолжения работы в "{{applicationName}}"',
+      title: 'Проверьте Вашу почту',
     },
     emailLink: {
       clientMismatch: {
@@ -664,7 +664,6 @@ export const ruRU: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
-      formTitle: 'Проверьте свою электронную почту',
       resendButton: 'Не получили ссылку? Отправить повторно',
       subtitle: 'чтобы продолжить в {{applicationName}}',
       title: 'Проверьте свою электронную почту',

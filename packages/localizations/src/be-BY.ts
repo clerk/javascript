@@ -617,10 +617,10 @@ export const beBY: LocalizationResource = {
       title: 'Праверце вашу пошту',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Праверце вашу пошту',
+      resendButton: 'Не атрымалі код? Адпраўце яшчэ раз',
+      subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      title: 'Праверце вашу пошту',
     },
     emailLink: {
       clientMismatch: {
@@ -660,7 +660,6 @@ export const beBY: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Выкарыстоўвайце спасылку для пацвярджэння, адпраўленую на вашу электронную пошту',
-      formTitle: 'Праверце сваю электронную пошту',
       resendButton: 'Не атрымалі спасылку? Адправіць зноў',
       subtitle: 'каб працягнуць да {{applicationName}}',
       title: 'Праверце сваю электронную пошту',

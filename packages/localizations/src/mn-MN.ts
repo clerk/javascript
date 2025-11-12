@@ -614,10 +614,10 @@ export const mnMN: LocalizationResource = {
       title: 'Имэйлээ шалгана уу',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Имэйлээ шалгана уу',
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
+      subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
+      title: 'Имэйлээ шалгана уу',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const mnMN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Имэйлдээ илгээсэн баталгаажуулах холбоосыг ашиглана уу',
-      formTitle: 'Имэйлээ шалгана уу',
       resendButton: 'Холбоос хүлээн авсангүй? Дахин илгээх',
       subtitle: '{{applicationName}} руу үргэлжлүүлэх',
       title: 'Имэйлээ шалгана уу',

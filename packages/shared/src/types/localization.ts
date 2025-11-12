@@ -488,7 +488,6 @@ export type __internal_LocalizationResource = {
     emailLinkMfa: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
-      formTitle: LocalizationValue;
       formSubtitle: LocalizationValue;
       resendButton: LocalizationValue;
     };

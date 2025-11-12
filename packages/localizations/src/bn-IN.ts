@@ -616,10 +616,10 @@ export const bnIN: LocalizationResource = {
       title: 'আপনার ইমেইল চেক করুন',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'আপনার ইমেইল চেক করুন',
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
+      subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
+      title: 'আপনার ইমেইল চেক করুন',
     },
     emailLink: {
       clientMismatch: {
@@ -658,7 +658,6 @@ export const bnIN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',
-      formTitle: 'আপনার ইমেইল পরীক্ষা করুন',
       resendButton: 'লিঙ্ক পাননি? আবার পাঠান',
       subtitle: '{{applicationName}} এ চালিয়ে যেতে',
       title: 'আপনার ইমেইল পরীক্ষা করুন',

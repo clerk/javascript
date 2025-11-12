@@ -613,10 +613,10 @@ export const hrHR: LocalizationResource = {
       title: 'Provjerite svoju e-poštu',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Provjerite svoju e-poštu',
+      resendButton: 'Niste primili kod? Pošalji ponovno',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const hrHR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Koristite vezu za provjeru poslanu na vašu e-poštu',
-      formTitle: 'Provjerite svoju e-poštu',
       resendButton: 'Niste primili vezu? Ponovno pošalji',
       subtitle: 'za nastavak na {{applicationName}}',
       title: 'Provjerite svoju e-poštu',

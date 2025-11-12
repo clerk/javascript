@@ -623,10 +623,10 @@ export const roRO: LocalizationResource = {
       title: 'Verifică-ți emailul',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Verifică-ți emailul',
+      resendButton: 'Nu ai primit un cod? Retrimite',
+      subtitle: 'pentru a continua la {{applicationName}}',
+      title: 'Verifică-ți emailul',
     },
     emailLink: {
       clientMismatch: {
@@ -666,7 +666,6 @@ export const roRO: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Folosiți linkul de verificare trimis la adresa dvs. de e-mail',
-      formTitle: 'Verificați-vă e-mailul',
       resendButton: 'Nu ați primit linkul? Retrimiteți',
       subtitle: 'pentru a continua către {{applicationName}}',
       title: 'Verificați-vă e-mailul',

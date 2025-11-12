@@ -605,10 +605,10 @@ export const kkKZ: LocalizationResource = {
       title: 'Электрондық поштаңызды тексеріңіз',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Электрондық поштаңызды тексеріңіз',
+      resendButton: 'Код алмадыңыз ба? Қайта жіберу',
+      subtitle: '{{applicationName}} қолдануды жалғастыру үшін',
+      title: 'Электрондық поштаңызды тексеріңіз',
     },
     emailLink: {
       clientMismatch: {
@@ -647,7 +647,6 @@ export const kkKZ: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Электрондық поштаңызға жіберілген растау сілтемесін пайдаланыңыз',
-      formTitle: 'Электрондық поштаңызды тексеріңіз',
       resendButton: 'Сілтеме алмадыңыз ба? Қайта жіберу',
       subtitle: '{{applicationName}} қосымшасына жалғастыру үшін',
       title: 'Электрондық поштаңызды тексеріңіз',

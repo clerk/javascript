@@ -614,10 +614,10 @@ export const nlNL: LocalizationResource = {
       title: 'Check je e-mail',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Check je e-mail',
+      resendButton: 'Niet ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Check je e-mail',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const nlNL: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Gebruik de verificatielink die naar je e-mail is verzonden',
-      formTitle: 'Controleer je e-mail',
       resendButton: 'Geen link ontvangen? Opnieuw verzenden',
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Controleer je e-mail',

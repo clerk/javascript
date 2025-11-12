@@ -622,10 +622,10 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu e-mail',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Verifique seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique seu e-mail',
     },
     emailLink: {
       clientMismatch: {
@@ -664,7 +664,6 @@ export const ptBR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Use o link de verificação enviado para o seu e-mail',
-      formTitle: 'Verifique seu e-mail',
       resendButton: 'Não recebeu o link? Reenviar',
       subtitle: 'para continuar para {{applicationName}}',
       title: 'Verifique seu e-mail',

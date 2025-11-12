@@ -615,10 +615,10 @@ export const idID: LocalizationResource = {
       title: 'Periksa email Anda',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Periksa email Anda',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
     },
     emailLink: {
       clientMismatch: {
@@ -658,7 +658,6 @@ export const idID: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Gunakan tautan verifikasi yang dikirim ke email Anda',
-      formTitle: 'Periksa email Anda',
       resendButton: 'Tidak menerima tautan? Kirim ulang',
       subtitle: 'untuk melanjutkan ke {{applicationName}}',
       title: 'Periksa email Anda',

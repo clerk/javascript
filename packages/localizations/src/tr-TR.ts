@@ -613,10 +613,10 @@ export const trTR: LocalizationResource = {
       title: 'E-posta kutunuzu kontrol edin',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'E-posta kutunuzu kontrol edin',
+      resendButton: 'Kod almadınız mı? Tekrar gönderin',
+      subtitle: '{{applicationName}} ile devam etmek için',
+      title: 'E-posta kutunuzu kontrol edin',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const trTR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',
-      formTitle: 'E-postanızı kontrol edin',
       resendButton: 'Bağlantıyı almadınız mı? Yeniden gönder',
       subtitle: '{{applicationName}} uygulamasına devam etmek için',
       title: 'E-postanızı kontrol edin',

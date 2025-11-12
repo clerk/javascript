@@ -626,10 +626,10 @@ export const deDE: LocalizationResource = {
       title: 'Überprüfen Sie Ihren Posteingang',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Überprüfen Sie Ihren Posteingang',
+      resendButton: 'Bestätigungscode nicht erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
     },
     emailLink: {
       clientMismatch: {
@@ -668,7 +668,6 @@ export const deDE: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Verwenden Sie den an Ihre E-Mail gesendeten Bestätigungslink',
-      formTitle: 'Überprüfen Sie Ihren Posteingang',
       resendButton: 'Keinen Link erhalten? Erneut senden',
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Überprüfen Sie Ihren Posteingang',

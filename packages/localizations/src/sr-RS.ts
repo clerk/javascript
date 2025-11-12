@@ -612,10 +612,10 @@ export const srRS: LocalizationResource = {
       title: 'Proveri svoj e-mail',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Proveri svoj e-mail',
+      resendButton: 'Nisi primio kod? Pošalji ponovo',
+      subtitle: 'da nastaviš na {{applicationName}}',
+      title: 'Proveri svoj e-mail',
     },
     emailLink: {
       clientMismatch: {
@@ -654,7 +654,6 @@ export const srRS: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Користите везу за верификацију послату на вашу е-пошту',
-      formTitle: 'Проверите своју е-пошту',
       resendButton: 'Нисте примили везу? Пошаљи поново',
       subtitle: 'да наставите на {{applicationName}}',
       title: 'Проверите своју е-пошту',

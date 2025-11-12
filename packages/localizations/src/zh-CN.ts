@@ -603,10 +603,10 @@ export const zhCN: LocalizationResource = {
       title: '查看您的电子邮件',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: '查看您的电子邮件',
+      resendButton: '未收到验证码？重新发送',
+      subtitle: '继续使用 {{applicationName}}',
+      title: '查看您的电子邮件',
     },
     emailLink: {
       clientMismatch: {
@@ -645,7 +645,6 @@ export const zhCN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: '使用发送到您电子邮件的验证链接',
-      formTitle: '查看您的电子邮件',
       resendButton: '没有收到链接？重新发送',
       subtitle: '继续使用 {{applicationName}}',
       title: '查看您的电子邮件',

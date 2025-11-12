@@ -616,10 +616,10 @@ export const esUY: LocalizationResource = {
       title: 'Revisá tu correo',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Revisá tu correo',
+      resendButton: '¿No recibiste un código? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revisá tu correo',
     },
     emailLink: {
       clientMismatch: {
@@ -659,7 +659,6 @@ export const esUY: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',
-      formTitle: 'Revisa tu correo electrónico',
       resendButton: '¿No recibiste el enlace? Reenviar',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Revisa tu correo electrónico',

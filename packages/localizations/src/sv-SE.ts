@@ -614,10 +614,10 @@ export const svSE: LocalizationResource = {
       title: 'Kontrollera din e-post',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Kontrollera din e-post',
+      resendButton: 'Fick du ingen kod? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din e-post',
     },
     emailLink: {
       clientMismatch: {
@@ -657,7 +657,6 @@ export const svSE: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Använd verifieringslänken som skickades till din e-post',
-      formTitle: 'Kontrollera din e-post',
       resendButton: 'Fick du inte länken? Skicka igen',
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',

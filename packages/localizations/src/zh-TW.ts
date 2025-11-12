@@ -603,10 +603,10 @@ export const zhTW: LocalizationResource = {
       title: '檢查您的電子郵件',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: '檢查您的電子郵件',
+      resendButton: '沒收到驗證碼？重新傳送',
+      subtitle: '以繼續前往 {{applicationName}}',
+      title: '檢查您的電子郵件',
     },
     emailLink: {
       clientMismatch: {
@@ -645,7 +645,6 @@ export const zhTW: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: '使用發送到您電子郵件的驗證連結',
-      formTitle: '查看您的電子郵件',
       resendButton: '沒有收到連結？重新發送',
       subtitle: '繼續使用 {{applicationName}}',
       title: '查看您的電子郵件',

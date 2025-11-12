@@ -613,10 +613,10 @@ export const daDK: LocalizationResource = {
       title: 'Tjek din email',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Tjek din email',
+      resendButton: 'Modtog du ikke en kode? Send igen',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      title: 'Tjek din email',
     },
     emailLink: {
       clientMismatch: {
@@ -655,7 +655,6 @@ export const daDK: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Brug bekræftelseslinket, der er sendt til din e-mail',
-      formTitle: 'Tjek din e-mail',
       resendButton: 'Har du ikke modtaget linket? Send igen',
       subtitle: 'for at fortsætte til {{applicationName}}',
       title: 'Tjek din e-mail',

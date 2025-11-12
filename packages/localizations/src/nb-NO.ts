@@ -613,10 +613,10 @@ export const nbNO: LocalizationResource = {
       title: 'Sjekk e-posten din',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Sjekk e-posten din',
+      resendButton: 'Ikke mottatt kode? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk e-posten din',
     },
     emailLink: {
       clientMismatch: {
@@ -655,7 +655,6 @@ export const nbNO: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',
-      formTitle: 'Sjekk din e-post',
       resendButton: 'Har du ikke mottatt lenken? Send på nytt',
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Sjekk din e-post',

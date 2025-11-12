@@ -609,10 +609,10 @@ export const koKR: LocalizationResource = {
       title: '이메일을 확인하세요',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: '이메일을 확인하세요',
+      resendButton: '코드를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}로 계속하려면',
+      title: '이메일을 확인하세요',
     },
     emailLink: {
       clientMismatch: {
@@ -651,7 +651,6 @@ export const koKR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',
-      formTitle: '이메일을 확인하세요',
       resendButton: '링크를 받지 못하셨나요? 다시 보내기',
       subtitle: '{{applicationName}}(으)로 계속',
       title: '이메일을 확인하세요',

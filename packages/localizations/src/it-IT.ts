@@ -621,10 +621,10 @@ export const itIT: LocalizationResource = {
       title: 'Controlla la tua email',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Controlla la tua email',
+      resendButton: 'Non hai ricevuto un codice? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
     },
     emailLink: {
       clientMismatch: {
@@ -663,7 +663,6 @@ export const itIT: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Usa il link di verifica inviato alla tua email',
-      formTitle: 'Controlla la tua email',
       resendButton: 'Non hai ricevuto il link? Reinvia',
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Controlla la tua email',

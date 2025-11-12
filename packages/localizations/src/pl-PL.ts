@@ -614,10 +614,10 @@ export const plPL: LocalizationResource = {
       title: 'Sprawdź swoją pocztę e-mail',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Sprawdź swoją pocztę e-mail',
+      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+      subtitle: 'aby kontynuować w {{applicationName}}',
+      title: 'Sprawdź swoją pocztę e-mail',
     },
     emailLink: {
       clientMismatch: {
@@ -657,7 +657,6 @@ export const plPL: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Użyj linku weryfikacyjnego wysłanego na Twój e-mail',
-      formTitle: 'Sprawdź swoją pocztę',
       resendButton: 'Nie otrzymałeś linku? Wyślij ponownie',
       subtitle: 'aby kontynuować do {{applicationName}}',
       title: 'Sprawdź swoją pocztę',

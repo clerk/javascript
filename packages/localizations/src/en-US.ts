@@ -654,7 +654,6 @@ export const enUS: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Use the verification link sent to your email',
-      formTitle: 'Check your email',
       resendButton: "Didn't receive a link? Resend",
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',

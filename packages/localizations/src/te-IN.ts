@@ -617,10 +617,10 @@ export const teIN: LocalizationResource = {
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
+      subtitle: '{{applicationName}}కి కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
     emailLink: {
       clientMismatch: {
@@ -659,7 +659,6 @@ export const teIN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'మీ ఇమెయిల్‌కు పంపబడిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
-      formTitle: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
       resendButton: 'లింక్ రాలేదా? మళ్లీ పంపండి',
       subtitle: '{{applicationName}} కు కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',

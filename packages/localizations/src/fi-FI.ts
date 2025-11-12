@@ -614,10 +614,10 @@ export const fiFI: LocalizationResource = {
       title: 'Tarkista sähköpostisi',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Tarkista sähköpostisi',
+      resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const fiFI: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
-      formTitle: 'Tarkista sähköpostisi',
       resendButton: 'Etkö saanut linkkiä? Lähetä uudelleen',
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',

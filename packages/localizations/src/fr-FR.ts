@@ -628,10 +628,10 @@ export const frFR: LocalizationResource = {
       title: 'Vérifiez votre messagerie',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Vérifiez votre messagerie',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
     },
     emailLink: {
       clientMismatch: {
@@ -670,7 +670,6 @@ export const frFR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
-      formTitle: 'Vérifiez votre messagerie',
       resendButton: "Vous n'avez pas reçu de lien ? Renvoyer",
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre messagerie',

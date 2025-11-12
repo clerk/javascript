@@ -614,10 +614,10 @@ export const elGR: LocalizationResource = {
       title: 'Ελέγξτε το email σας',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Ελέγξτε το email σας',
+      resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const elGR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
-      formTitle: 'Ελέγξτε το email σας',
       resendButton: 'Δεν λάβατε τον σύνδεσμο; Επανάληψη αποστολής',
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Ελέγξτε το email σας',

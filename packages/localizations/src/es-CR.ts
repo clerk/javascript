@@ -617,10 +617,10 @@ export const esCR: LocalizationResource = {
       title: 'Revise su correo electrónico',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Revise su correo electrónico',
+      resendButton: '¿No recibiste un código? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revise su correo electrónico',
     },
     emailLink: {
       clientMismatch: {
@@ -660,7 +660,6 @@ export const esCR: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',
-      formTitle: 'Revisa tu correo electrónico',
       resendButton: '¿No recibiste el enlace? Reenviar',
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Revisa tu correo electrónico',

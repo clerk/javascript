@@ -612,10 +612,10 @@ export const ukUA: LocalizationResource = {
       title: 'Перевірте свою електронну пошту',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Перевірте свою електронну пошту',
+      resendButton: 'Не отримали код? Повторно відправити',
+      subtitle: 'продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
     },
     emailLink: {
       clientMismatch: {
@@ -654,7 +654,6 @@ export const ukUA: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',
-      formTitle: 'Перевірте свою електронну пошту',
       resendButton: 'Не отримали посилання? Надіслати знову',
       subtitle: 'щоб продовжити до {{applicationName}}',
       title: 'Перевірте свою електронну пошту',

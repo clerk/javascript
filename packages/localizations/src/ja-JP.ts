@@ -613,10 +613,10 @@ export const jaJP: LocalizationResource = {
       title: 'メールを確認',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'メールを確認',
+      resendButton: 'コードが届いていませんか？再送信',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
+      title: 'メールを確認',
     },
     emailLink: {
       clientMismatch: {
@@ -655,7 +655,6 @@ export const jaJP: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'メールに送信された確認リンクを使用してください',
-      formTitle: 'メールを確認してください',
       resendButton: 'リンクが届いていませんか？再送信',
       subtitle: '{{applicationName}} に続行',
       title: 'メールを確認してください',

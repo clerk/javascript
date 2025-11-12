@@ -614,10 +614,10 @@ export const isIS: LocalizationResource = {
       title: 'Athugaðu tölvupóstinn þinn',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Athugaðu tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
     },
     emailLink: {
       clientMismatch: {
@@ -657,7 +657,6 @@ export const isIS: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',
-      formTitle: 'Athugaðu tölvupóstinn þinn',
       resendButton: 'Fékkstu ekki tengilinn? Senda aftur',
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',

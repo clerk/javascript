@@ -617,10 +617,10 @@ export const msMY: LocalizationResource = {
       title: 'Periksa e-mel anda',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Periksa e-mel anda',
+      resendButton: 'Tidak menerima kod? Hantar semula',
+      subtitle: 'untuk meneruskan ke {{applicationName}}',
+      title: 'Periksa e-mel anda',
     },
     emailLink: {
       clientMismatch: {
@@ -660,7 +660,6 @@ export const msMY: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Gunakan pautan pengesahan yang dihantar ke e-mel anda',
-      formTitle: 'Semak e-mel anda',
       resendButton: 'Tidak menerima pautan? Hantar semula',
       subtitle: 'untuk meneruskan ke {{applicationName}}',
       title: 'Semak e-mel anda',

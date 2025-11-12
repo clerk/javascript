@@ -620,10 +620,10 @@ export const viVN: LocalizationResource = {
       title: 'Kiểm tra email',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Kiểm tra email',
+      resendButton: 'Không nhận được mã? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email',
     },
     emailLink: {
       clientMismatch: {
@@ -662,7 +662,6 @@ export const viVN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',
-      formTitle: 'Kiểm tra email của bạn',
       resendButton: 'Không nhận được liên kết? Gửi lại',
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Kiểm tra email của bạn',

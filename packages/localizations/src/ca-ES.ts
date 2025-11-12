@@ -614,10 +614,10 @@ export const caES: LocalizationResource = {
       title: 'Comprova el teu correu electrònic',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Comprova el teu correu electrònic',
+      resendButton: 'No has rebut el codi? Reenvia',
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comprova el teu correu electrònic',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const caES: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: "Utilitzeu l'enllaç de verificació enviat al vostre correu electrònic",
-      formTitle: 'Comproveu el vostre correu electrònic',
       resendButton: "No heu rebut l'enllaç? Reenviar",
       subtitle: 'per continuar a {{applicationName}}',
       title: 'Comproveu el vostre correu electrònic',

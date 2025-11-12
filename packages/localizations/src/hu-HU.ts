@@ -613,10 +613,10 @@ export const huHU: LocalizationResource = {
       title: 'Ellenőrizd az emailed',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Ellenőrizd az emailed',
+      resendButton: 'Nem kaptad meg a kódot? Újraküldés',
+      subtitle: 'hogy folytathasd a(z) {{applicationName}}',
+      title: 'Ellenőrizd az emailed',
     },
     emailLink: {
       clientMismatch: {
@@ -655,7 +655,6 @@ export const huHU: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Használja az e-mail címére küldött megerősítő linket',
-      formTitle: 'Ellenőrizze az e-mailjét',
       resendButton: 'Nem kapta meg a linket? Újraküldés',
       subtitle: 'a folytatáshoz a {{applicationName}} alkalmazásban',
       title: 'Ellenőrizze az e-mailjét',

@@ -607,10 +607,10 @@ export const heIL: LocalizationResource = {
       title: 'בדוק את הדוא"ל שלך',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'בדוק את הדוא"ל שלך',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      title: 'בדוק את הדוא"ל שלך',
     },
     emailLink: {
       clientMismatch: {
@@ -649,7 +649,6 @@ export const heIL: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'השתמש בקישור האימות שנשלח לדוא״ל שלך',
-      formTitle: 'בדוק את הדוא״ל שלך',
       resendButton: 'לא קיבלת את הקישור? שלח שוב',
       subtitle: 'כדי להמשיך ל-{{applicationName}}',
       title: 'בדוק את הדוא״ל שלך',

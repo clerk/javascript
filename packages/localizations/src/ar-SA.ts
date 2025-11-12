@@ -611,10 +611,10 @@ export const arSA: LocalizationResource = {
       title: 'التحقق من البريد الإلكتروني',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'التحقق من البريد الإلكتروني',
+      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'التحقق من البريد الإلكتروني',
     },
     emailLink: {
       clientMismatch: {
@@ -653,7 +653,6 @@ export const arSA: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',
-      formTitle: 'تحقق من بريدك الإلكتروني',
       resendButton: 'لم تستلم الرابط؟ إعادة الإرسال',
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'تحقق من بريدك الإلكتروني',

@@ -620,10 +620,10 @@ export const csCZ: LocalizationResource = {
       title: 'Zkontrolujte svůj e-mail',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Zkontrolujte svůj e-mail',
+      resendButton: 'Neobdrželi jste kód? Znovu poslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
     },
     emailLink: {
       clientMismatch: {
@@ -663,7 +663,6 @@ export const csCZ: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',
-      formTitle: 'Zkontrolujte svůj e-mail',
       resendButton: 'Nedostali jste odkaz? Znovu odeslat',
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zkontrolujte svůj e-mail',

@@ -618,10 +618,10 @@ export const taIN: LocalizationResource = {
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+      resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
     emailLink: {
       clientMismatch: {
@@ -660,7 +660,6 @@ export const taIN: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',
-      formTitle: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
       resendButton: 'இணைப்பு கிடைக்கவில்லையா? மீண்டும் அனுப்பவும்',
       subtitle: '{{applicationName}} க்கு தொடர',
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',

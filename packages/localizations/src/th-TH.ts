@@ -615,10 +615,10 @@ export const thTH: LocalizationResource = {
       title: 'ตรวจสอบอีเมลของคุณ',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'ตรวจสอบอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
+      subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
     },
     emailLink: {
       clientMismatch: {
@@ -657,7 +657,6 @@ export const thTH: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',
-      formTitle: 'ตรวจสอบอีเมลของคุณ',
       resendButton: 'ไม่ได้รับลิงก์? ส่งอีกครั้ง',
       subtitle: 'เพื่อดำเนินการต่อที่ {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',

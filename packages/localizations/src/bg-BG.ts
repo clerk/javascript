@@ -614,10 +614,10 @@ export const bgBG: LocalizationResource = {
       title: 'Проверете вашия имейл',
     },
     emailCodeMfa: {
-      formTitle: undefined,
-      resendButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formTitle: 'Проверете вашия имейл',
+      resendButton: 'Не сте получили код? Изпрати отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете вашия имейл',
     },
     emailLink: {
       clientMismatch: {
@@ -656,7 +656,6 @@ export const bgBG: LocalizationResource = {
     },
     emailLinkMfa: {
       formSubtitle: 'Използвайте връзката за потвърждение, изпратена на вашия имейл',
-      formTitle: 'Проверете имейла си',
       resendButton: 'Не получихте връзката? Изпратете отново',
       subtitle: 'за да продължите към {{applicationName}}',
       title: 'Проверете имейла си',
