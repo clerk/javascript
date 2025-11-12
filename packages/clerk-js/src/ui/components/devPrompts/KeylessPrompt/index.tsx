@@ -178,7 +178,12 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             })}
           >
             {success ? (
-              <PromptSuccessIcon />
+              <PromptSuccessIcon
+                css={css`
+                  width: 1rem;
+                  height: 1rem;
+                `}
+              />
             ) : claimed ? (
               <svg
                 width='1rem'

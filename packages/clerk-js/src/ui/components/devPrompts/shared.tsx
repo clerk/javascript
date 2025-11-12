@@ -55,11 +55,10 @@ export const basePromptElementStyles = css`
   text-decoration: none;
 `;
 
-export function PromptSuccessIcon() {
+export function PromptSuccessIcon(props: React.ComponentProps<'svg'>) {
   return (
     <svg
-      width='1rem'
-      height='1rem'
+      {...props}
       viewBox='0 0 16 17'
       fill='none'
       aria-hidden
