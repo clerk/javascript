@@ -232,96 +232,28 @@ const EnableOrganizationsPromptInternal = (props: __internal_EnableOrganizations
             })}
           >
             {isEnabled ? (
-              <button
-                type='button'
+              <PromptButton
+                variant='outline'
                 onClick={() => clerk?.__internal_closeEnableOrganizationsPrompt?.()}
-                css={css`
-                  ${mainCTAStyles};
-                  min-width: 100%;
-                  color: white;
-                  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-                  box-shadow:
-                    0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                    0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                    0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                    0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-                    0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
-
-                  &:hover:not(:disabled) {
-                    box-shadow:
-                      0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
-                      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                      0px 0px 0px 1px rgba(0, 0, 0, 0.1),
-                      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-                  }
-
-                  &:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                  }
-                `}
               >
                 Continue
-              </button>
+              </PromptButton>
             ) : (
               <>
-                <button
-                  type='button'
+                <PromptButton
+                  variant='solid'
                   onClick={handleEnableOrganizations}
                   disabled={isLoading}
-                  css={css`
-                    ${mainCTAStyles};
-                    min-width: 100%;
-                    color: white;
-                    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-                    box-shadow:
-                      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-                      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-                      0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
-
-                    &:hover:not(:disabled) {
-                      box-shadow:
-                        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
-                        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
-                        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-                    }
-
-                    &:disabled {
-                      opacity: 0.6;
-                      cursor: not-allowed;
-                    }
-                  `}
                 >
                   Enable Organizations
-                </button>
+                </PromptButton>
 
-                <button
-                  type='button'
+                <PromptButton
+                  variant='outline'
                   onClick={() => clerk?.__internal_closeEnableOrganizationsPrompt?.()}
-                  css={css`
-                    ${mainCTAStyles};
-                    min-width: 100%;
-                    color: white;
-                    background: rgba(69, 69, 69, 0.1);
-                    border: 1px solid rgba(118, 118, 132, 0.25);
-
-                    &:hover {
-                      box-shadow:
-                        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
-                        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-                        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-                        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
-                        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-                    }
-                  `}
                 >
                   I&apos;ll remove it myself
-                </button>
+                </PromptButton>
               </>
             )}
           </Flex>
@@ -361,4 +293,85 @@ const mainCTAStyles = css`
   text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
   white-space: nowrap;
   user-select: none;
+  min-width: 100%;
+  color: white;
+  transition:
+    background 150ms cubic-bezier(0.2, 0.61, 0.1, 1),
+    box-shadow 150ms cubic-bezier(0.2, 0.61, 0.1, 1),
+    border-color 150ms cubic-bezier(0.2, 0.61, 0.1, 1);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
+
+type PromptButtonVariant = 'solid' | 'outline';
+
+type PromptButtonProps = Pick<React.ComponentProps<'button'>, 'onClick' | 'children' | 'disabled'> & {
+  variant?: PromptButtonVariant;
+};
+
+const PromptButton = ({ variant = 'solid', ...props }: PromptButtonProps) => {
+  const solidStyles = css`
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+    box-shadow:
+      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
+      0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.15) 100%), #5f5f5f;
+      box-shadow:
+        0 0 3px 0 rgba(253, 224, 71, 0) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+        0 0 0 1px rgba(0, 0, 0, 0.12),
+        0 1.5px 2px 0 rgba(0, 0, 0, 0.48);
+    }
+
+    &:focus:not(:disabled) {
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.15) 100%), #5f5f5f;
+      box-shadow:
+        0 0 3px 0 rgba(253, 224, 71, 0) inset,
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+        0 0 0 1px rgba(0, 0, 0, 0.12),
+        0 1.5px 2px 0 rgba(0, 0, 0, 0.48);
+    }
+  `;
+
+  const outlineStyles = css`
+    background: rgba(69, 69, 69, 0.1);
+    border: 1px solid rgba(118, 118, 132, 0.25);
+
+    &:hover:not(:disabled) {
+      box-shadow:
+        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
+        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+    }
+
+    &:focus:not(:disabled) {
+      box-shadow:
+        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
+        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
+        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
+        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
+        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
+      border-color: rgba(118, 118, 132, 0.4);
+    }
+  `;
+
+  return (
+    <button
+      type='button'
+      css={[mainCTAStyles, variant === 'solid' ? solidStyles : outlineStyles]}
+      {...props}
+    />
+  );
+};

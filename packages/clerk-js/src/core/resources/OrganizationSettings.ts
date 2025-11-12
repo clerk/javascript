@@ -76,6 +76,10 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
     } as unknown as OrganizationSettingsJSONSnapshot;
   }
 
+  /**
+   * Used to enable the Organizations feature in memory after it has been enabled in the backend
+   * from the devtools resource, since it cannot return the updated environment due to API caching
+   */
   public __internal_enableInMemory() {
     this.enabled = true;
   }
