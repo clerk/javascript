@@ -19,9 +19,7 @@ const EnableOrganizationsPromptInternal = ({
 }: __internal_EnableOrganizationsPromptProps) => {
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
-
-  // @ts-expect-error - __unstable__environment is not typed
-  const environment = clerk?.__unstable__environment as EnvironmentResource;
+  const [isEnabled, setIsEnabled] = useState(false);
 
   const handleEnableOrganizations = () => {
     setIsLoading(true);
@@ -31,17 +29,12 @@ const EnableOrganizationsPromptInternal = ({
         enable_organizations: true,
       })
       .then(() => {
-        // The above mutation doesn't return an environment due to API caching, so we need to enable it in memory
-        // as a persistent state
-        // By the time the user refreshes the page, the environment will be updated and the prompt will not be shown again
-        environment.organizationSettings.__internal_enableInMemory();
+        setIsEnabled(true);
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
-
-  const isEnabled = !!environment?.organizationSettings.enabled;
 
   return (
     <Portal>
