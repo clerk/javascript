@@ -60,7 +60,6 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
   };
 
   const handleVerificationResult = async (si: SignInResource) => {
-    console.log('>> handleVerificationResult', si);
     const ver = si.secondFactorVerification;
     if (ver.status === 'expired') {
       card.setError(t(localizationKeys('formFieldError__verificationLinkExpired')));
