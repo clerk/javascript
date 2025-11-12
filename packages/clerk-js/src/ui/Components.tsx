@@ -353,7 +353,7 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.openModal = (name, props) => {
       // Prevent opening enableOrganizations prompt if it's already open
-      // to avoid duplicate mounting when component is called multiple times
+      // It should open the first call and ignore the subsequent calls
       if (name === 'enableOrganizationsPrompt') {
         setState(prev => {
           // Modal is already open, don't update state
