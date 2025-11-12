@@ -89,7 +89,6 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
         cardTitle={localizationKeys('signIn.emailLinkMfa.title')}
         cardSubtitle={localizationKeys('signIn.emailLinkMfa.subtitle')}
         cardNotice={isNewDevice(signIn) ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
-        formTitle={localizationKeys('signIn.emailLinkMfa.formTitle')}
         formSubtitle={localizationKeys('signIn.emailLinkMfa.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLinkMfa.resendButton')}
         onResendCodeClicked={restartVerification}
