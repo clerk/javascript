@@ -1,4 +1,7 @@
-import type { __internal_EnableOrganizationsPromptProps, LoadedClerk, OrganizationMembershipResource } from './types';
+import { useEffect, useRef } from 'react';
+
+import { useClerk } from './react';
+import type { OrganizationMembershipResource } from './types';
 
 /**
  * Finds the organization membership for a given organization ID from a list of memberships
@@ -17,27 +20,25 @@ export function getCurrentOrganizationMembership(
 }
 
 /**
- * Wraps a function in a check to see if organization settings is enabled
- * If not enabled, it will open a dialog with a prompt to enable organizations
+ * Attempts to enable the organizations environment setting for a given caller
  *
  * @internal
  */
-export const withOrganizationSettingsEnabled =
-  <TParams extends any[], TReturn>(
-    hook: (...args: TParams) => TReturn,
-    getLoadedClerk: () => LoadedClerk | null | undefined,
-    utilityName?: __internal_EnableOrganizationsPromptProps['utilityName'],
-  ) =>
-  (...args: TParams): TReturn => {
-    const clerk = getLoadedClerk();
-    // @ts-expect-error - __unstable__environment is not typed
-    const environment = clerk?.__unstable__environment;
+export function useAttemptToEnableOrganizations(caller: 'useOrganization' | 'useOrganizationList') {
+  const clerk = useClerk();
+  const hasAttempted = useRef(false);
 
-    if (environment?.isDevelopment?.() && !environment?.organizationSettings.enabled) {
-      clerk?.__internal_openEnableOrganizationsPrompt({
-        utilityName,
-      });
+  useEffect(() => {
+    // Guard to not run this effect twice on Clerk resource update
+    if (hasAttempted.current) {
+      return;
     }
 
-    return hook(...args);
-  };
+    hasAttempted.current = true;
+    clerk.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller,
+      onSuccess: () => {},
+    });
+  }, [clerk, caller]);
+}
