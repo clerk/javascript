@@ -614,6 +614,12 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',
     },
+    emailCodeMfa: {
+      formTitle: 'ตรวจสอบอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
+      subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'เพื่อดำเนินการต่อ เปิดลิงก์ยืนยันในอุปกรณ์และเบราว์เซอร์ที่คุณเริ่มต้นการเข้าสู่ระบบ',
@@ -649,6 +655,12 @@ export const thTH: LocalizationResource = {
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับลิงก์? ส่งอีกครั้ง',
+      subtitle: 'เพื่อดำเนินการต่อที่ {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const thTH: LocalizationResource = {
       label__alternativeMethods: 'หรือ เข้าสู่ระบบด้วยวิธีอื่น',
       title: 'ลืมรหัสผ่าน?',
     },
+    newDeviceVerificationNotice:
+      'คุณกำลังเข้าสู่ระบบจากอุปกรณ์ใหม่ เรากำลังขอการยืนยันเพื่อรักษาความปลอดภัยของบัญชีของคุณ',
     noAvailableMethods: {
       message: 'ไม่สามารถดำเนินการเข้าสู่ระบบได้ ไม่มีปัจจัยการยืนยันตัวตนที่สามารถใช้ได้',
       subtitle: 'เกิดข้อผิดพลาด',

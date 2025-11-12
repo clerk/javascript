@@ -612,6 +612,12 @@ export const jaJP: LocalizationResource = {
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールを確認',
     },
+    emailCodeMfa: {
+      formTitle: 'メールを確認',
+      resendButton: 'コードが届いていませんか？再送信',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
+      title: 'メールを確認',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -647,6 +653,12 @@ export const jaJP: LocalizationResource = {
         titleNewTab: '他のタブでサインイン済み',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'メールに送信された確認リンクを使用してください',
+      resendButton: 'リンクが届いていませんか？再送信',
+      subtitle: '{{applicationName}} に続行',
+      title: 'メールを確認してください',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -664,6 +676,8 @@ export const jaJP: LocalizationResource = {
       label__alternativeMethods: 'または、別の方法でサインインしてください。',
       title: 'パスワードをお忘れですか？',
     },
+    newDeviceVerificationNotice:
+      '新しいデバイスからサインインしています。アカウントのセキュリティを保つため、確認をお願いしています。',
     noAvailableMethods: {
       message: 'サインインできません。利用可能な認証方法がありません。',
       subtitle: 'エラーが発生しました',

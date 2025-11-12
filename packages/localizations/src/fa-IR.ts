@@ -620,6 +620,12 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
     },
+    emailCodeMfa: {
+      formTitle: 'ایمیل خود را بررسی کنید',
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -656,6 +662,12 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
+      resendButton: 'لینک را دریافت نکردید؟ ارسال مجدد',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -673,6 +685,8 @@ export const faIR: LocalizationResource = {
       label__alternativeMethods: 'یا با روش دیگری وارد شوید',
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
+    newDeviceVerificationNotice:
+      'شما از یک دستگاه جدید وارد می‌شوید. برای حفظ امنیت حساب کاربری شما، درخواست تأیید می‌کنیم.',
     noAvailableMethods: {
       message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',
