@@ -1,5 +1,5 @@
 ---
-'@clerk/localizations': major
+'@clerk/localizations': minor
 ---
 
 Add Hebrew translations for waitlist component
