@@ -14,6 +14,7 @@ type VerificationLinkCardProps = {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
   cardNotice?: LocalizationKey;
+  formTitle?: LocalizationKey;
   formSubtitle: LocalizationKey;
   resendButton: LocalizationKey;
   profileImageUrl?: string;
