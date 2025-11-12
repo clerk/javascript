@@ -75,4 +75,8 @@ export class OrganizationSettings extends BaseResource implements OrganizationSe
       max_allowed_memberships: this.maxAllowedMemberships,
     } as unknown as OrganizationSettingsJSONSnapshot;
   }
+
+  public __internal_enableInMemory() {
+    this.enabled = true;
+  }
 }
