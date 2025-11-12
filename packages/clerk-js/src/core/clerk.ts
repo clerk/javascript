@@ -99,7 +99,6 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
-import { CLERK_ENVIRONMENT_SETTING_PROMPT_REJECTED_KEY, SafeSessionStorage } from '@/utils/sessionStorage';
 
 import type { MountComponentRenderer } from '../ui/Components';
 import {
@@ -750,15 +749,13 @@ export class Clerk implements ClerkInterface {
 
   public __internal_attemptToEnableEnvironmentSetting = (
     params: __internal_AttemptToEnableEnvironmentSettingParams,
-  ): { status: 'enabled' | 'prompt-shown' | 'rejected' } => {
-    const { for: setting, caller, onSuccess } = params;
+  ): { status: 'enabled' | 'prompt-shown' } => {
+    const { for: setting, caller } = params;
 
     // If not in development instance, return enabled status in order to not open the in-app prompt
     if (this.#instanceType !== 'development') {
       return { status: 'enabled' };
     }
-
-    const rejectedCallers = SafeSessionStorage.getItem<string[]>(CLERK_ENVIRONMENT_SETTING_PROMPT_REJECTED_KEY, []);
 
     switch (setting) {
       case 'organizations':
@@ -766,16 +763,12 @@ export class Clerk implements ClerkInterface {
           return { status: 'enabled' };
         }
 
-        if (rejectedCallers.includes(caller)) {
-          return { status: 'rejected' };
-        }
-
         this.__internal_openEnableOrganizationsPrompt({
           caller,
+          // Reload current window to all invalidate all resources
+          // related to organizations, eg: roles
           onSuccess: () => window.location.reload(),
-          onClose: () => {
-            SafeSessionStorage.setItem(CLERK_ENVIRONMENT_SETTING_PROMPT_REJECTED_KEY, [caller]);
-          },
+          onClose: params.onClose,
         } as __internal_EnableOrganizationsPromptProps);
 
         return { status: 'prompt-shown' };
@@ -871,16 +864,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationProfile',
-      onSuccess: () => {
-        this.openOrganizationProfile(props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
@@ -912,16 +901,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'CreateOrganization',
-      onSuccess: () => {
-        this.openCreateOrganization(props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
@@ -1065,16 +1050,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationProfile',
-      onSuccess: () => {
-        this.mountOrganizationProfile(node, props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
@@ -1116,16 +1097,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'CreateOrganization',
-      onSuccess: () => {
-        this.mountCreateOrganization(node, props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
@@ -1158,16 +1135,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationSwitcher',
-      onSuccess: () => {
-        this.mountOrganizationSwitcher(node, props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
@@ -1208,16 +1181,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationList',
-      onSuccess: () => {
-        this.mountOrganizationList(node, props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
@@ -1414,16 +1383,12 @@ export class Clerk implements ClerkInterface {
     const { status } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'TaskChooseOrganization',
-      onSuccess: () => {
-        this.mountTaskChooseOrganization(node, props);
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskChooseOrganization'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
       },
     });
-
-    if (status === 'rejected') {
-      throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskChooseOrganization'), {
-        code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-      });
-    }
 
     if (status === 'prompt-shown') {
       return;
