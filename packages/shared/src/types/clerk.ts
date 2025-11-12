@@ -1468,7 +1468,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'TaskChooseOrganization'
     | 'useOrganizationList'
     | 'useOrganization';
-  onSuccess: () => void;
+  onClose?: () => void;
 };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
