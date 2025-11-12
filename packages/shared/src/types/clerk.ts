@@ -38,6 +38,7 @@ import type { LocalizationResource } from './localization';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type { ClerkPaginationParams } from './pagination';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -1566,7 +1567,14 @@ export type UserProfileProps = RoutingOptions & {
    *
    * @experimental
    */
-  apiKeysProps?: APIKeysProps;
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1602,7 +1610,14 @@ export type OrganizationProfileProps = RoutingOptions & {
    *
    * @experimental
    */
-  apiKeysProps?: APIKeysProps;
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1704,7 +1719,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
   /*
    * Provide custom menu actions and links to be rendered inside the UserButton.
@@ -1969,9 +1984,10 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-export type GetAPIKeysParams = {
+export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;
-};
+  query?: string;
+}>;
 
 export type CreateAPIKeyParams = {
   type?: 'api_key';

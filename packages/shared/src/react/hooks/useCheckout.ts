@@ -165,6 +165,7 @@ export const useCheckout = (options?: UseCheckoutParams): __experimental_UseChec
         freeTrialEndsAt: null,
         payer: null,
         needsPaymentMethod: null,
+        planPeriodStart: null,
       } satisfies ForceNull<CheckoutProperties>;
     }
     const {

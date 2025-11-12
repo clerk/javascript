@@ -24,7 +24,8 @@
     "allowJs": true,
     "paths": {
       "virtual:data-hooks/useSubscription": ["./src/react/hooks/useSubscription.swr.tsx"],
-      "virtual:data-hooks/SWRConfigCompat": ["./src/react/providers/SWRConfigCompat.swr.tsx"]
+      "virtual:data-hooks/SWRConfigCompat": ["./src/react/providers/SWRConfigCompat.swr.tsx"],
+      "virtual:data-hooks/usePagesOrInfinite": ["./src/react/hooks/usePagesOrInfinite.swr.tsx"]
     }
   },
   "exclude": ["node_modules"],

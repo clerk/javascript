@@ -295,6 +295,9 @@ describe('useOrganizationList', () => {
         });
       });
 
+      fixtures.clerk.user?.getOrganizationMemberships.mockRejectedValue(null);
+      fixtures.clerk.user?.getOrganizationSuggestions.mockRejectedValue(null);
+
       fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
         Promise.resolve({
           data: [
@@ -457,6 +460,9 @@ describe('useOrganizationList', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.user?.getOrganizationMemberships.mockRejectedValue(null);
+      fixtures.clerk.user?.getOrganizationInvitations.mockRejectedValue(null);
 
       fixtures.clerk.user?.getOrganizationSuggestions.mockReturnValue(
         Promise.resolve({

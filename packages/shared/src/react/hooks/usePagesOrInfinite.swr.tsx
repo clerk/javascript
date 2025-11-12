@@ -3,95 +3,10 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useSWR, useSWRInfinite } from '../clerk-swr';
-import type {
-  CacheSetter,
-  PagesOrInfiniteConfig,
-  PagesOrInfiniteOptions,
-  PaginatedResources,
-  ValueOrSetter,
-} from '../types';
+import type { CacheSetter, ValueOrSetter } from '../types';
+import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
+import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
-
-/**
- * Returns an object containing only the keys from the first object that are not present in the second object.
- * Useful for extracting unique parameters that should be passed to a request while excluding common cache keys.
- *
- * @internal
- *
- * @example
- * ```typescript
- * // Example 1: Basic usage
- * const obj1 = { name: 'John', age: 30, city: 'NY' };
- * const obj2 = { name: 'John', age: 30 };
- * getDifferentKeys(obj1, obj2); // Returns { city: 'NY' }
- *
- * // Example 2: With cache keys
- * const requestParams = { page: 1, limit: 10, userId: '123' };
- * const cacheKeys = { userId: '123' };
- * getDifferentKeys(requestParams, cacheKeys); // Returns { page: 1, limit: 10 }
- * ```
- */
-function getDifferentKeys(obj1: Record<string, unknown>, obj2: Record<string, unknown>): Record<string, unknown> {
-  const keysSet = new Set(Object.keys(obj2));
-  const differentKeysObject: Record<string, unknown> = {};
-
-  for (const key1 of Object.keys(obj1)) {
-    if (!keysSet.has(key1)) {
-      differentKeysObject[key1] = obj1[key1];
-    }
-  }
-
-  return differentKeysObject;
-}
-
-/**
- * A hook that safely merges user-provided pagination options with default values.
- * It caches initial pagination values (page and size) until component unmount to prevent unwanted rerenders.
- *
- * @internal
- *
- * @example
- * ```typescript
- * // Example 1: With user-provided options
- * const userOptions = { initialPage: 2, pageSize: 20, infinite: true };
- * const defaults = { initialPage: 1, pageSize: 10, infinite: false };
- * useWithSafeValues(userOptions, defaults);
- * // Returns { initialPage: 2, pageSize: 20, infinite: true }
- *
- * // Example 2: With boolean true (use defaults)
- * const params = true;
- * const defaults = { initialPage: 1, pageSize: 10, infinite: false };
- * useWithSafeValues(params, defaults);
- * // Returns { initialPage: 1, pageSize: 10, infinite: false }
- *
- * // Example 3: With undefined options (fallback to defaults)
- * const params = undefined;
- * const defaults = { initialPage: 1, pageSize: 10, infinite: false };
- * useWithSafeValues(params, defaults);
- * // Returns { initialPage: 1, pageSize: 10, infinite: false }
- * ```
- */
-export const useWithSafeValues = <T extends PagesOrInfiniteOptions>(params: T | true | undefined, defaultValues: T) => {
-  const shouldUseDefaults = typeof params === 'boolean' && params;
-
-  // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(
-    shouldUseDefaults ? defaultValues.initialPage : (params?.initialPage ?? defaultValues.initialPage),
-  );
-  const pageSizeRef = useRef(shouldUseDefaults ? defaultValues.pageSize : (params?.pageSize ?? defaultValues.pageSize));
-
-  const newObj: Record<string, unknown> = {};
-  for (const key of Object.keys(defaultValues)) {
-    // @ts-ignore - defaultValues and params share shape; dynamic index access is safe here
-    newObj[key] = shouldUseDefaults ? defaultValues[key] : (params?.[key] ?? defaultValues[key]);
-  }
-
-  return {
-    ...newObj,
-    initialPage: initialPageRef.current,
-    pageSize: pageSizeRef.current,
-  } as T;
-};
 
 const cachingSWROptions = {
   dedupingInterval: 1000 * 60,
@@ -102,30 +17,6 @@ const cachingSWRInfiniteOptions = {
   ...cachingSWROptions,
   revalidateFirstPage: false,
 } satisfies Parameters<typeof useSWRInfinite>[2];
-
-type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? ElementType : never;
-type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
-
-type UsePagesOrInfinite = <
-  Params extends PagesOrInfiniteOptions,
-  FetcherReturnData extends Record<string, any>,
-  CacheKeys extends Record<string, unknown> = Record<string, unknown>,
-  TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
->(
-  /**
-   * The parameters will be passed to the fetcher.
-   */
-  params: Params,
-  /**
-   * A Promise returning function to fetch your data.
-   */
-  fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
-  /**
-   * Internal configuration of the hook.
-   */
-  config: TConfig,
-  cacheKeys: CacheKeys,
-) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;
 
 /**
  * A flexible pagination hook that supports both traditional pagination and infinite loading.
@@ -143,7 +34,7 @@ type UsePagesOrInfinite = <
  *
  * @internal
  */
-export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, cacheKeys) => {
+export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
 
   // Cache initialPage and initialPageSize until unmount
@@ -252,7 +143,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
       // @ts-ignore - remove cache-only keys from request params
       const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
       // @ts-ignore - fetcher expects Params subset; narrowing at call-site
-      return fetcher?.(requestParams);
+      return fetcher?.({ ...params, ...requestParams });
     },
     cachingSWRInfiniteOptions,
   );
@@ -293,9 +184,7 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
   const isFetching = triggerInfinite ? swrInfiniteIsValidating : swrIsValidating;
   const error = (triggerInfinite ? swrInfiniteError : swrError) ?? null;
   const isError = !!error;
-  /**
-   * Helpers.
-   */
+
   const fetchNext = useCallback(() => {
     fetchPage(n => Math.max(0, n + 1));
   }, [fetchPage]);
@@ -342,3 +231,5 @@ export const usePagesOrInfinite: UsePagesOrInfinite = (params, fetcher, config, 
     setData: setData as any,
   };
 };
+
+export { useWithSafeValues };

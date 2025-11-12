@@ -39,7 +39,11 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
+  const fee =
+    planPeriod === 'month'
+      ? plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.annualMonthlyFee!;
 
   return (
     <Drawer.Body>
@@ -97,7 +101,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             </LineItems.Group>
           )}
 
-          {!!freeTrialEndsAt && !!plan.freeTrialDays && (
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
                 title={localizationKeys('billing.checkout.totalDueAfterTrial', {
@@ -105,7 +109,7 @@ export const CheckoutForm = withCardStateProvider(() => {
                 })}
               />
               <LineItems.Description
-                text={`${totals.grandTotal?.currencySymbol}${totals.grandTotal?.amountFormatted}`}
+                text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
               />
             </LineItems.Group>
           )}
@@ -166,10 +170,10 @@ const useCheckoutMutations = () => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    const paymentSourceId = data.get(HIDDEN_INPUT_NAME) as string;
+    const paymentMethodId = data.get(HIDDEN_INPUT_NAME) as string;
 
     return confirmCheckout({
-      paymentSourceId,
+      paymentMethodId,
     });
   };
 
@@ -426,8 +430,12 @@ const ExistingPaymentMethodForm = withCardStateProvider(
       return paymentMethods.map(method => {
         const label =
           method.paymentType !== 'card'
-            ? `${capitalize(method.paymentType)}`
-            : `${capitalize(method.cardType)} ⋯ ${method.last4}`;
+            ? method.paymentType
+              ? `${capitalize(method.paymentType)}`
+              : '–'
+            : method.cardType
+              ? `${capitalize(method.cardType)} ⋯ ${method.last4}`
+              : '–';
 
         return {
           value: method.id,
