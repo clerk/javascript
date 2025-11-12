@@ -63,7 +63,6 @@ export const useOrganization: UseOrganization = () => {
         value.__internal_attemptToEnableEnvironmentSetting({
           for: 'organizations',
           caller: 'useOrganization',
-          onSuccess: () => {},
         });
         unwatch();
       }
