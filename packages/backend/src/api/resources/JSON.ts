@@ -498,6 +498,10 @@ export interface SessionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+export interface SessionWebhookEventJSON extends SessionJSON {
+  user: UserJSON | null;
+}
+
 export interface SignInJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignInToken;
   status: SignInStatus;
@@ -647,6 +651,10 @@ export interface DeletedObjectJSON {
   id?: string;
   slug?: string;
   deleted: boolean;
+}
+
+export interface UserDeletedJSON extends DeletedObjectJSON {
+  external_id?: string;
 }
 
 export interface PaginatedResponseJSON {
