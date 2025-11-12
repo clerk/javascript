@@ -296,7 +296,7 @@ jobs:
       matrix:
         test-name: [
             "generic",
-            # "express",
+            "express",
             "ap-flows",
             "localhost",
             "sessions",
@@ -367,7 +367,8 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -468,7 +469,8 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}

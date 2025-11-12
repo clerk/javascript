@@ -72,7 +72,11 @@ export const constants = {
   /**
    * The version of the dependency to use, controlled programmatically.
    */
-  E2E_CLERK_VERSION: process.env.E2E_CLERK_VERSION,
+  E2E_CLERK_JS_VERSION: process.env.E2E_CLERK_JS_VERSION,
+  /**
+   * The version of the dependency to use, controlled programmatically.
+   */
+  E2E_CLERK_UI_VERSION: process.env.E2E_CLERK_UI_VERSION,
   /**
    * Key used to encrypt request data for Next.js dynamic keys.
    * @ref https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys

@@ -11,8 +11,8 @@ const reactVite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/react', constants.E2E_CLERK_VERSION || linkPackage('react'))
-  .addDependency('@clerk/themes', constants.E2E_CLERK_VERSION || linkPackage('themes'));
+  .addDependency('@clerk/react', constants.E2E_CLERK_JS_VERSION || linkPackage('react'))
+  .addDependency('@clerk/themes', constants.E2E_CLERK_JS_VERSION || linkPackage('themes'));
 
 export const customFlows = {
   reactVite,
