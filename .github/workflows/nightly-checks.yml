@@ -2,7 +2,7 @@ name: Nightly upstream tests
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 7 * * *'
+    - cron: "0 7 * * *"
 
 jobs:
   integration-tests:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        test-name: ['nextjs']
+        test-name: ["nextjs"]
 
     steps:
       - name: Checkout Repo
@@ -64,11 +64,12 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: 'latest'
-          E2E_NEXTJS_VERSION: 'canary'
-          E2E_NPM_FORCE: 'true'
-          E2E_REACT_DOM_VERSION: '19.1.0'
-          E2E_REACT_VERSION: '19.1.0'
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
+          E2E_NEXTJS_VERSION: "canary"
+          E2E_NPM_FORCE: "true"
+          E2E_REACT_DOM_VERSION: "19.1.0"
+          E2E_REACT_VERSION: "19.1.0"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
@@ -91,8 +92,8 @@ jobs:
         uses: ravsamhq/notify-slack-action@v1
         with:
           status: ${{ steps.integration_tests.outputs.exit_code == '0' && 'success' || 'failure' }}
-          notify_when: 'failure'
-          notification_title: 'Integration Test Failure - ${{ matrix.test-name }}'
+          notify_when: "failure"
+          notification_title: "Integration Test Failure - ${{ matrix.test-name }}"
           message_format: |
             *Job:* ${{ github.workflow }} (${{ matrix.test-name }})
             *Status:* ${{ steps.integration_tests.outputs.exit_code == '0' && 'Success' || 'Failed' }}

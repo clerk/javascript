@@ -12,11 +12,13 @@ const isDevelopment = mode => !isProduction(mode);
 const variants = {
   uiBrowser: 'ui.browser',
   ui: 'ui',
+  entry: 'entry',
 };
 
 const variantToSourceFile = {
   [variants.uiBrowser]: './src/index.browser.ts',
   [variants.ui]: './src/index.ts',
+  [variants.entry]: './src/entry.ts',
 };
 
 /**
@@ -243,7 +245,54 @@ const prodConfig = mode => {
     },
   });
 
-  return [uiBrowser, uiEsm, uiCjs];
+  // Entry ESM module bundle (no chunks)
+  const entryEsm = merge(
+    entryForVariant(variants.entry),
+    common({ mode, variant: variants.entry }),
+    commonForProdBundled(),
+    {
+      experiments: {
+        outputModule: true,
+      },
+      output: {
+        filename: '[name].mjs',
+        libraryTarget: 'module',
+      },
+      plugins: [
+        // Bundle everything into a single file for ESM
+        new rspack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      ],
+      optimization: {
+        splitChunks: false,
+      },
+    },
+  );
+
+  // Entry CJS module bundle (no chunks)
+  const entryCjs = merge(
+    entryForVariant(variants.entry),
+    common({ mode, variant: variants.entry }),
+    commonForProdBundled(),
+    {
+      output: {
+        filename: '[name].js',
+        libraryTarget: 'commonjs',
+      },
+      plugins: [
+        // Bundle everything into a single file for CJS
+        new rspack.optimize.LimitChunkCountPlugin({
+          maxChunks: 1,
+        }),
+      ],
+      optimization: {
+        splitChunks: false,
+      },
+    },
+  );
+
+  return [uiBrowser, uiEsm, uiCjs, entryEsm, entryCjs];
 };
 
 /**
@@ -261,8 +310,7 @@ const devConfig = (mode, env) => {
       rules: [svgLoader(), ...typescriptLoaderDev()],
     },
     plugins: [new ReactRefreshPlugin({ overlay: { sockHost: devUrl.host } })],
-    // devtool: 'eval-cheap-source-map',
-    devtool: false,
+    devtool: 'eval-cheap-source-map',
     output: {
       publicPath: `${devUrl.origin}/npm/`,
       crossOriginLoading: 'anonymous',
