@@ -63,7 +63,7 @@ export class APIKeys implements APIKeysNamespace {
       path: '/api_keys',
       method: 'POST',
       body: JSON.stringify({
-        type: params.type ?? 'api_key',
+        type: 'api_key',
         name: params.name,
         subject: params.subject ?? BaseResource.clerk.organization?.id ?? BaseResource.clerk.user?.id ?? '',
         description: params.description,
