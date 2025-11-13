@@ -2,10 +2,10 @@ import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import { useMemo, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
-import { InternalThemeProvider } from '@/ui/styledSystem';
+import { common, InternalThemeProvider } from '@/ui/styledSystem';
 
 import { DevTools } from '../../../../core/resources/DevTools';
 import type { Environment } from '../../../../core/resources/Environment';
@@ -32,6 +32,7 @@ const EnableOrganizationsPromptInternal = ({
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [allowPersonalAccount, setAllowPersonalAccount] = useState(false);
 
   // @ts-expect-error - __unstable__environment is not typed
   const environment = clerk?.__unstable__environment as Environment | undefined;
@@ -70,6 +71,8 @@ const EnableOrganizationsPromptInternal = ({
       });
   };
 
+  const isComponent = !caller.startsWith('use');
+
   return (
     <Portal>
       <Modal
@@ -80,6 +83,7 @@ const EnableOrganizationsPromptInternal = ({
           sx={() => ({
             display: 'flex',
             flexDirection: 'column',
+            maxWidth: '30rem',
           })}
         >
           <Flex
@@ -200,7 +204,6 @@ const EnableOrganizationsPromptInternal = ({
               direction='col'
               sx={t => ({
                 gap: t.sizes.$0x5,
-                maxWidth: '18.75rem',
               })}
             >
               {isEnabled ? (
@@ -211,7 +214,7 @@ const EnableOrganizationsPromptInternal = ({
                       color: #b4b4b4;
                       font-size: 0.8125rem;
                       font-weight: 400;
-                      line-height: 1.23;
+                      line-height: 1.3;
                     `,
                   ]}
                 >
@@ -224,7 +227,7 @@ const EnableOrganizationsPromptInternal = ({
                         color: #a8a8ff;
                         font-size: inherit;
                         font-weight: 500;
-                        line-height: 1.5;
+                        line-height: 1.3;
                         font-size: 0.8125rem;
                       `,
                     ]}
@@ -250,20 +253,22 @@ const EnableOrganizationsPromptInternal = ({
                       `,
                     ]}
                   >
-                    To use{' '}
+                    To use the{' '}
                     <code
                       css={[
                         basePromptElementStyles,
                         css`
+                          font-size: 0.75rem;
                           color: white;
                           font-family: monospace;
                           line-height: 1.23;
                         `,
                       ]}
                     >
-                      {caller}
-                    </code>
-                    , you&apos;ll need to enable the Organizations feature for your app first.
+                      {isComponent ? `<${caller} />` : caller}
+                    </code>{' '}
+                    {isComponent ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations feature for your
+                    app first.
                   </span>
 
                   <a
@@ -287,6 +292,16 @@ const EnableOrganizationsPromptInternal = ({
                 </>
               )}
             </Flex>
+
+            {!isEnabled && (
+              <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
+                <AllowPersonalAccountSwitch
+                  checked={allowPersonalAccount}
+                  onChange={() => setAllowPersonalAccount(!allowPersonalAccount)}
+                  isDisabled={false}
+                />
+              </Flex>
+            )}
           </Flex>
 
           <span
@@ -299,30 +314,22 @@ const EnableOrganizationsPromptInternal = ({
           />
 
           <Flex
-            direction='col'
             justify='center'
             sx={t => ({
               padding: `${t.sizes.$4} ${t.sizes.$6}`,
               gap: t.sizes.$3,
+              justifyContent: 'flex-end',
             })}
           >
             {isEnabled ? (
               <PromptButton
-                variant='outline'
+                variant='solid'
                 onClick={() => onSuccess?.()}
               >
                 Continue
               </PromptButton>
             ) : (
               <>
-                <PromptButton
-                  variant='solid'
-                  onClick={handleEnableOrganizations}
-                  disabled={isLoading}
-                >
-                  Enable Organizations
-                </PromptButton>
-
                 <PromptButton
                   variant='outline'
                   onClick={() => {
@@ -331,6 +338,14 @@ const EnableOrganizationsPromptInternal = ({
                   }}
                 >
                   I&apos;ll remove it myself
+                </PromptButton>
+
+                <PromptButton
+                  variant='solid'
+                  onClick={handleEnableOrganizations}
+                  disabled={isLoading}
+                >
+                  Enable Organizations
                 </PromptButton>
               </>
             )}
@@ -359,9 +374,7 @@ const mainCTAStyles = css`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
   height: 1.75rem;
-  max-width: 14.625rem;
   padding: 0.375rem 0.625rem;
   border-radius: 0.375rem;
   font-size: 0.75rem;
@@ -371,7 +384,6 @@ const mainCTAStyles = css`
   text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.32);
   white-space: nowrap;
   user-select: none;
-  min-width: 100%;
   color: white;
   transition: all 120ms ease-in-out;
 
@@ -456,3 +468,121 @@ const PromptButton = ({ variant = 'solid', ...props }: PromptButtonProps) => {
     />
   );
 };
+
+type AllowPersonalAccountSwitchProps = {
+  checked: boolean;
+  isDisabled: boolean;
+  onChange: (checked: boolean) => void;
+};
+
+const AllowPersonalAccountSwitch = forwardRef<HTMLDivElement, AllowPersonalAccountSwitchProps>(
+  ({ checked, onChange, isDisabled = false }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (isDisabled) {
+        return;
+      }
+
+      onChange?.(e.target.checked);
+    };
+
+    return (
+      <Flex
+        ref={ref}
+        direction='row'
+        align='center'
+        as='label'
+        gap={2}
+        sx={t => ({
+          isolation: 'isolate',
+          width: 'fit-content',
+          '&:has(input:focus-visible) > input + span': {
+            ...common.focusRingStyles(t),
+          },
+        })}
+      >
+        {/* The order of the elements is important here for the focus ring to work. The input is visually hidden, so the focus ring is applied to the span. */}
+        <input
+          type='checkbox'
+          role='switch'
+          disabled={isDisabled}
+          checked={checked}
+          onChange={handleChange}
+          tabIndex={-1}
+          style={{
+            ...common.visuallyHidden(),
+          }}
+        />
+        <Flex
+          as='span'
+          data-checked={checked}
+          sx={t => ({
+            minWidth: t.sizes.$7,
+            alignSelf: 'flex-start',
+            height: t.sizes.$4,
+            alignItems: 'center',
+            position: 'relative',
+            borderColor: '#DBDBE0',
+            backgroundColor: checked ? '#DBDBE0' : t.colors.$primary500,
+            borderRadius: 999,
+            transition: 'background-color 0.2s',
+            opacity: isDisabled ? 0.6 : 1,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+            outline: 'none',
+            boxSizing: 'border-box',
+            boxShadow:
+              '0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
+          })}
+        >
+          <Flex
+            sx={t => ({
+              position: 'absolute',
+              left: t.sizes.$0x5,
+              width: t.sizes.$3,
+              height: t.sizes.$3,
+              borderRadius: '50%',
+              backgroundColor: 'white',
+              boxShadow: t.shadows.$switchControl,
+              transform: `translateX(${checked ? t.sizes.$3 : 0})`,
+              transition: 'transform 0.2s',
+              zIndex: 1,
+            })}
+          />
+        </Flex>
+
+        <Flex
+          direction='col'
+          gap={1}
+        >
+          <p
+            css={[
+              basePromptElementStyles,
+              css`
+                font-size: 0.875rem;
+                font-weight: 400;
+                line-height: 1.23;
+                color: white;
+              `,
+            ]}
+          >
+            Allow personal account
+          </p>
+
+          <span
+            css={[
+              basePromptElementStyles,
+              css`
+                color: #b4b4b4;
+                font-size: 0.8125rem;
+                font-weight: 400;
+                line-height: 1.23;
+              `,
+            ]}
+          >
+            This is an uncommon setting, meant for applications that sell to both organizations and individual users.
+            Most B2B applications require users to be part of an organization, and should keep this setting disabled.
+          </span>
+        </Flex>
+      </Flex>
+    );
+  },
+);
