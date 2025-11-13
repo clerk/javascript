@@ -98,6 +98,26 @@ describe('createBillingPaginatedHook', () => {
     expect(result.current.isFetching).toBe(false);
   });
 
+  it('does not fetch when enabled is false', () => {
+    const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4, enabled: false }), { wrapper });
+
+    expect(useFetcherMock).toHaveBeenCalledWith('user');
+
+    expect(fetcherMock).not.toHaveBeenCalled();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([]);
+  });
+
+  it('fetches when enabled is true', async () => {
+    const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4, enabled: true }), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(useFetcherMock).toHaveBeenCalledWith('user');
+    expect(fetcherMock).toHaveBeenCalled();
+    expect(fetcherMock.mock.calls[0][0]).toStrictEqual({ initialPage: 1, pageSize: 4 });
+  });
+
   it('authenticated hook: does not fetch when user is null', () => {
     mockUser = null;
 

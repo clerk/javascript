@@ -610,6 +610,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'التحقق من البريد الإلكتروني',
     },
+    emailCodeMfa: {
+      formTitle: 'التحقق من البريد الإلكتروني',
+      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'التحقق من البريد الإلكتروني',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'للمتابعة, قم بفتح رابط التحقق عبر نفس الجهاز والمتصفح الذي انشأت محاولة تسجيل الدخول منه',
@@ -645,6 +651,12 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',
+      resendButton: 'لم تستلم الرابط؟ إعادة الإرسال',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'تحقق من بريدك الإلكتروني',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -662,6 +674,7 @@ export const arSA: LocalizationResource = {
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
+    newDeviceVerificationNotice: 'أنت تسجل الدخول من جهاز جديد. نحن نطلب التحقق للحفاظ على أمان حسابك.',
     noAvailableMethods: {
       message: 'لا يمكن متابعة تسجيل الدخول. لا يوجد وسيلة مصادقة متاحة.',
       subtitle: 'حدث خطأ',

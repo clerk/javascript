@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.108.0
+
+### Minor Changes
+
+- Support for `email_code` and `email_link` as a second factor when user is signing in on a new device. ([#7116](https://github.com/clerk/javascript/pull/7116)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update SocialButtons to show "Continue with" prefix for last auth strategy, and improve mobile layout consistency. ([#7169](https://github.com/clerk/javascript/pull/7169)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- [Experimental] Update `errors` to have specific field types based on whether it's a sign-in or a sign-up. ([#7195](https://github.com/clerk/javascript/pull/7195)) by [@dstaley](https://github.com/dstaley)
+
+- Removed internal parameter when creating API keys ([#7207](https://github.com/clerk/javascript/pull/7207)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`d64638d`](https://github.com/clerk/javascript/commit/d64638d6c270e0c566d1f2c164a24111314365ee), [`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd)]:
+  - @clerk/localizations@3.28.0
+  - @clerk/shared@3.34.0
+
 ## 5.107.0
 
 ### Minor Changes

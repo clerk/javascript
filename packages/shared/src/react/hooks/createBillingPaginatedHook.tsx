@@ -26,7 +26,17 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
 /**
  * @interface
  */
-export interface HookParams extends PaginatedHookConfig<PagesOrInfiniteOptions> {
+export interface HookParams
+  extends PaginatedHookConfig<
+    PagesOrInfiniteOptions & {
+      /**
+       * If `true`, a request will be triggered when the hook is mounted.
+       *
+       * @default true
+       */
+      enabled?: boolean;
+    }
+  > {
   /**
    * Specifies whether to fetch for the current user or organization.
    *
@@ -58,7 +68,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
   return function useBillingHook<T extends HookParams>(
     params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
-    const { for: _for, ...paginationParams } = params || ({} as Partial<T>);
+    const { for: _for, enabled: externalEnabled, ...paginationParams } = params || ({} as Partial<T>);
 
     const safeFor = _for || 'user';
 
@@ -98,14 +108,16 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
       ? environment?.commerceSettings.billing.organization.enabled
       : environment?.commerceSettings.billing.user.enabled;
 
-    const isEnabled = !!hookParams && clerk.loaded && !!billingEnabled;
+    const isEnabled = !!hookParams && clerk.loaded && !!billingEnabled && (externalEnabled ?? true);
 
     const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
       (hookParams || {}) as TParams,
       fetchFn,
       {
-        keepPreviousData: safeValues.keepPreviousData,
-        infinite: safeValues.infinite,
+        ...({
+          keepPreviousData: safeValues.keepPreviousData,
+          infinite: safeValues.infinite,
+        } as PaginatedHookConfig<unknown>),
         enabled: isEnabled,
         ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
         __experimental_mode: safeValues.__experimental_mode,

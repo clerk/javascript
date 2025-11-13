@@ -613,6 +613,12 @@ export const bgBG: LocalizationResource = {
       subtitle: 'за да продължите към {{applicationName}}',
       title: 'Проверете вашия имейл',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверете вашия имейл',
+      resendButton: 'Не сте получили код? Изпрати отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете вашия имейл',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -648,6 +654,12 @@ export const bgBG: LocalizationResource = {
         titleNewTab: 'Влезнали сте в друг таб',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Използвайте връзката за потвърждение, изпратена на вашия имейл',
+      resendButton: 'Не получихте връзката? Изпратете отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете имейла си',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const bgBG: LocalizationResource = {
       label__alternativeMethods: 'Или, влезте с друг метод',
       title: 'Забравена парола?',
     },
+    newDeviceVerificationNotice:
+      'Влизате от ново устройство. Искаме потвърждение, за да запазим акаунта ви в безопасност.',
     noAvailableMethods: {
       message: 'Не може да се продължи с влизането. Няма наличен метод за удостоверяване.',
       subtitle: 'Възникна грешка',
