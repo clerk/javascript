@@ -25,27 +25,13 @@ const getNonceHeaders = React.cache(async function getNonceHeaders() {
       getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
 });
 
-async function generateStatePromise(dynamic: boolean) {
-  if (!dynamic) {
-    return Promise.resolve(null);
-  }
-  return getDynamicClerkState();
-}
-
-async function generateNonce(dynamic: boolean) {
-  if (!dynamic) {
-    return Promise.resolve('');
-  }
-  return getNonceHeaders();
-}
-
 export async function ClerkProvider(
   props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
 
-  const statePromise = generateStatePromise(!!dynamic);
-  const noncePromise = generateNonce(!!dynamic);
+  const statePromiseOrValue = dynamic ? getDynamicClerkState() : null;
+  const noncePromiseOrValue = dynamic ? getNonceHeaders() : '';
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
@@ -66,8 +52,8 @@ export async function ClerkProvider(
     return (
       <KeylessProvider
         rest={propsWithEnvs}
-        noncePromise={noncePromise}
-        statePromise={statePromise}
+        nonce={await noncePromiseOrValue}
+        initialState={await statePromiseOrValue}
         runningWithClaimedKeys={runningWithClaimedKeys}
       >
         {children}
@@ -78,8 +64,8 @@ export async function ClerkProvider(
   return (
     <ClientClerkProvider
       {...propsWithEnvs}
-      nonce={await noncePromise}
-      initialState={await statePromise}
+      nonce={await noncePromiseOrValue}
+      initialState={await statePromiseOrValue}
     >
       {children}
     </ClientClerkProvider>

@@ -35,12 +35,12 @@ export async function getKeylessStatus(
 type KeylessProviderProps = PropsWithChildren<{
   rest: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>;
   runningWithClaimedKeys: boolean;
-  statePromise: Promise<AuthObject | null>;
-  noncePromise: Promise<string>;
+  initialState: AuthObject | null;
+  nonce: string;
 }>;
 
 export const KeylessProvider = async (props: KeylessProviderProps) => {
-  const { rest, runningWithClaimedKeys, statePromise, noncePromise, children } = props;
+  const { rest, runningWithClaimedKeys, initialState, nonce, children } = props;
 
   // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
   const newOrReadKeys = await import('../../server/keyless-node.js')
@@ -56,8 +56,8 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
     return (
       <ClientClerkProvider
         {...mergeNextClerkPropsWithEnv(rest)}
-        nonce={await noncePromise}
-        initialState={await statePromise}
+        nonce={nonce}
+        initialState={initialState}
         disableKeyless
       >
         {children}
@@ -75,8 +75,8 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         // Explicitly use `null` instead of `undefined` here to avoid persisting `deleteKeylessAction` during merging of options.
         __internal_keyless_dismissPrompt: runningWithClaimedKeys ? deleteKeylessAction : null,
       })}
-      nonce={await noncePromise}
-      initialState={await statePromise}
+      nonce={nonce}
+      initialState={initialState}
     >
       {children}
     </ClientClerkProvider>
