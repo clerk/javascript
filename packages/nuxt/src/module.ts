@@ -136,11 +136,28 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const components: Array<keyof typeof import('@clerk/vue')> = [
-      // Authentication Components
+    // Components that use path-based routing (wrapped components)
+    const wrappedComponents = [
       'SignIn',
       'SignUp',
+      'UserProfile',
+      'OrganizationProfile',
+      'CreateOrganization',
+      'OrganizationList',
+    ] as const;
+
+    wrappedComponents.forEach(component => {
+      void addComponent({
+        name: component,
+        export: component,
+        filePath: resolver.resolve('./runtime/components'),
+      });
+    });
+
+    // Other components exported directly from @clerk/vue
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const otherComponents: Array<keyof typeof import('@clerk/vue')> = [
+      // Authentication Components
       'GoogleOneTap',
       // Unstyled Components
       'SignInButton',
@@ -149,12 +166,8 @@ export default defineNuxtModule<ModuleOptions>({
       'SignInWithMetamaskButton',
       // User Components
       'UserButton',
-      'UserProfile',
       // Organization Components
-      'CreateOrganization',
-      'OrganizationProfile',
       'OrganizationSwitcher',
-      'OrganizationList',
       // Billing Components
       'PricingTable',
       // Control Components
@@ -170,7 +183,7 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedOut',
       'Waitlist',
     ];
-    components.forEach(component => {
+    otherComponents.forEach(component => {
       void addComponent({
         name: component,
         export: component,

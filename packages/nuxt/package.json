@@ -79,7 +79,8 @@
   },
   "devDependencies": {
     "nuxt": "^4.1.2",
-    "typescript": "catalog:repo"
+    "typescript": "catalog:repo",
+    "vue": "3.5.21"
   },
   "engines": {
     "node": ">=18.17.0"
