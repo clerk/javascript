@@ -8,8 +8,8 @@ export default defineConfig(() => {
     entry: [
       './src/module.ts',
       './src/runtime/plugin.ts',
-      './src/runtime/components/index.ts',
-      './src/runtime/composables/index.ts',
+      './src/runtime/components/*.ts',
+      './src/runtime/composables/*.ts',
       './src/runtime/client/*.ts',
       './src/runtime/server/*.ts',
       './src/runtime/errors.ts',
