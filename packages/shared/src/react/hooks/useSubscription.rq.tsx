@@ -15,6 +15,13 @@ import type { SubscriptionResult, UseSubscriptionParams } from './useSubscriptio
 const HOOK_NAME = 'useSubscription';
 
 /**
+ * @internal
+ */
+function KeepPreviousDataFn<Data>(previousData: Data): Data {
+  return previousData;
+}
+
+/**
  * This is the new implementation of useSubscription using React Query.
  * It is exported only if the package is build with the `CLERK_USE_RQ` environment variable set to `true`.
  *
@@ -36,6 +43,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const billingEnabled = isOrganization
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
+  const keepPreviousData = params?.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
 
@@ -59,7 +67,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     },
     staleTime: 1_000 * 60,
     enabled: queriesEnabled,
-    // TODO(@RQ_MIGRATION): Add support for keepPreviousData
+    placeholderData: keepPreviousData && queriesEnabled ? KeepPreviousDataFn : undefined,
   });
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
