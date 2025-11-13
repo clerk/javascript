@@ -7,7 +7,7 @@ import type {
   SignUpVerifiableField,
   SignUpVerificationsResource,
   VerificationStrategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { Writable } from 'type-fest';
 import { and, assign, enqueueActions, fromCallback, fromPromise, log, raise, sendParent, sendTo, setup } from 'xstate';
 

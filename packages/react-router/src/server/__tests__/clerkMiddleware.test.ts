@@ -65,6 +65,14 @@ describe('clerkMiddleware', () => {
     const result = await middleware(args, mockNext);
 
     expect(mockAuthenticateRequest).toHaveBeenCalledWith(expect.any(Object), {
+      apiUrl: undefined,
+      secretKey: 'sk_test_...',
+      jwtKey: undefined,
+      proxyUrl: undefined,
+      isSatellite: undefined,
+      domain: undefined,
+      publishableKey: 'pk_test_...',
+      machineSecretKey: undefined,
       audience: '',
       authorizedParties: [],
       signInUrl: '',

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '复制并关闭',
+      formHint: '出于安全原因，我们不会允许您稍后再次查看。',
+      formTitle: '立即复制您的"{{name}}" API密钥',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const zhCN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '用户设备',
   badge__you: '您',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const zhCN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const zhCN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API密钥',
+  formFieldLabel__apiKeyDescription: '描述',
+  formFieldLabel__apiKeyExpiration: '过期时间',
+  formFieldLabel__apiKeyName: '密钥名称',
   formFieldLabel__automaticInvitations: '为此域名启用自动邀请',
   formFieldLabel__backupCode: '备用代码',
   formFieldLabel__confirmDeletion: '确认',
@@ -281,7 +288,7 @@ export const zhCN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -290,7 +297,7 @@ export const zhCN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -479,9 +486,11 @@ export const zhCN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '创建组织',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理组织',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '请求加入',
     notSelected: '未选择组织',
     personalWorkspace: '个人工作区',
@@ -628,6 +637,10 @@ export const zhCN: LocalizationResource = {
         titleNewTab: '在其他标签页上登录',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重置密码代码',
       resendButton: '重新发送代码',
@@ -747,6 +760,10 @@ export const zhCN: LocalizationResource = {
         subtitleNewTab: '返回上一个标签页继续',
         title: '成功验证电子邮件',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -916,7 +933,9 @@ export const zhCN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '添加账户',
+    action__closeUserMenu: '关闭用户菜单',
     action__manageAccount: '管理账户',
+    action__openUserMenu: '打开用户菜单',
     action__signOut: '退出登录',
     action__signOutAll: '退出所有账户',
   },
@@ -946,7 +965,7 @@ export const zhCN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -955,7 +974,7 @@ export const zhCN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1013,7 +1032,7 @@ export const zhCN: LocalizationResource = {
     deletePage: {
       actionDescription: '在下方输入 "删除账户" 以继续。',
       confirm: '删除账户',
-      messageLine1: '您确定要删除您在 Clerk 的账户吗？请联系应用程序所有者以从他们的应用程序和其他服务中删除您的信息。',
+      messageLine1: '您确定要删除您的账户吗？某些关联数据可能会被保留。要请求完全删除数据，请联系支持团队。',
       messageLine2: '此操作是永久且不可逆的。',
       title: '删除账户',
     },

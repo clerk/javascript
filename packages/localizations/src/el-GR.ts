@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Αντιγραφή και κλείσιμο',
+      formHint: 'Για λόγους ασφαλείας, δεν θα σας επιτρέψουμε να το δείτε ξανά αργότερα.',
+      formTitle: 'Αντιγράψτε το κλειδί API "{{name}}" σας τώρα',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const elGR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const elGR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const elGR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Εισάγετε τον κωδικό σας',
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Κλειδί API',
+  formFieldLabel__apiKeyDescription: 'Περιγραφή',
+  formFieldLabel__apiKeyExpiration: 'Λήξη',
+  formFieldLabel__apiKeyName: 'Όνομα μυστικού κλειδιού',
   formFieldLabel__automaticInvitations: 'Ενεργοποίηση αυτόματων προσκλήσεων για αυτόν τον τομέα',
   formFieldLabel__backupCode: 'Αντίγραφο ασφαλείας κωδικού',
   formFieldLabel__confirmDeletion: 'Επιβεβαίωση',
@@ -283,7 +290,7 @@ export const elGR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const elGR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const elGR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Δημιουργία Οργανισμού',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Διαχείριση Οργανισμού',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Δεν έχει επιλεγεί οργανισμός',
     personalWorkspace: 'Προσωπικός Χώρος Εργασίας',
@@ -639,6 +648,10 @@ export const elGR: LocalizationResource = {
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Επαναφορά κωδικού πρόσβασης',
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
@@ -760,6 +773,10 @@ export const elGR: LocalizationResource = {
         subtitleNewTab: 'Επιστροφή στην προηγούμενη καρτέλα για να συνεχίσετε',
         title: 'Επιτυχής επαλήθευση email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -937,7 +954,9 @@ export const elGR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Προσθήκη λογαριασμού',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Διαχείριση λογαριασμού',
+    action__openUserMenu: undefined,
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
@@ -969,7 +988,7 @@ export const elGR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -978,7 +997,7 @@ export const elGR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1038,7 +1057,7 @@ export const elGR: LocalizationResource = {
       actionDescription: 'Πληκτρολογήστε "Διαγραφή λογαριασμού" παρακάτω για να συνεχίσετε.',
       confirm: 'Διαγραφή λογαριασμού',
       messageLine1:
-        'Είστε βέβαιος ότι θέλετε να διαγράψετε τον λογαριασμό σας από το Clerk; Παρακαλώ επικοινωνήστε με τον ιδιοκτήτη της εφαρμογής για να διαγράψετε τις πληροφορίες σας από την εφαρμογή τους και άλλες υπηρεσίες.',
+        'Είστε βέβαιοι ότι θέλετε να διαγράψετε τον λογαριασμό σας; Ορισμένα σχετικά δεδομένα ενδέχεται να διατηρηθούν. Για να ζητήσετε πλήρη διαγραφή δεδομένων, επικοινωνήστε με την υποστήριξη.',
       messageLine2: 'Αυτή η ενέργεια είναι μόνιμη και μη αναστρέψιμη.',
       title: 'Διαγραφή λογαριασμού',
     },

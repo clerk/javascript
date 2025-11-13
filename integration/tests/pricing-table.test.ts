@@ -1,3 +1,4 @@
+import type { Locator } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../presets';
@@ -32,11 +33,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('renders pricing details of a specific plan', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
-
       const u = createTestUtils({ app, page, context });
       await u.po.page.goToRelative('/billing/plan-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Plan details' }).click();
 
       await u.po.planDetails.waitForMounted();
@@ -82,7 +82,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       page,
       context,
     }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
@@ -97,12 +96,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('when signed in, clicking checkout button open checkout drawer', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/checkout-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Checkout Now' }).click();
       await u.po.checkout.waitForMounted();
       await u.po.page.getByText(/^Checkout$/).click();
@@ -119,7 +118,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.waitForMounted();
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Visa ⋯ 4242')).toBeVisible();
       await u.po.checkout.confirmAndContinue();
 
       // eslint-disable-next-line playwright/no-conditional-in-test
@@ -132,12 +132,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     });
 
     test('opens subscription details drawer', async ({ page, context }) => {
-      test.skip(app.name.includes('astro'), 'Still working on it');
       const u = createTestUtils({ app, page, context });
       await u.po.signIn.goTo();
       await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
       await u.po.page.goToRelative('/billing/subscription-details-btn');
 
+      await u.po.page.waitForClerkJsLoaded();
       await u.po.page.getByRole('button', { name: 'Subscription details' }).click();
 
       await u.po.subscriptionDetails.waitForMounted();
@@ -279,7 +279,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       // Verify checkout shows trial details
       await expect(u.po.checkout.root.getByText('Checkout')).toBeVisible();
       await expect(u.po.checkout.root.getByText('Free trial')).toBeVisible();
-      await expect(u.po.checkout.root.getByText('Total Due after')).toBeVisible();
+      const title = /^Total Due after trial ends in \d+ days$/i;
+      await expect(matchLineItem(u.po.checkout.root, title, '$999.00')).toBeVisible();
 
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
@@ -287,6 +288,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await expect(u.po.checkout.root.getByText(/Trial.*successfully.*started/i)).toBeVisible({
         timeout: 15_000,
       });
+
+      const footer = u.po.checkout.root.locator('.cl-drawerFooter');
+      await expect(matchLineItem(footer, 'Total paid', '$0.00')).toBeVisible();
+      await expect(matchLineItem(footer, 'Trial ends on')).toBeVisible();
+      await expect(matchLineItem(footer, 'Payment method', 'Visa ⋯ 4242')).toBeVisible();
+      expect(await countLineItems(footer)).toBe(3);
+
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/pricing-table');
@@ -345,12 +353,18 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       // Verify checkout shows trial details
       await expect(u.po.checkout.root.getByText('Checkout')).toBeVisible();
       await expect(u.po.checkout.root.getByText('Free trial')).toBeHidden();
-      await expect(u.po.checkout.root.getByText('Total Due after')).toBeHidden();
-      await expect(u.po.checkout.root.getByText('Total Due Today')).toBeVisible();
+
+      await expect(matchLineItem(u.po.checkout.root, 'Total Due after')).toBeHidden();
+      await expect(matchLineItem(u.po.checkout.root, 'Subtotal', '$999.00')).toBeVisible();
+      await expect(matchLineItem(u.po.checkout.root, 'Total Due Today', '$999.00')).toBeVisible();
+      expect(await countLineItems(u.po.checkout.root)).toBe(3);
 
       await u.po.checkout.root.getByRole('button', { name: /^pay\s\$/i }).waitFor({ state: 'visible' });
       await u.po.checkout.clickPayOrSubscribe();
-      await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
+      await expect(u.po.checkout.root.getByText('Payment was successful!')).toBeVisible();
+      await expect(matchLineItem(footer, 'Total paid', '$999.00')).toBeVisible();
+      await expect(matchLineItem(footer, 'Payment method', 'Visa ⋯ 4242')).toBeVisible();
+      expect(await countLineItems(footer)).toBe(2);
       await u.po.checkout.confirmAndContinue();
 
       await u.po.page.goToRelative('/user');
@@ -454,7 +468,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
   test.describe('in UserProfile', () => {
     // test.describe.configure({ mode: 'serial' });
-    test('renders pricing table, subscribes to a plan, revalidates payment sources on complete and then downgrades to free', async ({
+    test('renders pricing table, subscribes to a plan, revalidates payment method on complete and then downgrades to free', async ({
       page,
       context,
     }) => {
@@ -586,7 +600,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('adds payment source via checkout and resets stripe setup intent after failed payment', async ({
+    test('adds payment method via checkout and resets stripe setup intent after failed payment', async ({
       page,
       context,
     }) => {
@@ -655,5 +669,257 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await fakeUser.deleteIfExists();
     });
+
+    test('displays billing history and navigates through statement and payment attempt details', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      try {
+        await u.po.signIn.goTo();
+        await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+
+        await u.po.page.goToRelative('/user');
+        await u.po.userProfile.waitForMounted();
+        await u.po.userProfile.switchToBillingTab();
+
+        const openBillingTab = async (label: RegExp) => {
+          await page.getByRole('tab', { name: label }).click();
+          await page
+            .locator('.cl-userProfile-root [role="tabpanel"] .cl-table')
+            .waitFor({ state: 'visible', timeout: 15000 });
+        };
+        const getBillingTableRows = () => {
+          return page.locator('.cl-userProfile-root .cl-tableBody .cl-tableRow');
+        };
+        const waitForBillingTableRows = async (options?: { hasText?: string | RegExp }) => {
+          const rows = getBillingTableRows();
+          if (options?.hasText) {
+            await rows
+              .filter({
+                hasText: options.hasText,
+              })
+              .first()
+              .waitFor({ state: 'visible', timeout: 15000 });
+          } else {
+            await rows.first().waitFor({ state: 'visible', timeout: 15000 });
+          }
+          return rows;
+        };
+        const getBillingEmptyStateMessage = (text: string | RegExp) => {
+          return page.locator('.cl-userProfile-root .cl-table').getByText(text);
+        };
+        const waitForStatementPage = async () => {
+          const statementRoot = page.locator('.cl-statementRoot');
+          await statementRoot.waitFor({ state: 'visible', timeout: 15000 });
+          return statementRoot;
+        };
+        const waitForPaymentAttemptPage = async () => {
+          const paymentAttemptRoot = page.locator('.cl-paymentAttemptRoot');
+          await paymentAttemptRoot.waitFor({ state: 'visible', timeout: 15000 });
+          return paymentAttemptRoot;
+        };
+        const goBackToPaymentsList = async () => {
+          const paymentAttemptRoot = page.locator('.cl-paymentAttemptRoot');
+          await Promise.all([
+            page.waitForURL(/tab=payments/, { timeout: 15000 }),
+            page.getByRole('link', { name: /Payments/i }).click(),
+          ]);
+          await paymentAttemptRoot.waitFor({ state: 'detached', timeout: 15000 });
+        };
+
+        await openBillingTab(/Statements/i);
+        await expect(getBillingEmptyStateMessage('No statements to display')).toBeVisible();
+
+        await u.po.page.goToRelative('/user');
+        await u.po.userProfile.waitForMounted();
+        await u.po.userProfile.switchToBillingTab();
+        await u.po.page.getByRole('button', { name: 'Switch plans' }).click();
+
+        await u.po.pricingTable.waitForMounted();
+        await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
+        await u.po.checkout.waitForMounted();
+        await u.po.checkout.fillTestCard();
+        await u.po.checkout.clickPayOrSubscribe();
+        await expect(u.po.page.getByText('Payment was successful!')).toBeVisible({
+          timeout: 15000,
+        });
+        await u.po.checkout.confirmAndContinue();
+
+        await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true });
+        await u.po.checkout.waitForMounted();
+        await u.po.checkout.root.getByText('Add payment method').click();
+        await u.po.checkout.fillCard({
+          number: '4100000000000019',
+          expiration: '1234',
+          cvc: '123',
+          country: 'United States',
+          zip: '12345',
+        });
+        await u.po.checkout.clickPayOrSubscribe();
+        await expect(u.po.checkout.root.getByText('The card was declined.').first()).toBeVisible({
+          timeout: 15000,
+        });
+        await u.po.checkout.closeDrawer();
+
+        await u.po.page.goToRelative('/user');
+        await u.po.userProfile.waitForMounted();
+        await u.po.userProfile.switchToBillingTab();
+
+        await openBillingTab(/Statements/i);
+        const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        await waitForBillingTableRows({ hasText: new RegExp(date, 'i') });
+        await expect(getBillingEmptyStateMessage('No statements to display')).toBeHidden();
+
+        const firstStatementRow = getBillingTableRows().first();
+        await firstStatementRow.click();
+
+        const statementRoot = await waitForStatementPage();
+        await expect(
+          statementRoot.locator('.cl-statementSectionContentDetailsHeaderTitle').filter({ hasText: /Plus/i }).first(),
+        ).toBeVisible();
+
+        const statementTotalText = (await statementRoot.locator('.cl-statementFooterValue').textContent())?.trim();
+        expect(statementTotalText).toBeTruthy();
+
+        await statementRoot
+          .getByRole('button', { name: /View payment/i })
+          .first()
+          .click();
+        const paymentAttemptRoot = await waitForPaymentAttemptPage();
+        await expect(paymentAttemptRoot.locator('.cl-paymentAttemptHeaderBadge')).toHaveText(/paid/i);
+
+        const paymentTotalText = (
+          await paymentAttemptRoot.locator('.cl-paymentAttemptFooterValue').textContent()
+        )?.trim();
+        expect(paymentTotalText).toBe(statementTotalText);
+
+        await expect(
+          paymentAttemptRoot.locator('.cl-lineItemsTitle').filter({ hasText: /Plus/i }).first(),
+        ).toBeVisible();
+
+        await goBackToPaymentsList();
+        await openBillingTab(/Payments/i);
+        await waitForBillingTableRows({ hasText: /paid/i });
+        await waitForBillingTableRows({ hasText: /Failed/i });
+        await expect(getBillingEmptyStateMessage('No payment history')).toBeHidden();
+
+        const failedPaymentRow = getBillingTableRows()
+          .filter({ hasText: /Failed/i })
+          .first();
+        await failedPaymentRow.click();
+
+        const failedPaymentAttemptRoot = await waitForPaymentAttemptPage();
+        await expect(failedPaymentAttemptRoot.locator('.cl-paymentAttemptHeaderBadge')).toHaveText(/failed/i);
+        await expect(
+          failedPaymentAttemptRoot.locator('.cl-lineItemsTitle').filter({ hasText: /Pro/i }).first(),
+        ).toBeVisible();
+
+        await goBackToPaymentsList();
+      } finally {
+        await fakeUser.deleteIfExists();
+      }
+    });
+
+    test('adds two payment methods and sets the last as default', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+
+      const fakeUser = u.services.users.createFakeUser();
+      await u.services.users.createBapiUser(fakeUser);
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+      await u.po.page.goToRelative('/user');
+
+      await u.po.userProfile.waitForMounted();
+      await u.po.userProfile.switchToBillingTab();
+
+      // Add first payment method
+      await u.po.page.getByText('Add new payment method').click();
+      await u.po.checkout.fillCard({
+        number: '4242424242424242',
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.page.getByRole('button', { name: 'Add Payment Method' }).click();
+
+      await expect(u.po.page.getByText(/visa/i)).toBeVisible();
+      await expect(
+        u.po.page
+          .getByText(/visa/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeVisible();
+
+      // Add second payment method
+      await u.po.page.getByText('Add new payment method').click();
+      await u.po.checkout.fillCard({
+        number: '5555555555554444',
+        expiration: '1234',
+        cvc: '123',
+        country: 'United States',
+        zip: '12345',
+      });
+      await u.po.page.getByRole('button', { name: 'Add Payment Method' }).click();
+
+      await expect(u.po.page.getByText(/mastercard/i)).toBeVisible();
+
+      // Open menu for the last payment method and make it default
+      await u.po.page.locator('.cl-userProfile-root .cl-menuButtonEllipsis').last().click();
+      await u.po.page.getByText('Make default').click();
+
+      // Verify Mastercard is now default and Visa is not
+      await expect(
+        u.po.page
+          .getByText(/mastercard/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(
+        u.po.page
+          .getByText(/visa/i)
+          .locator('xpath=..')
+          .getByText(/default/i),
+      ).toBeHidden();
+
+      await fakeUser.deleteIfExists();
+    });
   });
 });
+
+/**
+ * Helper to match a line item by its title and optionally its description.
+ * Line items are rendered as Clerk LineItems components with element descriptors:
+ * - .cl-lineItemsTitle contains the title
+ * - .cl-lineItemsDescription contains the description (immediately following the title)
+ */
+function matchLineItem(root: Locator, title: string | RegExp, description?: string | RegExp): Locator {
+  // Find the title element using the Clerk-generated class
+  const titleElement = root.locator('.cl-lineItemsTitle').filter({ hasText: title });
+
+  // If no description is provided, return the title element
+  if (description === undefined) {
+    return titleElement;
+  }
+
+  // Get the next sibling description element using the Clerk-generated class
+  const descriptionElement = titleElement
+    .locator('xpath=following-sibling::*[1][contains(@class, "cl-lineItemsDescription")]')
+    .filter({ hasText: description });
+
+  return descriptionElement;
+}
+
+/**
+ * Helper to count the number of line items within a given root element.
+ * Line items are rendered as Clerk LineItems components where each .cl-lineItemsTitle represents a line item.
+ */
+async function countLineItems(root: Locator): Promise<number> {
+  return await root.locator('.cl-lineItemsTitle').count();
+}

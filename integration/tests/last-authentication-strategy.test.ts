@@ -1,7 +1,7 @@
+import type { LastAuthenticationStrategy } from '@clerk/shared/types';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import type { LastAuthenticationStrategy } from '../../packages/types';
 import { appConfigs } from '../presets';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
@@ -74,6 +74,28 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       await expect(socialButtonContainers.first().locator('.cl-button')).toHaveCount(3);
     });
 
+    test('should show "Last used" badge when lastAuthenticationStrategy is saml_google', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await mockLastAuthenticationStrategyResponse(page, 'saml_google');
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.waitForMounted();
+
+      // Ensure "Last used" badge is present.
+      const lastUsedBadge = page.locator('.cl-lastAuthenticationStrategyBadge');
+      await expect(lastUsedBadge).toBeVisible();
+      await expect(lastUsedBadge).toHaveCount(1);
+
+      const btn = page.getByRole('button', { name: 'Last used Sign in with Google' });
+      await expect(btn).toBeVisible();
+
+      // Ensure the last used social button has been pulled to the first row.
+      const socialButtonContainers = u.page.locator('.cl-socialButtons');
+      await expect(socialButtonContainers).toHaveCount(2);
+      await expect(socialButtonContainers.first().locator('.cl-button__google')).toHaveCount(1);
+      await expect(socialButtonContainers.last().locator('.cl-button')).toHaveCount(2);
+    });
+
     test('should show "Last used" badge when lastAuthenticationStrategy is oauth_google', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
       await mockLastAuthenticationStrategyResponse(page, 'oauth_google');
@@ -114,6 +136,19 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })(
       const socialButtonContainers = u.page.locator('.cl-socialButtons');
       await expect(socialButtonContainers).toHaveCount(1);
       await expect(socialButtonContainers.first().locator('.cl-button')).toHaveCount(3);
+    });
+
+    test('should not show "Last used" badge on sign-up even when lastAuthenticationStrategy is set', async ({
+      page,
+      context,
+    }) => {
+      const u = createTestUtils({ app, page, context });
+      await mockLastAuthenticationStrategyResponse(page, 'oauth_google');
+
+      await u.po.signUp.goTo();
+      await u.po.signUp.waitForMounted();
+
+      await expect(page.locator('.cl-lastAuthenticationStrategyBadge')).toHaveCount(0);
     });
   },
 );

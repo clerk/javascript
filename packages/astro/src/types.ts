@@ -5,7 +5,7 @@ import type {
   MultiDomainAndOrProxyPrimitives,
   ProtectProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 
@@ -67,6 +67,7 @@ export type InternalUIComponentId =
   | 'organization-list'
   | 'organization-profile'
   | 'organization-switcher'
+  | 'user-avatar'
   | 'user-button'
   | 'user-profile'
   | 'google-one-tap'

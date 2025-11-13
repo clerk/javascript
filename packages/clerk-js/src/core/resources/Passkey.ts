@@ -1,8 +1,4 @@
 import { ClerkWebAuthnError } from '@clerk/shared/error';
-import {
-  isWebAuthnPlatformAuthenticatorSupported as isWebAuthnPlatformAuthenticatorSupportedOnWindow,
-  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
-} from '@clerk/shared/webauthn';
 import type {
   DeletedObjectJSON,
   DeletedObjectResource,
@@ -12,13 +8,17 @@ import type {
   PasskeyVerificationResource,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   UpdatePasskeyParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import {
+  isWebAuthnPlatformAuthenticatorSupported as isWebAuthnPlatformAuthenticatorSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 
 import { unixEpochToDate } from '../../utils/date';
 import {
   serializePublicKeyCredential,
   webAuthnCreateCredential as webAuthnCreateCredentialOnWindow,
-} from '../../utils/passkeys';
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 

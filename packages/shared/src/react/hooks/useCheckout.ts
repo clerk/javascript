@@ -1,12 +1,12 @@
+import { useMemo, useSyncExternalStore } from 'react';
+
+import type { ClerkAPIResponseError } from '../../error';
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
   BillingCheckoutResource,
   SetActiveNavigate,
-} from '@clerk/types';
-import { useMemo, useSyncExternalStore } from 'react';
-
-import type { ClerkAPIResponseError } from '../..';
+} from '../../types';
 import type { __experimental_CheckoutProvider } from '../contexts';
 import { useCheckoutContext } from '../contexts';
 import { useClerk } from './useClerk';
@@ -106,15 +106,16 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
         id: null,
         externalClientSecret: null,
         externalGatewayId: null,
-        status: null,
         totals: null,
         isImmediatePlanChange: null,
         planPeriod: null,
         plan: null,
-        paymentSource: null,
+        paymentMethod: null,
         freeTrialEndsAt: null,
         payer: null,
-      };
+        needsPaymentMethod: null,
+        planPeriodStart: null,
+      } satisfies ForceNull<CheckoutProperties>;
     }
     const {
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -124,7 +125,7 @@ export const useCheckout = (options?: Params): __experimental_UseCheckoutReturn 
       // All the above need to be removed from the properties
       ...rest
     } = managerProperties.checkout;
-    return rest;
+    return rest satisfies CheckoutProperties;
   }, [managerProperties.checkout]);
 
   const checkout = {

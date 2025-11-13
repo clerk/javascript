@@ -1,4 +1,5 @@
-import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/types';
+import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/shared/types';
+import { useState } from 'react';
 import { vi } from 'vitest';
 
 import { Clerk as ClerkCtor } from '@/core/clerk';
@@ -83,6 +84,7 @@ const unboundCreateFixtures = (
 
     const MockClerkProvider = (props: any) => {
       const { children } = props;
+      const [swrConfig] = useState(() => ({ provider: () => new Map() }));
 
       const componentsWithoutContext = [
         'UsernameSection',
@@ -106,7 +108,7 @@ const unboundCreateFixtures = (
         <CoreClerkContextWrapper
           clerk={clerkMock}
           // Clear swr cache
-          swrConfig={{ provider: () => new Map() }}
+          swrConfig={swrConfig}
         >
           <EnvironmentProvider value={environmentMock}>
             <OptionsProvider value={optionsMock}>

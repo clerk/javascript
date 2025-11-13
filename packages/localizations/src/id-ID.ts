@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Salin & Tutup',
+      formHint: 'Untuk alasan keamanan, kami tidak akan mengizinkan Anda untuk melihatnya lagi nanti.',
+      formTitle: 'Salin kunci API "{{name}}" Anda sekarang',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const idID: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Perangkat pengguna',
   badge__you: 'Anda',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const idID: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const idID: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const idID: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Kunci API',
+  formFieldLabel__apiKeyDescription: 'Deskripsi',
+  formFieldLabel__apiKeyExpiration: 'Kedaluwarsa',
+  formFieldLabel__apiKeyName: 'Nama kunci rahasia',
   formFieldLabel__automaticInvitations: 'Aktifkan undangan otomatis untuk domain ini',
   formFieldLabel__backupCode: 'Kode cadangan',
   formFieldLabel__confirmDeletion: 'Konfirmasi',
@@ -283,7 +290,7 @@ export const idID: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const idID: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const idID: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Buat organisasi',
     action__invitationAccept: 'Gabung',
     action__manageOrganization: 'Kelola',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta bergabung',
     notSelected: 'Tidak ada organisasi dipilih',
     personalWorkspace: 'Akun pribadi',
@@ -641,6 +650,10 @@ export const idID: LocalizationResource = {
         titleNewTab: 'Masuk di tab lain',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kode reset kata sandi',
       resendButton: 'Tidak menerima kode? Kirim ulang',
@@ -762,6 +775,10 @@ export const idID: LocalizationResource = {
         subtitleNewTab: 'Kembali ke tab sebelumnya untuk melanjutkan',
         title: 'Berhasil memverifikasi email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -941,7 +958,9 @@ export const idID: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tambah akun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Kelola akun',
+    action__openUserMenu: undefined,
     action__signOut: 'Keluar',
     action__signOutAll: 'Keluar dari semua akun',
   },
@@ -973,7 +992,7 @@ export const idID: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -982,7 +1001,7 @@ export const idID: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1042,7 +1061,7 @@ export const idID: LocalizationResource = {
       actionDescription: 'Ketik "Delete account" di bawah untuk melanjutkan.',
       confirm: 'Hapus akun',
       messageLine1:
-        'Anda yakin ingin menghapus akun Anda dari Clerk? Silakan hubungi pemilik aplikasi untuk menghapus informasi Anda dari aplikasi mereka dan layanan lainnya.',
+        'Apakah Anda yakin ingin menghapus akun Anda? Beberapa data terkait mungkin tetap disimpan. Untuk meminta penghapusan data lengkap, silakan hubungi dukungan.',
       messageLine2: 'Tindakan ini permanen dan tidak dapat dibatalkan.',
       title: 'Hapus akun',
     },

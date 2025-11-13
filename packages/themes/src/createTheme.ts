@@ -1,8 +1,8 @@
 // Temp way to import the type. We will clean this up when we extract
 // theming into its own package
-import type { BaseTheme, DeepPartial, Elements, Theme } from '@clerk/types';
+import type { BaseTheme, DeepPartial, Elements, Theme } from '@clerk/shared/types';
 
-import type { InternalTheme } from '../../clerk-js/src/ui/foundations';
+import type { InternalTheme } from '../../ui/src/foundations';
 
 interface CreateClerkThemeParams extends DeepPartial<Theme>, Pick<BaseTheme, 'cssLayerName'> {
   /**

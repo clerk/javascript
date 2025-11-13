@@ -1,15 +1,31 @@
-import type { Resources, UnsubscribeCallback } from '@clerk/types';
+import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
+// Mock the script loading functions to prevent unhandled promise rejections in tests
+vi.mock('@clerk/shared/loadClerkJsScript', () => ({
+  loadClerkJsScript: vi.fn().mockResolvedValue(null),
+  loadClerkUiScript: vi.fn().mockResolvedValue(null),
+}));
+
 describe('isomorphicClerk', () => {
   beforeAll(() => {
     vi.useFakeTimers();
+
+    // Set up minimal global Clerk objects to prevent errors during initialization
+    (global as any).Clerk = {
+      load: vi.fn().mockResolvedValue(undefined),
+      loaded: false,
+    };
+    (global as any).__unstable_ClerkUiCtor = vi.fn();
   });
 
   afterAll(() => {
     vi.useRealTimers();
+    // Clean up globals
+    delete (global as any).Clerk;
+    delete (global as any).__unstable_ClerkUiCtor;
   });
 
   it('instantiates a IsomorphicClerk instance', () => {

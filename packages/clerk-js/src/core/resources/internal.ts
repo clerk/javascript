@@ -8,7 +8,7 @@ export * from './BillingCheckout';
 export * from './Feature';
 export * from './BillingStatement';
 export * from './BillingPayment';
-export * from './BillingPaymentSource';
+export * from './BillingPaymentMethod';
 export * from './BillingPlan';
 export * from './BillingSubscription';
 export * from './DeletedObject';

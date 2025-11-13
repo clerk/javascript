@@ -1,20 +1,34 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "moduleResolution": "Bundler",
-    "module": "ESNext",
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
+    "rootDir": "src",
+    "verbatimModuleSyntax": true,
+    "types": ["node"],
+    "target": "es2022",
     "strict": true,
-    "outDir": "dist",
+    "skipLibCheck": true,
     "resolveJsonModule": true,
+    "preserveWatchOutput": true,
+    "outDir": "dist",
+    "noUnusedLocals": true,
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "module": "preserve",
+    "lib": ["ES2023", "DOM", "WebWorker"],
     "jsx": "react",
-    "lib": ["ES2022", "DOM", "WebWorker"],
-    "allowJs": true
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "virtual:data-hooks/useSubscription": ["./src/react/hooks/useSubscription.swr.tsx"],
+      "virtual:data-hooks/SWRConfigCompat": ["./src/react/providers/SWRConfigCompat.swr.tsx"],
+      "virtual:data-hooks/usePagesOrInfinite": ["./src/react/hooks/usePagesOrInfinite.swr.tsx"]
+    }
   },
   "exclude": ["node_modules"],
-  "include": ["src", "global.d.ts"]
+  "include": ["src", "global.d.ts", "src/types/virtual-data-hooks.d.ts"]
 }

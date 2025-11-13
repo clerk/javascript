@@ -1,7 +1,6 @@
-export * from './middlewareHandler';
-
-export * from './getAuth';
+export { auth } from './auth';
 export { clerkClient } from './clerkClient';
+export { clerkMiddleware } from './clerkMiddleware';
 
 /**
  * Re-export resource types from @clerk/backend

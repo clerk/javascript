@@ -1,8 +1,8 @@
-import '@clerk/types';
+import '@clerk/shared/types';
 
-import type { EnvironmentResource } from '@clerk/types';
+import type { EnvironmentResource } from '@clerk/shared/types';
 
-declare module '@clerk/types' {
+declare module '@clerk/shared/types' {
   export interface Clerk {
     __unstable__environment: EnvironmentResource | null | undefined;
   }

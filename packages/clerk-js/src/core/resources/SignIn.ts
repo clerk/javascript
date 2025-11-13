@@ -1,11 +1,24 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { ClerkWebAuthnError } from '@clerk/shared/error';
-import { Poller } from '@clerk/shared/poller';
-import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
 import {
-  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
-  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
-} from '@clerk/shared/webauthn';
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import {
+  generateSignatureWithBase,
+  generateSignatureWithCoinbaseWallet,
+  generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
+  getBaseIdentifier,
+  getCoinbaseWalletIdentifier,
+  getMetamaskIdentifier,
+  getOKXWalletIdentifier,
+} from '@clerk/shared/internal/clerk-js/web3';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
+import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
   AttemptSecondFactorParams,
@@ -13,6 +26,7 @@ import type {
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
   AuthenticateWithWeb3Params,
+  ClientTrustState,
   CreateEmailLinkFlowReturn,
   EmailCodeConfig,
   EmailCodeFactor,
@@ -38,6 +52,7 @@ import type {
   SignInFutureEmailLinkSendParams,
   SignInFutureFinalizeParams,
   SignInFutureMFAPhoneCodeVerifyParams,
+  SignInFuturePasskeyParams,
   SignInFuturePasswordParams,
   SignInFuturePhoneCodeSendParams,
   SignInFuturePhoneCodeVerifyParams,
@@ -58,30 +73,23 @@ import type {
   Web3Provider,
   Web3SignatureConfig,
   Web3SignatureFactor,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { deepCamelToSnake, deepSnakeToCamel } from '@clerk/shared/underscore';
+import {
+  isWebAuthnAutofillSupported as isWebAuthnAutofillSupportedOnWindow,
+  isWebAuthnSupported as isWebAuthnSupportedOnWindow,
+} from '@clerk/shared/webauthn';
 
 import { debugLogger } from '@/utils/debug';
 
+import { getBrowserLocale } from '../../utils';
 import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
-import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '../../utils/passkeys';
-import { createValidatePassword } from '../../utils/passwords/password';
+  _authenticateWithPopup,
+  _futureAuthenticateWithPopup,
+  wrapWithPopupRoutes,
+} from '../../utils/authenticateWithPopup';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -107,6 +115,7 @@ export class SignIn extends BaseResource implements SignInResource {
   identifier: string | null = null;
   createdSessionId: string | null = null;
   userData: UserData = new UserData(null);
+  clientTrustState?: ClientTrustState;
 
   /**
    * The current status of the sign-in process.
@@ -163,9 +172,10 @@ export class SignIn extends BaseResource implements SignInResource {
 
   create = (params: SignInCreateParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.create', { id: this.id, strategy: 'strategy' in params ? params.strategy : undefined });
+    const locale = getBrowserLocale();
     return this._basePost({
       path: this.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   };
 
@@ -222,6 +232,7 @@ export class SignIn extends BaseResource implements SignInResource {
           redirectUrl: params.redirectUrl,
           actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
           oidcPrompt: params.oidcPrompt,
+          enterpriseConnectionId: params.enterpriseConnectionId,
         } as EnterpriseSSOConfig;
         break;
       default:
@@ -308,7 +319,8 @@ export class SignIn extends BaseResource implements SignInResource {
     params: AuthenticateWithRedirectParams,
     navigateCallback: (url: URL | string) => void,
   ): Promise<void> => {
-    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn } = params || {};
+    const { strategy, redirectUrlComplete, identifier, oidcPrompt, continueSignIn, enterpriseConnectionId } =
+      params || {};
     const actionCompleteRedirectUrl = redirectUrlComplete;
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
@@ -328,6 +340,7 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
         oidcPrompt,
+        enterpriseConnectionId,
       });
     }
 
@@ -507,7 +520,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
+      return createValidatePassword(loadZxcvbn, {
         ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
@@ -526,6 +539,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
       this.userData = new UserData(data.user_data);
+      this.clientTrustState = data.client_trust_state ?? undefined;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -606,6 +620,8 @@ class SignInFuture implements SignInFutureResource {
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
+  #hasBeenFinalized = false;
+
   constructor(readonly resource: SignIn) {}
 
   get id() {
@@ -661,6 +677,10 @@ class SignInFuture implements SignInFutureResource {
     return this.resource.secondFactorVerification;
   }
 
+  get hasBeenFinalized() {
+    return this.#hasBeenFinalized;
+  }
+
   async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
@@ -704,9 +724,10 @@ class SignInFuture implements SignInFutureResource {
   }
 
   private async _create(params: SignInFutureCreateParams): Promise<void> {
+    const locale = getBrowserLocale();
     await this.resource.__internal_basePost({
       path: this.resource.pathRoot,
-      body: params,
+      body: locale ? { locale, ...params } : params,
     });
   }
 
@@ -725,9 +746,14 @@ class SignInFuture implements SignInFutureResource {
       // TODO @userland-errors:
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.resource.identifier;
+      const locale = getBrowserLocale();
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,
-        body: { identifier: identifier || previousIdentifier, password: params.password },
+        body: {
+          identifier: identifier || previousIdentifier,
+          password: params.password,
+          ...(locale ? { locale } : {}),
+        },
       });
     });
   }
@@ -878,12 +904,8 @@ class SignInFuture implements SignInFutureResource {
   }
 
   async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
-    const { flow = 'auto', strategy, redirectUrl, redirectCallbackUrl } = params;
+    const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId } = params;
     return runAsyncResourceTask(this.resource, async () => {
-      if (flow !== 'auto') {
-        throw new Error('modal flow is not supported yet');
-      }
-
       let actionCompleteRedirectUrl = redirectUrl;
       try {
         new URL(redirectUrl);
@@ -891,16 +913,43 @@ class SignInFuture implements SignInFutureResource {
         actionCompleteRedirectUrl = window.location.origin + redirectUrl;
       }
 
+      const routes = { redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl), actionCompleteRedirectUrl };
+      if (popup) {
+        const wrappedRoutes = wrapWithPopupRoutes(SignIn.clerk, {
+          redirectCallbackUrl: routes.redirectUrl,
+          redirectUrl: actionCompleteRedirectUrl,
+        });
+        routes.redirectUrl = wrappedRoutes.redirectCallbackUrl;
+        routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
+      }
+
       await this._create({
         strategy,
-        redirectUrl: SignIn.clerk.buildUrlWithAuth(redirectCallbackUrl),
-        actionCompleteRedirectUrl,
+        ...routes,
       });
+
+      if (strategy === 'enterprise_sso') {
+        await this.resource.__internal_basePost({
+          body: {
+            ...routes,
+            oidcPrompt,
+            enterpriseConnectionId,
+            strategy: 'enterprise_sso',
+          },
+          action: 'prepare_first_factor',
+        });
+      }
 
       const { status, externalVerificationRedirectURL } = this.resource.firstFactorVerification;
 
       if (status === 'unverified' && externalVerificationRedirectURL) {
-        windowNavigate(externalVerificationRedirectURL);
+        if (popup) {
+          await _futureAuthenticateWithPopup(SignIn.clerk, { popup, externalVerificationRedirectURL });
+          // Pick up the modified SignIn resource
+          await this.resource.reload();
+        } else {
+          windowNavigate(externalVerificationRedirectURL);
+        }
       }
     });
   }
@@ -976,6 +1025,77 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
+  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: unknown }> {
+    const { flow } = params || {};
+
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+    const isWebAuthnAutofillSupported =
+      SignIn.clerk.__internal_isWebAuthnAutofillSupported || isWebAuthnAutofillSupportedOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.resource, async () => {
+      if (flow === 'autofill' || flow === 'discoverable') {
+        await this._create({ strategy: 'passkey' });
+      } else {
+        const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
+
+        if (!passKeyFactor) {
+          clerkVerifyPasskeyCalledBeforeCreate();
+        }
+        await this.resource.__internal_basePost({
+          body: { strategy: 'passkey' },
+          action: 'prepare_first_factor',
+        });
+      }
+
+      const { nonce } = this.firstFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+
+      if (!publicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      let canUseConditionalUI = false;
+
+      if (flow === 'autofill') {
+        /**
+         * If autofill is not supported gracefully handle the result, we don't need to throw.
+         * The caller should always check this before calling this method.
+         */
+        canUseConditionalUI = await isWebAuthnAutofillSupported();
+      }
+
+      // Invoke the navigator.create.get() method.
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: canUseConditionalUI,
+      });
+
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      await this.resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
+        action: 'attempt_first_factor',
+      });
+    });
+  }
+
   async sendMFAPhoneCode(): Promise<{ error: unknown }> {
     return runAsyncResourceTask(this.resource, async () => {
       const phoneCodeFactor = this.resource.supportedSecondFactors?.find(f => f.strategy === 'phone_code');
@@ -1034,9 +1154,13 @@ class SignInFuture implements SignInFutureResource {
         throw new Error('Cannot finalize sign-in without a created session.');
       }
 
-      // Reload the client to prevent an issue where the created session is not picked up.
-      await SignIn.clerk.client?.reload();
+      // Reload the client if the created session is not in the client's sessions. This can happen during modal SSO
+      // flows where the in-memory client does not have the created session.
+      if (SignIn.clerk.client && !SignIn.clerk.client.sessions.some(s => s.id === this.resource.createdSessionId)) {
+        await SignIn.clerk.client.reload();
+      }
 
+      this.#hasBeenFinalized = true;
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }

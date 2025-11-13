@@ -1,4 +1,5 @@
 import type { VerifyTokenOptions } from '@clerk/backend';
+import type { OrganizationSyncOptions } from '@clerk/backend/internal';
 import type {
   LegacyRedirectProps,
   MultiDomainAndOrProxy,
@@ -6,15 +7,16 @@ import type {
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
-export type LoaderOptions = {
+export type ClerkMiddlewareOptions = {
   publishableKey?: string;
   jwtKey?: string;
   secretKey?: string;
   machineSecretKey?: string;
   signInUrl?: string;
   signUpUrl?: string;
+  organizationSyncOptions?: OrganizationSyncOptions;
 } & Pick<VerifyTokenOptions, 'audience' | 'authorizedParties'> &
   MultiDomainAndOrProxy &
   SignInForceRedirectUrl &
@@ -22,6 +24,8 @@ export type LoaderOptions = {
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps;
+
+export type LoaderOptions = ClerkMiddlewareOptions;
 
 export type AdditionalStateOptions = SignInFallbackRedirectUrl &
   SignUpFallbackRedirectUrl &

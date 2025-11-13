@@ -1,5 +1,11 @@
-import { useSignIn, useSignUp } from '@clerk/react';
-import type { EnterpriseSSOStrategy, OAuthStrategy, SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import { useSignIn, useSignUp } from '@clerk/react/legacy';
+import type {
+  EnterpriseSSOStrategy,
+  OAuthStrategy,
+  SetActive,
+  SignInResource,
+  SignUpResource,
+} from '@clerk/shared/types';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 

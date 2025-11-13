@@ -1,8 +1,24 @@
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
+
+import type { PaginatedResourceResponse } from '../../api/resources/Deserializer';
 import { joinPaths } from '../../util/path';
 import type { APIKey } from '../resources/APIKey';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/api_keys';
+
+type GetAPIKeyListParams = ClerkPaginationRequest<{
+  /**
+   * The user or organization ID to query API keys by
+   */
+  subject: string;
+  /**
+   * Whether to include invalid API keys.
+   *
+   * @default false
+   */
+  includeInvalid?: boolean;
+}>;
 
 type CreateAPIKeyParams = {
   type?: 'api_key';
@@ -11,7 +27,7 @@ type CreateAPIKeyParams = {
    */
   name: string;
   /**
-   * user or organization ID the API key is associated with
+   * The user or organization ID to associate the API key with
    */
   subject: string;
   /**
@@ -36,6 +52,14 @@ type RevokeAPIKeyParams = {
 };
 
 export class APIKeysAPI extends AbstractAPI {
+  async list(queryParams: GetAPIKeyListParams) {
+    return this.request<PaginatedResourceResponse<APIKey[]>>({
+      method: 'GET',
+      path: basePath,
+      queryParams,
+    });
+  }
+
   async create(params: CreateAPIKeyParams) {
     return this.request<APIKey>({
       method: 'POST',

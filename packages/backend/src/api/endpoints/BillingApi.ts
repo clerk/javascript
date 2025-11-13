@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest } from '@clerk/types';
+import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { BillingPlan } from '../resources/CommercePlan';
@@ -7,7 +7,7 @@ import type { BillingSubscriptionItem } from '../resources/CommerceSubscriptionI
 import type { PaginatedResourceResponse } from '../resources/Deserializer';
 import { AbstractAPI } from './AbstractApi';
 
-const basePath = '/commerce';
+const basePath = '/billing';
 const organizationBasePath = '/organizations';
 const userBasePath = '/users';
 

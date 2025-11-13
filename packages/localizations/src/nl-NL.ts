@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiëren en sluiten',
+      formHint: 'Om veiligheidsredenen kunnen we je dit later niet meer laten zien.',
+      formTitle: 'Kopieer nu je API-sleutel "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const nlNL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Gebruikersapparaat',
   badge__you: 'Jij',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const nlNL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const nlNL: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wachtwoord',
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-sleutel',
+  formFieldLabel__apiKeyDescription: 'Beschrijving',
+  formFieldLabel__apiKeyExpiration: 'Vervaldatum',
+  formFieldLabel__apiKeyName: 'Naam geheime sleutel',
   formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
@@ -282,7 +289,7 @@ export const nlNL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +298,7 @@ export const nlNL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const nlNL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
@@ -639,6 +648,10 @@ export const nlNL: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Wachtwoord resetcode',
       resendButton: 'Niet ontvangen? Verstuur opnieuw',
@@ -758,6 +771,10 @@ export const nlNL: LocalizationResource = {
         subtitleNewTab: 'Ga naar de vorige tab om verder te gaan',
         title: 'E-mail bevestigd',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +948,9 @@ export const nlNL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
+    action__closeUserMenu: 'Gebruikersmenu sluiten',
     action__manageAccount: 'Account beheren',
+    action__openUserMenu: 'Gebruikersmenu openen',
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },
@@ -963,7 +982,7 @@ export const nlNL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +991,7 @@ export const nlNL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1032,7 +1051,7 @@ export const nlNL: LocalizationResource = {
       actionDescription: 'Typ "Account verwijderen" hieronder om door te gaan.',
       confirm: 'Account verwijderen',
       messageLine1:
-        'Weet je zeker dat je je account van Clerk wilt verwijderen? Neem contact op met de eigenaar van de applicatie om je informatie uit hun applicatie en andere services te verwijderen.',
+        'Weet je zeker dat je je account wilt verwijderen? Sommige bijbehorende gegevens kunnen bewaard blijven. Neem contact op met de ondersteuning om volledige gegevensverwijdering aan te vragen.',
       messageLine2: 'Deze actie is permanent en onherroepelijk.',
       title: 'Account verwijderen',
     },

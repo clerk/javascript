@@ -1,4 +1,5 @@
-import type { SignInSignalValue, SignUpSignalValue } from '@clerk/types';
+import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { SignInSignalValue, SignUpSignalValue } from '@clerk/shared/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -10,6 +11,17 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
   useAssertWrappedByClerkProvider('useClerkSignal');
 
   const clerk = useIsomorphicClerkContext();
+
+  switch (signal) {
+    case 'signIn':
+      clerk.telemetry?.record(eventMethodCalled('useSignIn', { apiVersion: '2025-11' }));
+      break;
+    case 'signUp':
+      clerk.telemetry?.record(eventMethodCalled('useSignUp', { apiVersion: '2025-11' }));
+      break;
+    default:
+      break;
+  }
 
   const subscribe = useCallback(
     (callback: () => void) => {
@@ -62,7 +74,7 @@ function useClerkSignal(signal: 'signIn' | 'signUp'): SignInSignalValue | SignUp
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignInSignal() {
+export function useSignIn() {
   return useClerkSignal('signIn');
 }
 
@@ -79,6 +91,6 @@ export function useSignInSignal() {
  *
  * @experimental This experimental API is subject to change.
  */
-export function useSignUpSignal() {
+export function useSignUp() {
   return useClerkSignal('signUp');
 }

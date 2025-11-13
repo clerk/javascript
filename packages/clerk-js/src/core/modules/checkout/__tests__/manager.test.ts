@@ -1,4 +1,4 @@
-import type { BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/types';
+import type { BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/shared/types';
 import type { MockedFunction } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -21,6 +21,7 @@ const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> 
   isImmediatePlanChange: false,
   planPeriod: 'month',
   freeTrialEndsAt: null,
+  needsPaymentMethod: true,
   payer: {
     id: 'payer_123',
     createdAt: new Date('2025-01-01'),
@@ -52,7 +53,7 @@ const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> 
     pathRoot: '',
     reload: vi.fn(),
   },
-  paymentSource: undefined,
+  paymentMethod: undefined,
   confirm: vi.fn(),
   reload: vi.fn(),
   pathRoot: '/checkout',

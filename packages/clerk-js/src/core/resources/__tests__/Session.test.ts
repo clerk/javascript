@@ -1,4 +1,4 @@
-import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/types';
+import type { InstanceType, OrganizationJSON, SessionJSON } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { clerkMock, createUser, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
@@ -17,8 +17,17 @@ const baseFapiClientOptions = {
 };
 
 describe('Session', () => {
+  beforeEach(() => {
+    // Mock Date.now() to make the test tokens appear valid
+    // mockJwt has iat: 1666648250, exp: 1666648310
+    // Set current time to 1666648260 (10 seconds after iat, 50 seconds before exp)
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(1666648260 * 1000));
+  });
+
   afterEach(() => {
     SessionTokenCache.clear();
+    vi.useRealTimers();
   });
 
   describe('getToken()', () => {
@@ -26,7 +35,7 @@ describe('Session', () => {
 
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
-      BaseResource.clerk = clerkMock() as any;
+      BaseResource.clerk = clerkMock();
     });
 
     afterEach(() => {
@@ -67,7 +76,7 @@ describe('Session', () => {
     it('hydrates token cache from lastActiveToken', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      }) as any;
+      });
 
       const session = new Session({
         status: 'active',
@@ -91,10 +100,81 @@ describe('Session', () => {
       expect(dispatchSpy).toHaveBeenCalledTimes(2);
     });
 
+    it('does not re-cache token when Session is reconstructed with same token', async () => {
+      BaseResource.clerk = clerkMock({
+        organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
+      });
+
+      SessionTokenCache.clear();
+
+      const session1 = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(SessionTokenCache.size()).toBe(1);
+      const cachedEntry1 = SessionTokenCache.get({ tokenId: 'session_1-activeOrganization' });
+      expect(cachedEntry1).toBeDefined();
+
+      const session2 = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: 'activeOrganization',
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(SessionTokenCache.size()).toBe(1);
+
+      const token1 = await session1.getToken();
+      const token2 = await session2.getToken();
+
+      expect(token1).toBe(token2);
+      expect(token1).toEqual(mockJwt);
+      expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
+    });
+
+    it('caches token from cookie during degraded mode recovery', async () => {
+      BaseResource.clerk = clerkMock();
+
+      SessionTokenCache.clear();
+
+      const sessionFromCookie = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(SessionTokenCache.size()).toBe(1);
+      const cachedEntry = SessionTokenCache.get({ tokenId: 'session_1' });
+      expect(cachedEntry).toBeDefined();
+
+      const token = await sessionFromCookie.getToken();
+      expect(token).toEqual(mockJwt);
+      expect(BaseResource.clerk.getFapiClient().request).not.toHaveBeenCalled();
+    });
+
     it('dispatches token:update event on getToken with active organization', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      }) as any;
+      });
 
       const session = new Session({
         status: 'active',
@@ -129,7 +209,7 @@ describe('Session', () => {
     it('does not dispatch token:update if template is provided', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      }) as any;
+      });
 
       const session = new Session({
         status: 'active',
@@ -150,7 +230,7 @@ describe('Session', () => {
     it('dispatches token:update when provided organization ID matches current active organization', async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'activeOrganization' } as OrganizationJSON),
-      }) as any;
+      });
 
       const session = new Session({
         status: 'active',
@@ -169,7 +249,7 @@ describe('Session', () => {
     });
 
     it('does not dispatch token:update when provided organization ID does not match current active organization', async () => {
-      BaseResource.clerk = clerkMock() as any;
+      BaseResource.clerk = clerkMock();
 
       const session = new Session({
         status: 'active',
@@ -231,7 +311,7 @@ describe('Session', () => {
     it(`uses the current session's lastActiveOrganizationId by default, not clerk.organization.id`, async () => {
       BaseResource.clerk = clerkMock({
         organization: new Organization({ id: 'oldActiveOrganization' } as OrganizationJSON),
-      }) as any;
+      });
 
       const session = new Session({
         status: 'active',
@@ -250,6 +330,102 @@ describe('Session', () => {
         body: { organizationId: 'newActiveOrganization' },
       });
     });
+
+    it('deduplicates concurrent getToken calls to prevent multiple API requests', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      const [token1, token2, token3] = await Promise.all([session.getToken(), session.getToken(), session.getToken()]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+      expect(token1).toEqual(mockJwt);
+      expect(token2).toEqual(mockJwt);
+      expect(token3).toEqual(mockJwt);
+    });
+
+    it('deduplicates concurrent getToken calls with same template', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      const [token1, token2] = await Promise.all([
+        session.getToken({ template: 'custom-template' }),
+        session.getToken({ template: 'custom-template' }),
+      ]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+      expect(token1).toEqual(mockJwt);
+      expect(token2).toEqual(mockJwt);
+    });
+
+    it('does not deduplicate getToken calls with different templates', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      await Promise.all([session.getToken({ template: 'template1' }), session.getToken({ template: 'template2' })]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not deduplicate getToken calls with different organization IDs', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      await Promise.all([session.getToken({ organizationId: 'org_1' }), session.getToken({ organizationId: 'org_2' })]);
+
+      expect(requestSpy).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('touch()', () => {
@@ -257,7 +433,7 @@ describe('Session', () => {
 
     beforeEach(() => {
       dispatchSpy = vi.spyOn(eventBus, 'emit');
-      BaseResource.clerk = clerkMock() as any;
+      BaseResource.clerk = clerkMock();
     });
 
     afterEach(() => {

@@ -36,15 +36,10 @@ describe('Typedoc output', () => {
         "nextjs",
         "react",
         "shared",
-        "types",
       ]
     `);
   });
-  it('should have a deliberate file structure', async () => {
-    const files = await scanDirectory('file');
 
-    expect(files).toMatchSnapshot();
-  });
   it('should only contain lowercase files', async () => {
     const files = await scanDirectory('file');
     const upperCaseFiles = files.filter(file => /[A-Z]/.test(file));

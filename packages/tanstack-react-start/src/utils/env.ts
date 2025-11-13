@@ -1,10 +1,9 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import type { H3EventContext } from '@tanstack/react-start/server';
 
-export const getPublicEnvVariables = (context?: H3EventContext) => {
+export const getPublicEnvVariables = () => {
   const getValue = (name: string): string => {
-    return getEnvVariable(`VITE_${name}`, context) || getEnvVariable(name, context);
+    return getEnvVariable(`VITE_${name}`) || getEnvVariable(name);
   };
 
   return {
@@ -15,6 +14,7 @@ export const getPublicEnvVariables = (context?: H3EventContext) => {
     signInUrl: getValue('CLERK_SIGN_IN_URL'),
     signUpUrl: getValue('CLERK_SIGN_UP_URL'),
     clerkJsUrl: getValue('CLERK_JS_URL') || getValue('CLERK_JS'),
+    clerkUiUrl: getValue('CLERK_UI_URL'),
     clerkJsVariant: getValue('CLERK_JS_VARIANT') as '' | 'headless' | undefined,
     clerkJsVersion: getValue('CLERK_JS_VERSION'),
     telemetryDisabled: isTruthy(getValue('CLERK_TELEMETRY_DISABLED')),

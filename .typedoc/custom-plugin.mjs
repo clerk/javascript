@@ -29,6 +29,7 @@ const LINK_REPLACEMENTS = [
   ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['create-organization-params', '#create-organization-params'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
   ['sign-in-resource', '/docs/reference/javascript/sign-in'],
@@ -57,7 +58,7 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
-  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payment-method-resource', '/docs/reference/javascript/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
   ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
@@ -65,6 +66,9 @@ const LINK_REPLACEMENTS = [
   ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
   ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
+  ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
+  ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
+  ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
 ];
 
 /**
@@ -94,20 +98,50 @@ function getRelativeLinkReplacements() {
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /\(setActiveParams\)/g,
-      replace: '([setActiveParams](/docs/reference/javascript/types/set-active-params))',
-    },
-    {
-      pattern: /`LoadedClerk`/g,
-      replace: '[Clerk](/docs/reference/javascript/clerk)',
+      pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
+      replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
       pattern: /\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /\| `SignInResource` \|/,
-      replace: '| [SignInResource](/docs/reference/javascript/sign-in) |',
+      pattern: /`LoadedClerk`/g,
+      replace: '[Clerk](/docs/reference/javascript/clerk)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?LocalizationResource`?(?![\]\w`])/g,
+      replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      // SessionResource appears in plain text, with an array next to it, with backticks, etc.
+      // e.g. `SessionResource[]`
+      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[`SessionResource`](/docs/reference/javascript/session)$1',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
+      replace: '[`SessionStatusClaim`](/docs/reference/javascript/types/session-status)',
+    },
+    {
+      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
+      replace: '[SetActiveParams](/docs/reference/javascript/types/set-active-params)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
+      replace: '[`SignInResource`](/docs/reference/javascript/sign-in)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
+      replace: '[`SignedInSessionResource`](/docs/reference/javascript/session)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
+      replace: '[`SignUpResource`](/docs/reference/javascript/sign-up)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
+      replace: '[`OrganizationResource`](/docs/reference/javascript/organization)',
     },
     {
       pattern: /`OrganizationPrivateMetadata`/g,
@@ -137,6 +171,10 @@ function getCatchAllReplacements() {
       pattern: /`OrganizationMembershipPublicMetadata`/g,
       replace:
         '[`OrganizationMembershipPublicMetadata`](/docs/reference/javascript/types/metadata#organization-membership-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
+      replace: '[`UserResource`](/docs/reference/javascript/user)',
     },
     {
       /**

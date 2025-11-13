@@ -11,6 +11,9 @@ type LoadScriptOptions = {
   beforeLoad?: (script: HTMLScriptElement) => void;
 };
 
+/**
+ *
+ */
 export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTMLScriptElement> {
   const { async, defer, beforeLoad, crossOrigin, nonce } = opts || {};
 
@@ -33,6 +36,8 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
       script.defer = defer || false;
 
       script.addEventListener('load', () => {
+        console.log('this loaded ', src);
+
         script.remove();
         resolve(script);
       });
@@ -49,5 +54,10 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
     });
   };
 
-  return retry(load, { shouldRetry: (_, iterations) => iterations <= 5 });
+  return retry(load, {
+    shouldRetry: (_, iterations) => {
+      console.log('nikos 3', _, iterations);
+      return iterations <= 5;
+    },
+  });
 }

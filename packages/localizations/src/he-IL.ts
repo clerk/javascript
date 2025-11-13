@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const heIL: LocalizationResource = {
   locale: 'he-IL',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'העתק וסגור',
+      formHint: 'מסיבות אבטחה, לא נוכל לאפשר לך לצפות בזה שוב מאוחר יותר.',
+      formTitle: 'העתק את מפתח ה-API "{{name}}" שלך כעת',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const heIL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
   badge__you: 'אתה',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const heIL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const heIL: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'מפתח API',
+  formFieldLabel__apiKeyDescription: 'תיאור',
+  formFieldLabel__apiKeyExpiration: 'תאריך תפוגה',
+  formFieldLabel__apiKeyName: 'שם מפתח סודי',
   formFieldLabel__automaticInvitations: 'הפעל הזמנות אוטומטיות לדומיין הזה',
   formFieldLabel__backupCode: 'קוד גיבוי',
   formFieldLabel__confirmDeletion: 'אישור',
@@ -282,7 +289,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +298,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -483,9 +490,11 @@ export const heIL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'צור ארגון',
     action__invitationAccept: 'הצטרף',
     action__manageOrganization: 'נהל ארגון',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'בקשה להצטרפות',
     notSelected: 'לא נבחר ארגון',
     personalWorkspace: 'אזור אישי',
@@ -632,6 +641,10 @@ export const heIL: LocalizationResource = {
         titleNewTab: 'נכנס בכרטיסייה אחרת',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'אפס קוד הסיסמה',
       resendButton: 'שלח קוד שוב',
@@ -751,6 +764,10 @@ export const heIL: LocalizationResource = {
         subtitleNewTab: 'חזור לכרטיסייה הקודמת להמשיך',
         title: 'אימות דוא"ל הצליח',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -922,7 +939,9 @@ export const heIL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'הוסף חשבון',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'נהל חשבון',
+    action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
   },
@@ -952,7 +971,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -961,7 +980,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1020,7 +1039,7 @@ export const heIL: LocalizationResource = {
       actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
       messageLine1:
-        'האם אתה בטוח שאתה רוצה למחוק את החשבון שלך מ-Clerk? אנא צור קשר עם בעל האפליקציה כדי למחוק את המידע שלך מהאפליקציה שלהם ומשירותים אחרים.',
+        'האם אתה בטוח שברצונך למחוק את החשבון שלך? חלק מהנתונים המשויכים עשויים להישמר. כדי לבקש מחיקת נתונים מלאה, אנא צור קשר עם התמיכה.',
       messageLine2: 'פעולה זו היא סופית ובלתי הפיכה.',
       title: 'מחק חשבון',
     },

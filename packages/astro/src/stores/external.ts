@@ -1,5 +1,6 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { SignedInSessionResource } from '@clerk/shared/types';
 import { batched, computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
@@ -51,7 +52,7 @@ export const $userStore = computed([$authStore], auth => auth.user);
  * @example
  * $sessionStore.subscribe((session) => console.log(session.id))
  */
-export const $sessionStore = computed([$authStore], auth => auth.session);
+export const $sessionStore = computed([$authStore], auth => auth.session as SignedInSessionResource | null | undefined);
 
 /**
  * A client side store that is populated after clerk-js has loaded.

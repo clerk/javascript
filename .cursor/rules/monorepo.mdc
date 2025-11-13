@@ -50,7 +50,6 @@ Framework-Specific Packages
 - `@clerk/vue` - Vue.js composables and components
 - `@clerk/astro` - Astro integration with SSR support
 - `@clerk/nuxt` - Nuxt.js module
-- `@clerk/remix` - Remix loader and action utilities
 - `@clerk/express` - Express.js middleware
 - `@clerk/fastify` - Fastify plugin
 - `@clerk/expo` - React Native/Expo SDK
@@ -91,7 +90,9 @@ Localization Support
 Package Interdependency Rules
 
 - `@clerk/shared` is a common dependency for most packages
-- `@clerk/types` provides TypeScript definitions used across packages
+- `@clerk/shared/types` provides TypeScript definitions used across packages
+  - `@clerk/types` is an alias for `@clerk/shared/types`, but its usage is deprecated. Prefer using `@clerk/shared/types`.
+  - If a TypeScript error comes from a type imported from `@clerk/shared/types`, run `turbo build --filter=@clerk/shared --filter=@clerk/types` to make sure the latest version of the packages are being used.
 - `@clerk/backend` is independent and used for server-side operations
 - Framework packages depend on `@clerk/clerk-js` for core functionality
 - Integration packages build upon framework-specific packages

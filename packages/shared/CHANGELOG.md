@@ -1,5 +1,170 @@
 # Change Log
 
+## 3.33.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+## 3.32.0
+
+### Minor Changes
+
+- Implemented server-side pagination and filtering for API keys ([#6453](https://github.com/clerk/javascript/pull/6453)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add types for errors used in new custom flow APIs ([#7174](https://github.com/clerk/javascript/pull/7174)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Support granular API keys settings for user and organization profiles ([#7179](https://github.com/clerk/javascript/pull/7179)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Add email codes as an option to `PrepareSecondFactorParams` ([#7175](https://github.com/clerk/javascript/pull/7175)) by [@tmilewski](https://github.com/tmilewski)
+
+## 3.31.1
+
+### Patch Changes
+
+- Move clientTrustState to SignIn ([#7163](https://github.com/clerk/javascript/pull/7163)) by [@tmilewski](https://github.com/tmilewski)
+
+- Avoid revalidating first page on infinite pagination. ([#7153](https://github.com/clerk/javascript/pull/7153)) by [@panteliselef](https://github.com/panteliselef)
+
+## 3.31.0
+
+### Minor Changes
+
+- Adds `client_trust_state` field to Client and SignIn resources to support new fraud protection feature. ([#7096](https://github.com/clerk/javascript/pull/7096)) by [@chriscanin](https://github.com/chriscanin)
+
+### Patch Changes
+
+- Experimental: Ground work for fixing stale data between hooks and components by sharing a single cache. ([#6913](https://github.com/clerk/javascript/pull/6913)) by [@panteliselef](https://github.com/panteliselef)
+
+## 3.30.0
+
+### Minor Changes
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+### Patch Changes
+
+- Propagate locale from ClerkProvider to PaymentElement ([#6885](https://github.com/clerk/javascript/pull/6885)) by [@aeliox](https://github.com/aeliox)
+
+## 3.29.0
+
+### Minor Changes
+
+- Allow free trials without requiring a payment method, based on the configuration of an instance. ([#7068](https://github.com/clerk/javascript/pull/7068)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Billing Beta] Remove unnecessary `orgId` from BillingPayerMethods interface. ([#7087](https://github.com/clerk/javascript/pull/7087)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fixes a bug where `usePlans()` would display stale data even if the `for` property has changed. ([#7067](https://github.com/clerk/javascript/pull/7067)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/types@4.96.0
+
+## 3.28.3
+
+### Patch Changes
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911)]:
+  - @clerk/types@4.95.1
+
+## 3.28.2
+
+### Patch Changes
+
+- Bug fix for billing hooks that would sometimes fire requests while the user was signed out. ([#6992](https://github.com/clerk/javascript/pull/6992)) by [@panteliselef](https://github.com/panteliselef)
+
+  Improves the `usePlan` hook has been updated to not fire requests when switching organizations or when users sign in/out.
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764)]:
+  - @clerk/types@4.95.0
+
+## 3.28.1
+
+### Patch Changes
+
+- Rename static properties from 'name' to 'kind' in ClerkError class ([#7004](https://github.com/clerk/javascript/pull/7004)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+## 3.28.0
+
+### Minor Changes
+
+- Internal refactor of error handling to improve type safety and error classification. ([#6985](https://github.com/clerk/javascript/pull/6985)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  - Introduce new `ClerkError` base class for all Clerk errors
+  - Rename internal error files: `apiResponseError.ts` → `clerkApiResponseError.ts`, `runtimeError.ts` → `clerkRuntimeError.ts`
+  - Add `ClerkAPIError` class for individual API errors with improved type safety
+  - Add type guard utilities (`isClerkError`, `isClerkRuntimeError`, `isClerkApiResponseError`) for better error handling
+  - Deprecate `clerkRuntimeError` property in favor of `clerkError` for consistency
+  - Add support for error codes, long messages, and documentation URLs
+
+### Patch Changes
+
+- Fixed JWT public key caching in `verifyToken()` to support multi-instance scenarios. Public keys are now correctly cached per `kid` from the token header instead of using a single shared cache key. ([#6993](https://github.com/clerk/javascript/pull/6993)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  **What was broken:**
+
+  When verifying JWT tokens with the `jwtKey` option (PEM public key), all keys were cached under the same cache key. This caused verification failures in multi-instance scenarios.
+
+  **What's fixed:**
+
+  JWT public keys are now cached using the `kid` value from each token's header.
+
+- Updated dependencies [[`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2)]:
+  - @clerk/types@4.94.0
+
+## 3.27.4
+
+### Patch Changes
+
+- [Billing Beta] Rename payment source to payment method. ([#6865](https://github.com/clerk/javascript/pull/6865)) by [@panteliselef](https://github.com/panteliselef)
+
+  `Clerk.user.initializePaymentSource()` -> `Clerk.user.initializePaymentMethod()`
+  `Clerk.user.addPaymentSource()` -> `Clerk.user.addPaymentMethod()`
+  `Clerk.user.getPaymentSources()` -> `Clerk.user.getPaymentMethods()`
+
+  `Clerk.organization.initializePaymentSource()` -> `Clerk.organization.initializePaymentMethod()`
+  `Clerk.organization.addPaymentSource()` -> `Clerk.organization.addPaymentMethod()`
+  `Clerk.organization.getPaymentSources()` -> `Clerk.organization.getPaymentMethods()`
+
+- Introduce deprecation warning for LocalStorageBroadcastChannel ([#6891](https://github.com/clerk/javascript/pull/6891)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342)]:
+  - @clerk/types@4.93.0
+
 ## 3.27.3
 
 ### Patch Changes

@@ -45,7 +45,6 @@ All packages of the monorepo are inside [packages](../packages). For package spe
 - [`@clerk/backend`](../packages/backend): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
 - [`@clerk/clerk-js`](../packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
 - [`@clerk/react`](../packages/react) Clerk package for React applications.
-- [`@clerk/types`](../packages/types): Main TypeScript typings for Clerk libraries.
 - Browse [packages](../packages) to see more
 
 Additionally there are packages which act as shared utilities or building blocks.

@@ -1,5 +1,131 @@
 # @clerk/vue
 
+## 1.15.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/types@4.99.0
+
+## 1.14.13
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/types@4.98.0
+
+## 1.14.12
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+  - @clerk/types@4.97.2
+
+## 1.14.11
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+
+## 1.14.10
+
+### Patch Changes
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/types@4.97.0
+
+## 1.14.9
+
+### Patch Changes
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/shared@3.29.0
+  - @clerk/types@4.96.0
+
+## 1.14.8
+
+### Patch Changes
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911)]:
+  - @clerk/types@4.95.1
+  - @clerk/shared@3.28.3
+
+## 1.14.7
+
+### Patch Changes
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035)]:
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+
+## 1.14.6
+
+### Patch Changes
+
+- Updated dependencies [[`d8147fb`](https://github.com/clerk/javascript/commit/d8147fb58bfd6caf9a4f0a36fdc48c630d00387f)]:
+  - @clerk/shared@3.28.1
+
+## 1.14.5
+
+### Patch Changes
+
+- Updated dependencies [[`305f4ee`](https://github.com/clerk/javascript/commit/305f4eeb825086d55d1b0df198a0c43da8d94993), [`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2), [`1236c74`](https://github.com/clerk/javascript/commit/1236c745fd58020e0972938ca0a9ae697a24af02)]:
+  - @clerk/shared@3.28.0
+  - @clerk/types@4.94.0
+
+## 1.14.4
+
+### Patch Changes
+
+- Fixed an issue where the `transferable` prop in the `<SignIn />` component was incorrectly defaulting to `false` due to Vue's boolean prop coercion. ([#6935](https://github.com/clerk/javascript/pull/6935)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`9766c4a`](https://github.com/clerk/javascript/commit/9766c4afd26f2841d6f79dbdec2584ef8becd22f), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342)]:
+  - @clerk/types@4.93.0
+  - @clerk/shared@3.27.4
+
 ## 1.14.3
 
 ### Patch Changes

@@ -69,7 +69,6 @@ Please see the latest extension [authentication support matrix](https://clerk.co
     1. [**Base configuration**:](/packages/chrome-extension/docs/manifest.md#base-configuration) Use this if you plan to only use Clerk in the context of the extension.
     2. [**Session sync configuration**:](/packages/chrome-extension/docs/manifest.md#sync-host-configuration) Use this if you plan to share authentication with a website in the same browser.
 6.  **Add Clerk to your app:** Though not required, we generally suggest using Plasmo for browser extension development. This will enforce common standards across your extension as well as allow for easier integration with other browsers in the future.
-
     1. [**Via `ClerkProvider`:**](/packages/chrome-extension/docs/clerk-provider.md) This is the general approach to all extensions. From here you'll be able to support extension-only authentication as well as sharing authentication with a website in the same browser.
     2. [**Via service workers**:](/packages/chrome-extension/docs/service-workers.md) If you also require the use of background service workers, this will allow you to access the Clerk client from the extension context.
 

@@ -1,5 +1,4 @@
-import type { BillingPlanResource, GetPlansParams } from '@clerk/types';
-
+import type { BillingPlanResource, GetPlansParams } from '../../types';
 import { useClerkInstanceContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
@@ -14,10 +13,7 @@ export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlans
     if (!clerk.loaded) {
       return undefined;
     }
-    return ({ orgId, ...rest }) => {
-      // Cleanup `orgId` from the params
-      return clerk.billing.getPlans({ ...rest, for: _for });
-    };
+    return params => clerk.billing.getPlans({ ...params, for: _for });
   },
   options: {
     unauthenticated: true,

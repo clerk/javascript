@@ -1,5 +1,5 @@
 ---
-import type { UserButtonProps, UserProfileProps, Without } from '@clerk/types';
+import type { UserButtonProps, UserProfileProps, Without } from '@clerk/shared/types';
 
 type Props = Without<UserButtonProps, 'userProfileProps'> & {
   userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;

@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/types';
+import type { EnterpriseSSOStrategy, OAuthProvider, SamlStrategy, Web3Provider } from '@clerk/shared/types';
 import type React from 'react';
 import { useCallback } from 'react';
 import type { ActorRef } from 'xstate';
@@ -29,13 +29,18 @@ const useIsProviderEnabled = (
 
   if (provider === 'saml' || provider === 'enterprise_sso') {
     return (
+      // @ts-expect-error - __unstable__environment is not typed
       clerk.__unstable__environment?.userSettings.saml.enabled ??
+      // @ts-expect-error - __unstable__environment is not typed
       clerk.__unstable__environment?.userSettings.enterpriseSSO.enabled ??
       false
     );
   }
 
-  const data = getEnabledThirdPartyProviders(clerk.__unstable__environment);
+  const data = getEnabledThirdPartyProviders(
+    // @ts-expect-error - __unstable__environment is not typed
+    clerk.__unstable__environment as EnvironmentResource,
+  );
 
   return (
     isAuthenticatableOauthStrategy(provider, data.authenticatableOauthStrategies) ||

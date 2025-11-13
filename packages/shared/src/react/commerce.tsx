@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '@clerk/types';
-import type { Stripe, StripeElements } from '@stripe/stripe-js';
-import React, { type PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
+import React, { type PropsWithChildren, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
+import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';
@@ -62,19 +62,36 @@ const useInternalEnvironment = () => {
   return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
 };
 
+const useLocalization = () => {
+  const clerk = useClerk();
+
+  let locale = 'en';
+  try {
+    const localization = clerk.__internal_getOption('localization');
+    locale = localization?.locale || 'en';
+  } catch {
+    // ignore errors
+  }
+
+  // Normalize locale to 2-letter language code for Stripe compatibility
+  const normalizedLocale = locale.split('-')[0];
+
+  return normalizedLocale;
+};
+
 const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const { organization } = useOrganization();
   const { user } = useUser();
   const resource = forResource === 'organization' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
 
-  const { data: initializedPaymentSource, trigger: initializePaymentSource } = useSWRMutation(
+  const { data: initializedPaymentMethod, trigger: initializePaymentMethod } = useSWRMutation(
     {
-      key: 'billing-payment-source-initialize',
+      key: 'billing-payment-method-initialize',
       resourceId: resource?.id,
     },
     () => {
-      return resource?.initializePaymentSource({
+      return resource?.initializePaymentMethod({
         gateway: 'stripe',
       });
     },
@@ -86,14 +103,14 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
     if (!resource?.id) {
       return;
     }
-    initializePaymentSource().catch(() => {
+    initializePaymentMethod().catch(() => {
       // ignore errors
     });
   }, [resource?.id]);
 
-  const externalGatewayId = initializedPaymentSource?.externalGatewayId;
-  const externalClientSecret = initializedPaymentSource?.externalClientSecret;
-  const paymentMethodOrder = initializedPaymentSource?.paymentMethodOrder;
+  const externalGatewayId = initializedPaymentMethod?.externalGatewayId;
+  const externalClientSecret = initializedPaymentMethod?.externalClientSecret;
+  const paymentMethodOrder = initializedPaymentMethod?.paymentMethodOrder;
   const stripePublishableKey = environment?.commerceSettings.billing.stripePublishableKey;
 
   const { data: stripe } = useSWR(
@@ -114,7 +131,7 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
 
   return {
     stripe,
-    initializePaymentSource,
+    initializePaymentMethod,
     externalClientSecret,
     paymentMethodOrder,
   };
@@ -206,6 +223,7 @@ const PaymentElementProvider = ({ children, ...props }: PropsWithChildren<Paymen
 
 const PaymentElementInternalRoot = (props: PropsWithChildren) => {
   const { stripe, externalClientSecret, stripeAppearance } = usePaymentElementContext();
+  const locale = useLocalization();
 
   if (stripe && externalClientSecret) {
     return (
@@ -219,6 +237,7 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
           appearance: {
             variables: stripeAppearance,
           },
+          locale: locale as StripeElementsOptions['locale'],
         }}
       >
         <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
@@ -323,7 +342,7 @@ type UsePaymentElementReturn = {
 );
 
 const usePaymentElement = (): UsePaymentElementReturn => {
-  const { isPaymentElementReady, initializePaymentSource } = usePaymentElementContext();
+  const { isPaymentElementReady, initializePaymentMethod } = usePaymentElementContext();
   const { stripe, elements } = useStripeUtilsContext();
   const { externalClientSecret } = usePaymentElementContext();
 
@@ -363,8 +382,8 @@ const usePaymentElement = (): UsePaymentElementReturn => {
       return throwLibsMissingError();
     }
 
-    await initializePaymentSource();
-  }, [stripe, elements, initializePaymentSource]);
+    await initializePaymentMethod();
+  }, [stripe, elements, initializePaymentMethod]);
 
   const isProviderReady = Boolean(stripe && externalClientSecret);
 

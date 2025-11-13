@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Sao chép và đóng',
+      formHint: 'Vì lý do bảo mật, chúng tôi sẽ không cho phép bạn xem lại sau này.',
+      formTitle: 'Sao chép khóa API "{{name}}" của bạn ngay bây giờ',
+    },
     createdAndExpirationStatus__expiresOn:
       "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
@@ -69,8 +74,8 @@ export const viVN: LocalizationResource = {
   badge__upcomingPlan: 'Sắp tới',
   badge__userDevice: 'Thiết bị người dùng',
   badge__you: 'Bạn',
-  commerce: {
-    addPaymentMethod: 'Thêm phương thức thanh toán',
+  billing: {
+    addPaymentMethod__label: 'Thêm phương thức thanh toán',
     alwaysFree: 'Miễn phí mãi mãi',
     annually: 'Hàng năm',
     availableFeatures: 'Tính năng có sẵn',
@@ -125,8 +130,7 @@ export const viVN: LocalizationResource = {
     monthly: 'Hàng tháng',
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
-    paymentMethods: 'Phương thức thanh toán',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Thanh toán hàng năm',
         monthly: 'Thanh toán hàng tháng',
@@ -140,6 +144,7 @@ export const viVN: LocalizationResource = {
         testCardInfo: 'Thông tin thử nghiệm',
       },
     },
+    paymentMethods__label: 'Phương thức thanh toán',
     popular: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
@@ -224,6 +229,8 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Nhập mật khẩu của bạn',
   formFieldInputPlaceholder__phoneNumber: 'Nhập số điện thoại của bạn',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Khóa API',
   formFieldLabel__apiKeyDescription: 'Mô tả',
   formFieldLabel__apiKeyExpiration: 'Hết hạn',
   formFieldLabel__apiKeyName: 'Tên khoá bí mật',
@@ -287,7 +294,7 @@ export const viVN: LocalizationResource = {
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Làm mặc định',
         actionLabel__remove: 'Xóa',
         add: 'Thêm phương thức thanh toán mới',
@@ -296,11 +303,11 @@ export const viVN: LocalizationResource = {
         formButtonPrimary__add: 'Thêm phương thức thanh toán',
         formButtonPrimary__pay: 'Thanh toán {{amount}}',
         payWithTestCardButton: 'Thanh toán với thẻ thử nghiệm',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
-          successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
+          successMessage: '{{paymentMethod}} đã bị xóa khỏi tài khoản của bạn.',
           title: 'Xóa phương thức thanh toán',
         },
         title: 'Phương thức thanh toán',
@@ -493,9 +500,11 @@ export const viVN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Tạo tổ chức',
     action__invitationAccept: 'Tham gia',
     action__manageOrganization: 'Quản lý',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
@@ -645,6 +654,10 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -765,6 +778,10 @@ export const viVN: LocalizationResource = {
         subtitleNewTab: 'Quay lại tab trước để tiếp tục',
         title: 'Xác minh email thành công',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -938,7 +955,9 @@ export const viVN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Thêm tài khoản',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Quản lý tài khoản',
+    action__openUserMenu: undefined,
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
   },
@@ -970,7 +989,7 @@ export const viVN: LocalizationResource = {
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Làm mặc định',
         actionLabel__remove: 'Xóa',
         add: 'Thêm phương thức thanh toán mới',
@@ -979,11 +998,11 @@ export const viVN: LocalizationResource = {
         formButtonPrimary__add: 'Thêm phương thức thanh toán',
         formButtonPrimary__pay: 'Thanh toán {{amount}}',
         payWithTestCardButton: 'Thanh toán với thẻ thử',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
-          successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
+          successMessage: '{{paymentMethod}} đã bị xóa khỏi tài khoản của bạn.',
           title: 'Xóa phương thức thanh toán',
         },
         title: 'Phương thức thanh toán',
@@ -1040,7 +1059,7 @@ export const viVN: LocalizationResource = {
       actionDescription: 'Nhập "Xóa tài khoản" dưới đây để tiếp tục.',
       confirm: 'Xóa tài khoản',
       messageLine1:
-        'Bạn có chắc chắn muốn xóa tài khoản của bạn khỏi Clerk? Vui lòng liên hệ với chủ sở hữu ứng dụng để xóa thông tin của bạn khỏi ứng dụng và các dịch vụ khác của họ.',
+        'Bạn có chắc chắn muốn xóa tài khoản của mình không? Một số dữ liệu liên quan có thể được giữ lại. Để yêu cầu xóa dữ liệu hoàn toàn, vui lòng liên hệ bộ phận hỗ trợ.',
       messageLine2: 'Hành động này là vĩnh viễn và không thể hoàn tác.',
       title: 'Xóa tài khoản',
     },

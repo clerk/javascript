@@ -43,6 +43,14 @@ export class SamlAccount {
      * The SAML connection of the SAML account.
      */
     readonly samlConnection: SamlAccountConnection | null,
+    /**
+     * The date when the SAML account was last authenticated.
+     */
+    readonly lastAuthenticatedAt: number | null,
+    /**
+     * The ID of the enterprise connection associated with this SAML account.
+     */
+    readonly enterpriseConnectionId: string | null,
   ) {}
 
   static fromJSON(data: SamlAccountJSON): SamlAccount {
@@ -56,6 +64,8 @@ export class SamlAccount {
       data.last_name,
       data.verification && Verification.fromJSON(data.verification),
       data.saml_connection && SamlAccountConnection.fromJSON(data.saml_connection),
+      data.last_authenticated_at ?? null,
+      data.enterprise_connection_id,
     );
   }
 }

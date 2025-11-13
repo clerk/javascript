@@ -120,6 +120,7 @@ export default tseslint.config([
       'packages/backend/src/runtime/**/*',
       'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
+      'packages/shared/tsdown.config.mjs',
     ],
   },
   {
@@ -366,11 +367,34 @@ export default tseslint.config([
     },
   },
   {
-    name: 'packages/clerk-js - vitest',
-    files: ['packages/clerk-js/src/**/*.test.{ts,tsx}'],
+    name: 'packages - vitest',
+    files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
       'jest/unbound-method': 'off',
       '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
+    name: 'packages/shared',
+    files: ['packages/shared/src/**/*'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@clerk/shared', '@clerk/shared/*'],
+              message:
+                'Do not import from @clerk/shared package exports within the package itself. Use the @/ alias or relative imports from source files instead (e.g., import from "@/types" or "../../types").',
+            },
+            {
+              group: ['../../../*'],
+              message:
+                'Relative imports should not traverse more than 2 levels up (../../). Use the @/ path alias instead (e.g., import from "@/types").',
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -441,7 +465,7 @@ export default tseslint.config([
         { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
       ],
       'jsdoc/require-hyphen-before-param-description': 'warn',
-      'jsdoc/require-description': 'warn',
+      'jsdoc/require-description': 'off',
       'jsdoc/require-description-complete-sentence': 'warn',
       'jsdoc/require-param': ['warn', { ignoreWhenAllParamsMissing: true }],
       'jsdoc/require-param-description': 'warn',
@@ -452,6 +476,16 @@ export default tseslint.config([
         'always',
         { count: 1, applyToEndTag: false, startLines: 1, tags: { param: { lines: 'never' } } },
       ],
+    },
+  },
+  {
+    name: 'repo/jsdoc-internal',
+    files: ['packages/shared/src/**/internal/**/*.{ts,tsx}', 'packages/shared/src/**/*.{ts,tsx}'],
+    plugins: {
+      jsdoc: pluginJsDoc,
+    },
+    rules: {
+      'jsdoc/require-jsdoc': 'off',
     },
   },
   ...pluginYml.configs['flat/recommended'],

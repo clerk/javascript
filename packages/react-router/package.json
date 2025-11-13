@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -49,6 +49,10 @@
     "./webhooks": {
       "types": "./dist/webhooks.d.ts",
       "default": "./dist/webhooks.js"
+    },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "default": "./dist/legacy.js"
     }
   },
   "main": "dist/index.js",
@@ -92,14 +96,13 @@
     "@clerk/backend": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "cookie": "0.7.2",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
     "@types/cookie": "^0.6.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
-    "react-router": "7.9.1"
+    "react-router": "7.9.4"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",

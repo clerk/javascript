@@ -1,4 +1,4 @@
-import type { OAuthProvider, OAuthProviderData, OAuthStrategy } from '@clerk/types';
+import type { OAuthProvider, OAuthProviderData, OAuthStrategy } from './types';
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -176,6 +176,9 @@ interface getOAuthProviderDataProps {
   strategy?: OAuthStrategy;
 }
 
+/**
+ *
+ */
 export function getOAuthProviderData({
   provider,
   strategy,

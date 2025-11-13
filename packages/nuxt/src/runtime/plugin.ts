@@ -1,5 +1,5 @@
 import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
-import type { InitialState } from '@clerk/types';
+import type { InitialState } from '@clerk/shared/types';
 import { clerkPlugin } from '@clerk/vue';
 import { setErrorThrowerOptions } from '@clerk/vue/internal';
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
@@ -18,7 +18,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
   const runtimeConfig = useRuntimeConfig();
 
-  nuxtApp.vueApp.use(clerkPlugin, {
+  nuxtApp.vueApp.use(clerkPlugin as any, {
     ...(runtimeConfig.public.clerk ?? {}),
     sdkMetadata: {
       name: PACKAGE_NAME,

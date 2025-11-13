@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копіювати та закрити',
+      formHint: 'З міркувань безпеки ми не дозволимо вам переглянути його пізніше.',
+      formTitle: 'Скопіюйте ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const ukUA: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пристрій користувача',
   badge__you: 'Ви',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const ukUA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const ukUA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const ukUA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Термін дії',
+  formFieldLabel__apiKeyName: 'Назва секретного ключа',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код відновлення',
   formFieldLabel__confirmDeletion: 'Підтвердження',
@@ -283,7 +290,7 @@ export const ukUA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const ukUA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -487,9 +494,11 @@ export const ukUA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Створити організацію',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Управління організацією',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Організація не обрана',
     personalWorkspace: 'Особистий робочий простір',
@@ -637,6 +646,10 @@ export const ukUA: LocalizationResource = {
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код відновлення пароля',
       resendButton: 'Надіслати код ще раз',
@@ -756,6 +769,10 @@ export const ukUA: LocalizationResource = {
         subtitleNewTab: 'Повернутися до попередньої вкладки для продовження',
         title: 'Успішно перевірено email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -928,7 +945,9 @@ export const ukUA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Додати акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управління акаунтом',
+    action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
@@ -960,7 +979,7 @@ export const ukUA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +988,7 @@ export const ukUA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1029,7 +1048,7 @@ export const ukUA: LocalizationResource = {
       actionDescription: 'Введіть "Видалити акаунт" нижче, щоб продовжити.',
       confirm: 'Видалити акаунт',
       messageLine1:
-        "Ви впевнені, що хочете видалити свій акаунт з Clerk? Будь ласка, зв'яжіться з власником програми, щоб видалити вашу інформацію з їхньої програми та інших сервісів.",
+        "Ви впевнені, що хочете видалити свій обліковий запис? Деякі пов'язані дані можуть бути збережені. Щоб запросити повне видалення даних, зверніться до служби підтримки.",
       messageLine2: 'Ця дія є остаточною та незворотною.',
       title: 'Видалити акаунт',
     },

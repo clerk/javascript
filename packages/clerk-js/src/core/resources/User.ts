@@ -1,3 +1,4 @@
+import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import type {
   BackupCodeJSON,
   BackupCodeResource,
@@ -30,13 +31,12 @@ import type {
   UserResource,
   VerifyTOTPParams,
   Web3WalletResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
-import { getFullName } from '../../utils/user';
 import { eventBus, events } from '../events';
-import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/billing';
+import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
@@ -291,16 +291,16 @@ export class User extends BaseResource implements UserResource {
     return new DeletedObject(json);
   };
 
-  initializePaymentSource: typeof initializePaymentSource = params => {
-    return initializePaymentSource(params);
+  initializePaymentMethod: typeof initializePaymentMethod = params => {
+    return initializePaymentMethod(params);
   };
 
-  addPaymentSource: typeof addPaymentSource = params => {
-    return addPaymentSource(params);
+  addPaymentMethod: typeof addPaymentMethod = params => {
+    return addPaymentMethod(params);
   };
 
-  getPaymentSources: typeof getPaymentSources = params => {
-    return getPaymentSources(params);
+  getPaymentMethods: typeof getPaymentMethods = params => {
+    return getPaymentMethods(params);
   };
 
   get verifiedExternalAccounts() {

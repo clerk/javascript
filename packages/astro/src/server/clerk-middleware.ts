@@ -1,11 +1,10 @@
 import type { AuthObject, ClerkClient } from '@clerk/backend';
 import type {
   AuthenticateRequestOptions,
+  AuthOptions,
   ClerkRequest,
   RedirectFun,
   RequestState,
-  SignedInAuthObject,
-  SignedOutAuthObject,
 } from '@clerk/backend/internal';
 import {
   AuthStatus,
@@ -19,8 +18,8 @@ import {
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import { handleValueOrFn } from '@clerk/shared/utils';
-import type { PendingSessionOptions } from '@clerk/types';
 import type { APIContext } from 'astro';
 
 import { authAsyncStorage } from '#async-local-storage';
@@ -36,16 +35,12 @@ import type {
   AstroMiddlewareNextParam,
   AstroMiddlewareReturn,
   AuthFn,
-  AuthOptions,
+  SessionAuthObjectWithRedirect,
 } from './types';
 import { isRedirect, setHeader } from './utils';
 
 const CONTROL_FLOW_ERROR = {
   REDIRECT_TO_SIGN_IN: 'CLERK_PROTECT_REDIRECT_TO_SIGN_IN',
-};
-
-type ClerkMiddlewareAuthObject = (SignedInAuthObject | SignedOutAuthObject) & {
-  redirectToSignIn: (opts?: { returnBackUrl?: URL | string | null }) => Response;
 };
 
 type ClerkAstroMiddlewareHandler = (
@@ -396,7 +391,7 @@ const redirectAdapter = (url: string | URL) => {
 
 const createMiddlewareRedirectToSignIn = (
   clerkRequest: ClerkRequest,
-): ClerkMiddlewareAuthObject['redirectToSignIn'] => {
+): SessionAuthObjectWithRedirect['redirectToSignIn'] => {
   return (opts = {}) => {
     const err = new Error(CONTROL_FLOW_ERROR.REDIRECT_TO_SIGN_IN) as any;
     err.returnBackUrl = opts.returnBackUrl === null ? '' : opts.returnBackUrl || clerkRequest.clerkUrl.toString();

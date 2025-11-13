@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/types';
+import type { Errors, State } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';
@@ -105,6 +105,9 @@ export class StateProxy implements State {
             },
           });
         },
+        get hasBeenFinalized() {
+          return gateProperty(target, 'hasBeenFinalized', false);
+        },
 
         create: this.gateMethod(target, 'create'),
         password: this.gateMethod(target, 'password'),
@@ -131,6 +134,7 @@ export class StateProxy implements State {
           'verifyBackupCode',
         ] as const),
         ticket: this.gateMethod(target, 'ticket'),
+        passkey: this.gateMethod(target, 'passkey'),
         web3: this.gateMethod(target, 'web3'),
       },
     };
@@ -194,6 +198,9 @@ export class StateProxy implements State {
         get legalAcceptedAt() {
           return gateProperty(target, 'legalAcceptedAt', null);
         },
+        get locale() {
+          return gateProperty(target, 'locale', null);
+        },
         get status() {
           return gateProperty(target, 'status', 'missing_requirements');
         },
@@ -202,6 +209,9 @@ export class StateProxy implements State {
         },
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
+        },
+        get hasBeenFinalized() {
+          return gateProperty(target, 'hasBeenFinalized', false);
         },
 
         create: gateMethod(target, 'create'),

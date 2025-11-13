@@ -17,7 +17,7 @@ import {
   TokenType,
 } from '@clerk/backend/internal';
 import { decodeJwt } from '@clerk/backend/jwt';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import type { LoggerNoCommit } from '../../utils/debugLogger';
 import { API_URL, API_VERSION, PUBLISHABLE_KEY, SECRET_KEY } from '../constants';

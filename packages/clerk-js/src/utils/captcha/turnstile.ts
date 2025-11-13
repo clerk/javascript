@@ -1,8 +1,8 @@
 import { waitForElement } from '@clerk/shared/dom';
+import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from '@clerk/shared/internal/clerk-js/constants';
 import { loadScript } from '@clerk/shared/loadScript';
-import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/types';
+import type { CaptchaAppearanceOptions, CaptchaWidgetType } from '@clerk/shared/types';
 
-import { CAPTCHA_ELEMENT_ID, CAPTCHA_INVISIBLE_CLASSNAME } from './constants';
 import type { CaptchaOptions } from './types';
 
 // We use the explicit render mode to be able to control when the widget is rendered.

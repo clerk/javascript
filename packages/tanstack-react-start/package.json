@@ -1,6 +1,6 @@
 {
   "name": "@clerk/tanstack-react-start",
-  "version": "0.25.3",
+  "version": "0.27.0",
   "description": "Clerk SDK for TanStack React Start",
   "keywords": [
     "clerk",
@@ -43,6 +43,14 @@
       "types": "./dist/webhooks.d.ts",
       "default": "./dist/webhooks.js"
     },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "default": "./dist/legacy.js"
+    },
+    "./experimental": {
+      "types": "./dist/experimental.d.ts",
+      "default": "./dist/experimental.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "dist/index.js",
@@ -51,7 +59,8 @@
     "dist",
     "errors",
     "server",
-    "webhooks"
+    "webhooks",
+    "experimental"
   ],
   "scripts": {
     "build": "pnpm clean && tsup",
@@ -72,17 +81,16 @@
     "@clerk/backend": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
-    "@tanstack/react-router": "1.131.49",
-    "@tanstack/react-start": "1.131.49",
+    "@tanstack/react-router": "1.132.0",
+    "@tanstack/react-start": "1.132.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4"
   },
   "peerDependencies": {
-    "@tanstack/react-router": "^1.131.0 <1.132.0",
-    "@tanstack/react-start": "^1.131.0 <1.132.0",
+    "@tanstack/react-router": "^1.132.0",
+    "@tanstack/react-start": "^1.132.0",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },

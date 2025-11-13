@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Másolás és bezárás',
+      formHint: 'Biztonsági okokból később nem fogjuk tudni újra megengedni, hogy megtekintsd.',
+      formTitle: 'Másold le az "{{name}}" API kulcsot most',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const huHU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Felhasználói eszköz',
   badge__you: 'Te',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const huHU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const huHU: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API kulcs',
+  formFieldLabel__apiKeyDescription: 'Leírás',
+  formFieldLabel__apiKeyExpiration: 'Lejárat',
+  formFieldLabel__apiKeyName: 'API kulcs neve',
   formFieldLabel__automaticInvitations: 'Automatikus meghívások engedélyezése ezen a domainen',
   formFieldLabel__backupCode: 'Tartalék kód',
   formFieldLabel__confirmDeletion: 'Megerősítés',
@@ -282,7 +289,7 @@ export const huHU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +298,7 @@ export const huHU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const huHU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Szervezet létrehozása',
     action__invitationAccept: 'Csatlakozás',
     action__manageOrganization: 'Kezelés',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Csatlakozás kérése',
     notSelected: 'Nincs szervezet kiválasztva',
     personalWorkspace: 'Személyes fiók',
@@ -638,6 +647,10 @@ export const huHU: LocalizationResource = {
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Jelszó visszaállító kód',
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',
@@ -758,6 +771,10 @@ export const huHU: LocalizationResource = {
         subtitleNewTab: 'Menj vissza az előző lapra a folytatáshoz',
         title: 'Sikeresen megerősítetted az email címed',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -933,7 +950,9 @@ export const huHU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Fiók hozzáadása',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Fiók kezelése',
+    action__openUserMenu: undefined,
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },
@@ -964,7 +983,7 @@ export const huHU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +992,7 @@ export const huHU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1033,7 +1052,7 @@ export const huHU: LocalizationResource = {
       actionDescription: 'Írd be, hogy "Delete account" a folytatáshoz.',
       confirm: 'Fiók törlése',
       messageLine1:
-        'Biztos vagy benne, hogy törölni szeretnéd a fiókod a Clerk-ből? Kérjük, lépj kapcsolatba az alkalmazás tulajdonosával, hogy töröljék az adataidat az alkalmazásukból és más szolgáltatásaikból.',
+        'Biztosan törölni szeretné fiókját? Egyes kapcsolódó adatok megőrzésre kerülhetnek. A teljes adattörlés kéréséhez forduljon az ügyfélszolgálathoz.',
       messageLine2: 'Ez a művelet végleges és visszafordíthatatlan.',
       title: 'Fiók törlése',
     },

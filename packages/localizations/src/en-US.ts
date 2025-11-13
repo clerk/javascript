@@ -1,10 +1,15 @@
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
+    },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
@@ -57,8 +62,8 @@ export const enUS: LocalizationResource = {
   badge__upcomingPlan: 'Upcoming',
   badge__userDevice: 'User device',
   badge__you: 'You',
-  commerce: {
-    addPaymentMethod: 'Add payment method',
+  billing: {
+    addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',
     annually: 'Annually',
     availableFeatures: 'Available features',
@@ -116,8 +121,7 @@ export const enUS: LocalizationResource = {
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
-    paymentMethods: 'Payment Methods',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Annual payment',
         monthly: 'Monthly payment',
@@ -131,6 +135,7 @@ export const enUS: LocalizationResource = {
         testCardInfo: 'Test card information',
       },
     },
+    paymentMethods__label: 'Payment Methods',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
@@ -214,6 +219,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: 'Example format: name@example.com',
+  formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Secret key name',
@@ -278,7 +285,7 @@ export const enUS: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
         add: 'Add new payment method',
@@ -287,11 +294,11 @@ export const enUS: LocalizationResource = {
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         payWithTestCardButton: 'Pay with test card',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
-            'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
+            'You will no longer be able to use this payment method and any recurring subscriptions dependent on it will no longer work.',
+          successMessage: '{{paymentMethod}} has been removed from your account.',
           title: 'Remove payment method',
         },
         title: 'Payment methods',
@@ -484,9 +491,11 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: 'Close organization switcher',
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
+    action__openOrganizationSwitcher: 'Open organization switcher',
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organization selected',
     personalWorkspace: 'Personal account',
@@ -637,6 +646,10 @@ export const enUS: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    enterpriseConnections: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -757,6 +770,10 @@ export const enUS: LocalizationResource = {
         subtitleNewTab: 'Return to previous tab to continue',
         title: 'Successfully verified email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +948,9 @@ export const enUS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Add account',
+    action__closeUserMenu: 'Close user menu',
     action__manageAccount: 'Manage account',
+    action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
   },
@@ -963,7 +982,7 @@ export const enUS: LocalizationResource = {
         tableHeader__date: 'Date',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Make default',
         actionLabel__remove: 'Remove',
         add: 'Add new payment method',
@@ -972,11 +991,11 @@ export const enUS: LocalizationResource = {
         formButtonPrimary__add: 'Add Payment Method',
         formButtonPrimary__pay: 'Pay {{amount}}',
         payWithTestCardButton: 'Pay with test card',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} will be removed from this account.',
           messageLine2:
             'You will no longer be able to use this payment source and any recurring subscriptions dependent on it will no longer work.',
-          successMessage: '{{paymentSource}} has been removed from your account.',
+          successMessage: '{{paymentMethod}} has been removed from your account.',
           title: 'Remove payment method',
         },
         title: 'Payment methods',
@@ -1033,7 +1052,7 @@ export const enUS: LocalizationResource = {
       actionDescription: 'Type "Delete account" below to continue.',
       confirm: 'Delete account',
       messageLine1:
-        'Are you sure you want to delete your account from Clerk? Please contact the application owner to delete your information from their application and other services.',
+        'Are you sure you want to delete your account? Some associated data may be retained. To request full data deletion, please contact support.',
       messageLine2: 'This action is permanent and irreversible.',
       title: 'Delete account',
     },

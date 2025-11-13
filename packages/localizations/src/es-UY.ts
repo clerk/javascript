@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const esUY: LocalizationResource = {
   locale: 'es-UY',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar y cerrar',
+      formHint: 'Por razones de seguridad, no podrás verlo de nuevo más tarde.',
+      formTitle: 'Copia tu clave API "{{name}}" ahora',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const esUY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo del usuario',
   badge__you: 'Vos',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const esUY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const esUY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,9 +226,11 @@ export const esUY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingresá tu contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingresá tu número de teléfono',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Clave API',
+  formFieldLabel__apiKeyDescription: 'Descripción',
+  formFieldLabel__apiKeyExpiration: 'Expiración',
+  formFieldLabel__apiKeyName: 'Nombre de clave secreta',
   formFieldLabel__automaticInvitations: 'Habilitar invitaciones automáticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmación',
@@ -284,7 +291,7 @@ export const esUY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -293,7 +300,7 @@ export const esUY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -490,9 +497,11 @@ export const esUY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Gestionar',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Cuenta personal',
@@ -642,6 +651,10 @@ export const esUY: LocalizationResource = {
         titleNewTab: 'Sesión iniciada en otra pestaña',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código para restablecer la contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -763,6 +776,10 @@ export const esUY: LocalizationResource = {
         subtitleNewTab: 'Volvé a la pestaña anterior para continuar',
         title: 'Correo verificado con éxito',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -943,7 +960,9 @@ export const esUY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Agregar cuenta',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestionar cuenta',
+    action__openUserMenu: undefined,
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Cerrar sesión en todas las cuentas',
   },
@@ -975,7 +994,7 @@ export const esUY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -984,7 +1003,7 @@ export const esUY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1043,7 +1062,7 @@ export const esUY: LocalizationResource = {
       actionDescription: 'Escribí "Eliminar cuenta" abajo para continuar.',
       confirm: 'Eliminar cuenta',
       messageLine1:
-        '¿Estás seguro de que querés eliminar tu cuenta de Clerk? Por favor, contacta al propietario de la aplicación para eliminar tu información de su aplicación y otros servicios.',
+        '¿Estás seguro de que querés eliminar tu cuenta? Es posible que se conserven algunos datos asociados. Para solicitar la eliminación completa de datos, contactá al soporte.',
       messageLine2: 'Esta acción es permanente e irreversible.',
       title: 'Eliminar cuenta',
     },

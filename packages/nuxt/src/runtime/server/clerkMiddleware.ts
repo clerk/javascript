@@ -2,7 +2,7 @@ import type { AuthenticateRequestOptions } from '@clerk/backend/internal';
 import { AuthStatus, constants, getAuthObjectForAcceptedToken } from '@clerk/backend/internal';
 import { deprecated } from '@clerk/shared/deprecated';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
 import { createError, eventHandler, setResponseHeader } from 'h3';
 

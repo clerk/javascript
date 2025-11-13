@@ -1,4 +1,4 @@
-import type { ReverificationConfig } from '@clerk/types';
+import type { ReverificationConfig } from './types';
 
 type ClerkError<T> = {
   clerk_error: T;
@@ -44,4 +44,4 @@ const isReverificationHint = (result: any): result is ReturnType<typeof reverifi
   );
 };
 
-export { reverificationError, reverificationErrorResponse, isReverificationHint };
+export { isReverificationHint, reverificationError, reverificationErrorResponse };

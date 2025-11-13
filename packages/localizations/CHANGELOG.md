@@ -1,5 +1,97 @@
 # Change Log
 
+## 3.27.2
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/types@4.99.0
+
+## 3.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa)]:
+  - @clerk/types@4.98.0
+
+## 3.27.0
+
+### Minor Changes
+
+- Added localization entry for the API key copy modal component. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.97.2
+
+## 3.26.6
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293)]:
+  - @clerk/types@4.97.1
+
+## 3.26.5
+
+### Patch Changes
+
+- Updated dependencies [[`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/types@4.97.0
+
+## 3.26.4
+
+### Patch Changes
+
+- Localize aria-labels within `UserButton` and `OrganizationSwitcher` triggers. ([#7086](https://github.com/clerk/javascript/pull/7086)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/types@4.96.0
+
+## 3.26.3
+
+### Patch Changes
+
+- Add title attribute to email address field with the recommended format. ([#6956](https://github.com/clerk/javascript/pull/6956)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Added missing translations for the fr-FR localization. ([#6950](https://github.com/clerk/javascript/pull/6950)) by [@semleti](https://github.com/semleti)
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911)]:
+  - @clerk/types@4.95.1
+
+## 3.26.2
+
+### Patch Changes
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764)]:
+  - @clerk/types@4.95.0
+
+## 3.26.1
+
+### Patch Changes
+
+- Updated dependencies [[`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2)]:
+  - @clerk/types@4.94.0
+
+## 3.26.0
+
+### Minor Changes
+
+- [Billing Beta] Rename payment sources to method methods. ([#6959](https://github.com/clerk/javascript/pull/6959)) by [@panteliselef](https://github.com/panteliselef)
+
+  Updates localization keys from `commerce` -> `billing` and `paymentSource` to `paymentMethod`.
+
+- Introduce experimental step to choose enterprise connection on sign-in/sign-up ([#6947](https://github.com/clerk/javascript/pull/6947)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Update copy for account deletion modal ([#6937](https://github.com/clerk/javascript/pull/6937)) by [@jescalan](https://github.com/jescalan)
+
+- Expanded Brazilian Portuguese (pt-BR) localization ([#6881](https://github.com/clerk/javascript/pull/6881)) by [@hypeARM](https://github.com/hypeARM)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342)]:
+  - @clerk/types@4.93.0
+
 ## 3.25.7
 
 ### Patch Changes

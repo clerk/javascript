@@ -24,10 +24,10 @@ test.describe('custom middleware @nuxt', () => {
       )
       .addFile(
         'server/middleware/clerk.js',
-        () => `import { clerkMiddleware, createRouteMatcher, getAuth } from '@clerk/nuxt/server';
+        () => `import { clerkMiddleware, createRouteMatcher } from '@clerk/nuxt/server';
 
         export default clerkMiddleware((event) => {
-          const { userId } = getAuth(event);
+          const { userId } = event.context.auth();
           const isProtectedRoute = createRouteMatcher(['/api/me']);
 
           if (!userId && isProtectedRoute(event)) {
@@ -40,7 +40,7 @@ test.describe('custom middleware @nuxt', () => {
       `,
       )
       .addFile(
-        'pages/me.vue',
+        'app/pages/me.vue',
         () => `<script setup>
         const { data, error } = await useFetch('/api/me');
         </script>

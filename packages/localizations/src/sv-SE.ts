@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiera och stäng',
+      formHint: 'Av säkerhetsskäl kommer vi inte att tillåta dig att se det igen senare.',
+      formTitle: 'Kopiera din API-nyckel "{{name}}" nu',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const svSE: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Användarens enhet',
   badge__you: 'Du',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const svSE: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const svSE: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ange ditt lösenord',
   formFieldInputPlaceholder__phoneNumber: 'Ange ditt telefonnummer',
   formFieldInputPlaceholder__username: 'Ange ditt användarnamn',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-nyckel',
+  formFieldLabel__apiKeyDescription: 'Beskrivning',
+  formFieldLabel__apiKeyExpiration: 'Förfaller',
+  formFieldLabel__apiKeyName: 'Namn på hemlig nyckel',
   formFieldLabel__automaticInvitations: 'Aktivera automatiska inbjudningar för denna domän',
   formFieldLabel__backupCode: 'Reserv-kod',
   formFieldLabel__confirmDeletion: 'Radera konto',
@@ -283,7 +290,7 @@ export const svSE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const svSE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const svSE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Skapa organisation',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Hantera organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Ingen organisation vald',
     personalWorkspace: 'Personligt Arbetsområde',
@@ -640,6 +649,10 @@ export const svSE: LocalizationResource = {
         titleNewTab: 'Loggade in på annan flik',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Återställ lösenordskod',
       resendButton: 'Fick du inte en kod? Skicka igen',
@@ -761,6 +774,10 @@ export const svSE: LocalizationResource = {
         subtitleNewTab: 'Återgå till föregående flik för att fortsätta',
         title: 'E-posten har verifierats',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -934,7 +951,9 @@ export const svSE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lägg till konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hantera konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logga ut',
     action__signOutAll: 'Logga ut från alla konton',
   },
@@ -966,7 +985,7 @@ export const svSE: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -975,7 +994,7 @@ export const svSE: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1035,7 +1054,7 @@ export const svSE: LocalizationResource = {
       actionDescription: 'Skriv "Radera konto" nedan för att fortsätta.',
       confirm: 'Radera konto',
       messageLine1:
-        'Är du säker på att du vill radera ditt konto från Clerk? Vänligen kontakta applikationens ägare för att radera din information från deras applikation och andra tjänster.',
+        'Är du säker på att du vill radera ditt konto? Viss associerad data kan behållas. För att begära fullständig radering av data, vänligen kontakta support.',
       messageLine2: 'Denna åtgärd är permanent och kan inte ångras.',
       title: 'Radera konto',
     },

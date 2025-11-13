@@ -1,5 +1,5 @@
 import type { MatchFunction } from '@clerk/shared/pathToRegexp';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 
 import type { ApiClient, APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import type {
@@ -187,14 +187,13 @@ export type MachineAuthObject<T extends Exclude<TokenType, SessionTokenType>> = 
   ? AuthenticatedMachineObject<T> | UnauthenticatedMachineObject<T>
   : never;
 
-type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
+export type AuthOptions = PendingSessionOptions & { acceptsToken?: AuthenticateRequestOptions['acceptsToken'] };
 
 type MaybePromise<T, IsPromise extends boolean> = IsPromise extends true ? Promise<T> : T;
 
 /**
  * Shared generic overload type for getAuth() helpers across SDKs.
  *
- * - Parameterized by the request type (RequestType).
  * - Handles different accepted token types and their corresponding return types.
  */
 export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> {
@@ -234,4 +233,52 @@ export interface GetAuthFn<RequestType, ReturnsPromise extends boolean = false> 
    * const auth = await getAuth(req)
    */
   (req: RequestType, options?: PendingSessionOptions): MaybePromise<SessionAuthObject, ReturnsPromise>;
+}
+
+/**
+ * Shared generic overload type for auth() or getAuth() helpers that don't require a request parameter.
+ *
+ * - Handles different accepted token types and their corresponding return types.
+ * - The SessionAuthType parameter allows frameworks to extend the base SessionAuthObject with additional properties like redirect methods.
+ */
+export interface GetAuthFnNoRequest<
+  SessionAuthType extends SessionAuthObject = SessionAuthObject,
+  ReturnsPromise extends boolean = false,
+> {
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: ['session_token', 'api_key'] })
+   */
+  <T extends TokenType[]>(
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<
+    | InferAuthObjectFromTokenArray<T, SessionAuthType, MachineAuthObject<Exclude<T[number], SessionTokenType>>>
+    | InvalidTokenAuthObject,
+    ReturnsPromise
+  >;
+
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'session_token' })
+   */
+  <T extends TokenType>(
+    options: AuthOptions & { acceptsToken: T },
+  ): MaybePromise<
+    InferAuthObjectFromToken<T, SessionAuthType, MachineAuthObject<Exclude<T, SessionTokenType>>>,
+    ReturnsPromise
+  >;
+
+  /**
+   * @example
+   * const authObject = await auth({ acceptsToken: 'any' })
+   */
+  (
+    options: AuthOptions & { acceptsToken: 'any' },
+  ): MaybePromise<Exclude<AuthObject, SessionAuthObject> | SessionAuthType, ReturnsPromise>;
+
+  /**
+   * @example
+   * const authObject = await auth()
+   */
+  (options?: PendingSessionOptions): MaybePromise<SessionAuthType, ReturnsPromise>;
 }

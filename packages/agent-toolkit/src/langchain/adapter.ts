@@ -8,9 +8,11 @@ import type { SdkAdapter } from '../lib/types';
  * For more details, take a look at the LangChain docs https://js.langchain.com/docs/how_to/custom_tools
  */
 export const adapter: SdkAdapter<StructuredTool> = (clerkClient, context, clerkTool) => {
-  return tool(clerkTool.bindExecute(clerkClient, context), {
+  const executeFn = clerkTool.bindExecute(clerkClient, context as any) as any;
+  const toolConfig = {
     name: clerkTool.name,
     description: clerkTool.description,
     schema: clerkTool.parameters,
-  });
+  } as any;
+  return tool(executeFn, toolConfig) as StructuredTool;
 };

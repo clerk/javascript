@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/types';
+import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/shared/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
@@ -43,6 +43,7 @@ type GetOrganizationParams = ({ organizationId: string } | { slug: string }) & {
 type UpdateParams = {
   name?: string;
   slug?: string;
+  adminDeleteEnabled?: boolean;
   maxAllowedMemberships?: number;
 } & MetadataParams;
 

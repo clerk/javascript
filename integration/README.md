@@ -364,11 +364,10 @@ Assuming you have a `react-parcel` template defined in `integration/templates`, 
      .setName('react-parcel')
      .useTemplate(templates['react-parcel'])
      .setEnvFormatter('public', key => `${key}`)
-     .addDependency('@clerk/react', constants.E2E_CLERK_VERSION || clerkReactLocal);
+     .addDependency('@clerk/react', constants.E2E_CLERK_JS_VERSION || clerkReactLocal);
    ```
 
    Here's what each thing is doing:
-
    - `setName`: Set internal name
    - `useTemplate`: Define which template inside `integration/templates` to use
    - `setEnvFormatter`: Define how environment variables should be formatted. The first argument accepts `'public'` and `'private'`. Inside [`envs.ts`](./presets/envs.ts) the environment variables you can use through [`withEnv`](#environment-configs) are defined. Since different frameworks require environment variables to be in different formats (e.g. Next.js wants public env vars to be prefixed with `NEXT_PUBLIC_`) you can use this formatter to change that.

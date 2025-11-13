@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const beBY: LocalizationResource = {
   locale: 'be-BY',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Скапіраваць і закрыць',
+      formHint: 'З мэтаў бяспекі мы не дазволім вам праглядзець яго пазней.',
+      formTitle: 'Скапіруйце ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const beBY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Карыстальніцкая прылада',
   badge__you: 'Вы',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const beBY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const beBY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,9 +226,11 @@ export const beBY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Увядзіце ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Увядзіце ваш нумар тэлефона',
   formFieldInputPlaceholder__username: 'Увядзіце імя карыстальніка',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Апісанне',
+  formFieldLabel__apiKeyExpiration: 'Тэрмін дзеяння',
+  formFieldLabel__apiKeyName: 'Назва сакрэтнага ключа',
   formFieldLabel__automaticInvitations: 'Уключыць аўтаматычныя запрашэнні для гэтага дамена',
   formFieldLabel__backupCode: 'Код аднаўлення',
   formFieldLabel__confirmDeletion: 'Пацверджанне',
@@ -284,7 +291,7 @@ export const beBY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -293,7 +300,7 @@ export const beBY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -492,9 +499,11 @@ export const beBY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Стварыць арганізацыю',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Кіраванне арганізацыяй',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Арганізацыя не выбрана',
     personalWorkspace: 'Асабістае працоўнае прастора',
@@ -643,6 +652,10 @@ export const beBY: LocalizationResource = {
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код аднаўлення пароля',
       resendButton: 'Адправіць код яшчэ раз',
@@ -762,6 +775,10 @@ export const beBY: LocalizationResource = {
         subtitleNewTab: 'Вярніцеся на папярэднюю ўкладку, каб працягнуць',
         title: 'Пошта верыфікавана',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -938,7 +955,9 @@ export const beBY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Дадаць уліковы запіс',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Кіраванне ўліковым запісам',
+    action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
@@ -970,7 +989,7 @@ export const beBY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -979,7 +998,7 @@ export const beBY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1039,7 +1058,7 @@ export const beBY: LocalizationResource = {
       actionDescription: "Увядзіце 'Выдаліць уліковы запіс' ніжэй, каб працягнуць.",
       confirm: 'Выдаліць уліковы запіс',
       messageLine1:
-        'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс з Clerk? Калі ласка, звярніцеся да ўладальніка дадатка, каб выдаліць вашу інфармацыю з іх дадатка і іншых сэрвісаў.',
+        'Вы ўпэўнены, што хочаце выдаліць свой уліковы запіс? Некаторыя звязаныя дадзеныя могуць быць захаваны. Каб запытаць поўнае выдаленне дадзеных, звярніцеся ў службу падтрымкі.',
       messageLine2: "Гэта дзеянне з'яўляецца бессрочным і неабратным.",
       title: 'Выдаліць уліковы запіс',
     },
