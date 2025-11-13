@@ -782,6 +782,8 @@ export class Clerk implements ClerkInterface {
     void this.#componentControls
       .ensureMounted({ preloadHint: 'EnableOrganizationsPrompt' })
       .then(controls => controls.openModal('enableOrganizationsPrompt', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('EnableOrganizationsPrompt', props));
   };
 
   public __internal_closeEnableOrganizationsPrompt = (): void => {
