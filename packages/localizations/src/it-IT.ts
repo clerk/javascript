@@ -620,6 +620,12 @@ export const itIT: LocalizationResource = {
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Controlla la tua email',
     },
+    emailCodeMfa: {
+      formTitle: 'Controlla la tua email',
+      resendButton: 'Non hai ricevuto un codice? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Il client utilizzato non corrisponde al tipo di account associato.',
@@ -655,6 +661,12 @@ export const itIT: LocalizationResource = {
         titleNewTab: "Accedi da un'altra scheda",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Usa il link di verifica inviato alla tua email',
+      resendButton: 'Non hai ricevuto il link? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +684,8 @@ export const itIT: LocalizationResource = {
       label__alternativeMethods: 'Oppure, accedi con un altro metodo',
       title: 'Hai dimenticato la password?',
     },
+    newDeviceVerificationNotice:
+      "Stai effettuando l'accesso da un nuovo dispositivo. Richiediamo la verifica per mantenere il tuo account sicuro.",
     noAvailableMethods: {
       message: "Impossibile procedere con l'accesso. Non ci sono strumenti di autenticazione disponibili.",
       subtitle: 'Si è verificato un errore',

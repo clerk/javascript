@@ -1716,7 +1716,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
   /*
    * Provide custom menu actions and links to be rendered inside the UserButton.
@@ -1955,16 +1955,9 @@ export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps
 
 export type APIKeysProps = {
   /**
-   * The type of API key to filter by.
-   * Currently, only 'api_key' is supported.
-   *
-   * @default 'api_key'
-   */
-  type?: 'api_key';
-  /**
    * The number of API keys to show per page.
    *
-   * @default 5
+   * @default 10
    */
   perPage?: number;
   /**
@@ -1987,7 +1980,6 @@ export type GetAPIKeysParams = ClerkPaginationParams<{
 }>;
 
 export type CreateAPIKeyParams = {
-  type?: 'api_key';
   name: string;
   subject?: string;
   secondsUntilExpiration?: number;

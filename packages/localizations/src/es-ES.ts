@@ -614,6 +614,12 @@ export const esES: LocalizationResource = {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Revise su correo electrónico',
     },
+    emailCodeMfa: {
+      formTitle: 'Revise su correo electrónico',
+      resendButton: '¿No recibió un código? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revise su correo electrónico',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'El cliente no coincide con el solicitado. Por favor, intente de nuevo.',
@@ -649,6 +655,12 @@ export const esES: LocalizationResource = {
         titleNewTab: 'Inició sesión en otra pestaña',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',
+      resendButton: '¿No recibiste el enlace? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revisa tu correo electrónico',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const esES: LocalizationResource = {
       label__alternativeMethods: 'O, inicia sesión con otro método',
       title: '¿Olvidaste tu contraseña?',
     },
+    newDeviceVerificationNotice:
+      'Estás iniciando sesión desde un dispositivo nuevo. Estamos pidiendo verificación para mantener tu cuenta segura.',
     noAvailableMethods: {
       message: 'No se puede continuar con el inicio de sesión. No hay ningún factor de autenticación disponible.',
       subtitle: 'Ocurrió un error',

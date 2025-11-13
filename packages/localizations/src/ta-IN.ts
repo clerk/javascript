@@ -617,6 +617,12 @@ export const taIN: LocalizationResource = {
       subtitle: '{{applicationName}} க்கு தொடர',
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
+    emailCodeMfa: {
+      formTitle: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+      resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'தொடர, நீங்கள் உள்நுழைவைத் தொடங்கிய சாதனத்திலும் உலாவியிலும் சரிபார்ப்பு இணைப்பைத் திறக்கவும்',
@@ -652,6 +658,12 @@ export const taIN: LocalizationResource = {
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',
+      resendButton: 'இணைப்பு கிடைக்கவில்லையா? மீண்டும் அனுப்பவும்',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -669,6 +681,8 @@ export const taIN: LocalizationResource = {
       label__alternativeMethods: 'அல்லது, வேறு முறையில் உள்நுழையவும்',
       title: 'கடவுச்சொல் மறந்துவிட்டதா?',
     },
+    newDeviceVerificationNotice:
+      'நீங்கள் ஒரு புதிய சாதனத்திலிருந்து உள்நுழைகிறீர்கள். உங்கள் கணக்கை பாதுகாப்பாக வைத்திருக்க நாங்கள் சரிபார்ப்பு கோருகிறோம்.',
     noAvailableMethods: {
       message: 'உள்நுழைவைத் தொடர முடியாது. எந்த அங்கீகார காரணியும் கிடைக்கவில்லை.',
       subtitle: 'பிழை ஏற்பட்டது',
