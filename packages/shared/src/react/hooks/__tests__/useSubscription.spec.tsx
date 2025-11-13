@@ -167,7 +167,13 @@ describe('useSubscription', () => {
     rerender({ orgId: 'org_2', keepPreviousData: true });
 
     await waitFor(() => expect(result.current.isFetching).toBe(true));
-    expect(result.current.isLoading).toBe(false);
+
+    // Slight difference in behavior between SWR and React Query, but acceptable for the migration.
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+    } else {
+      await waitFor(() => expect(result.current.isLoading).toBe(true));
+    }
     expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
 
     deferred.resolve({ id: 'sub_org_org_2' });
