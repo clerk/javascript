@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -707,13 +707,13 @@ class SignUpFuture implements SignUpFutureResource {
     await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
   }
 
-  async create(params: SignUpFutureCreateParams): Promise<{ error: unknown }> {
+  async create(params: SignUpFutureCreateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this._create(params);
     });
   }
 
-  async update(params: SignUpFutureUpdateParams): Promise<{ error: unknown }> {
+  async update(params: SignUpFutureUpdateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       const body: Record<string, unknown> = {
         ...params,
@@ -724,7 +724,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async password(params: SignUpFuturePasswordParams): Promise<{ error: unknown }> {
+  async password(params: SignUpFuturePasswordParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
@@ -741,7 +741,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sendEmailCode(): Promise<{ error: unknown }> {
+  async sendEmailCode(): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         body: { strategy: 'email_code' },
@@ -750,7 +750,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -760,7 +760,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
     const { phoneNumber, channel = 'sms' } = params;
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
@@ -778,7 +778,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -788,7 +788,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async sso(params: SignUpFutureSSOParams): Promise<{ error: unknown }> {
+  async sso(params: SignUpFutureSSOParams): Promise<{ error: ClerkError | null }> {
     const { strategy, redirectUrl, redirectCallbackUrl } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
@@ -822,7 +822,7 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async web3(params: SignUpFutureWeb3Params): Promise<{ error: unknown }> {
+  async web3(params: SignUpFutureWeb3Params): Promise<{ error: ClerkError | null }> {
     const { strategy, unsafeMetadata, legalAccepted } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -888,12 +888,12 @@ class SignUpFuture implements SignUpFutureResource {
     });
   }
 
-  async ticket(params?: SignUpFutureTicketParams): Promise<{ error: unknown }> {
+  async ticket(params?: SignUpFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
     return this.create({ ...params, ticket: ticket ?? undefined });
   }
 
-  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: unknown }> {
+  async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {

@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { ClerkWebAuthnError } from '@clerk/shared/error';
+import { type ClerkError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -686,7 +686,7 @@ class SignInFuture implements SignInFutureResource {
     return this.resource.secondFactorVerification;
   }
 
-  async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
+  async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.id) {
         throw new Error('Cannot reset password without a sign in.');
@@ -708,7 +708,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyResetPasswordEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyResetPasswordEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -718,7 +718,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async submitResetPassword(params: SignInFutureResetPasswordSubmitParams): Promise<{ error: unknown }> {
+  async submitResetPassword(params: SignInFutureResetPasswordSubmitParams): Promise<{ error: ClerkError | null }> {
     const { password, signOutOfOtherSessions = true } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -736,13 +736,13 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
+  async create(params: SignInFutureCreateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this._create(params);
     });
   }
 
-  async password(params: SignInFuturePasswordParams): Promise<{ error: unknown }> {
+  async password(params: SignInFuturePasswordParams): Promise<{ error: ClerkError | null }> {
     if ([params.identifier, params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
       throw new Error('Only one of identifier, emailAddress, or phoneNumber can be provided');
     }
@@ -763,7 +763,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendEmailCode(params: SignInFutureEmailCodeSendParams = {}): Promise<{ error: unknown }> {
+  async sendEmailCode(params: SignInFutureEmailCodeSendParams = {}): Promise<{ error: ClerkError | null }> {
     const { emailAddress, emailAddressId } = params;
     if (!this.resource.id && emailAddressId) {
       throw new Error(
@@ -794,7 +794,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -804,7 +804,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: unknown }> {
+  async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
     const { emailAddress, verificationUrl, emailAddressId } = params;
     if (!this.resource.id && emailAddressId) {
       throw new Error(
@@ -846,7 +846,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async waitForEmailLinkVerification(): Promise<{ error: unknown }> {
+  async waitForEmailLinkVerification(): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       const { run, stop } = Poller();
       await new Promise((resolve, reject) => {
@@ -867,7 +867,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams = {}): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams = {}): Promise<{ error: ClerkError | null }> {
     const { phoneNumber, phoneNumberId, channel = 'sms' } = params;
     if (!this.resource.id && phoneNumberId) {
       throw new Error(
@@ -898,7 +898,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyPhoneCode(params: SignInFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyPhoneCode(params: SignInFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -908,7 +908,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
+  async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
     const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId } = params;
     return runAsyncResourceTask(this.resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
@@ -959,7 +959,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async web3(params: SignInFutureWeb3Params): Promise<{ error: unknown }> {
+  async web3(params: SignInFutureWeb3Params): Promise<{ error: ClerkError | null }> {
     const { strategy } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -1030,7 +1030,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: unknown }> {
+  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: ClerkError | null }> {
     const { flow } = params || {};
 
     /**
@@ -1101,7 +1101,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendMFAPhoneCode(): Promise<{ error: unknown }> {
+  async sendMFAPhoneCode(): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       const phoneCodeFactor = this.resource.supportedSecondFactors?.find(f => f.strategy === 'phone_code');
 
@@ -1117,7 +1117,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyMFAPhoneCode(params: SignInFutureMFAPhoneCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyMFAPhoneCode(params: SignInFutureMFAPhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -1127,7 +1127,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: unknown }> {
+  async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -1137,7 +1137,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyBackupCode(params: SignInFutureBackupCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyBackupCode(params: SignInFutureBackupCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -1147,12 +1147,12 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async ticket(params?: SignInFutureTicketParams): Promise<{ error: unknown }> {
+  async ticket(params?: SignInFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
     return this.create({ ticket: ticket ?? undefined });
   }
 
-  async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: unknown }> {
+  async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
     return runAsyncResourceTask(this.resource, async () => {
       if (!this.resource.createdSessionId) {
