@@ -399,9 +399,9 @@ describe('PricingTable - plans visibility', () => {
       expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
     });
 
-    // Ensure API args reflect org context
+    // Ensure API args reflect user context by default
     expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
-    // Ensure subscription called with active org
+    // Signed-out users should not fetch subscriptions
     expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
   });
 
@@ -640,7 +640,7 @@ describe('PricingTable - plans visibility', () => {
       // Ensure getPlans was called with organization filter
       expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'organization' }));
       // Ensure subscription called with active org
-      // expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'Org1' }));
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'Org1' }));
     });
   });
 
