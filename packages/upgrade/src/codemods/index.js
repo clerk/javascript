@@ -38,6 +38,6 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
     dry: false,
     ...options,
     // we must silence stdout to prevent output from interfering with ink CLI
-    // silent: true,
+    silent: true,
   });
 }
