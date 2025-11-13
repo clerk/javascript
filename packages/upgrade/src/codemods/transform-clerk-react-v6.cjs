@@ -7,8 +7,8 @@ const PACKAGES = [
 ];
 
 /**
- * Transforms imports of `@clerk/clerk-react` to `@clerk/react`, in addition to updating imports of `useSignIn` and
- * `useSignUp` to import from the `/legacy` subpath.
+ * Transforms imports of `@clerk/clerk-react` to `@clerk/react` and `@clerk/clerk-expo` to `@clerk/expo`, in addition
+ * to updating imports of `useSignIn` and `useSignUp` to import from the `/legacy` subpath.
  *
  * @param {import('jscodeshift').FileInfo} FileInfo - The parameters object
  * @param {import('jscodeshift').API} api - The API object provided by jscodeshift
@@ -20,18 +20,11 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
   let dirtyFlag = false;
 
   PACKAGES.forEach(([sourcePackage, targetPackage]) => {
-    // Transform imports from '@clerk/clerk-react'
+    // Transform imports from sourcePackage to targetPackage
     root.find(j.ImportDeclaration, { source: { value: sourcePackage } }).forEach(path => {
       const node = path.node;
       const specifiers = node.specifiers || [];
       const importKind = node.importKind; // preserve type-only imports
-
-      // If there are no specifiers (side-effect import), simply retarget to '@clerk/react'
-      if (specifiers.length === 0) {
-        node.source.value = targetPackage;
-        dirtyFlag = true;
-        return;
-      }
 
       /** Split specifiers into legacy and non-legacy groups */
       const legacySpecifiers = [];
@@ -49,7 +42,7 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
       }
 
       if (legacySpecifiers.length > 0 && nonLegacySpecifiers.length > 0) {
-        // Mixed import: keep non-legacy on '@clerk/react', emit a new import for legacy hooks
+        // Mixed import: keep non-legacy on targetPackage, emit a new import for legacy hooks
         node.specifiers = nonLegacySpecifiers;
         node.source = j.literal(targetPackage);
         if (importKind) {
