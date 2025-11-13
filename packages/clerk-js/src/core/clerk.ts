@@ -1158,14 +1158,6 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
-    // Temporary backward compatibility for legacy prop: `forOrganizations`. Will be removed in the coming minor release.
-    const nextProps = { ...(props as any) } as PricingTableProps & { forOrganizations?: boolean };
-    if (typeof (props as any)?.forOrganizations !== 'undefined') {
-      logger.warnOnce(
-        'Clerk: [IMPORTANT] <PricingTable /> prop `forOrganizations` is deprecated and will be removed in the coming minors. Use `for="organization"` instead.',
-      );
-    }
-
     this.assertComponentsReady(this.#clerkUi);
     const component = 'PricingTable';
     void this.#clerkUi
@@ -1175,11 +1167,11 @@ export class Clerk implements ClerkInterface {
           name: component,
           appearanceKey: 'pricingTable',
           node,
-          props: nextProps,
+          props,
         }),
       );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted(component, nextProps));
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {

@@ -95,12 +95,7 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider
-          value={
-            // Backward compatibility: support legacy `forOrganizations: true`
-            (props as any).forOrganizations ? 'organization' : (props as PricingTableProps).for || 'user'
-          }
-        >
+        <SubscriberTypeContext.Provider value={(props as PricingTableProps).for || 'user'}>
           <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
             {children}
           </PricingTableContext.Provider>
