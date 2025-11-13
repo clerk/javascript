@@ -1,4 +1,4 @@
-import type { VerificationStrategy } from '@clerk/types';
+import type { VerificationStrategy } from '@clerk/shared/types';
 
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { MfaBackupCodeCreateForm } from './MfaBackupCodeCreateForm';

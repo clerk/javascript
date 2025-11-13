@@ -1,4 +1,4 @@
-import type { __internal_CheckoutProps } from '@clerk/types';
+import type { __internal_CheckoutProps } from '@clerk/shared/types';
 
 import { Drawer } from '@/ui/elements/Drawer';
 
@@ -21,7 +21,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
             }}
           >
             <Drawer.Content>
-              <Drawer.Header title={localizationKeys('commerce.checkout.title')} />
+              <Drawer.Header title={localizationKeys('billing.checkout.title')} />
               <CheckoutPage.Root>
                 <CheckoutPage.Stage name='needs_initialization'>
                   <CheckoutPage.FetchStatus status='fetching'>

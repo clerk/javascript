@@ -106,7 +106,7 @@ export const StatementPage = () => {
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}
-                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
+                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('billing.month')) : t(localizationKeys('billing.year'))}`}
                         secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
                       />
                       <Statement.SectionContentDetailsList>
@@ -139,7 +139,7 @@ export const StatementPage = () => {
                                 gap: t.space.$1,
                               })}
                             >
-                              <Span localizationKey={localizationKeys('commerce.viewPayment')} />
+                              <Span localizationKey={localizationKeys('billing.viewPayment')} />
                               <Icon
                                 icon={ArrowRightIcon}
                                 size='sm'

@@ -9,7 +9,7 @@ import type {
   OrganizationMembershipResource,
   OrganizationResource,
   PublicUserData,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { vi } from 'vitest';
 
 type FakeMemberParams = {
@@ -100,8 +100,8 @@ export const createFakeOrganizationInvitation = (params: FakeInvitationParams): 
     status: params.status || 'pending',
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    revoke: vi.fn as any,
-    reload: vi.fn as any,
+    revoke: vi.fn() as any,
+    reload: vi.fn() as any,
   };
 };
 
@@ -131,8 +131,8 @@ export const createFakeOrganizationMembershipRequest = (
     status: params.status || 'pending',
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    accept: vi.fn as any,
-    reject: vi.fn as any,
-    reload: vi.fn as any,
+    accept: vi.fn() as any,
+    reject: vi.fn() as any,
+    reload: vi.fn() as any,
   };
 };

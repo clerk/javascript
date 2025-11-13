@@ -1,27 +1,17 @@
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/utlis';
-import { TaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
-import { bindCreateFixtures, render, waitFor } from '@/vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+import { createFakeUserOrganizationMembership } from '@/ui/components/OrganizationSwitcher/__tests__/test-utils';
 
 import { TaskChooseOrganization } from '..';
 
 const { createFixtures } = bindCreateFixtures('TaskChooseOrganization');
 
-const TaskChooseOrganizationWithContext = ({
-  redirectUrlComplete = '/dashboard',
-}: {
-  redirectUrlComplete?: string;
-}) => (
-  <TaskChooseOrganizationContext.Provider value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete }}>
-    <TaskChooseOrganization />
-  </TaskChooseOrganizationContext.Provider>
-);
-
 describe('TaskChooseOrganization', () => {
   it('does not render component without existing session task', async () => {
-    const { wrapper, props } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -30,19 +20,15 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
+    const { queryByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
-    const { queryByText, queryByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
-
-    await waitFor(() => {
-      expect(queryByText('Setup your organization')).not.toBeInTheDocument();
-      expect(queryByText('Enter your organization details to continue')).not.toBeInTheDocument();
-      expect(queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument();
-    });
+    expect(queryByText('Setup your organization')).not.toBeInTheDocument();
+    expect(queryByText('Enter your organization details to continue')).not.toBeInTheDocument();
+    expect(queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument();
   });
 
   it('renders component when session task exists', async () => {
-    const { wrapper, props } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -52,19 +38,15 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
+    const { findByText, findByRole } = render(<TaskChooseOrganization />, { wrapper });
 
-    const { getByText, getByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
-
-    await waitFor(() => {
-      expect(getByText('Setup your organization')).toBeInTheDocument();
-      expect(getByText('Enter your organization details to continue')).toBeInTheDocument();
-      expect(getByRole('link', { name: /sign out/i })).toBeInTheDocument();
-    });
+    expect(await findByText('Setup your organization')).toBeInTheDocument();
+    expect(await findByText('Enter your organization details to continue')).toBeInTheDocument();
+    expect(await findByRole('link', { name: /sign out/i })).toBeInTheDocument();
   });
 
   it('shows create organization screen when user has no existing resources', async () => {
-    const { wrapper, props } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -74,18 +56,14 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
+    const { findByRole, findByText } = render(<TaskChooseOrganization />, { wrapper });
 
-    const { getByRole, getByText } = render(<TaskChooseOrganizationWithContext />, { wrapper });
-
-    await waitFor(() => {
-      expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-      expect(getByText('Continue')).toBeInTheDocument();
-    });
+    expect(await findByRole('textbox', { name: /name/i })).toBeInTheDocument();
+    expect(await findByText('Continue')).toBeInTheDocument();
   });
 
   it('shows choose organization screen when user has existing organizations', async () => {
-    const { wrapper, fixtures, props } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -95,9 +73,7 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
-
-    (fixtures.clerk.user?.getOrganizationMemberships as any).mockReturnValue(
+    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
       Promise.resolve({
         data: [
           createFakeUserOrganizationMembership({
@@ -117,17 +93,15 @@ describe('TaskChooseOrganization', () => {
       }),
     );
 
-    const { getByText, queryByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
+    const { findByText, queryByRole } = render(<TaskChooseOrganization />, { wrapper });
 
-    await waitFor(() => {
-      expect(getByText('Existing Org')).toBeInTheDocument();
-      expect(getByText('Create new organization')).toBeInTheDocument();
-      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
-    });
+    expect(await findByText('Existing Org')).toBeInTheDocument();
+    expect(await findByText('Create new organization')).toBeInTheDocument();
+    expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
   });
 
   it('allows switching between choose and create organization screens', async () => {
-    const { wrapper, fixtures, props } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -137,9 +111,7 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
-
-    (fixtures.clerk.user?.getOrganizationMemberships as any).mockReturnValue(
+    fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
       Promise.resolve({
         data: [
           createFakeUserOrganizationMembership({
@@ -159,38 +131,30 @@ describe('TaskChooseOrganization', () => {
       }),
     );
 
-    const { getByText, getByRole, queryByRole, queryByText } = render(<TaskChooseOrganizationWithContext />, {
-      wrapper,
-    });
+    const { findByText, findByRole, queryByRole, queryByText } = render(<TaskChooseOrganization />, { wrapper });
 
-    await waitFor(() => {
-      expect(getByText('Existing Org')).toBeInTheDocument();
-      expect(getByText('Create new organization')).toBeInTheDocument();
-      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
-    });
+    expect(await findByText('Existing Org')).toBeInTheDocument();
+    expect(await findByText('Create new organization')).toBeInTheDocument();
+    expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
 
-    const createButton = getByText('Create new organization');
+    const createButton = await findByText('Create new organization');
     await userEvent.click(createButton);
 
-    await waitFor(() => {
-      expect(getByRole('textbox', { name: /name/i })).toBeInTheDocument();
-      expect(getByRole('button', { name: /continue/i })).toBeInTheDocument();
-      expect(getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-      expect(queryByText('Existing Org')).not.toBeInTheDocument();
-    });
+    expect(await findByRole('textbox', { name: /name/i })).toBeInTheDocument();
+    expect(await findByRole('button', { name: /continue/i })).toBeInTheDocument();
+    expect(await findByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    expect(queryByText('Existing Org')).not.toBeInTheDocument();
 
-    const cancelButton = getByRole('button', { name: /cancel/i });
+    const cancelButton = await findByRole('button', { name: /cancel/i });
     await userEvent.click(cancelButton);
 
-    await waitFor(() => {
-      expect(getByText('Existing Org')).toBeInTheDocument();
-      expect(getByText('Create new organization')).toBeInTheDocument();
-      expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
-    });
+    expect(await findByText('Existing Org')).toBeInTheDocument();
+    expect(await findByText('Create new organization')).toBeInTheDocument();
+    expect(queryByRole('textbox', { name: /name/i })).not.toBeInTheDocument();
   });
 
   it('displays user identifier in sign out section', async () => {
-    const { wrapper, props } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -200,18 +164,14 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
+    const { findByText } = render(<TaskChooseOrganization />, { wrapper });
 
-    const { getByText } = render(<TaskChooseOrganizationWithContext />, { wrapper });
-
-    await waitFor(() => {
-      expect(getByText(/user@test\.com/)).toBeInTheDocument();
-      expect(getByText('Sign out')).toBeInTheDocument();
-    });
+    expect(await findByText(/user@test\.com/)).toBeInTheDocument();
+    expect(await findByText('Sign out')).toBeInTheDocument();
   });
 
   it('handles sign out correctly', async () => {
-    const { wrapper, fixtures, props } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -221,10 +181,8 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
-
-    const { getByRole } = render(<TaskChooseOrganizationWithContext />, { wrapper });
-    const signOutButton = getByRole('link', { name: /sign out/i });
+    const { findByRole } = render(<TaskChooseOrganization />, { wrapper });
+    const signOutButton = await findByRole('link', { name: /sign out/i });
 
     await userEvent.click(signOutButton);
 
@@ -232,7 +190,7 @@ describe('TaskChooseOrganization', () => {
   });
 
   it('renders with username when email is not available', async () => {
-    const { wrapper, props } = await createFixtures(f => {
+    const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
@@ -242,10 +200,44 @@ describe('TaskChooseOrganization', () => {
       });
     });
 
-    props.setProps({ redirectUrlComplete: '/dashboard' });
+    const { findByText } = render(<TaskChooseOrganization />, { wrapper });
 
-    const { getByText } = render(<TaskChooseOrganizationWithContext />, { wrapper });
+    expect(await findByText(/testuser/)).toBeInTheDocument();
+  });
 
-    expect(getByText(/testuser/)).toBeInTheDocument();
+  describe('on create organization form', () => {
+    it("does not display slug field if it's disabled on environment", async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(false);
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      const { findByRole, queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(await findByRole('textbox', { name: /name/i })).toBeInTheDocument();
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+    });
+
+    it("display slug field if it's enabled on environment", async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(true);
+        f.withForceOrganizationSelection();
+        f.withUser({
+          create_organization_enabled: true,
+          tasks: [{ key: 'choose-organization' }],
+        });
+      });
+
+      const { findByRole, queryByLabelText } = render(<TaskChooseOrganization />, { wrapper });
+
+      expect(await findByRole('textbox', { name: /name/i })).toBeInTheDocument();
+      expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
+    });
   });
 });

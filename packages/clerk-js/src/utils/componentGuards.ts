@@ -1,4 +1,4 @@
-import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/types';
+import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/shared/types';
 
 export type ComponentGuard = (
   clerk: Clerk,
@@ -34,17 +34,14 @@ export const disabledAllBillingFeatures: ComponentGuard = (_, environment) => {
   return disabledUserBillingFeature(_, environment) && disabledOrganizationBillingFeature(_, environment);
 };
 
-export const disabledAPIKeysFeature: ComponentGuard = (_, environment) => {
-  return !environment?.apiKeysSettings?.enabled;
+export const disabledUserAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.user_api_keys_enabled;
 };
 
-export const canViewOrManageAPIKeys: ComponentGuard = clerk => {
-  if (!clerk.session) {
-    return false;
-  }
+export const disabledOrganizationAPIKeysFeature: ComponentGuard = (_, environment) => {
+  return !environment?.apiKeysSettings?.orgs_api_keys_enabled;
+};
 
-  return (
-    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:read' }) ||
-    clerk.session.checkAuthorization({ permission: 'org:sys_api_keys:manage' })
-  );
+export const disabledAllAPIKeysFeatures: ComponentGuard = (_, environment) => {
+  return disabledUserAPIKeysFeature(_, environment) && disabledOrganizationAPIKeysFeature(_, environment);
 };

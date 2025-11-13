@@ -1,15 +1,24 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/types';
+import type { SignInErrors, SignUpErrors, State } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';
 
-const defaultErrors = (): Errors => ({
+const defaultSignInErrors = (): SignInErrors => ({
+  fields: {
+    identifier: null,
+    password: null,
+    code: null,
+  },
+  raw: null,
+  global: null,
+});
+
+const defaultSignUpErrors = (): SignUpErrors => ({
   fields: {
     firstName: null,
     lastName: null,
     emailAddress: null,
-    identifier: null,
     phoneNumber: null,
     password: null,
     username: null,
@@ -39,12 +48,51 @@ export class StateProxy implements State {
     const target = () => this.client.signIn.__internal_future;
 
     return {
-      errors: defaultErrors(),
+      errors: defaultSignInErrors(),
       fetchStatus: 'idle' as const,
       signIn: {
         status: 'needs_identifier' as const,
         availableStrategies: [],
         isTransferable: false,
+        get id() {
+          return gateProperty(target, 'id', undefined);
+        },
+        get supportedFirstFactors() {
+          return gateProperty(target, 'supportedFirstFactors', []);
+        },
+        get supportedSecondFactors() {
+          return gateProperty(target, 'supportedSecondFactors', []);
+        },
+        get secondFactorVerification() {
+          return gateProperty(target, 'secondFactorVerification', {
+            status: null,
+            error: null,
+            expireAt: null,
+            externalVerificationRedirectURL: null,
+            nonce: null,
+            attempts: null,
+            message: null,
+            strategy: null,
+            verifiedAtClient: null,
+            verifiedFromTheSameClient: () => false,
+            __internal_toSnapshot: () => {
+              throw new Error('__internal_toSnapshot called before Clerk is loaded');
+            },
+            pathRoot: '',
+            reload: () => {
+              throw new Error('__internal_toSnapshot called before Clerk is loaded');
+            },
+          });
+        },
+        get identifier() {
+          return gateProperty(target, 'identifier', null);
+        },
+        get createdSessionId() {
+          return gateProperty(target, 'createdSessionId', null);
+        },
+        get userData() {
+          return gateProperty(target, 'userData', {});
+        },
         get firstFactorVerification() {
           return gateProperty(target, 'firstFactorVerification', {
             status: null,
@@ -92,6 +140,8 @@ export class StateProxy implements State {
           'verifyBackupCode',
         ] as const),
         ticket: this.gateMethod(target, 'ticket'),
+        passkey: this.gateMethod(target, 'passkey'),
+        web3: this.gateMethod(target, 'web3'),
       },
     };
   }
@@ -103,9 +153,60 @@ export class StateProxy implements State {
     const target = () => this.client.signUp.__internal_future;
 
     return {
-      errors: defaultErrors(),
+      errors: defaultSignUpErrors(),
       fetchStatus: 'idle' as const,
       signUp: {
+        get id() {
+          return gateProperty(target, 'id', undefined);
+        },
+        get requiredFields() {
+          return gateProperty(target, 'requiredFields', []);
+        },
+        get optionalFields() {
+          return gateProperty(target, 'optionalFields', []);
+        },
+        get missingFields() {
+          return gateProperty(target, 'missingFields', []);
+        },
+        get username() {
+          return gateProperty(target, 'username', null);
+        },
+        get firstName() {
+          return gateProperty(target, 'firstName', null);
+        },
+        get lastName() {
+          return gateProperty(target, 'lastName', null);
+        },
+        get emailAddress() {
+          return gateProperty(target, 'emailAddress', null);
+        },
+        get phoneNumber() {
+          return gateProperty(target, 'phoneNumber', null);
+        },
+        get web3Wallet() {
+          return gateProperty(target, 'web3Wallet', null);
+        },
+        get hasPassword() {
+          return gateProperty(target, 'hasPassword', false);
+        },
+        get unsafeMetadata() {
+          return gateProperty(target, 'unsafeMetadata', {});
+        },
+        get createdSessionId() {
+          return gateProperty(target, 'createdSessionId', null);
+        },
+        get createdUserId() {
+          return gateProperty(target, 'createdUserId', null);
+        },
+        get abandonAt() {
+          return gateProperty(target, 'abandonAt', null);
+        },
+        get legalAcceptedAt() {
+          return gateProperty(target, 'legalAcceptedAt', null);
+        },
+        get locale() {
+          return gateProperty(target, 'locale', null);
+        },
         get status() {
           return gateProperty(target, 'status', 'missing_requirements');
         },
@@ -121,6 +222,7 @@ export class StateProxy implements State {
         sso: gateMethod(target, 'sso'),
         password: gateMethod(target, 'password'),
         ticket: gateMethod(target, 'ticket'),
+        web3: gateMethod(target, 'web3'),
         finalize: gateMethod(target, 'finalize'),
 
         verifications: wrapMethods(() => target().verifications, [

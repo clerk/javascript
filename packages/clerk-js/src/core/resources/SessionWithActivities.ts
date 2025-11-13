@@ -4,7 +4,7 @@ import type {
   SessionActivityJSON,
   SessionWithActivitiesJSON,
   SessionWithActivitiesResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './internal';

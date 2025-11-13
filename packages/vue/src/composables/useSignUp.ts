@@ -1,5 +1,5 @@
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { UseSignUpReturn } from '@clerk/types';
+import type { UseSignUpReturn } from '@clerk/shared/types';
 import { computed, watch } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
@@ -9,7 +9,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSignUp = () => ToComputedRefs<UseSignUpReturn>;
 
 /**
- * Returns the current [`SignUp`](https://clerk.com/docs/references/javascript/sign-up) object which provides
+ * Returns the current [`SignUp`](https://clerk.com/docs/reference/javascript/sign-up) object which provides
  * methods and state for managing the sign-up flow.
  *
  * @example

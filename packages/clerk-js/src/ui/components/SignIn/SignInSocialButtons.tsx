@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeChannel } from '@clerk/types';
+import type { PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
 import { handleError } from '@/ui/utils/errorHandler';
@@ -33,6 +33,7 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   return (
     <SocialButtons
       {...rest}
+      showLastAuthenticationStrategy
       idleAfterDelay={!shouldUsePopup}
       oauthCallback={strategy => {
         if (shouldUsePopup) {

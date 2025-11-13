@@ -1,4 +1,4 @@
-import type { EnvironmentJSONSnapshot } from '@clerk/types';
+import type { EnvironmentJSONSnapshot } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { Environment } from '../internal';
@@ -9,7 +9,8 @@ describe('Environment', () => {
 
     expect(environment).toMatchObject({
       apiKeysSettings: expect.objectContaining({
-        enabled: false,
+        orgs_api_keys_enabled: false,
+        user_api_keys_enabled: false,
         pathRoot: '',
       }),
       authConfig: expect.objectContaining({
@@ -53,7 +54,8 @@ describe('Environment', () => {
       object: 'environment',
       id: '',
       api_keys_settings: {
-        enabled: false,
+        orgs_api_keys_enabled: false,
+        user_api_keys_enabled: false,
         id: undefined,
         path_root: '',
       },
@@ -578,7 +580,8 @@ describe('Environment', () => {
     expect(environment.__internal_toSnapshot()).toMatchObject({
       object: 'environment',
       api_keys_settings: expect.objectContaining({
-        enabled: false,
+        orgs_api_keys_enabled: false,
+        user_api_keys_enabled: false,
       }),
       auth_config: expect.objectContaining({
         single_session_mode: true,

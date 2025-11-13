@@ -1,5 +1,5 @@
 import { createCheckAuthorization, resolveAuthState } from '@clerk/shared/authorization';
-import type { Clerk, GetToken, JwtPayload, PendingSessionOptions, SignOut, UseAuthReturn } from '@clerk/types';
+import type { Clerk, GetToken, JwtPayload, PendingSessionOptions, SignOut, UseAuthReturn } from '@clerk/shared/types';
 import { computed, type ShallowRef, watch } from 'vue';
 
 import { errorThrower } from '../errors/errorThrower';

@@ -1,8 +1,8 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { FraudProtection } from './fraudProtection';
 import type { Clerk, Client } from './resources/internal';
-import { ClerkAPIResponseError } from './resources/internal';
 
 describe('FraudProtectionService', () => {
   let sut: FraudProtection;

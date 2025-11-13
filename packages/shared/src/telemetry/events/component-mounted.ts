@@ -1,8 +1,21 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import type { TelemetryEventRaw } from '../../types';
 
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_COMPONENT_OPENED = 'COMPONENT_OPENED';
 const EVENT_SAMPLING_RATE = 0.1;
+
+/** Increase sampling for high-signal auth components on mount. */
+const AUTH_COMPONENTS = new Set<string>(['SignIn', 'SignUp']);
+
+/**
+ * Returns the per-event sampling rate for component-mounted telemetry events.
+ * Uses a higher rate for SignIn/SignUp to improve signal quality.
+ *
+ *  @internal
+ */
+function getComponentMountedSamplingRate(component: string): number {
+  return AUTH_COMPONENTS.has(component) ? 1 : EVENT_SAMPLING_RATE;
+}
 
 type ComponentMountedBase = {
   component: string;
@@ -18,6 +31,8 @@ type EventPrebuiltComponent = ComponentMountedBase & {
 type EventComponentMounted = ComponentMountedBase & TelemetryEventRaw['payload'];
 
 /**
+ * Factory for prebuilt component telemetry events.
+ *
  * @internal
  */
 function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | typeof EVENT_COMPONENT_OPENED) {
@@ -28,7 +43,8 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
   ): TelemetryEventRaw<EventPrebuiltComponent> {
     return {
       event,
-      eventSamplingRate: EVENT_SAMPLING_RATE,
+      eventSamplingRate:
+        event === EVENT_COMPONENT_MOUNTED ? getComponentMountedSamplingRate(component) : EVENT_SAMPLING_RATE,
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
@@ -91,7 +107,7 @@ export function eventComponentMounted(
 ): TelemetryEventRaw<EventComponentMounted> {
   return {
     event: EVENT_COMPONENT_MOUNTED,
-    eventSamplingRate: EVENT_SAMPLING_RATE,
+    eventSamplingRate: getComponentMountedSamplingRate(component),
     payload: {
       component,
       ...props,

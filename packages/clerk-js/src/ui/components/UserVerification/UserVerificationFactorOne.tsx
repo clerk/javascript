@@ -1,4 +1,4 @@
-import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/types';
+import type { SessionVerificationFirstFactor, SignInFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

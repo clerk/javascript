@@ -1,11 +1,12 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/shared/types';
+import React from 'react';
 
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 
 import { forwardClerkQueryParams } from '../../../utils/getClerkQueryParam';
-import { useSignUpContext } from '../../contexts';
+import { SignInContext, useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { useRouter } from '../../router';
 import { completeSignUpFlow } from './util';
@@ -24,13 +25,16 @@ type SignInFactorOneCodeFormProps = {
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
+  const { afterSignUpUrl, navigateOnSetActive, isCombinedFlow: _isCombinedFlow } = useSignUpContext();
   const { setActive } = useClerk();
   const { navigate } = useRouter();
 
+  const isWithinSignInContext = !!React.useContext(SignInContext);
+  const isCombinedFlow = !!(isWithinSignInContext && _isCombinedFlow);
+
   const goBack = () => {
     const params = forwardClerkQueryParams();
-    return navigate('../', { searchParams: params });
+    return navigate(isCombinedFlow ? '../../' : '../', { searchParams: params });
   };
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {

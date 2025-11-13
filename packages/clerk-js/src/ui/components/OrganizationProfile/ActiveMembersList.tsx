@@ -1,5 +1,5 @@
 import { useOrganization, useUser } from '@clerk/shared/react';
-import type { OrganizationMembershipResource } from '@clerk/types';
+import type { OrganizationMembershipResource } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
@@ -89,6 +89,7 @@ const MemberRow = (props: {
           sx={{ maxWidth: '30ch' }}
           user={membership.publicUserData}
           subtitle={membership.publicUserData?.identifier}
+          subtitleProps={{ variant: 'caption' }}
           badge={isCurrentUser && <Badge localizationKey={localizationKeys('badge__you')} />}
         />
       </Td>

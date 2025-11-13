@@ -1,12 +1,12 @@
-// eslint-disable-next-line simple-import-sort/imports
-import { render, screen } from '../../../vitestUtils';
 import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
+import { render, screen } from '@/test/utils';
+
+import { InternalThemeProvider } from '../../styledSystem';
 import { Box, descriptors } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
-import { computedColors } from './vitestUtils';
-import { InternalThemeProvider } from '../../styledSystem';
+import { computedColors } from './test-utils';
 
 describe('Theme used in sx callback', () => {
   it('styles match the theme/globalAppearance', () => {
@@ -84,11 +84,11 @@ describe('Styles for specific elements', () => {
         />
       </AppearanceProvider>,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.yellow);
   });
 
   it('styles propagate to the correct element specified, including overriding styles when loading state is applied', () => {
-    const wrapper = ({ children }) => (
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -115,7 +115,7 @@ describe('Styles for specific elements', () => {
         wrapper,
       },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.yellow);
 
     rerender(
       <Box
@@ -124,11 +124,11 @@ describe('Styles for specific elements', () => {
         isLoading
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 
   it('overrides styles when active state is applied', () => {
-    const wrapper = ({ children }) => (
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -153,7 +153,7 @@ describe('Styles for specific elements', () => {
       />,
       { wrapper },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.yellow);
 
     rerender(
       <Box
@@ -162,11 +162,11 @@ describe('Styles for specific elements', () => {
         isActive
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 
   it('overrides styles when error state is applied', () => {
-    const wrapper = ({ children }) => (
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -193,7 +193,7 @@ describe('Styles for specific elements', () => {
         wrapper,
       },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.yellow);
 
     rerender(
       <Box
@@ -202,11 +202,11 @@ describe('Styles for specific elements', () => {
         hasError
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 
   it('overrides styles when open state is applied', () => {
-    const wrapper = ({ children }) => (
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -236,7 +236,7 @@ describe('Styles for specific elements', () => {
         wrapper,
       },
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.yellow);
 
     rerender(
       <Box
@@ -245,11 +245,11 @@ describe('Styles for specific elements', () => {
         isOpen
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 
   it('overrides &:disabled styles when loading state is applied', () => {
-    const wrapper = ({ children }) => (
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
@@ -278,7 +278,7 @@ describe('Styles for specific elements', () => {
       { wrapper },
     );
 
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 255, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.yellow);
 
     rerender(
       <Box
@@ -287,7 +287,7 @@ describe('Styles for specific elements', () => {
         isLoading
       />,
     );
-    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe('rgb(255, 0, 0)');
+    expect(getComputedStyle(screen.getByTestId('test')).backgroundColor).toBe(computedColors.red);
   });
 
   it('if a class is provided to the element via appearance, it adds the class to the element', () => {

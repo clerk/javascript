@@ -258,6 +258,24 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
+    "//#test:integration:sessions:staging": {
+      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:handshake": {
+      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
+    "//#test:integration:handshake:staging": {
+      "dependsOn": ["@clerk/testing#build", "@clerk/clerk-js#build", "@clerk/backend#build", "@clerk/nextjs#build"],
+      "env": ["CLEANUP", "DEBUG", "DISABLE_WEB_SECURITY", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
+    },
     "//#test:integration:elements": {
       "dependsOn": [
         "@clerk/testing#build",
@@ -282,17 +300,6 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:tanstack-react-start": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/tanstack-react-start#build",
-        "@clerk/clerk-react#build"
-      ],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
-      "outputLogs": "new-only"
-    },
-    "//#test:integration:tanstack-react-router": {
       "dependsOn": [
         "@clerk/testing#build",
         "@clerk/clerk-js#build",

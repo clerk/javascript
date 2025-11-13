@@ -1,6 +1,5 @@
-import type { Autocomplete } from '@clerk/types';
-
 import { pathToRegexp } from './pathToRegexp';
+import type { Autocomplete } from './types';
 
 export type WithPathPatternWildcard<T = string> = `${T & string}(.*)`;
 export type PathPattern = Autocomplete<WithPathPatternWildcard>;

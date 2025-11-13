@@ -8,12 +8,10 @@
     "skipLibCheck": true,
     "allowJs": true,
     "target": "ES2020",
-    "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,
     "outDir": "dist",
-    "resolveJsonModule": true,
-    "declarationDir": "dist/types"
+    "resolveJsonModule": true
   },
   "include": ["src"]
 }

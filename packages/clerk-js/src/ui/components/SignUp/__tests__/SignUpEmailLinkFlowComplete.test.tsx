@@ -1,10 +1,11 @@
+import { EmailLinkError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { EmailLinkError, EmailLinkErrorCodeStatus } from '../../../../core/resources';
-import { render, screen, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen, waitFor } from '@/test/utils';
+
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
 

@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { NavigateOptions } from '@clerk/types';
+import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 
 import { hasUrlInFragment, mergeFragmentIntoUrl, stripOrigin } from '../../utils';

@@ -17,6 +17,11 @@ export const isIS: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Afrita og loka',
+      formHint: 'Af öryggisástæðum munum við ekki leyfa þér að skoða það aftur síðar.',
+      formTitle: 'Afritaðu API-lykilinn "{{name}}" þinn núna',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const isIS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Notendatæki',
   badge__you: 'Þú',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const isIS: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const isIS: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const isIS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-lykill',
+  formFieldLabel__apiKeyDescription: 'Lýsing',
+  formFieldLabel__apiKeyExpiration: 'Rennur út',
+  formFieldLabel__apiKeyName: 'Nafn leynilykils',
   formFieldLabel__automaticInvitations: 'Virkja sjálfvirk boð fyrir þetta lén',
   formFieldLabel__backupCode: 'Öryggiskóði',
   formFieldLabel__confirmDeletion: 'Staðfesting',
@@ -283,7 +290,7 @@ export const isIS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const isIS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const isIS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Stofna samtök',
     action__invitationAccept: 'Ganga í',
     action__manageOrganization: 'Stjórna',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Biðja um að ganga í',
     notSelected: 'Engin samtök valin',
     personalWorkspace: 'Persónulegur reikningur',
@@ -604,6 +613,12 @@ export const isIS: LocalizationResource = {
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',
     },
+    emailCodeMfa: {
+      formTitle: 'Athugaðu tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -640,6 +655,16 @@ export const isIS: LocalizationResource = {
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki tengilinn? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Endurstilla lykilorð kóða',
       resendButton: 'Fékkstu ekki kóða? Senda aftur',
@@ -653,6 +678,8 @@ export const isIS: LocalizationResource = {
       label__alternativeMethods: 'Eða, skráðu þig inn með annarri aðferð',
       title: 'Gleymt lykilorð?',
     },
+    newDeviceVerificationNotice:
+      'Þú ert að skrá þig inn frá nýjum tæki. Við biðjum um staðfestingu til að halda reikningnum þínum öruggum.',
     noAvailableMethods: {
       message: 'Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.',
       subtitle: 'Villa kom upp',
@@ -761,6 +788,10 @@ export const isIS: LocalizationResource = {
         subtitleNewTab: 'Farðu aftur í fyrri flipann til að halda áfram',
         title: 'Tókst að staðfesta netfang',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -935,7 +966,9 @@ export const isIS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Bæta við reikningi',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Stjórna reikningi',
+    action__openUserMenu: undefined,
     action__signOut: 'Skrá út',
     action__signOutAll: 'Skrá út af öllum reikningum',
   },
@@ -967,7 +1000,7 @@ export const isIS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -976,7 +1009,7 @@ export const isIS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1036,7 +1069,7 @@ export const isIS: LocalizationResource = {
       actionDescription: 'Sláðu inn "Eyða reikningi" hér að neðan til að halda áfram.',
       confirm: 'Eyða reikningi',
       messageLine1:
-        'Ertu viss um að þú viljir eyða reikningnum þínum úr Clerk? Vinsamlegast hafðu samband við eiganda forritsins til að eyða upplýsingum þínum úr forriti þeirra og öðrum þjónustum.',
+        'Ertu viss um að þú viljir eyða reikningnum þínum? Sum tengd gögn kunna að verða varðveitt. Til að biðja um fullkomna eyðingu gagna, vinsamlegast hafðu samband við þjónustuver.',
       messageLine2: 'Þessi aðgerð er varanleg og óafturkræf.',
       title: 'Eyða reikningi',
     },

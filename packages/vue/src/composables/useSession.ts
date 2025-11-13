@@ -1,4 +1,4 @@
-import type { UseSessionReturn } from '@clerk/types';
+import type { UseSessionReturn } from '@clerk/shared/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
@@ -8,7 +8,7 @@ import { useClerkContext } from './useClerkContext';
 type UseSession = () => ToComputedRefs<UseSessionReturn>;
 
 /**
- * Returns the current [`Session`](https://clerk.com/docs/references/javascript/session) object which provides
+ * Returns the current [`Session`](https://clerk.com/docs/reference/javascript/session) object which provides
  * information about the active session and methods to manage it.
  *
  * @example

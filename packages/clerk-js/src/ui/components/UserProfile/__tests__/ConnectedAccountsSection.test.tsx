@@ -1,9 +1,10 @@
-import type { ExternalAccountResource } from '@clerk/types';
+import type { ExternalAccountResource } from '@clerk/shared/types';
 import { act, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { ConnectedAccountsSection } from '../ConnectedAccountsSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

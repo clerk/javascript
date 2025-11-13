@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/shared/react';
-import type { SessionVerificationLevel } from '@clerk/types';
+import type { SessionVerificationLevel } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import { LoadingCard } from '@/ui/elements/LoadingCard';

@@ -1,13 +1,14 @@
-import type { OrganizationInvitationResource } from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { OrganizationInvitationResource } from '@clerk/shared/types';
+import { waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
-import { render } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+
 import { Action } from '../../../elements/Action';
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { InviteMembersScreen } from '../InviteMembersScreen';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -29,6 +30,7 @@ describe('InviteMembersPage', () => {
       });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { findByText, getByText } = render(
@@ -55,6 +57,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -114,6 +117,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 1,
         data: [
@@ -151,6 +155,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 1,
         data: [
@@ -202,6 +207,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 3,
         data: [
@@ -265,6 +271,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -319,6 +326,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -376,6 +384,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -436,6 +445,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -492,6 +502,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -562,6 +573,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
@@ -628,6 +640,7 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [

@@ -2,7 +2,7 @@
 import { computed, provide } from 'vue';
 import { useOrganizationProfileCustomPages } from '../../../utils/useCustomPages';
 import { useClerk } from '../../../composables';
-import type { OrganizationProfileProps } from '@clerk/types';
+import type { OrganizationProfileProps } from '@clerk/shared/types';
 import { OrganizationProfileInjectionKey } from '../../../keys';
 import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 

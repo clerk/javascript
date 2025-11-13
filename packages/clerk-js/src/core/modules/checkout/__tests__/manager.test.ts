@@ -1,8 +1,8 @@
-import type { __experimental_CheckoutCacheState, BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/types';
+import type { BillingCheckoutResource, ClerkAPIResponseError } from '@clerk/shared/types';
 import type { MockedFunction } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { type CheckoutKey, createCheckoutManager, FETCH_STATUS } from '../manager';
+import { type CheckoutCacheState, type CheckoutKey, createCheckoutManager, FETCH_STATUS } from '../manager';
 
 // Type-safe mock for BillingCheckoutResource
 const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> = {}): BillingCheckoutResource => ({
@@ -21,6 +21,7 @@ const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> 
   isImmediatePlanChange: false,
   planPeriod: 'month',
   freeTrialEndsAt: null,
+  needsPaymentMethod: true,
   payer: {
     id: 'payer_123',
     createdAt: new Date('2025-01-01'),
@@ -52,7 +53,7 @@ const createMockCheckoutResource = (overrides: Partial<BillingCheckoutResource> 
     pathRoot: '',
     reload: vi.fn(),
   },
-  paymentSource: undefined,
+  paymentMethod: undefined,
   confirm: vi.fn(),
   reload: vi.fn(),
   pathRoot: '/checkout',
@@ -104,7 +105,7 @@ describe('createCheckoutManager', () => {
 
   describe('subscribe', () => {
     it('should add listener and return unsubscribe function', () => {
-      const listener: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
+      const listener: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
 
       const unsubscribe = manager.subscribe(listener);
 
@@ -113,7 +114,7 @@ describe('createCheckoutManager', () => {
     });
 
     it('should remove listener when unsubscribe is called', async () => {
-      const listener: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
+      const listener: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
 
       const unsubscribe = manager.subscribe(listener);
 
@@ -137,8 +138,8 @@ describe('createCheckoutManager', () => {
     });
 
     it('should notify all listeners when state changes', async () => {
-      const listener1: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
-      const listener2: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
+      const listener1: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
+      const listener2: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
       const mockCheckout = createMockCheckoutResource();
 
       manager.subscribe(listener1);
@@ -164,7 +165,7 @@ describe('createCheckoutManager', () => {
     });
 
     it('should handle multiple subscribe/unsubscribe cycles', () => {
-      const listener: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
+      const listener: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
 
       // Subscribe and unsubscribe multiple times
       const unsubscribe1 = manager.subscribe(listener);
@@ -210,7 +211,7 @@ describe('createCheckoutManager', () => {
     });
 
     it('should set isStarting to true during operation', async () => {
-      let capturedState: __experimental_CheckoutCacheState | null = null;
+      let capturedState: CheckoutCacheState | null = null;
       const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
@@ -314,7 +315,7 @@ describe('createCheckoutManager', () => {
     });
 
     it('should set isConfirming to true during operation', async () => {
-      let capturedState: __experimental_CheckoutCacheState | null = null;
+      let capturedState: CheckoutCacheState | null = null;
       const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
@@ -479,7 +480,7 @@ describe('createCheckoutManager', () => {
 
   describe('clearCheckout', () => {
     it('should clear checkout state when no operations are pending', () => {
-      const listener: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
+      const listener: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
       manager.subscribe(listener);
 
       manager.clearCheckout();
@@ -543,7 +544,7 @@ describe('createCheckoutManager', () => {
       expect(manager.getCacheState().fetchStatus).toBe(FETCH_STATUS.IDLE);
 
       // During operation - fetching
-      let capturedState: __experimental_CheckoutCacheState | null = null;
+      let capturedState: CheckoutCacheState | null = null;
       const mockOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
         .mockImplementation(async () => {
@@ -595,8 +596,8 @@ describe('createCheckoutManager', () => {
     });
 
     it('should handle both operations running simultaneously', async () => {
-      let startCapturedState: __experimental_CheckoutCacheState | null = null;
-      let confirmCapturedState: __experimental_CheckoutCacheState | null = null;
+      let startCapturedState: CheckoutCacheState | null = null;
+      let confirmCapturedState: CheckoutCacheState | null = null;
 
       const startOperation: MockedFunction<() => Promise<BillingCheckoutResource>> = vi
         .fn()
@@ -660,8 +661,8 @@ describe('createCheckoutManager', () => {
       const manager1 = createCheckoutManager(createCacheKey('key1'));
       const manager2 = createCheckoutManager(createCacheKey('key2'));
 
-      const listener1: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
-      const listener2: MockedFunction<(state: __experimental_CheckoutCacheState) => void> = vi.fn();
+      const listener1: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
+      const listener2: MockedFunction<(state: CheckoutCacheState) => void> = vi.fn();
 
       manager1.subscribe(listener1);
       manager2.subscribe(listener2);

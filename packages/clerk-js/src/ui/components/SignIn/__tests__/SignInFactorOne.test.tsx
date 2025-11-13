@@ -1,11 +1,11 @@
-import { parseError } from '@clerk/shared/error';
-import type { SignInResource } from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
+import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
+import type { SignInResource } from '@clerk/shared/types';
+import { waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
-import { act, mockWebAuthn, render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { act, mockWebAuthn, render, screen } from '@/test/utils';
+
 import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -20,7 +20,7 @@ describe('SignInFactorOne', () => {
     });
     fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
     render(<SignInFactorOne />, { wrapper });
-    screen.getByText('Check your email');
+    await screen.findByText('Check your email');
   });
 
   it('prefills the email if the identifier is an email', async () => {
@@ -31,7 +31,7 @@ describe('SignInFactorOne', () => {
     });
 
     render(<SignInFactorOne />, { wrapper });
-    screen.getByText('test@clerk.com');
+    await screen.findByText('test@clerk.com');
   });
 
   it('prefills the phone number if the identifier is a phone number', async () => {
@@ -42,7 +42,7 @@ describe('SignInFactorOne', () => {
     });
 
     render(<SignInFactorOne />, { wrapper });
-    screen.getByText('+30 123 4567890');
+    await screen.findByText('+30 123 4567890');
   });
 
   describe('Navigation', () => {
@@ -85,7 +85,9 @@ describe('SignInFactorOne', () => {
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
 
       await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two'));
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-two');
+      });
     });
 
     it('sets an active session when user submits first factor successfully and second factor does not exist', async () => {
@@ -115,7 +117,7 @@ describe('SignInFactorOne', () => {
           f.startSignInWithEmailAddress({ supportEmailCode: true, supportPassword: true });
         });
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Password');
+        await screen.findByText('Password');
       });
 
       it('should render the other methods component when clicking on "Forgot password"', async () => {
@@ -133,12 +135,10 @@ describe('SignInFactorOne', () => {
         });
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText(/Forgot password/i));
-        await waitFor(() => {
-          screen.getByText('Use another method');
-          expect(screen.queryByText('Or, sign in with another method')).not.toBeInTheDocument();
-          screen.getByText(`Email code to ${email}`);
-          expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
-        });
+        await screen.findByText('Use another method');
+        expect(screen.queryByText('Or, sign in with another method')).not.toBeInTheDocument();
+        await screen.findByText(`Email code to ${email}`);
+        expect(screen.queryByText('Sign in with your password')).not.toBeInTheDocument();
       });
 
       it('should render the Forgot Password alternative methods component when clicking on "Forgot password" (email)', async () => {
@@ -156,14 +156,10 @@ describe('SignInFactorOne', () => {
 
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         await userEvent.click(screen.getByText(/Forgot password/i));
-        await waitFor(() => {
-          screen.getByText('Forgot Password?');
-          screen.getByText('Or, sign in with another method');
-        });
+        await screen.findByText('Forgot Password?');
+        await screen.findByText('Or, sign in with another method');
         await userEvent.click(screen.getByText('Reset your password'));
-        await waitFor(() => {
-          screen.getByText('First, enter the code sent to your email address');
-        });
+        await screen.findByText('First, enter the code sent to your email address');
       });
 
       it('shows a UI error when submission fails', async () => {
@@ -190,7 +186,8 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
-        await waitFor(() => expect(screen.getByText('Incorrect Password')).toBeInTheDocument());
+        const errorElement = await screen.findByTestId('form-feedback-error');
+        expect(errorElement).toHaveTextContent(/Incorrect Password/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -218,9 +215,7 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
-        await waitFor(() => {
-          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
-        });
+        expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
       });
 
       it('Prompts the user to reset their password via email if it has been pwned', async () => {
@@ -255,18 +250,14 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
 
-        await waitFor(() => {
-          screen.getByText('Password compromised');
-          screen.getByText(
-            'This password has been found as part of a breach and can not be used, please reset your password.',
-          );
-          screen.getByText('Or, sign in with another method');
-        });
+        await screen.findByText('Password compromised');
+        await screen.findByText(
+          'This password has been found as part of a breach and can not be used, please reset your password.',
+        );
+        await screen.findByText('Or, sign in with another method');
 
         await userEvent.click(screen.getByText('Reset your password'));
-        await waitFor(() => {
-          screen.getByText('First, enter the code sent to your email address');
-        });
+        await screen.findByText('First, enter the code sent to your email address');
       });
 
       it('Prompts the user to reset their password via phone if it has been pwned', async () => {
@@ -301,18 +292,14 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
 
-        await waitFor(() => {
-          screen.getByText('Password compromised');
-          screen.getByText(
-            'This password has been found as part of a breach and can not be used, please reset your password.',
-          );
-          screen.getByText('Or, sign in with another method');
-        });
+        await screen.findByText('Password compromised');
+        await screen.findByText(
+          'This password has been found as part of a breach and can not be used, please reset your password.',
+        );
+        await screen.findByText('Or, sign in with another method');
 
         await userEvent.click(screen.getByText('Reset your password'));
-        await waitFor(() => {
-          screen.getByText('First, enter the code sent to your phone');
-        });
+        await screen.findByText('First, enter the code sent to your phone');
       });
 
       it('entering a pwned password, then going back and clicking forgot password should result in the correct title', async () => {
@@ -347,27 +334,23 @@ describe('SignInFactorOne', () => {
         await userEvent.type(screen.getByLabelText('Password'), '123456');
         await userEvent.click(screen.getByText('Continue'));
 
-        await waitFor(() => {
-          screen.getByText('Password compromised');
-          screen.getByText(
-            'This password has been found as part of a breach and can not be used, please reset your password.',
-          );
-          screen.getByText('Or, sign in with another method');
-        });
+        await screen.findByText('Password compromised');
+        await screen.findByText(
+          'This password has been found as part of a breach and can not be used, please reset your password.',
+        );
+        await screen.findByText('Or, sign in with another method');
 
         // Go back
         await userEvent.click(screen.getByText('Back'));
 
         // Choose to reset password via "Forgot password" instead
         await userEvent.click(screen.getByText(/Forgot password/i));
-        await waitFor(() => {
-          screen.getByText('Forgot Password?');
-          expect(
-            screen.queryByText(
-              'This password has been found as part of a breach and can not be used, please reset your password.',
-            ),
-          ).not.toBeInTheDocument();
-        });
+        await screen.findByText('Forgot Password?');
+        expect(
+          screen.queryByText(
+            'This password has been found as part of a breach and can not be used, please reset your password.',
+          ),
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -385,14 +368,10 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText(/Forgot password/i));
-        await waitFor(() => {
-          screen.getByText('Forgot Password?');
-        });
+        await screen.findByText('Forgot Password?');
 
         await userEvent.click(screen.getByText('Reset your password'));
-        await waitFor(() => {
-          screen.getByText('First, enter the code sent to your phone');
-        });
+        await screen.findByText('First, enter the code sent to your phone');
       });
 
       it('redirects to `reset-password` on successful code verification', async () => {
@@ -469,7 +448,7 @@ describe('SignInFactorOne', () => {
         );
 
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Use the verification link sent to your email');
+        await screen.findByText('Use the verification link sent to your email');
       });
 
       it('enables the "Resend link" button after 60 seconds', async () => {
@@ -515,7 +494,7 @@ describe('SignInFactorOne', () => {
         });
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Check your email');
+        await screen.findByText('Check your email');
       });
 
       it('enables the "Resend code" button after 30 seconds', async () => {
@@ -580,7 +559,8 @@ describe('SignInFactorOne', () => {
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect code')).toBeDefined());
+        const errorElement = await screen.findByTestId('form-feedback-error');
+        expect(errorElement).toHaveTextContent(/Incorrect code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -620,8 +600,8 @@ describe('SignInFactorOne', () => {
         });
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Check your phone');
-        screen.getByText('to continue to TestApp');
+        await screen.findByText('Check your phone');
+        await screen.findByText('to continue to TestApp');
       });
 
       it('enables the "Resend" button after 30 seconds', async () => {
@@ -685,7 +665,8 @@ describe('SignInFactorOne', () => {
         );
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+        const errorElement = await screen.findByTestId('form-feedback-error');
+        expect(errorElement).toHaveTextContent(/Incorrect phone code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -711,9 +692,7 @@ describe('SignInFactorOne', () => {
 
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => {
-          expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
-        });
+        expect(fixtures.clerk.__internal_navigateWithError).toHaveBeenCalledWith('..', parseError(errJSON));
       });
     });
 
@@ -728,7 +707,7 @@ describe('SignInFactorOne', () => {
         });
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
         render(<SignInFactorOne />, { wrapper });
-        screen.getByText('Check your email');
+        await screen.findByText('Check your email');
       });
 
       mockWebAuthn(() => {
@@ -741,11 +720,11 @@ describe('SignInFactorOne', () => {
             f.startSignInWithEmailAddress({ supportPasskey: true, supportEmailCode: true });
           });
           render(<SignInFactorOne />, { wrapper });
-          screen.getByText('Use your passkey');
-          screen.getByText(
+          await screen.findByText('Use your passkey');
+          await screen.findByText(
             "Using your passkey confirms it's you. Your device may ask for your fingerprint, face or screen lock.",
           );
-          screen.getByText('hello@clerk.com');
+          await screen.findByText('hello@clerk.com');
         });
 
         it('call appropriate method from passkey factor one screen', async () => {
@@ -763,9 +742,7 @@ describe('SignInFactorOne', () => {
 
           await userEvent.click(screen.getByText('Continue'));
 
-          await waitFor(() => {
-            expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalled();
-          });
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalled();
         });
       });
     });
@@ -782,8 +759,8 @@ describe('SignInFactorOne', () => {
 
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Email code to ${email}`);
-      screen.getByText(`Email link to ${email}`);
+      await screen.findByText(`Email code to ${email}`);
+      await screen.findByText(`Email link to ${email}`);
       expect(screen.queryByText(`Sign in with your password`)).not.toBeInTheDocument();
     });
 
@@ -802,7 +779,7 @@ describe('SignInFactorOne', () => {
 
       render(<SignInFactorOne />, { wrapper });
       expect(screen.queryByText(`Use another method`)).not.toBeInTheDocument();
-      screen.getByText(`Get help`);
+      await screen.findByText(`Get help`);
     });
 
     it('should go back to the main screen when clicking the "<- Back" button from the "Use another method" page', async () => {
@@ -816,7 +793,7 @@ describe('SignInFactorOne', () => {
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
       await userEvent.click(screen.getByText('Back'));
-      screen.getByText('Enter your password');
+      await screen.findByText('Enter your password');
     });
 
     it('should list all the enabled first factor methods', async () => {
@@ -830,7 +807,7 @@ describe('SignInFactorOne', () => {
       fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Sign in with your password`);
+      await screen.findByText(`Sign in with your password`);
       const deactivatedMethod = screen.queryByText(`Send link to ${email}`);
       expect(deactivatedMethod).not.toBeInTheDocument();
     });
@@ -868,7 +845,7 @@ describe('SignInFactorOne', () => {
         await userEvent.click(screen.getByText('Use another method'));
         await userEvent.click(screen.getByText('Sign in with your password'));
         await userEvent.click(screen.getByText('Use another method'));
-        screen.getByText(`Sign in with your passkey`);
+        await screen.findByText(`Sign in with your passkey`);
       });
     });
 
@@ -886,8 +863,8 @@ describe('SignInFactorOne', () => {
       await userEvent.click(screen.getByText('Use another method'));
       const currentMethod = screen.queryByText(`Send code to ${email}`);
       expect(currentMethod).not.toBeInTheDocument();
-      screen.getByText(/Continue with google/i);
-      screen.getByText(`Sign in with your password`);
+      await screen.findByText(/Continue with google/i);
+      await screen.findByText(`Sign in with your password`);
       const deactivatedMethod = screen.queryByText(`Send link to ${email}`);
       expect(deactivatedMethod).not.toBeInTheDocument();
     });
@@ -903,7 +880,7 @@ describe('SignInFactorOne', () => {
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
       await userEvent.click(screen.getByText('Sign in with your password'));
-      screen.getByText('Enter your password');
+      await screen.findByText('Enter your password');
     });
 
     it('clicking the email link method should show the magic link screen', async () => {
@@ -924,10 +901,10 @@ describe('SignInFactorOne', () => {
       );
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Email link to ${email}`);
+      await screen.findByText(`Email link to ${email}`);
       await userEvent.click(screen.getByText(`Email link to ${email}`));
-      screen.getByText('Check your email');
-      screen.getByText('Use the verification link sent to your email');
+      await screen.findByText('Check your email');
+      await screen.findByText('Use the verification link sent to your email');
     });
 
     it('clicking the email code method should show the email code input', async () => {
@@ -945,10 +922,10 @@ describe('SignInFactorOne', () => {
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(`Email code to ${email}`);
+      await screen.findByText(`Email code to ${email}`);
       await userEvent.click(screen.getByText(`Email code to ${email}`));
-      screen.getByText('Check your email');
-      screen.getByText('to continue to TestApp');
+      await screen.findByText('Check your email');
+      await screen.findByText('to continue to TestApp');
     });
 
     it('clicking the phone code method should show the phone code input', async () => {
@@ -965,9 +942,9 @@ describe('SignInFactorOne', () => {
       } as any);
       const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      screen.getByText(/code to \+/);
+      await screen.findByText(/code to \+/);
       await userEvent.click(screen.getByText(/code to \+/));
-      screen.getByText('Check your phone');
+      await screen.findByText('Check your phone');
     });
 
     describe('Get Help', () => {
@@ -980,7 +957,7 @@ describe('SignInFactorOne', () => {
         const { userEvent } = render(<SignInFactorOne />, { wrapper });
         await userEvent.click(screen.getByText('Use another method'));
         await userEvent.click(screen.getByText('Get help'));
-        screen.getByText('Email support');
+        await screen.findByText('Email support');
       });
 
       it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {

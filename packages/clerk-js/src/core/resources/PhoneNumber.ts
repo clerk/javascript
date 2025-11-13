@@ -6,7 +6,7 @@ import type {
   PhoneNumberResource,
   SetReservedForSecondFactorParams,
   VerificationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
 

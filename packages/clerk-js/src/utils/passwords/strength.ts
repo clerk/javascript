@@ -1,4 +1,4 @@
-import type { PasswordSettingsData, ZxcvbnResult } from '@clerk/types';
+import type { PasswordSettingsData, ZxcvbnResult } from '@clerk/shared/types';
 
 import type { zxcvbnFN } from '../zxcvbn';
 

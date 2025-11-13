@@ -1,4 +1,4 @@
-/* eslint-disable jsdoc/require-description-complete-sentence */
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   ClerkPaginatedResponse,
   CreateOrganizationParams,
@@ -10,9 +10,7 @@ import type {
   OrganizationSuggestionResource,
   SetActive,
   UserOrganizationInvitationResource,
-} from '@clerk/types';
-
-import { eventMethodCalled } from '../../telemetry/events/method-called';
+} from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';

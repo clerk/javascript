@@ -1,5 +1,6 @@
+import type { ClerkError } from '@clerk/shared/error';
 import { createEventBus } from '@clerk/shared/eventBus';
-import type { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/shared/types';
 
 import type { BaseResource } from './resources/Base';
 
@@ -15,7 +16,7 @@ export const events = {
 
 type TokenUpdatePayload = { token: TokenResource | null };
 export type ResourceUpdatePayload = { resource: BaseResource };
-export type ResourceErrorPayload = { resource: BaseResource; error: unknown };
+export type ResourceErrorPayload = { resource: BaseResource; error: ClerkError | null };
 export type ResourceFetchPayload = { resource: BaseResource; status: 'idle' | 'fetching' };
 
 type InternalEvents = {

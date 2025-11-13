@@ -1,44 +1,48 @@
-import type { TelemetryEvent } from '@clerk/types';
+import type { TelemetryEvent } from '../types';
 
 type TtlInMilliseconds = number;
 
 const DEFAULT_CACHE_TTL_MS = 86400000; // 24 hours
 
 /**
- * Manages throttling for telemetry events using the browser's localStorage to
- * mitigate event flooding in frequently executed code paths.
+ * Interface for cache storage used by the telemetry throttler.
+ * Implementations can use localStorage, in-memory storage, or any other storage mechanism.
+ */
+export interface ThrottlerCache {
+  getItem(key: string): TtlInMilliseconds | undefined;
+  setItem(key: string, value: TtlInMilliseconds): void;
+  removeItem(key: string): void;
+}
+
+/**
+ * Manages throttling for telemetry events using a configurable cache implementation
+ * to mitigate event flooding in frequently executed code paths.
  */
 export class TelemetryEventThrottler {
-  #storageKey = 'clerk_telemetry_throttler';
+  #cache: ThrottlerCache;
   #cacheTtl = DEFAULT_CACHE_TTL_MS;
 
+  constructor(cache: ThrottlerCache) {
+    this.#cache = cache;
+  }
+
   isEventThrottled(payload: TelemetryEvent): boolean {
-    if (!this.#isValidBrowser) {
+    const now = Date.now();
+    const key = this.#generateKey(payload);
+    const entry = this.#cache.getItem(key);
+
+    if (!entry) {
+      this.#cache.setItem(key, now);
       return false;
     }
 
-    const now = Date.now();
-    const key = this.#generateKey(payload);
-    const entry = this.#cache?.[key];
-
-    if (!entry) {
-      const updatedCache = {
-        ...this.#cache,
-        [key]: now,
-      };
-
-      localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
-    }
-
-    const shouldInvalidate = entry && now - entry > this.#cacheTtl;
+    const shouldInvalidate = now - entry > this.#cacheTtl;
     if (shouldInvalidate) {
-      const updatedCache = this.#cache;
-      delete updatedCache[key];
-
-      localStorage.setItem(this.#storageKey, JSON.stringify(updatedCache));
+      this.#cache.setItem(key, now);
+      return false;
     }
 
-    return !!entry;
+    return true;
   }
 
   /**
@@ -62,51 +66,85 @@ export class TelemetryEventThrottler {
         .map(key => sanitizedEvent[key]),
     );
   }
+}
 
-  get #cache(): Record<string, TtlInMilliseconds> | undefined {
-    const cacheString = localStorage.getItem(this.#storageKey);
+/**
+ * LocalStorage-based cache implementation for browser environments.
+ */
+export class LocalStorageThrottlerCache implements ThrottlerCache {
+  #storageKey = 'clerk_telemetry_throttler';
 
-    if (!cacheString) {
-      return {};
-    }
-
-    return JSON.parse(cacheString);
+  getItem(key: string): TtlInMilliseconds | undefined {
+    return this.#getCache()[key];
   }
 
-  /**
-   * Checks if the browser's localStorage is supported and writable.
-   *
-   * If any of these operations fail, it indicates that localStorage is either
-   * not supported or not writable (e.g., in cases where the storage is full or
-   * the browser is in a privacy mode that restricts localStorage usage).
-   */
-  get #isValidBrowser(): boolean {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    const storage = window.localStorage;
-    if (!storage) {
-      return false;
-    }
-
+  setItem(key: string, value: TtlInMilliseconds): void {
     try {
-      const testKey = 'test';
-      storage.setItem(testKey, testKey);
-      storage.removeItem(testKey);
-
-      return true;
+      const cache = this.#getCache();
+      cache[key] = value;
+      localStorage.setItem(this.#storageKey, JSON.stringify(cache));
     } catch (err: unknown) {
       const isQuotaExceededError =
         err instanceof DOMException &&
         // Check error names for different browsers
         (err.name === 'QuotaExceededError' || err.name === 'NS_ERROR_DOM_QUOTA_REACHED');
 
-      if (isQuotaExceededError && storage.length > 0) {
-        storage.removeItem(this.#storageKey);
+      if (isQuotaExceededError && localStorage.length > 0) {
+        // Clear our cache if quota exceeded
+        localStorage.removeItem(this.#storageKey);
       }
-
-      return false;
     }
+  }
+
+  removeItem(key: string): void {
+    try {
+      const cache = this.#getCache();
+      delete cache[key];
+      localStorage.setItem(this.#storageKey, JSON.stringify(cache));
+    } catch {
+      // Silently fail if we can't remove
+    }
+  }
+
+  #getCache(): Record<string, TtlInMilliseconds> {
+    try {
+      const cacheString = localStorage.getItem(this.#storageKey);
+      if (!cacheString) {
+        return {};
+      }
+      return JSON.parse(cacheString);
+    } catch {
+      return {};
+    }
+  }
+
+  static isSupported(): boolean {
+    return typeof window !== 'undefined' && !!window.localStorage;
+  }
+}
+
+/**
+ * In-memory cache implementation for non-browser environments (e.g., React Native).
+ */
+export class InMemoryThrottlerCache implements ThrottlerCache {
+  #cache: Map<string, TtlInMilliseconds> = new Map();
+  #maxSize = 10000; // Defensive limit to prevent memory issues
+
+  getItem(key: string): TtlInMilliseconds | undefined {
+    // Defensive: clear cache if it gets too large
+    if (this.#cache.size > this.#maxSize) {
+      this.#cache.clear();
+      return undefined;
+    }
+
+    return this.#cache.get(key);
+  }
+
+  setItem(key: string, value: TtlInMilliseconds): void {
+    this.#cache.set(key, value);
+  }
+
+  removeItem(key: string): void {
+    this.#cache.delete(key);
   }
 }

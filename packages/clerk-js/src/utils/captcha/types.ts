@@ -1,4 +1,4 @@
-import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/types';
+import type { CaptchaProvider, CaptchaWidgetType } from '@clerk/shared/types';
 
 export type CaptchaOptions = {
   action?: 'verify' | 'signup' | 'heartbeat';

@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { WaitlistModalProps } from '@clerk/types';
+import type { WaitlistModalProps } from '@clerk/shared/types';
 
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';

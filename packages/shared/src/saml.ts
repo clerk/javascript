@@ -1,4 +1,4 @@
-import type { SamlIdpMap } from '@clerk/types';
+import type { SamlIdpMap } from './types';
 
 export const SAML_IDPS: SamlIdpMap = {
   saml_okta: {

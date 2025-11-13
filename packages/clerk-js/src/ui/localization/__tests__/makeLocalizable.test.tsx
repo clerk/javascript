@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { render, renderHook, screen } from '../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, renderHook, screen } from '@/test/utils';
 import {
   Badge,
   Button,
@@ -12,8 +13,7 @@ import {
   SimpleButton,
   Text,
   useLocalizations,
-} from '../../customizables';
-import { bindCreateFixtures } from '../../utils/vitest/createFixtures';
+} from '@/ui/customizables';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

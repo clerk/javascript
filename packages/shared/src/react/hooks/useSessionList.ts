@@ -1,11 +1,10 @@
-import type { UseSessionListReturn } from '@clerk/types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { UseSessionListReturn } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
 
 const hookName = 'useSessionList';
 /**
- * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/references/javascript/session) objects that have been registered on the client device.
+ * The `useSessionList()` hook returns an array of [`Session`](https://clerk.com/docs/reference/javascript/session) objects that have been registered on the client device.
  *
  * @unionReturnHeadings
  * ["Initialization", "Loaded"]

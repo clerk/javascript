@@ -3,10 +3,23 @@ import 'regenerator-runtime/runtime';
 import { Clerk } from './core/clerk';
 import { mountComponentRenderer } from './ui/Components';
 
-export * from './core/resources/Error';
+export {
+  ClerkAPIResponseError,
+  ClerkRuntimeError,
+  EmailLinkError,
+  EmailLinkErrorCode,
+  EmailLinkErrorCodeStatus,
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+  isEmailLinkError,
+  isKnownError,
+  isMetamaskError,
+  isUserLockedError,
+  type MetamaskError,
+} from '@clerk/shared/error';
+export { Clerk };
 
 Clerk.mountComponentRenderer = mountComponentRenderer;
-export { Clerk };
 
 if (module.hot) {
   module.hot.accept();

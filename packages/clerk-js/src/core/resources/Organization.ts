@@ -24,11 +24,11 @@ import type {
   SetOrganizationLogoParams,
   UpdateMembershipParams,
   UpdateOrganizationParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { addPaymentSource, getPaymentSources, initializePaymentSource } from '../modules/billing';
+import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
 import { BaseResource, OrganizationInvitation, OrganizationMembership } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -262,22 +262,22 @@ export class Organization extends BaseResource implements OrganizationResource {
     }).then(res => new Organization(res?.response as OrganizationJSON));
   };
 
-  initializePaymentSource: typeof initializePaymentSource = params => {
-    return initializePaymentSource({
+  initializePaymentMethod: typeof initializePaymentMethod = params => {
+    return initializePaymentMethod({
       ...params,
       orgId: this.id,
     });
   };
 
-  addPaymentSource: typeof addPaymentSource = params => {
-    return addPaymentSource({
+  addPaymentMethod: typeof addPaymentMethod = params => {
+    return addPaymentMethod({
       ...params,
       orgId: this.id,
     });
   };
 
-  getPaymentSources: typeof getPaymentSources = params => {
-    return getPaymentSources({
+  getPaymentMethods: typeof getPaymentMethods = params => {
+    return getPaymentMethods({
       ...params,
       orgId: this.id,
     });

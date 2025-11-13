@@ -1,10 +1,11 @@
-import type { SessionWithActivitiesResource } from '@clerk/types';
-import { within } from '@testing-library/dom';
+import type { SessionWithActivitiesResource } from '@clerk/shared/types';
+import { within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render, screen, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen, waitFor } from '@/test/utils';
+
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SecurityPage } from '../SecurityPage';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

@@ -1,4 +1,3 @@
-import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   APIKeysProps,
   CreateOrganizationProps,
@@ -10,11 +9,13 @@ import type {
   SignInProps,
   SignUpProps,
   TaskChooseOrganizationProps,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
@@ -78,7 +79,7 @@ type UserButtonPropsWithoutCustomPages = Without<
   UserButtonProps,
   'userProfileProps' | '__experimental_asStandalone'
 > & {
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'apiKeysProps'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
    *
@@ -638,6 +639,34 @@ export const APIKeys = withClerk(
     );
   },
   { component: 'ApiKeys', renderWhileLoading: true },
+);
+
+export const UserAvatar = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<UserAvatarProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountUserAvatar}
+            unmount={clerk.unmountUserAvatar}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'UserAvatar', renderWhileLoading: true },
 );
 
 export const TaskChooseOrganization = withClerk(

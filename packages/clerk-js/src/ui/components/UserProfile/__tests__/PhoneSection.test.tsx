@@ -1,10 +1,10 @@
 import { act } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PhoneSection } from '../PhoneSection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

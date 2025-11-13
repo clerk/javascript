@@ -72,8 +72,6 @@ if (asChild) {
       throw new Error('Wrap `<CheckoutButton for="organization" />` with a check for an active organization.');
     }
 
-    console.log('checkoutOptions', checkoutOptions);
-
     if (checkoutOptions.clickIdentifier) {
       const clickEvent = new CustomEvent('clerk:subscription-complete', { detail: checkoutOptions.clickIdentifier });
       checkoutOptions.onSubscriptionComplete = () => {

@@ -13,6 +13,7 @@ interface MetadataHeaders {
   xPort: string;
   xProtocol: string;
   xClerkAuthStatus: string;
+  isCI: boolean;
 }
 
 /**
@@ -32,7 +33,56 @@ export async function collectKeylessMetadata(): Promise<MetadataHeaders> {
     xHost: headerStore.get('x-forwarded-host') ?? 'unknown x-forwarded-host',
     xProtocol: headerStore.get('x-forwarded-proto') ?? 'unknown x-forwarded-proto',
     xClerkAuthStatus: headerStore.get('x-clerk-auth-status') ?? 'unknown x-clerk-auth-status',
+    isCI: detectCIEnvironment(),
   };
+}
+
+// Common CI environment variables
+const CI_ENV_VARS = [
+  'CI',
+  'CONTINUOUS_INTEGRATION',
+  'BUILD_NUMBER',
+  'BUILD_ID',
+  'BUILDKITE',
+  'CIRCLECI',
+  'GITHUB_ACTIONS',
+  'GITLAB_CI',
+  'JENKINS_URL',
+  'TRAVIS',
+  'APPVEYOR',
+  'WERCKER',
+  'DRONE',
+  'CODESHIP',
+  'SEMAPHORE',
+  'SHIPPABLE',
+  'TEAMCITY_VERSION',
+  'BAMBOO_BUILDKEY',
+  'GO_PIPELINE_NAME',
+  'TF_BUILD',
+  'SYSTEM_TEAMFOUNDATIONCOLLECTIONURI',
+  'BITBUCKET_BUILD_NUMBER',
+  'HEROKU_TEST_RUN_ID',
+  'VERCEL',
+  'NETLIFY',
+];
+
+/**
+ * Detects if the application is running in a CI environment
+ */
+function detectCIEnvironment(): boolean {
+  const ciIndicators = CI_ENV_VARS;
+
+  const falsyValues = new Set<string>(['', 'false', '0', 'no']);
+
+  return ciIndicators.some(indicator => {
+    const value = process.env[indicator];
+    if (value === undefined) {
+      return false;
+    }
+
+    const normalizedValue = value.trim().toLowerCase();
+    return !falsyValues.has(normalizedValue);
+  });
 }
 
 /**
@@ -90,6 +140,10 @@ export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
 
   if (metadata.xClerkAuthStatus) {
     headers.set('Clerk-Auth-Status', metadata.xClerkAuthStatus);
+  }
+
+  if (metadata.isCI) {
+    headers.set('Clerk-Is-CI', 'true');
   }
 
   return headers;

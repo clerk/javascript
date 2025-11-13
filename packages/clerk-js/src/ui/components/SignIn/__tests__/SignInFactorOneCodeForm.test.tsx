@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+
 import { CardStateProvider } from '../../../elements/contexts';
 import { clearFetchCache, useFetch } from '../../../hooks';
 import { localizationKeys } from '../../../localization';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SignInFactorOneCodeForm } from '../SignInFactorOneCodeForm';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

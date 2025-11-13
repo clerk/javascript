@@ -1,4 +1,4 @@
-import type { OAuthProvider, PhoneCodeProvider, Web3Provider } from '@clerk/types';
+import type { OAuthProvider, PhoneCodeProvider, Web3Provider } from '@clerk/shared/types';
 
 import { Box, descriptors, Text } from '../customizables';
 import type { PropsOfComponent } from '../styledSystem';

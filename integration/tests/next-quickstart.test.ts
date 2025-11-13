@@ -48,7 +48,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodesQuickstart] })(
     await u.po.expect.toBeSignedIn();
     await u.po.userButton.waitForMounted();
 
-    await expect(u.page.getByRole('button', { name: /Open user button/i })).toBeVisible();
+    await expect(u.page.getByRole('button', { name: /Open user menu/i })).toBeVisible();
   });
 
   test('user button is functional after sign in', async ({ page, context }) => {

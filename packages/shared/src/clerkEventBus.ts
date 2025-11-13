@@ -1,6 +1,5 @@
-import type { ClerkEventPayload } from '@clerk/types';
-
 import { createEventBus } from './eventBus';
+import type { ClerkEventPayload } from './types';
 
 export const clerkEvents = {
   Status: 'status',

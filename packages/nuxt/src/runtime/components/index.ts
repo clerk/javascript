@@ -3,6 +3,7 @@ export {
   SignUp,
   SignIn,
   UserProfile,
+  UserAvatar,
   UserButton,
   OrganizationSwitcher,
   OrganizationProfile,

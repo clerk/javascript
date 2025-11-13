@@ -1,9 +1,10 @@
 import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { UserVerificationFactorOne } from '../UserVerificationFactorOne';
 
 const { createFixtures } = bindCreateFixtures('UserVerification');
@@ -50,7 +51,7 @@ describe('UserVerificationFactorOne', () => {
       getByLabelText(/Enter verification code/i);
     });
 
-    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalled();
+    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
   });
 
   it('renders the component for with strategy:phone_code', async () => {
@@ -70,7 +71,7 @@ describe('UserVerificationFactorOne', () => {
       getByLabelText(/Enter verification code/i);
     });
 
-    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalled();
+    expect(fixtures.session?.prepareFirstFactorVerification).toHaveBeenCalledOnce();
   });
 
   describe('Submitting', () => {

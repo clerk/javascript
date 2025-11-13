@@ -26,14 +26,15 @@ export default defineConfig({
   plugins: [react({ jsxRuntime: 'automatic', jsxImportSource: '@emotion/react' }), viteSvgMockPlugin()],
   define: {
     __BUILD_DISABLE_RHC__: JSON.stringify(false),
+    __BUILD_VARIANT_CHANNEL__: JSON.stringify(true),
     __BUILD_VARIANT_CHIPS__: JSON.stringify(false),
     __PKG_NAME__: JSON.stringify('@clerk/clerk-js'),
     __PKG_VERSION__: JSON.stringify('test'),
   },
   test: {
     coverage: {
+      enabled: false,
       provider: 'v8',
-      enabled: true,
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
@@ -52,16 +53,16 @@ export default defineConfig({
       ],
     },
     environment: 'jsdom',
-    globals: false,
-    include: ['**/*.test.?(c|m)[jt]s?(x)'],
-    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)', 'node_modules/**', 'dist/**'],
-    setupFiles: './vitest.setup.mts',
-    testTimeout: 5000,
     environmentOptions: {
       jsdom: {
         resources: 'usable',
       },
     },
+    globals: false,
+    include: ['**/*.test.?(c|m)[jt]s?(x)'],
+    exclude: ['sandbox/**/*.spec.?(c|m)[jt]s?(x)', 'node_modules/**', 'dist/**'],
+    setupFiles: './vitest.setup.mts',
+    testTimeout: 5000,
   },
   resolve: {
     alias: [{ find: /^@\//, replacement: `${resolve(__dirname, 'src')}/` }],

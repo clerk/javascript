@@ -1,12 +1,20 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
-import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
+import type {
+  ClerkAPIErrorJSON,
+  ClerkResourceJSON,
+  ClerkResourceReloadParams,
+  DeletedObjectJSON,
+} from '@clerk/shared/types';
+
+import { debugLogger } from '@/utils/debug';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
 import type { Clerk } from './internal';
-import { ClerkAPIResponseError, ClerkRuntimeError, Client } from './internal';
+import { Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;
@@ -62,6 +70,7 @@ export abstract class BaseResource {
     return !this.id;
   }
 
+  // TODO @userland-errors:
   static async _fetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
@@ -69,6 +78,7 @@ export abstract class BaseResource {
     return FraudProtection.getInstance().execute(this.clerk, () => this._baseFetch<J>(requestInit, opts));
   }
 
+  // TODO @userland-errors:
   protected static async _baseFetch<J extends ClerkResourceJSON | DeletedObjectJSON | null>(
     requestInit: FapiRequestInit,
     opts: BaseFetchOptions = {},
@@ -85,11 +95,19 @@ export abstract class BaseResource {
     } catch (e) {
       // TODO: This should be the default behavior in the next major version, as long as we have a way to handle the requests more gracefully when offline
       if (this.shouldRethrowOfflineNetworkErrors()) {
+        // TODO @userland-errors:
         throw new ClerkRuntimeError(e?.message || e, {
           code: 'network_error',
         });
       } else if (!isValidBrowserOnline()) {
-        console.warn(e);
+        debugLogger.warn(
+          'Network request failed while offline, returning null',
+          {
+            method: requestInit.method,
+            path: requestInit.path,
+          },
+          'baseResource',
+        );
         return null;
       } else {
         throw e;
@@ -201,6 +219,7 @@ export abstract class BaseResource {
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
     const { action, body, method, path } = params;
+    // TODO @userland-errors:
     const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body });
     return this.fromJSON((json?.response || json) as J);
   }

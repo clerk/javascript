@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignInModalProps, SignInProps } from '@clerk/types';
+import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/ui/common/EmailLinkCompleteFlowCard';

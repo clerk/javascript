@@ -81,6 +81,8 @@ type CreateUserParams = {
   password?: string;
   firstName?: string;
   lastName?: string;
+  /** The locale of the user in BCP-47 format. */
+  locale?: string;
   skipPasswordChecks?: boolean;
   skipPasswordRequirement?: boolean;
   skipLegalChecks?: boolean;
@@ -148,6 +150,9 @@ type UpdateUserParams = {
 
   /** A custom timestamp denoting when the user accepted legal requirements, specified in RFC3339 format (e.g. 2012-10-20T07:15:20.902Z). */
   legalAcceptedAt?: Date;
+
+  /** The locale of the user in BCP-47 format. */
+  locale?: string;
 
   /** If true, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;

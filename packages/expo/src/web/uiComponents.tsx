@@ -11,6 +11,7 @@ import {
   SignOutButton as BaseSignOutButton,
   SignUp as BaseSignUp,
   SignUpButton as BaseSignUpButton,
+  UserAvatar as BaseUserAvatar,
   UserButton as BaseUserButton,
   UserProfile as BaseUserProfile,
   Waitlist as BaseWaitlist,
@@ -37,6 +38,7 @@ function WrapComponent<T extends { displayName: string }>(component: T) {
 export const SignIn: typeof BaseSignIn = WrapComponent(BaseSignIn);
 export const SignUp: typeof BaseSignUp = WrapComponent(BaseSignUp);
 
+export const UserAvatar: typeof BaseUserAvatar = WrapComponent(BaseUserAvatar);
 export const UserButton: typeof BaseUserButton = WrapComponent(BaseUserButton);
 export const UserProfile: typeof BaseUserProfile = WrapComponent(BaseUserProfile);
 

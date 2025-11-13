@@ -38,8 +38,15 @@ const OrganizationPaymentAttemptPage = lazy(() =>
 );
 
 export const OrganizationProfileRoutes = () => {
-  const { pages, isMembersPageRoot, isGeneralPageRoot, isBillingPageRoot, isApiKeysPageRoot, shouldShowBilling } =
-    useOrganizationProfileContext();
+  const {
+    pages,
+    isMembersPageRoot,
+    isGeneralPageRoot,
+    isBillingPageRoot,
+    isApiKeysPageRoot,
+    shouldShowBilling,
+    apiKeysProps,
+  } = useOrganizationProfileContext();
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 
   const customPageRoutesWithContents = pages.contents?.map((customPage, index) => {
@@ -117,7 +124,7 @@ export const OrganizationProfileRoutes = () => {
             </Route>
           </Protect>
         ) : null}
-        {apiKeysSettings.enabled && (
+        {apiKeysSettings.orgs_api_keys_enabled && !apiKeysProps?.hide && (
           <Protect
             condition={has =>
               has({ permission: 'org:sys_api_keys:read' }) || has({ permission: 'org:sys_api_keys:manage' })

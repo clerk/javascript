@@ -8,6 +8,7 @@ export { default as PricingTable } from './ui-components/PricingTable.vue';
 export { UserProfile } from './ui-components/UserProfile';
 export { OrganizationProfile } from './ui-components/OrganizationProfile';
 export { OrganizationSwitcher } from './ui-components/OrganizationSwitcher';
+export { default as UserAvatar } from './ui-components/UserAvatar.vue';
 export { UserButton } from './ui-components/UserButton';
 export {
   ClerkLoaded,

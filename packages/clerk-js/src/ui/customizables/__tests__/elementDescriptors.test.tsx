@@ -1,10 +1,8 @@
-// eslint-disable-next-line simple-import-sort/imports
-import { render, screen } from '../../../vitestUtils';
-import React from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { Box, descriptors } from '..';
-import { AppearanceProvider } from '../AppearanceContext';
+import { render, screen } from '@/test/utils';
+import { Box, descriptors } from '@/ui/customizables';
+import { AppearanceProvider } from '@/ui/customizables/AppearanceContext';
 
 describe('Targetable classes', () => {
   it('default stable class is added to the element ', () => {

@@ -1,4 +1,5 @@
-/* eslint-disable jsdoc/require-description-complete-sentence */
+import { getCurrentOrganizationMembership } from '../../organization';
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   ClerkPaginatedResponse,
   GetDomainsParams,
@@ -10,10 +11,7 @@ import type {
   OrganizationMembershipRequestResource,
   OrganizationMembershipResource,
   OrganizationResource,
-} from '@clerk/types';
-
-import { getCurrentOrganizationMembership } from '../../organization';
-import { eventMethodCalled } from '../../telemetry/events/method-called';
+} from '../../types';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
@@ -31,7 +29,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/organizations/verified-domains#enrollment-mode).</li>
+   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/verified-domains#enrollment-mode).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
    */
@@ -49,7 +47,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/references/javascript/types/organization-custom-role-key).</li>
+   *  <li>`role`: An array of [`OrganizationCustomRoleKey`](https://clerk.com/docs/reference/javascript/types/organization-custom-role-key).</li>
    *  <li>`query`: A string that filters the memberships by the provided string.</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>

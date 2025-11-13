@@ -1,6 +1,6 @@
 import { DEV_BROWSER_JWT_HEADER, extractDevBrowserJWTFromURL, setDevBrowserJWTInURL } from '@clerk/shared/devBrowser';
 import { parseErrors } from '@clerk/shared/error';
-import type { ClerkAPIErrorJSON } from '@clerk/types';
+import type { ClerkAPIErrorJSON } from '@clerk/shared/types';
 
 import { isDevOrStagingUrl } from '../../utils';
 import { clerkErrorDevInitFailed } from '../errors';

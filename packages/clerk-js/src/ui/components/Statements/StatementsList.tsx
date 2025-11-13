@@ -1,4 +1,4 @@
-import type { BillingStatementResource } from '@clerk/types';
+import type { BillingStatementResource } from '@clerk/shared/types';
 
 import { DataTable, DataTableRow } from '@/ui/elements/DataTable';
 import { formatDate } from '@/ui/utils/formatDate';

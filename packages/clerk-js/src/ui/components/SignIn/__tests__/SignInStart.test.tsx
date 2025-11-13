@@ -1,15 +1,15 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import type { SignInResource } from '@clerk/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { fireEvent, mockWebAuthn, render, screen } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
-import { fireEvent, mockWebAuthn, render, screen } from '../../../../vitestUtils';
 import { OptionsProvider } from '../../../contexts';
 import { AppearanceProvider } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SignInStart } from '../SignInStart';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

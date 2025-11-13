@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import type { Manifest } from 'webextension-polyfill';
 
 import { missingManifestKeyError } from '../errors';

@@ -1,4 +1,4 @@
-import type { LoadedClerk, Without } from '@clerk/types';
+import type { LoadedClerk, Without } from '@clerk/shared/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';

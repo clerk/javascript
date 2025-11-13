@@ -1,11 +1,11 @@
-import type { PasskeyJSON, PasskeyResource } from '@clerk/types';
+import type { PasskeyJSON, PasskeyResource } from '@clerk/shared/types';
 import { act } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { render, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { PasskeySection } from '../PasskeySection';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');

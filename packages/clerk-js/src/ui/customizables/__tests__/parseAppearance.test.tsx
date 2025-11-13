@@ -1,11 +1,11 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { render } from '@/vitestUtils';
+import { render } from '@/test/utils';
 
 import { Box, useAppearance } from '..';
 import { AppearanceProvider } from '../AppearanceContext';
-import { knownColors } from './vitestUtils';
+import { knownColors } from './test-utils';
 
 const themeAColor = 'blue';
 const themeA = {

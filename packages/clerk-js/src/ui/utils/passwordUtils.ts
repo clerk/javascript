@@ -1,4 +1,4 @@
-import type { ClerkAPIError, PasswordSettingsData } from '@clerk/types';
+import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../localization';
 import { localizationKeys } from '../localization/localizationKeys';

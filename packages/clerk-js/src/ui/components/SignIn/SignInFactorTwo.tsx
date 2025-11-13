@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -8,6 +8,8 @@ import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../commo
 import { useCoreSignIn } from '../../contexts';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
 import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
+import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
+import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { determineStartingSignInSecondFactor } from './utils';
@@ -56,11 +58,12 @@ function SignInFactorTwoInternal(): JSX.Element {
     );
   }
 
+  const factorAlreadyPrepared = lastPreparedFactorKeyRef.current === factorKey(currentFactor);
   switch (currentFactor?.strategy) {
     case 'phone_code':
       return (
         <SignInFactorTwoPhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -69,7 +72,7 @@ function SignInFactorTwoInternal(): JSX.Element {
     case 'totp':
       return (
         <SignInFactorTwoTOTPCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -77,6 +80,24 @@ function SignInFactorTwoInternal(): JSX.Element {
       );
     case 'backup_code':
       return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+    case 'email_code':
+      return (
+        <SignInFactorTwoEmailCodeCard
+          factorAlreadyPrepared={factorAlreadyPrepared}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
+    case 'email_link':
+      return (
+        <SignInFactorTwoEmailLinkCard
+          factorAlreadyPrepared={factorAlreadyPrepared}
+          onFactorPrepare={handleFactorPrepare}
+          factor={currentFactor}
+          onShowAlternativeMethodsClicked={toggleAllStrategies}
+        />
+      );
     default:
       return <LoadingCard />;
   }

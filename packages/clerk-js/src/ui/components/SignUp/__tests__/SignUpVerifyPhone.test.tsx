@@ -1,8 +1,9 @@
-import { waitFor } from '@testing-library/dom';
+import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { SignUpVerifyPhone } from '../SignUpVerifyPhone';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

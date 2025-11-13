@@ -1,4 +1,4 @@
-import type { LoadedClerk, SignUpResource } from '@clerk/types';
+import type { LoadedClerk, SignUpResource } from '@clerk/shared/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { handleCombinedFlowTransfer, hasOptionalFields } from '../handleCombinedFlowTransfer';

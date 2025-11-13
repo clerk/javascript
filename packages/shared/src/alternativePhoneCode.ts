@@ -1,4 +1,4 @@
-import type { PhoneCodeChannelData } from '@clerk/types';
+import type { PhoneCodeChannelData } from './types';
 
 export const ALTERNATIVE_PHONE_CODE_PROVIDERS: PhoneCodeChannelData[] = [
   {

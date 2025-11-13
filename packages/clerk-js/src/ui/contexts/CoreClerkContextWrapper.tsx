@@ -6,7 +6,7 @@ import {
   SessionContext,
   UserContext,
 } from '@clerk/shared/react';
-import type { Clerk, LoadedClerk, Resources } from '@clerk/types';
+import type { Clerk, LoadedClerk, Resources } from '@clerk/shared/types';
 import React from 'react';
 
 import { assertClerkSingletonExists } from './utils';

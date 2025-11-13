@@ -10,6 +10,7 @@
  *
  * For more information, please see the telemetry documentation page: https://clerk.com/docs/telemetry.
  */
+import { parsePublishableKey } from '../keys';
 import type {
   InstanceType,
   SDKMetadata,
@@ -17,11 +18,9 @@ import type {
   TelemetryEvent,
   TelemetryEventRaw,
   TelemetryLogEntry,
-} from '@clerk/types';
-
-import { parsePublishableKey } from '../keys';
+} from '../types';
 import { isTruthy } from '../underscore';
-import { TelemetryEventThrottler } from './throttler';
+import { InMemoryThrottlerCache, LocalStorageThrottlerCache, TelemetryEventThrottler } from './throttler';
 import type { TelemetryCollectorOptions } from './types';
 
 /**
@@ -141,7 +140,11 @@ export class TelemetryCollector implements TelemetryCollectorInterface {
       this.#metadata.secretKey = options.secretKey.substring(0, 16);
     }
 
-    this.#eventThrottler = new TelemetryEventThrottler();
+    // Use LocalStorage cache in browsers where it's supported, otherwise fall back to in-memory cache
+    const cache = LocalStorageThrottlerCache.isSupported()
+      ? new LocalStorageThrottlerCache()
+      : new InMemoryThrottlerCache();
+    this.#eventThrottler = new TelemetryEventThrottler(cache);
   }
 
   get isEnabled(): boolean {

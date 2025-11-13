@@ -1,7 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
-import { handleValueOrFn } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
   __internal_OAuthConsentProps,
@@ -48,12 +47,14 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
   WaitlistResource,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
 import { unsupportedNonBrowserDomainOrProxyUrlFunction } from './errors/messages';
@@ -132,6 +133,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private preOpenWaitlist?: null | WaitlistProps = null;
   private premountSignInNodes = new Map<HTMLDivElement, SignInProps | undefined>();
   private premountSignUpNodes = new Map<HTMLDivElement, SignUpProps | undefined>();
+  private premountUserAvatarNodes = new Map<HTMLDivElement, UserAvatarProps | undefined>();
   private premountUserProfileNodes = new Map<HTMLDivElement, UserProfileProps | undefined>();
   private premountUserButtonNodes = new Map<HTMLDivElement, UserButtonProps | undefined>();
   private premountOrganizationProfileNodes = new Map<HTMLDivElement, OrganizationProfileProps | undefined>();
@@ -144,6 +146,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
+
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -279,6 +282,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   get isStandardBrowser() {
     return this.clerkjs?.isStandardBrowser || this.options.standardBrowser || false;
+  }
+
+  get __internal_queryClient() {
+    // @ts-expect-error - __internal_queryClient is not typed
+    return this.clerkjs?.__internal_queryClient;
   }
 
   get isSatellite() {
@@ -565,6 +573,13 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.on('status', listener, { notify: true });
     });
 
+    // @ts-expect-error - queryClientStatus is not typed
+    this.#eventBus.internal.retrieveListeners('queryClientStatus')?.forEach(listener => {
+      // Since clerkjs exists it will call `this.clerkjs.on('queryClientStatus', listener)`
+      // @ts-expect-error - queryClientStatus is not typed
+      this.on('queryClientStatus', listener, { notify: true });
+    });
+
     if (this.preopenSignIn !== null) {
       clerkjs.openSignIn(this.preopenSignIn);
     }
@@ -619,6 +634,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     this.premountUserProfileNodes.forEach((props, node) => {
       clerkjs.mountUserProfile(node, props);
+    });
+
+    this.premountUserAvatarNodes.forEach((props, node) => {
+      clerkjs.mountUserAvatar(node, props);
     });
 
     this.premountUserButtonNodes.forEach((props, node) => {
@@ -746,6 +765,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
+  // TODO @userland-errors:
   __unstable__updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
@@ -970,6 +990,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountSignUp(node);
     } else {
       this.premountSignUpNodes.delete(node);
+    }
+  };
+
+  mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountUserAvatar(node, props);
+    } else {
+      this.premountUserAvatarNodes.set(node, props);
+    }
+  };
+
+  unmountUserAvatar = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountUserAvatar(node);
+    } else {
+      this.premountUserAvatarNodes.delete(node);
     }
   };
 

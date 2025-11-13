@@ -17,6 +17,11 @@ export const bgBG: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копирай и затвори',
+      formHint: 'От съображения за сигурност няма да можем да ви позволим да го видите отново по-късно.',
+      formTitle: 'Копирайте вашия API ключ "{{name}}" сега',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const bgBG: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Потребителско устройство',
   badge__you: 'Вие',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -122,8 +127,7 @@ export const bgBG: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -137,6 +141,7 @@ export const bgBG: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Парола',
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Изтичане',
+  formFieldLabel__apiKeyName: 'Име на таен ключ',
   formFieldLabel__automaticInvitations: 'Включи автоматични покани за този домейн',
   formFieldLabel__backupCode: 'Резервен код',
   formFieldLabel__confirmDeletion: 'Потвърждение',
@@ -283,7 +290,7 @@ export const bgBG: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const bgBG: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const bgBG: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Създаване на организация',
     action__invitationAccept: 'Присъединяване',
     action__manageOrganization: 'Управление',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Заявка за присъединяване',
     notSelected: 'Няма избрана организация',
     personalWorkspace: 'Личен акаунт',
@@ -604,6 +613,12 @@ export const bgBG: LocalizationResource = {
       subtitle: 'за да продължите към {{applicationName}}',
       title: 'Проверете вашия имейл',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверете вашия имейл',
+      resendButton: 'Не сте получили код? Изпрати отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете вашия имейл',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +654,16 @@ export const bgBG: LocalizationResource = {
         titleNewTab: 'Влезнали сте в друг таб',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Използвайте връзката за потвърждение, изпратена на вашия имейл',
+      resendButton: 'Не получихте връзката? Изпратете отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете имейла си',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код за нулиране на парола',
       resendButton: 'Не сте получили код? Изпрати отново',
@@ -652,6 +677,8 @@ export const bgBG: LocalizationResource = {
       label__alternativeMethods: 'Или, влезте с друг метод',
       title: 'Забравена парола?',
     },
+    newDeviceVerificationNotice:
+      'Влизате от ново устройство. Искаме потвърждение, за да запазим акаунта ви в безопасност.',
     noAvailableMethods: {
       message: 'Не може да се продължи с влизането. Няма наличен метод за удостоверяване.',
       subtitle: 'Възникна грешка',
@@ -759,6 +786,10 @@ export const bgBG: LocalizationResource = {
         subtitleNewTab: 'Върнете се към предходния таб, за да продължите',
         title: 'Успешно потвърден имейл',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -930,7 +961,9 @@ export const bgBG: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавяне на акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управление на акаунта',
+    action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
   },
@@ -962,7 +995,7 @@ export const bgBG: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -971,7 +1004,7 @@ export const bgBG: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1031,7 +1064,7 @@ export const bgBG: LocalizationResource = {
       actionDescription: 'Напишете "Изтриване на акаунта" по-долу, за да продължите.',
       confirm: 'Изтриване на акаунта',
       messageLine1:
-        'Сигурни ли сте, че искате да изтриете акаунта си от Clerk? Моля, свържете се със собственика на приложението, за да изтриете информацията си от тяхното приложение и други услуги.',
+        'Сигурни ли сте, че искате да изтриете акаунта си? Някои свързани данни могат да бъдат запазени. За да поискате пълно изтриване на данните, моля, свържете се с поддръжката.',
       messageLine2: 'Това действие е перманентно и необратимо.',
       title: 'Изтриване на акаунта',
     },

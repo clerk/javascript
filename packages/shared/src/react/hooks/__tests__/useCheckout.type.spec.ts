@@ -1,3 +1,5 @@
+import { describe, expectTypeOf, it } from 'vitest';
+
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
@@ -6,9 +8,7 @@ import type {
   ClerkAPIResponseError,
   ConfirmCheckoutParams,
   SetActiveNavigate,
-} from '@clerk/types';
-import { describe, expectTypeOf, it } from 'vitest';
-
+} from '../../../types';
 import type { useCheckout } from '../useCheckout';
 
 type UseCheckoutParameters = Parameters<typeof useCheckout>[0];
@@ -144,7 +144,7 @@ describe('useCheckout type tests', () => {
           | 'isImmediatePlanChange'
           | 'planPeriod'
           | 'plan'
-          | 'paymentSource'
+          | 'paymentMethod'
         >;
 
         type PropNames = keyof CheckoutProps;
@@ -156,7 +156,7 @@ describe('useCheckout type tests', () => {
           | 'isImmediatePlanChange'
           | 'planPeriod'
           | 'plan'
-          | 'paymentSource'
+          | 'paymentMethod'
         >();
       });
     });
@@ -201,7 +201,7 @@ describe('useCheckout type tests', () => {
           expectTypeOf<InitializationState['isImmediatePlanChange']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['planPeriod']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['plan']>().toEqualTypeOf<null>();
-          expectTypeOf<InitializationState['paymentSource']>().toEqualTypeOf<null | undefined>();
+          expectTypeOf<InitializationState['paymentMethod']>().toEqualTypeOf<null | undefined>();
 
           // Test that the status property is correctly typed
           expectTypeOf<InitializationState['status']>().toEqualTypeOf<'needs_initialization'>();

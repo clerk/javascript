@@ -20,10 +20,11 @@ import type {
   SignUpForceRedirectUrl,
   SignUpProps,
   TaskChooseOrganizationProps,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export type {
   __internal_OAuthConsentProps,
@@ -35,6 +36,7 @@ export type {
   OrganizationSwitcherProps,
   SignInProps,
   SignUpProps,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
@@ -43,6 +45,7 @@ export type {
 export type AvailableComponentProps =
   | SignInProps
   | SignUpProps
+  | UserAvatarProps
   | UserProfileProps
   | UserButtonProps
   | OrganizationSwitcherProps
@@ -88,6 +91,10 @@ export type SignUpCtx = SignUpProps & {
 export type UserButtonCtx = UserButtonProps & {
   componentName: 'UserButton';
   mode?: ComponentMode;
+};
+
+export type UserAvatarCtx = UserAvatarProps & {
+  componentName: 'UserAvatar';
 };
 
 export type OrganizationProfileCtx = OrganizationProfileProps & {
@@ -159,6 +166,7 @@ export type PlanDetailsCtx = __internal_PlanDetailsProps & {
 export type AvailableComponentCtx =
   | SignInCtx
   | SignUpCtx
+  | UserAvatarCtx
   | UserButtonCtx
   | UserProfileCtx
   | UserVerificationCtx

@@ -1,6 +1,5 @@
-import type { ClerkPaginatedResponse } from '@clerk/types';
-
 import type { ClerkAPIResponseError } from '../error';
+import type { ClerkPaginatedResponse } from '../types';
 
 export type ValueOrSetter<T = unknown> = (size: T | ((_size: T) => T)) => void;
 
@@ -13,7 +12,7 @@ export type CacheSetter<CData = any> = (
  */
 export type PaginatedResources<T = unknown, Infinite = false> = {
   /**
-   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/references/javascript/types/organization-membership) objects.
+   * An array that contains the fetched data. For example, for the `memberships` attribute, data will be an array of [`OrganizationMembership`](https://clerk.com/docs/reference/javascript/types/organization-membership) objects.
    */
   data: T[];
   /**
@@ -115,6 +114,7 @@ export type PagesOrInfiniteConfig = PaginatedHookConfig<{
    * @default undefined
    *
    * @hidden
+   *
    * @experimental
    */
   __experimental_mode?: 'cache';

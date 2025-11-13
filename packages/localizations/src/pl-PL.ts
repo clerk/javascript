@@ -17,6 +17,11 @@ export const plPL: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiuj i zamknij',
+      formHint: 'Ze względów bezpieczeństwa nie będziemy mogli wyświetlić tego ponownie później.',
+      formTitle: 'Skopiuj teraz swój klucz API "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const plPL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Urządzenie użytkownika',
   badge__you: 'Ty',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const plPL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const plPL: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const plPL: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Wprowadź swoje hasło',
   formFieldInputPlaceholder__phoneNumber: 'Wprowadź numer telefonu',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Klucz API',
+  formFieldLabel__apiKeyDescription: 'Opis',
+  formFieldLabel__apiKeyExpiration: 'Wygaśnięcie',
+  formFieldLabel__apiKeyName: 'Nazwa klucza tajnego',
   formFieldLabel__automaticInvitations: 'Włącz automatyczne zaproszenia dla tej domeny',
   formFieldLabel__backupCode: 'Kod zapasowy',
   formFieldLabel__confirmDeletion: 'Potwierdzenie',
@@ -283,7 +290,7 @@ export const plPL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const plPL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const plPL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Utwórz organizację',
     action__invitationAccept: 'Dołącz',
     action__manageOrganization: 'Zarządzaj organizacją',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Prośba o dołączenie',
     notSelected: 'Nie wybrano organizacji',
     personalWorkspace: 'Przestrzeń osobista',
@@ -604,6 +613,12 @@ export const plPL: LocalizationResource = {
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Sprawdź swoją pocztę e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Sprawdź swoją pocztę e-mail',
+      resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
+      subtitle: 'aby kontynuować w {{applicationName}}',
+      title: 'Sprawdź swoją pocztę e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -640,6 +655,16 @@ export const plPL: LocalizationResource = {
         titleNewTab: 'Zalogowano na innej karcie',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Użyj linku weryfikacyjnego wysłanego na Twój e-mail',
+      resendButton: 'Nie otrzymałeś linku? Wyślij ponownie',
+      subtitle: 'aby kontynuować do {{applicationName}}',
+      title: 'Sprawdź swoją pocztę',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod werfikacyjny resetowania hasła',
       resendButton: 'Nie otrzymałeś kodu? Wyślij ponownie',
@@ -653,6 +678,8 @@ export const plPL: LocalizationResource = {
       label__alternativeMethods: 'Lub zaloguj się za pomocą innej metody',
       title: 'Zapomniałeś hasła?',
     },
+    newDeviceVerificationNotice:
+      'Logujesz się z nowego urządzenia. Prosimy o weryfikację, aby zapewnić bezpieczeństwo Twojego konta.',
     noAvailableMethods: {
       message: 'Nie można kontynuować logowania. Brak dostępnych czynników uwierzytelniających.',
       subtitle: 'Wystąpił błąd',
@@ -761,6 +788,10 @@ export const plPL: LocalizationResource = {
         subtitleNewTab: 'Powróć do poprzedniej karty, aby kontynuować',
         title: 'Adres e-mail został pomyślnie zweryfikowany',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -940,7 +971,9 @@ export const plPL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Zarządzaj kontem',
+    action__openUserMenu: undefined,
     action__signOut: 'Wyloguj',
     action__signOutAll: 'Wyloguj ze wszystkich kont',
   },
@@ -972,7 +1005,7 @@ export const plPL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -981,7 +1014,7 @@ export const plPL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1041,7 +1074,7 @@ export const plPL: LocalizationResource = {
       actionDescription: 'Wpisz "Usuń konto" poniżej aby kontynuować.',
       confirm: 'Usuń konto',
       messageLine1:
-        'Czy na pewno chcesz usunąć swoje konto z Clerk? Skontaktuj się z właścicielem aplikacji, aby usunąć swoje informacje z ich aplikacji i innych usług.',
+        'Czy na pewno chcesz usunąć swoje konto? Niektóre powiązane dane mogą zostać zachowane. Aby poprosić o całkowite usunięcie danych, skontaktuj się z pomocą techniczną.',
       messageLine2: 'Ta operacja jest nieodwracalna i nie można jej cofnąć.',
       title: 'Usuń konto',
     },

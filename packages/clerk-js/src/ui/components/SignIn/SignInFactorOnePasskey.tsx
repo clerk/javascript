@@ -1,4 +1,4 @@
-import type { ResetPasswordCodeFactor } from '@clerk/types';
+import type { ResetPasswordCodeFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';

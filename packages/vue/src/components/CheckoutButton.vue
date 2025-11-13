@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAttrs, useSlots } from 'vue';
-import type { __experimental_CheckoutButtonProps } from '@clerk/types';
+import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
 import { useClerk } from '../composables/useClerk';
 import { useAuth } from '../composables/useAuth';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';

@@ -1,5 +1,5 @@
 import { logger } from '@clerk/shared/logger';
-import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '@clerk/types';
+import type { ClerkOptions, SessionResource, SessionTask, SetActiveParams } from '@clerk/shared/types';
 
 import { buildURL, forwardClerkQueryParams } from '../utils';
 

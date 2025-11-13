@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { OrganizationMembershipRequestResource } from '@clerk/types';
+import type { OrganizationMembershipRequestResource } from '@clerk/shared/types';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { UserPreview } from '@/ui/elements/UserPreview';
@@ -84,6 +84,7 @@ const RequestRow = withCardStateProvider(
             sx={{ maxWidth: '30ch' }}
             showAvatar={false}
             user={{ primaryEmailAddress: { emailAddress: request.publicUserData.identifier } } as any}
+            subtitleProps={{ variant: 'caption' }}
           />
         </Td>
         <Td>

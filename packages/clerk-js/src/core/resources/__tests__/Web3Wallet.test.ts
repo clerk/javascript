@@ -1,4 +1,4 @@
-import type { Web3WalletJSON } from '@clerk/types';
+import type { Web3WalletJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BaseResource, Web3Wallet } from '../internal';

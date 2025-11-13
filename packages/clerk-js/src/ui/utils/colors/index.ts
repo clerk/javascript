@@ -1,4 +1,4 @@
-import type { HslaColor } from '@clerk/types';
+import type { HslaColor } from '@clerk/shared/types';
 
 import { cssSupports } from '../cssSupports';
 import { colors as legacyColors } from './legacy';

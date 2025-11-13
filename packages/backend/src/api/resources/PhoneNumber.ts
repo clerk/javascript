@@ -7,7 +7,7 @@ import { Verification } from './Verification';
  *
  * Phone numbers must be **verified** to ensure that they can be assigned to their rightful owners. The `PhoneNumber` object holds all the necessary state around the verification process.
  *
- * Finally, phone numbers can be used as part of [multi-factor authentication](https://clerk.com/docs/authentication/configuration/sign-up-sign-in-options#multi-factor-authentication). During sign in, users can opt in to an extra verification step where they will receive an SMS message with a one-time code. This code must be entered to complete the sign in process.
+ * Finally, phone numbers can be used as part of [multi-factor authentication](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#multi-factor-authentication). During sign in, users can opt in to an extra verification step where they will receive an SMS message with a one-time code. This code must be entered to complete the sign in process.
  */
 export class PhoneNumber {
   constructor(

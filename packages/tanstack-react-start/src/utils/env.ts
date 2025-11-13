@@ -1,10 +1,9 @@
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isTruthy } from '@clerk/shared/underscore';
-import type { H3EventContext } from '@tanstack/react-start/server';
 
-export const getPublicEnvVariables = (context?: H3EventContext) => {
+export const getPublicEnvVariables = () => {
   const getValue = (name: string): string => {
-    return getEnvVariable(`VITE_${name}`, context) || getEnvVariable(name, context);
+    return getEnvVariable(`VITE_${name}`) || getEnvVariable(name);
   };
 
   return {

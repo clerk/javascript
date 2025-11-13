@@ -1,4 +1,4 @@
-import type { ColorScale } from '@clerk/types';
+import type { ColorScale } from '@clerk/shared/types';
 
 import { cssSupports } from '../cssSupports';
 import type { ColorShade } from './constants';

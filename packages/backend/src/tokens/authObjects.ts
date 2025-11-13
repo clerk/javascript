@@ -47,7 +47,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
    */
   tokenType: SessionTokenType;
   /**
-   * A function that gets the current user's [session token](https://clerk.com/docs/backend-requests/resources/session-tokens) or a [custom JWT template](https://clerk.com/docs/backend-requests/jwt-templates).
+   * A function that gets the current user's [session token](https://clerk.com/docs/guides/sessions/session-tokens) or a [custom JWT template](https://clerk.com/docs/guides/sessions/jwt-templates).
    */
   getToken: ServerGetToken;
   /**

@@ -1,10 +1,11 @@
-import { expect, test } from '@playwright/test';
 import { parsePublishableKey } from '@clerk/shared/keys';
 import { clerkSetup } from '@clerk/testing/playwright';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import { createTestUtils, FakeUser } from '../../testUtils';
+import type { FakeUser } from '../../testUtils';
+import { createTestUtils } from '../../testUtils';
 
 test.describe('Custom Flows Sign Up @custom', () => {
   test.describe.configure({ mode: 'parallel' });

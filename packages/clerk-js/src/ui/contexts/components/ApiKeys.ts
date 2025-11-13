@@ -2,13 +2,13 @@ import { createContext, useContext } from 'react';
 
 import type { APIKeysCtx } from '../../types';
 
-export const ApiKeysContext = createContext<APIKeysCtx | null>(null);
+export const APIKeysContext = createContext<APIKeysCtx | null>(null);
 
-export const useApiKeysContext = () => {
-  const context = useContext(ApiKeysContext);
+export const useAPIKeysContext = () => {
+  const context = useContext(APIKeysContext);
 
   if (!context || context.componentName !== 'APIKeys') {
-    throw new Error('Clerk: useApiKeysContext called outside ApiKeys.');
+    throw new Error('Clerk: useAPIKeysContext called outside APIKeys.');
   }
 
   const { componentName, ...ctx } = context;

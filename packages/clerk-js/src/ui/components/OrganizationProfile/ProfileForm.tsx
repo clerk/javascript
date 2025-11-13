@@ -1,6 +1,8 @@
 import { useOrganization } from '@clerk/shared/react';
+import type { UpdateOrganizationParams } from '@clerk/shared/types';
 import React from 'react';
 
+import { useEnvironment } from '@/ui/contexts';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
@@ -20,6 +22,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
   const title = localizationKeys('organizationProfile.profilePage.title');
   const card = useCardState();
   const { organization } = useOrganization();
+  const { organizationSettings } = useEnvironment();
 
   const nameField = useFormControl('name', organization?.name || '', {
     type: 'text',
@@ -39,14 +42,20 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
 
   const dataChanged = organization.name !== nameField.value || organization.slug !== slugField.value;
   const canSubmit = dataChanged && slugField.feedbackType !== 'error';
+  const organizationSlugEnabled = !organizationSettings.slug.disabled;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    return (canSubmit ? organization.update({ name: nameField.value, slug: slugField.value }) : Promise.resolve())
-      .then(onSuccess)
-      .catch(err => {
-        handleError(err, [nameField, slugField], card.setError);
-      });
+
+    const updateOrgParams: UpdateOrganizationParams = { name: nameField.value };
+
+    if (organizationSlugEnabled) {
+      updateOrgParams.slug = slugField.value;
+    }
+
+    return (canSubmit ? organization.update(updateOrgParams) : Promise.resolve()).then(onSuccess).catch(err => {
+      handleError(err, [nameField, slugField], card.setError);
+    });
   };
 
   const uploadAvatar = (file: File) => {
@@ -54,6 +63,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       .setLogo({ file })
       .then(() => {
         card.setIdle();
+        onSuccess?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -63,6 +73,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       .setLogo({ file: null })
       .then(() => {
         card.setIdle();
+        onSuccess?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -92,13 +103,15 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
             ignorePasswordManager
           />
         </Form.ControlRow>
-        <Form.ControlRow elementId={slugField.id}>
-          <Form.PlainInput
-            {...slugField.props}
-            onChange={onChangeSlug}
-            ignorePasswordManager
-          />
-        </Form.ControlRow>
+        {organizationSlugEnabled && (
+          <Form.ControlRow elementId={slugField.id}>
+            <Form.PlainInput
+              {...slugField.props}
+              onChange={onChangeSlug}
+              ignorePasswordManager
+            />
+          </Form.ControlRow>
+        )}
         <FormButtons
           isDisabled={!canSubmit}
           onReset={onReset}

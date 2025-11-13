@@ -1,8 +1,9 @@
-import type { WaitlistResource } from '@clerk/types';
+import type { WaitlistResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { Waitlist } from '../';
 
 const { createFixtures } = bindCreateFixtures('Waitlist');

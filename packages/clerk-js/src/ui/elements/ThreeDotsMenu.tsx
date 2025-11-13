@@ -1,4 +1,4 @@
-import type { MenuId } from '@clerk/types';
+import type { MenuId } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, descriptors, Icon } from '../customizables';
@@ -41,7 +41,7 @@ export const ThreeDotsMenu = (props: ThreeDotsMenuProps) => {
                   padding: t.space.$0x5,
                   boxSizing: 'content-box',
                   opacity: t.opacity.$inactive,
-                  ':hover': {
+                  ':hover,:focus-visible': {
                     opacity: 1,
                   },
                 }

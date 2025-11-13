@@ -1,4 +1,4 @@
-import type { JWT, TokenJSON, TokenJSONSnapshot, TokenResource } from '@clerk/types';
+import type { JWT, TokenJSON, TokenJSONSnapshot, TokenResource } from '@clerk/shared/types';
 
 import { decode } from '../../utils';
 import { BaseResource } from './internal';

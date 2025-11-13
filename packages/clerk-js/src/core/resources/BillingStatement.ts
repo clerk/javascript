@@ -4,7 +4,7 @@ import type {
   BillingStatementResource,
   BillingStatementStatus,
   BillingStatementTotals,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';

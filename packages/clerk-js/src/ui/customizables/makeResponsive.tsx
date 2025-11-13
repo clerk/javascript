@@ -10,7 +10,7 @@ type Responsive<T = Record<never, never>> = T & {
 // BASE_IMAGE_WIDTH is the default "small size" for Clerk images.
 // Images are rendered at a multiple of this resolution (currently 1x or 2x)
 // NOTE: img.clerk.com only returns the true aspect ratio for a few specific widths.
-// For other widths, it returns the next largest size. See https://clerk.com/docs/guides/image-optimization/imageurl-image-optimization
+// For other widths, it returns the next largest size. See https://clerk.com/docs/guides/development/image-optimization/imageurl-image-optimization
 // Currently, 80 and 160 are available exact widths returned by img.clerk.com.
 // Before updating this value, or returning a new size multiple, recommend
 // ensuring that img.clerk.com also returns that new size exactly.

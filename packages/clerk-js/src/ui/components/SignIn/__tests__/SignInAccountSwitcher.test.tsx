@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { render } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+
 import { SignInAccountSwitcher } from '../SignInAccountSwitcher';
 
 const { createFixtures } = bindCreateFixtures('SignIn');

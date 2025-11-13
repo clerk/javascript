@@ -4,6 +4,40 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { collectKeylessMetadata, formatMetadataHeaders } from '../server/keyless-custom-headers';
 
+const CI_ENV_VARS = [
+  'CI',
+  'CONTINUOUS_INTEGRATION',
+  'BUILD_NUMBER',
+  'BUILD_ID',
+  'BUILDKITE',
+  'CIRCLECI',
+  'GITHUB_ACTIONS',
+  'GITLAB_CI',
+  'JENKINS_URL',
+  'TRAVIS',
+  'APPVEYOR',
+  'WERCKER',
+  'DRONE',
+  'CODESHIP',
+  'SEMAPHORE',
+  'SHIPPABLE',
+  'TEAMCITY_VERSION',
+  'BAMBOO_BUILDKEY',
+  'GO_PIPELINE_NAME',
+  'TF_BUILD',
+  'SYSTEM_TEAMFOUNDATIONCOLLECTIONURI',
+  'BITBUCKET_BUILD_NUMBER',
+  'HEROKU_TEST_RUN_ID',
+  'VERCEL',
+  'NETLIFY',
+];
+// Helper function to clear all CI environment variables
+function clearAllCIEnvironmentVariables(): void {
+  CI_ENV_VARS.forEach(indicator => {
+    vi.stubEnv(indicator, undefined);
+  });
+}
+
 // Default mock headers for keyless-custom-headers.ts
 const defaultMockHeaders = new Headers({
   'User-Agent': 'Mozilla/5.0 (Test Browser)',
@@ -113,11 +147,21 @@ describe('keyless-custom-headers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockHeaders.mockImplementation(async () => createMockHeaders());
+
+    // Stub all environment variables that collectKeylessMetadata might access
+    vi.stubEnv('npm_config_user_agent', undefined);
+    vi.stubEnv('PORT', undefined);
+    // Clear all CI environment variables
+    clearAllCIEnvironmentVariables();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-    vi.unstubAllEnvs();
+    // Don't use vi.unstubAllEnvs() as it restores real environment variables
+    // Instead, explicitly stub all environment variables to undefined
+    vi.stubEnv('npm_config_user_agent', undefined);
+    vi.stubEnv('PORT', undefined);
+    clearAllCIEnvironmentVariables();
     mockHeaders.mockReset();
   });
 
@@ -134,6 +178,7 @@ describe('keyless-custom-headers', () => {
         xPort: '3000',
         xProtocol: 'https',
         xClerkAuthStatus: 'signed-out',
+        isCI: false,
       };
 
       const result = formatMetadataHeaders(metadata);
@@ -159,6 +204,7 @@ describe('keyless-custom-headers', () => {
         xPort: '3000',
         xProtocol: 'https',
         xClerkAuthStatus: 'signed-out',
+        isCI: false,
         // Missing: nodeVersion, nextVersion, npmConfigUserAgent, port
       };
 
@@ -191,6 +237,7 @@ describe('keyless-custom-headers', () => {
         xPort: 'test-x-port',
         xProtocol: 'test-x-protocol',
         xClerkAuthStatus: 'test-auth-status',
+        isCI: false,
       };
 
       const result = formatMetadataHeaders(metadata);
@@ -222,6 +269,7 @@ describe('keyless-custom-headers', () => {
         xPort: '',
         xProtocol: '',
         xClerkAuthStatus: '',
+        isCI: false,
       };
 
       const result = formatMetadataHeaders(metadata);
@@ -334,6 +382,7 @@ describe('keyless-custom-headers', () => {
         xHost: 'example.com',
         xProtocol: 'https',
         xClerkAuthStatus: 'signed-out',
+        isCI: false,
       });
 
       // Restore original values

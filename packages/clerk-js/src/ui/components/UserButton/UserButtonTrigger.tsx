@@ -5,7 +5,7 @@ import { UserAvatar } from '@/ui/elements/UserAvatar';
 import { withAvatarShimmer } from '@/ui/elements/withAvatarShimmer';
 
 import { useUserButtonContext } from '../../contexts';
-import { Button, descriptors, Flex } from '../../customizables';
+import { Button, descriptors, Flex, localizationKeys, useLocalizations } from '../../customizables';
 import type { PropsOfComponent } from '../../styledSystem';
 import { UserButtonTopLevelIdentifier } from './UserButtonTopLevelIdentifier';
 
@@ -18,6 +18,7 @@ export const UserButtonTrigger = withAvatarShimmer(
     const { sx, ...rest } = props;
     const { user } = useUser();
     const { showName } = useUserButtonContext();
+    const { t } = useLocalizations();
 
     return (
       <Button
@@ -25,7 +26,7 @@ export const UserButtonTrigger = withAvatarShimmer(
         variant='roundWrapper'
         sx={[t => ({ borderRadius: showName ? t.radii.$md : t.radii.$circle, color: t.colors.$colorForeground }), sx]}
         ref={ref}
-        aria-label={`${props.isOpen ? 'Close' : 'Open'} user button`}
+        aria-label={`${props.isOpen ? t(localizationKeys('userButton.action__closeUserMenu')) : t(localizationKeys('userButton.action__openUserMenu'))}`}
         aria-expanded={props.isOpen}
         aria-haspopup='dialog'
         {...rest}

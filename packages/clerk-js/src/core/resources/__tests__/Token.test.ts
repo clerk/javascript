@@ -1,9 +1,11 @@
-import type { InstanceType } from '@clerk/types';
+import type { InstanceType } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+
+import { mockFetch, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { debugLogger } from '@/utils/debug';
 
 import { SUPPORTED_FAPI_VERSION } from '../../constants';
 import { createFapiClient } from '../../fapiClient';
-import { mockFetch, mockNetworkFailedFetch } from '../../vitest/fixtures';
 import { BaseResource } from '../internal';
 import { Token } from '../Token';
 
@@ -49,7 +51,7 @@ describe('Token', () => {
           writable: true,
           value: false,
         });
-        warnSpy = vi.spyOn(console, 'warn').mockReturnValue();
+        warnSpy = vi.spyOn(debugLogger, 'warn').mockReturnValue();
       });
 
       afterEach(() => {

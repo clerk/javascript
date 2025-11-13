@@ -1,11 +1,15 @@
-import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
+import type {
+  ClerkPaginatedResponse,
+  OrganizationDomainResource,
+  OrganizationMembershipResource,
+} from '@clerk/shared/types';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { act, render, waitFor } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { act, render, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { OrganizationGeneralPage } from '../OrganizationGeneralPage';
 import { createFakeDomain, createFakeMember } from './utils';
 
@@ -84,10 +88,10 @@ describe('OrganizationSettings', () => {
         total_count: 1,
       }),
     );
-    const { findByText, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
+    const { findByText, findByRole, queryByRole } = render(<OrganizationGeneralPage />, { wrapper });
     await findByText('General');
     expect(queryByRole('button', { name: /update profile/i })).not.toBeInTheDocument();
-    const leaveButton = queryByRole('button', { name: /leave organization/i });
+    const leaveButton = await findByRole('button', { name: /leave organization/i });
     expect(leaveButton).not.toBeDisabled();
   });
 
@@ -246,6 +250,7 @@ describe('OrganizationSettings', () => {
     it('open the profile section', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
+        f.withOrganizationSlug(true);
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', slug: 'Org1' }],

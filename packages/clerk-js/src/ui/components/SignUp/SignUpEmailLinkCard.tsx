@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { VerificationLinkCard } from '@/ui/elements/VerificationLinkCard';

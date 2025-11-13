@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-import { Button, Col, descriptors, localizationKeys } from '../customizables';
+import { Alert, Button, Col, descriptors, localizationKeys, Text } from '../customizables';
 import type { LocalizationKey } from '../localization';
 import { Card } from './Card';
 import { useFieldOTP } from './CodeControl';
@@ -13,6 +13,7 @@ import { IdentityPreview } from './IdentityPreview';
 export type VerificationCodeCardProps = {
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
+  cardNotice?: LocalizationKey;
   inputLabel?: LocalizationKey;
   safeIdentifier?: string | undefined | null;
   resendButton?: LocalizationKey;
@@ -31,7 +32,7 @@ export type VerificationCodeCardProps = {
 };
 
 export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCardProps>) => {
-  const { showAlternativeMethods = true, children } = props;
+  const { showAlternativeMethods = true, cardNotice, children } = props;
   const card = useCardState();
 
   const otp = useFieldOTP({
@@ -64,6 +65,17 @@ export const VerificationCodeCard = (props: PropsWithChildren<VerificationCodeCa
             label={props.inputLabel}
             resendButton={props.resendButton}
           />
+
+          {cardNotice && (
+            <Alert colorScheme='warning'>
+              <Text
+                colorScheme='warning'
+                localizationKey={cardNotice}
+                variant='caption'
+              />
+            </Alert>
+          )}
+
           <Col gap={3}>
             <Button
               elementDescriptor={descriptors.formButtonPrimary}

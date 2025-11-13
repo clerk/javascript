@@ -1,4 +1,4 @@
-import type { TelemetryCollector } from '@clerk/types';
+import type { TelemetryCollector } from '@clerk/shared/types';
 
 import type { DebugLogEntry, DebugLogLevel, DebugTransport } from '../types';
 

@@ -6,7 +6,7 @@ import {
   SessionContext,
   UserContext,
 } from '@clerk/shared/react';
-import type { ClientResource, InitialState, Resources } from '@clerk/types';
+import type { ClientResource, InitialState, Resources } from '@clerk/shared/types';
 import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';

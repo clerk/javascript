@@ -3,7 +3,7 @@ import type {
   OrganizationResource,
   OrganizationSuggestionResource,
   UserOrganizationInvitationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { PropsWithChildren } from 'react';
 
 import { Actions } from '@/ui/elements/Actions';

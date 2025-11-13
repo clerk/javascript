@@ -10,6 +10,13 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { prepareApplication } from './utils';
 
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const APP_1_ENV_KEY = process.env.E2E_SESSIONS_APP_1_ENV_KEY;
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const APP_1_HOST = process.env.E2E_SESSIONS_APP_1_HOST;
+// eslint-disable-next-line turbo/no-undeclared-env-vars
+const APP_2_ENV_KEY = process.env.E2E_SESSIONS_APP_2_ENV_KEY;
+
 /**
  * These two suites need to run in serial mode because they are both using a local proxy server
  * that listens to port 443. We can't run them in parallel because they would conflict with each other, unless
@@ -40,7 +47,7 @@ test.describe('root and subdomain production apps @sessions', () => {
    * 5. The second app is going to be served on sub-1.multiple-apps-e2e.clerk.app
    */
   test.describe('multiple apps same domain for the same production instances', () => {
-    const hosts = ['multiple-apps-e2e.clerk.app:8443', 'sub-1.multiple-apps-e2e.clerk.app:8443'];
+    const hosts = [`${APP_1_HOST}:8443`, `sub-1.${APP_1_HOST}:8443`];
 
     let fakeUser: FakeUser;
     let server: Server;
@@ -49,9 +56,9 @@ test.describe('root and subdomain production apps @sessions', () => {
     test.beforeAll(async () => {
       apps = await Promise.all([
         // first app
-        prepareApplication('sessions-prod-1'),
+        prepareApplication(APP_1_ENV_KEY),
         // second app using the same instance keys
-        prepareApplication('sessions-prod-1'),
+        prepareApplication(APP_1_ENV_KEY),
       ]);
 
       // TODO: Move this into createProxyServer
@@ -70,7 +77,11 @@ test.describe('root and subdomain production apps @sessions', () => {
 
       const u = createTestUtils({ app: apps[0].app });
       fakeUser = u.services.users.createFakeUser();
-      await u.services.users.createBapiUser(fakeUser);
+      try {
+        await u.services.users.createBapiUser(fakeUser);
+      } catch (error) {
+        console.error(error);
+      }
     });
 
     test.afterAll(async () => {
@@ -180,13 +191,13 @@ test.describe('root and subdomain production apps @sessions', () => {
    * 5. The second app is going to be served on sub-1.multiple-apps-e2e.clerk.app
    */
   test.describe('multiple apps same domain for different production instances', () => {
-    const hosts = ['multiple-apps-e2e.clerk.app:8443', 'sub-2.multiple-apps-e2e.clerk.app:8443'];
+    const hosts = [`${APP_1_HOST}:8443`, `sub-2.${APP_1_HOST}:8443`];
     let fakeUsers: FakeUser[];
     let server: Server;
     let apps: Array<{ app: Application; serverUrl: string }>;
 
     test.beforeAll(async () => {
-      apps = await Promise.all([prepareApplication('sessions-prod-1'), prepareApplication('sessions-prod-2')]);
+      apps = await Promise.all([prepareApplication(APP_1_ENV_KEY), prepareApplication(APP_2_ENV_KEY)]);
 
       // TODO: Move this into createProxyServer
       const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {
@@ -312,13 +323,13 @@ test.describe('root and subdomain production apps @sessions', () => {
    *
    */
   test.describe('multiple apps different same-level subdomains  for different production instances', () => {
-    const hosts = ['sub-1.multiple-apps-e2e.clerk.app:8443', 'sub-2.multiple-apps-e2e.clerk.app:8443'];
+    const hosts = [`sub-1.${APP_1_HOST}:8443`, `sub-2.${APP_1_HOST}:8443`];
     let fakeUsers: FakeUser[];
     let server: Server;
     let apps: Array<{ app: Application; serverUrl: string }>;
 
     test.beforeAll(async () => {
-      apps = await Promise.all([prepareApplication('sessions-prod-1'), prepareApplication('sessions-prod-2')]);
+      apps = await Promise.all([prepareApplication(APP_1_ENV_KEY), prepareApplication(APP_2_ENV_KEY)]);
 
       // TODO: Move this into createProxyServer
       const ssl: Pick<ServerOptions, 'ca' | 'cert' | 'key'> = {

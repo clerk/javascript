@@ -1,10 +1,10 @@
-import type { BillingMoneyAmount } from '@clerk/types';
+import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/shared/types';
 
 import { Feature } from './Feature';
 import type { BillingPlanJSON } from './JSON';
 
 /**
- * The `BillingPlan` object is similar to the [`BillingPlanResource`](/docs/references/javascript/types/billing-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `BillingPlan` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/plans) and is not directly accessible from the Frontend API.
+ * The `BillingPlan` object is similar to the [`BillingPlanResource`](/docs/reference/javascript/types/billing-plan-resource) object as it holds information about a plan, as well as methods for managing it. However, the `BillingPlan` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/plans) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -14,10 +14,6 @@ export class BillingPlan {
      * The unique identifier for the plan.
      */
     readonly id: string,
-    /**
-     * The ID of the product the plan belongs to.
-     */
-    readonly productId: string,
     /**
      * The name of the plan.
      */
@@ -29,7 +25,7 @@ export class BillingPlan {
     /**
      * The description of the plan.
      */
-    readonly description: string | undefined,
+    readonly description: string | null,
     /**
      * Whether the plan is the default plan.
      */
@@ -53,11 +49,11 @@ export class BillingPlan {
     /**
      * The annual fee of the plan.
      */
-    readonly annualFee: BillingMoneyAmount,
+    readonly annualFee: BillingMoneyAmount | null,
     /**
      * The annual fee of the plan on a monthly basis.
      */
-    readonly annualMonthlyFee: BillingMoneyAmount,
+    readonly annualMonthlyFee: BillingMoneyAmount | null,
     /**
      * The type of payer for the plan.
      */
@@ -69,20 +65,25 @@ export class BillingPlan {
   ) {}
 
   static fromJSON(data: BillingPlanJSON): BillingPlan {
-    const formatAmountJSON = (fee: BillingPlanJSON['fee']) => {
-      return {
-        amount: fee.amount,
-        amountFormatted: fee.amount_formatted,
-        currency: fee.currency,
-        currencySymbol: fee.currency_symbol,
-      };
+    const formatAmountJSON = <T extends BillingMoneyAmountJSON | null>(
+      fee: T,
+    ): T extends null ? null : BillingMoneyAmount => {
+      return (
+        fee
+          ? {
+              amount: fee.amount,
+              amountFormatted: fee.amount_formatted,
+              currency: fee.currency,
+              currencySymbol: fee.currency_symbol,
+            }
+          : null
+      ) as T extends null ? null : BillingMoneyAmount;
     };
     return new BillingPlan(
       data.id,
-      data.product_id,
       data.name,
       data.slug,
-      data.description,
+      data.description ?? null,
       data.is_default,
       data.is_recurring,
       data.has_base_fee,
@@ -91,7 +92,7 @@ export class BillingPlan {
       formatAmountJSON(data.annual_fee),
       formatAmountJSON(data.annual_monthly_fee),
       data.for_payer_type,
-      data.features.map(feature => Feature.fromJSON(feature)),
+      (data.features ?? []).map(feature => Feature.fromJSON(feature)),
     );
   }
 }

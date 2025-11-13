@@ -16,7 +16,7 @@ describe('useClerkContext', () => {
     });
 
     expect(() => render(Component)).toThrow(
-      '@clerk/vue: useAuth can only be used when the Vue plugin is installed. Learn more: https://clerk.com/docs/references/vue/clerk-plugin',
+      '@clerk/vue: useAuth can only be used when the Vue plugin is installed. Learn more: https://clerk.com/docs/reference/vue/clerk-plugin',
     );
 
     consoleSpy.mockRestore();

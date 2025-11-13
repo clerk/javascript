@@ -1,6 +1,6 @@
+import type { ClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it } from 'vitest';
 
-import type { ClerkAPIResponseError } from '../../core/resources/Error';
 import { isError } from '../errors';
 
 describe('isError(err, code)', () => {

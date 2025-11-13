@@ -1,4 +1,4 @@
-import type { CardActionId } from '@clerk/types';
+import type { CardActionId } from '@clerk/shared/types';
 import React from 'react';
 
 import { descriptors, Flex, Text } from '../../customizables';

@@ -2,7 +2,7 @@ import type {
   OrganizationInvitationStatus,
   OrganizationMembershipRequestJSON,
   OrganizationMembershipRequestResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource, PublicUserData } from './internal';

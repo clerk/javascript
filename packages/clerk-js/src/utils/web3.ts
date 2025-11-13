@@ -1,4 +1,4 @@
-import type { Web3Provider } from '@clerk/types';
+import type { Web3Provider } from '@clerk/shared/types';
 
 import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
 

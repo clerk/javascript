@@ -1,4 +1,4 @@
-import type { Serializable } from '@clerk/types';
+import type { Serializable } from '@clerk/shared/types';
 
 const formatWarning = (msg: string) => {
   return `🔒 Clerk:\n${msg.trim()}\n(This notice only appears in development)`;
@@ -46,9 +46,11 @@ const warnings = {
   cannotOpenSignInOrSignUp:
     'The SignIn or SignUp modals do not render when a user is already signed in, unless the application allows multiple sessions. Since a user is signed in and this application only allows a single session, this is no-op.',
   cannotRenderAPIKeysComponent:
-    'The <APIKeys/> component cannot be rendered when API keys is disabled. Since API keys is disabled, this is no-op.',
-  cannotRenderAPIKeysComponentForOrgWhenUnauthorized:
-    'The <APIKeys/> component cannot be rendered for an organization unless a user has the required permissions. Since the user does not have the necessary permissions, this is no-op.',
+    'The <APIKeys/> component cannot be rendered when API keys are disabled. Since API keys are disabled, this is no-op.',
+  cannotRenderAPIKeysComponentForUserWhenDisabled:
+    'The <APIKeys/> component cannot be rendered when user API keys are disabled. Since user API keys are disabled, this is no-op.',
+  cannotRenderAPIKeysComponentForOrgWhenDisabled:
+    'The <APIKeys/> component cannot be rendered when organization API keys are disabled. Since organization API keys are disabled, this is no-op.',
 };
 
 type SerializableWarnings = Serializable<typeof warnings>;

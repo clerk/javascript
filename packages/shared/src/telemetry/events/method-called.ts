@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import type { TelemetryEventRaw } from '../../types';
 
 const EVENT_METHOD_CALLED = 'METHOD_CALLED';
 const EVENT_SAMPLING_RATE = 0.1;

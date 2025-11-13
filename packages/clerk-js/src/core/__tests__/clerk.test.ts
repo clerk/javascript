@@ -1,3 +1,4 @@
+import { EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -5,17 +6,18 @@ import type {
   SignInJSON,
   SignUpJSON,
   TokenResource,
-} from '@clerk/types';
-import { waitFor } from '@testing-library/dom';
+} from '@clerk/shared/types';
+import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { mockNativeRuntime } from '../../vitestUtils';
+import { mockJwt } from '@/test/core-fixtures';
+
+import { mockNativeRuntime } from '../../test/utils';
 import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
-import { BaseResource, Client, EmailLinkErrorCodeStatus, Environment, SignIn, SignUp } from '../resources/internal';
-import { mockJwt } from '../test/fixtures';
+import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
 const mockClientFetch = vi.fn();
 const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));
@@ -395,7 +397,7 @@ describe('Clerk singleton', () => {
           session: mockSession as any as ActiveSessionResource,
           redirectUrl: '/redirect-url-path',
         });
-        const redirectUrl = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0]);
+        const redirectUrl = new URL((sut.navigate as ReturnType<typeof vi.fn>).mock.calls[0][0]);
         expect(redirectUrl.pathname).toEqual('/v1/client/touch');
         expect(redirectUrl.searchParams.get('redirect_url')).toEqual(`${mockWindowLocation.href}/redirect-url-path`);
       });
@@ -742,7 +744,7 @@ describe('Clerk singleton', () => {
     const mockClientRemoveSessions = vi.fn();
     const mockSession1 = { id: '1', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
     const mockSession2 = { id: '2', remove: vi.fn(), status: 'active', user: {}, getToken: vi.fn() };
-    const mockSession3 = { id: '2', remove: vi.fn(), status: 'pending', user: {}, getToken: vi.fn() };
+    const mockSession3 = { id: '3', remove: vi.fn(), status: 'pending', user: {}, getToken: vi.fn() };
 
     beforeEach(() => {
       mockClientDestroy.mockReset();

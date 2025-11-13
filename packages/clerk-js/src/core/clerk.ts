@@ -1,9 +1,15 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { deprecated } from '@clerk/shared/deprecated';
-import { ClerkRuntimeError, EmailLinkErrorCodeStatus, is4xxError, isClerkAPIResponseError } from '@clerk/shared/error';
+import {
+  ClerkRuntimeError,
+  EmailLinkError,
+  EmailLinkErrorCodeStatus,
+  is4xxError,
+  isClerkAPIResponseError,
+  isClerkRuntimeError,
+} from '@clerk/shared/error';
 import { parsePublishableKey } from '@clerk/shared/keys';
-import { LocalStorageBroadcastChannel } from '@clerk/shared/localStorageBroadcastChannel';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
@@ -13,8 +19,6 @@ import {
   eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
-import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
@@ -80,13 +84,17 @@ import type {
   TaskChooseOrganizationProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
+  UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
   UserResource,
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
+import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -94,14 +102,15 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
-  disabledAPIKeysFeature,
+  disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledUserAPIKeysFeature,
   errorThrower,
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -149,22 +158,12 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
-import {
-  BaseResource,
-  Client,
-  EmailLinkError,
-  Environment,
-  isClerkRuntimeError,
-  Organization,
-  Waitlist,
-} from './resources/internal';
+import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
 import { warnings } from './warnings';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
-
-export type ClerkCoreBroadcastChannelEvent = { type: 'signout' };
 
 declare global {
   interface Window {
@@ -181,7 +180,8 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
-const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
+const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -222,12 +222,13 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
+  #queryClient: QueryClient | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
   #captchaHeartbeat?: CaptchaHeartbeat;
-  #broadcastChannel: LocalStorageBroadcastChannel<ClerkCoreBroadcastChannelEvent> | null = null;
+  #broadcastChannel: BroadcastChannel | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
@@ -239,6 +240,28 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
+
+  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
+    if (!this.#queryClient) {
+      void import('./query-core')
+        .then(module => module.QueryClient)
+        .then(QueryClient => {
+          if (this.#queryClient) {
+            return;
+          }
+          this.#queryClient = new QueryClient();
+          // @ts-expect-error - queryClientStatus is not typed
+          this.#publicEventBus.emit('queryClientStatus', 'ready');
+        });
+    }
+
+    return this.#queryClient
+      ? {
+          __tag: 'clerk-rq-client',
+          client: this.#queryClient,
+        }
+      : undefined;
+  }
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -476,10 +499,21 @@ export class Clerk implements ClerkInterface {
       } else {
         await this.#loadInNonStandardBrowser();
       }
-      if (this.environment?.clientDebugMode) {
+      const telemetry = this.#options.telemetry;
+      const telemetryEnabled = telemetry !== false && !telemetry?.disabled;
+
+      const isKeyless = Boolean(this.#options.__internal_keyless_claimKeylessApplicationUrl);
+      const hasClientDebugMode = Boolean(this.environment?.clientDebugMode);
+      const isProd = this.environment?.isProduction?.() ?? false;
+
+      const shouldEnable = hasClientDebugMode || (isKeyless && !isProd);
+      const logLevel = isKeyless && !hasClientDebugMode ? 'error' : undefined;
+
+      if (shouldEnable) {
         initDebugLogger({
           enabled: true,
-          telemetryCollector: this.telemetry,
+          ...(logLevel ? { logLevel } : {}),
+          ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
       debugLogger.info('load() complete', {}, 'clerk');
@@ -867,6 +901,30 @@ export class Clerk implements ClerkInterface {
     );
   };
 
+  public mountUserAvatar = (node: HTMLDivElement, props?: UserAvatarProps): void => {
+    this.assertComponentsReady(this.#componentControls);
+    const component = 'UserAvatar';
+    void this.#componentControls.ensureMounted({ preloadHint: component }).then(controls =>
+      controls.mountComponent({
+        name: component,
+        appearanceKey: 'userAvatar',
+        node,
+        props,
+      }),
+    );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public unmountUserAvatar = (node: HTMLDivElement): void => {
+    this.assertComponentsReady(this.#componentControls);
+    void this.#componentControls.ensureMounted().then(controls =>
+      controls.unmountComponent({
+        node,
+      }),
+    );
+  };
+
   public mountSignUp = (node: HTMLDivElement, props?: SignUpProps): void => {
     this.assertComponentsReady(this.#componentControls);
     const component = 'SignUp';
@@ -1119,16 +1177,24 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    // Temporary backward compatibility for legacy prop: `forOrganizations`. Will be removed in the coming minor release.
+    const nextProps = { ...(props as any) } as PricingTableProps & { forOrganizations?: boolean };
+    if (typeof (props as any)?.forOrganizations !== 'undefined') {
+      logger.warnOnce(
+        'Clerk: [IMPORTANT] <PricingTable /> prop `forOrganizations` is deprecated and will be removed in the coming minors. Use `for="organization"` instead.',
+      );
+    }
+
     void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
       controls.mountComponent({
         name: 'PricingTable',
         appearanceKey: 'pricingTable',
         node,
-        props,
+        props: nextProps,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', nextProps));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
@@ -1169,7 +1235,7 @@ export class Clerk implements ClerkInterface {
 
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
-    if (disabledAPIKeysFeature(this, this.environment)) {
+    if (disabledAllAPIKeysFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
           code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
@@ -1178,10 +1244,19 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (this.organization && !canViewOrManageAPIKeys(this)) {
+    if (this.organization && disabledOrganizationAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
-          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenDisabled, {
+          code: CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledUserAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForUserWhenDisabled, {
+          code: CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -1340,6 +1415,13 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       const token = await newSession?.getToken();
       if (!token) {
+        if (!isValidBrowserOnline()) {
+          debugLogger.warn(
+            'Token is null when setting active session (offline)',
+            { sessionId: newSession?.id },
+            'clerk',
+          );
+        }
         eventBus.emit(events.TokenUpdate, { token: null });
       }
 
@@ -2340,6 +2422,13 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      if (!this.session?.lastActiveToken && !isValidBrowserOnline()) {
+        debugLogger.warn(
+          'No last active token when updating client (offline)',
+          { sessionId: this.session?.id },
+          'clerk',
+        );
+      }
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
@@ -2368,6 +2457,7 @@ export class Clerk implements ClerkInterface {
     this.#fapiClient.onAfterResponse(callback);
   };
 
+  // TODO @userland-errors:
   __unstable__updateProps = (_props: any) => {
     // We need to re-init the options here in order to keep the options passed to ClerkProvider
     // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:
@@ -2379,6 +2469,7 @@ export class Clerk implements ClerkInterface {
       ..._props,
       options: this.#initOptions({ ...this.#options, ..._props.options }),
     };
+
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 
@@ -2517,7 +2608,10 @@ export class Clerk implements ClerkInterface {
      */
     this.#pageLifecycle = createPageLifecycle();
 
-    this.#broadcastChannel = new LocalStorageBroadcastChannel('clerk');
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.#broadcastChannel = new BroadcastChannel('clerk');
+    }
+
     this.#setupBrowserListeners();
 
     const isInAccountsHostedPages = isDevAccountPortalOrigin(window?.location.hostname);
@@ -2726,10 +2820,10 @@ export class Clerk implements ClerkInterface {
     });
 
     /**
-     * Background tabs get notified of a signout event from active tab.
+     * Background tabs get notified of cross-tab signout events.
      */
-    this.#broadcastChannel?.addEventListener('message', ({ data }) => {
-      if (data.type === 'signout') {
+    this.#broadcastChannel?.addEventListener('message', (event: MessageEvent) => {
+      if (event.data?.type === 'signout') {
         void this.handleUnauthenticated({ broadcast: false });
       }
     });

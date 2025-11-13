@@ -1,5 +1,5 @@
 import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
-import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
+import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
@@ -27,7 +27,7 @@ type UseOrganizationReturn =
 type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
 
 /**
- * Returns the current [`Organization`](https://clerk.com/docs/references/javascript/organization/organization) object
+ * Returns the current [`Organization`](https://clerk.com/docs/reference/javascript/organization/organization) object
  * along with loading states and membership information.
  *
  * @example

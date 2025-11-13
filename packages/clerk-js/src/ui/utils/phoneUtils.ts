@@ -1,4 +1,4 @@
-import type { PhoneCodeChannel } from '@clerk/types';
+import type { PhoneCodeChannel } from '@clerk/shared/types';
 
 import type { CountryEntry, CountryIso } from '../elements/PhoneInput/countryCodeData';
 import { CodeToCountriesMap, IsoToCountryMap, SubAreaCodeSets } from '../elements/PhoneInput/countryCodeData';

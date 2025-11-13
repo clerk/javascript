@@ -1,13 +1,12 @@
-import type { UseSessionReturn } from '@clerk/types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { UseSessionReturn } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';
 
 type UseSession = () => UseSessionReturn;
 
 const hookName = `useSession`;
 /**
- * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/references/javascript/session) object, as well as helpers for setting the active session.
+ * The `useSession()` hook provides access to the current user's [`Session`](https://clerk.com/docs/reference/javascript/session) object, as well as helpers for setting the active session.
  *
  * @unionReturnHeadings
  * ["Initialization", "Signed out", "Signed in"]
@@ -15,7 +14,6 @@ const hookName = `useSession`;
  * @function
  *
  * @param [options] - An object containing options for the `useSession()` hook.
- *
  * @example
  * ### Access the `Session` object
  *

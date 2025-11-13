@@ -1,10 +1,10 @@
-import { parseError } from '@clerk/shared/error';
-import type { SignInResource } from '@clerk/types';
+import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
+import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ClerkAPIResponseError } from '../../../../core/resources';
-import { render, screen, waitFor } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen, waitFor } from '@/test/utils';
+
 import { SignInFactorTwo } from '../SignInFactorTwo';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
@@ -185,7 +185,7 @@ describe('SignInFactorTwo', () => {
         );
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect phone code')).toBeDefined());
+        expect(await screen.findByTestId('form-feedback-error')).toHaveTextContent(/Incorrect phone code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -274,7 +274,7 @@ describe('SignInFactorTwo', () => {
         );
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        await waitFor(() => expect(screen.getByText('Incorrect authenticator code')).toBeDefined());
+        expect(await screen.findByTestId('form-feedback-error')).toHaveTextContent(/Incorrect authenticator code/i);
       });
     });
 
@@ -367,7 +367,7 @@ describe('SignInFactorTwo', () => {
         const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(getByLabelText('Backup code'), '123456');
         await userEvent.click(getByText('Continue'));
-        await waitFor(() => expect(screen.getByText('Incorrect backup code')).toBeDefined());
+        expect(await screen.findByTestId('form-feedback-error')).toHaveTextContent(/Incorrect backup code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -422,9 +422,7 @@ describe('SignInFactorTwo', () => {
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
       // Wait for the alternative methods to be rendered
-      await waitFor(() => {
-        expect(screen.getByText(/Send SMS code to \+/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/Send SMS code to \+/i)).toBeInTheDocument();
     });
 
     it('goes back to the main screen when clicking the "<- Back" button', async () => {
@@ -441,13 +439,9 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await waitFor(() => {
-        expect(screen.getByText('Back')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('Back')).toBeInTheDocument();
       await userEvent.click(screen.getByText('Back'));
-      await waitFor(() => {
-        expect(screen.getByText('Check your phone')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('Check your phone')).toBeInTheDocument();
     });
 
     it('lists all the enabled second factor methods', async () => {
@@ -464,11 +458,9 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await waitFor(() => {
-        expect(screen.getByText(/Send SMS code to \+/i)).toBeInTheDocument();
-        expect(screen.getByText(/Use a backup code/i)).toBeInTheDocument();
-        expect(screen.getByText(/Authenticator/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/Send SMS code to \+/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Use a backup code/i)).toBeInTheDocument();
+      expect(await screen.findByText(/Authenticator/i)).toBeInTheDocument();
     });
 
     it('shows the SMS code input when clicking the Phone code method', async () => {
@@ -485,13 +477,9 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await waitFor(() => {
-        expect(screen.getByText(/Send SMS code to \+/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/Send SMS code to \+/i)).toBeInTheDocument();
       await userEvent.click(screen.getByText(/Send SMS code to \+/i));
-      await waitFor(() => {
-        expect(screen.getByText(/Check your phone/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/Check your phone/i)).toBeInTheDocument();
     });
 
     it('shows the Authenticator app screen when clicking the Authenticator app method', async () => {
@@ -508,14 +496,10 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await waitFor(() => {
-        expect(screen.getByText(/authenticator/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/authenticator/i)).toBeInTheDocument();
       await userEvent.click(screen.getByText(/authenticator/i));
-      await waitFor(() => {
-        expect(screen.getByText(/Enter the verification code/i)).toBeInTheDocument();
-        expect(screen.getByText(/authenticator/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/Enter the verification code/i)).toBeInTheDocument();
+      expect(await screen.findByText(/authenticator/i)).toBeInTheDocument();
     });
 
     it('shows the Backup code screen when clicking the Backup code method', async () => {
@@ -532,13 +516,9 @@ describe('SignInFactorTwo', () => {
       fixtures.signIn.prepareSecondFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
       const { userEvent } = render(<SignInFactorTwo />, { wrapper });
       await userEvent.click(screen.getByText('Use another method'));
-      await waitFor(() => {
-        expect(screen.getByText(/backup/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/backup/i)).toBeInTheDocument();
       await userEvent.click(screen.getByText(/backup/i));
-      await waitFor(() => {
-        expect(screen.getByText(/enter a backup code/i)).toBeInTheDocument();
-      });
+      expect(await screen.findByText(/enter a backup code/i)).toBeInTheDocument();
     });
 
     describe('Get Help', () => {
@@ -555,13 +535,9 @@ describe('SignInFactorTwo', () => {
 
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.click(screen.getByText('Use another method'));
-        await waitFor(() => {
-          expect(screen.getByText('Get help')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Get help')).toBeInTheDocument();
         await userEvent.click(screen.getByText('Get help'));
-        await waitFor(() => {
-          expect(screen.getByText('Email support')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Email support')).toBeInTheDocument();
       });
 
       it('should go back to "Use another method" screen when clicking the "<- Back" button', async () => {
@@ -577,17 +553,11 @@ describe('SignInFactorTwo', () => {
 
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.click(screen.getByText('Use another method'));
-        await waitFor(() => {
-          expect(screen.getByText('Get help')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Get help')).toBeInTheDocument();
         await userEvent.click(screen.getByText('Get help'));
-        await waitFor(() => {
-          expect(screen.getByText('Back')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Back')).toBeInTheDocument();
         await userEvent.click(screen.getByText('Back'));
-        await waitFor(() => {
-          expect(screen.getByText('Use another method')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Use another method')).toBeInTheDocument();
       });
 
       it('should open a "mailto:" link when clicking the email support button', async () => {
@@ -603,13 +573,9 @@ describe('SignInFactorTwo', () => {
 
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.click(screen.getByText('Use another method'));
-        await waitFor(() => {
-          expect(screen.getByText('Get help')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Get help')).toBeInTheDocument();
         await userEvent.click(screen.getByText('Get help'));
-        await waitFor(() => {
-          expect(screen.getByText('Email support')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Email support')).toBeInTheDocument();
 
         const assignMock = vi.fn();
         const mockResponse = vi.fn();

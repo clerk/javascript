@@ -1,4 +1,4 @@
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
@@ -60,7 +60,7 @@ export function PricingTableMatrix({
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
-  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyFee.amount > 0), [plans]);
+  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => Boolean(plan.annualMonthlyFee)), [plans]);
 
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
@@ -133,7 +133,7 @@ export function PricingTableMatrix({
                       id={segmentedControlId}
                       colorScheme='secondary'
                       variant='caption'
-                      localizationKey={localizationKeys('commerce.pricingTable.billingCycle')}
+                      localizationKey={localizationKeys('billing.pricingTable.billingCycle')}
                     >
                       Billing cycle
                     </Text>
@@ -144,11 +144,11 @@ export function PricingTableMatrix({
                     >
                       <SegmentedControl.Button
                         value='month'
-                        text={localizationKeys('commerce.monthly')}
+                        text={localizationKeys('billing.monthly')}
                       />
                       <SegmentedControl.Button
                         value='annual'
-                        text={localizationKeys('commerce.annually')}
+                        text={localizationKeys('billing.annually')}
                       />
                     </SegmentedControl.Root>
                   </>
@@ -156,12 +156,11 @@ export function PricingTableMatrix({
               </Box>
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
-                const planFee =
-                  plan.annualMonthlyFee.amount <= 0
-                    ? plan.fee
-                    : planPeriod === 'annual'
-                      ? plan.annualMonthlyFee
-                      : plan.fee;
+                const planFee = !plan.annualMonthlyFee
+                  ? plan.fee
+                  : planPeriod === 'annual'
+                    ? plan.annualMonthlyFee
+                    : plan.fee;
 
                 return (
                   <Box
@@ -211,7 +210,7 @@ export function PricingTableMatrix({
                             <Badge
                               elementDescriptor={descriptors.pricingTableMatrixBadge}
                               colorScheme='secondary'
-                              localizationKey={localizationKeys('commerce.popular')}
+                              localizationKey={localizationKeys('billing.popular')}
                             />
                           ) : null}
                         </Span>
@@ -251,9 +250,9 @@ export function PricingTableMatrix({
                                   marginInlineEnd: t.space.$1,
                                 },
                               })}
-                              localizationKey={localizationKeys('commerce.month')}
+                              localizationKey={localizationKeys('billing.month')}
                             />
-                            {plan.annualMonthlyFee.amount > 0 ? (
+                            {plan.annualMonthlyFee ? (
                               <Box
                                 elementDescriptor={descriptors.pricingTableMatrixFeePeriodNotice}
                                 sx={[
@@ -291,7 +290,7 @@ export function PricingTableMatrix({
                                       size='sm'
                                       aria-hidden
                                     />{' '}
-                                    <Span localizationKey={localizationKeys('commerce.billedAnnually')} />
+                                    <Span localizationKey={localizationKeys('billing.billedAnnually')} />
                                   </Text>
                                 </Box>
                               </Box>
@@ -301,7 +300,7 @@ export function PricingTableMatrix({
                           <Text
                             elementDescriptor={descriptors.pricingTableMatrixFee}
                             variant='h2'
-                            localizationKey={localizationKeys('commerce.free')}
+                            localizationKey={localizationKeys('billing.free')}
                             colorScheme='body'
                           />
                         )}
@@ -398,7 +397,7 @@ export function PricingTableMatrix({
                             icon={Check}
                             colorScheme='neutral'
                             size='sm'
-                            aria-label={t(localizationKeys('commerce.pricingTable.included'))}
+                            aria-label={t(localizationKeys('billing.pricingTable.included'))}
                           />
                         )}
                       </Box>

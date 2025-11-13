@@ -1,5 +1,382 @@
 # Change Log
 
+## 5.108.0
+
+### Minor Changes
+
+- Support for `email_code` and `email_link` as a second factor when user is signing in on a new device. ([#7116](https://github.com/clerk/javascript/pull/7116)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update SocialButtons to show "Continue with" prefix for last auth strategy, and improve mobile layout consistency. ([#7169](https://github.com/clerk/javascript/pull/7169)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- [Experimental] Update `errors` to have specific field types based on whether it's a sign-in or a sign-up. ([#7195](https://github.com/clerk/javascript/pull/7195)) by [@dstaley](https://github.com/dstaley)
+
+- Removed internal parameter when creating API keys ([#7207](https://github.com/clerk/javascript/pull/7207)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`d64638d`](https://github.com/clerk/javascript/commit/d64638d6c270e0c566d1f2c164a24111314365ee), [`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd)]:
+  - @clerk/localizations@3.28.0
+  - @clerk/shared@3.34.0
+
+## 5.107.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/localizations@3.27.2
+
+## 5.106.0
+
+### Minor Changes
+
+- Implemented server-side pagination and filtering for API keys ([#6453](https://github.com/clerk/javascript/pull/6453)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add types for errors used in new custom flow APIs ([#7174](https://github.com/clerk/javascript/pull/7174)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- [Experimental] Add support for modal SSO sign-ins to new APIs ([#7026](https://github.com/clerk/javascript/pull/7026)) by [@dstaley](https://github.com/dstaley)
+
+- Support granular API keys settings for user and organization profiles ([#7179](https://github.com/clerk/javascript/pull/7179)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/localizations@3.27.1
+
+## 5.105.1
+
+### Patch Changes
+
+- Add aria live region to ensure feedback messages are read to screen readers when feedback changes. ([#7111](https://github.com/clerk/javascript/pull/7111)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.105.0
+
+### Minor Changes
+
+- Replaced the persistent key column in the API keys table with a one-time modal that displays the secret immediately after creation. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Move clientTrustState to SignIn ([#7163](https://github.com/clerk/javascript/pull/7163)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`d88ea99`](https://github.com/clerk/javascript/commit/d88ea99755e605673111cccb41eb93391e1e68dd), [`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/localizations@3.27.0
+  - @clerk/shared@3.31.1
+
+## 5.104.0
+
+### Minor Changes
+
+- Adds `client_trust_state` field to Client and SignIn resources to support new fraud protection feature. ([#7096](https://github.com/clerk/javascript/pull/7096)) by [@chriscanin](https://github.com/chriscanin)
+
+### Patch Changes
+
+- fix: Appropriately handle last-used SAML strategies ([#7135](https://github.com/clerk/javascript/pull/7135)) by [@tmilewski](https://github.com/tmilewski)
+
+- Experimental: Ground work for fixing stale data between hooks and components by sharing a single cache. ([#6913](https://github.com/clerk/javascript/pull/6913)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/shared@3.31.0
+  - @clerk/localizations@3.26.6
+
+## 5.103.2
+
+### Patch Changes
+
+- Propagate locale from ClerkProvider to PaymentElement ([#6885](https://github.com/clerk/javascript/pull/6885)) by [@aeliox](https://github.com/aeliox)
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+- Add debug logging to session update flows when browser is offline ([#7113](https://github.com/clerk/javascript/pull/7113)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove last used badge from rendering on sign-up. ([#7100](https://github.com/clerk/javascript/pull/7100)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Bug fix for Checkout success screen to not mention payment if a payment was not made. ([#7140](https://github.com/clerk/javascript/pull/7140)) by [@panteliselef](https://github.com/panteliselef)
+
+- Optimize Session.#hydrateCache to only cache token if it's new/different ([#7105](https://github.com/clerk/javascript/pull/7105)) by [@jacekradko](https://github.com/jacekradko)
+
+- Navigates to `/sign-up/continue` on sign-up with `missing_requirements` status using `ticket` as strategy ([#7101](https://github.com/clerk/javascript/pull/7101)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It fixes IdP-initiated flows with missing requirements such as accepting legal consent
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/localizations@3.26.5
+
+## 5.103.1
+
+### Patch Changes
+
+- Bring back OrgPreview within the OrgSwitcher component ([#7091](https://github.com/clerk/javascript/pull/7091)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.103.0
+
+### Minor Changes
+
+- Allow free trials without requiring a payment method, based on the configuration of an instance. ([#7068](https://github.com/clerk/javascript/pull/7068)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- [Billing Beta] Remove unnecessary `orgId` from BillingPayerMethods interface. ([#7087](https://github.com/clerk/javascript/pull/7087)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Ensure `ThreeDotsMenu` is full opacity when focus visible. ([#7080](https://github.com/clerk/javascript/pull/7080)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Localize aria-labels within `UserButton` and `OrganizationSwitcher` triggers. ([#7086](https://github.com/clerk/javascript/pull/7086)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533)]:
+  - @clerk/shared@3.29.0
+  - @clerk/types@4.96.0
+  - @clerk/localizations@3.26.4
+
+## 5.102.1
+
+### Patch Changes
+
+- Add title attribute to email address field with the recommended format. ([#6956](https://github.com/clerk/javascript/pull/6956)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes an issue in SelectOption where the focus styles were not being properly applied when the option is focused. ([#6999](https://github.com/clerk/javascript/pull/6999)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Increases SelectOption touch area to remove any dead spots between items.
+
+- Make avatar remove button size xs to be consistent with upload button sizing. ([#7041](https://github.com/clerk/javascript/pull/7041)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve avatar upload and removal UX to auto collapse the profile section upon successful save. ([#7044](https://github.com/clerk/javascript/pull/7044)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911), [`1217b87`](https://github.com/clerk/javascript/commit/1217b87c5a4810c521fd83dac8b4828ea98cdb9a)]:
+  - @clerk/localizations@3.26.3
+  - @clerk/types@4.95.1
+  - @clerk/shared@3.28.3
+
+## 5.102.0
+
+### Minor Changes
+
+- [Billing Beta]: Dropping `paymentMethodId` from subscription item. ([#7017](https://github.com/clerk/javascript/pull/7017)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Add support for automatically sending the browser locale during the sign-in flow ([#7011](https://github.com/clerk/javascript/pull/7011)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- [Billing Beta] Extend support of `forOrganizations` prop by a few minors. ([#7021](https://github.com/clerk/javascript/pull/7021)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`a172d51`](https://github.com/clerk/javascript/commit/a172d51df2d7f2e450c983a15ae897624304a764), [`947d0f5`](https://github.com/clerk/javascript/commit/947d0f5480b0151a392966cad2e1a45423f66035)]:
+  - @clerk/types@4.95.0
+  - @clerk/shared@3.28.2
+  - @clerk/localizations@3.26.2
+
+## 5.101.1
+
+### Patch Changes
+
+- Hide slug field on `OrganizationProfile` based on environment settings ([#7001](https://github.com/clerk/javascript/pull/7001)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`d8147fb`](https://github.com/clerk/javascript/commit/d8147fb58bfd6caf9a4f0a36fdc48c630d00387f)]:
+  - @clerk/shared@3.28.1
+
+## 5.101.0
+
+### Minor Changes
+
+- [Experimental] Add support for sign-in with passkey to new APIs ([#6997](https://github.com/clerk/javascript/pull/6997)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Replace `/commerce` endpoints with `/billing` endpoints. ([#6854](https://github.com/clerk/javascript/pull/6854)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`305f4ee`](https://github.com/clerk/javascript/commit/305f4eeb825086d55d1b0df198a0c43da8d94993), [`53214f9`](https://github.com/clerk/javascript/commit/53214f9a600074affc84d616bbbe7a6b625e7d33), [`1441e68`](https://github.com/clerk/javascript/commit/1441e6851102e9eed5697ad78c695f75b4a20db2), [`1236c74`](https://github.com/clerk/javascript/commit/1236c745fd58020e0972938ca0a9ae697a24af02)]:
+  - @clerk/shared@3.28.0
+  - @clerk/types@4.94.0
+  - @clerk/localizations@3.26.1
+
+## 5.100.0
+
+### Minor Changes
+
+- [Billing Beta] Rename payment source descriptors to use "payment method". ([#6951](https://github.com/clerk/javascript/pull/6951)) by [@panteliselef](https://github.com/panteliselef)
+
+- When fetching a new Session token, broadcast the token value to other tabs so they can pre-warm their in-memory Session Token cache with the most recent token. ([#6891](https://github.com/clerk/javascript/pull/6891)) by [@jacekradko](https://github.com/jacekradko)
+
+- Add support for sign up `locale` ([#6915](https://github.com/clerk/javascript/pull/6915)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- [Experimental] Fix `signIn.password` emailAddress parameter name. ([#6932](https://github.com/clerk/javascript/pull/6932)) by [@dstaley](https://github.com/dstaley)
+
+- [Experimental] Fix issue where calling `this.create()` would not correctly propagate errors. ([#6932](https://github.com/clerk/javascript/pull/6932)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Rename payment source to payment method. ([#6865](https://github.com/clerk/javascript/pull/6865)) by [@panteliselef](https://github.com/panteliselef)
+
+  `Clerk.user.initializePaymentSource()` -> `Clerk.user.initializePaymentMethod()`
+  `Clerk.user.addPaymentSource()` -> `Clerk.user.addPaymentMethod()`
+  `Clerk.user.getPaymentSources()` -> `Clerk.user.getPaymentMethods()`
+
+  `Clerk.organization.initializePaymentSource()` -> `Clerk.organization.initializePaymentMethod()`
+  `Clerk.organization.addPaymentSource()` -> `Clerk.organization.addPaymentMethod()`
+  `Clerk.organization.getPaymentSources()` -> `Clerk.organization.getPaymentMethods()`
+
+- [Billing Beta] Rename payment sources to method methods. ([#6959](https://github.com/clerk/javascript/pull/6959)) by [@panteliselef](https://github.com/panteliselef)
+
+  Updates localization keys from `commerce` -> `billing` and `paymentSource` to `paymentMethod`.
+
+- Introduce experimental step to choose enterprise connection on sign-in/sign-up ([#6947](https://github.com/clerk/javascript/pull/6947)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- [Billing Beta] Replace `forOrganizations: true` with `for: "organization"` in `<PricingTable/>`. ([#6978](https://github.com/clerk/javascript/pull/6978)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Ensure inputs are properly connected to feedback messages via `aria-describedby` usage. ([#6914](https://github.com/clerk/javascript/pull/6914)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add `enterpriseConnectionId` to `SamlAccount` and `EnterpriseAccount` resources ([#6961](https://github.com/clerk/javascript/pull/6961)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- - Update checkbox checked background color and icon ([#6934](https://github.com/clerk/javascript/pull/6934)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  - Increase role select options contrast
+  - Updates user preview subtitle text variant
+
+- Add success text descriptor to otp input field. ([#6958](https://github.com/clerk/javascript/pull/6958)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- - Add experimental property `last_authenticated_at` to `SamlAccount` resource, which represents the date when the SAML account was last authenticated ([#6954](https://github.com/clerk/javascript/pull/6954)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  - Add experimental support for `enterprise_sso` as a `strategy` param for `session.prepareFirstFactorVerification`
+
+- Only navigate to enterprise connections chooser when there are multiple `enterprise_sso` strategies as `supported_first_factors` ([#6983](https://github.com/clerk/javascript/pull/6983)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Updated dependencies [[`65b7cc7`](https://github.com/clerk/javascript/commit/65b7cc787a5f02a302b665b6eaf4d4b9a1cae4b0), [`6e09786`](https://github.com/clerk/javascript/commit/6e09786adeb0f481ca8b6d060ae8754b556a3f9a), [`aa7210c`](https://github.com/clerk/javascript/commit/aa7210c7fff34f6c6e2d4ca3cb736bbd35439cb6), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2eee6`](https://github.com/clerk/javascript/commit/1a2eee6b8b6ead2d0481e93104fcaed6452bd1b9), [`2cd53cd`](https://github.com/clerk/javascript/commit/2cd53cd8c713dfa7f2e802fe08986411587095fa), [`1a2430a`](https://github.com/clerk/javascript/commit/1a2430a166fb1df5fbca76437c63423b18a49ced), [`31a04fc`](https://github.com/clerk/javascript/commit/31a04fc2b783f01cd4848c1e681af3b30e57bb2f), [`9766c4a`](https://github.com/clerk/javascript/commit/9766c4afd26f2841d6f79dbdec2584ef8becd22f), [`22b8e49`](https://github.com/clerk/javascript/commit/22b8e49f9fb65d55ab737d11f1f57a25bf947511), [`a66357e`](https://github.com/clerk/javascript/commit/a66357e8a5928199aebde408ec7cfaac152c2c42), [`43a9c2b`](https://github.com/clerk/javascript/commit/43a9c2b4cd737b8dc49725b96aa8c51f3401c634), [`dacc1af`](https://github.com/clerk/javascript/commit/dacc1af22e1d1af0940b2d626b8a47d376c19342), [`b1ac445`](https://github.com/clerk/javascript/commit/b1ac445abd78d555e1572490d252f2cd1ea52fef)]:
+  - @clerk/types@4.93.0
+  - @clerk/shared@3.27.4
+  - @clerk/localizations@3.26.0
+
+## 5.99.0
+
+### Minor Changes
+
+- [Experimental] Add support for additional properties to Signal SignIn/SignUp ([#6897](https://github.com/clerk/javascript/pull/6897)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Display organization slug based on environment settings ([#6903](https://github.com/clerk/javascript/pull/6903)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`fba4781`](https://github.com/clerk/javascript/commit/fba4781ff2a2d16f8934029fa6fb77d70953f2be), [`a1f6714`](https://github.com/clerk/javascript/commit/a1f671480cda6f978db059ba0640d4ed8b08f112)]:
+  - @clerk/types@4.92.0
+  - @clerk/localizations@3.25.7
+  - @clerk/shared@3.27.3
+
+## 5.98.0
+
+### Minor Changes
+
+- Adding /oauth/oauth/end_session to frontendApiRedirectPathsNoUserInput ([#6890](https://github.com/clerk/javascript/pull/6890)) by [@Ben2W](https://github.com/Ben2W)
+
+- [Experimental] Add Signal support for Web3 APIs ([#6840](https://github.com/clerk/javascript/pull/6840)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Add auto focus behavior to otp input to enable pasting codes immediately ([#6863](https://github.com/clerk/javascript/pull/6863)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- feat(clerk-js): Enable debugLogger for Next.js keyless applications. ([#6886](https://github.com/clerk/javascript/pull/6886)) by [@heatlikeheatwave](https://github.com/heatlikeheatwave)
+
+- Ensure the back navigation within SignUpVerificationCode returns to the appropriate step within combined flow. ([#6909](https://github.com/clerk/javascript/pull/6909)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Improve appearance selectors for tasks, such as including it within `SignIn/SignUp` components ([#6861](https://github.com/clerk/javascript/pull/6861)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Updated dependencies [[`f737d26`](https://github.com/clerk/javascript/commit/f737d268aa167889a4f3f7aba2658c2ba1fd909a), [`8777f35`](https://github.com/clerk/javascript/commit/8777f350f5fb51413609a53d9de05b2e5d1d7cfe), [`2c0128b`](https://github.com/clerk/javascript/commit/2c0128b05ecf48748f27f10f0b0215a279ba6cc1)]:
+  - @clerk/types@4.91.0
+  - @clerk/shared@3.27.2
+  - @clerk/localizations@3.25.6
+
+## 5.97.0
+
+### Minor Changes
+
+- [Billing Beta] Drop top level billing flags from environment. Instead, use the payer specific flags. ([#6882](https://github.com/clerk/javascript/pull/6882)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Prevent leaking the `data-component-status` attribute for components other than `<PricingTable/>`. ([#6884](https://github.com/clerk/javascript/pull/6884)) by [@panteliselef](https://github.com/panteliselef)
+
+- Hide CTA for `<PricingTable forOrganization/>` when the user is does not have an active organization selected. ([#6883](https://github.com/clerk/javascript/pull/6883)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`37028ca`](https://github.com/clerk/javascript/commit/37028caad59cb0081ac74e70a44e4a419082a999)]:
+  - @clerk/types@4.90.0
+  - @clerk/localizations@3.25.5
+  - @clerk/shared@3.27.1
+
+## 5.96.0
+
+### Minor Changes
+
+- Udpate Tyepdoc links to fix temporary ignore warnings ([#6846](https://github.com/clerk/javascript/pull/6846)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Add new <UserAvatar /> component ([#6808](https://github.com/clerk/javascript/pull/6808)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Update active context cookie to properly set `Secure` attribute. ([#6851](https://github.com/clerk/javascript/pull/6851)) by [@brkalow](https://github.com/brkalow)
+
+- Updated dependencies [[`e3e77eb`](https://github.com/clerk/javascript/commit/e3e77eb277c6b36847265db7b863c418e3708ab6), [`9cf89cd`](https://github.com/clerk/javascript/commit/9cf89cd3402c278e8d5bfcd8277cee292bc45333), [`090ca74`](https://github.com/clerk/javascript/commit/090ca742c590bc4f369cf3e1ca2ec9917410ffe4), [`5546352`](https://github.com/clerk/javascript/commit/55463527df9a710ef3215c353bab1ef423d1de62)]:
+  - @clerk/shared@3.27.0
+  - @clerk/types@4.89.0
+  - @clerk/localizations@3.25.4
+
+## 5.95.0
+
+### Minor Changes
+
+- [Experimental] Add support for ticket sign-ins and sign-ups ([#6806](https://github.com/clerk/javascript/pull/6806)) by [@dstaley](https://github.com/dstaley)
+
+- [Billing Beta] Rename types, interfaces and classes that contain `commerce` to use `billing` instead. ([#6757](https://github.com/clerk/javascript/pull/6757)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Fix `TaskChooseOrganizationScreen` to render accepted suggestions properly ([#6804](https://github.com/clerk/javascript/pull/6804)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Correct ticket field reference in `SignUpStart.tsx` `handleSubmit` logic gate ([#6824](https://github.com/clerk/javascript/pull/6824)) by [@kduprey](https://github.com/kduprey)
+
+- Update jsdocs mentions of `@experimental` tag. ([#6651](https://github.com/clerk/javascript/pull/6651)) by [@panteliselef](https://github.com/panteliselef)
+
+- [Experimental] Correctly determine destination first factor based on identifier. ([#6789](https://github.com/clerk/javascript/pull/6789)) by [@dstaley](https://github.com/dstaley)
+
+- Update `<ArrowBlockButton />` icon sizing to be consistent with usage within billing components ([#6803](https://github.com/clerk/javascript/pull/6803)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`4a142e9`](https://github.com/clerk/javascript/commit/4a142e9ee5f9afafc127d9eeeece17db2c8de69e), [`41e0a41`](https://github.com/clerk/javascript/commit/41e0a4190b33dd2c4bdc0d536bbe83fcf99af9b0), [`1aa9e9f`](https://github.com/clerk/javascript/commit/1aa9e9f10c051319e9ff4b1a0ecd71507bd6a6aa), [`40e1b01`](https://github.com/clerk/javascript/commit/40e1b01171cf192aa7065e03543154c3d9c34850), [`a88ee58`](https://github.com/clerk/javascript/commit/a88ee5827adee0cc8a62246d03a3034d8566fe21), [`d6c7bbb`](https://github.com/clerk/javascript/commit/d6c7bbba23f38c0b3ca7edebb53028a05c7b38e6)]:
+  - @clerk/localizations@3.25.3
+  - @clerk/shared@3.26.1
+  - @clerk/types@4.88.0
+
 ## 5.94.0
 
 ### Minor Changes

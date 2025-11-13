@@ -8,7 +8,7 @@ import type {
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 type WebAuthnCreateCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAttestationResponse>;
 type WebAuthnGetCredentialReturn = CredentialReturn<PublicKeyCredentialWithAuthenticatorAssertionResponse>;

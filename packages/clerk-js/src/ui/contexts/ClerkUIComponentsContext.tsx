@@ -5,13 +5,12 @@ import type {
   TaskChooseOrganizationProps,
   UserButtonProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  ApiKeysContext,
-  CheckoutContext,
+  APIKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -22,7 +21,7 @@ import {
   SignInContext,
   SignUpContext,
   SubscriberTypeContext,
-  SubscriptionDetailsContext,
+  UserAvatarContext,
   UserButtonContext,
   UserProfileContext,
   UserVerificationContext,
@@ -52,6 +51,8 @@ export function ComponentContextProvider({
           {children}
         </UserVerificationContext.Provider>
       );
+    case 'UserAvatar':
+      return <UserAvatarContext.Provider value={{ componentName, ...props }}>{children}</UserAvatarContext.Provider>;
     case 'UserButton':
       return (
         <UserButtonContext.Provider value={{ componentName, ...(props as UserButtonProps) }}>
@@ -94,7 +95,12 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'organization' : 'user'}>
+        <SubscriberTypeContext.Provider
+          value={
+            // Backward compatibility: support legacy `forOrganizations: true`
+            (props as any).forOrganizations ? 'organization' : (props as PricingTableProps).for || 'user'
+          }
+        >
           <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
             {children}
           </PricingTableContext.Provider>
@@ -102,9 +108,9 @@ export function ComponentContextProvider({
       );
     case 'APIKeys':
       return (
-        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
+        <APIKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
           {children}
-        </ApiKeysContext.Provider>
+        </APIKeysContext.Provider>
       );
     case 'OAuthConsent':
       return (
@@ -120,14 +126,6 @@ export function ComponentContextProvider({
           {children}
         </TaskChooseOrganizationContext.Provider>
       );
-    case 'SubscriptionDetails':
-      return (
-        <SubscriptionDetailsContext.Provider value={{ componentName, ...props }}>
-          {children}
-        </SubscriptionDetailsContext.Provider>
-      );
-    case 'Checkout':
-      return <CheckoutContext.Provider value={{ componentName, ...props }}>{children}</CheckoutContext.Provider>;
     default:
       throw new Error(`Unknown component context: ${componentName}`);
   }

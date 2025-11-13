@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk/types';
+import type { HandleOAuthCallbackParams, HandleSamlCallbackParams } from '@clerk/shared/types';
 import React from 'react';
 
 import { Flow } from '../customizables';

@@ -1,5 +1,5 @@
 import { useSession } from '@clerk/shared/react';
-import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';

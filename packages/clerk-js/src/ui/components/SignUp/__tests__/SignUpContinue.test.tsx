@@ -1,11 +1,11 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import { waitFor } from '@testing-library/dom';
-import React from 'react';
+import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { render, screen } from '../../../../vitestUtils';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { SignUpContinue } from '../SignUpContinue';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -168,9 +168,8 @@ describe('SignUpContinue', () => {
     await userEvent.click(button);
 
     await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-    await waitFor(() =>
-      expect(screen.queryByText(/^Your username must be between 4 and 40 characters long./i)).toBeInTheDocument(),
-    );
+    const errorElement = await screen.findByTestId('form-feedback-error');
+    expect(errorElement).toHaveTextContent(/Your username must be between 4 and 40 characters long/i);
   });
 
   it('renders error for existing username', async () => {
@@ -203,9 +202,8 @@ describe('SignUpContinue', () => {
     await userEvent.click(button);
 
     await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-    await waitFor(() =>
-      expect(screen.queryByText(/^This username is taken. Please try another./i)).toBeInTheDocument(),
-    );
+    const errorElement = await screen.findByTestId('form-feedback-error');
+    expect(errorElement).toHaveTextContent(/This username is taken. Please try another/i);
   });
 
   describe('Sign in Link', () => {

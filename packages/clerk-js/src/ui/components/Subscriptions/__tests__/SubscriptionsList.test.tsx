@@ -1,9 +1,10 @@
-import type { BillingPayerResourceType } from '@clerk/types';
+import type { BillingPayerResourceType } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { render, waitFor } from '../../../../vitestUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
+
 import { localizationKeys } from '../../../customizables';
-import { bindCreateFixtures } from '../../../utils/vitest/createFixtures';
 import { SubscriptionsList } from '../SubscriptionsList';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -26,6 +27,7 @@ describe('SubscriptionsList', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top_empty',
       status: 'active',
@@ -46,6 +48,10 @@ describe('SubscriptionsList', () => {
     });
 
     expect(queryByText('Manage')).toBeNull();
+    expect(fixtures.clerk.billing.getPlans).not.toHaveBeenCalled();
+    expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
+    expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+    expect(fixtures.clerk.user.getPaymentMethods).toHaveBeenCalled();
   });
 
   it('shows switch plans CTA and hides Manage when there on free plan', async () => {
@@ -54,6 +60,9 @@ describe('SubscriptionsList', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockRejectedValue(null);
+    fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top_empty',
       status: 'active',
@@ -90,7 +99,6 @@ describe('SubscriptionsList', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-01-15'),
           canceledAt: null,
-          paymentSourceId: 'src_free',
           planPeriod: 'month' as const,
           isFreeTrial: false,
           pastDueAt: null,
@@ -155,7 +163,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-01-15'),
       canceledAt: null,
-      paymentSourceId: 'src_trial',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: true, // This subscription is in a free trial
@@ -165,6 +172,9 @@ describe('SubscriptionsList', () => {
       reload: vi.fn(),
     };
 
+    fixtures.clerk.billing.getPlans.mockRejectedValue(null);
+    fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top',
       status: 'active',
@@ -219,7 +229,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: null,
-      paymentSourceId: 'src_past_due',
       planPeriod: 'month' as const,
       status: 'past_due' as const,
       isFreeTrial: false,
@@ -229,6 +238,9 @@ describe('SubscriptionsList', () => {
       reload: vi.fn(),
     };
 
+    fixtures.clerk.billing.getPlans.mockRejectedValue(null);
+    fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top',
       status: 'past_due',
@@ -257,6 +269,9 @@ describe('SubscriptionsList', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockRejectedValue(null);
+    fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
 
     const activeSubscription = {
       id: 'sub_active',
@@ -284,7 +299,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: null,
-      paymentSourceId: 'src_active',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: false,
@@ -348,7 +362,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-02-01'),
       periodEnd: new Date('2021-03-01'),
       canceledAt: null,
-      paymentSourceId: 'src_upcoming',
       planPeriod: 'month' as const,
       status: 'upcoming' as const,
       isFreeTrial: false,
@@ -384,7 +397,6 @@ describe('SubscriptionsList', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2021-02-01'),
       canceledAt: new Date('2021-01-15'),
-      paymentSourceId: 'src_active_canceled',
       planPeriod: 'month' as const,
       status: 'active' as const,
       isFreeTrial: false,
@@ -394,6 +406,9 @@ describe('SubscriptionsList', () => {
       reload: vi.fn(),
     };
 
+    fixtures.clerk.billing.getPlans.mockRejectedValue(null);
+    fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue(null);
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top',
       status: 'active',
