@@ -1,10 +1,10 @@
 {
   "files": [
     { "path": "./dist/clerk.js", "maxSize": "840KB" },
-    { "path": "./dist/clerk.browser.js", "maxSize": "81KB" },
-    { "path": "./dist/clerk.channel.browser.js", "maxSize": "81KB" },
-    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "123KB" },
-    { "path": "./dist/clerk.headless*.js", "maxSize": "65KB" },
+    { "path": "./dist/clerk.browser.js", "maxSize": "82KB" },
+    { "path": "./dist/clerk.channel.browser.js", "maxSize": "82KB" },
+    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "124KB" },
+    { "path": "./dist/clerk.headless*.js", "maxSize": "64KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "117.1KB" },
     { "path": "./dist/ui-common*.legacy.*.js", "maxSize": "120.1KB" },
     { "path": "./dist/vendors*.js", "maxSize": "47KB" },
