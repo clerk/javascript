@@ -31,11 +31,12 @@ const usePathnameWithoutSplatRouteParams = () => {
     const pathname = route.path || '';
     const pathParts = pathname.split('/').filter(Boolean);
 
-    // In Nuxt, catch-all routes use [...slug] syntax
-    // route.params.slug is an array containing the catch-all segments
-    // Example: /profile/security/x/y -> params.slug = ["security", "x", "y"]
-    const slug = route.params.slug;
-    const catchAllSegments = Array.isArray(slug) ? slug : [];
+    // In Nuxt, catch-all routes use [...paramName] syntax
+    // Named params are strings, catch-all params are arrays
+    // We find all catch-all params by checking if the value is an array
+    const catchAllSegments = Object.values(route.params || {})
+      .filter((v): v is string[] => Array.isArray(v))
+      .flat();
 
     // Remove catch-all segments from the pathname
     // so we end up with the pathname where the components are mounted at
