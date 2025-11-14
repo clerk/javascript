@@ -123,7 +123,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
         predicate: query => {
           const key = query.queryKey;
           // Clear all queries that are marked as authenticated
-          return Array.isArray(key) && key[2] === true;
+          return Array.isArray(key) && key[1] === true;
         },
       });
 
