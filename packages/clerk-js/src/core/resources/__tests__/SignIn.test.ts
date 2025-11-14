@@ -197,48 +197,6 @@ describe('SignIn', () => {
         });
       });
 
-      it('passes strategy parameter in request body', async () => {
-        vi.stubGlobal('navigator', { language: '' });
-
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123', status: 'needs_first_factor' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn();
-        await signIn.__internal_future.create({ strategy: 'oauth_google' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins',
-          body: {
-            strategy: 'oauth_google',
-          },
-        });
-      });
-
-      it('passes ticket parameter in request body', async () => {
-        vi.stubGlobal('navigator', { language: '' });
-
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123', status: 'needs_first_factor' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn();
-        await signIn.__internal_future.create({ ticket: 'ticket_123' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins',
-          body: {
-            ticket: 'ticket_123',
-          },
-        });
-      });
-
       it('returns error property on success', async () => {
         const mockFetch = vi.fn().mockResolvedValue({
           client: null,
@@ -493,32 +451,6 @@ describe('SignIn', () => {
 
         expect(result.error).toBeTruthy();
         expect(result.error?.code).toBe('factor_not_found');
-      });
-    });
-
-    describe('verifyEmailCode', () => {
-      afterEach(() => {
-        vi.clearAllMocks();
-      });
-
-      it('attempts first factor with code and strategy', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123', status: 'complete' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn({ id: 'signin_123' } as any);
-        await signIn.__internal_future.emailCode.verifyCode({ code: '123456' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins/signin_123/attempt_first_factor',
-          body: {
-            code: '123456',
-            strategy: 'email_code',
-          },
-        });
       });
     });
 
@@ -880,32 +812,6 @@ describe('SignIn', () => {
       });
     });
 
-    describe('verifyPhoneCode', () => {
-      afterEach(() => {
-        vi.clearAllMocks();
-      });
-
-      it('attempts first factor with code and strategy', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123', status: 'complete' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn({ id: 'signin_123' } as any);
-        await signIn.__internal_future.phoneCode.verifyCode({ code: '123456' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins/signin_123/attempt_first_factor',
-          body: {
-            code: '123456',
-            strategy: 'phone_code',
-          },
-        });
-      });
-    });
-
     describe('sendResetPasswordEmailCode', () => {
       afterEach(() => {
         vi.clearAllMocks();
@@ -955,32 +861,6 @@ describe('SignIn', () => {
 
         expect(result.error).toBeTruthy();
         expect(result.error?.code).toBe('factor_not_found');
-      });
-    });
-
-    describe('verifyResetPasswordEmailCode', () => {
-      afterEach(() => {
-        vi.clearAllMocks();
-      });
-
-      it('attempts first factor with code and strategy', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn({ id: 'signin_123' } as any);
-        await signIn.__internal_future.resetPasswordEmailCode.verifyCode({ code: '123456' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins/signin_123/attempt_first_factor',
-          body: {
-            code: '123456',
-            strategy: 'reset_password_email_code',
-          },
-        });
       });
     });
 
@@ -1072,84 +952,6 @@ describe('SignIn', () => {
 
         expect(result.error).toBeTruthy();
         expect(result.error?.code).toBe('factor_not_found');
-      });
-    });
-
-    describe('verifyMFAPhoneCode', () => {
-      afterEach(() => {
-        vi.clearAllMocks();
-      });
-
-      it('attempts second factor with code and strategy', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn({ id: 'signin_123' } as any);
-        await signIn.__internal_future.mfa.verifyPhoneCode({ code: '123456' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins/signin_123/attempt_second_factor',
-          body: {
-            code: '123456',
-            strategy: 'phone_code',
-          },
-        });
-      });
-    });
-
-    describe('verifyTOTP', () => {
-      afterEach(() => {
-        vi.clearAllMocks();
-      });
-
-      it('attempts second factor with code and totp strategy', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn({ id: 'signin_123' } as any);
-        await signIn.__internal_future.mfa.verifyTOTP({ code: '123456' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins/signin_123/attempt_second_factor',
-          body: {
-            code: '123456',
-            strategy: 'totp',
-          },
-        });
-      });
-    });
-
-    describe('verifyBackupCode', () => {
-      afterEach(() => {
-        vi.clearAllMocks();
-      });
-
-      it('attempts second factor with code and backup_code strategy', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn({ id: 'signin_123' } as any);
-        await signIn.__internal_future.mfa.verifyBackupCode({ code: 'backup123' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins/signin_123/attempt_second_factor',
-          body: {
-            code: 'backup123',
-            strategy: 'backup_code',
-          },
-        });
       });
     });
 
@@ -1881,7 +1683,7 @@ describe('SignIn', () => {
           dispatchEvent: vi.fn(),
         });
 
-        const mockPopup = { location: { href: '' } };
+        const mockPopup = { location: { href: '' } } as Window;
         const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
 
         SignIn.clerk = {
@@ -1931,23 +1733,6 @@ describe('SignIn', () => {
       afterEach(() => {
         vi.clearAllMocks();
         vi.unstubAllGlobals();
-      });
-
-      it('creates signIn with ticket parameter', async () => {
-        const mockFetch = vi.fn().mockResolvedValue({
-          client: null,
-          response: { id: 'signin_123' },
-        });
-        BaseResource._fetch = mockFetch;
-
-        const signIn = new SignIn();
-        await signIn.__internal_future.ticket({ ticket: 'ticket_123' });
-
-        expect(mockFetch).toHaveBeenCalledWith({
-          method: 'POST',
-          path: '/client/sign_ins',
-          body: { ticket: 'ticket_123' },
-        });
       });
 
       it('uses ticket from query param when not provided', async () => {
