@@ -505,6 +505,35 @@ describe('usePagesOrInfinite - behaviors mirrored from useCoreOrganization', () 
 });
 
 describe('usePagesOrInfinite - revalidate behavior', () => {
+  it('refetches current data when revalidate is invoked', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({
+        data: [{ id: 'initial-1' }],
+        total_count: 1,
+      })
+      .mockResolvedValueOnce({
+        data: [{ id: 'refetched-1' }],
+        total_count: 1,
+      });
+
+    const params = { initialPage: 1, pageSize: 1 };
+    const config = buildConfig(params);
+    const keys = buildKeys('t-revalidate-refresh', params);
+
+    const { result } = renderUsePagesOrInfinite({ fetcher, config, keys });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([{ id: 'initial-1' }]);
+
+    await act(async () => {
+      await (result.current as any).revalidate();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual([{ id: 'refetched-1' }]));
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
   it('pagination mode: isFetching toggles during revalidate, isLoading stays false after initial load', async () => {
     const deferred = createDeferredPromise();
     let callCount = 0;
@@ -653,6 +682,47 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
       { id: 'p2-0-revalidate' },
       { id: 'p2-1-revalidate' },
     ]);
+  });
+
+  it('cascades revalidation to related queries only in React Query mode', async () => {
+    const params = { initialPage: 1, pageSize: 1 };
+    const keys = buildKeys('t-revalidate-cascade', params, { userId: 'user_123' });
+    const fetcher = vi.fn(async ({ initialPage }: any) => ({
+      data: [{ id: `item-${initialPage}-${fetcher.mock.calls.length}` }],
+      total_count: 3,
+    }));
+
+    const useBoth = () => {
+      const paginated = usePagesOrInfinite({
+        fetcher,
+        config: buildConfig(params),
+        keys,
+      });
+      const infinite = usePagesOrInfinite({
+        fetcher,
+        config: buildConfig(params, { infinite: true }),
+        keys,
+      });
+
+      return { paginated, infinite };
+    };
+
+    const { result } = renderHook(useBoth, { wrapper });
+
+    await waitFor(() => expect(result.current.paginated.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.infinite.isLoading).toBe(false));
+
+    fetcher.mockClear();
+
+    await act(async () => {
+      await result.current.paginated.revalidate();
+    });
+
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(2));
+    } else {
+      await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(1));
+    }
   });
 });
 
