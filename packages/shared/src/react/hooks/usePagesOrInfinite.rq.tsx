@@ -1,17 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useReducer, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
+import { useClearCacheOnSignOut } from './useClearCacheOnSignOut';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
-import { usePreviousValue } from './usePreviousValue';
 
 /**
+ * Returns the previous query data unchanged to preserve existing results.
+ *
  * @internal
  */
 function KeepPreviousDataFn<Data>(previousData: Data): Data {
@@ -37,10 +39,49 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const queriesEnabled = enabled && Boolean(fetcher) && !cacheMode && isSignedIn !== false;
 
   // Force re-render counter for cache-only updates
-  const [forceUpdateCounter, setForceUpdateCounter] = useState(0);
-  const forceUpdate = useCallback((updater: (n: number) => number) => {
-    setForceUpdateCounter(updater);
-  }, []);
+  const [, forceRerender] = useReducer((n: number) => n + 1, 0);
+  const forceUpdate = useCallback(() => {
+    forceRerender();
+  }, [forceRerender]);
+
+  const clearCacheOnSignOut = useCallback(() => {
+    const predicate = (query: { queryKey: unknown }) => {
+      const key = query.queryKey;
+      return (
+        (Array.isArray(key) && key[0] === 'clerk-pages') || (Array.isArray(key) && key[0] === 'clerk-pages-infinite')
+      );
+    };
+
+    queryClient.setQueriesData({ predicate }, (oldData: any) => {
+      if (!oldData) {
+        return oldData;
+      }
+
+      if (Array.isArray(oldData.pages)) {
+        const pageParams = Array.isArray(oldData.pageParams)
+          ? oldData.pageParams.map(() => initialPageRef.current)
+          : [];
+
+        return {
+          ...oldData,
+          pages: [],
+          pageParams,
+        };
+      }
+
+      if (Array.isArray(oldData.data)) {
+        return {
+          ...oldData,
+          data: [],
+          total_count: 0,
+        };
+      }
+
+      return oldData;
+    });
+
+    setPaginatedPage(initialPageRef.current);
+  }, [queryClient]);
 
   // Non-infinite mode: single page query
   const pagesQueryKey = useMemo(() => {
@@ -105,34 +146,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     enabled: queriesEnabled && triggerInfinite,
   });
 
-  // Track previous isSignedIn state to detect sign-out transitions
-  const previousIsSignedIn = usePreviousValue(isSignedIn);
-
-  // Detect sign-out and clear queries
-  useEffect(() => {
-    const isNowSignedOut = isSignedIn === false;
-
-    if (previousIsSignedIn && isNowSignedOut) {
-      // Clear ALL queries matching the base query keys (including old userId)
-      // Use predicate to match queries that start with 'clerk-pages' or 'clerk-pages-infinite'
-
-      queryClient.removeQueries({
-        predicate: query => {
-          const key = query.queryKey;
-          return (
-            (Array.isArray(key) && key[0] === 'clerk-pages') ||
-            (Array.isArray(key) && key[0] === 'clerk-pages-infinite')
-          );
-        },
-      });
-
-      // Reset paginated page to initial
-      setPaginatedPage(initialPageRef.current);
-
-      // Force re-render to reflect cache changes
-      void Promise.resolve().then(() => forceUpdate(n => n + 1));
-    }
-  }, [isSignedIn, queryClient, previousIsSignedIn, forceUpdate]);
+  useClearCacheOnSignOut({ onSignOut: clearCacheOnSignOut });
 
   const page = useMemo(() => {
     if (triggerInfinite) {
@@ -174,13 +188,14 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
     // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
     // This ensures that after cache clearing, we return empty data
-    const pageData = queriesEnabled
-      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
-      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
-    return pageData?.data ?? [];
+    if (queriesEnabled) {
+      return singlePageQuery.data?.data ?? [];
+    }
+
+    const cachedPage = queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    return cachedPage?.data ?? [];
   }, [
     queriesEnabled,
-    forceUpdateCounter,
     triggerInfinite,
     singlePageQuery.data,
     infiniteQuery.data,
@@ -199,13 +214,14 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
     // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
     // This ensures that after cache clearing, we return 0
-    const pageData = queriesEnabled
-      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
-      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
-    return pageData?.total_count ?? 0;
+    if (queriesEnabled) {
+      return singlePageQuery.data?.total_count ?? 0;
+    }
+
+    const cachedPage = queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    return cachedPage?.total_count ?? 0;
   }, [
     queriesEnabled,
-    forceUpdateCounter,
     triggerInfinite,
     singlePageQuery.data,
     infiniteQuery.data,
@@ -254,7 +270,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
         return { ...prevValue, pages: nextPages };
       });
       // Force re-render to reflect cache changes
-      forceUpdate(n => n + 1);
+      forceUpdate();
       return Promise.resolve();
     }
     queryClient.setQueryData(pagesQueryKey, (prevValue: any = { data: [], total_count: 0 }) => {
@@ -262,7 +278,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return nextValue;
     });
     // Force re-render to reflect cache changes
-    forceUpdate(n => n + 1);
+    forceUpdate();
     return Promise.resolve();
   };
 

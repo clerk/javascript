@@ -10,11 +10,14 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { useClearCacheOnSignOut } from './useClearCacheOnSignOut';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const HOOK_NAME = 'useSubscription';
 
 /**
+ * Returns the previous query data unchanged to preserve existing results.
+ *
  * @internal
  */
 function KeepPreviousDataFn<Data>(previousData: Data): Data {
@@ -47,6 +50,11 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   const [queryClient] = useClerkQueryClient();
 
+  const clearSubscriptionCache = useCallback(() => {
+    queryClient.setQueriesData({ queryKey: ['commerce-subscription'] }, () => undefined);
+    queryClient.removeQueries({ queryKey: ['commerce-subscription'] });
+  }, [queryClient]);
+
   const queryKey = useMemo(() => {
     return [
       'commerce-subscription',
@@ -71,6 +79,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   });
 
   const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
+
+  useClearCacheOnSignOut({ onSignOut: clearSubscriptionCache });
 
   return {
     data: query.data,

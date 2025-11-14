@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDeferredPromise } from '../../../utils/createDeferredPromise';
@@ -54,6 +54,9 @@ describe('useSubscription', () => {
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = userBillingEnabled;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
     defaultQueryClient.client.clear();
+    mockClerk.user = mockUser;
+    mockClerk.organization = mockOrganization;
+    mockClerk.__unsafe__emitResources({ user: mockUser, organization: mockOrganization });
   });
 
   it('does not fetch when billing disabled for user', () => {
@@ -102,6 +105,10 @@ describe('useSubscription', () => {
 
     // Simulate sign-out
     mockUser = null;
+    mockClerk.user = mockUser;
+    act(() => {
+      mockClerk.__unsafe__emitResources({ user: null });
+    });
     rerender();
 
     if (__CLERK_USE_RQ__) {
@@ -130,6 +137,10 @@ describe('useSubscription', () => {
 
     // Simulate sign-out
     mockUser = null;
+    mockClerk.user = mockUser;
+    act(() => {
+      mockClerk.__unsafe__emitResources({ user: null });
+    });
     rerender({ kp: true });
 
     if (__CLERK_USE_RQ__) {

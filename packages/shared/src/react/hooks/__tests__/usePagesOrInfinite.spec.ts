@@ -16,7 +16,7 @@ vi.mock('../../contexts', () => {
   return {
     useAssertWrappedByClerkProvider: () => {},
     useClerkInstanceContext: () => mockClerk,
-    useUserContext: () => ({ id: 'user_123' }),
+    useUserContext: () => mockClerk.user,
     useOrganizationContext: () => ({ organization: { id: 'org_123' } }),
   };
 });
@@ -25,6 +25,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   defaultQueryClient.client.clear();
   mockClerk.loaded = true;
+  mockClerk.user = { id: 'user_123' };
+  mockClerk.__unsafe__emitResources({ user: mockClerk.user });
 });
 
 describe('usePagesOrInfinite - basic pagination', () => {
@@ -77,7 +79,7 @@ describe('usePagesOrInfinite - basic pagination', () => {
 
     // setData should update cached data without revalidation
     await act(async () => {
-      await (result.current as any).setData((prev: any) => ({ ...prev, data: [{ id: 'mutated' }] }));
+      await result.current.setData((prev: any) => ({ ...prev, data: [{ id: 'mutated' }] }));
     });
     expect(result.current.data).toEqual([{ id: 'mutated' }]);
   });
@@ -180,13 +182,13 @@ describe('usePagesOrInfinite - infinite mode', () => {
 
     // setData should replace the aggregated pages
     await act(async () => {
-      await (result.current as any).setData([{ data: [{ id: 'X' }], total_count: 1 }]);
+      await result.current.setData([{ data: [{ id: 'X' }], total_count: 1 }]);
     });
     expect(result.current.data).toEqual([{ id: 'X' }]);
 
     // revalidate should not throw
     await act(async () => {
-      await (result.current as any).revalidate();
+      await result.current.revalidate();
     });
   });
 });
@@ -263,14 +265,14 @@ describe('usePagesOrInfinite - cache mode', () => {
     expect(fetcher).toHaveBeenCalledTimes(0);
 
     await act(async () => {
-      await (result.current as any).setData({ data: [{ id: 'cached' }], total_count: 1 });
+      await result.current.setData({ data: [{ id: 'cached' }], total_count: 1 });
     });
 
     expect(result.current.data).toEqual([{ id: 'cached' }]);
     expect(result.current.count).toBe(1);
 
     await act(async () => {
-      await (result.current as any).revalidate();
+      await result.current.revalidate();
     });
   });
 });
@@ -346,6 +348,36 @@ describe('usePagesOrInfinite - keepPreviousData behavior', () => {
     deferred.resolve(undefined);
     await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data).toEqual([{ id: 'p2-a' }, { id: 'p2-b' }]);
+  });
+});
+
+describe('usePagesOrInfinite - sign-out cache clearing', () => {
+  it('clears cached data when Clerk emits a sign-out event', async () => {
+    const fetcher = vi.fn(async (p: any) => ({
+      data: Array.from({ length: p.pageSize }, (_, i) => ({ id: `p${p.initialPage}-${i}` })),
+      total_count: 4,
+    }));
+
+    const params = { initialPage: 1, pageSize: 2 } as const;
+    const config = { infinite: false, enabled: true } as const;
+    const cacheKeys = { type: 't-signout' } as const;
+
+    const { result } = renderHook(
+      () => usePagesOrInfinite(params as any, fetcher as any, config as any, cacheKeys as any),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toHaveLength(2);
+
+    await act(async () => {
+      mockClerk.__unsafe__emitResources({ user: null });
+      await Promise.resolve();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual([]));
+    await waitFor(() => expect(result.current.count).toBe(0));
+    expect(result.current.page).toBe(1);
   });
 });
 
@@ -529,7 +561,7 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
 
     // Trigger revalidate
     act(() => {
-      (result.current as any).revalidate();
+      result.current.revalidate();
     });
 
     // isFetching should become true, but isLoading should stay false after initial load
@@ -575,7 +607,7 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
 
     // Trigger revalidate
     act(() => {
-      (result.current as any).revalidate();
+      result.current.revalidate();
     });
 
     // isFetching should become true, but isLoading should stay false after initial load
@@ -635,7 +667,7 @@ describe('usePagesOrInfinite - revalidate behavior', () => {
 
     // Trigger revalidate
     await act(async () => {
-      await (result.current as any).revalidate();
+      await result.current.revalidate();
     });
 
     await waitFor(() => expect(result.current.isFetching).toBe(false));
@@ -852,7 +884,7 @@ describe('usePagesOrInfinite - query state transitions and remounting', () => {
 
     // Trigger refetch
     act(() => {
-      (result.current as any).revalidate();
+      result.current.revalidate();
     });
 
     await waitFor(() => expect(result.current.isFetching).toBe(true));

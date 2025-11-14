@@ -26,6 +26,7 @@ export function createMockQueryClient() {
  */
 export function createMockClerk(overrides: any = {}) {
   const queryClient = overrides.queryClient || createMockQueryClient();
+  const listeners: Array<(resources: any) => void> = [];
 
   const mockClerk: any = {
     loaded: true,
@@ -42,6 +43,44 @@ export function createMockClerk(overrides: any = {}) {
     },
     ...overrides,
   };
+
+  let currentResources: {
+    client: any;
+    session: any;
+    user: any;
+    organization: any;
+  } = {
+    client: mockClerk.client,
+    session: mockClerk.session,
+    user: mockClerk.user ?? null,
+    organization: mockClerk.organization ?? null,
+  };
+
+  if (!mockClerk.addListener) {
+    mockClerk.addListener = vi.fn((listener: (resources: typeof currentResources) => void) => {
+      listeners.push(listener);
+      listener({ ...currentResources });
+      return () => {
+        const index = listeners.indexOf(listener);
+        if (index >= 0) {
+          listeners.splice(index, 1);
+        }
+      };
+    });
+  }
+
+  if (!mockClerk.__unsafe__emitResources) {
+    mockClerk.__unsafe__emitResources = (resources: Partial<typeof currentResources>) => {
+      currentResources = { ...currentResources, ...resources };
+      if ('user' in resources) {
+        mockClerk.user = resources.user;
+      }
+      if ('organization' in resources) {
+        mockClerk.organization = resources.organization;
+      }
+      listeners.forEach(listener => listener({ ...currentResources }));
+    };
+  }
 
   // Add query client as getter if not already set
   if (!Object.getOwnPropertyDescriptor(mockClerk, '__internal_queryClient')) {
