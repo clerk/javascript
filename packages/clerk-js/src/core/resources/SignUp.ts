@@ -55,7 +55,11 @@ import {
   getOKXWalletIdentifier,
   windowNavigate,
 } from '../../utils';
-import { _authenticateWithPopup } from '../../utils/authenticateWithPopup';
+import {
+  _authenticateWithPopup,
+  _futureAuthenticateWithPopup,
+  wrapWithPopupRoutes,
+} from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
@@ -789,7 +793,17 @@ class SignUpFuture implements SignUpFutureResource {
   }
 
   async sso(params: SignUpFutureSSOParams): Promise<{ error: ClerkError | null }> {
-    const { strategy, redirectUrl, redirectCallbackUrl } = params;
+    const {
+      strategy,
+      redirectUrl,
+      redirectCallbackUrl,
+      unsafeMetadata,
+      legalAccepted,
+      oidcPrompt,
+      enterpriseConnectionId,
+      emailAddress,
+      popup,
+    } = params;
     return runAsyncResourceTask(this.resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
@@ -800,24 +814,56 @@ class SignUpFuture implements SignUpFutureResource {
         redirectUrlComplete = window.location.origin + redirectUrl;
       }
 
-      await this.resource.__internal_basePost({
-        path: this.resource.pathRoot,
-        body: {
-          strategy,
-          redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
-          redirectUrlComplete,
-          captchaToken,
-          captchaWidgetType,
-          captchaError,
-        },
+      const routes = {
+        redirectUrl: SignUp.clerk.buildUrlWithAuth(redirectCallbackUrl),
+        actionCompleteRedirectUrl: redirectUrlComplete,
+      };
+      if (popup) {
+        const wrappedRoutes = wrapWithPopupRoutes(SignUp.clerk, {
+          redirectCallbackUrl: routes.redirectUrl,
+          redirectUrl: redirectUrlComplete,
+        });
+        routes.redirectUrl = wrappedRoutes.redirectCallbackUrl;
+        routes.actionCompleteRedirectUrl = wrappedRoutes.redirectUrl;
+      }
+
+      const authenticateFn = () => {
+        return this.resource.__internal_basePost({
+          path: this.resource.pathRoot,
+          body: {
+            strategy,
+            ...routes,
+            unsafeMetadata,
+            legalAccepted,
+            oidcPrompt,
+            enterpriseConnectionId,
+            emailAddress,
+            captchaToken,
+            captchaWidgetType,
+            captchaError,
+          },
+        });
+      };
+
+      await authenticateFn().catch(async e => {
+        if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          await SignUp.clerk.__unstable__environment!.reload();
+          return authenticateFn();
+        }
+        throw e;
       });
 
       const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
 
-      if (status === 'unverified' && !!externalVerificationRedirectURL) {
-        windowNavigate(externalVerificationRedirectURL);
-      } else {
-        clerkInvalidFAPIResponse(status, SignUp.fapiClient.buildEmailAddress('support'));
+      if (status === 'unverified' && externalVerificationRedirectURL) {
+        if (popup) {
+          await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
+          // Pick up the modified SignUp resource
+          await this.resource.reload();
+        } else {
+          windowNavigate(externalVerificationRedirectURL);
+        }
       }
     });
   }
