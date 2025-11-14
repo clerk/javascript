@@ -139,7 +139,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
           ? ({ for: safeFor } as const)
           : ({
               userId: user?.id,
-              ...(isForOrganization ? { orgId: organization?.id } : {}),
+              ...(isForOrganization ? { [__CLERK_USE_RQ__ ? 'orgId' : '_orgId']: organization?.id } : {}),
             } as const),
         untracked: {
           args: hookParams as TParams,
