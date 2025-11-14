@@ -784,7 +784,7 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   planPeriod: BillingSubscriptionPlanPeriod;
   /**
-   * Unix timestamp (milliseconds) of when the current period starts.
+   * The start date of the plan period, represented as a Unix timestamp.
    */
   planPeriodStart?: number;
   /**

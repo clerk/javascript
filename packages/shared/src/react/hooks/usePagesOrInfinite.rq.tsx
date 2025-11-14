@@ -11,6 +11,13 @@ import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
 
+/**
+ * @internal
+ */
+function KeepPreviousDataFn<Data>(previousData: Data): Data {
+  return previousData;
+}
+
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
   const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
 
@@ -65,7 +72,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,
     // Use placeholderData to keep previous data while fetching new page
-    placeholderData: keepPreviousData ? previousData => previousData : undefined,
+    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
   });
 
   // Infinite mode: accumulate pages

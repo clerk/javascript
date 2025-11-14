@@ -35,9 +35,10 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const billingEnabled = isOrganization
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
+  const isEnabled = (params?.enabled ?? true) && billingEnabled;
 
   const swr = useSWR(
-    billingEnabled
+    isEnabled
       ? {
           type: 'commerce-subscription',
           userId: user?.id,

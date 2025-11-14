@@ -608,6 +608,12 @@ export const koKR: LocalizationResource = {
       subtitle: '{{applicationName}}로 계속하려면',
       title: '이메일을 확인하세요',
     },
+    emailCodeMfa: {
+      formTitle: '이메일을 확인하세요',
+      resendButton: '코드를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}로 계속하려면',
+      title: '이메일을 확인하세요',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -643,6 +649,12 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',
+      resendButton: '링크를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}(으)로 계속',
+      title: '이메일을 확인하세요',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +672,7 @@ export const koKR: LocalizationResource = {
       label__alternativeMethods: '또는 다른 방법으로 로그인',
       title: '비밀번호를 잊으셨나요?',
     },
+    newDeviceVerificationNotice: '새로운 기기에서 로그인하고 있습니다. 계정 보안을 위해 확인을 요청하고 있습니다.',
     noAvailableMethods: {
       message: '로그인을 계속할 수 없습니다. 사용 가능한 인증 방법이 없습니다.',
       subtitle: '오류가 발생했습니다',

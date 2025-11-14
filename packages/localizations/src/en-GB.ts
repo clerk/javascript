@@ -613,6 +613,12 @@ export const enGB: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
+    emailCodeMfa: {
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -649,6 +655,12 @@ export const enGB: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use the verification link sent to your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const enGB: LocalizationResource = {
       label__alternativeMethods: 'Or, sign in with another method',
       title: 'Forgot Password?',
     },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     noAvailableMethods: {
       message: "Cannot proceed with sign in. There's no available authentication factor.",
       subtitle: 'An error occurred',

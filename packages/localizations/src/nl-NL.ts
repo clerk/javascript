@@ -613,6 +613,12 @@ export const nlNL: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Check je e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Check je e-mail',
+      resendButton: 'Niet ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Check je e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'De client komt niet overeen met wat verwacht werd. Probeer het opnieuw.',
@@ -648,6 +654,12 @@ export const nlNL: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gebruik de verificatielink die naar je e-mail is verzonden',
+      resendButton: 'Geen link ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Controleer je e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const nlNL: LocalizationResource = {
       label__alternativeMethods: 'Of log in met een andere methode',
       title: 'Wachtwoord vergeten?',
     },
+    newDeviceVerificationNotice:
+      'Je meldt je aan vanaf een nieuw apparaat. We vragen om verificatie om je account veilig te houden.',
     noAvailableMethods: {
       message: 'Het is niet mogelijk om door te gaan met inloggen. Er is geen beschikbare authenticatiefactor.',
       subtitle: 'Er heeft zich een fout voorgedaan',
