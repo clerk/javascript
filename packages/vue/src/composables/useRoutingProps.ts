@@ -1,40 +1,41 @@
-import { buildErrorThrower } from '@clerk/shared/error';
 import type { RoutingOptions } from '@clerk/shared/types';
 import type { ComputedRef, MaybeRefOrGetter } from 'vue';
 import { computed, toValue } from 'vue';
 
+import { errorThrower } from '../errors/errorThrower';
 import { incompatibleRoutingWithPathProvidedError, noPathProvidedError } from '../errors/messages';
-
-const errorThrower = buildErrorThrower({ packageName: '@clerk/nuxt' });
 
 export function useRoutingProps<T extends RoutingOptions>(
   componentName: string,
-  props: T,
+  props: MaybeRefOrGetter<T>,
   routingOptions?: MaybeRefOrGetter<RoutingOptions>,
 ): ComputedRef<T> {
-  const path = computed(() => props.path || toValue(routingOptions)?.path);
-  const routing = computed(() => props.routing || toValue(routingOptions)?.routing || 'path');
-
   return computed(() => {
-    if (routing.value === 'path') {
-      if (!path.value) {
+    const propsValue = toValue(props) || {};
+    const routingOptionsValue = toValue(routingOptions);
+
+    const path = propsValue.path || routingOptionsValue?.path;
+    const routing = propsValue.routing || routingOptionsValue?.routing || 'path';
+
+    if (routing === 'path') {
+      if (!path) {
         return errorThrower.throw(noPathProvidedError(componentName));
       }
 
       return {
-        ...toValue(routingOptions),
-        ...props,
+        ...routingOptionsValue,
+        ...propsValue,
         routing: 'path',
       };
     }
 
-    if (props.path) {
+    if (propsValue.path) {
       return errorThrower.throw(incompatibleRoutingWithPathProvidedError(componentName));
     }
 
     return {
-      ...toValue(routingOptions),
-      ...props,
+      ...routingOptionsValue,
+      ...propsValue,
       path: undefined,
     };
   });
