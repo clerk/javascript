@@ -3,6 +3,20 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
 
+// Mock the authenticateWithPopup module
+vi.mock('../../../utils/authenticateWithPopup', async () => {
+  const actual = await vi.importActual<typeof import('../../../utils/authenticateWithPopup')>(
+    '../../../utils/authenticateWithPopup',
+  );
+  return {
+    ...actual,
+    _futureAuthenticateWithPopup: vi.fn(),
+  };
+});
+
+// Import the mocked function after mocking
+import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
+
 describe('SignIn', () => {
   describe('signIn.create', () => {
     afterEach(() => {
@@ -1678,54 +1692,77 @@ describe('SignIn', () => {
       });
 
       it('uses popup when provided', async () => {
-        vi.stubGlobal('window', {
-          location: { origin: 'https://example.com' },
-          dispatchEvent: vi.fn(),
-        });
+        vi.stubGlobal('window', { location: { origin: 'https://example.com' } });
 
         const mockPopup = { location: { href: '' } } as Window;
-        const mockBuildUrlWithAuth = vi.fn().mockReturnValue('https://example.com/sso-callback');
+        const mockBuildUrlWithAuth = vi.fn().mockImplementation(url => {
+          // Convert relative URLs to absolute
+          if (url.startsWith('/')) {
+            return 'https://example.com' + url;
+          }
+          return url;
+        });
 
         SignIn.clerk = {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
+          frontendApi: 'clerk.example.com',
         } as any;
 
-        const mockFetch = vi
-          .fn()
-          .mockResolvedValueOnce({
-            client: null,
-            response: { id: 'signin_123' },
-          })
-          .mockResolvedValueOnce({
-            client: null,
-            response: {
-              id: 'signin_123',
-              first_factor_verification: {
-                status: 'unverified',
-                external_verification_redirect_url: 'https://sso.example.com/auth',
-              },
+        const mockFetch = vi.fn();
+        // First call: create signIn - returns with first_factor_verification
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_123',
+            first_factor_verification: {
+              status: 'unverified',
+              external_verification_redirect_url: 'https://sso.example.com/auth',
             },
-          })
-          .mockResolvedValueOnce({
-            client: null,
-            response: {
-              id: 'signin_123',
-              status: 'complete',
-            },
-          });
+          },
+        });
+        // Second call: reload after popup
+        mockFetch.mockResolvedValueOnce({
+          client: null,
+          response: {
+            id: 'signin_123',
+            status: 'complete',
+          },
+        });
         BaseResource._fetch = mockFetch;
 
+        vi.mocked(_futureAuthenticateWithPopup).mockImplementation(async (_clerk, params) => {
+          // Simulate the actual behavior of setting popup href
+          params.popup.location.href = params.externalVerificationRedirectURL.toString();
+        });
+
         const signIn = new SignIn();
-        await signIn.__internal_future.sso({
+        const result = await signIn.__internal_future.sso({
           strategy: 'oauth_google',
           redirectUrl: 'https://complete.example.com',
           redirectCallbackUrl: '/sso-callback',
           popup: mockPopup,
         });
 
-        // Should create signIn - exact number of calls depends on popup flow
-        expect(mockFetch).toHaveBeenCalled();
+        expect(result.error).toBeNull();
+        expect(_futureAuthenticateWithPopup).toHaveBeenCalledWith(
+          SignIn.clerk,
+          expect.objectContaining({
+            popup: mockPopup,
+            externalVerificationRedirectURL: expect.any(URL),
+          }),
+        );
+        expect(mockPopup.location.href).toBe('https://sso.example.com/auth');
+
+        // Verify that wrapWithPopupRoutes was used by checking the fetch body contains popup-callback URLs
+        expect(mockFetch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: expect.objectContaining({
+              redirectUrl: expect.stringContaining('/popup-callback'),
+              actionCompleteRedirectUrl: expect.stringContaining('/popup-callback'),
+            }),
+          }),
+        );
       });
     });
 
