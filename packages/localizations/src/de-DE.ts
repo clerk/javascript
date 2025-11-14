@@ -625,6 +625,12 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Überprüfen Sie Ihren Posteingang',
     },
+    emailCodeMfa: {
+      formTitle: 'Überprüfen Sie Ihren Posteingang',
+      resendButton: 'Bestätigungscode nicht erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Die Anfrage stammt von einem nicht kompatiblen Client.',
@@ -660,6 +666,12 @@ export const deDE: LocalizationResource = {
         titleNewTab: 'In einem anderen Tab angemeldet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Verwenden Sie den an Ihre E-Mail gesendeten Bestätigungslink',
+      resendButton: 'Keinen Link erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -677,6 +689,8 @@ export const deDE: LocalizationResource = {
       label__alternativeMethods: 'Oder melden Sie sich mit einer anderen Methode an',
       title: 'Passwort vergessen?',
     },
+    newDeviceVerificationNotice:
+      'Sie melden sich von einem neuen Gerät an. Wir bitten um eine Überprüfung, um Ihr Konto sicher zu halten.',
     noAvailableMethods: {
       message: 'Die Anmeldung kann nicht fortgesetzt werden. Es ist kein Authentifizierungsfaktor verfügbar.',
       subtitle: 'Ein Fehler ist aufgetreten',

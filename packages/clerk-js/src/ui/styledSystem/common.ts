@@ -84,13 +84,16 @@ const borderVariants = (t: InternalTheme, props?: any) => {
     '{{color}}',
     !props?.hasError ? t.colors.$borderAlpha150 : t.colors.$dangerAlpha200,
   );
-  const hoverStyles = {
-    '&:hover': {
-      WebkitTapHighlightColor: 'transparent',
-      borderColor: hoverBorderColor,
-      boxShadow: hoverBoxShadow,
-    },
-  };
+  const hoverStyles =
+    props?.hoverStyles === false
+      ? {}
+      : {
+          '&:hover': {
+            WebkitTapHighlightColor: 'transparent',
+            borderColor: hoverBorderColor,
+            boxShadow: hoverBoxShadow,
+          },
+        };
   const focusStyles =
     props?.focusRing === false
       ? {}
@@ -107,16 +110,26 @@ const borderVariants = (t: InternalTheme, props?: any) => {
             ].toString(),
           },
         };
+
+  const borderColor = !props?.hasError
+    ? !props?.hasWarning
+      ? t.colors.$borderAlpha150 // Default border color
+      : t.colors.$warningAlpha300 // Warning border color
+    : t.colors.$dangerAlpha500; // Error border color
+
+  const boxShadow = !props?.hasError
+    ? !props?.hasWarning
+      ? t.colors.$borderAlpha100 // Default box shadow color
+      : t.colors.$warningAlpha50 // Warning box shadow color
+    : t.colors.$borderAlpha150; // Error box shadow color
+
   return {
     normal: {
       borderRadius: t.radii.$md,
       borderWidth: t.borderWidths.$normal,
       borderStyle: t.borderStyles.$solid,
-      borderColor: !props?.hasError ? t.colors.$borderAlpha150 : t.colors.$dangerAlpha500,
-      boxShadow: t.shadows.$input.replace(
-        '{{color}}',
-        !props?.hasError ? t.colors.$borderAlpha100 : t.colors.$borderAlpha150,
-      ),
+      borderColor,
+      boxShadow: t.shadows.$input.replace('{{color}}', boxShadow),
       transitionProperty: t.transitionProperty.$common,
       transitionTimingFunction: t.transitionTiming.$common,
       transitionDuration: t.transitionDuration.$focusRing,
