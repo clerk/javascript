@@ -1,0 +1,14 @@
+{
+  "name": "@clerk/eslint-plugin-tree-shaking",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@types/estree": "^1.0.8",
+    "@types/estree-jsx": "^1.0.5",
+    "eslint": "9.31.0"
+  }
+}
