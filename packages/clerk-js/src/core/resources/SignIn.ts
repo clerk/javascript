@@ -1,5 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-import { ClerkWebAuthnError } from '@clerk/shared/error';
+import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -686,18 +686,19 @@ class SignInFuture implements SignInFutureResource {
     return this.resource.secondFactorVerification;
   }
 
-  async sendResetPasswordEmailCode(): Promise<{ error: unknown }> {
+  async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
+    if (!this.resource.id) {
+      throw new Error('Cannot reset password without a sign in.');
+    }
     return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.id) {
-        throw new Error('Cannot reset password without a sign in.');
-      }
-
       const resetPasswordEmailCodeFactor = this.resource.supportedFirstFactors?.find(
         f => f.strategy === 'reset_password_email_code',
       );
 
       if (!resetPasswordEmailCodeFactor) {
-        throw new Error('Reset password email code factor not found');
+        throw new ClerkRuntimeError('Reset password email code factor not found', {
+          code: 'factor_not_found',
+        });
       }
 
       const { emailAddressId } = resetPasswordEmailCodeFactor;
@@ -708,7 +709,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyResetPasswordEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyResetPasswordEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -718,7 +719,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async submitResetPassword(params: SignInFutureResetPasswordSubmitParams): Promise<{ error: unknown }> {
+  async submitResetPassword(params: SignInFutureResetPasswordSubmitParams): Promise<{ error: ClerkError | null }> {
     const { password, signOutOfOtherSessions = true } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -736,13 +737,13 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async create(params: SignInFutureCreateParams): Promise<{ error: unknown }> {
+  async create(params: SignInFutureCreateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this._create(params);
     });
   }
 
-  async password(params: SignInFuturePasswordParams): Promise<{ error: unknown }> {
+  async password(params: SignInFuturePasswordParams): Promise<{ error: ClerkError | null }> {
     if ([params.identifier, params.emailAddress, params.phoneNumber].filter(Boolean).length > 1) {
       throw new Error('Only one of identifier, emailAddress, or phoneNumber can be provided');
     }
@@ -763,7 +764,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendEmailCode(params: SignInFutureEmailCodeSendParams = {}): Promise<{ error: unknown }> {
+  async sendEmailCode(params: SignInFutureEmailCodeSendParams = {}): Promise<{ error: ClerkError | null }> {
     const { emailAddress, emailAddressId } = params;
     if (!this.resource.id && emailAddressId) {
       throw new Error(
@@ -784,7 +785,7 @@ class SignInFuture implements SignInFutureResource {
 
       const emailCodeFactor = this.selectFirstFactor({ strategy: 'email_code', emailAddressId });
       if (!emailCodeFactor) {
-        throw new Error('Email code factor not found');
+        throw new ClerkRuntimeError('Email code factor not found', { code: 'factor_not_found' });
       }
 
       await this.resource.__internal_basePost({
@@ -794,7 +795,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyEmailCode(params: SignInFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -804,7 +805,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: unknown }> {
+  async sendEmailLink(params: SignInFutureEmailLinkSendParams): Promise<{ error: ClerkError | null }> {
     const { emailAddress, verificationUrl, emailAddressId } = params;
     if (!this.resource.id && emailAddressId) {
       throw new Error(
@@ -825,7 +826,7 @@ class SignInFuture implements SignInFutureResource {
 
       const emailLinkFactor = this.selectFirstFactor({ strategy: 'email_link', emailAddressId });
       if (!emailLinkFactor) {
-        throw new Error('Email link factor not found');
+        throw new ClerkRuntimeError('Email link factor not found', { code: 'factor_not_found' });
       }
 
       let absoluteVerificationUrl = verificationUrl;
@@ -846,7 +847,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async waitForEmailLinkVerification(): Promise<{ error: unknown }> {
+  async waitForEmailLinkVerification(): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       const { run, stop } = Poller();
       await new Promise((resolve, reject) => {
@@ -867,7 +868,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams = {}): Promise<{ error: unknown }> {
+  async sendPhoneCode(params: SignInFuturePhoneCodeSendParams = {}): Promise<{ error: ClerkError | null }> {
     const { phoneNumber, phoneNumberId, channel = 'sms' } = params;
     if (!this.resource.id && phoneNumberId) {
       throw new Error(
@@ -888,7 +889,7 @@ class SignInFuture implements SignInFutureResource {
 
       const phoneCodeFactor = this.selectFirstFactor({ strategy: 'phone_code', phoneNumberId });
       if (!phoneCodeFactor) {
-        throw new Error('Phone code factor not found');
+        throw new ClerkRuntimeError('Phone code factor not found', { code: 'factor_not_found' });
       }
 
       await this.resource.__internal_basePost({
@@ -898,7 +899,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyPhoneCode(params: SignInFuturePhoneCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyPhoneCode(params: SignInFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -908,7 +909,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sso(params: SignInFutureSSOParams): Promise<{ error: unknown }> {
+  async sso(params: SignInFutureSSOParams): Promise<{ error: ClerkError | null }> {
     const { strategy, redirectUrl, redirectCallbackUrl, popup, oidcPrompt, enterpriseConnectionId } = params;
     return runAsyncResourceTask(this.resource, async () => {
       let actionCompleteRedirectUrl = redirectUrl;
@@ -959,7 +960,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async web3(params: SignInFutureWeb3Params): Promise<{ error: unknown }> {
+  async web3(params: SignInFutureWeb3Params): Promise<{ error: ClerkError | null }> {
     const { strategy } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -993,7 +994,7 @@ class SignInFuture implements SignInFutureResource {
         f => f.strategy === strategy,
       ) as Web3SignatureFactor;
       if (!web3FirstFactor) {
-        throw new Error('Web3 first factor not found');
+        throw new ClerkRuntimeError('Web3 first factor not found', { code: 'factor_not_found' });
       }
 
       await this.resource.__internal_basePost({
@@ -1003,7 +1004,7 @@ class SignInFuture implements SignInFutureResource {
 
       const { message } = this.firstFactorVerification;
       if (!message) {
-        throw new Error('Web3 nonce not found');
+        throw new ClerkRuntimeError('Web3 nonce not found', { code: 'web3_nonce_not_found' });
       }
 
       let signature: string;
@@ -1030,7 +1031,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: unknown }> {
+  async passkey(params?: SignInFuturePasskeyParams): Promise<{ error: ClerkError | null }> {
     const { flow } = params || {};
 
     /**
@@ -1056,7 +1057,7 @@ class SignInFuture implements SignInFutureResource {
         const passKeyFactor = this.supportedFirstFactors.find(f => f.strategy === 'passkey') as PasskeyFactor;
 
         if (!passKeyFactor) {
-          clerkVerifyPasskeyCalledBeforeCreate();
+          throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
         }
         await this.resource.__internal_basePost({
           body: { strategy: 'passkey' },
@@ -1068,7 +1069,7 @@ class SignInFuture implements SignInFutureResource {
       const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
 
       if (!publicKeyOptions) {
-        clerkMissingWebAuthnPublicKeyOptions('get');
+        throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
       }
 
       let canUseConditionalUI = false;
@@ -1088,7 +1089,7 @@ class SignInFuture implements SignInFutureResource {
       });
 
       if (!publicKeyCredential) {
-        throw error;
+        throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
       }
 
       await this.resource.__internal_basePost({
@@ -1101,12 +1102,12 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async sendMFAPhoneCode(): Promise<{ error: unknown }> {
+  async sendMFAPhoneCode(): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       const phoneCodeFactor = this.resource.supportedSecondFactors?.find(f => f.strategy === 'phone_code');
 
       if (!phoneCodeFactor) {
-        throw new Error('Phone code factor not found');
+        throw new ClerkRuntimeError('Phone code factor not found', { code: 'factor_not_found' });
       }
 
       const { phoneNumberId } = phoneCodeFactor;
@@ -1117,7 +1118,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyMFAPhoneCode(params: SignInFutureMFAPhoneCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyMFAPhoneCode(params: SignInFutureMFAPhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -1127,7 +1128,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: unknown }> {
+  async verifyTOTP(params: SignInFutureTOTPVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -1137,7 +1138,7 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async verifyBackupCode(params: SignInFutureBackupCodeVerifyParams): Promise<{ error: unknown }> {
+  async verifyBackupCode(params: SignInFutureBackupCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
@@ -1147,18 +1148,19 @@ class SignInFuture implements SignInFutureResource {
     });
   }
 
-  async ticket(params?: SignInFutureTicketParams): Promise<{ error: unknown }> {
+  async ticket(params?: SignInFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
     return this.create({ ticket: ticket ?? undefined });
   }
 
-  async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: unknown }> {
+  async finalize(params?: SignInFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
-    return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.createdSessionId) {
-        throw new Error('Cannot finalize sign-in without a created session.');
-      }
 
+    if (!this.resource.createdSessionId) {
+      throw new Error('Cannot finalize sign-in without a created session.');
+    }
+
+    return runAsyncResourceTask(this.resource, async () => {
       // Reload the client to prevent an issue where the created session is not picked up.
       await SignIn.clerk.client?.reload();
 
