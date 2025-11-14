@@ -4,39 +4,6 @@ export type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? 
 
 export type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
 
-// export type UsePagesOrInfiniteSignature = <
-//   Params extends PagesOrInfiniteOptions,
-//   FetcherReturnData extends Record<string, any>,
-//   TCacheKeys extends {
-//     stableKey: string;
-//     trackedKeys: {
-//       [key: string]: unknown;
-//       args?: Record<string, unknown>;
-//     };
-//     untrackedKeys: {
-//       [key: string]: unknown;
-//       args?: Record<string, unknown>;
-//     };
-//   },
-//   CacheKeys extends Record<string, unknown> = Record<string, unknown>,
-//   TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
-// >(
-//   /**
-//    * The parameters will be passed to the fetcher.
-//    */
-//   params: Params,
-//   /**
-//    * A Promise returning function to fetch your data.
-//    */
-//   fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
-//   acacheKeys: TCacheKeys,
-//   /**
-//    * Internal configuration of the hook.
-//    */
-//   config: TConfig,
-//   cacheKeys: CacheKeys,
-// ) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;
-
 type Config = PagesOrInfiniteConfig & PagesOrInfiniteOptions;
 
 interface Register {
@@ -76,26 +43,9 @@ export type UsePagesOrInfiniteSignature = <
     invalidationKey: AnyQueryKey;
     stableKey: string;
   },
-  // CacheKeys extends Record<string, unknown> = Record<string, unknown>,
   TConfig extends Config = Config,
->(
-  // /**
-  //  * The parameters will be passed to the fetcher.
-  //  */
-  // params: Params,
-  // /**
-  //  * A Promise returning function to fetch your data.
-  //  */
-  // fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
-  // acacheKeys: TCacheKeys,
-  // /**
-  //  * Internal configuration of the hook.
-  //  */
-  // config: TConfig,
-  // cacheKeys: CacheKeys,
-  params: {
-    fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined;
-    config: TConfig;
-    keys: TCacheKeys;
-  },
-) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;
+>(params: {
+  fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined;
+  config: TConfig;
+  keys: TCacheKeys;
+}) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;
