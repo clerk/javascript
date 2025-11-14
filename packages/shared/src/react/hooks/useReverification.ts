@@ -88,7 +88,7 @@ type UseReverification = <
    */
   fetcher: Fetcher,
   /**
-   * Optional configuration object extending `UseReverificationOptions`.
+   * Optional configuration object extending [`UseReverificationOptions`](https://clerk.com/docs/reference/hooks/use-reverification#use-reverification-options).
    */
   options?: Options,
 ) => UseReverificationResult<Fetcher>;
