@@ -143,7 +143,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
-  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountAPIKeysNode = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
 
@@ -656,8 +656,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
-    this.premountApiKeysNodes.forEach((props, node) => {
-      clerkjs.mountApiKeys(node, props);
+    this.premountAPIKeysNode.forEach((props, node) => {
+      clerkjs.mountAPIKeys(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -1146,19 +1146,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+  mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountApiKeys(node, props);
+      this.clerkjs.mountAPIKeys(node, props);
     } else {
-      this.premountApiKeysNodes.set(node, props);
+      this.premountAPIKeysNode.set(node, props);
     }
   };
 
-  unmountApiKeys = (node: HTMLDivElement): void => {
+  unmountAPIKeys = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountApiKeys(node);
+      this.clerkjs.unmountAPIKeys(node);
     } else {
-      this.premountApiKeysNodes.delete(node);
+      this.premountAPIKeysNode.delete(node);
     }
   };
 

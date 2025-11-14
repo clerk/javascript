@@ -628,8 +628,8 @@ export const APIKeys = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountApiKeys}
-            unmount={clerk.unmountApiKeys}
+            mount={clerk.mountAPIKeys}
+            unmount={clerk.unmountAPIKeys}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}
