@@ -863,7 +863,7 @@ describe('SignIn', () => {
       it('throws error when no signIn ID', async () => {
         const signIn = new SignIn();
 
-        await expect(() => signIn.__internal_future.resetPasswordEmailCode.sendCode()).rejects.toThrow();
+        await expect(signIn.__internal_future.resetPasswordEmailCode.sendCode()).rejects.toThrow();
       });
 
       it('returns error when reset password email code factor not found', async () => {
@@ -1841,7 +1841,7 @@ describe('SignIn', () => {
       it('throws error when no created session ID', async () => {
         const signIn = new SignIn({ id: 'signin_123' } as any);
 
-        await expect(() => signIn.__internal_future.finalize()).rejects.toThrow();
+        await expect(signIn.__internal_future.finalize()).rejects.toThrow();
       });
     });
   });
