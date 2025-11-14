@@ -52,11 +52,7 @@ const usePathnameWithoutSplatRouteParams = () => {
 export const UserProfile = Object.assign(
   defineComponent((props: UserProfileProps) => {
     const path = usePathnameWithoutSplatRouteParams();
-    const routingProps = useRoutingProps(
-      'UserProfile',
-      () => props,
-      () => ({ path: path.value }),
-    );
+    const routingProps = useRoutingProps('UserProfile', props, () => ({ path: path.value }));
     return () => h(BaseUserProfile, routingProps.value);
   }),
   { ...BaseUserProfile },
@@ -67,11 +63,7 @@ export const UserProfile = Object.assign(
 export const OrganizationProfile = Object.assign(
   defineComponent((props: OrganizationProfileProps) => {
     const path = usePathnameWithoutSplatRouteParams();
-    const routingProps = useRoutingProps(
-      'OrganizationProfile',
-      () => props,
-      () => ({ path: path.value }),
-    );
+    const routingProps = useRoutingProps('OrganizationProfile', props, () => ({ path: path.value }));
     return () => h(BaseOrganizationProfile, routingProps.value);
   }),
   { ...BaseOrganizationProfile },
@@ -79,40 +71,24 @@ export const OrganizationProfile = Object.assign(
 
 export const CreateOrganization = defineComponent((props: CreateOrganizationProps) => {
   const path = usePathnameWithoutSplatRouteParams();
-  const routingProps = useRoutingProps(
-    'CreateOrganization',
-    () => props,
-    () => ({ path: path.value }),
-  );
+  const routingProps = useRoutingProps('CreateOrganization', props, () => ({ path: path.value }));
   return () => h(BaseCreateOrganization, routingProps.value);
 });
 
 export const OrganizationList = defineComponent((props: OrganizationListProps) => {
   const path = usePathnameWithoutSplatRouteParams();
-  const routingProps = useRoutingProps(
-    'OrganizationList',
-    () => props as RoutingOptions,
-    () => ({ path: path.value }),
-  );
+  const routingProps = useRoutingProps('OrganizationList', props as RoutingOptions, () => ({ path: path.value }));
   return () => h(BaseOrganizationList, routingProps.value);
 });
 
 export const SignIn = defineComponent((props: SignInProps) => {
   const path = usePathnameWithoutSplatRouteParams();
-  const routingProps = useRoutingProps(
-    'SignIn',
-    () => props,
-    () => ({ path: path.value }),
-  );
+  const routingProps = useRoutingProps('SignIn', props, () => ({ path: path.value }));
   return () => h(BaseSignIn, routingProps.value);
 });
 
 export const SignUp = defineComponent((props: SignUpProps) => {
   const path = usePathnameWithoutSplatRouteParams();
-  const routingProps = useRoutingProps(
-    'SignUp',
-    () => props,
-    () => ({ path: path.value }),
-  );
+  const routingProps = useRoutingProps('SignUp', props, () => ({ path: path.value }));
   return () => h(BaseSignUp, routingProps.value);
 });
