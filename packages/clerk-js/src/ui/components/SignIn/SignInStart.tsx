@@ -37,6 +37,7 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
@@ -87,6 +88,7 @@ function SignInStartInternal(): JSX.Element {
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
+  const { totalCount: totalEnabledAuthMethods } = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
@@ -524,9 +526,10 @@ function SignInStartInternal(): JSX.Element {
   const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
 
   const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
-  const isIdentifierLastAuthenticationStrategy = lastAuthenticationStrategy
-    ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
-    : false;
+  const isIdentifierLastAuthenticationStrategy =
+    lastAuthenticationStrategy && totalEnabledAuthMethods > 1
+      ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
+      : false;
 
   return (
     <Flow.Part part='start'>
