@@ -51,7 +51,6 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const [queryClient] = useClerkQueryClient();
 
   const clearSubscriptionCache = useCallback(() => {
-    queryClient.setQueriesData({ queryKey: ['commerce-subscription'] }, () => undefined);
     queryClient.removeQueries({ queryKey: ['commerce-subscription'] });
   }, [queryClient]);
 

@@ -8,6 +8,9 @@ type UseClearCacheOnSignOutParams = {
   onSignOut: () => void;
 };
 
+/**
+ * @internal
+ */
 export function useClearCacheOnSignOut({ onSignOut }: UseClearCacheOnSignOutParams): void {
   const clerk = useClerkInstanceContext();
   const previousUserRef = useRef(clerk.user);

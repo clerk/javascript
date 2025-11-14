@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useReducer, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
-import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
+import { isClerkRecursiveMock, useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
@@ -52,33 +52,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       );
     };
 
-    queryClient.setQueriesData({ predicate }, (oldData: any) => {
-      if (!oldData) {
-        return oldData;
-      }
-
-      if (Array.isArray(oldData.pages)) {
-        const pageParams = Array.isArray(oldData.pageParams)
-          ? oldData.pageParams.map(() => initialPageRef.current)
-          : [];
-
-        return {
-          ...oldData,
-          pages: [],
-          pageParams,
-        };
-      }
-
-      if (Array.isArray(oldData.data)) {
-        return {
-          ...oldData,
-          data: [],
-          total_count: 0,
-        };
-      }
-
-      return oldData;
-    });
+    queryClient.removeQueries({ predicate });
 
     setPaginatedPage(initialPageRef.current);
   }, [queryClient]);
@@ -151,7 +125,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const page = useMemo(() => {
     if (triggerInfinite) {
       // Read from query data first, fallback to cache
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const cachedDataRaw = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const cachedData = isClerkRecursiveMock(cachedDataRaw as unknown) ? undefined : cachedDataRaw;
       const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
       // Return pages.length if > 0, otherwise return initialPage (default 1)
       return pages.length > 0 ? pages.length : initialPageRef.current;
@@ -164,7 +139,10 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       if (triggerInfinite) {
         const next = typeof numberOrgFn === 'function' ? (numberOrgFn as (n: number) => number)(page) : numberOrgFn;
         const targetCount = Math.max(0, next);
-        const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+        const cachedDataRaw = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(
+          infiniteQueryKey,
+        );
+        const cachedData = isClerkRecursiveMock(cachedDataRaw as unknown) ? undefined : cachedDataRaw;
         const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
         const currentCount = pages.length;
         const toFetch = targetCount - currentCount;
@@ -180,7 +158,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const data = useMemo(() => {
     if (triggerInfinite) {
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const cachedDataRaw = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const cachedData = isClerkRecursiveMock(cachedDataRaw as unknown) ? undefined : cachedDataRaw;
       // When query is disabled, the hook's data is stale, so only read from cache
       const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
       return pages.map((a: ClerkPaginatedResponse<any>) => a?.data).flat() ?? [];
@@ -192,7 +171,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return singlePageQuery.data?.data ?? [];
     }
 
-    const cachedPage = queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    const cachedPageRaw = queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    const cachedPage = isClerkRecursiveMock(cachedPageRaw as unknown) ? undefined : cachedPageRaw;
     return cachedPage?.data ?? [];
   }, [
     queriesEnabled,
@@ -206,7 +186,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const count = useMemo(() => {
     if (triggerInfinite) {
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const cachedDataRaw = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
+      const cachedData = isClerkRecursiveMock(cachedDataRaw as unknown) ? undefined : cachedDataRaw;
       // When query is disabled, the hook's data is stale, so only read from cache
       const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
       return pages[pages.length - 1]?.total_count || 0;
@@ -218,7 +199,8 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       return singlePageQuery.data?.total_count ?? 0;
     }
 
-    const cachedPage = queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    const cachedPageRaw = queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+    const cachedPage = isClerkRecursiveMock(cachedPageRaw as unknown) ? undefined : cachedPageRaw;
     return cachedPage?.total_count ?? 0;
   }, [
     queriesEnabled,

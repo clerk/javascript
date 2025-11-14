@@ -6,7 +6,20 @@ import { useClerkInstanceContext } from '../contexts';
 export type RecursiveMock = {
   (...args: unknown[]): RecursiveMock;
 } & {
-  readonly [key in string | symbol]: RecursiveMock;
+  readonly [key in string | symbol]: RecursiveMock | boolean | string | number | undefined;
+};
+
+const CLERK_RECURSIVE_MOCK = Symbol.for('clerk.recursiveMock');
+
+type TaggedQueryClient = { __tag: 'clerk-rq-client'; client: QueryClient };
+
+const isTaggedQueryClient = (value: unknown): value is TaggedQueryClient => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '__tag' in value &&
+    (value as { __tag?: unknown }).__tag === 'clerk-rq-client'
+  );
 };
 
 /**
@@ -31,6 +44,9 @@ function createRecursiveProxy(label: string): RecursiveMock {
       }
       if (prop === 'toString') {
         return () => `[${label}]`;
+      }
+      if (prop === CLERK_RECURSIVE_MOCK) {
+        return true;
       }
       if (prop === Symbol.toPrimitive) {
         return () => 0;
@@ -57,28 +73,43 @@ function createRecursiveProxy(label: string): RecursiveMock {
 
 const mockQueryClient = createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient;
 
+const isClerkRecursiveMock = (value: unknown): value is RecursiveMock => {
+  return typeof value === 'function' && (value as RecursiveMock)[CLERK_RECURSIVE_MOCK] === true;
+};
+
 const useClerkQueryClient = (): [QueryClient, boolean] => {
   const clerk = useClerkInstanceContext();
 
   // @ts-expect-error - __internal_queryClient is not typed
-  const queryClient = clerk.__internal_queryClient as { __tag: 'clerk-rq-client'; client: QueryClient } | undefined;
-  const [, setQueryClientLoaded] = useState(
-    typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client',
-  );
+  const queryClient = clerk.__internal_queryClient as TaggedQueryClient | undefined;
+  const [queryClientLoaded, setQueryClientLoaded] = useState(isTaggedQueryClient(queryClient));
 
   useEffect(() => {
-    const _setQueryClientLoaded = () => setQueryClientLoaded(true);
+    const handleQueryClientStatus = () => {
+      // @ts-expect-error - __internal_queryClient is not typed
+      const nextQueryClient = clerk.__internal_queryClient as TaggedQueryClient | undefined;
+      if (isTaggedQueryClient(nextQueryClient)) {
+        setQueryClientLoaded(true);
+      }
+    };
     // @ts-expect-error - queryClientStatus is not typed
-    clerk.on('queryClientStatus', _setQueryClientLoaded);
+    clerk.on('queryClientStatus', handleQueryClientStatus);
     return () => {
       // @ts-expect-error - queryClientStatus is not typed
-      clerk.off('queryClientStatus', _setQueryClientLoaded);
+      clerk.off('queryClientStatus', handleQueryClientStatus);
     };
   }, [clerk, setQueryClientLoaded]);
 
-  const isLoaded = typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client';
+  useEffect(() => {
+    if (!queryClientLoaded && isTaggedQueryClient(queryClient)) {
+      setQueryClientLoaded(true);
+    }
+  }, [queryClientLoaded, queryClient, setQueryClientLoaded]);
 
-  return [queryClient?.client || mockQueryClient, isLoaded];
+  const isLoaded = queryClientLoaded && isTaggedQueryClient(queryClient);
+  const resolvedQueryClient = isTaggedQueryClient(queryClient) ? queryClient.client : mockQueryClient;
+
+  return [resolvedQueryClient, isLoaded];
 };
 
-export { useClerkQueryClient };
+export { CLERK_RECURSIVE_MOCK, isClerkRecursiveMock, useClerkQueryClient };
