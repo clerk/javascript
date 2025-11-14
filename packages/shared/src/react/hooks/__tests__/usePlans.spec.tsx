@@ -2,8 +2,10 @@ import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockUser: any = { id: 'user_1' };
-const mockOrganization: any = { id: 'org_1' };
+import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
+
+const mockUser: any = createMockUser();
+const mockOrganization: any = createMockOrganization();
 
 const getPlansSpy = vi.fn((args: any) =>
   Promise.resolve({
@@ -16,21 +18,14 @@ const getPlansSpy = vi.fn((args: any) =>
   }),
 );
 
-const mockClerk = {
-  loaded: true,
+const defaultQueryClient = createMockQueryClient();
+
+const mockClerk = createMockClerk({
   billing: {
     getPlans: getPlansSpy,
   },
-  telemetry: { record: vi.fn() },
-  __unstable__environment: {
-    commerceSettings: {
-      billing: {
-        user: { enabled: true },
-        organization: { enabled: true },
-      },
-    },
-  },
-};
+  queryClient: defaultQueryClient,
+});
 
 vi.mock('../../contexts', () => {
   return {
@@ -51,6 +46,7 @@ describe('usePlans', () => {
     mockClerk.loaded = true;
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    defaultQueryClient.client.clear();
   });
 
   it('does not call fetcher when clerk.loaded is false', () => {
@@ -115,6 +111,8 @@ describe('usePlans', () => {
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
     // orgId must not leak to fetcher
     expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'organization', pageSize: 3, initialPage: 1 });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data.length).toBe(3);
   });
 
@@ -181,5 +179,28 @@ describe('usePlans', () => {
         { for: 'organization', initialPage: 1, pageSize: 2 },
       ]),
     );
+  });
+
+  it('does not clear data after user sign out', async () => {
+    const { result, rerender } = renderHook(() => usePlans({ initialPage: 1, pageSize: 5 }), { wrapper });
+
+    // Wait for initial data to load
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(getPlansSpy).toHaveBeenCalledTimes(1);
+    expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'user', initialPage: 1, pageSize: 5 });
+    expect(result.current.data.length).toBe(5);
+    expect(result.current.count).toBe(25);
+
+    const initialData = result.current.data;
+
+    // Simulate user sign out
+    mockUser.id = null;
+    rerender();
+
+    // Data should persist after sign out
+    expect(result.current.data).toEqual(initialData);
+    expect(result.current.data.length).toBe(5);
+    expect(result.current.count).toBe(25);
   });
 });

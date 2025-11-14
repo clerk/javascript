@@ -602,6 +602,12 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       title: '檢查您的電子郵件',
     },
+    emailCodeMfa: {
+      formTitle: '檢查您的電子郵件',
+      resendButton: '沒收到驗證碼？重新傳送',
+      subtitle: '以繼續前往 {{applicationName}}',
+      title: '檢查您的電子郵件',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -637,6 +643,12 @@ export const zhTW: LocalizationResource = {
         titleNewTab: '已在其他分頁登入',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '使用發送到您電子郵件的驗證連結',
+      resendButton: '沒有收到連結？重新發送',
+      subtitle: '繼續使用 {{applicationName}}',
+      title: '查看您的電子郵件',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -654,6 +666,7 @@ export const zhTW: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登入。',
       title: '忘記密碼？',
     },
+    newDeviceVerificationNotice: '您正在從新裝置登入。我們需要驗證以保護您的帳戶安全。',
     noAvailableMethods: {
       message: '無法繼續登入。沒有可用的驗證方式。',
       subtitle: '發生錯誤',

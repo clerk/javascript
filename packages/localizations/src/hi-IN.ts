@@ -614,6 +614,12 @@ export const hiIN: LocalizationResource = {
       subtitle: '{{applicationName}} पर जारी रखने के लिए',
       title: 'अपना ईमेल जांचें',
     },
+    emailCodeMfa: {
+      formTitle: 'अपना ईमेल जांचें',
+      resendButton: 'कोड नहीं मिला? फिर से भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'जारी रखने के लिए, सत्यापन लिंक को उस डिवाइस और ब्राउज़र पर खोलें जिससे आपने साइन-अप शुरू किया था',
@@ -649,6 +655,12 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',
+      resendButton: 'लिंक नहीं मिला? पुनः भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const hiIN: LocalizationResource = {
       label__alternativeMethods: 'या, दूसरी विधि से साइन इन करें',
       title: 'पासवर्ड भूल गए?',
     },
+    newDeviceVerificationNotice:
+      'आप एक नए डिवाइस से साइन इन कर रहे हैं। हम आपके खाते को सुरक्षित रखने के लिए सत्यापन मांग रहे हैं।',
     noAvailableMethods: {
       message: 'साइन इन जारी नहीं रख सकते। कोई उपलब्ध प्रमाणीकरण कारक नहीं है।',
       subtitle: 'एक त्रुटि हुई',
