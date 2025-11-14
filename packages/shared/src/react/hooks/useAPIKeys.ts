@@ -1,9 +1,10 @@
 'use client';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
-import type { APIKeyResource, ClerkPaginatedResponse, GetAPIKeysParams } from '../../types';
+import type { APIKeyResource, GetAPIKeysParams } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import type { PaginatedHookConfig, PaginatedResources } from '../types';
+import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -92,17 +93,25 @@ export function useApiKeys<T extends UseApiKeysParams>(params?: T): UseApiKeysRe
 
   const isEnabled = (safeValues.enabled ?? true) && clerk.loaded;
 
-  return usePagesOrInfinite<GetAPIKeysParams, ClerkPaginatedResponse<APIKeyResource>>(
-    hookParams,
-    clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
-    {
+  return usePagesOrInfinite({
+    fetcher: clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
+    config: {
       keepPreviousData: safeValues.keepPreviousData,
       infinite: safeValues.infinite,
       enabled: isEnabled,
+      isSignedIn: Boolean(clerk.user),
+      initialPage: safeValues.initialPage,
+      pageSize: safeValues.pageSize,
     },
-    {
-      type: 'apiKeys',
-      subject: safeValues.subject || '',
-    },
-  ) as UseApiKeysReturn<T>;
+    keys: createCacheKeys({
+      stablePrefix: 'apiKeys',
+      authenticated: Boolean(clerk.user),
+      tracked: {
+        subject: safeValues.subject,
+      },
+      untracked: {
+        args: hookParams,
+      },
+    }),
+  }) as UseApiKeysReturn<T>;
 }

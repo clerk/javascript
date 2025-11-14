@@ -7,6 +7,7 @@ import {
   useUserContext,
 } from '../contexts';
 import type { PagesOrInfiniteOptions, PaginatedHookConfig, PaginatedResources } from '../types';
+import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -51,6 +52,16 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
        * @default true
        */
       enabled?: boolean;
+      /**
+       * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
+       *
+       * @default undefined
+       *
+       * @hidden
+       *
+       * @experimental
+       */
+      __experimental_mode?: 'cache';
     }
   > & {
     for?: ForPayerType;
@@ -101,28 +112,31 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
 
     const isEnabled = !!hookParams && clerk.loaded && !!billingEnabled && (externalEnabled ?? true);
 
-    const result = usePagesOrInfinite<TParams, ClerkPaginatedResponse<TResource>>(
-      (hookParams || {}) as TParams,
-      fetchFn,
-      {
-        ...({
-          keepPreviousData: safeValues.keepPreviousData,
-          infinite: safeValues.infinite,
-        } as PaginatedHookConfig<unknown>),
+    const result = usePagesOrInfinite({
+      fetcher: fetchFn,
+      config: {
+        keepPreviousData: safeValues.keepPreviousData,
+        infinite: safeValues.infinite,
         enabled: isEnabled,
         ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
         __experimental_mode: safeValues.__experimental_mode,
+        initialPage: safeValues.initialPage,
+        pageSize: safeValues.pageSize,
       },
-      {
-        type: resourceType,
-        ...(options?.unauthenticated
-          ? { for: safeFor }
-          : {
+      keys: createCacheKeys({
+        stablePrefix: resourceType,
+        authenticated: !options?.unauthenticated,
+        tracked: options?.unauthenticated
+          ? ({ for: safeFor } as const)
+          : ({
               userId: user?.id,
               ...(isForOrganization ? { orgId: organization?.id } : {}),
-            }),
-      },
-    );
+            } as const),
+        untracked: {
+          args: hookParams as TParams,
+        },
+      }),
+    });
 
     return result;
   };
