@@ -5,9 +5,7 @@ import { SignUp } from '../SignUp';
 
 // Mock the authenticateWithPopup module
 vi.mock('../../../utils/authenticateWithPopup', async () => {
-  const actual = await vi.importActual<typeof import('../../../utils/authenticateWithPopup')>(
-    '../../../utils/authenticateWithPopup',
-  );
+  const actual = await vi.importActual('../../../utils/authenticateWithPopup');
   return {
     ...actual,
     _futureAuthenticateWithPopup: vi.fn(),
