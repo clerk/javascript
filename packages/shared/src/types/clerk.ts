@@ -80,6 +80,9 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
+/**
+ * @inline
+ */
 type CheckoutResult =
   | {
       data: BillingCheckoutResource;

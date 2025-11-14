@@ -25,6 +25,38 @@ type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrI
 };
 
 /**
+ * @interface
+ */
+export interface HookParams
+  extends PaginatedHookConfig<
+    PagesOrInfiniteOptions & {
+      /**
+       * If `true`, a request will be triggered when the hook is mounted.
+       *
+       * @default true
+       */
+      enabled?: boolean;
+      /**
+       * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
+       *
+       * @default undefined
+       *
+       * @hidden
+       *
+       * @experimental
+       */
+      __experimental_mode?: 'cache';
+    }
+  > {
+  /**
+   * Specifies whether to fetch for the current user or organization.
+   *
+   * @default 'user'
+   */
+  for?: ForPayerType;
+}
+
+/**
  * A hook factory that creates paginated data fetching hooks for commerce-related resources.
  * It provides a standardized way to create hooks that can fetch either user or organization resources
  * with built-in pagination support.
@@ -44,29 +76,6 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
   useFetcher,
   options,
 }: BillingHookConfig<TResource, TParams>) {
-  type HookParams = PaginatedHookConfig<
-    PagesOrInfiniteOptions & {
-      /**
-       * If `true`, a request will be triggered when the hook is mounted.
-       *
-       * @default true
-       */
-      enabled?: boolean;
-      /**
-       * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
-       *
-       * @default undefined
-       *
-       * @hidden
-       *
-       * @experimental
-       */
-      __experimental_mode?: 'cache';
-    }
-  > & {
-    for?: ForPayerType;
-  };
-
   return function useBillingHook<T extends HookParams>(
     params?: T,
   ): PaginatedResources<TResource, T extends { infinite: true } ? true : false> {
