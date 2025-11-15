@@ -102,7 +102,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedAPIKeyID, setSelectedAPIKeyID] = useState('');
-  const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
+  const [selectedAPIKeyName, setSelectedAPIKeyName] = useState('');
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
   const handleCreateAPIKey = async (params: OnCreateParams) => {
@@ -125,7 +125,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 
   const handleRevoke = (apiKeyID: string, apiKeyName: string) => {
     setSelectedAPIKeyID(apiKeyID);
-    setSelectedApiKeyName(apiKeyName);
+    setSelectedAPIKeyName(apiKeyName);
     setIsRevokeModalOpen(true);
   };
 
@@ -221,11 +221,11 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {
           setSelectedAPIKeyID('');
-          setSelectedApiKeyName('');
+          setSelectedAPIKeyName('');
           setIsRevokeModalOpen(false);
         }}
         apiKeyID={selectedAPIKeyID}
-        apiKeyName={selectedApiKeyName}
+        apiKeyName={selectedAPIKeyName}
         onRevokeSuccess={invalidateAll}
         modalRoot={revokeModalRoot}
       />
