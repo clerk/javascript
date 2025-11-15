@@ -1,6 +1,5 @@
 import { inBrowser } from '@clerk/shared/browser';
-
-import { debugLogger } from '@/utils/debug';
+import { logger } from '@clerk/shared/logger';
 
 import type { Environment } from './resources';
 export class Protect {
@@ -27,7 +26,7 @@ export class Protect {
     if (config.rollout) {
       if (typeof config.rollout !== 'number' || config.rollout < 0 || config.rollout > 1) {
         // invalid rollout percentage - do nothing
-        debugLogger.warn(`[protect] loader rollout value is invalid`, { rollout: config.rollout });
+        logger.warnOnce(`[protect] loader rollout value is invalid: ${config.rollout}`);
         return;
       }
       if (Math.random() > config.rollout) {
@@ -37,7 +36,7 @@ export class Protect {
     }
 
     if (!config.loader.type) {
-      debugLogger.warn(`[protect] loader type is missing`);
+      logger.warnOnce(`[protect] loader type is missing`);
       return;
     }
 
@@ -53,7 +52,7 @@ export class Protect {
             break;
           default:
             // illegal to set.
-            debugLogger.warn(`[protect] loader attribute is invalid type`, { key, value });
+            logger.warnOnce(`[protect] loader attribute is invalid type: ${key}=${value}`);
             break;
         }
       });
@@ -66,7 +65,7 @@ export class Protect {
         document.body.appendChild(element);
         break;
       default:
-        debugLogger.warn(`[protect] loader target is invalid`, { target: config.loader.target });
+        logger.warnOnce(`[protect] loader target is invalid: ${config.loader.target}`);
         break;
     }
   }
