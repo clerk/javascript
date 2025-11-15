@@ -143,7 +143,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
-  private premountAPIKeysNode = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
 
@@ -656,7 +656,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
-    this.premountAPIKeysNode.forEach((props, node) => {
+    this.premountAPIKeysNodes.forEach((props, node) => {
       clerkjs.mountAPIKeys(node, props);
     });
 
@@ -1150,7 +1150,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.mountAPIKeys(node, props);
     } else {
-      this.premountAPIKeysNode.set(node, props);
+      this.premountAPIKeysNodes.set(node, props);
     }
   };
 
@@ -1158,7 +1158,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.unmountAPIKeys(node);
     } else {
-      this.premountAPIKeysNode.delete(node);
+      this.premountAPIKeysNodes.delete(node);
     }
   };
 
