@@ -10,6 +10,7 @@ import { BaseResource } from './internal';
 export class ProtectConfig extends BaseResource implements ProtectConfigResource {
   id: string = '';
   loader?: ProtectLoader;
+  rollout?: number;
 
   public constructor(data: ProtectConfigJSON | ProtectConfigJSONSnapshot | null = null) {
     super();
@@ -23,6 +24,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
     }
 
     this.id = this.withDefault(data.id, this.id);
+    this.rollout = this.withDefault(data.rollout, this.rollout);
     this.loader = this.withDefault(data.loader, this.loader);
 
     return this;
