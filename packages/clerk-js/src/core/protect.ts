@@ -7,7 +7,7 @@ export class Protect {
     const config = env?.protectConfig;
 
     if (!config?.loader) {
-      // no protect config available
+      // not enabled or no protect config available
       return;
     } else if (this.#initialized) {
       // already initialized - do nothing

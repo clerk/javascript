@@ -10,13 +10,11 @@ export interface ProtectLoader {
 export interface ProtectConfigJSON {
   object: 'protect_config';
   id: string;
-  enabled: boolean;
   loader?: ProtectLoader;
 }
 
 export interface ProtectConfigResource extends ClerkResource {
   id: string;
-  enabled: boolean;
   loader?: ProtectLoader;
   __internal_toSnapshot: () => ProtectConfigJSONSnapshot;
 }
