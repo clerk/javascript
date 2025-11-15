@@ -89,6 +89,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   display_config: DisplayConfigJSON;
   maintenance_mode: boolean;
   organization_settings: OrganizationSettingsJSON;
+  protect_settings?: { enabled: boolean };
   user_settings: UserSettingsJSON;
 }
 
