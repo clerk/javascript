@@ -11,8 +11,6 @@ export function createCacheKeys<
   authenticated: boolean;
   tracked: T;
   untracked: U extends { args: Params } ? U : never;
-
-  //U extends undefined ? never : U extends { args: Params } ? U['args'] : never;
 }) {
   return {
     queryKey: [params.stablePrefix, params.authenticated, params.tracked, params.untracked] as const,

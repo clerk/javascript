@@ -72,8 +72,6 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
         return undefined as any;
       }
 
-      // Why do we need this ? can we just specify which `args` to use in the key ?
-      // const requestParams = getDifferentKeys(key, cacheKeys);
       return fetcher(args);
     },
     staleTime: 60_000,
@@ -116,14 +114,14 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     const isNowSignedOut = isSignedIn === false;
 
     if (previousIsSignedIn && isNowSignedOut) {
-      // Clear ALL queries matching the base query keys (including old userId)
-      // Use predicate to match queries that start with 'clerk-pages' or 'clerk-pages-infinite'
-
       queryClient.removeQueries({
         predicate: query => {
-          const key = query.queryKey;
-          // Clear all queries that are marked as authenticated
-          return Array.isArray(key) && key[2] === true;
+          const [stablePrefix, authenticated] = query.queryKey;
+          return (
+            authenticated === true &&
+            typeof stablePrefix === 'string' &&
+            (stablePrefix === keys.queryKey[0] || stablePrefix === keys.queryKey[0] + '-inf')
+          );
         },
       });
 

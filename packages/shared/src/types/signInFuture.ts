@@ -192,7 +192,7 @@ export interface SignInFutureSSOParams {
    * await signIn.sso({ popup, strategy: 'oauth_google', redirectUrl: '/dashboard' });
    * ```
    */
-  popup?: { location: { href: string } };
+  popup?: Window;
   /**
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the
    * [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.)
@@ -203,6 +203,10 @@ export interface SignInFutureSSOParams {
    * @experimental
    */
   enterpriseConnectionId?: string;
+  /**
+   * The unique identifier of the user. Only supported with the `enterprise_sso` strategy.
+   */
+  identifier?: string;
 }
 
 export interface SignInFutureMFAPhoneCodeVerifyParams {

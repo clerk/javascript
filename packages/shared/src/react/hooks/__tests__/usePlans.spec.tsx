@@ -188,6 +188,7 @@ describe('usePlans', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(getPlansSpy).toHaveBeenCalledTimes(1);
+    expect(getPlansSpy.mock.calls[0][0]).toStrictEqual({ for: 'user', initialPage: 1, pageSize: 5 });
     expect(result.current.data.length).toBe(5);
     expect(result.current.count).toBe(25);
 

@@ -250,6 +250,12 @@ describe('createBillingPaginatedHook', () => {
       expect(result.current.page).toBe(1);
       expect(result.current.pageCount).toBe(3); // ceil(5/2)
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
+
       // Simulate sign-out
       mockUser = null;
       rerender();
@@ -294,6 +300,12 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 5 });
+      });
+
       if (__CLERK_USE_RQ__) {
         expect(result.current.isLoading).toBe(false);
       } else {
@@ -336,6 +348,12 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
+
       await waitFor(() => expect(result.current.data).toEqual([]));
       expect(result.current.count).toBe(0);
       expect(result.current.page).toBe(1);
@@ -364,6 +382,12 @@ describe('createBillingPaginatedHook', () => {
 
       const originalData = [...result.current.data];
       const originalCount = result.current.count;
+
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
 
       // Simulate sign-out
       mockUser = null;
@@ -411,6 +435,12 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 5 });
+      });
+
       // Data should persist for unauthenticated hooks even with keepPreviousData: true
       expect(result.current.data).toEqual(originalData);
       expect(result.current.count).toBe(20);
@@ -442,6 +472,12 @@ describe('createBillingPaginatedHook', () => {
       // Simulate sign-out
       mockUser = null;
       rerender();
+
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
 
       // Data should persist for unauthenticated hooks
       expect(result.current.data).toEqual(originalData);
