@@ -1,13 +1,14 @@
 import { QueryClient } from '@tanstack/query-core';
 import { vi } from 'vitest';
 
+import { createClerkQueryClientCarrier } from '../../../clerk-rq/query-client-facade';
+
 /**
  * Shared query client configuration for tests
  */
 export function createMockQueryClient() {
-  return {
-    __tag: 'clerk-rq-client' as const,
-    client: new QueryClient({
+  return createClerkQueryClientCarrier(
+    new QueryClient({
       defaultOptions: {
         queries: {
           retry: false,
@@ -18,7 +19,7 @@ export function createMockQueryClient() {
         },
       },
     }),
-  };
+  );
 }
 
 /**

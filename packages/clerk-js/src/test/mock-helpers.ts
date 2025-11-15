@@ -1,3 +1,4 @@
+import { createClerkQueryClientCarrier } from '@clerk/shared/react';
 import type { ActiveSessionResource, LoadedClerk } from '@clerk/shared/types';
 import { type Mocked, vi } from 'vitest';
 
@@ -15,9 +16,7 @@ type DeepVitestMocked<T> = T extends FunctionLike
     : T;
 
 // Removing vi.Mock type for now, relying on inference
-type MockMap<T = any> = {
-  [K in { [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never }[keyof T]]?: ReturnType<typeof vi.fn>;
-};
+type MockMap<T = any> = Partial<Record<keyof T, ReturnType<typeof vi.fn>>>;
 
 const mockProp = <T>(obj: T, k: keyof T, mocks?: MockMap<T>) => {
   if (typeof obj[k] === 'function') {
@@ -39,16 +38,15 @@ const mockMethodsOf = <T extends Record<string, any> | null = any>(
   Object.keys(obj)
     .filter(key => !options?.exclude.includes(key as keyof T))
     // Pass the specific MockMap for the object T being mocked
-    .forEach(k => mockProp(obj, k, options?.mocks));
+    .forEach(k => mockProp(obj, k as keyof T, options?.mocks));
 };
 
 export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedClerk> => {
   // Cast clerk to any to allow mocking properties
   const clerkAny = clerk as any;
 
-  const defaultQueryClient = {
-    __tag: 'clerk-rq-client' as const,
-    client: new QueryClient({
+  const defaultQueryClient = createClerkQueryClientCarrier(
+    new QueryClient({
       defaultOptions: {
         queries: {
           retry: false,
@@ -58,7 +56,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
         },
       },
     }),
-  };
+  );
 
   mockMethodsOf(clerkAny);
   if (clerkAny.client) {

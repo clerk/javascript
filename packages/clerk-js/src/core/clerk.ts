@@ -13,6 +13,7 @@ import { parsePublishableKey } from '@clerk/shared/keys';
 import { logger } from '@clerk/shared/logger';
 import { CLERK_NETLIFY_CACHE_BUST_PARAM } from '@clerk/shared/netlifyCacheHandler';
 import { isHttpOrHttps, isValidProxyUrl, proxyUrlToAbsoluteURL } from '@clerk/shared/proxy';
+import { type ClerkQueryClientCarrier, createClerkQueryClientCarrier } from '@clerk/shared/react';
 import {
   eventPrebuiltComponentMounted,
   eventPrebuiltComponentOpened,
@@ -94,7 +95,6 @@ import type {
 } from '@clerk/shared/types';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
-import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -222,7 +222,7 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
-  #queryClient: QueryClient | undefined;
+  #queryClient: ClerkQueryClientCarrier | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -241,7 +241,7 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
 
-  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
+  get __internal_queryClient(): ClerkQueryClientCarrier | undefined {
     if (!this.#queryClient) {
       void import('./query-core')
         .then(module => module.QueryClient)
@@ -249,18 +249,13 @@ export class Clerk implements ClerkInterface {
           if (this.#queryClient) {
             return;
           }
-          this.#queryClient = new QueryClient();
+          this.#queryClient = createClerkQueryClientCarrier(new QueryClient());
           // @ts-expect-error - queryClientStatus is not typed
           this.#publicEventBus.emit('queryClientStatus', 'ready');
         });
     }
 
-    return this.#queryClient
-      ? {
-          __tag: 'clerk-rq-client',
-          client: this.#queryClient,
-        }
-      : undefined;
+    return this.#queryClient;
   }
 
   public __internal_getCachedResources:

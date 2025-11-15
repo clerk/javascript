@@ -25,6 +25,7 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   Observer: typeof QueryObserver,
 ): DistributivePick<QueryObserverResult<TData, TError>, CommonQueryResult> {
   const [client, isQueryClientLoaded] = useClerkQueryClient();
+  const queryClient = React.useMemo(() => client.asQueryClient(), [client]);
   const defaultedOptions = isQueryClientLoaded
     ? client.defaultQueryOptions(options)
     : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>);
@@ -33,8 +34,8 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   defaultedOptions._optimisticResults = 'optimistic';
 
   const observer = React.useMemo(() => {
-    return new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(client, defaultedOptions);
-  }, [client]);
+    return new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(queryClient, defaultedOptions);
+  }, [queryClient]);
 
   // note: this must be called before useSyncExternalStore
   const result = observer.getOptimisticResult(defaultedOptions);

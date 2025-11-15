@@ -2,6 +2,8 @@ import type { QueryClient } from '@tanstack/query-core';
 import { useEffect, useState } from 'react';
 
 import { useClerkInstanceContext } from '../contexts';
+import type { ClerkQueryClient, ClerkQueryClientCarrier } from './query-client-facade';
+import { createClerkQueryClientCarrier, isClerkQueryClientCarrier } from './query-client-facade';
 
 export type RecursiveMock = {
   (...args: unknown[]): RecursiveMock;
@@ -55,16 +57,16 @@ function createRecursiveProxy(label: string): RecursiveMock {
   return self;
 }
 
-const mockQueryClient = createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient;
+const mockQueryClient = createClerkQueryClientCarrier(
+  createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient,
+).client;
 
-const useClerkQueryClient = (): [QueryClient, boolean] => {
+const useClerkQueryClient = (): [ClerkQueryClient, boolean] => {
   const clerk = useClerkInstanceContext();
 
   // @ts-expect-error - __internal_queryClient is not typed
-  const queryClient = clerk.__internal_queryClient as { __tag: 'clerk-rq-client'; client: QueryClient } | undefined;
-  const [, setQueryClientLoaded] = useState(
-    typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client',
-  );
+  const queryClient = clerk.__internal_queryClient as ClerkQueryClientCarrier | undefined;
+  const [, setQueryClientLoaded] = useState(isClerkQueryClientCarrier(queryClient));
 
   useEffect(() => {
     const _setQueryClientLoaded = () => setQueryClientLoaded(true);
@@ -76,7 +78,7 @@ const useClerkQueryClient = (): [QueryClient, boolean] => {
     };
   }, [clerk, setQueryClientLoaded]);
 
-  const isLoaded = typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client';
+  const isLoaded = isClerkQueryClientCarrier(queryClient);
 
   return [queryClient?.client || mockQueryClient, isLoaded];
 };
