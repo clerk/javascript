@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
 import { appConfigs } from '../presets';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-const mockProtectSettings = async (page: Page, config: ProtectConfigJSON) => {
+const mockProtectSettings = async (page: Page, config?: ProtectConfigJSON) => {
   await page.route('*/**/v1/environment*', async route => {
     const response = await route.fetch();
     const json = await response.json();
@@ -17,14 +17,14 @@ const mockProtectSettings = async (page: Page, config: ProtectConfigJSON) => {
   });
 };
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Hello World Div @xgeneric', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Clerk Protect checks', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
 
   test.afterAll(async () => {
     await app.teardown();
   });
 
-  test('should create script when protect_config.loader is set', async ({ page, context }) => {
+  test('should add loader script when protect_config.loader is set', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await mockProtectSettings(page, {
       object: 'protect_config',
@@ -40,7 +40,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Hello Wor
     await expect(page.locator('#test-protect-loader')).toHaveAttribute('type', 'module');
   });
 
-  test('should not create Hello World div when protect_config.loader is not set', async ({ page, context }) => {
+  test('should not create loader element when protect_config.loader is not set', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await mockProtectSettings(page, undefined);
     await u.page.goToAppHome();
