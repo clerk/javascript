@@ -158,6 +158,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { getTaskEndpoint, navigateIfTaskExists, warnMissingPendingTaskHandlers } from './sessionTasks';
 import { State } from './state';
@@ -227,6 +228,7 @@ export class Clerk implements ClerkInterface {
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
+  #protect?: Protect;
   #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: BroadcastChannel | null = null;
   #componentControls?: ReturnType<MountComponentRenderer> | null;
@@ -429,6 +431,7 @@ export class Clerk implements ClerkInterface {
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
+    this.#protect = new Protect();
   }
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
@@ -516,6 +519,7 @@ export class Clerk implements ClerkInterface {
           ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
+      this.#protect?.load(this.environment as Environment);
       debugLogger.info('load() complete', {}, 'clerk');
     } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
