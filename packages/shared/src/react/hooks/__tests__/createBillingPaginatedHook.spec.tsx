@@ -180,7 +180,7 @@ describe('createBillingPaginatedHook', () => {
     });
   });
 
-  it.only('when for=organization orgId should be forwarded to fetcher (infinite mode)', async () => {
+  it('when for=organization orgId should be forwarded to fetcher (infinite mode)', async () => {
     fetcherMock.mockImplementation((params: any) =>
       Promise.resolve({
         data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `item-${params.initialPage}-${i}` })),
