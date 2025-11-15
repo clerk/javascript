@@ -29,16 +29,39 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Clerk Pro
     await mockProtectSettings(page, {
       object: 'protect_config',
       id: 'n',
-      loader: {
-        type: 'script',
-        target: 'body',
-        attributes: { id: 'test-protect-loader', type: 'module', src: 'data:application/json;base64,Cgo=' },
-      },
+      loaders: [
+        {
+          rollout: 1.0,
+          type: 'script',
+          target: 'body',
+          attributes: { id: 'test-protect-loader', type: 'module', src: 'data:application/json;base64,Cgo=' },
+        },
+      ],
     });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
 
     await expect(page.locator('#test-protect-loader')).toHaveAttribute('type', 'module');
+  });
+
+  test('should not add loader script when protect_config.loader is set and rollout 0.00', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await mockProtectSettings(page, {
+      object: 'protect_config',
+      id: 'n',
+      loaders: [
+        {
+          rollout: 0,
+          type: 'script',
+          target: 'body',
+          attributes: { id: 'test-protect-loader', type: 'module', src: 'data:application/json;base64,Cgo=' },
+        },
+      ],
+    });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+
+    await expect(page.locator('#test-protect-loader')).toHaveCount(0);
   });
 
   test('should not create loader element when protect_config.loader is not set', async ({ page, context }) => {
