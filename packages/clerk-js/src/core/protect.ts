@@ -1,5 +1,6 @@
-import type { Environment } from './resources';
+import { inBrowser } from '@clerk/shared/browser';
 
+import type { Environment } from './resources';
 export class Protect {
   #initialized: boolean = false;
 
@@ -12,7 +13,7 @@ export class Protect {
     } else if (this.#initialized) {
       // already initialized - do nothing
       return;
-    } else if (typeof document === 'undefined') {
+    } else if (!inBrowser()) {
       // no document: not running browser?
       return;
     }
