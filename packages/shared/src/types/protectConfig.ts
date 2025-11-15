@@ -2,21 +2,21 @@ import type { ClerkResource } from './resource';
 import type { ProtectConfigJSONSnapshot } from './snapshots';
 
 export interface ProtectLoader {
-  target: 'head' | 'body';
+  rollout?: number;
+  target: 'head' | 'body' | `#${string}`;
   type: string;
-  attributes: Record<string, string | number | boolean>;
+  attributes?: Record<string, string | number | boolean>;
+  textContent?: string;
 }
 
 export interface ProtectConfigJSON {
   object: 'protect_config';
   id: string;
-  rollout?: number;
-  loader?: ProtectLoader;
+  loaders?: ProtectLoader[];
 }
 
 export interface ProtectConfigResource extends ClerkResource {
   id: string;
-  loader?: ProtectLoader;
-  rollout?: number;
+  loaders?: ProtectLoader[];
   __internal_toSnapshot: () => ProtectConfigJSONSnapshot;
 }

@@ -9,7 +9,7 @@ import { BaseResource } from './internal';
 
 export class ProtectConfig extends BaseResource implements ProtectConfigResource {
   id: string = '';
-  loader?: ProtectLoader;
+  loaders?: ProtectLoader[];
   rollout?: number;
 
   public constructor(data: ProtectConfigJSON | ProtectConfigJSONSnapshot | null = null) {
@@ -24,8 +24,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
     }
 
     this.id = this.withDefault(data.id, this.id);
-    this.rollout = this.withDefault(data.rollout, this.rollout);
-    this.loader = this.withDefault(data.loader, this.loader);
+    this.loaders = this.withDefault(data.loaders, this.loaders);
 
     return this;
   }
@@ -34,7 +33,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
     return {
       object: 'protect_config',
       id: this.id,
-      loader: this.loader,
+      loaders: this.loaders,
     };
   }
 }

@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { logger } from '@clerk/shared/logger';
+import type { ProtectLoader } from '@clerk/shared/types';
 
 import type { Environment } from './resources';
 export class Protect {
@@ -8,7 +9,7 @@ export class Protect {
   load(env: Environment): void {
     const config = env?.protectConfig;
 
-    if (!config?.loader) {
+    if (!config?.loaders || !Array.isArray(config.loaders) || config.loaders.length === 0) {
       // not enabled or no protect config available
       return;
     } else if (this.#initialized) {
@@ -22,28 +23,37 @@ export class Protect {
     // here rather than at end to mark as initialized even if load fails.
     this.#initialized = true;
 
+    for (const loader of config.loaders) {
+      this.applyLoader(loader);
+    }
+  }
+
+  // apply individual loader
+  applyLoader(loader: ProtectLoader) {
     // we use rollout for percentage based rollouts (as the environment file is cached)
-    if (config.rollout) {
-      if (typeof config.rollout !== 'number' || config.rollout < 0 || config.rollout > 1) {
+    if (loader.rollout) {
+      if (typeof loader.rollout !== 'number' || loader.rollout < 0 || loader.rollout > 1) {
         // invalid rollout percentage - do nothing
-        logger.warnOnce(`[protect] loader rollout value is invalid: ${config.rollout}`);
+        logger.warnOnce(`[protect] loader rollout value is invalid: ${loader.rollout}`);
         return;
       }
-      if (Math.random() > config.rollout) {
+      if (Math.random() > loader.rollout) {
         // not in rollout percentage - do nothing
         return;
       }
     }
 
-    if (!config.loader.type) {
-      logger.warnOnce(`[protect] loader type is missing`);
-      return;
+    if (!loader.type) {
+      loader.type = 'script';
+    }
+    if (!loader.target) {
+      loader.target = 'body';
     }
 
-    const element = document.createElement(config.loader.type);
+    const element = document.createElement(loader.type);
 
-    if (config.loader.attributes) {
-      Object.entries(config.loader.attributes).forEach(([key, value]) => {
+    if (loader.attributes) {
+      for (const [key, value] of Object.entries(loader.attributes)) {
         switch (typeof value) {
           case 'string':
           case 'number':
@@ -55,9 +65,14 @@ export class Protect {
             logger.warnOnce(`[protect] loader attribute is invalid type: ${key}=${value}`);
             break;
         }
-      });
+      }
     }
-    switch (config.loader.target) {
+
+    if (loader.textContent && typeof loader.textContent === 'string') {
+      element.textContent = loader.textContent;
+    }
+
+    switch (loader.target) {
       case 'head':
         document.head.appendChild(element);
         break;
@@ -65,7 +80,16 @@ export class Protect {
         document.body.appendChild(element);
         break;
       default:
-        logger.warnOnce(`[protect] loader target is invalid: ${config.loader.target}`);
+        if (loader.target?.startsWith('#')) {
+          const targetElement = document.getElementById(loader.target.substring(1));
+          if (!targetElement) {
+            logger.warnOnce(`[protect] loader target element not found: ${loader.target}`);
+            return;
+          }
+          targetElement.appendChild(element);
+          return;
+        }
+        logger.warnOnce(`[protect] loader target is invalid: ${loader.target}`);
         break;
     }
   }
