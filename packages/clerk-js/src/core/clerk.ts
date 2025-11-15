@@ -94,7 +94,7 @@ import type {
 } from '@clerk/shared/types';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
-import type { QueryClient } from '@tanstack/query-core';
+import type { InfiniteQueryObserver, QueryClient, QueryObserver } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -223,6 +223,9 @@ export class Clerk implements ClerkInterface {
   protected environment?: EnvironmentResource | null;
 
   #queryClient: QueryClient | undefined;
+  #queryObserverCtor: typeof QueryObserver | undefined;
+  #infiniteQueryObserverCtor: typeof InfiniteQueryObserver | undefined;
+  #queryCoreModulePromise: Promise<typeof import('./query-core')> | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -241,24 +244,55 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
 
-  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
-    if (!this.#queryClient) {
-      void import('./query-core')
-        .then(module => module.QueryClient)
-        .then(QueryClient => {
-          if (this.#queryClient) {
-            return;
-          }
-          this.#queryClient = new QueryClient();
-          // @ts-expect-error - queryClientStatus is not typed
-          this.#publicEventBus.emit('queryClientStatus', 'ready');
-        });
+  #loadQueryCoreModule(): Promise<typeof import('./query-core')> {
+    if (!this.#queryCoreModulePromise) {
+      this.#queryCoreModulePromise = import('./query-core');
+    }
+    return this.#queryCoreModulePromise;
+  }
+
+  #cacheQueryObservers(module: typeof import('./query-core')) {
+    if (!this.#queryObserverCtor) {
+      this.#queryObserverCtor = module.QueryObserver;
+    }
+    if (!this.#infiniteQueryObserverCtor) {
+      this.#infiniteQueryObserverCtor = module.InfiniteQueryObserver;
+    }
+  }
+
+  get __internal_queryClient():
+    | {
+        __tag: 'clerk-rq-client';
+        client: QueryClient;
+        QueryObserver: typeof QueryObserver;
+        InfiniteQueryObserver: typeof InfiniteQueryObserver;
+      }
+    | undefined {
+    if (!this.#queryObserverCtor || !this.#infiniteQueryObserverCtor) {
+      void this.#loadQueryCoreModule().then(module => {
+        this.#cacheQueryObservers(module);
+      });
     }
 
-    return this.#queryClient
+    if (!this.#queryClient) {
+      void this.#loadQueryCoreModule().then(module => {
+        this.#cacheQueryObservers(module);
+        if (this.#queryClient) {
+          return;
+        }
+        const { QueryClient } = module;
+        this.#queryClient = new QueryClient();
+        // @ts-expect-error - queryClientStatus is not typed
+        this.#publicEventBus.emit('queryClientStatus', 'ready');
+      });
+    }
+
+    return this.#queryClient && this.#queryObserverCtor && this.#infiniteQueryObserverCtor
       ? {
           __tag: 'clerk-rq-client',
           client: this.#queryClient,
+          QueryObserver: this.#queryObserverCtor,
+          InfiniteQueryObserver: this.#infiniteQueryObserverCtor,
         }
       : undefined;
   }

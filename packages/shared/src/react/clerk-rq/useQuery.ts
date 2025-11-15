@@ -1,6 +1,5 @@
 'use client';
 import type { DefaultError, NoInfer, QueryKey } from '@tanstack/query-core';
-import { QueryObserver } from '@tanstack/query-core';
 
 import type { DefinedInitialDataOptions, UndefinedInitialDataOptions } from './queryOptions';
 import type { DefinedUseQueryResult, UseQueryOptions, UseQueryResult } from './types';
@@ -38,5 +37,5 @@ export function useClerkQuery<
  *
  */
 export function useClerkQuery(options: UseQueryOptions) {
-  return useBaseQuery(options, QueryObserver);
+  return useBaseQuery(options, 'query');
 }

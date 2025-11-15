@@ -4,7 +4,7 @@
  */
 
 'use client';
-import type { DefaultedQueryObserverOptions, QueryKey, QueryObserver, QueryObserverResult } from '@tanstack/query-core';
+import type { DefaultedQueryObserverOptions, QueryKey, QueryObserverResult } from '@tanstack/query-core';
 import { noop, notifyManager } from '@tanstack/query-core';
 import * as React from 'react';
 
@@ -20,11 +20,24 @@ export type CommonQueryResult = 'data' | 'error' | 'isLoading' | 'isFetching' | 
  *
  * @internal
  */
+export type ObserverKind = 'query' | 'infinite';
+
+/**
+ *
+ */
 export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey extends QueryKey>(
   options: UseBaseQueryOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>,
-  Observer: typeof QueryObserver,
+  observerKind: ObserverKind,
 ): DistributivePick<QueryObserverResult<TData, TError>, CommonQueryResult> {
-  const [client, isQueryClientLoaded] = useClerkQueryClient();
+  const [client, isQueryClientLoaded, clerkQueryClient] = useClerkQueryClient();
+  const ObserverCtor = React.useMemo(() => {
+    if (!clerkQueryClient || clerkQueryClient.__tag !== 'clerk-rq-client') {
+      return undefined;
+    }
+    return observerKind === 'query'
+      ? clerkQueryClient.QueryObserver
+      : (clerkQueryClient.InfiniteQueryObserver as unknown as typeof clerkQueryClient.QueryObserver);
+  }, [clerkQueryClient, observerKind]);
   const defaultedOptions = isQueryClientLoaded
     ? client.defaultQueryOptions(options)
     : (options as DefaultedQueryObserverOptions<TQueryFnData, TError, TData, TQueryData, TQueryKey>);
@@ -33,17 +46,34 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   defaultedOptions._optimisticResults = 'optimistic';
 
   const observer = React.useMemo(() => {
-    return new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(client, defaultedOptions);
-  }, [client]);
+    if (!ObserverCtor) {
+      return null;
+    }
+    return new ObserverCtor<TQueryFnData, TError, TData, TQueryData, TQueryKey>(client, defaultedOptions);
+  }, [ObserverCtor, client]);
 
   // note: this must be called before useSyncExternalStore
-  const result = observer.getOptimisticResult(defaultedOptions);
+  const fallbackResult = React.useMemo(
+    () => ({
+      data: undefined,
+      error: null,
+      isLoading: false,
+      isFetching: false,
+      status: 'pending' as const,
+    }),
+    [],
+  );
+
+  const result = observer?.getOptimisticResult(defaultedOptions) ?? fallbackResult;
 
   const shouldSubscribe = options.subscribed !== false;
   React.useSyncExternalStore(
     React.useCallback(
       onStoreChange => {
-        const unsubscribe = shouldSubscribe ? observer.subscribe(notifyManager.batchCalls(onStoreChange)) : noop;
+        if (!observer || !shouldSubscribe) {
+          return noop;
+        }
+        const unsubscribe = observer.subscribe(notifyManager.batchCalls(onStoreChange));
 
         // Update result to make sure we did not miss any query updates
         // between creating the observer and subscribing to it.
@@ -53,25 +83,19 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
       },
       [observer, shouldSubscribe],
     ),
-    () => observer.getCurrentResult(),
-    () => observer.getCurrentResult(),
+    () => observer?.getCurrentResult() ?? fallbackResult,
+    () => observer?.getCurrentResult() ?? fallbackResult,
   );
 
   React.useEffect(() => {
-    observer.setOptions(defaultedOptions);
+    observer?.setOptions(defaultedOptions);
   }, [defaultedOptions, observer]);
 
-  if (!isQueryClientLoaded) {
+  if (!isQueryClientLoaded || !ObserverCtor || !observer) {
     // In this step we attempt to return a dummy result that matches RQ's pending state while on SSR or until the query client is loaded on the client (after clerk-js loads).
     // When the query client is not loaded, we return the result as if the query was not enabled.
     // `isLoading` and `isFetching` need to be `false` because we can't know if the query will be enabled during SSR since most conditions rely on client-only data that are available after clerk-js loads.
-    return {
-      data: undefined,
-      error: null,
-      isLoading: false,
-      isFetching: false,
-      status: 'pending',
-    };
+    return fallbackResult;
   }
 
   // Handle result property usage tracking

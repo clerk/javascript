@@ -1,3 +1,3 @@
-import { QueryClient } from '@tanstack/query-core';
+import { InfiniteQueryObserver, QueryClient, QueryObserver } from '@tanstack/query-core';
 
-export { QueryClient };
+export { InfiniteQueryObserver, QueryClient, QueryObserver };
