@@ -759,11 +759,6 @@ export interface Clerk {
   buildWaitlistUrl(opts?: { initialValues?: Record<string, string> }): string;
 
   /**
-   * Creates a div element with "Hello World" text and attaches it to the HTML body.
-   */
-  createHelloWorldDiv: () => void;
-
-  /**
    *
    * Redirects to the provided url after decorating it with the auth token for development instances.
    *
