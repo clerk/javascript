@@ -11,13 +11,13 @@ const mockProtectSettings = async (page: Page, config?: ProtectConfigJSON) => {
     const json = await response.json();
     const newJson = {
       ...json,
-      protect_config: config,
+      ...(config ? { protect_config: config } : {}),
     };
     await route.fulfill({ response, json: newJson });
   });
 };
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Clerk Protect checks', ({ app }) => {
+testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Clerk Protect checks @generic', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
 
   test.afterAll(async () => {
@@ -37,14 +37,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Clerk Pro
     });
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
+
     await expect(page.locator('#test-protect-loader')).toHaveAttribute('type', 'module');
   });
 
   test('should not create loader element when protect_config.loader is not set', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-    await mockProtectSettings(page, undefined);
+    await mockProtectSettings(page);
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
-    expect(page.locator('#test-protect-loader')).toBeUndefined();
+
+    // Playwright locators are always objects, never undefined
+    await expect(page.locator('#test-protect-loader')).toHaveCount(0);
   });
 });
