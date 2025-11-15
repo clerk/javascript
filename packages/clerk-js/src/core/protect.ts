@@ -23,7 +23,18 @@ export class Protect {
     if (config.loader.type) {
       const element = document.createElement(config.loader.type);
       if (config.loader.attributes) {
-        Object.entries(config.loader.attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+        Object.entries(config.loader.attributes).forEach(([key, value]) => {
+          switch (typeof value) {
+            case 'string':
+            case 'number':
+            case 'boolean':
+              element.setAttribute(key, String(value));
+              break;
+            default:
+              // illegal to set.
+              break;
+          }
+        });
       }
       switch (config.loader.target) {
         case 'head':
