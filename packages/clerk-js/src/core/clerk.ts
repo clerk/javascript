@@ -1654,6 +1654,16 @@ export class Clerk implements ClerkInterface {
     return buildURL({ base: waitlistUrl, hashSearchParams: [initValues] }, { stringify: true });
   }
 
+  #createHelloWorldDiv = (): void => {
+    if (!inBrowser()) {
+      return;
+    }
+    const div = document.createElement('div');
+    div.textContent = 'Hello World';
+    div.id = 'hello-world-div';
+    document.body.appendChild(div);
+  };
+
   public buildAfterMultiSessionSingleSignOutUrl(): string {
     if (!this.environment) {
       return '';
@@ -2732,6 +2742,10 @@ export class Clerk implements ClerkInterface {
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
+
+    if (this.environment?.protectSettings?.enabled) {
+      this.#createHelloWorldDiv();
+    }
 
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
