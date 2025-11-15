@@ -3,4 +3,4 @@
 "@clerk/shared": minor
 ---
 
-Introduce "feature name" make it more descriptive
+Introduce ProtectConfig resource and Protect loader integration.
