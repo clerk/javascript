@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { BillingPaymentMethodResource, ConfirmCheckoutParams } from '@clerk/shared/types';
+import type { BillingPaymentMethodResource, ConfirmCheckoutParams, RemoveFunctions } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -29,9 +29,9 @@ const HIDDEN_INPUT_NAME = 'payment_method_id';
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
 
-  const { id, plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
+  const { plan, totals, isImmediatePlanChange, planPeriod, freeTrialEndsAt } = checkout;
 
-  if (!id) {
+  if (!plan) {
     return null;
   }
 
@@ -145,10 +145,9 @@ export const CheckoutForm = withCardStateProvider(() => {
 const useCheckoutMutations = () => {
   const { onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { id, confirm } = checkout;
   const card = useCardState();
 
-  if (!id) {
+  if (checkout.status !== 'needs_confirmation') {
     throw new Error('Checkout not found');
   }
 
@@ -156,11 +155,12 @@ const useCheckoutMutations = () => {
     card.setLoading();
     card.setError(undefined);
 
-    const { data, error } = await confirm(params);
+    const { error } = await checkout.confirm(params);
 
     if (error) {
+      // @ts-expect-error - error is not an Error
       handleError(error, [], card.setError);
-    } else if (data) {
+    } else {
       onSubscriptionComplete?.();
     }
     card.setIdle();
@@ -200,11 +200,11 @@ const useCheckoutMutations = () => {
 
 const CheckoutFormElements = () => {
   const { checkout } = useCheckout();
-  const { id } = checkout;
+  const { plan } = checkout;
 
   const { isLoading } = usePaymentMethods();
 
-  if (!id) {
+  if (!plan) {
     return null;
   }
 
@@ -223,7 +223,7 @@ const CheckoutFormElements = () => {
 
 const CheckoutFormElementsInternal = () => {
   const { checkout } = useCheckout();
-  const { id, isImmediatePlanChange, needsPaymentMethod } = checkout;
+  const { plan, isImmediatePlanChange, needsPaymentMethod } = checkout;
   const { data: paymentMethods } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
@@ -232,7 +232,7 @@ const CheckoutFormElementsInternal = () => {
 
   const showTabs = isImmediatePlanChange && needsPaymentMethod;
 
-  if (!id) {
+  if (!plan) {
     return null;
   }
 
@@ -422,9 +422,9 @@ const ExistingPaymentMethodForm = withCardStateProvider(
 
     const { payWithExistingPaymentMethod } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<BillingPaymentMethodResource | undefined>(
-      paymentMethod || paymentMethods.find(p => p.isDefault),
-    );
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
+      RemoveFunctions<BillingPaymentMethodResource> | undefined
+    >(paymentMethod || paymentMethods.find(p => p.isDefault));
 
     const options = useMemo(() => {
       return paymentMethods.map(method => {

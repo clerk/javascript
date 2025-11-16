@@ -1,6 +1,7 @@
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
+import type { ForceNull, RemoveFunctions, Simplify } from './utils';
 
 type WithOptionalOrgType<T> = T & {
   /**
@@ -864,3 +865,102 @@ export interface BillingPayerResource extends ClerkResource {
    */
   organizationName?: string | null;
 }
+
+export interface CheckoutFutureProperties {
+  /**
+   * A client secret from an external payment provider (such as Stripe) used to complete the payment on the client-side.
+   */
+  externalClientSecret: string;
+  /**
+   * The identifier for the external payment gateway used for this checkout session.
+   */
+  externalGatewayId: string;
+  /**
+   * The payment source being used for the checkout, such as a credit card or bank account.
+   */
+  paymentMethod: Simplify<RemoveFunctions<BillingPaymentMethodResource>> | null;
+  /**
+   * The subscription plan details for the checkout.
+   */
+  plan: Simplify<RemoveFunctions<BillingPlanResource>>;
+  /**
+   * The billing period for the plan.
+   */
+  planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   * Unix timestamp (milliseconds) of when the current period starts.
+   */
+  planPeriodStart: number | undefined;
+  /**
+   * The total costs, taxes, and other pricing details for the checkout.
+   */
+  totals: BillingCheckoutTotals;
+  /**
+   * Whether the plan change will take effect immediately after checkout.
+   */
+  isImmediatePlanChange: boolean;
+  /**
+   * Unix timestamp (milliseconds) of when the free trial ends.
+   */
+  freeTrialEndsAt?: Date;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   *
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  payer: Simplify<RemoveFunctions<BillingPayerResource>>;
+  /**
+   * Whether a payment method is required for this checkout.
+   */
+  needsPaymentMethod: boolean;
+}
+
+type CheckoutPropertiesPerStatus =
+  | ({
+      status: 'needs_initialization';
+    } & ForceNull<CheckoutFutureProperties>)
+  | ({
+      status: 'needs_confirmation' | 'completed';
+    } & CheckoutFutureProperties);
+
+export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
+  /**
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   */
+  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: unknown }>;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   *
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  start: () => Promise<{ error: unknown }>;
+};
+
+export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
+  status: 'needs_initialization' | 'needs_confirmation' | 'completed';
+} & {
+  /**
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   */
+  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: unknown }>;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   *
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  start: () => Promise<{ error: unknown }>;
+};

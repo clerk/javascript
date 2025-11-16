@@ -4,7 +4,7 @@ import React, { type PropsWithChildren, type ReactNode, useCallback, useEffect, 
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../types';
+import type { BillingCheckoutResource, CheckoutFutureResource, EnvironmentResource, ForPayerType } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';
@@ -156,8 +156,17 @@ type internalStripeAppearance = {
   spacingUnit: string;
 };
 
-type PaymentElementProviderProps = {
-  checkout?: BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+/**
+ * @interface
+ */
+export type PaymentElementProviderProps = {
+  /**
+   * An optional checkout resource object. When provided, the payment element is scoped to the specific checkout session.
+   */
+  checkout?: CheckoutFutureResource | BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  /**
+   * An optional object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
+   */
   stripeAppearance?: internalStripeAppearance;
   /**
    * Default to `user` if not provided.
