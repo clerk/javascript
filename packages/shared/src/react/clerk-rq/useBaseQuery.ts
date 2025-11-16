@@ -53,18 +53,23 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   }, [ObserverCtor, client]);
 
   // note: this must be called before useSyncExternalStore
-  const fallbackResult = React.useMemo(
+  const fallbackResult = React.useMemo<DistributivePick<QueryObserverResult<TData, TError>, CommonQueryResult>>(
     () => ({
       data: undefined,
       error: null,
       isLoading: false,
       isFetching: false,
-      status: 'pending' as const,
+      status: 'pending',
     }),
     [],
   );
 
-  const result = observer?.getOptimisticResult(defaultedOptions) ?? fallbackResult;
+  const optimisticResult = React.useMemo(() => {
+    if (!observer) {
+      return undefined;
+    }
+    return observer.getOptimisticResult(defaultedOptions);
+  }, [defaultedOptions, observer]);
 
   const shouldSubscribe = options.subscribed !== false;
   React.useSyncExternalStore(
@@ -83,15 +88,15 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
       },
       [observer, shouldSubscribe],
     ),
-    () => observer?.getCurrentResult() ?? fallbackResult,
-    () => observer?.getCurrentResult() ?? fallbackResult,
+    () => observer?.getCurrentResult() ?? (fallbackResult as QueryObserverResult<TData, TError>),
+    () => observer?.getCurrentResult() ?? (fallbackResult as QueryObserverResult<TData, TError>),
   );
 
   React.useEffect(() => {
     observer?.setOptions(defaultedOptions);
   }, [defaultedOptions, observer]);
 
-  if (!isQueryClientLoaded || !ObserverCtor || !observer) {
+  if (!isQueryClientLoaded || !ObserverCtor || !observer || !optimisticResult) {
     // In this step we attempt to return a dummy result that matches RQ's pending state while on SSR or until the query client is loaded on the client (after clerk-js loads).
     // When the query client is not loaded, we return the result as if the query was not enabled.
     // `isLoading` and `isFetching` need to be `false` because we can't know if the query will be enabled during SSR since most conditions rely on client-only data that are available after clerk-js loads.
@@ -99,5 +104,6 @@ export function useBaseQuery<TQueryFnData, TError, TData, TQueryData, TQueryKey 
   }
 
   // Handle result property usage tracking
-  return !defaultedOptions.notifyOnChangeProps ? observer.trackResult(result) : result;
+  const finalResult = defaultedOptions.notifyOnChangeProps ? optimisticResult : observer.trackResult(optimisticResult);
+  return finalResult;
 }
