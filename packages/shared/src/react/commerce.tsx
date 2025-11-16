@@ -407,8 +407,4 @@ const usePaymentElement = (): UsePaymentElementReturn => {
   };
 };
 
-export {
-  PaymentElement as __experimental_PaymentElement,
-  PaymentElementProvider as __experimental_PaymentElementProvider,
-  usePaymentElement as __experimental_usePaymentElement,
-};
+export { PaymentElement, PaymentElementProvider, usePaymentElement };

@@ -26,6 +26,10 @@ export {
   UserAvatar,
   UserButton,
   Waitlist,
+  PaymentElement,
+  CheckoutButton,
+  SubscriptionDetailsButton,
+  PlanDetailsButton,
 } from '@clerk/react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

@@ -33,7 +33,7 @@ type UseCheckoutOptions = {
 
 const [CheckoutContext, useCheckoutContext] = createContextAndHook<UseCheckoutOptions>('CheckoutContext');
 
-const __experimental_CheckoutProvider = ({ children, ...rest }: PropsWithChildren<UseCheckoutOptions>) => {
+const CheckoutProvider = ({ children, ...rest }: PropsWithChildren<UseCheckoutOptions>) => {
   return <CheckoutContext.Provider value={{ value: rest }}>{children}</CheckoutContext.Provider>;
 };
 
@@ -103,7 +103,7 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
 }
 
 export {
-  __experimental_CheckoutProvider,
+  CheckoutProvider,
   ClerkInstanceContext,
   ClientContext,
   OptionsContext,

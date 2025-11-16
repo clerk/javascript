@@ -1,6 +1,6 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import {
-  __experimental_CheckoutProvider as CheckoutProvider,
+  CheckoutProvider,
   ClientContext,
   OrganizationProvider,
   SessionContext,

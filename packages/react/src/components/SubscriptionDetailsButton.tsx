@@ -1,4 +1,4 @@
-import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/shared/types';
+import type { SubscriptionDetailsButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useAuth } from '../hooks';
@@ -11,8 +11,7 @@ import { withClerk } from './withClerk';
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/react';
- * import { SubscriptionDetailsButton } from '@clerk/react/experimental';
+ * import { SignedIn, SubscriptionDetailsButton } from '@clerk/react';
  *
  * // Basic usage with default "Subscription details" text
  * function BasicSubscriptionDetails() {
@@ -36,15 +35,9 @@ import { withClerk } from './withClerk';
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
  * @throws {Error} When `for="organization"` is used without an active organization context
- *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export const SubscriptionDetailsButton = withClerk(
-  ({
-    clerk,
-    children,
-    ...props
-  }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SubscriptionDetailsButtonProps>>) => {
     const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');

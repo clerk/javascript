@@ -39,6 +39,10 @@ export {
   UserButton,
   UserProfile,
   Waitlist,
+  PaymentElement,
+  CheckoutButton,
+  SubscriptionDetailsButton,
+  PlanDetailsButton,
 } from './client-boundary/uiComponents';
 
 /**
@@ -57,6 +61,15 @@ export {
   useSignIn,
   useSignUp,
   useUser,
+  usePaymentElement,
+  PaymentElementProvider,
+  usePaymentAttempts,
+  usePaymentMethods,
+  usePlans,
+  useSubscription,
+  useStatements,
+  useCheckout,
+  CheckoutProvider,
 } from './client-boundary/hooks';
 
 /**

@@ -1,4 +1,4 @@
-import type { __experimental_PlanDetailsButtonProps } from '@clerk/shared/types';
+import type { PlanDetailsButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import type { WithClerkProp } from '../types';
@@ -11,8 +11,7 @@ import { withClerk } from './withClerk';
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/react';
- * import { PlanDetailsButton } from '@clerk/react/experimental';
+ * import { SignedIn, PlanDetailsButton } from '@clerk/react';
  *
  * // Basic usage with default "Plan details" text
  * function BasicPlanDetails() {
@@ -30,11 +29,9 @@ import { withClerk } from './withClerk';
  *   );
  * }
  * ```
- *
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export const PlanDetailsButton = withClerk(
-  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_PlanDetailsButtonProps>>) => {
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<PlanDetailsButtonProps>>) => {
     const { plan, planId, initialPlanPeriod, planDetailsProps, ...rest } = props;
 
     children = normalizeWithDefaultValue(children, 'Plan details');
@@ -50,7 +47,7 @@ export const PlanDetailsButton = withClerk(
         planId,
         initialPlanPeriod,
         ...planDetailsProps,
-      } as __experimental_PlanDetailsButtonProps);
+      } as PlanDetailsButtonProps);
     };
 
     const wrappedChildClickHandler: React.MouseEventHandler = async e => {

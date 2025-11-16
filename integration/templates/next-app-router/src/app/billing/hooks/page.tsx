@@ -1,5 +1,5 @@
 'use client';
-import { usePlans, useSubscription, useStatements } from '@clerk/nextjs/experimental';
+import { usePlans, useSubscription, useStatements } from '@clerk/nextjs';
 
 export default function Home() {
   const { data: plans, count: planCount } = usePlans();

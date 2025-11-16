@@ -1,11 +1,12 @@
 import {
-  __experimental_usePaymentAttempts,
-  __experimental_usePaymentMethods,
-  __experimental_usePlans,
-  __experimental_useStatements,
-  __experimental_useSubscription,
   useClerk,
+  useOrganization,
+  usePaymentAttempts as usePaymentAttemptsShared,
+  usePaymentMethods as usePaymentMethodsShared,
+  usePlans as usePlansShared,
   useSession,
+  useStatements as useStatementsShared,
+  useSubscription as useSubscriptionShared,
 } from '@clerk/shared/react';
 import type {
   Appearance,
@@ -15,6 +16,7 @@ import type {
 } from '@clerk/shared/types';
 import { useCallback, useMemo } from 'react';
 
+import { useProtect } from '@/ui/common/Gate';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import type { LocalizationKey } from '../../localization';
@@ -28,44 +30,42 @@ export function normalizeFormatted(formatted: string) {
   return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
 }
 
-// TODO(@COMMERCE): Rename payment sources to payment methods at the API level
-export const usePaymentMethods = () => {
+const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
-  return __experimental_usePaymentMethods({
+  const { organization } = useOrganization();
+  const allowBillingRoutes = useProtect(
+    has =>
+      has({
+        permission: 'org:sys_billing:read',
+      }) || has({ permission: 'org:sys_billing:manage' }),
+  );
+
+  return {
     for: subscriberType,
-    initialPage: 1,
-    pageSize: 10,
     keepPreviousData: true,
-  });
+    // If the user is in an organization, only fetch billing data if they have the necessary permissions
+    enabled: subscriberType === 'organization' ? Boolean(organization) && allowBillingRoutes : true,
+  };
+};
+
+export const usePaymentMethods = () => {
+  const params = useBillingHookParams();
+  return usePaymentMethodsShared(params);
 };
 
 export const usePaymentAttempts = () => {
-  const subscriberType = useSubscriberTypeContext();
-  return __experimental_usePaymentAttempts({
-    for: subscriberType,
-    initialPage: 1,
-    pageSize: 10,
-    keepPreviousData: true,
-  });
+  const params = useBillingHookParams();
+  return usePaymentAttemptsShared(params);
 };
 
-export const useStatements = (params?: { mode: 'cache' }) => {
-  const subscriberType = useSubscriberTypeContext();
-  return __experimental_useStatements({
-    for: subscriberType,
-    initialPage: 1,
-    pageSize: 10,
-    keepPreviousData: true,
-    __experimental_mode: params?.mode,
-  });
+export const useStatements = (externalParams?: { mode: 'cache' }) => {
+  const params = useBillingHookParams();
+  return useStatementsShared({ ...params, __experimental_mode: externalParams?.mode });
 };
 
 export const useSubscription = () => {
-  const subscriberType = useSubscriberTypeContext();
-  const subscription = __experimental_useSubscription({
-    for: subscriberType,
-    keepPreviousData: true,
-  });
+  const params = useBillingHookParams();
+  const subscription = useSubscriptionShared(params);
   const subscriptionItems = useMemo(
     () => subscription.data?.subscriptionItems || [],
     [subscription.data?.subscriptionItems],
@@ -80,11 +80,12 @@ export const useSubscription = () => {
 export const usePlans = (params?: { mode: 'cache' }) => {
   const subscriberType = useSubscriberTypeContext();
 
-  return __experimental_usePlans({
+  return usePlansShared({
     for: subscriberType,
     initialPage: 1,
     pageSize: 50,
     keepPreviousData: true,
+    enabled: true,
     __experimental_mode: params?.mode,
   });
 };

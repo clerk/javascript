@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useAttrs, useSlots } from 'vue';
-import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/shared/types';
+import type { SubscriptionDetailsButtonProps as SubscriptionDetailsButtonPropsType } from '@clerk/shared/types';
 import { useClerk } from '../composables/useClerk';
 import { useAuth } from '../composables/useAuth';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
-type SubscriptionDetailsButtonProps = Omit<__experimental_SubscriptionDetailsButtonProps, 'onSubscriptionCancel'>;
+type SubscriptionDetailsButtonProps = Omit<SubscriptionDetailsButtonPropsType, 'onSubscriptionCancel'>;
 const props = defineProps<SubscriptionDetailsButtonProps>();
 
 const clerk = useClerk();
