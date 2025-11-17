@@ -63,7 +63,7 @@ describe('useApiKeys', () => {
 
   it('cascades revalidation for related queries only when using React Query', async () => {
     let sequence = 0;
-    getAllSpy.mockImplementation(async ({ initialPage }: { initialPage?: number }) => {
+    getAllSpy.mockImplementation(async ({ initialPage }: { initialPage?: number } = {}) => {
       sequence += 1;
       const page = initialPage ?? 1;
       return {
@@ -100,7 +100,7 @@ describe('useApiKeys', () => {
 
   it('handles revalidation with different pageSize configurations', async () => {
     let seq = 0;
-    getAllSpy.mockImplementation(async ({ pageSize }: { pageSize?: number }) => {
+    getAllSpy.mockImplementation(async ({ pageSize }: { pageSize?: number } = {}) => {
       seq += 1;
       return {
         data: [{ id: `key-pageSize-${pageSize ?? 'unknown'}-${seq}` }],
@@ -138,7 +138,7 @@ describe('useApiKeys', () => {
 
   it('handles revalidation with different query filters', async () => {
     let seq = 0;
-    getAllSpy.mockImplementation(async ({ query }: { query?: string }) => {
+    getAllSpy.mockImplementation(async ({ query }: { query?: string } = {}) => {
       seq += 1;
       return {
         data: [{ id: `key-query-${query ?? 'empty'}-${seq}` }],
@@ -176,7 +176,7 @@ describe('useApiKeys', () => {
 
   it('does not cascade revalidation across different subjects', async () => {
     let seq = 0;
-    getAllSpy.mockImplementation(async ({ subject }: { subject?: string }) => {
+    getAllSpy.mockImplementation(async ({ subject }: { subject?: string } = {}) => {
       seq += 1;
       return {
         data: [{ id: `key-subject-${subject ?? 'none'}-${seq}` }],
@@ -204,7 +204,9 @@ describe('useApiKeys', () => {
     await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
 
     expect(getAllSpy).toHaveBeenCalledTimes(1);
-    const subjects = getAllSpy.mock.calls.map(call => (call[0] as { subject?: string })?.subject);
+    const subjects = (getAllSpy.mock.calls as Array<unknown[]>).map(
+      call => (call[0] as { subject?: string } | undefined)?.subject,
+    );
     expect(subjects).not.toContain('user_secondary');
     expect(subjects[0] === undefined || subjects[0] === 'user_primary').toBe(true);
   });
