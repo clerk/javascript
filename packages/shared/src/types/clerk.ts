@@ -63,6 +63,13 @@ import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
 import type { WaitlistResource } from './waitlist';
 
+/**
+ * Configuration for portalling components to a specific container.
+ * - `false`: Disable portalling (render in place)
+ * - `() => HTMLElement | null`: Portal to the returned element
+ */
+export type PortalConfig = boolean | (() => HTMLElement | null);
+
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
 export type __experimental_CheckoutCacheState = Readonly<{
@@ -1575,6 +1582,14 @@ export type UserProfileProps = RoutingOptions & {
      */
     hide?: boolean;
   };
+  /**
+   * Configuration for portalling the UserProfile modal to a specific container.
+   * - `false`: Disable portalling (render in place)
+   * - `() => HTMLElement | null`: Portal to the returned element
+   *
+   * @default true
+   */
+  portal?: PortalConfig;
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1727,9 +1742,13 @@ export type UserButtonProps = UserButtonProfileMode & {
   customMenuItems?: CustomMenuItem[];
 
   /**
+   * Configuration for portalling the UserButton popover and nested modals to a specific container.
+   * - `false`: Disable portalling (render in place)
+   * - `() => HTMLElement | null`: Portal to the returned element
+   *
    * @default true
    */
-  portal?: boolean;
+  portal?: PortalConfig;
 };
 
 export type UserAvatarProps = {

@@ -463,6 +463,7 @@ const Components = (props: ComponentsProps) => {
       componentName={'UserProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+      portal={(userProfileModal as UserProfileProps & { portal?: boolean | (() => HTMLElement | null) })?.portal}
     >
       <UserProfileModal {...userProfileModal} />
     </LazyModalRenderer>

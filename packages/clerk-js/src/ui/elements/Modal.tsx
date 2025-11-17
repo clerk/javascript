@@ -1,6 +1,8 @@
 import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
+type PortalConfig = boolean | (() => HTMLElement | null);
+
 import { descriptors, Flex } from '../customizables';
 import { usePopover } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -19,12 +21,28 @@ type ModalProps = React.PropsWithChildren<{
   containerSx?: ThemableCssProp;
   canCloseModal?: boolean;
   style?: React.CSSProperties;
-  portalRoot?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
+  portalRoot?: PortalConfig | HTMLElement | React.MutableRefObject<HTMLElement | null>;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { disableScrollLock, enableScrollLock } = useScrollLock();
   const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot } = props;
+
+  // Resolve portal root
+  const resolvePortalRoot = (): HTMLElement | null => {
+    if (typeof portalRoot === 'function') {
+      return portalRoot();
+    }
+    if (typeof portalRoot === 'boolean') {
+      return null;
+    }
+    if (typeof portalRoot === 'object' && 'current' in portalRoot) {
+      return portalRoot.current;
+    }
+    return portalRoot || null;
+  };
+
+  const resolvedRoot = resolvePortalRoot();
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
@@ -56,7 +74,8 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       context={context}
       isOpen={isOpen}
       outsideElementsInert
-      root={portalRoot}
+      portal={resolvedRoot ? () => resolvedRoot : false}
+      root={resolvedRoot || undefined}
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex

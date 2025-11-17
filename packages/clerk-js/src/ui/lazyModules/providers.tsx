@@ -2,6 +2,8 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
+type PortalConfig = boolean | (() => HTMLElement | null);
+
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
 import type { ThemableCssProp } from '../styledSystem';
@@ -103,6 +105,7 @@ type LazyModalRendererProps = React.PropsWithChildren<
     canCloseModal?: boolean;
     modalId?: string;
     modalStyle?: React.CSSProperties;
+    portal?: PortalConfig;
   } & AppearanceProviderProps
 >;
 
@@ -123,6 +126,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
               containerSx={props.modalContainerSx}
               contentSx={props.modalContentSx}
               canCloseModal={props.canCloseModal}
+              portalRoot={props.portal}
             >
               {props.startPath ? (
                 <Suspense>

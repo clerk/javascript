@@ -3,6 +3,8 @@ import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+type PortalConfig = boolean | (() => HTMLElement | null);
+
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
   nodeId?: string;
@@ -14,7 +16,7 @@ type PopoverProps = PropsWithChildren<{
    */
   outsideElementsInert?: boolean;
   order?: Array<'reference' | 'floating' | 'content'>;
-  portal?: boolean;
+  portal?: PortalConfig;
   /**
    * The root element to render the portal into.
    * @default document.body
@@ -35,36 +37,42 @@ export const Popover = (props: PopoverProps) => {
     children,
   } = props;
 
-  if (portal) {
+  // Resolve portal root
+  const resolveRoot = (): HTMLElement | null => {
+    if (typeof portal === 'function') {
+      return portal();
+    }
+    if (typeof root === 'object' && 'current' in root) {
+      return root.current;
+    }
+    return root || null;
+  };
+
+  const portalRoot = portal !== false ? resolveRoot() : null;
+  const shouldPortal = portal !== false && portalRoot !== null;
+
+  if (!isOpen) {
+    return <FloatingNode id={nodeId} />;
+  }
+
+  const content = (
+    <FloatingFocusManager
+      context={context}
+      initialFocus={initialFocus}
+      outsideElementsInert={outsideElementsInert}
+      order={order}
+    >
+      <>{children}</>
+    </FloatingFocusManager>
+  );
+
+  if (shouldPortal) {
     return (
       <FloatingNode id={nodeId}>
-        <FloatingPortal root={root}>
-          {isOpen && (
-            <FloatingFocusManager
-              context={context}
-              initialFocus={initialFocus}
-              outsideElementsInert={outsideElementsInert}
-              order={order}
-            >
-              <>{children}</>
-            </FloatingFocusManager>
-          )}
-        </FloatingPortal>
+        <FloatingPortal root={portalRoot}>{content}</FloatingPortal>
       </FloatingNode>
     );
   }
 
-  return (
-    <FloatingNode id={nodeId}>
-      {isOpen && (
-        <FloatingFocusManager
-          context={context}
-          initialFocus={initialFocus}
-          order={order}
-        >
-          <>{children}</>
-        </FloatingFocusManager>
-      )}
-    </FloatingNode>
-  );
+  return <FloatingNode id={nodeId}>{content}</FloatingNode>;
 };
