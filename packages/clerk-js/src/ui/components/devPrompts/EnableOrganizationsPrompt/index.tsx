@@ -62,11 +62,13 @@ const EnableOrganizationsPromptInternal = ({
     void new DevTools()
       .__internal_enableEnvironmentSetting({
         enable_organizations: true,
+        allow_personal_account: allowPersonalAccount,
       })
       .then(() => {
         setIsEnabled(true);
+        setIsLoading(false);
       })
-      .finally(() => {
+      .catch(() => {
         setIsLoading(false);
       });
   };
