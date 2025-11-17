@@ -14,7 +14,7 @@ const OrganizationBillingPage = lazy(() =>
 );
 
 const OrganizationAPIKeysPage = lazy(() =>
-  import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationApiKeysPage').then(module => ({
+  import(/* webpackChunkName: "op-api-keys-page"*/ './OrganizationAPIKeysPage').then(module => ({
     default: module.OrganizationAPIKeysPage,
   })),
 );

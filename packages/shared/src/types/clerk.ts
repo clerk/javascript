@@ -585,7 +585,7 @@ export interface Clerk {
    * @param targetNode - Target to mount the APIKeys component.
    * @param props - Configuration parameters.
    */
-  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+  mountAPIKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
    * This API is in early access and may change in future releases.
@@ -597,7 +597,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to unmount the ApiKeys component from.
    */
-  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+  unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a OAuth consent component at the target element.
