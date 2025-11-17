@@ -620,6 +620,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Проверьте Вашу почту',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверьте Вашу почту',
+      resendButton: 'Не получили код? Отправить снова.',
+      subtitle: 'для продолжения работы в "{{applicationName}}"',
+      title: 'Проверьте Вашу почту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -656,6 +662,12 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
+      resendButton: 'Не получили ссылку? Отправить повторно',
+      subtitle: 'чтобы продолжить в {{applicationName}}',
+      title: 'Проверьте свою электронную почту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -673,6 +685,8 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы входите с нового устройства. Мы просим подтверждение для обеспечения безопасности вашего аккаунта.',
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',

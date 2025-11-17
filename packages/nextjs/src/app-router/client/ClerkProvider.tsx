@@ -72,9 +72,9 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
         // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
         // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
         // SOLUTION:
-        // To mitigate this, since the router cache on version 15 is much less aggressive, we can treat this as a noop and simply resolve the promise.
+        // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
         // Once `setActive` performs the navigation, `__unstable__onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
-        if (nextVersion.startsWith('15') && intent === 'sign-out') {
+        if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
           resolve(); // noop
         } else {
           void invalidateCacheAction().then(() => resolve());

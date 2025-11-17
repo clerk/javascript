@@ -1,15 +1,24 @@
 import { inBrowser } from '@clerk/shared/browser';
-import type { Errors, State } from '@clerk/shared/types';
+import type { SignInErrors, SignUpErrors, State } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
 import type { IsomorphicClerk } from './isomorphicClerk';
 
-const defaultErrors = (): Errors => ({
+const defaultSignInErrors = (): SignInErrors => ({
+  fields: {
+    identifier: null,
+    password: null,
+    code: null,
+  },
+  raw: null,
+  global: null,
+});
+
+const defaultSignUpErrors = (): SignUpErrors => ({
   fields: {
     firstName: null,
     lastName: null,
     emailAddress: null,
-    identifier: null,
     phoneNumber: null,
     password: null,
     username: null,
@@ -39,7 +48,7 @@ export class StateProxy implements State {
     const target = () => this.client.signIn.__internal_future;
 
     return {
-      errors: defaultErrors(),
+      errors: defaultSignInErrors(),
       fetchStatus: 'idle' as const,
       signIn: {
         status: 'needs_identifier' as const,
@@ -147,7 +156,7 @@ export class StateProxy implements State {
     const target = () => this.client.signUp.__internal_future;
 
     return {
-      errors: defaultErrors(),
+      errors: defaultSignUpErrors(),
       fetchStatus: 'idle' as const,
       signUp: {
         get id() {

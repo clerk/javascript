@@ -52,9 +52,7 @@ describe('usePagesOrInfinite - basic pagination', () => {
     // ensure fetcher received params without cache keys and with page info
     expect(fetcher).toHaveBeenCalledTimes(1);
     const calledWith = fetcher.mock.calls[0][0];
-    expect(calledWith).toMatchObject({ initialPage: 2, pageSize: 5 });
-    expect(calledWith.type).toBeUndefined();
-    expect(calledWith.userId).toBeUndefined();
+    expect(calledWith).toStrictEqual({ initialPage: 2, pageSize: 5 });
 
     // hook result mapping
     expect(result.current.isLoading).toBe(false);
@@ -752,7 +750,9 @@ describe('usePagesOrInfinite - query state transitions and remounting', () => {
     // Document that during transition, we may see loading/fetching states
     // This is expected RQ behavior and tests must account for it
     expect(fetcher).toHaveBeenCalledTimes(2);
-    expect(fetcher).toHaveBeenCalledWith(expect.objectContaining({ filter: 'B' }));
+    const paramsCalls = fetcher.mock.calls.map(([params]) => params);
+    expect(paramsCalls[0]).toStrictEqual({ initialPage: 1, pageSize: 2, filter: 'A' });
+    expect(paramsCalls[1]).toStrictEqual({ initialPage: 1, pageSize: 2, filter: 'B' });
   });
 
   it('pagination mode: after data loads, subsequent renders with same params keep isLoading false', async () => {

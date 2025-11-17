@@ -398,6 +398,11 @@ describe('PricingTable - plans visibility', () => {
       // Should show plans when signed out
       expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
     });
+
+    // Ensure API args reflect user context by default
+    expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
+    // Signed-out users should not fetch subscriptions
+    expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
   });
 
   it('shows no plans when user is signed in but subscription is null', async () => {
@@ -517,7 +522,15 @@ describe('PricingTable - plans visibility', () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withBilling();
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: ['org:sys_billing:read'],
+          },
+        ],
+      });
     });
 
     // Set new prop via context provider

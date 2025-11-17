@@ -613,6 +613,12 @@ export const caES: LocalizationResource = {
       subtitle: 'per continuar a {{applicationName}}',
       title: 'Comprova el teu correu electrònic',
     },
+    emailCodeMfa: {
+      formTitle: 'Comprova el teu correu electrònic',
+      resendButton: 'No has rebut el codi? Reenvia',
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comprova el teu correu electrònic',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -648,6 +654,12 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: "Utilitzeu l'enllaç de verificació enviat al vostre correu electrònic",
+      resendButton: "No heu rebut l'enllaç? Reenviar",
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comproveu el vostre correu electrònic',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const caES: LocalizationResource = {
       label__alternativeMethods: 'O bé, inicia sessió amb un altre mètode',
       title: 'Has oblidat la contrasenya?',
     },
+    newDeviceVerificationNotice:
+      "Estàs iniciant sessió des d'un dispositiu nou. Demanem verificació per mantenir el compte segur.",
     noAvailableMethods: {
       message: "No es pot procedir amb l'inici de sessió. No hi ha cap factor d'autenticació disponible.",
       subtitle: "S'ha produït un error",

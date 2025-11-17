@@ -613,6 +613,12 @@ export const isIS: LocalizationResource = {
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',
     },
+    emailCodeMfa: {
+      formTitle: 'Athugaðu tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -649,6 +655,12 @@ export const isIS: LocalizationResource = {
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki tengilinn? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const isIS: LocalizationResource = {
       label__alternativeMethods: 'Eða, skráðu þig inn með annarri aðferð',
       title: 'Gleymt lykilorð?',
     },
+    newDeviceVerificationNotice:
+      'Þú ert að skrá þig inn frá nýjum tæki. Við biðjum um staðfestingu til að halda reikningnum þínum öruggum.',
     noAvailableMethods: {
       message: 'Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.',
       subtitle: 'Villa kom upp',

@@ -498,6 +498,17 @@ export interface SessionJSON extends ClerkResourceJSON {
   updated_at: number;
 }
 
+/**
+ * Session webhook event payload extending `SessionJSON` interface with associated `User` information.
+ * Used for `session.created`, `session.ended`, `session.removed`, and `session.revoked` webhook events.
+ */
+export interface SessionWebhookEventJSON extends SessionJSON {
+  /**
+   * The user associated with the session, or null if not available.
+   */
+  user: UserJSON | null;
+}
+
 export interface SignInJSON extends ClerkResourceJSON {
   object: typeof ObjectType.SignInToken;
   status: SignInStatus;
@@ -647,6 +658,18 @@ export interface DeletedObjectJSON {
   id?: string;
   slug?: string;
   deleted: boolean;
+}
+
+/**
+ * User deletion webhook event payload that extends `DeletedObjectJSON`.
+ * Includes the `external_id` field to identify the deleted user in external systems.
+ * Used for `user.deleted` webhook events.
+ */
+export interface UserDeletedJSON extends DeletedObjectJSON {
+  /**
+   * The external identifier associated with the deleted user, if one was set.
+   */
+  external_id?: string;
 }
 
 export interface PaginatedResponseJSON {

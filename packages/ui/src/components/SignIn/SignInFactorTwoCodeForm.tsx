@@ -1,7 +1,7 @@
 import { isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
+import type { EmailCodeFactor, PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -17,7 +17,7 @@ import { useRouter } from '../../router';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
-  factor: PhoneCodeFactor | TOTPFactor;
+  factor: EmailCodeFactor | PhoneCodeFactor | TOTPFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
   prepare?: () => Promise<SignInResource>;
@@ -29,6 +29,12 @@ type SignInFactorTwoCodeFormProps = SignInFactorTwoCodeCard & {
   inputLabel: LocalizationKey;
   resendButton?: LocalizationKey;
 };
+
+const isResettingPassword = (resource: SignInResource) =>
+  isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
+  resource.firstFactorVerification?.status === 'verified';
+
+const isNewDevice = (resource: SignInResource) => resource.clientTrustState === 'new';
 
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
   const signIn = useCoreSignIn();
@@ -62,10 +68,6 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
           });
       }
     : undefined;
-
-  const isResettingPassword = (resource: SignInResource) =>
-    isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
-    resource.firstFactorVerification?.status === 'verified';
 
   const action: VerificationCodeCardProps['onCodeEntryFinishedAction'] = (code, resolve, reject) => {
     signIn
@@ -105,6 +107,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       cardSubtitle={
         isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
       }
+      cardNotice={isNewDevice(signIn) ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
       resendButton={props.resendButton}
       inputLabel={props.inputLabel}
       onCodeEntryFinishedAction={action}

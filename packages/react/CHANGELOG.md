@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.55.0
+
+### Minor Changes
+
+- [Experimental] Update `errors` to have specific field types based on whether it's a sign-in or a sign-up. ([#7195](https://github.com/clerk/javascript/pull/7195)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fixed missing API keys props within `<UserButton />` ([#7201](https://github.com/clerk/javascript/pull/7201)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd)]:
+  - @clerk/shared@3.34.0
+
 ## 5.54.0
 
 ### Minor Changes

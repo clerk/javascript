@@ -1,5 +1,20 @@
 # Change Log
 
+## 3.28.0
+
+### Minor Changes
+
+- Support for `email_code` and `email_link` as a second factor when user is signing in on a new device. ([#7116](https://github.com/clerk/javascript/pull/7116)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Improve Korean (ko-KR) localization by translating missing strings ([#7200](https://github.com/clerk/javascript/pull/7200)) by [@HwangSB](https://github.com/HwangSB)
+
+  - Translated undefined values to Korean
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854)]:
+  - @clerk/types@4.100.0
+
 ## 3.27.2
 
 ### Patch Changes
