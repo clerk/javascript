@@ -22,6 +22,7 @@ export default defineConfig(({ watch }) => {
       PACKAGE_VERSION: `"${sharedPackage.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
       __DEV__: `${watch}`,
+      __CLERK_USE_RQ__: `${process.env.CLERK_USE_RQ === 'true'}`,
     },
   } satisfies Options;
 

@@ -8,7 +8,7 @@ import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
-import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
+import { useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
 
 /**
@@ -18,12 +18,14 @@ function KeepPreviousDataFn<Data>(previousData: Data): Data {
   return previousData;
 }
 
-export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
-  const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
+export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
+  const { fetcher, config, keys } = params;
+
+  const [paginatedPage, setPaginatedPage] = useState(config.initialPage ?? 1);
 
   // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(params.initialPage ?? 1);
-  const pageSizeRef = useRef(params.pageSize ?? 10);
+  const initialPageRef = useRef(config.initialPage ?? 1);
+  const pageSizeRef = useRef(config.pageSize ?? 10);
 
   const enabled = config.enabled ?? true;
   const isSignedIn = config.isSignedIn;
@@ -44,30 +46,33 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   // Non-infinite mode: single page query
   const pagesQueryKey = useMemo(() => {
+    const [stablePrefix, authenticated, tracked, untracked] = keys.queryKey;
+
     return [
-      'clerk-pages',
+      stablePrefix,
+      authenticated,
+      tracked,
       {
-        ...cacheKeys,
-        ...params,
-        initialPage: paginatedPage,
-        pageSize: pageSizeRef.current,
+        ...untracked,
+        args: {
+          ...untracked.args,
+          initialPage: paginatedPage,
+          pageSize: pageSizeRef.current,
+        },
       },
-    ];
-  }, [cacheKeys, params, paginatedPage]);
+    ] as const;
+  }, [keys.queryKey, paginatedPage]);
 
   const singlePageQuery = useClerkQuery({
     queryKey: pagesQueryKey,
     queryFn: ({ queryKey }) => {
-      const [, key] = queryKey as [string, Record<string, unknown>];
+      const { args } = queryKey[3];
 
       if (!fetcher) {
         return undefined as any;
       }
 
-      const requestParams = getDifferentKeys(key, cacheKeys);
-
-      // @ts-ignore - params type differs slightly but is structurally compatible
-      return fetcher({ ...params, ...requestParams } as Params);
+      return fetcher(args);
     },
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,
@@ -77,29 +82,25 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   // Infinite mode: accumulate pages
   const infiniteQueryKey = useMemo(() => {
-    return [
-      'clerk-pages-infinite',
-      {
-        ...cacheKeys,
-        ...params,
-      },
-    ];
-  }, [cacheKeys, params]);
+    const [stablePrefix, authenticated, tracked, untracked] = keys.queryKey;
 
-  const infiniteQuery = useClerkInfiniteQuery<ClerkPaginatedResponse<any>>({
+    return [stablePrefix + '-inf', authenticated, tracked, untracked] as const;
+  }, [keys.queryKey]);
+
+  const infiniteQuery = useClerkInfiniteQuery<ClerkPaginatedResponse<any>, any, any, typeof infiniteQueryKey, any>({
     queryKey: infiniteQueryKey,
-    initialPageParam: params.initialPage ?? 1,
+    initialPageParam: config.initialPage ?? 1,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       const total = lastPage?.total_count ?? 0;
-      const consumed = (allPages.length + (params.initialPage ? params.initialPage - 1 : 0)) * (params.pageSize ?? 10);
+      const consumed = (allPages.length + (config.initialPage ? config.initialPage - 1 : 0)) * (config.pageSize ?? 10);
       return consumed < total ? (lastPageParam as number) + 1 : undefined;
     },
-    queryFn: ({ pageParam }) => {
+    queryFn: ({ pageParam, queryKey }) => {
+      const { args } = queryKey[3];
       if (!fetcher) {
         return undefined as any;
       }
-      // @ts-ignore - merging page params for fetcher call
-      return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
+      return fetcher({ ...args, initialPage: pageParam, pageSize: pageSizeRef.current });
     },
     staleTime: 60_000,
     enabled: queriesEnabled && triggerInfinite,
@@ -113,15 +114,13 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     const isNowSignedOut = isSignedIn === false;
 
     if (previousIsSignedIn && isNowSignedOut) {
-      // Clear ALL queries matching the base query keys (including old userId)
-      // Use predicate to match queries that start with 'clerk-pages' or 'clerk-pages-infinite'
-
       queryClient.removeQueries({
         predicate: query => {
-          const key = query.queryKey;
+          const [stablePrefix, authenticated] = query.queryKey;
           return (
-            (Array.isArray(key) && key[0] === 'clerk-pages') ||
-            (Array.isArray(key) && key[0] === 'clerk-pages-infinite')
+            authenticated === true &&
+            typeof stablePrefix === 'string' &&
+            (stablePrefix === keys.queryKey[0] || stablePrefix === keys.queryKey[0] + '-inf')
           );
         },
       });
@@ -216,7 +215,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
-  const error = (triggerInfinite ? (infiniteQuery.error as any) : singlePageQuery.error) ?? null;
+  const error = (triggerInfinite ? infiniteQuery.error : singlePageQuery.error) ?? null;
   const isError = !!error;
 
   const fetchNext = useCallback(() => {
