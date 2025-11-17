@@ -11,9 +11,6 @@ const buildEnvVarFromOption = (valueToBeStored: unknown, envName: keyof Internal
 };
 
 type HotloadAstroClerkIntegrationParams = AstroClerkIntegrationParams & {
-  clerkJSUrl?: string;
-  clerkJSVariant?: 'headless' | '';
-  clerkJSVersion?: string;
   enableEnvSchema?: boolean;
 };
 
