@@ -27,8 +27,8 @@ import { MagnifyingGlass } from '@/ui/icons';
 import { mqu } from '@/ui/styledSystem';
 
 import { APIKeysTable } from './ApiKeysTable';
-import type { OnCreateParams } from './CreateApiKeyForm';
-import { CreateAPIKeyForm } from './CreateApiKeyForm';
+import type { OnCreateParams } from './CreateAPIKeyForm';
+import { CreateAPIKeyForm } from './CreateAPIKeyForm';
 import { useAPIKeysPagination } from './utils';
 
 type APIKeysPageProps = {
