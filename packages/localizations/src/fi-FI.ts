@@ -613,6 +613,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',
     },
+    emailCodeMfa: {
+      formTitle: 'Tarkista sähköpostisi',
+      resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
@@ -648,6 +654,12 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
+      resendButton: 'Etkö saanut linkkiä? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const fiFI: LocalizationResource = {
       label__alternativeMethods: 'tai kirjaudu sisään toisella tavalla',
       title: 'Unohditko salasanasi?',
     },
+    newDeviceVerificationNotice:
+      'Kirjaudut sisään uudesta laitteesta. Pyydämme vahvistusta tilisi turvallisuuden varmistamiseksi.',
     noAvailableMethods: {
       message: 'Kirjautuminen ei onnistu. Käytettävissä ei ole yhtään todennusmenetelmää.',
       subtitle: 'Tapahtui virhe',

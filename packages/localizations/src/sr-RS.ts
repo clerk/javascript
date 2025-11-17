@@ -611,6 +611,12 @@ export const srRS: LocalizationResource = {
       subtitle: 'da nastaviš na {{applicationName}}',
       title: 'Proveri svoj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Proveri svoj e-mail',
+      resendButton: 'Nisi primio kod? Pošalji ponovo',
+      subtitle: 'da nastaviš na {{applicationName}}',
+      title: 'Proveri svoj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -646,6 +652,12 @@ export const srRS: LocalizationResource = {
         titleNewTab: 'Prijavljen na drugom tabu',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Користите везу за верификацију послату на вашу е-пошту',
+      resendButton: 'Нисте примили везу? Пошаљи поново',
+      subtitle: 'да наставите на {{applicationName}}',
+      title: 'Проверите своју е-пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -663,6 +675,8 @@ export const srRS: LocalizationResource = {
       label__alternativeMethods: 'Ili, prijavi se drugom metodom',
       title: 'Zaboravljena lozinka?',
     },
+    newDeviceVerificationNotice:
+      'Prijavljuješ se sa novog uređaja. Tražimo verifikaciju kako bismo zadržali tvoj nalog sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
       subtitle: 'Došlo je do greške',
