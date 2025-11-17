@@ -4,6 +4,7 @@ import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
+import { PortalProvider } from '../contexts';
 import type { ThemableCssProp } from '../styledSystem';
 import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';
@@ -109,6 +110,24 @@ type LazyModalRendererProps = React.PropsWithChildren<
 >;
 
 export const LazyModalRenderer = (props: LazyModalRendererProps) => {
+  const modalContent = props.startPath ? (
+    <Suspense>
+      <VirtualRouter
+        startPath={props.startPath}
+        onExternalNavigate={props.onExternalNavigate}
+      >
+        {props.children}
+      </VirtualRouter>
+    </Suspense>
+  ) : (
+    props.children
+  );
+
+  // When portal={false}, wrap content with PortalProvider to disable portaling
+  // for all Select components inside the modal (e.g., PhoneInput in UserProfile)
+  const wrappedContent =
+    props.portal === false ? <PortalProvider disablePortal>{modalContent}</PortalProvider> : modalContent;
+
   return (
     <Suspense fallback={''}>
       <AppearanceProvider
@@ -128,18 +147,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
               portal={props.portal}
               portalRoot={props.portalRoot}
             >
-              {props.startPath ? (
-                <Suspense>
-                  <VirtualRouter
-                    startPath={props.startPath}
-                    onExternalNavigate={props.onExternalNavigate}
-                  >
-                    {props.children}
-                  </VirtualRouter>
-                </Suspense>
-              ) : (
-                props.children
-              )}
+              {wrappedContent}
             </Modal>
           </InternalThemeProvider>
         </FlowMetadataProvider>
