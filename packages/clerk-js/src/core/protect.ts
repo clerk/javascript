@@ -47,14 +47,10 @@ export class Protect {
       }
     }
 
-    if (!loader.type) {
-      loader.type = 'script';
-    }
-    if (!loader.target) {
-      loader.target = 'body';
-    }
+    const type = loader.type || 'script';
+    const target = loader.target || 'body';
 
-    const element = document.createElement(loader.type);
+    const element = document.createElement(type);
 
     if (loader.attributes) {
       for (const [key, value] of Object.entries(loader.attributes)) {
@@ -76,7 +72,7 @@ export class Protect {
       element.textContent = loader.textContent;
     }
 
-    switch (loader.target) {
+    switch (target) {
       case 'head':
         document.head.appendChild(element);
         break;
@@ -84,16 +80,16 @@ export class Protect {
         document.body.appendChild(element);
         break;
       default:
-        if (loader.target?.startsWith('#')) {
-          const targetElement = document.getElementById(loader.target.substring(1));
+        if (target?.startsWith('#')) {
+          const targetElement = document.getElementById(target.substring(1));
           if (!targetElement) {
-            logger.warnOnce(`[protect] loader target element not found: ${loader.target}`);
+            logger.warnOnce(`[protect] loader target element not found: ${target}`);
             return;
           }
           targetElement.appendChild(element);
           return;
         }
-        logger.warnOnce(`[protect] loader target is invalid: ${loader.target}`);
+        logger.warnOnce(`[protect] loader target is invalid: ${target}`);
         break;
     }
   }
