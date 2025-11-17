@@ -39,6 +39,7 @@ export {
   UserButton,
   UserProfile,
   Waitlist,
+  PortalProvider,
 } from './client-boundary/uiComponents';
 
 /**

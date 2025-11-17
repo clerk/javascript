@@ -1,11 +1,11 @@
 import { createContextAndHook, useSafeLayoutEffect } from '@clerk/shared/react';
+import type { PortalConfig } from '@clerk/shared/types';
 import React, { useRef } from 'react';
-
-type PortalConfig = boolean | (() => HTMLElement | null);
 
 import { descriptors, Flex } from '../customizables';
 import { usePopover } from '../hooks';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { usePortalContext } from '../contexts/PortalContext';
 import type { ThemableCssProp } from '../styledSystem';
 import { animations, mqu } from '../styledSystem';
 import { withFloatingTree } from './contexts';
@@ -26,7 +26,20 @@ type ModalProps = React.PropsWithChildren<{
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { disableScrollLock, enableScrollLock } = useScrollLock();
-  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot } = props;
+  const {
+    handleClose,
+    handleOpen,
+    contentSx,
+    containerSx,
+    canCloseModal,
+    id,
+    style,
+    portalRoot: portalRootProp,
+  } = props;
+
+  // Get portal from context, fallback to prop, then default to true
+  const portalFromContext = usePortalContext();
+  const portalRoot = portalRootProp !== undefined ? portalRootProp : (portalFromContext ?? true);
 
   // Resolve portal root
   const resolvePortalRoot = (): HTMLElement | null => {

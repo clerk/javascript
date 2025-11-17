@@ -47,6 +47,7 @@ import {
 } from '../utils';
 import { useWaitForComponentMount } from '../utils/useWaitForComponentMount';
 import { ClerkHostRenderer } from './ClerkHostRenderer';
+import { usePortalConfig } from './PortalProvider';
 import { withClerk } from './withClerk';
 
 type FallbackProp = {
@@ -205,6 +206,10 @@ const _UserProfile = withClerk(
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
+    // Get portal from PortalProvider context, props override context
+    const portalFromContext = usePortalConfig();
+    const portal = props.portal !== undefined ? props.portal : portalFromContext;
+
     const rendererRootProps = {
       ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
     };
@@ -218,7 +223,7 @@ const _UserProfile = withClerk(
           mount={clerk.mountUserProfile}
           unmount={clerk.unmountUserProfile}
           updateProps={(clerk as any).__unstable__updateProps}
-          props={{ ...props, customPages }}
+          props={{ ...props, portal, customPages }}
           rootProps={rendererRootProps}
         >
           <CustomPortalsRenderer customPagesPortals={customPagesPortals} />
@@ -250,6 +255,10 @@ const _UserButton = withClerk(
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
+    // Get portal from PortalProvider context, props override context
+    const portalFromContext = usePortalConfig();
+    const portal = props.portal !== undefined ? props.portal : portalFromContext;
+
     const rendererRootProps = {
       ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
     };
@@ -267,7 +276,7 @@ const _UserButton = withClerk(
       mount: clerk.mountUserButton,
       unmount: clerk.unmountUserButton,
       updateProps: (clerk as any).__unstable__updateProps,
-      props: { ...props, userProfileProps, customMenuItems },
+      props: { ...props, portal, userProfileProps, customMenuItems },
     };
     const portalProps = {
       customPagesPortals: customPagesPortals,
@@ -428,6 +437,10 @@ const _OrganizationSwitcher = withClerk(
     const mountingStatus = useWaitForComponentMount(component);
     const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
 
+    // Get portal from PortalProvider context, props override context
+    const portalFromContext = usePortalConfig();
+    const portal = props.portal !== undefined ? props.portal : portalFromContext;
+
     const rendererRootProps = {
       ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
     };
@@ -442,7 +455,7 @@ const _OrganizationSwitcher = withClerk(
       mount: clerk.mountOrganizationSwitcher,
       unmount: clerk.unmountOrganizationSwitcher,
       updateProps: (clerk as any).__unstable__updateProps,
-      props: { ...props, organizationProfileProps },
+      props: { ...props, portal, organizationProfileProps },
       rootProps: rendererRootProps,
       component,
     };

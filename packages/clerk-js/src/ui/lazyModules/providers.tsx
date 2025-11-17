@@ -1,11 +1,10 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { Appearance } from '@clerk/shared/types';
+import type { Appearance, PortalConfig } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
-
-type PortalConfig = boolean | (() => HTMLElement | null);
 
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
+import { usePortalContext } from '../contexts/PortalContext';
 import type { ThemableCssProp } from '../styledSystem';
 import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';
@@ -110,6 +109,10 @@ type LazyModalRendererProps = React.PropsWithChildren<
 >;
 
 export const LazyModalRenderer = (props: LazyModalRendererProps) => {
+  // Get portal from context, fallback to prop, then default to true
+  const portalFromContext = usePortalContext();
+  const portal = props.portal !== undefined ? props.portal : (portalFromContext ?? true);
+
   return (
     <Suspense fallback={''}>
       <AppearanceProvider
@@ -126,7 +129,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
               containerSx={props.modalContainerSx}
               contentSx={props.modalContentSx}
               canCloseModal={props.canCloseModal}
-              portalRoot={props.portal}
+              portalRoot={portal}
             >
               {props.startPath ? (
                 <Suspense>

@@ -26,6 +26,7 @@ export {
   UserAvatar,
   UserButton,
   Waitlist,
+  PortalProvider,
 } from '@clerk/clerk-react';
 
 // The assignment of UserProfile with BaseUserProfile props is used

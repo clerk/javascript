@@ -1,11 +1,12 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { MenuId } from '@clerk/shared/types';
+import type { MenuId, PortalConfig } from '@clerk/shared/types';
 import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
 import type { Button } from '../customizables';
 import { Col, descriptors, SimpleButton } from '../customizables';
+import { usePortalContext } from '../contexts/PortalContext';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -28,10 +29,15 @@ type MenuProps = PropsWithChildren<Record<never, never>> & {
 
 export const Menu = withFloatingTree((props: MenuProps) => {
   const { popoverPlacement = 'bottom-end', elementId, ...rest } = props;
+  const portalFromContext = usePortalContext();
+  const useFixedPosition =
+    typeof portalFromContext === 'function' || (portalFromContext !== false && portalFromContext !== undefined);
+
   const popoverCtx = usePopover({
     placement: popoverPlacement,
     offset: 8,
     shoudFlip: true,
+    strategy: useFixedPosition ? 'fixed' : 'absolute',
   });
 
   const value = React.useMemo(() => ({ value: { popoverCtx, elementId } }), [{ ...popoverCtx }, elementId]);
@@ -82,14 +88,18 @@ const findMenuItem = (el: Element, siblingType: 'prev' | 'next', options?: { cou
 };
 
 type MenuListProps = PropsOfComponent<typeof Col> & {
-  asPortal?: boolean;
+  asPortal?: PortalConfig;
 };
 
 export const MenuList = (props: MenuListProps) => {
-  const { sx, asPortal, ...rest } = props;
+  const { sx, asPortal: asPortalProp, ...rest } = props;
   const { popoverCtx, elementId } = useMenuState();
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Get portal from context, fallback to prop, then default to false
+  const portalFromContext = usePortalContext();
+  const asPortal = asPortalProp !== undefined ? asPortalProp : (portalFromContext ?? false);
 
   useLayoutEffect(() => {
     const current = containerRef.current;

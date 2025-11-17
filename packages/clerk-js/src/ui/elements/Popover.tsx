@@ -1,9 +1,10 @@
+import type { PortalConfig } from '@clerk/shared/types';
 import type { FloatingContext, ReferenceType } from '@floating-ui/react';
 import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-type PortalConfig = boolean | (() => HTMLElement | null);
+import { usePortalContext } from '../contexts/PortalContext';
 
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
@@ -32,10 +33,14 @@ export const Popover = (props: PopoverProps) => {
     order = ['reference', 'content'],
     nodeId,
     isOpen,
-    portal = true,
+    portal: portalProp,
     root,
     children,
   } = props;
+
+  // Get portal from context, fallback to prop, then default to true
+  const portalFromContext = usePortalContext();
+  const portal = portalProp !== undefined ? portalProp : (portalFromContext ?? true);
 
   // Resolve portal root
   const resolveRoot = (): HTMLElement | null => {

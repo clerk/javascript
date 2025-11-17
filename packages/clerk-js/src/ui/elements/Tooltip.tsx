@@ -17,6 +17,7 @@ import {
 import * as React from 'react';
 
 import { Box, descriptors, type LocalizationKey, Span, Text, useAppearance } from '../customizables';
+import { usePortalContext } from '../contexts/PortalContext';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
 
@@ -185,47 +186,69 @@ const Content = React.forwardRef<
 >(function TooltipContent({ style, text, sx, ...props }, propRef) {
   const context = useTooltipContext();
   const ref = useMergeRefs([context.refs.setFloating, propRef]);
+  const portalFromContext = usePortalContext();
 
   if (!context.isMounted) {
     return null;
   }
 
-  return (
-    <FloatingPortal>
+  // Resolve portal root
+  const resolvePortalRoot = (): HTMLElement | null => {
+    if (portalFromContext === false) {
+      return null; // Don't portal at all
+    }
+    if (portalFromContext === undefined) {
+      return null; // Use default FloatingPortal behavior (no root specified)
+    }
+    if (typeof portalFromContext === 'function') {
+      return portalFromContext();
+    }
+    return null;
+  };
+
+  const portalRoot = resolvePortalRoot();
+  const tooltipContent = (
+    <Box
+      ref={ref}
+      elementDescriptor={descriptors.tooltip}
+      style={{
+        ...context.floatingStyles,
+        ...style,
+      }}
+      {...context.getFloatingProps(props)}
+    >
       <Box
-        ref={ref}
-        elementDescriptor={descriptors.tooltip}
-        style={{
-          ...context.floatingStyles,
-          ...style,
-        }}
-        {...context.getFloatingProps(props)}
+        elementDescriptor={descriptors.tooltipContent}
+        style={context.transitionStyles}
+        sx={[
+          t => ({
+            paddingBlock: t.space.$1,
+            paddingInline: t.space.$1x5,
+            borderRadius: t.radii.$md,
+            backgroundColor: t.colors.$black,
+            color: t.colors.$white,
+            maxWidth: t.sizes.$60,
+          }),
+          sx,
+        ]}
       >
-        <Box
-          elementDescriptor={descriptors.tooltipContent}
-          style={context.transitionStyles}
-          sx={[
-            t => ({
-              paddingBlock: t.space.$1,
-              paddingInline: t.space.$1x5,
-              borderRadius: t.radii.$md,
-              backgroundColor: t.colors.$black,
-              color: t.colors.$white,
-              maxWidth: t.sizes.$60,
-            }),
-            sx,
-          ]}
-        >
-          <Text
-            elementDescriptor={descriptors.tooltipText}
-            localizationKey={text}
-            variant='body'
-            colorScheme='inherit'
-          />
-        </Box>
+        <Text
+          elementDescriptor={descriptors.tooltipText}
+          localizationKey={text}
+          variant='body'
+          colorScheme='inherit'
+        />
       </Box>
-    </FloatingPortal>
+    </Box>
   );
+
+  // If portalFromContext is false, render directly without portalling
+  if (portalFromContext === false) {
+    return tooltipContent;
+  }
+
+  // Otherwise use FloatingPortal (with custom root if specified)
+  return <FloatingPortal root={portalRoot || undefined}>{tooltipContent}</FloatingPortal>;
 });
 
 export const Tooltip = {

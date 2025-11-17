@@ -12,6 +12,7 @@ type UsePopoverProps = {
   adjustToReferenceWidth?: boolean;
   referenceElement?: React.RefObject<HTMLElement> | null;
   canCloseModal?: boolean;
+  strategy?: 'absolute' | 'fixed';
   bubbles?:
     | boolean
     | {
@@ -40,6 +41,7 @@ export const usePopover = (props: UsePopoverProps = {}) => {
       reference: referenceElement?.current,
     },
     nodeId,
+    strategy: props.strategy || 'absolute',
     whileElementsMounted: props.autoUpdate === false ? undefined : autoUpdate,
     placement: props.placement || 'bottom-start',
     middleware: [

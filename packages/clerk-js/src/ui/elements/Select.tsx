@@ -1,8 +1,9 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { SelectId } from '@clerk/shared/types';
+import type { PortalConfig, SelectId } from '@clerk/shared/types';
 import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import React, { useState } from 'react';
 
+import { usePortalContext } from '../contexts/PortalContext';
 import { Button, descriptors, Flex, Icon, Input, Text } from '../customizables';
 import { usePopover, useSearchInput } from '../hooks';
 import { ChevronDown } from '../icons';
@@ -30,7 +31,7 @@ type SelectProps<O extends Option> = {
   noResultsMessage?: string;
   renderOption?: RenderOption<O>;
   elementId?: SelectId;
-  portal?: boolean;
+  portal?: PortalConfig;
   referenceElement?: React.RefObject<HTMLElement>;
 };
 
@@ -46,7 +47,7 @@ type SelectState<O extends Option> = Pick<
   select: (option: O) => void;
   focusedItemRef: React.RefObject<HTMLDivElement>;
   onTriggerClick: () => void;
-  portal?: boolean;
+  portal?: PortalConfig;
 };
 
 const [SelectStateCtx, useSelectState] = createContextAndHook<SelectState<any>>('SelectState');
@@ -91,14 +92,21 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     searchPlaceholder,
     elementId,
     children,
-    portal = false,
+    portal: portalProp = false,
     referenceElement = null,
     ...rest
   } = props;
+
+  // Get portal from context, fallback to prop, then default to false
+  const portalFromContext = usePortalContext();
+  const portal = portalProp !== undefined ? portalProp : (portalFromContext ?? false);
+
   const popoverCtx = usePopover({
     autoUpdate: true,
     adjustToReferenceWidth: !!referenceElement,
     referenceElement: referenceElement,
+    strategy:
+      typeof portal === 'function' || (portal !== false && portalFromContext !== undefined) ? 'fixed' : 'absolute',
   });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
@@ -310,7 +318,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      portal={portal || false}
+      portal={portal}
       order={['content']}
     >
       <Flex
