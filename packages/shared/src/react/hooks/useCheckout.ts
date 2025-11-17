@@ -22,12 +22,11 @@ export const useCheckout = (options?: UseCheckoutParams): CheckoutSignalValue =>
   const { isLoaded, user } = useUser();
   const clerk = useClerkInstanceContext();
 
-  // TODO: Move authContext from `clerk-react` to `shared`
-  if (!user && isLoaded) {
+  if (user === null && isLoaded) {
     throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<SignedIn />`.');
   }
 
-  if (isLoaded && forOrganization === 'organization' && !organization) {
+  if (isLoaded && forOrganization === 'organization' && organization === null) {
     throw new Error(
       'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/reference/backend/types/auth-object#how-to-access-the-auth-object',
     );
@@ -35,12 +34,7 @@ export const useCheckout = (options?: UseCheckoutParams): CheckoutSignalValue =>
 
   const signal = useCallback(() => {
     return clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization });
-  }, [
-    // user?.id, organization?.id,
-    planId,
-    planPeriod,
-    forOrganization,
-  ]);
+  }, [user?.id, organization?.id, planId, planPeriod, forOrganization]);
 
   const subscribe = useCallback(
     (callback: () => void) => {

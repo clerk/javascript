@@ -7,6 +7,7 @@ import type {
   BillingPayerResource,
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
+  CheckoutFutureFinalizeParams,
   CheckoutFutureResource,
   CheckoutFutureResourceLax,
   CheckoutSignalValue,
@@ -226,7 +227,23 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
     });
   }
 
+  async finalize(params?: CheckoutFutureFinalizeParams): Promise<{ error: unknown }> {
+    const { navigate } = params || {};
+    return this.runAsyncResourceTask('finalize', async () => {
+      if (this.resource.status !== 'completed') {
+        throw new Error('Clerk: Call `confirm` before `finalize`');
+      }
+
+      await BillingCheckout.clerk.setActive({ session: BillingCheckout.clerk.session?.id, navigate });
+    });
+  }
+
   private runAsyncResourceTask<T>(operationType: string, task: () => Promise<T>, beforeTask?: () => void) {
+    // Noops during transitive state
+    if (typeof BillingCheckout.clerk.user === 'undefined') {
+      console.warn('Clerk: Checkout operations cannot be performed during transitive state');
+      return { error: null };
+    }
     return createRunAsyncResourceTask(this, this.signals, this.pendingOperations)(operationType, task, beforeTask);
   }
 }

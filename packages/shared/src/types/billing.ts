@@ -1,3 +1,4 @@
+import type { SetActiveNavigate } from './clerk';
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
@@ -927,6 +928,10 @@ type CheckoutPropertiesPerStatus =
       status: 'needs_confirmation' | 'completed';
     } & CheckoutFutureProperties);
 
+export interface CheckoutFutureFinalizeParams {
+  navigate: SetActiveNavigate;
+}
+
 export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
@@ -943,6 +948,12 @@ export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
    * ```
    */
   start: () => Promise<{ error: unknown }>;
+
+  /**
+   * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
+   * subscription state (such as the `useSubscription()` hook) to update automatically.
+   */
+  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: unknown }>;
 };
 
 export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
@@ -963,4 +974,10 @@ export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
    * ```
    */
   start: () => Promise<{ error: unknown }>;
+
+  /**
+   * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
+   * subscription state (such as the `useSubscription()` hook) to update automatically.
+   */
+  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: unknown }>;
 };

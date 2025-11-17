@@ -28,16 +28,16 @@ const CheckoutSignalCache = new Map<
 function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOptions): CheckoutSignalValue {
   const { for: forOrganization, planId, planPeriod } = options;
 
-  if (!clerk.isSignedIn || !clerk.user) {
+  if (clerk.user === null) {
     throw new Error('Clerk: User is not authenticated');
   }
 
-  if (forOrganization === 'organization' && !clerk.organization) {
+  if (forOrganization === 'organization' && clerk.organization === null) {
     throw new Error('Clerk: Use `setActive` to set the organization');
   }
 
   const checkoutKey = cacheKey({
-    userId: clerk.user.id,
+    userId: clerk.user?.id || '',
     orgId: forOrganization === 'organization' ? clerk.organization?.id : undefined,
     planId,
     planPeriod,

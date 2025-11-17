@@ -1,7 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import type {
   BillingSubscriptionPlanPeriod,
-  CheckoutFutureResource,
   CheckoutSignalValue,
   Clerk,
   ForPayerType,
@@ -256,8 +255,9 @@ export class StateProxy implements State {
 
   private buildCheckoutProxy(params: CheckoutSignalProps): CheckoutSignalValue {
     const gateProperty = this.gateProperty.bind(this);
+    const gateMethod = this.gateMethod.bind(this);
     const targetCheckout = () => this.checkout(params);
-    const target = () => targetCheckout().checkout as CheckoutFutureResource;
+    const target = () => targetCheckout().checkout;
 
     return {
       errors: {
@@ -275,8 +275,8 @@ export class StateProxy implements State {
         get externalGatewayId() {
           return gateProperty(target, 'externalGatewayId', null) as null;
         },
-        get paymentSource() {
-          return gateProperty(target, 'paymentSource', null) as null;
+        get paymentMethod() {
+          return gateProperty(target, 'paymentMethod', null) as null;
         },
         get plan() {
           return gateProperty(target, 'plan', null) as null;
@@ -299,9 +299,13 @@ export class StateProxy implements State {
         get planPeriodStart() {
           return gateProperty(target, 'planPeriodStart', null) as null;
         },
+        get needsPaymentMethod() {
+          return gateProperty(target, 'needsPaymentMethod', null) as null;
+        },
 
         start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),
         confirm: this.gateMethod<ReturnType<typeof target>, 'confirm'>(target, 'confirm'),
+        finalize: gateMethod<ReturnType<typeof target>, 'finalize'>(target, 'finalize'),
       },
     };
   }
