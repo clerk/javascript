@@ -38,3 +38,9 @@ export { SignInButton } from './SignInButton';
 export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';
 export { SignOutButton } from './SignOutButton';
 export { SignUpButton } from './SignUpButton';
+
+export { CheckoutButton } from './CheckoutButton';
+export { PlanDetailsButton } from './PlanDetailsButton';
+export { SubscriptionDetailsButton } from './SubscriptionDetailsButton';
+
+export type { CheckoutButtonProps, SubscriptionDetailsButtonProps, PlanDetailsButtonProps } from '@clerk/shared/types';

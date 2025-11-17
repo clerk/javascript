@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useAttrs, useSlots } from 'vue';
-import type { __experimental_PlanDetailsButtonProps } from '@clerk/shared/types';
+import type { PlanDetailsButtonProps } from '@clerk/shared/types';
 import { useClerk } from '../composables/useClerk';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
-const props = defineProps<__experimental_PlanDetailsButtonProps>();
+const props = defineProps<PlanDetailsButtonProps>();
 
 const clerk = useClerk();
 const slots = useSlots();
@@ -25,7 +25,7 @@ function clickHandler() {
     planId: props.planId,
     initialPlanPeriod: props.initialPlanPeriod,
     ...props.planDetailsProps,
-  } as __experimental_PlanDetailsButtonProps);
+  } as PlanDetailsButtonProps);
 }
 </script>
 

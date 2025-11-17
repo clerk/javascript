@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../commerce';
+import { PaymentElement, PaymentElementProvider } from '../commerce';
 import { OptionsContext } from '../contexts';
 
 // Mock the Stripe components
@@ -173,9 +173,9 @@ describe('PaymentElement Localization', () => {
 
     return render(
       <OptionsContext.Provider value={options}>
-        <__experimental_PaymentElementProvider checkout={mockCheckout}>
-          <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-        </__experimental_PaymentElementProvider>
+        <PaymentElementProvider checkout={mockCheckout}>
+          <PaymentElement fallback={<div>Loading...</div>} />
+        </PaymentElementProvider>
       </OptionsContext.Provider>,
     );
   };
@@ -200,9 +200,9 @@ describe('PaymentElement Localization', () => {
 
     render(
       <OptionsContext.Provider value={options}>
-        <__experimental_PaymentElementProvider checkout={mockCheckout}>
-          <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-        </__experimental_PaymentElementProvider>
+        <PaymentElementProvider checkout={mockCheckout}>
+          <PaymentElement fallback={<div>Loading...</div>} />
+        </PaymentElementProvider>
       </OptionsContext.Provider>,
     );
 
@@ -236,9 +236,9 @@ describe('PaymentElement Localization', () => {
 
       const { unmount } = render(
         <OptionsContext.Provider value={options}>
-          <__experimental_PaymentElementProvider checkout={mockCheckout}>
-            <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-          </__experimental_PaymentElementProvider>
+          <PaymentElementProvider checkout={mockCheckout}>
+            <PaymentElement fallback={<div>Loading...</div>} />
+          </PaymentElementProvider>
         </OptionsContext.Provider>,
       );
 

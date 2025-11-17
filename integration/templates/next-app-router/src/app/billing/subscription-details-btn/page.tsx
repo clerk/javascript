@@ -1,4 +1,4 @@
-import { SubscriptionDetailsButton } from '@clerk/nextjs/experimental';
+import { SubscriptionDetailsButton } from '@clerk/nextjs';
 
 export default function Home() {
   return (

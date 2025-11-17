@@ -930,11 +930,8 @@ export interface Clerk {
 
   /**
    * Checkout API
-   *
-   * @experimental
-   * This API is in early access and may change in future releases.
    */
-  __experimental_checkout: __experimental_CheckoutFunction;
+  checkout: __experimental_CheckoutFunction;
 }
 
 export type HandleOAuthCallbackParams = TransferableOption &
@@ -2025,10 +2022,7 @@ export type __internal_CheckoutProps = {
   onClose?: () => void;
 };
 
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
- */
-export type __experimental_CheckoutButtonProps = {
+export type CheckoutButtonProps = {
   planId: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
@@ -2047,9 +2041,6 @@ export type __experimental_CheckoutButtonProps = {
   newSubscriptionRedirectUrl?: string;
 };
 
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
- */
 export type __internal_PlanDetailsProps = (
   | {
       planId: string;
@@ -2069,10 +2060,7 @@ export type __internal_PlanDetailsProps = (
   portalRoot?: PortalRoot;
 };
 
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
- */
-export type __experimental_PlanDetailsButtonProps = (
+export type PlanDetailsButtonProps = (
   | {
       planId: string;
       plan?: never;
@@ -2093,9 +2081,6 @@ export type __experimental_PlanDetailsButtonProps = (
   };
 };
 
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
- */
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
@@ -2110,10 +2095,7 @@ export type __internal_SubscriptionDetailsProps = {
   portalRoot?: PortalRoot;
 };
 
-/**
- * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
- */
-export type __experimental_SubscriptionDetailsButtonProps = {
+export type SubscriptionDetailsButtonProps = {
   /**
    * The subscriber type to display the subscription details for.
    * If `organization` is provided, the subscription details will be displayed for the active organization.

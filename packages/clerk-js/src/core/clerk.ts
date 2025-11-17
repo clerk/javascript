@@ -216,7 +216,7 @@ export class Clerk implements ClerkInterface {
 
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
-  private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
+  private _checkout: ClerkInterface['checkout'] | undefined;
 
   public client: ClientResource | undefined;
   public session: SignedInSessionResource | null | undefined;
@@ -382,7 +382,7 @@ export class Clerk implements ClerkInterface {
     return Clerk._apiKeys;
   }
 
-  __experimental_checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
+  checkout(options: __experimental_CheckoutOptions): __experimental_CheckoutInstance {
     if (!this._checkout) {
       this._checkout = params => createCheckoutInstance(this, params);
     }

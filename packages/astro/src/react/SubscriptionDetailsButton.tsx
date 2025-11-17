@@ -1,17 +1,13 @@
-import type { __experimental_SubscriptionDetailsButtonProps } from '@clerk/shared/types';
+import type { SubscriptionDetailsButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import type { WithClerkProp } from './utils';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute, withClerk } from './utils';
 
-export type { __experimental_SubscriptionDetailsButtonProps as SubscriptionDetailsButtonProps };
+export type { SubscriptionDetailsButtonProps };
 
 export const SubscriptionDetailsButton = withClerk(
-  ({
-    clerk,
-    children,
-    ...props
-  }: WithClerkProp<React.PropsWithChildren<__experimental_SubscriptionDetailsButtonProps>>) => {
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<SubscriptionDetailsButtonProps>>) => {
     const { for: _for, subscriptionDetailsProps, onSubscriptionCancel, ...rest } = props;
     children = normalizeWithDefaultValue(children, 'Subscription details');
     const child = assertSingleChild(children)('SubscriptionDetailsButton');

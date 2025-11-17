@@ -1,13 +1,13 @@
-import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
+import type { CheckoutButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import type { WithClerkProp } from './utils';
 import { assertSingleChild, normalizeWithDefaultValue, safeExecute, withClerk } from './utils';
 
-export type { __experimental_CheckoutButtonProps as CheckoutButtonProps };
+export type { CheckoutButtonProps };
 
 export const CheckoutButton = withClerk(
-  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<__experimental_CheckoutButtonProps>>) => {
+  ({ clerk, children, ...props }: WithClerkProp<React.PropsWithChildren<CheckoutButtonProps>>) => {
     const {
       planId,
       planPeriod,

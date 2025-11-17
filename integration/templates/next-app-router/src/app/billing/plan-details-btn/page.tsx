@@ -1,4 +1,4 @@
-import { PlanDetailsButton } from '@clerk/nextjs/experimental';
+import { PlanDetailsButton } from '@clerk/nextjs';
 
 export default function Home() {
   return (

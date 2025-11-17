@@ -11,6 +11,15 @@ export {
   useSignUp,
   useUser,
   useReverification,
+  usePaymentElement,
+  PaymentElementProvider,
+  usePaymentAttempts,
+  usePaymentMethods,
+  usePlans,
+  useSubscription,
+  useStatements,
+  useCheckout,
+  CheckoutProvider,
 } from '@clerk/react';
 
 export {

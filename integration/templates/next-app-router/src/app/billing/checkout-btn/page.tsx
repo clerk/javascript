@@ -1,5 +1,4 @@
-import { SignedIn } from '@clerk/nextjs';
-import { CheckoutButton } from '@clerk/nextjs/experimental';
+import { CheckoutButton, SignedIn } from '@clerk/nextjs';
 
 export default function Home() {
   return (

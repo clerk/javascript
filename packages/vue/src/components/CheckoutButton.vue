@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useAttrs, useSlots } from 'vue';
-import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
+import type { CheckoutButtonProps as CheckoutButtonPropsType } from '@clerk/shared/types';
 import { useClerk } from '../composables/useClerk';
 import { useAuth } from '../composables/useAuth';
 import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
 
-type CheckoutButtonProps = Omit<__experimental_CheckoutButtonProps, 'onSubscriptionComplete'>;
+type CheckoutButtonProps = Omit<CheckoutButtonPropsType, 'onSubscriptionComplete'>;
 const props = defineProps<CheckoutButtonProps>();
 
 const clerk = useClerk();
