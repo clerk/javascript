@@ -1,9 +1,10 @@
 // packages/clerk-js/src/ui/elements/__tests__/SocialButtons.test.tsx
-import { render, screen } from '@testing-library/react';
+import { render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
+import { useTotalEnabledAuthMethods } from '@/ui/hooks/useTotalEnabledAuthMethods';
 
 import { SocialButtons } from '../SocialButtons';
 
@@ -117,9 +118,101 @@ describe('SocialButtons', () => {
   });
 
   describe('With last authentication strategy', () => {
-    it('should show "Continue with" prefix for single strategy', async () => {
+    it('should NOT show "Last used" badge when only one total auth method exists (single social provider, no email/username)', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
+        // Explicitly disable email and username to ensure only one auth method
+        // Note: By default fixtures have these disabled, but we set them explicitly to be sure
+        f.withEmailAddress({ enabled: false, used_for_first_factor: false });
+        f.withUsername({ enabled: false, used_for_first_factor: false });
+      });
+
+      // Verify that email and username are disabled
+      const enabledIdentifiers = fixtures.environment.userSettings.enabledFirstFactorIdentifiers;
+      expect(enabledIdentifiers).not.toContain('email_address');
+      expect(enabledIdentifiers).not.toContain('username');
+      // Verify only one social provider is enabled
+      expect(fixtures.environment.userSettings.authenticatableSocialStrategies).toHaveLength(1);
+
+      // Verify the total count is actually 1 using the hook
+      const { result } = renderHook(() => useTotalEnabledAuthMethods(), { wrapper });
+      expect(result.current.totalCount).toBe(1);
+
+      fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
+
+      render(
+        <CardStateProvider>
+          <SocialButtons
+            {...defaultProps}
+            showLastAuthenticationStrategy
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const button = screen.getByRole('button', { name: /google/i });
+      expect(button).toHaveTextContent('Continue with Google');
+      expect(button).not.toHaveTextContent('Last used');
+      expect(screen.queryByText('Last used')).not.toBeInTheDocument();
+    });
+
+    it('should show "Last used" badge when email is enabled even with single social provider', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        f.withEmailAddress({ enabled: true, used_for_first_factor: true });
+        f.withUsername({ enabled: false, used_for_first_factor: false });
+      });
+
+      // Verify the total count is 2 (email + google)
+      const { result } = renderHook(() => useTotalEnabledAuthMethods(), { wrapper });
+      expect(result.current.totalCount).toBe(2);
+
+      fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
+
+      render(
+        <CardStateProvider>
+          <SocialButtons
+            {...defaultProps}
+            showLastAuthenticationStrategy
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const button = screen.getByRole('button', { name: /google/i });
+      expect(button).toHaveTextContent('Continue with Google');
+      expect(button).toHaveTextContent('Last used');
+      expect(screen.getByText('Last used')).toBeInTheDocument();
+    });
+
+    it('should show "Last used" badge when only one social provider but email/username is also enabled', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        f.withEmailAddress({ enabled: true, used_for_first_factor: true });
+      });
+
+      fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
+
+      render(
+        <CardStateProvider>
+          <SocialButtons
+            {...defaultProps}
+            showLastAuthenticationStrategy
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const button = screen.getByRole('button', { name: /google/i });
+      expect(button).toHaveTextContent('Continue with Google');
+      expect(button).toHaveTextContent('Last used');
+      expect(screen.getByText('Last used')).toBeInTheDocument();
+    });
+
+    it('should show "Continue with" prefix for single strategy when multiple auth methods exist', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        f.withEmailAddress({ enabled: true, used_for_first_factor: true });
       });
 
       fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
@@ -217,6 +310,7 @@ describe('SocialButtons', () => {
     it('should handle SAML strategies converted to OAuth', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withSocialProvider({ provider: 'google' });
+        f.withEmailAddress({ enabled: true, used_for_first_factor: true });
       });
 
       // SAML strategy should be converted to OAuth
@@ -234,6 +328,33 @@ describe('SocialButtons', () => {
 
       const googleButton = screen.getByRole('button', { name: /google/i });
       expect(googleButton).toHaveTextContent('Continue with Google');
+    });
+
+    it('should NOT show "Last used" badge when only one total auth method exists (single social provider, no email/username, SAML)', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+        // Disable email and username to ensure only one auth method
+        f.withEmailAddress({ enabled: false, used_for_first_factor: false });
+        f.withUsername({ enabled: false, used_for_first_factor: false });
+      });
+
+      // SAML strategy should be converted to OAuth but badge should not show
+      fixtures.clerk.client.lastAuthenticationStrategy = 'saml_google' as any;
+
+      render(
+        <CardStateProvider>
+          <SocialButtons
+            {...defaultProps}
+            showLastAuthenticationStrategy
+          />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const googleButton = screen.getByRole('button', { name: /google/i });
+      expect(googleButton).toHaveTextContent('Continue with Google');
+      expect(googleButton).not.toHaveTextContent('Last used');
+      expect(screen.queryByText('Last used')).not.toBeInTheDocument();
     });
   });
 });
