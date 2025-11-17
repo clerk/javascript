@@ -1,6 +1,6 @@
+import type { SignInStatus } from '@clerk/shared/types';
 import { joinURL } from '@clerk/shared/url';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
-import type { SignInStatus } from '@clerk/types';
 import type { NonReducibleUnknown } from 'xstate';
 import { and, assign, enqueueActions, fromPromise, log, not, or, raise, sendTo, setup } from 'xstate';
 

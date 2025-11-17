@@ -5,7 +5,8 @@ import type {
   MultiDomainAndOrProxyPrimitives,
   ProtectProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 
 type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 
@@ -20,8 +21,17 @@ type AstroClerkIntegrationParams = Without<
   | 'routerPush'
   | 'polling'
   | 'touchSession'
+  | 'clerkUiCtor'
 > &
-  MultiDomainAndOrProxyPrimitives;
+  MultiDomainAndOrProxyPrimitives & {
+    clerkJSUrl?: string;
+    clerkJSVariant?: 'headless' | '';
+    clerkJSVersion?: string;
+    /**
+     * The URL that `@clerk/ui` should be hot-loaded from.
+     */
+    clerkUiUrl?: string;
+  };
 
 type AstroClerkCreateInstanceParams = AstroClerkIntegrationParams & { publishableKey: string };
 
@@ -42,6 +52,7 @@ declare global {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
     __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
     Clerk: BrowserClerk;
+    __unstable_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
 

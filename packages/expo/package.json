@@ -65,15 +65,7 @@
   "source": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "web",
-    "local-credentials",
-    "passkeys",
-    "secure-store",
-    "resource-cache",
-    "token-cache",
-    "experimental",
-    "legacy"
+    "dist"
   ],
   "scripts": {
     "build": "tsup",
@@ -92,7 +84,6 @@
     "@clerk/clerk-js": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "base-64": "^1.0.0",
     "react-native-url-polyfill": "2.0.0",
     "tslib": "catalog:repo"
@@ -110,6 +101,7 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "expo": ">=53 <55",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
     "expo-crypto": ">=12",

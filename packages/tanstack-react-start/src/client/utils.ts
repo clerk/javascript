@@ -19,6 +19,7 @@ export const pickFromClerkInitState = (
     __afterSignInUrl,
     __afterSignUpUrl,
     __clerkJSUrl,
+    __clerkUiUrl,
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
@@ -39,6 +40,7 @@ export const pickFromClerkInitState = (
     afterSignInUrl: __afterSignInUrl,
     afterSignUpUrl: __afterSignUpUrl,
     clerkJSUrl: __clerkJSUrl,
+    clerkUiUrl: __clerkUiUrl,
     clerkJSVersion: __clerkJSVersion,
     telemetry: {
       disabled: __telemetryDisabled,
@@ -62,6 +64,7 @@ export const mergeWithPublicEnvs = (restInitState: any) => {
     afterSignInUrl: restInitState.afterSignInUrl || getPublicEnvVariables().afterSignInUrl,
     afterSignUpUrl: restInitState.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl,
     clerkJSUrl: restInitState.clerkJSUrl || getPublicEnvVariables().clerkJsUrl,
+    clerkUiUrl: restInitState.clerkUiUrl || getPublicEnvVariables().clerkUiUrl,
     clerkJSVersion: restInitState.clerkJSVersion || getPublicEnvVariables().clerkJsVersion,
     signInForceRedirectUrl: restInitState.signInForceRedirectUrl,
     clerkJSVariant: restInitState.clerkJSVariant || getPublicEnvVariables().clerkJsVariant,

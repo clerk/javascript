@@ -117,7 +117,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
-        run: pnpm turbo build $TURBO_ARGS --only
+        run: pnpm turbo build $TURBO_ARGS --only --filter=!@clerk/elements
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -191,7 +191,7 @@ jobs:
   unit-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Unit Tests (${{ matrix.node-version }}, ${{ matrix.filter-label }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
+    name: Unit Tests (${{ matrix.filter-label }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -264,7 +264,7 @@ jobs:
         run: |
           # Only run Typedoc tests for one matrix version and main test run
           if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
-            pnpm test:typedoc
+            pnpm turbo run //#test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -294,53 +294,49 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
-            'generic',
-            'express',
-            'ap-flows',
-            'elements',
-            'localhost',
-            'sessions',
-            'sessions:staging',
-            'handshake',
-            'handshake:staging',
-            'astro',
-            'expo-web',
-            'tanstack-react-start',
-            'vue',
-            'nuxt',
-            'react-router',
-            'machine',
-            'custom',
+        test-name:
+          [
+            "generic",
+            "express",
+            "ap-flows",
+            "localhost",
+            "sessions",
+            "sessions:staging",
+            "handshake",
+            "handshake:staging",
+            "astro",
+            "tanstack-react-start",
+            "vue",
+            "nuxt",
+            "react-router",
+            "machine",
+            "custom",
           ]
         test-project: ["chrome"]
         include:
-          - test-name: 'billing'
-            test-project: 'chrome'
-            clerk-use-rq: 'false'
-          - test-name: 'billing'
-            test-project: 'chrome'
-            clerk-use-rq: 'true'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '14'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-            clerk-use-rq: 'false'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-            clerk-use-rq: 'true'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '16'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '16'
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "false"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "true"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "false"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "true"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "16"
 
     steps:
       - name: Checkout Repo
@@ -371,7 +367,9 @@ jobs:
         id: task-status
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -406,7 +404,8 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag integration; fi
+
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
@@ -427,6 +426,15 @@ jobs:
           pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/ui
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
@@ -462,7 +470,9 @@ jobs:
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}

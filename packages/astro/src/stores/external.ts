@@ -1,6 +1,6 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { SignedInSessionResource } from '@clerk/types';
+import type { SignedInSessionResource } from '@clerk/shared/types';
 import { batched, computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';

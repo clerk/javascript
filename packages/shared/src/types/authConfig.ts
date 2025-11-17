@@ -9,6 +9,7 @@ export interface AuthConfigResource extends ClerkResource {
   singleSessionMode: boolean;
   /**
    * Timestamp of when the instance was claimed. This only applies to applications created with the Keyless mode.
+   *
    * @default null
    */
   claimedAt: Date | null;

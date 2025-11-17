@@ -58,9 +58,9 @@
     "app:dev:debug:ui": "(cd examples/nextjs && NEXT_PUBLIC_CLERK_ELEMENTS_DEBUG_UI=true pnpm dev)",
     "app:e2e": "(cd examples/nextjs && pnpm e2e)",
     "app:lint": "(cd examples/nextjs && pnpm lint)",
-    "build": "tsup --env.NODE_ENV production",
     "build:analyze": "tsup --env.NODE_ENV production --metafile; open https://esbuild.github.io/analyze/",
     "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:disable": "tsup --env.NODE_ENV production",
     "dev": "tsup --env.NODE_ENV development --watch",
     "dev:example": "concurrently \"pnpm dev\" \"pnpm app:dev\"",
     "format": "node ../../scripts/format-package.mjs",
@@ -74,7 +74,6 @@
   "dependencies": {
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "@radix-ui/primitive": "^1.1.3",
     "@radix-ui/react-form": "^0.1.8",
     "@radix-ui/react-slot": "^1.2.3",

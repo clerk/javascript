@@ -48,9 +48,6 @@ testing:
 themes:
   - packages/themes/**
 
-types:
-  - packages/types/**
-
 vue:
   - packages/vue/**
 

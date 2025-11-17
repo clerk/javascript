@@ -1,10 +1,9 @@
 'use client';
 
 import { eventMethodCalled } from '../../telemetry/events/method-called';
-import type { APIKeyResource, GetAPIKeysParams } from '../../types';
+import type { APIKeyResource, ClerkPaginatedResponse, GetAPIKeysParams } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import type { PaginatedHookConfig, PaginatedResources } from '../types';
-import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -67,8 +66,8 @@ export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
  * });
  * ```
  */
-export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysReturn<T> {
-  useAssertWrappedByClerkProvider('useAPIKeys');
+export function useApiKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysReturn<T> {
+  useAssertWrappedByClerkProvider('useApiKeys');
 
   const safeValues = useWithSafeValues(params, {
     initialPage: 1,
@@ -82,7 +81,7 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
 
   const clerk = useClerkInstanceContext();
 
-  clerk.telemetry?.record(eventMethodCalled('useAPIKeys'));
+  clerk.telemetry?.record(eventMethodCalled('useApiKeys'));
 
   const hookParams: GetAPIKeysParams = {
     initialPage: safeValues.initialPage,
@@ -93,25 +92,17 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
 
   const isEnabled = (safeValues.enabled ?? true) && clerk.loaded;
 
-  return usePagesOrInfinite({
-    fetcher: clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
-    config: {
+  return usePagesOrInfinite<GetAPIKeysParams, ClerkPaginatedResponse<APIKeyResource>>(
+    hookParams,
+    clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
+    {
       keepPreviousData: safeValues.keepPreviousData,
       infinite: safeValues.infinite,
       enabled: isEnabled,
-      isSignedIn: Boolean(clerk.user),
-      initialPage: safeValues.initialPage,
-      pageSize: safeValues.pageSize,
     },
-    keys: createCacheKeys({
-      stablePrefix: 'apiKeys',
-      authenticated: Boolean(clerk.user),
-      tracked: {
-        subject: safeValues.subject,
-      },
-      untracked: {
-        args: hookParams,
-      },
-    }),
-  }) as UseAPIKeysReturn<T>;
+    {
+      type: 'apiKeys',
+      subject: safeValues.subject || '',
+    },
+  ) as UseAPIKeysReturn<T>;
 }

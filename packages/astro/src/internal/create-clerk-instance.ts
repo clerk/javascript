@@ -1,5 +1,10 @@
-import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
-import type { ClerkOptions } from '@clerk/types';
+import {
+  loadClerkJsScript,
+  loadClerkUiScript,
+  setClerkJsLoadingErrorPackageName,
+} from '@clerk/shared/loadClerkJsScript';
+import type { ClerkOptions } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 
 import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
@@ -31,8 +36,20 @@ const createClerkInstance = runOnce(createClerkInstanceInternal);
 
 async function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
   let clerkJSInstance = window.Clerk;
+  let clerkUiCtor: Promise<ClerkUiConstructor> | undefined;
+
   if (!clerkJSInstance) {
-    await loadClerkJsScript(options);
+    // Load both clerk-js and clerk-ui in parallel
+    const clerkPromise = loadClerkJsScript(options);
+    clerkUiCtor = loadClerkUiScript(options).then(() => {
+      if (!window.__unstable_ClerkUiCtor) {
+        throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+      }
+      // After the check, TypeScript knows it's defined
+      return window.__unstable_ClerkUiCtor;
+    });
+
+    await clerkPromise;
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
@@ -48,6 +65,8 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
+    // Pass the clerk-ui constructor promise to clerk.load()
+    clerkUiCtor,
   };
 
   return clerkJSInstance

@@ -327,6 +327,13 @@ export interface SignInFutureResource {
   readonly userData: UserData;
 
   /**
+   * Indicates that the sign-in has been finalized.
+   *
+   * @internal
+   */
+  readonly hasBeenFinalized: boolean;
+
+  /**
    * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in
    * lifecycle state through its `status` property, which updates as the authentication flow progresses.
    *

@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "verbatimModuleSyntax": true,
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "preserveWatchOutput": true,
+    "outDir": "dist",
+    "noUnusedLocals": true,
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "module": "preserve",
+    "lib": ["ES2023", "DOM", "WebWorker"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      // Adding this to avoid changes in the ui files
+      // in order to make git merges easier
+      // TODO: @nikos remove after v6 release
+      "@/ui*": ["./src/*"]
+    }
+  },
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+  "include": ["src", "src/global.d.ts"]
+}

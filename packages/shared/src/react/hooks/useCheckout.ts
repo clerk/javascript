@@ -1,8 +1,6 @@
 import { useMemo, useSyncExternalStore } from 'react';
 
-import { useMemo, useSyncExternalStore } from 'react';
-
-import type { ClerkAPIResponseError } from '../..';
+import type { ClerkAPIResponseError } from '../../error';
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,

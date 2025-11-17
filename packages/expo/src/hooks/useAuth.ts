@@ -1,6 +1,6 @@
 import { useAuth as useAuthBase } from '@clerk/react';
 import { isNetworkError } from '@clerk/shared/error';
-import type { GetToken, GetTokenOptions, UseAuthReturn } from '@clerk/types';
+import type { GetToken, GetTokenOptions, UseAuthReturn } from '@clerk/shared/types';
 
 import { SessionJWTCache } from '../cache';
 

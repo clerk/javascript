@@ -1218,65 +1218,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "types-dev-minor",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "types-dev-major",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "types-prod-minor",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "types-prod-major",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "upgrade-dev-minor",
       matchFileNames: [
         "packages/upgrade/package.json",

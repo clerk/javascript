@@ -1,5 +1,23 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import {
+  generateSignatureWithBase,
+  generateSignatureWithCoinbaseWallet,
+  generateSignatureWithMetamask,
+  generateSignatureWithOKXWallet,
+  getBaseIdentifier,
+  getCoinbaseWalletIdentifier,
+  getMetamaskIdentifier,
+  getOKXWalletIdentifier,
+} from '@clerk/shared/internal/clerk-js/web3';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -64,31 +82,14 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { getBrowserLocale } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '../../utils/passkeys';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -531,7 +532,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
+      return createValidatePassword(loadZxcvbn, {
         ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
@@ -631,6 +632,8 @@ class SignInFuture implements SignInFutureResource {
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
+  #hasBeenFinalized = false;
+
   constructor(readonly resource: SignIn) {}
 
   get id() {
@@ -684,6 +687,10 @@ class SignInFuture implements SignInFutureResource {
 
   get secondFactorVerification() {
     return this.resource.secondFactorVerification;
+  }
+
+  get hasBeenFinalized() {
+    return this.#hasBeenFinalized;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
@@ -1163,9 +1170,13 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return runAsyncResourceTask(this.resource, async () => {
-      // Reload the client to prevent an issue where the created session is not picked up.
-      await SignIn.clerk.client?.reload();
+      // Reload the client if the created session is not in the client's sessions. This can happen during modal SSO
+      // flows where the in-memory client does not have the created session.
+      if (SignIn.clerk.client && !SignIn.clerk.client.sessions.some(s => s.id === this.resource.createdSessionId)) {
+        await SignIn.clerk.client.reload();
+      }
 
+      this.#hasBeenFinalized = true;
       await SignIn.clerk.setActive({ session: this.resource.createdSessionId, navigate });
     });
   }

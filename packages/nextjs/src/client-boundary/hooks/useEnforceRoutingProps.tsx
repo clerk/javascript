@@ -1,5 +1,5 @@
 import { useRoutingProps } from '@clerk/react/internal';
-import type { RoutingOptions } from '@clerk/types';
+import type { RoutingOptions } from '@clerk/shared/types';
 
 import { useEnforceCatchAllRoute } from './useEnforceCatchAllRoute';
 import { usePathnameWithoutCatchAll } from './usePathnameWithoutCatchAll';
