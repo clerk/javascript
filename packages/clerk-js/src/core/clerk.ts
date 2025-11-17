@@ -1204,7 +1204,7 @@ export class Clerk implements ClerkInterface {
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
-  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+  public mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
     if (disabledAllAPIKeysFeatures(this, this.environment)) {
@@ -1258,7 +1258,7 @@ export class Clerk implements ClerkInterface {
    *
    * @param targetNode Target node to unmount the ApiKeys component from.
    */
-  public unmountApiKeys = (node: HTMLDivElement) => {
+  public unmountAPIKeys = (node: HTMLDivElement) => {
     void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
