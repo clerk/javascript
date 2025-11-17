@@ -1,5 +1,29 @@
 # Change Log
 
+## 5.109.0
+
+### Minor Changes
+
+- Introduced initial Clerk Protect dynamic loader and related types to support dynamically enabling and rolling out Protect in the environment. ([#7227](https://github.com/clerk/javascript/pull/7227)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Standardized API keys naming convention ([#7223](https://github.com/clerk/javascript/pull/7223)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add support for sign-up via modal in signals implementation ([#7193](https://github.com/clerk/javascript/pull/7193)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- fix(clerk-js): update inCrossOriginIframe to handle nested cross origin iframes ([#7212](https://github.com/clerk/javascript/pull/7212)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- [Experimental] Type method returns using ClerkError ([#7213](https://github.com/clerk/javascript/pull/7213)) by [@dstaley](https://github.com/dstaley)
+
+- Fixes a bug where billing hooks would attempt to fetch billing information for an organization member with insufficient permissions, resulting in a 403 error. ([#7202](https://github.com/clerk/javascript/pull/7202)) by [@panteliselef](https://github.com/panteliselef)
+
+- Ensure scrollbox height fills the available space. ([#7222](https://github.com/clerk/javascript/pull/7222)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`9f48f13`](https://github.com/clerk/javascript/commit/9f48f1372b72334d48b3fd54612c16c964f7cbc1), [`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/localizations@3.28.1
+  - @clerk/shared@3.35.0
+
 ## 5.108.0
 
 ### Minor Changes
