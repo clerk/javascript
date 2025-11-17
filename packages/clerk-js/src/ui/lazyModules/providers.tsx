@@ -1,8 +1,8 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { Appearance } from '@clerk/shared/types';
+import type { Appearance, PortalProps as SharedPortalProps } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
-import { usePortalRoot } from '../contexts/PortalContext';
+import { PortalProvider, usePortalRoot } from '../contexts/PortalContext';
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
 import type { ThemableCssProp } from '../styledSystem';
@@ -104,20 +104,33 @@ type LazyModalRendererProps = React.PropsWithChildren<
     canCloseModal?: boolean;
     modalId?: string;
     modalStyle?: React.CSSProperties;
-  } & AppearanceProviderProps
+  } & AppearanceProviderProps &
+    Partial<Pick<SharedPortalProps, 'disablePortal' | 'portalId' | 'portalRoot'>>
 >;
 
 export const LazyModalRenderer = (props: LazyModalRendererProps) => {
+  const { disablePortal, portalId, portalRoot, ...restProps } = props;
+  const portalProps: SharedPortalProps | undefined =
+    disablePortal !== undefined || portalId !== undefined || portalRoot !== undefined
+      ? { disablePortal, portalId, portalRoot }
+      : undefined;
+
   return (
     <Suspense fallback={''}>
       <AppearanceProvider
-        globalAppearance={props.globalAppearance}
-        appearanceKey={props.appearanceKey}
-        appearance={props.componentAppearance}
+        globalAppearance={restProps.globalAppearance}
+        appearanceKey={restProps.appearanceKey}
+        appearance={restProps.componentAppearance}
       >
-        <FlowMetadataProvider flow={props.flowName || ('' as any)}>
+        <FlowMetadataProvider flow={restProps.flowName || ('' as any)}>
           <InternalThemeProvider>
-            <LazyModalRendererInner {...props} />
+            {portalProps ? (
+              <PortalProvider {...portalProps}>
+                <LazyModalRendererInner {...restProps} />
+              </PortalProvider>
+            ) : (
+              <LazyModalRendererInner {...restProps} />
+            )}
           </InternalThemeProvider>
         </FlowMetadataProvider>
       </AppearanceProvider>
@@ -125,7 +138,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
   );
 };
 
-const LazyModalRendererInner = (props: LazyModalRendererProps) => {
+const LazyModalRendererInner = (props: Omit<LazyModalRendererProps, 'disablePortal' | 'portalId' | 'portalRoot'>) => {
   const portalRootValue = usePortalRoot();
 
   return (
