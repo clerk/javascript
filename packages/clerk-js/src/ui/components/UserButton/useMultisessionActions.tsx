@@ -1,5 +1,10 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignedInSessionResource, UserButtonProps, UserResource } from '@clerk/shared/types';
+import type {
+  SignedInSessionResource,
+  UserButtonProps,
+  UserProfileModalProps,
+  UserResource,
+} from '@clerk/shared/types';
 
 import { navigateIfTaskExists } from '@/core/sessionTasks';
 import { useEnvironment } from '@/ui/contexts';
@@ -49,7 +54,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     openUserProfile({
       ...opts.userProfileProps,
       portal: opts.portal,
-    });
+    } as UserProfileModalProps);
     return opts.actionCompleteCallback?.();
   };
 
@@ -66,7 +71,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
       ...opts.userProfileProps,
       ...(__experimental_startPath && { __experimental_startPath }),
       portal: opts.portal,
-    });
+    } as UserProfileModalProps);
 
     return opts.actionCompleteCallback?.();
   };

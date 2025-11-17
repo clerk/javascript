@@ -1859,9 +1859,13 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
     /**
+     * Configuration for portalling the OrganizationSwitcher popover and nested modals to a specific container.
+     * - `false`: Disable portalling (render in place)
+     * - `() => HTMLElement | null`: Portal to the returned element
+     *
      * @default true
      */
-    portal?: boolean;
+    portal?: PortalConfig;
   };
 
 export type OrganizationListProps = {
