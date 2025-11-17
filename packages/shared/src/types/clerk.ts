@@ -1575,6 +1575,15 @@ export type UserProfileProps = RoutingOptions & {
      */
     hide?: boolean;
   };
+  /**
+   * Controls whether the UserProfile modal is rendered in a portal.
+   * When set to `false`, the modal will be rendered inline where the component is mounted.
+   * This is useful when the UserProfile is used within components that restrict interaction
+   * with portaled content (e.g., some sidebar libraries).
+   *
+   * @default true
+   */
+  portal?: boolean;
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1719,12 +1728,24 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
+  userProfileProps?: Pick<
+    UserProfileProps,
+    'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps' | 'portal'
+  >;
 
   /*
    * Provide custom menu actions and links to be rendered inside the UserButton.
    */
   customMenuItems?: CustomMenuItem[];
+  /**
+   * Controls whether the UserButton popover is rendered in a portal.
+   * When set to `false`, the popover will be rendered inline where the component is mounted.
+   * This is useful when the UserButton is used within components that restrict interaction
+   * with portaled content (e.g., some sidebar libraries).
+   *
+   * @default true
+   */
+  portal?: boolean;
 };
 
 export type UserAvatarProps = {

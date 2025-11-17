@@ -103,6 +103,8 @@ type LazyModalRendererProps = React.PropsWithChildren<
     canCloseModal?: boolean;
     modalId?: string;
     modalStyle?: React.CSSProperties;
+    portal?: boolean;
+    portalRoot?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
   } & AppearanceProviderProps
 >;
 
@@ -123,6 +125,8 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
               containerSx={props.modalContainerSx}
               contentSx={props.modalContentSx}
               canCloseModal={props.canCloseModal}
+              portal={props.portal}
+              portalRoot={props.portalRoot}
             >
               {props.startPath ? (
                 <Suspense>

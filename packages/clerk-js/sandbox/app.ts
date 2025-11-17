@@ -293,7 +293,12 @@ void (async () => {
       Clerk.mountUserAvatar(app, componentControls.userAvatar.getProps() ?? {});
     },
     '/user-button': () => {
-      Clerk.mountUserButton(app, componentControls.userButton.getProps() ?? {});
+      Clerk.mountUserButton(
+        app,
+        componentControls.userButton.getProps() ?? {
+          portal: false,
+        },
+      );
     },
     '/user-profile': () => {
       Clerk.mountUserProfile(app, componentControls.userProfile.getProps() ?? {});

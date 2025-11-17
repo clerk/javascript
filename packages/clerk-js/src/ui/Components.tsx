@@ -448,6 +448,18 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  // Find the UserButton mount node to use as portal root when portal={false}
+  const userButtonNode = React.useMemo(() => {
+    if (userProfileModal?.portal === false) {
+      for (const [node, component] of nodes) {
+        if (component.name === 'UserButton') {
+          return node;
+        }
+      }
+    }
+    return null;
+  }, [nodes, userProfileModal?.portal]);
+
   const mountedUserProfileModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -463,6 +475,8 @@ const Components = (props: ComponentsProps) => {
       componentName={'UserProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+      portal={userProfileModal?.portal}
+      portalRoot={userButtonNode || undefined}
     >
       <UserProfileModal {...userProfileModal} />
     </LazyModalRenderer>

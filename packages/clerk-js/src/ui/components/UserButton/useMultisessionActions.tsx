@@ -19,7 +19,7 @@ type UseMultisessionActionsParams = {
   userProfileUrl?: string;
   signInUrl?: string;
   taskUrl?: string | null;
-} & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps'>;
+} & Pick<UserButtonProps, 'userProfileMode' | 'appearance' | 'userProfileProps' | 'portal'>;
 
 export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { setActive, signOut, openUserProfile } = useClerk();
@@ -46,7 +46,10 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
         })();
       });
     }
-    openUserProfile(opts.userProfileProps);
+    openUserProfile({
+      ...opts.userProfileProps,
+      portal: opts.userProfileProps?.portal !== undefined ? opts.userProfileProps.portal : opts.portal,
+    });
     return opts.actionCompleteCallback?.();
   };
 
@@ -61,6 +64,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     }
     openUserProfile({
       ...opts.userProfileProps,
+      portal: opts.userProfileProps?.portal !== undefined ? opts.userProfileProps.portal : opts.portal,
       ...(__experimental_startPath && { __experimental_startPath }),
     });
 

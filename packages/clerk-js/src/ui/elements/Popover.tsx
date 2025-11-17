@@ -35,7 +35,10 @@ export const Popover = (props: PopoverProps) => {
     children,
   } = props;
 
-  if (portal) {
+  // Portal if portal=true (default) OR if portal=false but root is provided (for custom portal location)
+  const shouldPortal = portal || (portal === false && root !== undefined);
+
+  if (shouldPortal) {
     return (
       <FloatingNode id={nodeId}>
         <FloatingPortal root={root}>
