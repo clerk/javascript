@@ -3,6 +3,8 @@ import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+import { usePortalContext } from '../contexts';
+
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
   nodeId?: string;
@@ -35,13 +37,38 @@ export const Popover = (props: PopoverProps) => {
     children,
   } = props;
 
-  // Portal if portal=true (default) OR if portal=false but root is provided (for custom portal location)
-  const shouldPortal = portal || (portal === false && root !== undefined);
+  const { getContainer } = usePortalContext();
+
+  // Resolve the root element to portal to
+  // Priority: root prop > portal prop > PortalProvider context > default behavior
+  let resolvedRoot: HTMLElement | React.MutableRefObject<HTMLElement | null> | null = null;
+  let shouldPortal = false;
+
+  if (root !== undefined) {
+    // root prop takes highest priority - always portal to the provided root
+    resolvedRoot = root;
+    shouldPortal = true;
+  } else if (portal === false) {
+    // portal prop explicitly set to false - portal prop takes precedence over context
+    // Even if context provides a container, we respect portal={false}
+    shouldPortal = false;
+  } else {
+    // portal prop is true (default) or undefined - check context
+    const contextContainer = getContainer();
+    if (contextContainer === null) {
+      // Context explicitly disables portaling (similar to portal={false})
+      shouldPortal = false;
+    } else {
+      // Use context container (can be HTMLElement or ref)
+      resolvedRoot = contextContainer;
+      shouldPortal = true;
+    }
+  }
 
   if (shouldPortal) {
     return (
       <FloatingNode id={nodeId}>
-        <FloatingPortal root={root}>
+        <FloatingPortal root={resolvedRoot || undefined}>
           {isOpen && (
             <FloatingFocusManager
               context={context}

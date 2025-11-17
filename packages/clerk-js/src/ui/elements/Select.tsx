@@ -310,7 +310,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      portal={portal || false}
+      portal={portal}
       order={['content']}
     >
       <Flex
