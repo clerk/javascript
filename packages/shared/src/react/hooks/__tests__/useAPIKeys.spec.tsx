@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useApiKeys } from '../useAPIKeys';
+import { useAPIKeys } from '../useAPIKeys';
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
@@ -48,7 +48,7 @@ describe('useApiKeys', () => {
         total_count: 1,
       });
 
-    const { result } = renderHook(() => useApiKeys({ subject: 'user_1', pageSize: 1 }), { wrapper });
+    const { result } = renderHook(() => useAPIKeys({ subject: 'user_1', pageSize: 1 }), { wrapper });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toEqual([{ id: 'key_initial' }]);
@@ -63,7 +63,7 @@ describe('useApiKeys', () => {
 
   it('cascades revalidation for related queries only when using React Query', async () => {
     let sequence = 0;
-    getAllSpy.mockImplementation(async ({ initialPage }: { initialPage?: number }) => {
+    getAllSpy.mockImplementation(async ({ initialPage }: { initialPage?: number } = {}) => {
       sequence += 1;
       const page = initialPage ?? 1;
       return {
@@ -73,8 +73,8 @@ describe('useApiKeys', () => {
     });
 
     const useBoth = () => {
-      const paginated = useApiKeys({ subject: 'user_1', pageSize: 1 });
-      const infinite = useApiKeys({ subject: 'user_1', pageSize: 1, infinite: true });
+      const paginated = useAPIKeys({ subject: 'user_1', pageSize: 1 });
+      const infinite = useAPIKeys({ subject: 'user_1', pageSize: 1, infinite: true });
       return { paginated, infinite };
     };
 
@@ -100,7 +100,7 @@ describe('useApiKeys', () => {
 
   it('handles revalidation with different pageSize configurations', async () => {
     let seq = 0;
-    getAllSpy.mockImplementation(async ({ pageSize }: { pageSize?: number }) => {
+    getAllSpy.mockImplementation(async ({ pageSize }: { pageSize?: number } = {}) => {
       seq += 1;
       return {
         data: [{ id: `key-pageSize-${pageSize ?? 'unknown'}-${seq}` }],
@@ -109,8 +109,8 @@ describe('useApiKeys', () => {
     });
 
     const useHooks = () => {
-      const small = useApiKeys({ subject: 'user_1', pageSize: 1 });
-      const large = useApiKeys({ subject: 'user_1', pageSize: 5 });
+      const small = useAPIKeys({ subject: 'user_1', pageSize: 1 });
+      const large = useAPIKeys({ subject: 'user_1', pageSize: 5 });
       return { small, large };
     };
 
@@ -138,7 +138,7 @@ describe('useApiKeys', () => {
 
   it('handles revalidation with different query filters', async () => {
     let seq = 0;
-    getAllSpy.mockImplementation(async ({ query }: { query?: string }) => {
+    getAllSpy.mockImplementation(async ({ query }: { query?: string } = {}) => {
       seq += 1;
       return {
         data: [{ id: `key-query-${query ?? 'empty'}-${seq}` }],
@@ -147,8 +147,8 @@ describe('useApiKeys', () => {
     });
 
     const useHooks = () => {
-      const defaultQuery = useApiKeys({ subject: 'user_1', pageSize: 11, query: '' });
-      const filtered = useApiKeys({ subject: 'user_1', pageSize: 11, query: 'search' });
+      const defaultQuery = useAPIKeys({ subject: 'user_1', pageSize: 11, query: '' });
+      const filtered = useAPIKeys({ subject: 'user_1', pageSize: 11, query: 'search' });
       return { defaultQuery, filtered };
     };
 
@@ -176,7 +176,7 @@ describe('useApiKeys', () => {
 
   it('does not cascade revalidation across different subjects', async () => {
     let seq = 0;
-    getAllSpy.mockImplementation(async ({ subject }: { subject?: string }) => {
+    getAllSpy.mockImplementation(async ({ subject }: { subject?: string } = {}) => {
       seq += 1;
       return {
         data: [{ id: `key-subject-${subject ?? 'none'}-${seq}` }],
@@ -185,8 +185,8 @@ describe('useApiKeys', () => {
     });
 
     const useHooks = () => {
-      const primary = useApiKeys({ subject: 'user_primary', pageSize: 1 });
-      const secondary = useApiKeys({ subject: 'user_secondary', pageSize: 1 });
+      const primary = useAPIKeys({ subject: 'user_primary', pageSize: 1 });
+      const secondary = useAPIKeys({ subject: 'user_secondary', pageSize: 1 });
       return { primary, secondary };
     };
 
@@ -204,7 +204,9 @@ describe('useApiKeys', () => {
     await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
 
     expect(getAllSpy).toHaveBeenCalledTimes(1);
-    const subjects = getAllSpy.mock.calls.map(call => (call[0] as { subject?: string })?.subject);
+    const subjects = (getAllSpy.mock.calls as Array<unknown[]>).map(
+      call => (call[0] as { subject?: string } | undefined)?.subject,
+    );
     expect(subjects).not.toContain('user_secondary');
     expect(subjects[0] === undefined || subjects[0] === 'user_primary').toBe(true);
   });

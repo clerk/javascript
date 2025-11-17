@@ -24,7 +24,7 @@ export type OrganizationProfileContextType = OrganizationProfileCtx & {
   isMembersPageRoot: boolean;
   isGeneralPageRoot: boolean;
   isBillingPageRoot: boolean;
-  isApiKeysPageRoot: boolean;
+  isAPIKeysPageRoot: boolean;
   shouldShowBilling: boolean;
 };
 
@@ -67,7 +67,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const isMembersPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.MEMBERS;
   const isGeneralPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.GENERAL;
   const isBillingPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING;
-  const isApiKeysPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
+  const isAPIKeysPageRoot = pages.routes[0].id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS;
   const navigateToGeneralPageRoot = () =>
     navigate(isGeneralPageRoot ? '../' : isMembersPageRoot ? './organization-general' : '../organization-general');
 
@@ -80,7 +80,7 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
     isMembersPageRoot,
     isGeneralPageRoot,
     isBillingPageRoot,
-    isApiKeysPageRoot,
+    isAPIKeysPageRoot,
     shouldShowBilling,
   };
 };
