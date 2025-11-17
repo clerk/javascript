@@ -15,6 +15,7 @@ import { unixEpochToDate } from '@/utils/date';
 import { billingMoneyAmountFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
 import { BaseResource, BillingPlan, DeletedObject } from './internal';
+import { safeInvalidateStableKeys, STABLE_KEYS } from '@clerk/shared/resourceCache';
 
 export class BillingSubscription extends BaseResource implements BillingSubscriptionResource {
   id!: string;
@@ -115,6 +116,14 @@ export class BillingSubscriptionItem extends BaseResource implements BillingSubs
         method: 'DELETE',
       })
     )?.response as unknown as DeletedObjectJSON;
+
+    await safeInvalidateStableKeys(BillingSubscriptionItem.clerk?.__internal_queryClient?.client, [
+      STABLE_KEYS.SUBSCRIPTION_KEY,
+      STABLE_KEYS.STATEMENTS_KEY,
+      STABLE_KEYS.PLANS_KEY,
+      STABLE_KEYS.PAYMENT_METHODS_KEY,
+      STABLE_KEYS.PAYMENT_ATTEMPTS_KEY,
+    ]);
 
     return new DeletedObject(json);
   }

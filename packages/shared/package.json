@@ -111,6 +111,7 @@
     "url",
     "versionSelector",
     "react",
+    "resourceCache",
     "constants",
     "apiUrlFromPublishableKey",
     "telemetry",

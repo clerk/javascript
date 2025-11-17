@@ -1,5 +1,6 @@
 'use client';
 
+import { STABLE_KEYS } from '../../resourceCache';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { APIKeyResource, GetAPIKeysParams } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
@@ -104,7 +105,7 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
       pageSize: safeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'apiKeys',
+      stablePrefix: STABLE_KEYS.API_KEYS_KEY,
       authenticated: Boolean(clerk.user),
       tracked: {
         subject: safeValues.subject,

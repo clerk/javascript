@@ -22,13 +22,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import {
-  normalizeFormatted,
-  SubscriberTypeContext,
-  usePlansContext,
-  useSubscriberTypeContext,
-  useSubscription,
-} from '../../contexts';
+import { normalizeFormatted, SubscriberTypeContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -368,7 +362,6 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const { __internal_openCheckout } = useClerk();
   const subscriberType = useSubscriberTypeContext();
   const { setIsOpen } = useDrawerContext();
-  const { revalidateAll } = usePlansContext();
   const { setSubscription, setConfirmationOpen } = useContext(SubscriptionForCancellationContext);
   const canOrgManageBilling = useProtect(has => has({ permission: 'org:sys_billing:manage' }));
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
@@ -389,13 +382,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 
       __internal_openCheckout({
         ...params,
-        onSubscriptionComplete: () => {
-          void revalidateAll();
-        },
         portalRoot,
       });
     },
-    [__internal_openCheckout, revalidateAll, portalRoot, setIsOpen],
+    [__internal_openCheckout, portalRoot, setIsOpen],
   );
 
   const actions = React.useMemo(() => {

@@ -85,7 +85,6 @@ export const usePlans = (params?: { mode: 'cache' }) => {
     initialPage: 1,
     pageSize: 50,
     keepPreviousData: true,
-    enabled: true,
     __experimental_mode: params?.mode,
   });
 };
@@ -116,23 +115,10 @@ export const usePlansContext = () => {
     return false;
   }, [clerk, subscriberType]);
 
-  const { subscriptionItems, revalidate: revalidateSubscriptions, data: topLevelSubscription } = useSubscription();
+  const { subscriptionItems, data: topLevelSubscription } = useSubscription();
 
   // Invalidates cache but does not fetch immediately
-  const { data: plans, revalidate: revalidatePlans } = usePlans({ mode: 'cache' });
-
-  // Invalidates cache but does not fetch immediately
-  const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
-
-  const { revalidate: revalidatePaymentMethods } = usePaymentMethods();
-
-  const revalidateAll = useCallback(() => {
-    // Revalidate the plans and subscriptions
-    void revalidateSubscriptions();
-    void revalidatePlans();
-    void revalidateStatements();
-    void revalidatePaymentMethods();
-  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentMethods]);
+  const { data: plans } = usePlans({ mode: 'cache' });
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
@@ -310,13 +296,10 @@ export const usePlansContext = () => {
       const portalRoot = getClosestProfileScrollBox('modal', event);
       clerk.__internal_openSubscriptionDetails({
         for: subscriberType,
-        onSubscriptionCancel: () => {
-          revalidateAll();
-        },
         portalRoot,
       });
     },
-    [clerk, subscriberType, revalidateAll],
+    [clerk, subscriberType],
   );
 
   // handle the selection of a plan, either by opening the subscription details or checkout
@@ -329,9 +312,6 @@ export const usePlansContext = () => {
         // if the plan doesn't support annual, use monthly
         planPeriod: planPeriod === 'annual' && !plan.annualMonthlyFee ? 'month' : planPeriod,
         for: subscriberType,
-        onSubscriptionComplete: () => {
-          revalidateAll();
-        },
         onClose: () => {
           if (session?.id) {
             void clerk.setActive({ session: session.id });
@@ -342,7 +322,7 @@ export const usePlansContext = () => {
         newSubscriptionRedirectUrl,
       });
     },
-    [clerk, revalidateAll, subscriberType, session?.id],
+    [clerk, subscriberType, session?.id],
   );
 
   const defaultFreePlan = useMemo(() => {
@@ -360,6 +340,5 @@ export const usePlansContext = () => {
     canManageSubscription,
     captionForSubscription,
     defaultFreePlan,
-    revalidateAll,
   };
 };

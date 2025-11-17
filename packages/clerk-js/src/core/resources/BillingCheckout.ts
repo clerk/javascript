@@ -1,4 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { safeInvalidateStableKeys, STABLE_KEYS } from '@clerk/shared/resourceCache';
 import { retry } from '@clerk/shared/retry';
 import type {
   BillingCheckoutJSON,
@@ -60,11 +61,11 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     return this;
   }
 
-  confirm = (params: ConfirmCheckoutParams): Promise<this> => {
+  confirm = async (params: ConfirmCheckoutParams): Promise<this> => {
     // Retry confirmation in case of a 500 error
     // This will retry up to 3 times with an increasing delay
     // It retries at 2s, 4s, 6s and 8s
-    return retry(
+    const res = await retry(
       () =>
         this._basePatch({
           path: Billing.path(`/checkouts/${this.id}/confirm`, { orgId: this.payer.organizationId }),
@@ -89,5 +90,13 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
         },
       },
     );
+    await safeInvalidateStableKeys(BillingCheckout.clerk?.__internal_queryClient?.client, [
+      STABLE_KEYS.SUBSCRIPTION_KEY,
+      STABLE_KEYS.STATEMENTS_KEY,
+      STABLE_KEYS.PLANS_KEY,
+      STABLE_KEYS.PAYMENT_METHODS_KEY,
+      STABLE_KEYS.PAYMENT_ATTEMPTS_KEY,
+    ]);
+    return res;
   };
 }
