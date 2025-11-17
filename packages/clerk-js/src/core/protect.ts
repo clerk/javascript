@@ -24,7 +24,11 @@ export class Protect {
     this.#initialized = true;
 
     for (const loader of config.loaders) {
-      this.applyLoader(loader);
+      try {
+        this.applyLoader(loader);
+      } catch (error) {
+        logger.warnOnce(`[protect] failed to apply loader: ${error}`);
+      }
     }
   }
 
