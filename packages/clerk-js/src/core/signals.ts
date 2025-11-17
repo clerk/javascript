@@ -1,4 +1,5 @@
-import { type ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
+import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
@@ -38,7 +39,7 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
  * generic non-API errors into the global array.
  */
-function errorsToParsedErrors(error: ClerkError | null): Errors {
+export function errorsToParsedErrors(error: ClerkError | null): Errors {
   const parsedErrors: Errors = {
     fields: {
       firstName: null,
@@ -66,7 +67,11 @@ function errorsToParsedErrors(error: ClerkError | null): Errors {
     return parsedErrors;
   }
 
-  const hasFieldErrors = error.errors.some(error => 'meta' in error && error.meta && 'paramName' in error.meta);
+  function isFieldError(error: ClerkAPIError): boolean {
+    return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
+  }
+
+  const hasFieldErrors = error.errors.some(isFieldError);
   if (hasFieldErrors) {
     error.errors.forEach(error => {
       if (parsedErrors.raw) {
@@ -74,7 +79,7 @@ function errorsToParsedErrors(error: ClerkError | null): Errors {
       } else {
         parsedErrors.raw = [error];
       }
-      if ('meta' in error && error.meta && 'paramName' in error.meta) {
+      if (isFieldError(error)) {
         const name = snakeToCamel(error.meta.paramName);
         parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
       }

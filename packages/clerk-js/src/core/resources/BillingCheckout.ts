@@ -1,3 +1,4 @@
+import type { ClerkError } from '@clerk/shared/error';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
 import type {
@@ -20,6 +21,7 @@ import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
+import { errorsToParsedErrors } from '../signals';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
@@ -98,42 +100,9 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   };
 }
 
-function errorsToParsedErrors(error: unknown): CheckoutSignalValue['errors'] {
-  const parsedErrors: CheckoutSignalValue['errors'] = {
-    raw: null,
-    global: null,
-  };
-
-  if (!error) {
-    return parsedErrors;
-  }
-
-  if (!isClerkAPIResponseError(error)) {
-    parsedErrors.raw = [];
-    parsedErrors.global = [];
-    return parsedErrors;
-  }
-
-  error.errors.forEach(error => {
-    if (parsedErrors.raw) {
-      parsedErrors.raw.push(error);
-    } else {
-      parsedErrors.raw = [error];
-    }
-
-    if (parsedErrors.global) {
-      parsedErrors.global.push(error);
-    } else {
-      parsedErrors.global = [error];
-    }
-  });
-
-  return parsedErrors;
-}
-
 export const createSignals = () => {
   const resourceSignal = signal<{ resource: CheckoutFuture | null }>({ resource: null });
-  const errorSignal = signal<{ error: unknown }>({ error: null });
+  const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
   const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
   const computedSignal = computed<Omit<CheckoutSignalValue, 'checkout'> & { checkout: CheckoutFutureResource | null }>(
     () => {
@@ -204,7 +173,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
     return this.resource.needsPaymentMethod;
   }
 
-  async start(): Promise<{ error: unknown }> {
+  async start(): Promise<{ error: ClerkError | null }> {
     return this.runAsyncResourceTask(
       'start',
       async () => {
@@ -218,7 +187,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
     );
   }
 
-  async confirm(params: ConfirmCheckoutParams): Promise<{ error: unknown }> {
+  async confirm(params: ConfirmCheckoutParams): Promise<{ error: ClerkError | null }> {
     return this.runAsyncResourceTask('confirm', async () => {
       if (!this.resource.id) {
         throw new Error('Clerk: Call `start` before `confirm`');
@@ -227,7 +196,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
     });
   }
 
-  async finalize(params?: CheckoutFutureFinalizeParams): Promise<{ error: unknown }> {
+  async finalize(params?: CheckoutFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
     return this.runAsyncResourceTask('finalize', async () => {
       if (this.resource.status !== 'completed') {
@@ -252,7 +221,11 @@ function createRunAsyncResourceTask(
   resource: CheckoutFuture,
   signals: ReturnType<typeof createSignals>,
   pendingOperations: Map<string, Promise<{ error: unknown }> | null>,
-): <T>(operationType: string, task: () => Promise<T>, beforeTask?: () => void) => Promise<{ error: unknown }> {
+): <T>(
+  operationType: string,
+  task: () => Promise<T>,
+  beforeTask?: () => void,
+) => Promise<{ error: ClerkError | null }> {
   return async (operationType, task, beforeTask?: () => void) => {
     if (pendingOperations.get(operationType)) {
       // Wait for the existing operation to complete and return its result

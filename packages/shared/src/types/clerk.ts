@@ -1,3 +1,5 @@
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
 import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -58,7 +60,7 @@ import type { SessionVerificationLevel } from './sessionVerification';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from './snapshots';
-import type { FieldError, State } from './state';
+import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
@@ -82,16 +84,17 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-interface GlobalErrors {
+export type CheckoutErrors = {
   /**
    * The raw, unparsed errors from the Clerk API.
    */
-  raw: FieldError[] | null;
+  raw: unknown[] | null;
   /**
    * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
    */
-  global: FieldError[] | null; // does not include any errors that could be parsed as a field error
-}
+  global: ClerkGlobalHookError[] | null;
+};
 
 /**
  * The value returned by the `useSignInSignal` hook.
@@ -100,7 +103,7 @@ export interface CheckoutSignalValue {
   /**
    * Represents the errors that occurred during the last fetch of the parent resource.
    */
-  errors: GlobalErrors;
+  errors: CheckoutErrors;
   /**
    * The fetch status of the underlying `SignIn` resource.
    */
