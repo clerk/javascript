@@ -20,6 +20,7 @@ const mountAllClerkAstroJSComponents = () => {
     'google-one-tap': 'openGoogleOneTap',
     waitlist: 'mountWaitlist',
     'pricing-table': 'mountPricingTable',
+    'api-keys': 'mountAPIKeys',
   } as const satisfies Record<InternalUIComponentId, keyof Clerk>;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {

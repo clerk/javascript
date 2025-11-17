@@ -169,6 +169,8 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
+      // API Keys Components
+      'APIKeys',
     ];
     components.forEach(component => {
       void addComponent({
