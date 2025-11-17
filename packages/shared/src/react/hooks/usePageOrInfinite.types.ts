@@ -4,23 +4,33 @@ export type ArrayType<DataArray> = DataArray extends Array<infer ElementType> ? 
 
 export type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Data> : Type;
 
+type Config = PagesOrInfiniteConfig & PagesOrInfiniteOptions;
+
+type QueryArgs<Params> = Readonly<{
+  args: Params;
+}>;
+
+type QueryKeyWithArgs<Params> = readonly [
+  string,
+  boolean,
+  Record<string, unknown>,
+  QueryArgs<Params>,
+  ...Array<unknown>,
+];
+
+type InvalidationQueryKey = readonly [string, boolean, Record<string, unknown>];
+
 export type UsePagesOrInfiniteSignature = <
-  Params extends PagesOrInfiniteOptions,
+  Params,
   FetcherReturnData extends Record<string, any>,
-  CacheKeys extends Record<string, unknown> = Record<string, unknown>,
-  TConfig extends PagesOrInfiniteConfig = PagesOrInfiniteConfig,
->(
-  /**
-   * The parameters will be passed to the fetcher.
-   */
-  params: Params,
-  /**
-   * A Promise returning function to fetch your data.
-   */
-  fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined,
-  /**
-   * Internal configuration of the hook.
-   */
-  config: TConfig,
-  cacheKeys: CacheKeys,
-) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;
+  TCacheKeys extends {
+    queryKey: QueryKeyWithArgs<Params>;
+    invalidationKey: InvalidationQueryKey;
+    stableKey: string;
+  },
+  TConfig extends Config = Config,
+>(params: {
+  fetcher: ((p: Params) => FetcherReturnData | Promise<FetcherReturnData>) | undefined;
+  config: TConfig;
+  keys: TCacheKeys;
+}) => PaginatedResources<ExtractData<FetcherReturnData>, TConfig['infinite']>;

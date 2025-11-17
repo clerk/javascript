@@ -21,6 +21,19 @@ function KeepPreviousDataFn<Data>(previousData: Data): Data {
   return previousData;
 }
 
+export const subscriptionQuery = <T extends Record<string, unknown>, U extends Record<string, unknown>>(params: {
+  trackedKeys: T;
+  untrackedKeys?: U;
+}) => {
+  const stableKey = 'commerce-subscription';
+  const { trackedKeys, untrackedKeys } = params;
+  return {
+    queryKey: [stableKey, trackedKeys, untrackedKeys] as const,
+    invalidationKey: [stableKey, trackedKeys] as const,
+    stableKey,
+  };
+};
+
 /**
  * This is the new implementation of useSubscription using React Query.
  * It is exported only if the package is build with the `CLERK_USE_RQ` environment variable set to `true`.
@@ -47,14 +60,13 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   const [queryClient] = useClerkQueryClient();
 
-  const queryKey = useMemo(() => {
-    return [
-      'commerce-subscription',
-      {
+  const { queryKey, invalidationKey } = useMemo(() => {
+    return subscriptionQuery({
+      trackedKeys: {
         userId: user?.id,
         args: { orgId: isOrganization ? organization?.id : undefined },
       },
-    ];
+    });
   }, [user?.id, isOrganization, organization?.id]);
 
   const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
@@ -70,7 +82,10 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     placeholderData: keepPreviousData && queriesEnabled ? KeepPreviousDataFn : undefined,
   });
 
-  const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
+  const revalidate = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: invalidationKey }),
+    [queryClient, invalidationKey],
+  );
 
   return {
     data: query.data,

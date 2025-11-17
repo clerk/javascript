@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDeferredPromise } from '../../../utils/createDeferredPromise';
@@ -211,6 +211,24 @@ describe('useSubscription', () => {
     await waitFor(() => expect(result.current.isFetching).toBe(false));
     expect(result.current.data).toEqual({ id: 'sub_org_org_2' });
     expect(result.current.isLoading).toBe(false);
+    expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('revalidate fetches the latest subscription data', async () => {
+    getSubscriptionSpy
+      .mockImplementationOnce(() => Promise.resolve({ id: 'sub_user_initial' }))
+      .mockImplementationOnce(() => Promise.resolve({ id: 'sub_user_refetched' }));
+
+    const { result } = renderHook(() => useSubscription(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_user_initial' });
+
+    await act(async () => {
+      await result.current.revalidate();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual({ id: 'sub_user_refetched' }));
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
   });
 });
