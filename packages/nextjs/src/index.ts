@@ -60,6 +60,11 @@ export {
 } from './client-boundary/hooks';
 
 /**
+ * Context providers and hooks
+ */
+export { PortalProvider, usePortalContext } from './client-boundary/contexts';
+
+/**
  * Conditionally export components that exhibit different behavior
  * when used in /app vs /pages.
  * We defined the runtime and the type values explicitly,
