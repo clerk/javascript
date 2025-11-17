@@ -35,13 +35,14 @@ export class Protect {
   // apply individual loader
   applyLoader(loader: ProtectLoader) {
     // we use rollout for percentage based rollouts (as the environment file is cached)
-    if (loader.rollout) {
-      if (typeof loader.rollout !== 'number' || loader.rollout < 0 || loader.rollout > 1) {
+    if (loader.rollout !== undefined) {
+      const rollout = loader.rollout;
+      if (typeof rollout !== 'number' || rollout < 0) {
         // invalid rollout percentage - do nothing
-        logger.warnOnce(`[protect] loader rollout value is invalid: ${loader.rollout}`);
+        logger.warnOnce(`[protect] loader rollout value is invalid: ${rollout}`);
         return;
       }
-      if (Math.random() > loader.rollout) {
+      if (rollout === 0 || Math.random() > rollout) {
         // not in rollout percentage - do nothing
         return;
       }
