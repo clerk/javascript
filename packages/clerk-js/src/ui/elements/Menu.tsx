@@ -4,9 +4,9 @@ import type { Placement } from '@floating-ui/react';
 import type { PropsWithChildren } from 'react';
 import React, { cloneElement, isValidElement, useLayoutEffect, useRef } from 'react';
 
+import { usePortalContext } from '../contexts/PortalContext';
 import type { Button } from '../customizables';
 import { Col, descriptors, SimpleButton } from '../customizables';
-import { usePortalContext } from '../contexts/PortalContext';
 import type { UsePopoverReturn } from '../hooks';
 import { usePopover } from '../hooks';
 import type { PropsOfComponent } from '../styledSystem';
@@ -29,9 +29,9 @@ type MenuProps = PropsWithChildren<Record<never, never>> & {
 
 export const Menu = withFloatingTree((props: MenuProps) => {
   const { popoverPlacement = 'bottom-end', elementId, ...rest } = props;
+  // Only read from context to determine strategy for fixed positioning
   const portalFromContext = usePortalContext();
-  const useFixedPosition =
-    typeof portalFromContext === 'function' || (portalFromContext !== false && portalFromContext !== undefined);
+  const useFixedPosition = portalFromContext !== undefined && portalFromContext !== false;
 
   const popoverCtx = usePopover({
     placement: popoverPlacement,
@@ -97,10 +97,6 @@ export const MenuList = (props: MenuListProps) => {
   const { floating, styles, isOpen, context, nodeId } = popoverCtx;
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Get portal from context, fallback to prop, then default to false
-  const portalFromContext = usePortalContext();
-  const asPortal = asPortalProp !== undefined ? asPortalProp : (portalFromContext ?? false);
-
   useLayoutEffect(() => {
     const current = containerRef.current;
     floating(current);
@@ -127,7 +123,7 @@ export const MenuList = (props: MenuListProps) => {
       context={context}
       nodeId={nodeId}
       isOpen={isOpen}
-      portal={asPortal}
+      portal={asPortalProp !== undefined ? asPortalProp : undefined}
     >
       <Col
         elementDescriptor={descriptors.menuList}

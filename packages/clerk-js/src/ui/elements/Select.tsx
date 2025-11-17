@@ -92,21 +92,23 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
     searchPlaceholder,
     elementId,
     children,
-    portal: portalProp = false,
+    portal: portalProp,
     referenceElement = null,
     ...rest
   } = props;
 
-  // Get portal from context, fallback to prop, then default to false
+  // Only read from context to determine strategy for fixed positioning
   const portalFromContext = usePortalContext();
-  const portal = portalProp !== undefined ? portalProp : (portalFromContext ?? false);
+  const useFixedPosition =
+    typeof portalProp === 'function' ||
+    (portalProp !== false && portalProp !== undefined) ||
+    (portalFromContext !== undefined && portalFromContext !== false);
 
   const popoverCtx = usePopover({
     autoUpdate: true,
     adjustToReferenceWidth: !!referenceElement,
     referenceElement: referenceElement,
-    strategy:
-      typeof portal === 'function' || (portal !== false && portalFromContext !== undefined) ? 'fixed' : 'absolute',
+    strategy: useFixedPosition ? 'fixed' : 'absolute',
   });
   const togglePopover = popoverCtx.toggle;
   const focusedItemRef = React.useRef<HTMLDivElement>(null);
@@ -148,7 +150,7 @@ export const Select = withFloatingTree(<O extends Option>(props: PropsWithChildr
           select,
           onTriggerClick: togglePopover,
           elementId,
-          portal,
+          portal: portalProp, // Only pass explicit prop, let Popover read from context otherwise
         },
       }}
       {...rest}
@@ -318,7 +320,7 @@ export const SelectOptionList = (props: SelectOptionListProps) => {
       nodeId={nodeId}
       context={context}
       isOpen={isOpen}
-      portal={portal}
+      portal={portal !== undefined ? portal : undefined}
       order={['content']}
     >
       <Flex
