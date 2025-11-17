@@ -50,6 +50,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       organizationProfileProps,
       skipInvitationScreen,
       hideSlug,
+      portal,
     } = useOrganizationSwitcherContext();
 
     const { user } = useUser();
@@ -86,7 +87,12 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (createOrganizationMode === 'navigation') {
         return navigateCreateOrganization();
       }
-      return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen, hideSlug });
+      return openCreateOrganization({
+        afterCreateOrganizationUrl,
+        skipInvitationScreen,
+        hideSlug,
+        portal,
+      });
     };
 
     const handleItemClick = () => {
@@ -102,6 +108,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         __unstable_manageBillingUrl,
         __unstable_manageBillingLabel,
         __unstable_manageBillingMembersLimit,
+        portal: organizationProfileProps?.portal !== undefined ? organizationProfileProps.portal : portal,
       });
     };
 

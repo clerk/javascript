@@ -1627,6 +1627,15 @@ export type OrganizationProfileProps = RoutingOptions & {
      */
     hide?: boolean;
   };
+  /**
+   * Controls whether the OrganizationProfile modal is rendered in a portal.
+   * When set to `false`, the modal will be rendered inline where the component is mounted.
+   * This is useful when the OrganizationProfile is used within components that restrict interaction
+   * with portaled content (e.g., some sidebar libraries).
+   *
+   * @default true
+   */
+  portal?: boolean;
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1659,6 +1668,15 @@ export type CreateOrganizationProps = RoutingOptions & {
    * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
+  /**
+   * Controls whether the CreateOrganization modal is rendered in a portal.
+   * When set to `false`, the modal will be rendered inline where the component is mounted.
+   * This is useful when the CreateOrganization is used within components that restrict interaction
+   * with portaled content (e.g., some sidebar libraries).
+   *
+   * @default true
+   */
+  portal?: boolean;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -1854,7 +1872,16 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * Specify options for the underlying <OrganizationProfile /> component.
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
      */
-    organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
+    organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages' | 'portal'>;
+    /**
+     * Controls whether the OrganizationSwitcher popover is rendered in a portal.
+     * When set to `false`, the popover will be rendered inline where the component is mounted.
+     * This is useful when the OrganizationSwitcher is used within components that restrict interaction
+     * with portaled content (e.g., some sidebar libraries).
+     *
+     * @default true
+     */
+    portal?: boolean;
   };
 
 export type OrganizationListProps = {

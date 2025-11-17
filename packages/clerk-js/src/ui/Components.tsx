@@ -498,6 +498,21 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  // Find the OrganizationSwitcher mount node to use as portal root when portal=false
+  const organizationSwitcherNode = React.useMemo(() => {
+    if (
+      (organizationProfileModal?.portal === false || createOrganizationModal?.portal === false) &&
+      (organizationProfileModal || createOrganizationModal)
+    ) {
+      for (const [node, component] of nodes) {
+        if (component.name === 'OrganizationSwitcher') {
+          return node;
+        }
+      }
+    }
+    return null;
+  }, [nodes, organizationProfileModal, createOrganizationModal]);
+
   const mountedOrganizationProfileModal = (
     <LazyModalRenderer
       globalAppearance={state.appearance}
@@ -513,6 +528,8 @@ const Components = (props: ComponentsProps) => {
       componentName={'OrganizationProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+      portal={organizationProfileModal?.portal}
+      portalRoot={organizationSwitcherNode || undefined}
     >
       <OrganizationProfileModal {...organizationProfileModal} />
     </LazyModalRenderer>
@@ -530,6 +547,8 @@ const Components = (props: ComponentsProps) => {
       componentName={'CreateOrganizationModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+      portal={createOrganizationModal?.portal}
+      portalRoot={organizationSwitcherNode || undefined}
     >
       <CreateOrganizationModal {...createOrganizationModal} />
     </LazyModalRenderer>
