@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useApiKeys } from '../useAPIKeys';
+import { useAPIKeys } from '../useAPIKeys';
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
@@ -48,7 +48,7 @@ describe('useApiKeys', () => {
         total_count: 1,
       });
 
-    const { result } = renderHook(() => useApiKeys({ subject: 'user_1', pageSize: 1 }), { wrapper });
+    const { result } = renderHook(() => useAPIKeys({ subject: 'user_1', pageSize: 1 }), { wrapper });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toEqual([{ id: 'key_initial' }]);
@@ -73,8 +73,8 @@ describe('useApiKeys', () => {
     });
 
     const useBoth = () => {
-      const paginated = useApiKeys({ subject: 'user_1', pageSize: 1 });
-      const infinite = useApiKeys({ subject: 'user_1', pageSize: 1, infinite: true });
+      const paginated = useAPIKeys({ subject: 'user_1', pageSize: 1 });
+      const infinite = useAPIKeys({ subject: 'user_1', pageSize: 1, infinite: true });
       return { paginated, infinite };
     };
 
@@ -109,8 +109,8 @@ describe('useApiKeys', () => {
     });
 
     const useHooks = () => {
-      const small = useApiKeys({ subject: 'user_1', pageSize: 1 });
-      const large = useApiKeys({ subject: 'user_1', pageSize: 5 });
+      const small = useAPIKeys({ subject: 'user_1', pageSize: 1 });
+      const large = useAPIKeys({ subject: 'user_1', pageSize: 5 });
       return { small, large };
     };
 
@@ -147,8 +147,8 @@ describe('useApiKeys', () => {
     });
 
     const useHooks = () => {
-      const defaultQuery = useApiKeys({ subject: 'user_1', pageSize: 11, query: '' });
-      const filtered = useApiKeys({ subject: 'user_1', pageSize: 11, query: 'search' });
+      const defaultQuery = useAPIKeys({ subject: 'user_1', pageSize: 11, query: '' });
+      const filtered = useAPIKeys({ subject: 'user_1', pageSize: 11, query: 'search' });
       return { defaultQuery, filtered };
     };
 
@@ -185,8 +185,8 @@ describe('useApiKeys', () => {
     });
 
     const useHooks = () => {
-      const primary = useApiKeys({ subject: 'user_primary', pageSize: 1 });
-      const secondary = useApiKeys({ subject: 'user_secondary', pageSize: 1 });
+      const primary = useAPIKeys({ subject: 'user_primary', pageSize: 1 });
+      const secondary = useAPIKeys({ subject: 'user_secondary', pageSize: 1 });
       return { primary, secondary };
     };
 
