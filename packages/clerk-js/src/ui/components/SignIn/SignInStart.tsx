@@ -88,7 +88,7 @@ function SignInStartInternal(): JSX.Element {
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
-  const { totalCount: totalEnabledAuthMethods } = useTotalEnabledAuthMethods();
+  const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],

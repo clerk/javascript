@@ -3,7 +3,7 @@ import type { Attribute } from '@clerk/shared/types';
 import { useEnvironment } from '../contexts/EnvironmentContext';
 import { useEnabledThirdPartyProviders } from './useEnabledThirdPartyProviders';
 
-export const useTotalEnabledAuthMethods = (): { totalCount: number } => {
+export const useTotalEnabledAuthMethods = (): number => {
   const { userSettings } = useEnvironment();
   const { authenticatableOauthStrategies, web3Strategies, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
@@ -18,5 +18,5 @@ export const useTotalEnabledAuthMethods = (): { totalCount: number } => {
 
   const totalCount = firstFactorCount + oauthCount + web3Count + alternativePhoneCodeCount;
 
-  return { totalCount };
+  return totalCount;
 };

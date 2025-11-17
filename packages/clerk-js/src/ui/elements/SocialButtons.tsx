@@ -66,7 +66,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   } = props;
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
-  const { totalCount: totalEnabledAuthMethods } = useTotalEnabledAuthMethods();
+  const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const card = useCardState();
   const clerk = useClerk();
   const { socialButtonsVariant } = useAppearance().parsedLayout;

@@ -136,7 +136,7 @@ describe('SocialButtons', () => {
 
       // Verify the total count is actually 1 using the hook
       const { result } = renderHook(() => useTotalEnabledAuthMethods(), { wrapper });
-      expect(result.current.totalCount).toBe(1);
+      expect(result.current).toBe(1);
 
       fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
 
@@ -165,7 +165,7 @@ describe('SocialButtons', () => {
 
       // Verify the total count is 2 (email + google)
       const { result } = renderHook(() => useTotalEnabledAuthMethods(), { wrapper });
-      expect(result.current.totalCount).toBe(2);
+      expect(result.current).toBe(2);
 
       fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
 
