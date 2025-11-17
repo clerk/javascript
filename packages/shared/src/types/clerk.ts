@@ -1725,6 +1725,11 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Provide custom menu actions and links to be rendered inside the UserButton.
    */
   customMenuItems?: CustomMenuItem[];
+
+  /**
+   * @default true
+   */
+  portal?: boolean;
 };
 
 export type UserAvatarProps = {
@@ -1834,6 +1839,10 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
      */
     organizationProfileProps?: Pick<OrganizationProfileProps, 'appearance' | 'customPages'>;
+    /**
+     * @default true
+     */
+    portal?: boolean;
   };
 
 export type OrganizationListProps = {

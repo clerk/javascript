@@ -10,7 +10,7 @@ import { UserButtonPopover } from './UserButtonPopover';
 import { UserButtonTrigger } from './UserButtonTrigger';
 
 const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { defaultOpen } = useUserButtonContext();
+  const { defaultOpen, portal = true } = useUserButtonContext();
 
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
@@ -33,6 +33,7 @@ const UserButtonWithFloatingTree = withFloatingTree<{ children: ReactElement }>(
         nodeId={nodeId}
         context={context}
         isOpen={isOpen}
+        portal={portal}
       >
         {cloneElement(children, {
           id: userButtonMenuId,

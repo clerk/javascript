@@ -11,7 +11,7 @@ import { OrganizationSwitcherPopover } from './OrganizationSwitcherPopover';
 import { OrganizationSwitcherTrigger } from './OrganizationSwitcherTrigger';
 
 const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactElement }>(({ children }) => {
-  const { defaultOpen } = useOrganizationSwitcherContext();
+  const { defaultOpen, portal = true } = useOrganizationSwitcherContext();
 
   const { floating, reference, styles, toggle, isOpen, nodeId, context } = usePopover({
     defaultOpen,
@@ -34,6 +34,7 @@ const OrganizationSwitcherWithFloatingTree = withFloatingTree<{ children: ReactE
         nodeId={nodeId}
         context={context}
         isOpen={isOpen}
+        portal={portal}
       >
         {cloneElement(children, {
           id: switcherButtonMenuId,
