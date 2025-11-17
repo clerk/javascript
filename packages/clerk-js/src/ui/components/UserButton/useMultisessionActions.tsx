@@ -3,6 +3,7 @@ import type { SignedInSessionResource, UserButtonProps, UserResource } from '@cl
 
 import { navigateIfTaskExists } from '@/core/sessionTasks';
 import { useEnvironment } from '@/ui/contexts';
+import { usePortalConfig } from '@/ui/contexts/PortalContext';
 import { useCardState } from '@/ui/elements/contexts';
 import { sleep } from '@/ui/utils/sleep';
 
@@ -27,6 +28,7 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
   const { signedInSessions, otherSessions } = useMultipleSessions({ user: opts.user });
   const { navigate } = useRouter();
   const { displayConfig } = useEnvironment();
+  const portalConfig = usePortalConfig();
 
   const handleSignOutSessionClicked = (session: SignedInSessionResource) => () => {
     if (otherSessions.length === 0) {
@@ -46,7 +48,11 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
         })();
       });
     }
-    openUserProfile(opts.userProfileProps);
+    openUserProfile({
+      ...opts.userProfileProps,
+      // Pass portal config from UserButton context to UserProfile modal
+      ...portalConfig,
+    });
     return opts.actionCompleteCallback?.();
   };
 
@@ -62,6 +68,8 @@ export const useMultisessionActions = (opts: UseMultisessionActionsParams) => {
     openUserProfile({
       ...opts.userProfileProps,
       ...(__experimental_startPath && { __experimental_startPath }),
+      // Pass portal config from UserButton context to UserProfile modal
+      ...portalConfig,
     });
 
     return opts.actionCompleteCallback?.();

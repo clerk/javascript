@@ -3,7 +3,7 @@ import { useAttrs, useSlots } from 'vue';
 import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
 import { useClerk } from '../composables/useClerk';
 import { useAuth } from '../composables/useAuth';
-import { assertSingleChild, normalizeWithDefaultValue } from '../utils';
+import { assertSingleChild, mergePortalProps, normalizePortalRoot, normalizeWithDefaultValue } from '../utils';
 
 type CheckoutButtonProps = Omit<__experimental_CheckoutButtonProps, 'onSubscriptionComplete'>;
 const props = defineProps<CheckoutButtonProps>();
@@ -34,12 +34,25 @@ function clickHandler() {
     return;
   }
 
+  // Merge portal config: top-level props take precedence over nested checkoutProps
+  // Note: checkoutProps.portalRoot is PortalRoot (HTMLElement | null | undefined) which is
+  // incompatible with PortalProps.portalRoot, so we handle portalRoot separately
+  // Also note: __internal_CheckoutProps only supports portalId and portalRoot, not disablePortal
+  const topLevelPortalConfig = mergePortalProps(props);
+
+  // Get portalRoot from top-level props first, then fallback to checkoutProps
+  const portalRootValue = topLevelPortalConfig.portalRoot
+    ? normalizePortalRoot(topLevelPortalConfig.portalRoot)
+    : (props.checkoutProps?.portalRoot ?? undefined);
+
   return clerk.value.__internal_openCheckout({
     planId: props.planId,
     planPeriod: props.planPeriod,
     for: props.for,
     newSubscriptionRedirectUrl: props.newSubscriptionRedirectUrl,
     ...props.checkoutProps,
+    portalId: topLevelPortalConfig.portalId ?? props.checkoutProps?.portalId,
+    portalRoot: portalRootValue,
     onSubscriptionComplete: () => emit('subscription-complete'),
   });
 }

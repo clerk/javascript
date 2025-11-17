@@ -5,12 +5,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Flow } from '@/ui/customizables/Flow';
 
 import { usePaymentMethods, usePlans, usePlansContext, usePricingTableContext, useSubscription } from '../../contexts';
+import { usePortalConfig } from '../../contexts/PortalContext';
 import { PricingTableDefault } from './PricingTableDefault';
 import { PricingTableMatrix } from './PricingTableMatrix';
 
 const PricingTableRoot = (props: PricingTableProps) => {
   const clerk = useClerk();
   const { mode = 'mounted', signInMode = 'redirect' } = usePricingTableContext();
+  const portalConfig = usePortalConfig();
   const isCompact = mode === 'modal';
   const { data: subscription, subscriptionItems } = useSubscription();
   const { data: plans } = usePlans();
@@ -52,7 +54,8 @@ const PricingTableRoot = (props: PricingTableProps) => {
   const selectPlan = (plan: BillingPlanResource, event?: React.MouseEvent<HTMLElement>) => {
     if (!clerk.isSignedIn) {
       if (signInMode === 'modal') {
-        return clerk.openSignIn();
+        // Pass portal config from PricingTable context to SignIn modal
+        return clerk.openSignIn(portalConfig);
       }
       return clerk.redirectToSignIn();
     }

@@ -15,6 +15,8 @@ export {
   Waitlist,
 } from './uiComponents';
 
+export { PortalProvider } from './PortalProvider';
+
 export {
   AuthenticateWithRedirectCallback,
   ClerkDegraded,

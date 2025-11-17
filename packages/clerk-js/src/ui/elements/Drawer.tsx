@@ -13,6 +13,7 @@ import {
 } from '@floating-ui/react';
 import * as React from 'react';
 
+import { usePortalContext } from '../contexts/PortalContext';
 import { transitionDurationValues, transitionTiming } from '../../ui/foundations/transitions';
 import type { LocalizationKey } from '../customizables';
 import { Box, descriptors, Flex, Heading, Icon, Span, useAppearance } from '../customizables';
@@ -88,6 +89,7 @@ function Root({
   dismissProps,
 }: RootProps) {
   const direction = useDirection();
+  const portalConfig = usePortalContext();
 
   const { refs, context } = useFloating({
     open,
@@ -104,20 +106,61 @@ function Root({
     useRole(context),
   ]);
 
+  // Merge portal config from context with portalProps (context takes precedence)
+  const mergedPortalProps = React.useMemo<FloatingPortalProps>(() => {
+    const merged: FloatingPortalProps = { ...portalProps };
+
+    if (portalConfig?.disablePortal) {
+      // If portal is disabled, we still need to render but without FloatingPortal
+      // This will be handled by checking in the render
+      return merged;
+    }
+
+    if (portalConfig?.portalId) {
+      merged.id = portalConfig.portalId;
+    }
+
+    if (portalConfig?.portalRoot) {
+      merged.root = typeof portalConfig.portalRoot === 'function' ? portalConfig.portalRoot() : portalConfig.portalRoot;
+    }
+
+    return merged;
+  }, [portalConfig, portalProps]);
+
+  // If portal is disabled, render without FloatingPortal
+  if (portalConfig?.disablePortal) {
+    return (
+      <DrawerContext.Provider
+        value={{
+          isOpen: open,
+          setIsOpen: onOpenChange,
+          strategy: 'absolute', // Use absolute when portal is disabled
+          portalProps: mergedPortalProps,
+          refs,
+          context,
+          getFloatingProps,
+          direction,
+        }}
+      >
+        {children}
+      </DrawerContext.Provider>
+    );
+  }
+
   return (
     <DrawerContext.Provider
       value={{
         isOpen: open,
         setIsOpen: onOpenChange,
         strategy,
-        portalProps: portalProps || {},
+        portalProps: mergedPortalProps,
         refs,
         context,
         getFloatingProps,
         direction,
       }}
     >
-      <FloatingPortal {...portalProps}>{children}</FloatingPortal>
+      <FloatingPortal {...mergedPortalProps}>{children}</FloatingPortal>
     </DrawerContext.Provider>
   );
 }

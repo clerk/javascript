@@ -2,6 +2,7 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
+import { usePortalRoot } from '../contexts/PortalContext';
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
 import type { ThemableCssProp } from '../styledSystem';
@@ -116,31 +117,40 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
       >
         <FlowMetadataProvider flow={props.flowName || ('' as any)}>
           <InternalThemeProvider>
-            <Modal
-              id={props.modalId}
-              style={props.modalStyle}
-              handleClose={props.onClose}
-              containerSx={props.modalContainerSx}
-              contentSx={props.modalContentSx}
-              canCloseModal={props.canCloseModal}
-            >
-              {props.startPath ? (
-                <Suspense>
-                  <VirtualRouter
-                    startPath={props.startPath}
-                    onExternalNavigate={props.onExternalNavigate}
-                  >
-                    {props.children}
-                  </VirtualRouter>
-                </Suspense>
-              ) : (
-                props.children
-              )}
-            </Modal>
+            <LazyModalRendererInner {...props} />
           </InternalThemeProvider>
         </FlowMetadataProvider>
       </AppearanceProvider>
     </Suspense>
+  );
+};
+
+const LazyModalRendererInner = (props: LazyModalRendererProps) => {
+  const portalRootValue = usePortalRoot();
+
+  return (
+    <Modal
+      id={props.modalId}
+      style={props.modalStyle}
+      handleClose={props.onClose}
+      containerSx={props.modalContainerSx}
+      contentSx={props.modalContentSx}
+      canCloseModal={props.canCloseModal}
+      portalRoot={portalRootValue}
+    >
+      {props.startPath ? (
+        <Suspense>
+          <VirtualRouter
+            startPath={props.startPath}
+            onExternalNavigate={props.onExternalNavigate}
+          >
+            {props.children}
+          </VirtualRouter>
+        </Suspense>
+      ) : (
+        props.children
+      )}
+    </Modal>
   );
 };
 

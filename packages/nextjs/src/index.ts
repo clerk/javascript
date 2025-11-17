@@ -28,6 +28,7 @@ export {
   OrganizationProfile,
   OrganizationSwitcher,
   PricingTable,
+  PortalProvider,
   SignIn,
   SignInButton,
   SignInWithMetamaskButton,

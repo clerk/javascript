@@ -3,6 +3,8 @@ import { FloatingFocusManager, FloatingNode, FloatingPortal } from '@floating-ui
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+import { usePortalContext, usePortalRoot } from '../contexts/PortalContext';
+
 type PopoverProps = PropsWithChildren<{
   context: FloatingContext<ReferenceType>;
   nodeId?: string;
@@ -35,10 +37,20 @@ export const Popover = (props: PopoverProps) => {
     children,
   } = props;
 
-  if (portal) {
+  const portalConfig = usePortalContext();
+
+  // Determine portal settings: context takes precedence over props
+  const shouldPortal = portalConfig?.disablePortal ? false : portal;
+  const portalRootValue = usePortalRoot(root);
+  const portalId = portalConfig?.portalId;
+
+  if (shouldPortal) {
     return (
       <FloatingNode id={nodeId}>
-        <FloatingPortal root={root}>
+        <FloatingPortal
+          root={portalRootValue}
+          id={portalId}
+        >
           {isOpen && (
             <FloatingFocusManager
               context={context}

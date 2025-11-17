@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { usePortalRoot } from '@/ui/contexts/PortalContext';
 import { Modal } from '@/ui/elements/Modal';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 
@@ -34,10 +35,12 @@ const getScopedPortalContainerStyles = (modalRoot?: React.MutableRefObject<HTMLE
 };
 
 export const APIKeyModal = ({ modalRoot, containerSx, ...modalProps }: APIKeyModalProps) => {
+  const portalRootValue = usePortalRoot(modalRoot);
+
   return (
     <Modal
       {...modalProps}
-      portalRoot={modalRoot}
+      portalRoot={portalRootValue}
       containerSx={[getScopedPortalContainerStyles(modalRoot), containerSx]}
     />
   );

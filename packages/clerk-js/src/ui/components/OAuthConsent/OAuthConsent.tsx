@@ -1,8 +1,9 @@
 import { useUser } from '@clerk/shared/react';
 import type { ComponentProps } from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { useEnvironment, useOAuthConsentContext } from '@/ui/contexts';
+import { usePortalRoot } from '@/ui/contexts/PortalContext';
 import { Box, Button, Flex, Flow, Grid, Icon, Text } from '@/ui/customizables';
 import { ApplicationLogo } from '@/ui/elements/ApplicationLogo';
 import { Card } from '@/ui/elements/Card';
@@ -265,6 +266,8 @@ type RedirectUriModalProps = {
 };
 
 function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicationName }: RedirectUriModalProps) {
+  const portalRootValue = usePortalRoot();
+
   if (!isOpen) {
     return null;
   }
@@ -273,6 +276,7 @@ function RedirectUriModal({ onOpen, onClose, isOpen, redirectUri, oAuthApplicati
     <Modal
       handleOpen={onOpen}
       handleClose={onClose}
+      portalRoot={portalRootValue}
     >
       <Card.Root>
         <Card.Content>

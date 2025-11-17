@@ -3,7 +3,13 @@ import React from 'react';
 
 import { useAuth } from '../hooks';
 import type { WithClerkProp } from '../types';
-import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
+import {
+  assertSingleChild,
+  mergePortalProps,
+  normalizePortalRoot,
+  normalizeWithDefaultValue,
+  safeExecute,
+} from '../utils';
 import { withClerk } from './withClerk';
 
 /**
@@ -68,10 +74,22 @@ export const SubscriptionDetailsButton = withClerk(
         return;
       }
 
+      // Merge portal config: top-level props take precedence over nested subscriptionDetailsProps
+      // Note: subscriptionDetailsProps.portalRoot is PortalRoot (HTMLElement | null | undefined) which is
+      // incompatible with PortalProps.portalRoot, so we handle portalRoot separately
+      const topLevelPortalConfig = mergePortalProps(props);
+
+      // Get portalRoot from top-level props first, then fallback to subscriptionDetailsProps
+      const portalRootValue = topLevelPortalConfig.portalRoot
+        ? normalizePortalRoot(topLevelPortalConfig.portalRoot)
+        : (subscriptionDetailsProps?.portalRoot ?? undefined);
+
       return clerk.__internal_openSubscriptionDetails({
         for: _for,
         onSubscriptionCancel,
         ...subscriptionDetailsProps,
+        portalId: topLevelPortalConfig.portalId ?? subscriptionDetailsProps?.portalId,
+        portalRoot: portalRootValue,
       });
     };
 

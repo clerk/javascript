@@ -3,7 +3,13 @@ import React from 'react';
 
 import { useAuth } from '../hooks';
 import type { WithClerkProp } from '../types';
-import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../utils';
+import {
+  assertSingleChild,
+  mergePortalProps,
+  normalizePortalRoot,
+  normalizeWithDefaultValue,
+  safeExecute,
+} from '../utils';
 import { withClerk } from './withClerk';
 
 /**
@@ -78,6 +84,17 @@ export const CheckoutButton = withClerk(
         return;
       }
 
+      // Merge portal config: top-level props take precedence over nested checkoutProps
+      // Note: checkoutProps.portalRoot is PortalRoot (HTMLElement | null | undefined) which is
+      // incompatible with PortalProps.portalRoot, so we handle portalRoot separately
+      // Also note: __internal_CheckoutProps only supports portalId and portalRoot, not disablePortal
+      const topLevelPortalConfig = mergePortalProps(props);
+
+      // Get portalRoot from top-level props first, then fallback to checkoutProps
+      const portalRootValue = topLevelPortalConfig.portalRoot
+        ? normalizePortalRoot(topLevelPortalConfig.portalRoot)
+        : (checkoutProps?.portalRoot ?? undefined);
+
       return clerk.__internal_openCheckout({
         planId,
         planPeriod,
@@ -85,6 +102,8 @@ export const CheckoutButton = withClerk(
         onSubscriptionComplete,
         newSubscriptionRedirectUrl,
         ...checkoutProps,
+        portalId: topLevelPortalConfig.portalId ?? checkoutProps?.portalId,
+        portalRoot: portalRootValue,
       });
     };
 

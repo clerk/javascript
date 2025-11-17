@@ -11,6 +11,7 @@ import { PopoverCard } from '@/ui/elements/PopoverCard';
 import { runIfFunctionOrReturn } from '../../../utils';
 import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
+import { usePortalConfig } from '../../contexts/PortalContext';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { RootBox } from '../../elements/RootBox';
 import { Billing, CogFilled } from '../../icons';
@@ -30,6 +31,7 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { organization: currentOrg } = useOrganization();
     const { isLoaded, setActive } = useOrganizationList();
     const router = useRouter();
+    const portalConfig = usePortalConfig();
     const {
       hidePersonal,
       //@ts-expect-error
@@ -86,7 +88,13 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       if (createOrganizationMode === 'navigation') {
         return navigateCreateOrganization();
       }
-      return openCreateOrganization({ afterCreateOrganizationUrl, skipInvitationScreen, hideSlug });
+      return openCreateOrganization({
+        afterCreateOrganizationUrl,
+        skipInvitationScreen,
+        hideSlug,
+        // Pass portal config from OrganizationSwitcher context to CreateOrganization modal
+        ...portalConfig,
+      });
     };
 
     const handleItemClick = () => {
@@ -102,6 +110,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
         __unstable_manageBillingUrl,
         __unstable_manageBillingLabel,
         __unstable_manageBillingMembersLimit,
+        // Pass portal config from OrganizationSwitcher context to OrganizationProfile modal
+        ...portalConfig,
       });
     };
 

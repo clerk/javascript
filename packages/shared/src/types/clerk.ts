@@ -1321,68 +1321,69 @@ export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
   | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
 
-export type SignInProps = RoutingOptions & {
-  /**
-   * Full URL or path to navigate to after successful sign in.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   *
-   * @default undefined
-   */
-  forceRedirectUrl?: string | null;
-  /**
-   * Full URL or path to navigate to after successful sign in.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   *
-   * @default undefined
-   */
-  fallbackRedirectUrl?: string | null;
-  /**
-   * Full URL or path to for the sign in process.
-   * Used to fill the "Sign in" link in the SignUp component.
-   */
-  signInUrl?: string;
-  /**
-   * Full URL or path to for the sign up process.
-   * Used to fill the "Sign up" link in the SignUp component.
-   */
-  signUpUrl?: string;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: SignInTheme;
-  /**
-   * Initial values that are used to prefill the sign in or up forms.
-   */
-  initialValues?: SignInInitialValues & SignUpInitialValues;
-  /**
-   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
-   */
-  __experimental?: Record<string, any> & { newComponents?: boolean };
-  /**
-   * Full URL or path to for the waitlist process.
-   * Used to fill the "Join waitlist" link in the SignUp component.
-   */
-  waitlistUrl?: string;
-  /**
-   * Additional arbitrary metadata to be stored alongside the User object
-   */
-  unsafeMetadata?: SignUpUnsafeMetadata;
-  /**
-   * Enable sign-in-or-up flow for `<SignIn />` component instance.
-   */
-  withSignUp?: boolean;
-  /**
-   * Control whether OAuth flows use redirects or popups.
-   */
-  oauthFlow?: 'auto' | 'redirect' | 'popup';
-  /**
-   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
-   */
-  oidcPrompt?: string;
-} & TransferableOption &
+export type SignInProps = RoutingOptions &
+  PortalProps & {
+    /**
+     * Full URL or path to navigate to after successful sign in.
+     * This value has precedence over other redirect props, environment variables or search params.
+     * Use this prop to override the redirect URL when needed.
+     *
+     * @default undefined
+     */
+    forceRedirectUrl?: string | null;
+    /**
+     * Full URL or path to navigate to after successful sign in.
+     * This value is used when no other redirect props, environment variables or search params are present.
+     *
+     * @default undefined
+     */
+    fallbackRedirectUrl?: string | null;
+    /**
+     * Full URL or path to for the sign in process.
+     * Used to fill the "Sign in" link in the SignUp component.
+     */
+    signInUrl?: string;
+    /**
+     * Full URL or path to for the sign up process.
+     * Used to fill the "Sign up" link in the SignUp component.
+     */
+    signUpUrl?: string;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
+     */
+    appearance?: SignInTheme;
+    /**
+     * Initial values that are used to prefill the sign in or up forms.
+     */
+    initialValues?: SignInInitialValues & SignUpInitialValues;
+    /**
+     * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+     */
+    __experimental?: Record<string, any> & { newComponents?: boolean };
+    /**
+     * Full URL or path to for the waitlist process.
+     * Used to fill the "Join waitlist" link in the SignUp component.
+     */
+    waitlistUrl?: string;
+    /**
+     * Additional arbitrary metadata to be stored alongside the User object
+     */
+    unsafeMetadata?: SignUpUnsafeMetadata;
+    /**
+     * Enable sign-in-or-up flow for `<SignIn />` component instance.
+     */
+    withSignUp?: boolean;
+    /**
+     * Control whether OAuth flows use redirects or popups.
+     */
+    oauthFlow?: 'auto' | 'redirect' | 'popup';
+    /**
+     * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+     */
+    oidcPrompt?: string;
+  } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   LegacyRedirectProps &
@@ -1400,32 +1401,33 @@ export interface TransferableOption {
 
 export type SignInModalProps = WithoutRouting<SignInProps>;
 
-export type __internal_UserVerificationProps = RoutingOptions & {
-  /**
-   * Non-awaitable callback for when verification is completed successfully
-   */
-  afterVerification?: () => void;
+export type __internal_UserVerificationProps = RoutingOptions &
+  PortalProps & {
+    /**
+     * Non-awaitable callback for when verification is completed successfully
+     */
+    afterVerification?: () => void;
 
-  /**
-   * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
-   */
-  afterVerificationCancelled?: () => void;
+    /**
+     * Non-awaitable callback for when verification is cancelled, (i.e modal is closed)
+     */
+    afterVerificationCancelled?: () => void;
 
-  /**
-   * Defines the steps of the verification flow.
-   * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
-   *
-   * @default `'secondFactor'`
-   */
-  level?: SessionVerificationLevel;
+    /**
+     * Defines the steps of the verification flow.
+     * When `multiFactor` is used, the user will be prompt for a first factor flow followed by a second factor flow.
+     *
+     * @default `'secondFactor'`
+     */
+    level?: SessionVerificationLevel;
 
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: UserVerificationTheme;
-};
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
+     */
+    appearance?: UserVerificationTheme;
+  };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
@@ -1452,205 +1454,210 @@ export type __internal_ComponentNavigationContext = {
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
 
-export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
-  /**
-   * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
-   *
-   * @default true
-   */
-  cancelOnTapOutside?: boolean;
-  /**
-   * Enables upgraded One Tap UX on ITP browsers.
-   * Turning this options off, would hide any One Tap UI in such browsers.
-   *
-   * @default true
-   */
-  itpSupport?: boolean;
-  /**
-   * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
-   * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
-   * Backwards compatible with browsers that still support third-party cookies.
-   *
-   * @default true
-   */
-  fedCmSupport?: boolean;
-  appearance?: SignInTheme;
-};
+export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps &
+  PortalProps & {
+    /**
+     * Whether to cancel the Google One Tap request if a user clicks outside the prompt.
+     *
+     * @default true
+     */
+    cancelOnTapOutside?: boolean;
+    /**
+     * Enables upgraded One Tap UX on ITP browsers.
+     * Turning this options off, would hide any One Tap UI in such browsers.
+     *
+     * @default true
+     */
+    itpSupport?: boolean;
+    /**
+     * FedCM enables more private sign-in flows without requiring the use of third-party cookies.
+     * The browser controls user settings, displays user prompts, and only contacts an Identity Provider such as Google after explicit user consent is given.
+     * Backwards compatible with browsers that still support third-party cookies.
+     *
+     * @default true
+     */
+    fedCmSupport?: boolean;
+    appearance?: SignInTheme;
+  };
 
-export type SignUpProps = RoutingOptions & {
-  /**
-   * Full URL or path to navigate to after successful sign up.
-   * This value has precedence over other redirect props, environment variables or search params.
-   * Use this prop to override the redirect URL when needed.
-   *
-   * @default undefined
-   */
-  forceRedirectUrl?: string | null;
-  /**
-   * Full URL or path to navigate to after successful sign up.
-   * This value is used when no other redirect props, environment variables or search params are present.
-   *
-   * @default undefined
-   */
-  fallbackRedirectUrl?: string | null;
-  /**
-   * Full URL or path to for the sign in process.
-   * Used to fill the "Sign in" link in the SignUp component.
-   */
-  signInUrl?: string;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: SignUpTheme;
+export type SignUpProps = RoutingOptions &
+  PortalProps & {
+    /**
+     * Full URL or path to navigate to after successful sign up.
+     * This value has precedence over other redirect props, environment variables or search params.
+     * Use this prop to override the redirect URL when needed.
+     *
+     * @default undefined
+     */
+    forceRedirectUrl?: string | null;
+    /**
+     * Full URL or path to navigate to after successful sign up.
+     * This value is used when no other redirect props, environment variables or search params are present.
+     *
+     * @default undefined
+     */
+    fallbackRedirectUrl?: string | null;
+    /**
+     * Full URL or path to for the sign in process.
+     * Used to fill the "Sign in" link in the SignUp component.
+     */
+    signInUrl?: string;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
+     */
+    appearance?: SignUpTheme;
 
-  /**
-   * Additional arbitrary metadata to be stored alongside the User object
-   */
-  unsafeMetadata?: SignUpUnsafeMetadata;
-  /**
-   * Initial values that are used to prefill the sign up form.
-   */
-  initialValues?: SignUpInitialValues;
-  /**
-   * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
-   */
-  __experimental?: Record<string, any> & { newComponents?: boolean };
-  /**
-   * Full URL or path to for the waitlist process.
-   * Used to fill the "Join waitlist" link in the SignUp component.
-   */
-  waitlistUrl?: string;
-  /**
-   * Control whether OAuth flows use redirects or popups.
-   */
-  oauthFlow?: 'auto' | 'redirect' | 'popup';
-  /**
-   * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
-   */
-  oidcPrompt?: string;
-} & SignInFallbackRedirectUrl &
+    /**
+     * Additional arbitrary metadata to be stored alongside the User object
+     */
+    unsafeMetadata?: SignUpUnsafeMetadata;
+    /**
+     * Initial values that are used to prefill the sign up form.
+     */
+    initialValues?: SignUpInitialValues;
+    /**
+     * Enable experimental flags to gain access to new features. These flags are not guaranteed to be stable and may change drastically in between patch or minor versions.
+     */
+    __experimental?: Record<string, any> & { newComponents?: boolean };
+    /**
+     * Full URL or path to for the waitlist process.
+     * Used to fill the "Join waitlist" link in the SignUp component.
+     */
+    waitlistUrl?: string;
+    /**
+     * Control whether OAuth flows use redirects or popups.
+     */
+    oauthFlow?: 'auto' | 'redirect' | 'popup';
+    /**
+     * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+     */
+    oidcPrompt?: string;
+  } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
   LegacyRedirectProps &
   AfterSignOutUrl;
 
 export type SignUpModalProps = WithoutRouting<SignUpProps>;
 
-export type UserProfileProps = RoutingOptions & {
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: UserProfileTheme;
-  /*
-   * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
-   * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
-   */
-  additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
-  /*
-   * Provide custom pages and links to be rendered inside the UserProfile.
-   */
-  customPages?: CustomPage[];
-  /**
-   * Specify on which page the user profile modal will open.
-   *
-   * @example __experimental_startPath: '/members'
-   *
-   * @experimental
-   */
-  __experimental_startPath?: string;
-  /**
-   * Specify options for the underlying <APIKeys /> component.
-   * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
-   *
-   * @experimental
-   */
-  apiKeysProps?: APIKeysProps & {
+export type UserProfileProps = RoutingOptions &
+  PortalProps & {
     /**
-     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
-     *
-     * @default false
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
      */
-    hide?: boolean;
+    appearance?: UserProfileTheme;
+    /*
+     * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
+     * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
+     */
+    additionalOAuthScopes?: Partial<Record<OAuthProvider, OAuthScope[]>>;
+    /*
+     * Provide custom pages and links to be rendered inside the UserProfile.
+     */
+    customPages?: CustomPage[];
+    /**
+     * Specify on which page the user profile modal will open.
+     *
+     * @example __experimental_startPath: '/members'
+     *
+     * @experimental
+     */
+    __experimental_startPath?: string;
+    /**
+     * Specify options for the underlying <APIKeys /> component.
+     * e.g. <UserProfile apiKeysProps={{ showDescription: true }} />
+     *
+     * @experimental
+     */
+    apiKeysProps?: APIKeysProps & {
+      /**
+       * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+       *
+       * @default false
+       */
+      hide?: boolean;
+    };
   };
-};
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
 
-export type OrganizationProfileProps = RoutingOptions & {
-  /**
-   * Full URL or path to navigate to after the user leaves the currently active organization.
-   *
-   * @default undefined
-   */
-  afterLeaveOrganizationUrl?: string;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: OrganizationProfileTheme;
-  /*
-   * Provide custom pages and links to be rendered inside the OrganizationProfile.
-   */
-  customPages?: CustomPage[];
-  /**
-   * Specify on which page the organization profile modal will open.
-   *
-   * @example __experimental_startPath: '/organization-members'
-   *
-   * @experimental
-   */
-  __experimental_startPath?: string;
-  /**
-   * Specify options for the underlying <APIKeys /> component.
-   * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
-   *
-   * @experimental
-   */
-  apiKeysProps?: APIKeysProps & {
+export type OrganizationProfileProps = RoutingOptions &
+  PortalProps & {
     /**
-     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     * Full URL or path to navigate to after the user leaves the currently active organization.
      *
-     * @default false
+     * @default undefined
      */
-    hide?: boolean;
+    afterLeaveOrganizationUrl?: string;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
+     */
+    appearance?: OrganizationProfileTheme;
+    /*
+     * Provide custom pages and links to be rendered inside the OrganizationProfile.
+     */
+    customPages?: CustomPage[];
+    /**
+     * Specify on which page the organization profile modal will open.
+     *
+     * @example __experimental_startPath: '/organization-members'
+     *
+     * @experimental
+     */
+    __experimental_startPath?: string;
+    /**
+     * Specify options for the underlying <APIKeys /> component.
+     * e.g. <OrganizationProfile apiKeysProps={{ showDescription: true }} />
+     *
+     * @experimental
+     */
+    apiKeysProps?: APIKeysProps & {
+      /**
+       * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+       *
+       * @default false
+       */
+      hide?: boolean;
+    };
   };
-};
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
 
-export type CreateOrganizationProps = RoutingOptions & {
-  /**
-   * Full URL or path to navigate to after creating a new organization.
-   *
-   * @default undefined
-   */
-  afterCreateOrganizationUrl?:
-    | ((organization: OrganizationResource) => string)
-    | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
-  /**
-   * Hides the screen for sending invitations after an organization is created.
-   *
-   * @default undefined When left undefined Clerk will automatically hide the screen if
-   * the number of max allowed members is equal to 1
-   */
-  skipInvitationScreen?: boolean;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: CreateOrganizationTheme;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
-};
+export type CreateOrganizationProps = RoutingOptions &
+  PortalProps & {
+    /**
+     * Full URL or path to navigate to after creating a new organization.
+     *
+     * @default undefined
+     */
+    afterCreateOrganizationUrl?:
+      | ((organization: OrganizationResource) => string)
+      | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
+    /**
+     * Hides the screen for sending invitations after an organization is created.
+     *
+     * @default undefined When left undefined Clerk will automatically hide the screen if
+     * the number of max allowed members is equal to 1
+     */
+    skipInvitationScreen?: boolean;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
+     */
+    appearance?: CreateOrganizationTheme;
+    /**
+     * @deprecated
+     * This prop will be removed in a future version.
+     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
+     */
+    hideSlug?: boolean;
+  };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
 
@@ -1665,67 +1672,68 @@ type UserButtonProfileMode =
       userProfileMode?: Extract<UserProfileMode, 'navigation'>;
     };
 
-export type UserButtonProps = UserButtonProfileMode & {
-  /**
-   * Controls if the username is displayed next to the trigger button
-   */
-  showName?: boolean;
-  /**
-   * Controls the default state of the UserButton
-   */
-  defaultOpen?: boolean;
+export type UserButtonProps = UserButtonProfileMode &
+  PortalProps & {
+    /**
+     * Controls if the username is displayed next to the trigger button
+     */
+    showName?: boolean;
+    /**
+     * Controls the default state of the UserButton
+     */
+    defaultOpen?: boolean;
 
-  /**
-   * If true the `<UserButton />` will only render the popover.
-   * Enables developers to implement a custom dialog.
-   *
-   * @default undefined
-   *
-   * @experimental This API is experimental and may change at any moment.
-   */
-  __experimental_asStandalone?: boolean | ((opened: boolean) => void);
+    /**
+     * If true the `<UserButton />` will only render the popover.
+     * Enables developers to implement a custom dialog.
+     *
+     * @default undefined
+     *
+     * @experimental This API is experimental and may change at any moment.
+     */
+    __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
-  /**
-   * Full URL or path to navigate to after sign out is complete
-   *
-   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
-   */
-  afterSignOutUrl?: string;
-  /**
-   * Full URL or path to navigate to after signing out the current user is complete.
-   * This option applies to multi-session applications.
-   *
-   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
-   */
-  afterMultiSessionSingleSignOutUrl?: string;
-  /**
-   * Full URL or path to navigate to on "Add another account" action.
-   * Multi-session mode only.
-   */
-  signInUrl?: string;
-  /**
-   * Full URL or path to navigate to after successful account change.
-   * Multi-session mode only.
-   */
-  afterSwitchSessionUrl?: string;
-  /**
-   * Customisation options to fully match the Clerk components to your own brand.
-   * These options serve as overrides and will be merged with the global `appearance`
-   * prop of ClerkProvider (if one is provided)
-   */
-  appearance?: UserButtonTheme;
+    /**
+     * Full URL or path to navigate to after sign out is complete
+     *
+     * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
+     */
+    afterSignOutUrl?: string;
+    /**
+     * Full URL or path to navigate to after signing out the current user is complete.
+     * This option applies to multi-session applications.
+     *
+     * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
+     */
+    afterMultiSessionSingleSignOutUrl?: string;
+    /**
+     * Full URL or path to navigate to on "Add another account" action.
+     * Multi-session mode only.
+     */
+    signInUrl?: string;
+    /**
+     * Full URL or path to navigate to after successful account change.
+     * Multi-session mode only.
+     */
+    afterSwitchSessionUrl?: string;
+    /**
+     * Customisation options to fully match the Clerk components to your own brand.
+     * These options serve as overrides and will be merged with the global `appearance`
+     * prop of ClerkProvider (if one is provided)
+     */
+    appearance?: UserButtonTheme;
 
-  /*
-   * Specify options for the underlying <UserProfile /> component.
-   * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
-   */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
+    /*
+     * Specify options for the underlying <UserProfile /> component.
+     * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
+     */
+    userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
-  /*
-   * Provide custom menu actions and links to be rendered inside the UserButton.
-   */
-  customMenuItems?: CustomMenuItem[];
-};
+    /*
+     * Provide custom menu actions and links to be rendered inside the UserButton.
+     */
+    customMenuItems?: CustomMenuItem[];
+  };
 
 export type UserAvatarProps = {
   appearance?: UserAvatarTheme;
@@ -1747,7 +1755,8 @@ type CreateOrganizationMode =
   | { createOrganizationUrl?: never; createOrganizationMode?: 'modal' };
 
 export type OrganizationSwitcherProps = CreateOrganizationMode &
-  OrganizationProfileMode & {
+  OrganizationProfileMode &
+  PortalProps & {
     /**
      * Controls the default state of the OrganizationSwitcher
      */
@@ -1891,7 +1900,7 @@ export type OrganizationListProps = {
   hideSlug?: boolean;
 };
 
-export type WaitlistProps = {
+export type WaitlistProps = PortalProps & {
   /**
    * Full URL or path to navigate to after join waitlist.
    */
@@ -1953,6 +1962,27 @@ type PricingTableBaseProps = {
 };
 
 type PortalRoot = HTMLElement | null | undefined;
+
+/**
+ * Portal configuration props that can be used by components that render portals.
+ */
+export type PortalProps = {
+  /**
+   * If true, portals will be disabled and components will render inline.
+   * @default false
+   */
+  disablePortal?: boolean;
+  /**
+   * Portal ID to render portals into. If provided, portals will render into an element with this ID.
+   * @default undefined
+   */
+  portalId?: string;
+  /**
+   * Custom container element to render portals into. Can be an HTMLElement or a function that returns one.
+   * @default document.body
+   */
+  portalRoot?: HTMLElement | (() => HTMLElement | null);
+};
 
 export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps;
 
@@ -2017,7 +2047,7 @@ export type __internal_CheckoutProps = {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type __experimental_CheckoutButtonProps = {
+export type __experimental_CheckoutButtonProps = PortalProps & {
   planId: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
@@ -2061,26 +2091,27 @@ export type __internal_PlanDetailsProps = (
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type __experimental_PlanDetailsButtonProps = (
-  | {
-      planId: string;
-      plan?: never;
-    }
-  | {
-      /**
-       * The plan object will be used as initial data until the plan is fetched from the server.
-       */
-      plan: BillingPlanResource;
-      planId?: never;
-    }
-) & {
-  initialPlanPeriod?: BillingSubscriptionPlanPeriod;
-  planDetailsProps?: {
-    appearance?: PlanDetailTheme;
-    portalId?: string;
-    portalRoot?: PortalRoot;
+export type __experimental_PlanDetailsButtonProps = PortalProps &
+  (
+    | {
+        planId: string;
+        plan?: never;
+      }
+    | {
+        /**
+         * The plan object will be used as initial data until the plan is fetched from the server.
+         */
+        plan: BillingPlanResource;
+        planId?: never;
+      }
+  ) & {
+    initialPlanPeriod?: BillingSubscriptionPlanPeriod;
+    planDetailsProps?: {
+      appearance?: PlanDetailTheme;
+      portalId?: string;
+      portalRoot?: PortalRoot;
+    };
   };
-};
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -2102,7 +2133,7 @@ export type __internal_SubscriptionDetailsProps = {
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-export type __experimental_SubscriptionDetailsButtonProps = {
+export type __experimental_SubscriptionDetailsButtonProps = PortalProps & {
   /**
    * The subscriber type to display the subscription details for.
    * If `organization` is provided, the subscription details will be displayed for the active organization.
@@ -2118,7 +2149,7 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   };
 };
 
-export type __internal_OAuthConsentProps = {
+export type __internal_OAuthConsentProps = PortalProps & {
   appearance?: OAuthConsentTheme;
   /**
    * Name of the OAuth application.
