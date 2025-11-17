@@ -17,6 +17,11 @@ export const frFR: LocalizationResource = {
   apiKeys: {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copier et fermer',
+      formHint: 'Pour des raisons de sécurité, nous ne vous permettrons pas de le consulter à nouveau plus tard.',
+      formTitle: 'Copiez votre clé API "{{name}}" maintenant',
+    },
     createdAndExpirationStatus__expiresOn:
       "Créée le {{ createdDate | shortDate('fr-FR') }} • Expire le {{ expiresDate | longDate('fr-FR') }}",
     createdAndExpirationStatus__never: "Créée le {{ createdDate | shortDate('fr-FR') }} • N’expire jamais",
@@ -229,6 +234,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Clé API',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Nom de la clé secrète',
@@ -502,9 +508,11 @@ export const frFR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Créer une organisation',
     action__invitationAccept: 'Rejoindre',
     action__manageOrganization: "Gérer l'organisation",
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Demander à rejoindre',
     notSelected: 'Aucune organisation sélectionnée',
     personalWorkspace: 'Espace de travail personnel',
@@ -619,6 +627,12 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre messagerie',
     },
+    emailCodeMfa: {
+      formTitle: 'Vérifiez votre messagerie',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Ce lien ne correspond pas à la demande en cours.',
@@ -654,6 +668,12 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
+      resendButton: "Vous n'avez pas reçu de lien ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +691,8 @@ export const frFR: LocalizationResource = {
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       title: 'Mot de passe oublié ?',
     },
+    newDeviceVerificationNotice:
+      'Vous vous connectez depuis un nouvel appareil. Nous demandons une vérification pour sécuriser votre compte.',
     noAvailableMethods: {
       message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
       subtitle: "Une erreur s'est produite",
@@ -960,7 +982,9 @@ export const frFR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Ajouter un compte',
+    action__closeUserMenu: 'Fermer le menu utilisateur',
     action__manageAccount: 'Gérer son compte',
+    action__openUserMenu: 'Ouvrir le menu utilisateur',
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },

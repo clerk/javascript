@@ -1,4 +1,4 @@
-import type { ExternalAccountResource, SamlAccountResource, UserPreviewId, UserResource } from '@clerk/types';
+import type { ExternalAccountResource, SamlAccountResource, UserPreviewId, UserResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { getFullName, getIdentifier } from '../../utils/user';

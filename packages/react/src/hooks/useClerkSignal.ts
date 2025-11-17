@@ -1,4 +1,4 @@
-import type { SignInSignalValue, SignUpSignalValue } from '@clerk/types';
+import type { SignInSignalValue, SignUpSignalValue } from '@clerk/shared/types';
 import { useCallback, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';

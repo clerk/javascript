@@ -1,3 +1,5 @@
+import { describe, expectTypeOf, it } from 'vitest';
+
 import type {
   __experimental_CheckoutCacheState,
   __experimental_CheckoutInstance,
@@ -6,9 +8,7 @@ import type {
   ClerkAPIResponseError,
   ConfirmCheckoutParams,
   SetActiveNavigate,
-} from '@clerk/types';
-import { describe, expectTypeOf, it } from 'vitest';
-
+} from '../../../types';
 import type { useCheckout } from '../useCheckout';
 
 type UseCheckoutParameters = Parameters<typeof useCheckout>[0];

@@ -56,7 +56,7 @@
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
     "typedoc:generate": "pnpm build:declarations && pnpm typedoc:generate:skip-build",
-    "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && rm -rf .typedoc/docs && mv .typedoc/temp-docs .typedoc/docs",
+    "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && node .typedoc/extract-returns-and-params.mjs && rimraf .typedoc/docs && cpy '.typedoc/temp-docs/**' '.typedoc/docs' && rimraf .typedoc/temp-docs",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
@@ -78,14 +78,14 @@
     "@faker-js/faker": "^9.9.0",
     "@jest/globals": "29.7.0",
     "@octokit/rest": "^20.1.2",
-    "@playwright/test": "^1.44.0",
+    "@playwright/test": "^1.56.1",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
     "@types/cross-spawn": "^6.0.6",
     "@types/jest": "^29.3.1",
-    "@types/node": "^22.18.8",
+    "@types/node": "^22.18.12",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "^4.5.2",
@@ -134,9 +134,11 @@
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "rimraf": "6.0.1",
+    "rolldown": "catalog:repo",
     "statuses": "^1.5.0",
     "tree-kill": "^1.2.2",
     "ts-jest": "29.2.5",
+    "tsdown": "catalog:repo",
     "tsup": "catalog:repo",
     "turbo": "^2.5.4",
     "typedoc": "0.28.5",
@@ -162,10 +164,10 @@
     ],
     "overrides": {
       "jest": "29.7.0",
-      "jest-snapshot-prettier": "npm:prettier@^3.5.3"
-    },
-    "patchedDependencies": {
-      "yalc@1.0.0-pre.53": "patches/yalc@1.0.0-pre.53.patch"
+      "jest-snapshot-prettier": "npm:prettier@^3.5.3",
+      "react": "catalog:react",
+      "react-dom": "catalog:react",
+      "rolldown": "catalog:repo"
     }
   }
 }

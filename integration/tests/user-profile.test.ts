@@ -127,7 +127,7 @@ export default function Page() {
     await u.page.goToRelative('/');
     await u.page.waitForClerkComponentMounted();
 
-    await u.page.getByRole('button', { name: 'Open user button' }).click();
+    await u.page.getByRole('button', { name: 'Open user menu' }).click();
 
     await u.page.getByText(/Manage account/).click();
 

@@ -1,4 +1,4 @@
-import type { SessionWithActivitiesResource } from '@clerk/types';
+import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

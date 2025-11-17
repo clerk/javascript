@@ -17,6 +17,11 @@ export const nbNO: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopier og lukk',
+      formHint: 'Av sikkerhetshensyn kan vi ikke tillate deg å se det igjen senere.',
+      formTitle: 'Kopier API-nøkkelen "{{name}}" din nå',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-nøkkel',
+  formFieldLabel__apiKeyDescription: 'Beskrivelse',
+  formFieldLabel__apiKeyExpiration: 'Utløper',
+  formFieldLabel__apiKeyName: 'Navn på hemmelig nøkkel',
   formFieldLabel__automaticInvitations: 'Skru på automatiske invitasjoner for dette domenet',
   formFieldLabel__backupCode: 'Sikkerhetskode',
   formFieldLabel__confirmDeletion: 'Bekreftelse',
@@ -266,7 +272,7 @@ export const nbNO: LocalizationResource = {
     subtitle: 'for å fortsette til {{applicationName}}',
     suggestionsAcceptedLabel: 'Venter på godkjenning',
     title: 'Velg en bruker',
-    titleWithoutPersonal: 'Velg en organiasjon',
+    titleWithoutPersonal: 'Velg en organisasjon',
   },
   organizationProfile: {
     apiKeysPage: {
@@ -489,9 +495,11 @@ export const nbNO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opprett organisasjon',
     action__invitationAccept: 'Bli med',
     action__manageOrganization: 'Administrer organisasjon',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Spør om å bli med',
     notSelected: 'Ingen organisasjon valgt',
     personalWorkspace: 'Personlig arbeidsområde',
@@ -604,6 +612,12 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Sjekk e-posten din',
     },
+    emailCodeMfa: {
+      formTitle: 'Sjekk e-posten din',
+      resendButton: 'Ikke mottatt kode? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk e-posten din',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +653,12 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',
+      resendButton: 'Har du ikke mottatt lenken? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk din e-post',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -656,6 +676,8 @@ export const nbNO: LocalizationResource = {
       label__alternativeMethods: 'Eller logg inn med en annen metode.',
       title: 'Glemt passord?',
     },
+    newDeviceVerificationNotice:
+      'Du logger inn fra en ny enhet. Vi ber om verifisering for å holde kontoen din sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsette med innloggingen. Det er ingen tilgjengelige autentiseringsfaktorer.',
       subtitle: 'En feil oppstod',
@@ -940,7 +962,9 @@ export const nbNO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Legg til konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
   },

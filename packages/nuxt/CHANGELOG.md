@@ -1,5 +1,89 @@
 # @clerk/nuxt
 
+## 1.12.1
+
+### Patch Changes
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd), [`791e942`](https://github.com/clerk/javascript/commit/791e9426181f89012d4c5380a99141f3bb7ae88a)]:
+  - @clerk/types@4.100.0
+  - @clerk/shared@3.34.0
+  - @clerk/backend@2.22.0
+  - @clerk/vue@1.15.1
+
+## 1.12.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/backend@2.21.0
+  - @clerk/types@4.99.0
+  - @clerk/vue@1.15.0
+
+## 1.11.6
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/types@4.98.0
+  - @clerk/backend@2.20.1
+  - @clerk/vue@1.14.13
+
+## 1.11.5
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`b505755`](https://github.com/clerk/javascript/commit/b505755a8da834186922e2a5db8c82e530434d18), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+  - @clerk/backend@2.20.0
+  - @clerk/types@4.97.2
+  - @clerk/vue@1.14.12
+
+## 1.11.4
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+  - @clerk/backend@2.19.3
+  - @clerk/vue@1.14.11
+
+## 1.11.3
+
+### Patch Changes
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/types@4.97.0
+  - @clerk/backend@2.19.2
+  - @clerk/vue@1.14.10
+
+## 1.11.2
+
+### Patch Changes
+
+- Updated dependencies [[`791ff19`](https://github.com/clerk/javascript/commit/791ff19a55ecb39eac20e1533a7d578a30386388), [`439427e`](https://github.com/clerk/javascript/commit/439427e44adef4f43e5f0719adf5654ea58c33e7), [`7dfbf3a`](https://github.com/clerk/javascript/commit/7dfbf3aa1b5269aee2d3af628b02027be9767088), [`d33b7b5`](https://github.com/clerk/javascript/commit/d33b7b5538e9bcbbca1ac23c46793d0cddcef533), [`f2644c2`](https://github.com/clerk/javascript/commit/f2644c2e7ed32012275e8379153e53672475f29f)]:
+  - @clerk/shared@3.29.0
+  - @clerk/types@4.96.0
+  - @clerk/backend@2.19.1
+  - @clerk/vue@1.14.9
+
+## 1.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`4d46e4e`](https://github.com/clerk/javascript/commit/4d46e4e601a5f2a213f1718af3f9271db4db0911), [`a42a015`](https://github.com/clerk/javascript/commit/a42a0157d3142dca32713f7749ffce7b4e7bb3ac), [`8ebbf1e`](https://github.com/clerk/javascript/commit/8ebbf1e6e31251b7d0c3bb5d54249572adc96b7e)]:
+  - @clerk/types@4.95.1
+  - @clerk/backend@2.19.0
+  - @clerk/shared@3.28.3
+  - @clerk/vue@1.14.8
+
 ## 1.11.0
 
 ### Minor Changes

@@ -1,5 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import type { EmailAddressResource } from '@clerk/types';
+import type { EmailAddressResource } from '@clerk/shared/types';
 import { Fragment } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';

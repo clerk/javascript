@@ -1,4 +1,4 @@
-import type { ImageResource } from '@clerk/types';
+import type { ImageResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';

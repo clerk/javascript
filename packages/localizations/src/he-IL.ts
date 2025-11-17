@@ -17,6 +17,11 @@ export const heIL: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'העתק וסגור',
+      formHint: 'מסיבות אבטחה, לא נוכל לאפשר לך לצפות בזה שוב מאוחר יותר.',
+      formTitle: 'העתק את מפתח ה-API "{{name}}" שלך כעת',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'מפתח API',
+  formFieldLabel__apiKeyDescription: 'תיאור',
+  formFieldLabel__apiKeyExpiration: 'תאריך תפוגה',
+  formFieldLabel__apiKeyName: 'שם מפתח סודי',
   formFieldLabel__automaticInvitations: 'הפעל הזמנות אוטומטיות לדומיין הזה',
   formFieldLabel__backupCode: 'קוד גיבוי',
   formFieldLabel__confirmDeletion: 'אישור',
@@ -484,9 +490,11 @@ export const heIL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'צור ארגון',
     action__invitationAccept: 'הצטרף',
     action__manageOrganization: 'נהל ארגון',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'בקשה להצטרפות',
     notSelected: 'לא נבחר ארגון',
     personalWorkspace: 'אזור אישי',
@@ -598,6 +606,12 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'בדוק את הדוא"ל שלך',
     },
+    emailCodeMfa: {
+      formTitle: 'בדוק את הדוא"ל שלך',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      title: 'בדוק את הדוא"ל שלך',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'להמשך, פתח את קוד האימות מהמכשיר והדפדפן ממנו אתה מתכוון לבצע כניסה',
@@ -633,6 +647,12 @@ export const heIL: LocalizationResource = {
         titleNewTab: 'נכנס בכרטיסייה אחרת',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'השתמש בקישור האימות שנשלח לדוא״ל שלך',
+      resendButton: 'לא קיבלת את הקישור? שלח שוב',
+      subtitle: 'כדי להמשיך ל-{{applicationName}}',
+      title: 'בדוק את הדוא״ל שלך',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -650,6 +670,7 @@ export const heIL: LocalizationResource = {
       label__alternativeMethods: 'או, התחבר באמצעות שיטה אחרת.',
       title: 'שכחת סיסמה?',
     },
+    newDeviceVerificationNotice: 'אתה נכנס מכשיר חדש. אנו מבקשים אימות כדי לשמור על החשבון שלך מאובטח.',
     noAvailableMethods: {
       message: 'לא ניתן להמשיך בהתחברות. אין גורם אימות זמין.',
       subtitle: 'אירעה שגיאה',
@@ -931,7 +952,9 @@ export const heIL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'הוסף חשבון',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'נהל חשבון',
+    action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
   },
@@ -1026,7 +1049,7 @@ export const heIL: LocalizationResource = {
       title: 'הוסף חשבון מחובר',
     },
     deletePage: {
-      actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
+      actionDescription: 'הקלד "מחיקת חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
       messageLine1:
         'האם אתה בטוח שברצונך למחוק את החשבון שלך? חלק מהנתונים המשויכים עשויים להישמר. כדי לבקש מחיקת נתונים מלאה, אנא צור קשר עם התמיכה.',
@@ -1268,16 +1291,16 @@ export const heIL: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'התחבר',
+      actionText: 'כבר יש לך גישה?',
+      formButton: 'הצטרף לרשימת ההמתנה',
+      subtitle: 'הזן את כתובת הדוא"ל שלך ואנו נודיע לך כשהמקום שלך יהיה מוכן',
+      title: 'הצטרף לרשימת ההמתנה',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'תועבר בקרוב...',
+      subtitle: 'אנו ניצור איתך קשר כשהמקום שלך יהיה מוכן',
+      title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
   },
 } as const;

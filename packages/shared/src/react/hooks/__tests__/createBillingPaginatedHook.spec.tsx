@@ -1,25 +1,20 @@
-import type { ClerkResource } from '@clerk/types';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { ClerkResource } from '../../../types';
 import { createBillingPaginatedHook } from '../createBillingPaginatedHook';
+import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
 // Mocks for contexts
-let mockUser: any = { id: 'user_1' };
-let mockOrganization: any = { id: 'org_1' };
+let mockUser: any = createMockUser();
+let mockOrganization: any = createMockOrganization();
 
-const mockClerk = {
-  loaded: true,
-  __unstable__environment: {
-    commerceSettings: {
-      billing: {
-        user: { enabled: true },
-        organization: { enabled: true },
-      },
-    },
-  },
-};
+const defaultQueryClient = createMockQueryClient();
+
+const mockClerk = createMockClerk({
+  queryClient: defaultQueryClient,
+});
 
 vi.mock('../../contexts', () => {
   return {
@@ -52,11 +47,18 @@ const useDummyUnauth = createBillingPaginatedHook<DummyResource, DummyParams>({
 describe('createBillingPaginatedHook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    fetcherMock.mockImplementation(() =>
+      Promise.resolve({
+        data: [],
+        total_count: 0,
+      }),
+    );
     mockClerk.loaded = true;
     mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
-    mockUser = { id: 'user_1' };
-    mockOrganization = { id: 'org_1' };
+    mockUser = createMockUser();
+    mockOrganization = createMockOrganization();
+    defaultQueryClient.client.clear();
   });
 
   it('fetches with default params when called with no params', async () => {
@@ -94,6 +96,26 @@ describe('createBillingPaginatedHook', () => {
     // Ensures that SWR does not update the loading state even if the fetcher is not called.
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isFetching).toBe(false);
+  });
+
+  it('does not fetch when enabled is false', () => {
+    const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4, enabled: false }), { wrapper });
+
+    expect(useFetcherMock).toHaveBeenCalledWith('user');
+
+    expect(fetcherMock).not.toHaveBeenCalled();
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isFetching).toBe(false);
+    expect(result.current.data).toEqual([]);
+  });
+
+  it('fetches when enabled is true', async () => {
+    const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4, enabled: true }), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(useFetcherMock).toHaveBeenCalledWith('user');
+    expect(fetcherMock).toHaveBeenCalled();
+    expect(fetcherMock.mock.calls[0][0]).toStrictEqual({ initialPage: 1, pageSize: 4 });
   });
 
   it('authenticated hook: does not fetch when user is null', () => {
@@ -158,6 +180,31 @@ describe('createBillingPaginatedHook', () => {
     });
   });
 
+  it('when for=organization orgId should be forwarded to fetcher (infinite mode)', async () => {
+    fetcherMock.mockImplementation((params: any) =>
+      Promise.resolve({
+        data: Array.from({ length: params.pageSize }, (_, i) => ({ id: `item-${params.initialPage}-${i}` })),
+        total_count: 20,
+      }),
+    );
+
+    const { result } = renderHook(
+      () => useDummyAuth({ initialPage: 1, pageSize: 4, for: 'organization', infinite: true } as any),
+      {
+        wrapper,
+      },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(useFetcherMock).toHaveBeenCalledWith('organization');
+    expect(fetcherMock.mock.calls[0][0]).toStrictEqual({
+      initialPage: 1,
+      pageSize: 4,
+      orgId: 'org_1',
+    });
+    expect(result.current.data.length).toBe(4);
+  });
+
   it('does not fetch in organization mode when organization billing disabled', async () => {
     mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
 
@@ -203,6 +250,12 @@ describe('createBillingPaginatedHook', () => {
       expect(result.current.page).toBe(1);
       expect(result.current.pageCount).toBe(3); // ceil(5/2)
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
+
       // Simulate sign-out
       mockUser = null;
       rerender();
@@ -247,12 +300,22 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
-      // Attention: We are forcing fetcher to be executed instead of setting the key to null
-      // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
-      // This means that SWR will update the loading state to true even if the fetcher is not called,
-      // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
-      await waitFor(() => expect(result.current.isLoading).toBe(true));
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 5 });
+      });
+
+      if (__CLERK_USE_RQ__) {
+        expect(result.current.isLoading).toBe(false);
+      } else {
+        // Attention: We are forcing fetcher to be executed instead of setting the key to null
+        // because SWR will continue to display the cached data when the key is null and `keepPreviousData` is true.
+        // This means that SWR will update the loading state to true even if the fetcher is not called,
+        // because the key changes from `{..., userId: 'user_1'}` to `{..., userId: undefined}`.
+        await waitFor(() => expect(result.current.isLoading).toBe(true));
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+      }
 
       // Data should be cleared even with keepPreviousData: true
       // The key difference here vs usePagesOrInfinite test: userId in cache key changes
@@ -285,6 +348,12 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
+
       await waitFor(() => expect(result.current.data).toEqual([]));
       expect(result.current.count).toBe(0);
       expect(result.current.page).toBe(1);
@@ -313,6 +382,12 @@ describe('createBillingPaginatedHook', () => {
 
       const originalData = [...result.current.data];
       const originalCount = result.current.count;
+
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
 
       // Simulate sign-out
       mockUser = null;
@@ -360,6 +435,12 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 5 });
+      });
+
       // Data should persist for unauthenticated hooks even with keepPreviousData: true
       expect(result.current.data).toEqual(originalData);
       expect(result.current.count).toBe(20);
@@ -392,11 +473,79 @@ describe('createBillingPaginatedHook', () => {
       mockUser = null;
       rerender();
 
+      expect(fetcherMock).toHaveBeenCalled();
+      const paramsCalls = fetcherMock.mock.calls.map(([params]) => params);
+      paramsCalls.forEach(params => {
+        expect(params).toStrictEqual({ initialPage: 1, pageSize: 2 });
+      });
+
       // Data should persist for unauthenticated hooks
       expect(result.current.data).toEqual(originalData);
       expect(result.current.count).toBe(originalCount);
       expect(result.current.page).toBe(1);
       expect(result.current.pageCount).toBe(5);
+    });
+  });
+
+  describe('revalidate behavior', () => {
+    it('revalidate fetches fresh data for authenticated hook', async () => {
+      fetcherMock
+        .mockResolvedValueOnce({
+          data: [{ id: 'initial-1' } as DummyResource, { id: 'initial-2' } as DummyResource],
+          total_count: 2,
+        })
+        .mockResolvedValueOnce({
+          data: [{ id: 'refetched-1' } as DummyResource, { id: 'refetched-2' } as DummyResource],
+          total_count: 2,
+        });
+
+      const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 2 }), { wrapper });
+
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      expect(result.current.data).toEqual([{ id: 'initial-1' }, { id: 'initial-2' }]);
+
+      await act(async () => {
+        await result.current.revalidate();
+      });
+
+      await waitFor(() => expect(result.current.data).toEqual([{ id: 'refetched-1' }, { id: 'refetched-2' }]));
+      expect(fetcherMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('revalidate propagates to infinite counterpart only for React Query', async () => {
+      let seq = 0;
+      fetcherMock.mockImplementation(async (params: DummyParams) => {
+        seq++;
+        return {
+          data: Array.from({ length: params.pageSize ?? 2 }, (_, i) => ({
+            id: `item-${params.initialPage ?? 1}-${seq}-${i}`,
+          })) as DummyResource[],
+          total_count: 10,
+        };
+      });
+
+      const useBoth = () => {
+        const paginated = useDummyAuth({ initialPage: 1, pageSize: 2 });
+        const infinite = useDummyAuth({ initialPage: 1, pageSize: 2, infinite: true } as any);
+        return { paginated, infinite };
+      };
+
+      const { result } = renderHook(useBoth, { wrapper });
+
+      await waitFor(() => expect(result.current.paginated.isLoading).toBe(false));
+      await waitFor(() => expect(result.current.infinite.isLoading).toBe(false));
+
+      fetcherMock.mockClear();
+
+      await act(async () => {
+        await result.current.paginated.revalidate();
+      });
+
+      if (__CLERK_USE_RQ__) {
+        await waitFor(() => expect(fetcherMock.mock.calls.length).toBeGreaterThanOrEqual(2));
+      } else {
+        await waitFor(() => expect(fetcherMock).toHaveBeenCalledTimes(1));
+      }
     });
   });
 });

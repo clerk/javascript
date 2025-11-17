@@ -17,6 +17,11 @@ export const hiIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'कॉपी करें और बंद करें',
+      formHint: 'सुरक्षा कारणों से, हम आपको बाद में इसे फिर से देखने की अनुमति नहीं देंगे।',
+      formTitle: 'अभी अपना "{{name}}" API कुंजी कॉपी करें',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const hiIN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'अपना फोन नंबर दर्ज करें',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API कुंजी',
+  formFieldLabel__apiKeyDescription: 'विवरण',
+  formFieldLabel__apiKeyExpiration: 'समाप्ति',
+  formFieldLabel__apiKeyName: 'गुप्त कुंजी का नाम',
   formFieldLabel__automaticInvitations: 'इस डोमेन के लिए स्वचालित आमंत्रण सक्षम करें',
   formFieldLabel__backupCode: 'बैकअप कोड',
   formFieldLabel__confirmDeletion: 'पुष्टिकरण',
@@ -489,9 +495,11 @@ export const hiIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'संगठन बनाएँ',
     action__invitationAccept: 'शामिल हों',
     action__manageOrganization: 'प्रबंधित करें',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
     notSelected: 'कोई संगठन चयनित नहीं',
     personalWorkspace: 'व्यक्तिगत खाता',
@@ -606,6 +614,12 @@ export const hiIN: LocalizationResource = {
       subtitle: '{{applicationName}} पर जारी रखने के लिए',
       title: 'अपना ईमेल जांचें',
     },
+    emailCodeMfa: {
+      formTitle: 'अपना ईमेल जांचें',
+      resendButton: 'कोड नहीं मिला? फिर से भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'जारी रखने के लिए, सत्यापन लिंक को उस डिवाइस और ब्राउज़र पर खोलें जिससे आपने साइन-अप शुरू किया था',
@@ -641,6 +655,12 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',
+      resendButton: 'लिंक नहीं मिला? पुनः भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -658,6 +678,8 @@ export const hiIN: LocalizationResource = {
       label__alternativeMethods: 'या, दूसरी विधि से साइन इन करें',
       title: 'पासवर्ड भूल गए?',
     },
+    newDeviceVerificationNotice:
+      'आप एक नए डिवाइस से साइन इन कर रहे हैं। हम आपके खाते को सुरक्षित रखने के लिए सत्यापन मांग रहे हैं।',
     noAvailableMethods: {
       message: 'साइन इन जारी नहीं रख सकते। कोई उपलब्ध प्रमाणीकरण कारक नहीं है।',
       subtitle: 'एक त्रुटि हुई',
@@ -951,7 +973,9 @@ export const hiIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'खाता जोड़ें',
+    action__closeUserMenu: 'उपयोगकर्ता मेनू बंद करें',
     action__manageAccount: 'खाता प्रबंधित करें',
+    action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
   },

@@ -17,6 +17,11 @@ export const idID: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Salin & Tutup',
+      formHint: 'Untuk alasan keamanan, kami tidak akan mengizinkan Anda untuk melihatnya lagi nanti.',
+      formTitle: 'Salin kunci API "{{name}}" Anda sekarang',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const idID: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Kunci API',
+  formFieldLabel__apiKeyDescription: 'Deskripsi',
+  formFieldLabel__apiKeyExpiration: 'Kedaluwarsa',
+  formFieldLabel__apiKeyName: 'Nama kunci rahasia',
   formFieldLabel__automaticInvitations: 'Aktifkan undangan otomatis untuk domain ini',
   formFieldLabel__backupCode: 'Kode cadangan',
   formFieldLabel__confirmDeletion: 'Konfirmasi',
@@ -490,9 +496,11 @@ export const idID: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Buat organisasi',
     action__invitationAccept: 'Gabung',
     action__manageOrganization: 'Kelola',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta bergabung',
     notSelected: 'Tidak ada organisasi dipilih',
     personalWorkspace: 'Akun pribadi',
@@ -606,6 +614,12 @@ export const idID: LocalizationResource = {
       subtitle: 'untuk melanjutkan ke {{applicationName}}',
       title: 'Periksa email Anda',
     },
+    emailCodeMfa: {
+      formTitle: 'Periksa email Anda',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -642,6 +656,12 @@ export const idID: LocalizationResource = {
         titleNewTab: 'Masuk di tab lain',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gunakan tautan verifikasi yang dikirim ke email Anda',
+      resendButton: 'Tidak menerima tautan? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +679,8 @@ export const idID: LocalizationResource = {
       label__alternativeMethods: 'Atau, masuk dengan metode lain',
       title: 'Lupa Kata Sandi?',
     },
+    newDeviceVerificationNotice:
+      'Anda masuk dari perangkat baru. Kami meminta verifikasi untuk menjaga keamanan akun Anda.',
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan masuk. Tidak ada faktor autentikasi yang tersedia.',
       subtitle: 'Terjadi kesalahan',
@@ -950,7 +972,9 @@ export const idID: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tambah akun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Kelola akun',
+    action__openUserMenu: undefined,
     action__signOut: 'Keluar',
     action__signOutAll: 'Keluar dari semua akun',
   },

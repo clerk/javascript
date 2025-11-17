@@ -1,4 +1,4 @@
-import type { ClerkOptions } from '@clerk/types';
+import type { ClerkOptions } from '@clerk/shared/types';
 
 type ClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
 

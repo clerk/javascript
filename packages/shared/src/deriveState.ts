@@ -7,7 +7,7 @@ import type {
   Resources,
   SignedInSessionResource,
   UserResource,
-} from '@clerk/types';
+} from './types';
 
 /**
  * Derives authentication state based on the current rendering context (SSR or client-side).

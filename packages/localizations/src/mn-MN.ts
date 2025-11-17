@@ -17,6 +17,11 @@ export const mnMN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Хуулах ба хаах',
+      formHint: 'Аюулгүй байдлын шалтгаанаар бид танд дараа нь үүнийг дахин харах боломж олгохгүй.',
+      formTitle: 'Одоо "{{name}}" API түлхүүрээ хуулаарай',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API түлхүүр',
+  formFieldLabel__apiKeyDescription: 'Тодорхойлолт',
+  formFieldLabel__apiKeyExpiration: 'Хугацаа дуусах',
+  formFieldLabel__apiKeyName: 'Нууц түлхүүрийн нэр',
   formFieldLabel__automaticInvitations: 'Энэ домэйны автомат урилгыг идэвхжүүлэх',
   formFieldLabel__backupCode: 'Нөөц код',
   formFieldLabel__confirmDeletion: 'Баталгаажуулалт',
@@ -490,9 +496,11 @@ export const mnMN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Байгууллага үүсгэх',
     action__invitationAccept: 'Нэгдэх',
     action__manageOrganization: 'Удирдах',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Нэгдэх хүсэлт',
     notSelected: 'Байгууллага сонгогдоогүй байна',
     personalWorkspace: 'Хувийн бүртгэл',
@@ -605,6 +613,12 @@ export const mnMN: LocalizationResource = {
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Имэйлээ шалгана уу',
     },
+    emailCodeMfa: {
+      formTitle: 'Имэйлээ шалгана уу',
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
+      subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
+      title: 'Имэйлээ шалгана уу',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -640,6 +654,12 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Имэйлдээ илгээсэн баталгаажуулах холбоосыг ашиглана уу',
+      resendButton: 'Холбоос хүлээн авсангүй? Дахин илгээх',
+      subtitle: '{{applicationName}} руу үргэлжлүүлэх',
+      title: 'Имэйлээ шалгана уу',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const mnMN: LocalizationResource = {
       label__alternativeMethods: 'Эсвэл өөр аргаар нэвтэрнэ үү',
       title: 'Нууц үгээ мартсан?',
     },
+    newDeviceVerificationNotice:
+      'Та шинэ төхөөрөмжөөс нэвтэрч байна. Бид таны дансыг аюулгүй байлгахын тулд баталгаажуулалт хүсч байна.',
     noAvailableMethods: {
       message: 'Нэвтрэхийг үргэлжлүүлэх боломжгүй. Баталгаажуулах хүчин зүйл алга.',
       subtitle: 'Алдаа гарлаа',
@@ -941,7 +963,9 @@ export const mnMN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Бүртгэл нэмэх',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Бүртгэлийг удирдах',
+    action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },

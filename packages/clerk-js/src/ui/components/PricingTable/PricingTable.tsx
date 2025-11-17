@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Flow } from '@/ui/customizables/Flow';

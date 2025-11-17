@@ -1,4 +1,4 @@
-import type { Attribute } from '@clerk/types';
+import type { Attribute } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { determineActiveFields, determineRequiredIdentifier, getInitialActiveIdentifier } from '../signUpFormHelpers';

@@ -1,5 +1,5 @@
 import { useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams } from '@clerk/types';
+import type { CreateOrganizationParams } from '@clerk/shared/types';
 
 import { useEnvironment } from '@/ui/contexts';
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';

@@ -1,4 +1,4 @@
-import type { UserResource } from '@clerk/types';
+import type { UserResource } from '@clerk/shared/types';
 
 import type { AvatarUploaderProps } from '@/ui/elements/AvatarUploader';
 import { AvatarUploader } from '@/ui/elements/AvatarUploader';

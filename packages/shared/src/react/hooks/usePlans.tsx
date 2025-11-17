@@ -1,5 +1,4 @@
-import type { BillingPlanResource, GetPlansParams } from '@clerk/types';
-
+import type { BillingPlanResource, GetPlansParams } from '../../types';
 import { useClerkInstanceContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
@@ -20,3 +19,8 @@ export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlans
     unauthenticated: true,
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePlansReturn = ReturnType<typeof usePlans>;

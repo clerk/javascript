@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import type { GoogleOneTapProps } from '@clerk/types';
+import type { GoogleOneTapProps } from '@clerk/shared/types';
 
 const clerk = useClerk();
 

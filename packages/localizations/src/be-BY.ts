@@ -17,6 +17,11 @@ export const beBY: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Скапіраваць і закрыць',
+      formHint: 'З мэтаў бяспекі мы не дазволім вам праглядзець яго пазней.',
+      formTitle: 'Скапіруйце ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -222,9 +227,10 @@ export const beBY: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Увядзіце ваш нумар тэлефона',
   formFieldInputPlaceholder__username: 'Увядзіце імя карыстальніка',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Апісанне',
+  formFieldLabel__apiKeyExpiration: 'Тэрмін дзеяння',
+  formFieldLabel__apiKeyName: 'Назва сакрэтнага ключа',
   formFieldLabel__automaticInvitations: 'Уключыць аўтаматычныя запрашэнні для гэтага дамена',
   formFieldLabel__backupCode: 'Код аднаўлення',
   formFieldLabel__confirmDeletion: 'Пацверджанне',
@@ -493,9 +499,11 @@ export const beBY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Стварыць арганізацыю',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Кіраванне арганізацыяй',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Арганізацыя не выбрана',
     personalWorkspace: 'Асабістае працоўнае прастора',
@@ -608,6 +616,12 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Праверце вашу пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Праверце вашу пошту',
+      resendButton: 'Не атрымалі код? Адпраўце яшчэ раз',
+      subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      title: 'Праверце вашу пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -644,6 +658,12 @@ export const beBY: LocalizationResource = {
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Выкарыстоўвайце спасылку для пацвярджэння, адпраўленую на вашу электронную пошту',
+      resendButton: 'Не атрымалі спасылку? Адправіць зноў',
+      subtitle: 'каб працягнуць да {{applicationName}}',
+      title: 'Праверце сваю электронную пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -661,6 +681,8 @@ export const beBY: LocalizationResource = {
       label__alternativeMethods: 'Або ўвайдзіце іншым спосабам',
       title: 'Забыўся пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы ўваходзіце з новай прылады. Мы просім пацверджанне для забеспячэння бяспекі вашага акаўнта.',
     noAvailableMethods: {
       message: 'Немагчыма ўвайсці. Няма даступных фактараў аўтэнтыфікацыі.',
       subtitle: 'Адбылася памылка',
@@ -947,7 +969,9 @@ export const beBY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Дадаць уліковы запіс',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Кіраванне ўліковым запісам',
+    action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },

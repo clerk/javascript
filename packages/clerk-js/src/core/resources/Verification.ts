@@ -14,7 +14,7 @@ import type {
   VerificationJSONSnapshot,
   VerificationResource,
   VerificationStatus,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';

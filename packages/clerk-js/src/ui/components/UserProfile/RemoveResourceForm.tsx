@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { PasskeyResource } from '@clerk/types';
+import type { PasskeyResource } from '@clerk/shared/types';
 import React from 'react';
 
 import type { FormProps } from '@/ui/elements/FormContainer';

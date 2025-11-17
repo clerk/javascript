@@ -36,7 +36,6 @@ describe('Typedoc output', () => {
         "clerk-react",
         "nextjs",
         "shared",
-        "types",
       ]
     `);
   });

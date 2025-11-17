@@ -17,6 +17,11 @@ export const enGB: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const enGB: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API key',
+  formFieldLabel__apiKeyDescription: 'Description',
+  formFieldLabel__apiKeyExpiration: 'Expiration',
+  formFieldLabel__apiKeyName: 'Secret key name',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Backup code',
   formFieldLabel__confirmDeletion: 'Confirmation',
@@ -489,9 +495,11 @@ export const enGB: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Create organisation',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organisation selected',
     personalWorkspace: 'Personal account',
@@ -605,6 +613,12 @@ export const enGB: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
+    emailCodeMfa: {
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -641,6 +655,12 @@ export const enGB: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use the verification link sent to your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -658,6 +678,8 @@ export const enGB: LocalizationResource = {
       label__alternativeMethods: 'Or, sign in with another method',
       title: 'Forgot Password?',
     },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     noAvailableMethods: {
       message: "Cannot proceed with sign in. There's no available authentication factor.",
       subtitle: 'An error occurred',
@@ -946,7 +968,9 @@ export const enGB: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Add account',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Manage account',
+    action__openUserMenu: undefined,
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
   },

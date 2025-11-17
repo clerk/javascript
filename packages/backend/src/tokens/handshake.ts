@@ -221,6 +221,7 @@ export class HandshakeService {
       newUrl.searchParams.delete(constants.QueryParameters.Handshake);
       newUrl.searchParams.delete(constants.QueryParameters.HandshakeHelp);
       newUrl.searchParams.delete(constants.QueryParameters.DevBrowser);
+      newUrl.searchParams.delete(constants.QueryParameters.HandshakeNonce);
       headers.append(constants.Headers.Location, newUrl.toString());
       headers.set(constants.Headers.CacheControl, 'no-store');
     }

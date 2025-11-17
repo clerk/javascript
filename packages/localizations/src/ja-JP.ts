@@ -17,6 +17,11 @@ export const jaJP: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'コピーして閉じる',
+      formHint: 'セキュリティ上の理由により、後で再度表示することはできません。',
+      formTitle: '「{{name}}」APIキーを今すぐコピー',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const jaJP: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: '電話番号',
   formFieldInputPlaceholder__username: 'ユーザー名',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'APIキー',
+  formFieldLabel__apiKeyDescription: '説明',
+  formFieldLabel__apiKeyExpiration: '有効期限',
+  formFieldLabel__apiKeyName: 'シークレットキー名',
   formFieldLabel__automaticInvitations: 'このドメインの自動招待を有効にする',
   formFieldLabel__backupCode: 'バックアップコード',
   formFieldLabel__confirmDeletion: '削除の確認',
@@ -489,9 +495,11 @@ export const jaJP: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '組織の作成',
     action__invitationAccept: '参加する',
     action__manageOrganization: '組織の管理',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '参加をリクエストする',
     notSelected: '組織が選択されていません',
     personalWorkspace: '個人ワークスペース',
@@ -604,6 +612,12 @@ export const jaJP: LocalizationResource = {
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'メールを確認',
     },
+    emailCodeMfa: {
+      formTitle: 'メールを確認',
+      resendButton: 'コードが届いていませんか？再送信',
+      subtitle: '{{applicationName}}へのアクセスを続ける',
+      title: 'メールを確認',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +653,12 @@ export const jaJP: LocalizationResource = {
         titleNewTab: '他のタブでサインイン済み',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'メールに送信された確認リンクを使用してください',
+      resendButton: 'リンクが届いていませんか？再送信',
+      subtitle: '{{applicationName}} に続行',
+      title: 'メールを確認してください',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -656,6 +676,8 @@ export const jaJP: LocalizationResource = {
       label__alternativeMethods: 'または、別の方法でサインインしてください。',
       title: 'パスワードをお忘れですか？',
     },
+    newDeviceVerificationNotice:
+      '新しいデバイスからサインインしています。アカウントのセキュリティを保つため、確認をお願いしています。',
     noAvailableMethods: {
       message: 'サインインできません。利用可能な認証方法がありません。',
       subtitle: 'エラーが発生しました',
@@ -943,7 +965,9 @@ export const jaJP: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'アカウントの追加',
+    action__closeUserMenu: 'ユーザーメニューを閉じる',
     action__manageAccount: 'アカウントの管理',
+    action__openUserMenu: 'ユーザーメニューを開く',
     action__signOut: 'サインアウト',
     action__signOutAll: '全てのアカウントからサインアウト',
   },

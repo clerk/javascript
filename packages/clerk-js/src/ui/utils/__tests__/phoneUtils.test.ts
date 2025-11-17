@@ -1,4 +1,4 @@
-import type { PhoneCodeChannel } from '@clerk/types';
+import type { PhoneCodeChannel } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {

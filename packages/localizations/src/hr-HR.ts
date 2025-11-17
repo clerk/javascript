@@ -17,6 +17,11 @@ export const hrHR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiraj i zatvori',
+      formHint: 'Iz sigurnosnih razloga, nećemo vam dopustiti da ga ponovo pogledate kasnije.',
+      formTitle: 'Kopirajte svoj API ključ "{{name}}" sada',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const hrHR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API ključ',
+  formFieldLabel__apiKeyDescription: 'Opis',
+  formFieldLabel__apiKeyExpiration: 'Istječe',
+  formFieldLabel__apiKeyName: 'Naziv tajnog ključa',
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovu domenu',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -488,9 +494,11 @@ export const hrHR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
     notSelected: 'Nije odabrana organizacija',
     personalWorkspace: 'Osobni račun',
@@ -604,6 +612,12 @@ export const hrHR: LocalizationResource = {
       subtitle: 'za nastavak na {{applicationName}}',
       title: 'Provjerite svoju e-poštu',
     },
+    emailCodeMfa: {
+      formTitle: 'Provjerite svoju e-poštu',
+      resendButton: 'Niste primili kod? Pošalji ponovno',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -640,6 +654,12 @@ export const hrHR: LocalizationResource = {
         titleNewTab: 'Prijavljeni na drugoj kartici',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Koristite vezu za provjeru poslanu na vašu e-poštu',
+      resendButton: 'Niste primili vezu? Ponovno pošalji',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const hrHR: LocalizationResource = {
       label__alternativeMethods: 'Ili se prijavite na drugi način',
       title: 'Zaboravili ste lozinku?',
     },
+    newDeviceVerificationNotice:
+      'Prijavljujete se s novog uređaja. Tražimo provjeru kako bismo zadržali vaš račun sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti s prijavom. Nema dostupnog faktora autentifikacije.',
       subtitle: 'Došlo je do pogreške',
@@ -946,7 +968,9 @@ export const hrHR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj račun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Upravljaj računom',
+    action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
   },

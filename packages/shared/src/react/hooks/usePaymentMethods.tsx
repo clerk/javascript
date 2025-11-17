@@ -1,5 +1,4 @@
-import type { BillingPaymentMethodResource, GetPaymentMethodsParams } from '@clerk/types';
-
+import type { BillingPaymentMethodResource, GetPaymentMethodsParams } from '../../types';
 import { useOrganizationContext, useUserContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
@@ -19,3 +18,8 @@ export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentMethod
     return user?.getPaymentMethods;
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePaymentMethodsReturn = ReturnType<typeof usePaymentMethods>;

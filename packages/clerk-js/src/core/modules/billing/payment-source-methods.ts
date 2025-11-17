@@ -5,7 +5,7 @@ import type {
   ClerkPaginatedResponse,
   GetPaymentMethodsParams,
   InitializePaymentMethodParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import { BaseResource, BillingInitializedPaymentMethod, BillingPaymentMethod } from '../../resources/internal';
@@ -13,7 +13,11 @@ import { Billing } from './namespace';
 
 const PAYMENT_METHODS_PATH = '/payment_methods';
 
-export const initializePaymentMethod = async (params: InitializePaymentMethodParams) => {
+type WithOptionalOrgType<T> = T & {
+  orgId?: string;
+};
+
+export const initializePaymentMethod = async (params: WithOptionalOrgType<InitializePaymentMethodParams>) => {
   const { orgId, ...rest } = params;
   const json = (
     await BaseResource._fetch({
@@ -25,7 +29,7 @@ export const initializePaymentMethod = async (params: InitializePaymentMethodPar
   return new BillingInitializedPaymentMethod(json);
 };
 
-export const addPaymentMethod = async (params: AddPaymentMethodParams) => {
+export const addPaymentMethod = async (params: WithOptionalOrgType<AddPaymentMethodParams>) => {
   const { orgId, ...rest } = params;
 
   const json = (
@@ -38,8 +42,8 @@ export const addPaymentMethod = async (params: AddPaymentMethodParams) => {
   return new BillingPaymentMethod(json);
 };
 
-export const getPaymentMethods = async (params: GetPaymentMethodsParams) => {
-  const { orgId, ...rest } = params;
+export const getPaymentMethods = async (params?: WithOptionalOrgType<GetPaymentMethodsParams>) => {
+  const { orgId, ...rest } = params ?? {};
 
   return await BaseResource._fetch({
     path: Billing.path(PAYMENT_METHODS_PATH, { orgId }),

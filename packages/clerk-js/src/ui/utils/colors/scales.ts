@@ -1,4 +1,4 @@
-import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColorString } from '@clerk/types';
+import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColorString } from '@clerk/shared/types';
 
 import { cssSupports } from '../cssSupports';
 import { ALL_SHADES, ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';

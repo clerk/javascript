@@ -17,6 +17,11 @@ export const viVN: LocalizationResource = {
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Sao chép và đóng',
+      formHint: 'Vì lý do bảo mật, chúng tôi sẽ không cho phép bạn xem lại sau này.',
+      formTitle: 'Sao chép khóa API "{{name}}" của bạn ngay bây giờ',
+    },
     createdAndExpirationStatus__expiresOn:
       "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
@@ -225,6 +230,7 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Nhập số điện thoại của bạn',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Khóa API',
   formFieldLabel__apiKeyDescription: 'Mô tả',
   formFieldLabel__apiKeyExpiration: 'Hết hạn',
   formFieldLabel__apiKeyName: 'Tên khoá bí mật',
@@ -494,9 +500,11 @@ export const viVN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Tạo tổ chức',
     action__invitationAccept: 'Tham gia',
     action__manageOrganization: 'Quản lý',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
@@ -611,6 +619,12 @@ export const viVN: LocalizationResource = {
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Kiểm tra email',
     },
+    emailCodeMfa: {
+      formTitle: 'Kiểm tra email',
+      resendButton: 'Không nhận được mã? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng nhập',
@@ -646,6 +660,12 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',
+      resendButton: 'Không nhận được liên kết? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email của bạn',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -663,6 +683,8 @@ export const viVN: LocalizationResource = {
       label__alternativeMethods: 'Hoặc, đăng nhập với phương thức khác',
       title: 'Quên mật khẩu?',
     },
+    newDeviceVerificationNotice:
+      'Bạn đang đăng nhập từ thiết bị mới. Chúng tôi yêu cầu xác minh để giữ tài khoản của bạn an toàn.',
     noAvailableMethods: {
       message: 'Không thể tiếp tục đăng nhập. Không có yếu tố xác thực phù hợp được cấu hình',
       subtitle: 'Đã xảy ra lỗi',
@@ -947,7 +969,9 @@ export const viVN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Thêm tài khoản',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Quản lý tài khoản',
+    action__openUserMenu: undefined,
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
   },

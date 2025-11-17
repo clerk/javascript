@@ -1,4 +1,4 @@
-import type { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/types';
+import type { ElementObjectKey, ElementsConfig, IdSelectors, StateSelectors } from '@clerk/shared/types';
 
 import { containsAllOfType } from '../utils/containsAllOf';
 import { fromEntries } from '../utils/fromEntries';
@@ -495,6 +495,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysRevokeModal',
   'apiKeysRevokeModalInput',
   'apiKeysRevokeModalSubmitButton',
+  'apiKeysCopyModal',
+  'apiKeysCopyModalInput',
+  'apiKeysCopyModalSubmitButton',
 
   'subscriptionDetailsCard',
   'subscriptionDetailsCardHeader',

@@ -11,7 +11,7 @@ import type {
   SignUpRedirectOptions,
   TasksRedirectOptions,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type React from 'react';
 
 declare global {

@@ -3,7 +3,7 @@ import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
   SetActiveNavigate,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { Clerk } from '../../clerk';
 import { type CheckoutKey, createCheckoutManager } from './manager';

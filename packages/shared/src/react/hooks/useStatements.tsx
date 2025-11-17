@@ -1,5 +1,4 @@
-import type { BillingStatementResource, GetStatementsParams } from '@clerk/types';
-
+import type { BillingStatementResource, GetStatementsParams } from '../../types';
 import { useClerkInstanceContext } from '../contexts';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
@@ -17,3 +16,8 @@ export const useStatements = createBillingPaginatedHook<BillingStatementResource
     return undefined;
   },
 });
+
+/**
+ * @interface
+ */
+export type UseStatementsReturn = ReturnType<typeof useStatements>;

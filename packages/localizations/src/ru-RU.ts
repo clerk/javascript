@@ -17,6 +17,11 @@ export const ruRU: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копировать и закрыть',
+      formHint: 'По соображениям безопасности мы не позволим вам просмотреть его позже.',
+      formTitle: 'Скопируйте ваш API-ключ "{{name}}" сейчас',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -223,9 +228,10 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Введите ваш номер телефона',
   formFieldInputPlaceholder__username: 'Имя пользователя',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Срок действия',
+  formFieldLabel__apiKeyName: 'Название секретного ключа',
   formFieldLabel__automaticInvitations: 'Включить автоматические приглашения для этого домена',
   formFieldLabel__backupCode: 'Код восстановления',
   formFieldLabel__confirmDeletion: 'Подтверждение',
@@ -496,9 +502,11 @@ export const ruRU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
     action__manageOrganization: 'Настройки',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
     personalWorkspace: 'Личный профиль',
@@ -612,6 +620,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Проверьте Вашу почту',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверьте Вашу почту',
+      resendButton: 'Не получили код? Отправить снова.',
+      subtitle: 'для продолжения работы в "{{applicationName}}"',
+      title: 'Проверьте Вашу почту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -648,6 +662,12 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
+      resendButton: 'Не получили ссылку? Отправить повторно',
+      subtitle: 'чтобы продолжить в {{applicationName}}',
+      title: 'Проверьте свою электронную почту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +685,8 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы входите с нового устройства. Мы просим подтверждение для обеспечения безопасности вашего аккаунта.',
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',
@@ -955,7 +977,9 @@ export const ruRU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавить учетную запись',
+    action__closeUserMenu: 'Закрыть меню пользователя',
     action__manageAccount: 'Управление учетной записью',
+    action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
   },

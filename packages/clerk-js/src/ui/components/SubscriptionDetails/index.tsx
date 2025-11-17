@@ -4,7 +4,7 @@ import type {
   __internal_SubscriptionDetailsProps,
   BillingPlanResource,
   BillingSubscriptionItemResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 
@@ -374,7 +374,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isSwitchable =
-    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyFee.amount > 0) ||
+    ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
@@ -409,8 +409,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
             label:
               subscription.planPeriod === 'month'
                 ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
-                    price: normalizeFormatted(subscription.plan.annualFee.amountFormatted),
-                    currency: subscription.plan.annualFee.currencySymbol,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currency: subscription.plan.annualFee!.currencySymbol,
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
                     price: normalizeFormatted(subscription.plan.fee.amountFormatted),
@@ -480,7 +482,11 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
 
-  const fee = subscription.planPeriod === 'month' ? subscription.plan.fee : subscription.plan.annualFee;
+  const fee =
+    subscription.planPeriod === 'month'
+      ? subscription.plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscription.plan.annualFee!;
 
   return (
     <Col

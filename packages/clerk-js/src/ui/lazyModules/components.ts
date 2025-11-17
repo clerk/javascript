@@ -25,7 +25,7 @@ const componentImportPaths = {
     import(/* webpackChunkName: "taskChooseOrganization" */ '../components/SessionTasks/tasks/TaskChooseOrganization'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
-  APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/ApiKeys/ApiKeys'),
+  APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
 } as const;
 

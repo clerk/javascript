@@ -17,6 +17,11 @@ export const kkKZ: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Көшіру және жабу',
+      formHint: 'Қауіпсіздік себептерімен, біз сізге кейінірек оны қайта көруге рұқсат бере алмаймыз.',
+      formTitle: 'API кілтіңізді "{{name}}" қазір көшіріңіз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const kkKZ: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Телефон нөмірін енгізіңіз',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API кілті',
+  formFieldLabel__apiKeyDescription: 'Сипаттама',
+  formFieldLabel__apiKeyExpiration: 'Мерзімі',
+  formFieldLabel__apiKeyName: 'Құпия кілт атауы',
   formFieldLabel__automaticInvitations: 'Бұл доменге автошақыруларды қосу',
   formFieldLabel__backupCode: 'Сақтық коды',
   formFieldLabel__confirmDeletion: 'Растау',
@@ -481,9 +487,11 @@ export const kkKZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
     action__manageOrganization: 'Басқару',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Қосылу сұрауы',
     notSelected: 'Ұйым таңдалмады',
     personalWorkspace: 'Жеке есептік жазба',
@@ -596,6 +604,12 @@ export const kkKZ: LocalizationResource = {
       subtitle: '{{applicationName}} қолдануды жалғастыру үшін',
       title: 'Электрондық поштаңызды тексеріңіз',
     },
+    emailCodeMfa: {
+      formTitle: 'Электрондық поштаңызды тексеріңіз',
+      resendButton: 'Код алмадыңыз ба? Қайта жіберу',
+      subtitle: '{{applicationName}} қолдануды жалғастыру үшін',
+      title: 'Электрондық поштаңызды тексеріңіз',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Бастапқы құрылғыда растау сілтемесін ашыңыз.',
@@ -631,6 +645,12 @@ export const kkKZ: LocalizationResource = {
         titleNewTab: 'Басқа бетте кірдіңіз',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Электрондық поштаңызға жіберілген растау сілтемесін пайдаланыңыз',
+      resendButton: 'Сілтеме алмадыңыз ба? Қайта жіберу',
+      subtitle: '{{applicationName}} қосымшасына жалғастыру үшін',
+      title: 'Электрондық поштаңызды тексеріңіз',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -648,6 +668,8 @@ export const kkKZ: LocalizationResource = {
       label__alternativeMethods: 'Немесе басқа әдісті қолданыңыз',
       title: 'Құпия сөзді ұмыттыңыз ба?',
     },
+    newDeviceVerificationNotice:
+      'Сіз жаңа құрылғыдан кірудесіз. Біз сіздің есептік жазбаңызды қауіпсіз сақтау үшін растау сұраймыз.',
     noAvailableMethods: {
       message: 'Кіру мүмкін емес. Аутентификация әдісі қолжетімсіз.',
       subtitle: 'Қате орын алды',
@@ -930,7 +952,9 @@ export const kkKZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Есептік жазба қосу',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Есептік жазбаны басқару',
+    action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
   },
