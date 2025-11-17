@@ -265,11 +265,10 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     return Promise.resolve();
   };
 
-  const revalidate = () => {
-    if (triggerInfinite) {
-      return queryClient.invalidateQueries({ queryKey: infiniteQueryKey });
-    }
-    return queryClient.invalidateQueries({ queryKey: pagesQueryKey });
+  const revalidate = async () => {
+    await queryClient.invalidateQueries({ queryKey: keys.invalidationKey });
+    const [stablePrefix, ...rest] = keys.invalidationKey;
+    return queryClient.invalidateQueries({ queryKey: [stablePrefix + '-inf', ...rest] });
   };
 
   return {

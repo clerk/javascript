@@ -6,23 +6,6 @@ export type ExtractData<Type> = Type extends { data: infer Data } ? ArrayType<Da
 
 type Config = PagesOrInfiniteConfig & PagesOrInfiniteOptions;
 
-interface Register {
-  /**
-   * Placeholder field to satisfy lint rules; actual shape is provided via declaration merging.
-   */
-  __clerkPaginationQueryKeyArgs?: never;
-}
-
-type AnyQueryKey = Register extends {
-  queryKey: infer TQueryKey;
-}
-  ? TQueryKey extends ReadonlyArray<unknown>
-    ? TQueryKey
-    : TQueryKey extends Array<unknown>
-      ? Readonly<TQueryKey>
-      : ReadonlyArray<unknown>
-  : ReadonlyArray<unknown>;
-
 type QueryArgs<Params> = Readonly<{
   args: Params;
 }>;
@@ -35,12 +18,14 @@ type QueryKeyWithArgs<Params> = readonly [
   ...Array<unknown>,
 ];
 
+type InvalidationQueryKey = readonly [string, boolean, Record<string, unknown>];
+
 export type UsePagesOrInfiniteSignature = <
   Params,
   FetcherReturnData extends Record<string, any>,
   TCacheKeys extends {
     queryKey: QueryKeyWithArgs<Params>;
-    invalidationKey: AnyQueryKey;
+    invalidationKey: InvalidationQueryKey;
     stableKey: string;
   },
   TConfig extends Config = Config,
