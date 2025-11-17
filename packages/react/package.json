@@ -1,6 +1,6 @@
 {
-  "name": "@clerk/react",
-  "version": "5.53.1",
+  "name": "@clerk/clerk-react",
+  "version": "5.55.0",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -101,7 +101,6 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {

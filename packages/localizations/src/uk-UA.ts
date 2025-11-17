@@ -17,6 +17,11 @@ export const ukUA: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копіювати та закрити',
+      formHint: 'З міркувань безпеки ми не дозволимо вам переглянути його пізніше.',
+      formTitle: 'Скопіюйте ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const ukUA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const ukUA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const ukUA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Термін дії',
+  formFieldLabel__apiKeyName: 'Назва секретного ключа',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код відновлення',
   formFieldLabel__confirmDeletion: 'Підтвердження',
@@ -487,9 +494,11 @@ export const ukUA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Створити організацію',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Управління організацією',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Організація не обрана',
     personalWorkspace: 'Особистий робочий простір',
@@ -602,6 +611,12 @@ export const ukUA: LocalizationResource = {
       subtitle: 'продовжити до {{applicationName}}',
       title: 'Перевірте свою електронну пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Перевірте свою електронну пошту',
+      resendButton: 'Не отримали код? Повторно відправити',
+      subtitle: 'продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -637,6 +652,16 @@ export const ukUA: LocalizationResource = {
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',
+      resendButton: 'Не отримали посилання? Надіслати знову',
+      subtitle: 'щоб продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код відновлення пароля',
       resendButton: 'Надіслати код ще раз',
@@ -650,6 +675,8 @@ export const ukUA: LocalizationResource = {
       label__alternativeMethods: 'Або, увійти іншим способом',
       title: 'Забули пароль?',
     },
+    newDeviceVerificationNotice:
+      'Ви входите з нового пристрою. Ми просимо підтвердження для забезпечення безпеки вашого облікового запису.',
     noAvailableMethods: {
       message: 'Не вдається виконати вхід. Немає доступного фактору автентифікації.',
       subtitle: 'Виникла помилка',
@@ -756,6 +783,10 @@ export const ukUA: LocalizationResource = {
         subtitleNewTab: 'Повернутися до попередньої вкладки для продовження',
         title: 'Успішно перевірено email',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -928,7 +959,9 @@ export const ukUA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Додати акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управління акаунтом',
+    action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
   },

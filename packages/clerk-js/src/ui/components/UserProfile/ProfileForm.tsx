@@ -74,6 +74,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       .setProfileImage({ file })
       .then(() => {
         card.setIdle();
+        onSuccess?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -83,6 +84,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       .setProfileImage({ file: null })
       .then(() => {
         card.setIdle();
+        onSuccess?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };

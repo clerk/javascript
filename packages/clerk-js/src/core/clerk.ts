@@ -18,8 +18,6 @@ import {
   eventThemeUsage,
   TelemetryCollector,
 } from '@clerk/shared/telemetry';
-import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
-import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
@@ -92,7 +90,10 @@ import type {
   WaitlistProps,
   WaitlistResource,
   Web3Provider,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
+import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
+import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -100,14 +101,15 @@ import type { MountComponentRenderer } from '../ui/Components';
 import {
   ALLOWED_PROTOCOLS,
   buildURL,
-  canViewOrManageAPIKeys,
   completeSignUpFlow,
   createAllowedRedirectOrigins,
   createBeforeUnloadTracker,
   createPageLifecycle,
+  disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
-  disabledAPIKeysFeature,
+  disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledUserAPIKeysFeature,
   errorThrower,
   generateSignatureWithBase,
   generateSignatureWithCoinbaseWallet,
@@ -177,7 +179,8 @@ const CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE = 'cannot_render_organizat
 const CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE = 'cannot_render_organization_missing';
 const CANNOT_RENDER_SINGLE_SESSION_ENABLED_ERROR_CODE = 'cannot_render_single_session_enabled';
 const CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE = 'cannot_render_api_keys_disabled';
-const CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE = 'cannot_render_api_keys_org_unauthorized';
+const CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE = 'cannot_render_api_keys_user_disabled';
+const CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE = 'cannot_render_api_keys_org_disabled';
 const defaultOptions: ClerkOptions = {
   polling: true,
   standardBrowser: true,
@@ -218,6 +221,7 @@ export class Clerk implements ClerkInterface {
   // converted to protected environment to support `updateEnvironment` type assertion
   protected environment?: EnvironmentResource | null;
 
+  #queryClient: QueryClient | undefined;
   #publishableKey = '';
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
@@ -235,6 +239,28 @@ export class Clerk implements ClerkInterface {
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
+
+  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
+    if (!this.#queryClient) {
+      void import('./query-core')
+        .then(module => module.QueryClient)
+        .then(QueryClient => {
+          if (this.#queryClient) {
+            return;
+          }
+          this.#queryClient = new QueryClient();
+          // @ts-expect-error - queryClientStatus is not typed
+          this.#publicEventBus.emit('queryClientStatus', 'ready');
+        });
+    }
+
+    return this.#queryClient
+      ? {
+          __tag: 'clerk-rq-client',
+          client: this.#queryClient,
+        }
+      : undefined;
+  }
 
   public __internal_getCachedResources:
     | (() => Promise<{ client: ClientJSONSnapshot | null; environment: EnvironmentJSONSnapshot | null }>)
@@ -1150,16 +1176,24 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+    // Temporary backward compatibility for legacy prop: `forOrganizations`. Will be removed in the coming minor release.
+    const nextProps = { ...(props as any) } as PricingTableProps & { forOrganizations?: boolean };
+    if (typeof (props as any)?.forOrganizations !== 'undefined') {
+      logger.warnOnce(
+        'Clerk: [IMPORTANT] <PricingTable /> prop `forOrganizations` is deprecated and will be removed in the coming minors. Use `for="organization"` instead.',
+      );
+    }
+
     void this.#componentControls.ensureMounted({ preloadHint: 'PricingTable' }).then(controls =>
       controls.mountComponent({
         name: 'PricingTable',
         appearanceKey: 'pricingTable',
         node,
-        props,
+        props: nextProps,
       }),
     );
 
-    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', props));
+    this.telemetry?.record(eventPrebuiltComponentMounted('PricingTable', nextProps));
   };
 
   public unmountPricingTable = (node: HTMLDivElement): void => {
@@ -1191,16 +1225,16 @@ export class Clerk implements ClerkInterface {
   /**
    * @experimental This API is in early access and may change in future releases.
    *
-   * Mount a api keys component at the target element.
+   * Mount a API keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
-  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+  public mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
     this.assertComponentsReady(this.#componentControls);
 
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
-    if (disabledAPIKeysFeature(this, this.environment)) {
+    if (disabledAllAPIKeysFeatures(this, this.environment)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponent, {
           code: CANNOT_RENDER_API_KEYS_DISABLED_ERROR_CODE,
@@ -1209,10 +1243,19 @@ export class Clerk implements ClerkInterface {
       return;
     }
 
-    if (this.organization && !canViewOrManageAPIKeys(this)) {
+    if (this.organization && disabledOrganizationAPIKeysFeature(this, this.environment)) {
       if (this.#instanceType === 'development') {
-        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenUnauthorized, {
-          code: CANNOT_RENDER_API_KEYS_ORG_UNAUTHORIZED_ERROR_CODE,
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForOrgWhenDisabled, {
+          code: CANNOT_RENDER_API_KEYS_ORG_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledUserAPIKeysFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderAPIKeysComponentForUserWhenDisabled, {
+          code: CANNOT_RENDER_API_KEYS_USER_DISABLED_ERROR_CODE,
         });
       }
       return;
@@ -1233,12 +1276,12 @@ export class Clerk implements ClerkInterface {
   /**
    * @experimental This API is in early access and may change in future releases.
    *
-   * Unmount a api keys component from the target element.
+   * Unmount a API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the ApiKeys component from.
+   * @param targetNode Target node to unmount the APIKeys component from.
    */
-  public unmountApiKeys = (node: HTMLDivElement) => {
+  public unmountAPIKeys = (node: HTMLDivElement) => {
     this.assertComponentsReady(this.#componentControls);
     void this.#componentControls.ensureMounted().then(controls => controls.unmountComponent({ node }));
   };
@@ -1371,6 +1414,13 @@ export class Clerk implements ClerkInterface {
       // getToken syncs __session and __client_uat to cookies using events.TokenUpdate dispatched event.
       const token = await newSession?.getToken();
       if (!token) {
+        if (!isValidBrowserOnline()) {
+          debugLogger.warn(
+            'Token is null when setting active session (offline)',
+            { sessionId: newSession?.id },
+            'clerk',
+          );
+        }
         eventBus.emit(events.TokenUpdate, { token: null });
       }
 
@@ -2361,6 +2411,13 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(session);
 
       // A client response contains its associated sessions, along with a fresh token, so we dispatch a token update event.
+      if (!this.session?.lastActiveToken && !isValidBrowserOnline()) {
+        debugLogger.warn(
+          'No last active token when updating client (offline)',
+          { sessionId: this.session?.id },
+          'clerk',
+        );
+      }
       eventBus.emit(events.TokenUpdate, { token: this.session?.lastActiveToken });
     }
 
@@ -2401,6 +2458,7 @@ export class Clerk implements ClerkInterface {
       ..._props,
       options: this.#initOptions({ ...this.#options, ..._props.options }),
     };
+
     return this.#componentControls?.ensureMounted().then(controls => controls.updateProps(props));
   };
 

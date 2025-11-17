@@ -24,7 +24,7 @@ import type {
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export type {
   __internal_OAuthConsentProps,

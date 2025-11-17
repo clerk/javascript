@@ -11,7 +11,7 @@ import { Header } from '@/ui/elements/Header';
 import { Modal } from '@/ui/elements/Modal';
 import { Tooltip } from '@/ui/elements/Tooltip';
 import { LockDottedCircle } from '@/ui/icons';
-import { Textarea } from '@/ui/primitives';
+import { Alert, Textarea } from '@/ui/primitives';
 import type { ThemableCssProp } from '@/ui/styledSystem';
 import { common } from '@/ui/styledSystem';
 import { colors } from '@/ui/utils/colors';
@@ -165,13 +165,7 @@ export function OAuthConsentInternal() {
               ))}
             </Box>
           </Box>
-          <Box
-            sx={t => ({
-              background: 'rgba(243, 107, 22, 0.12)',
-              padding: t.space.$4,
-              borderRadius: t.radii.$lg,
-            })}
-          >
+          <Alert colorScheme='warning'>
             <Text
               colorScheme='warning'
               variant='caption'
@@ -201,7 +195,7 @@ export function OAuthConsentInternal() {
               </Tooltip.Root>
               {''}. You may be sharing sensitive data with this site or app.
             </Text>
-          </Box>
+          </Alert>
           <Grid
             columns={2}
             gap={3}

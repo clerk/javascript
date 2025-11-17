@@ -1,4 +1,4 @@
-import type { HandleOAuthCallbackParams } from '@clerk/types';
+import type { HandleOAuthCallbackParams } from '@clerk/shared/types';
 import { createContext, useCallback, useContext } from 'react';
 
 import { buildURL } from '../../../utils';

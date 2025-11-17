@@ -1,4 +1,4 @@
-import type { RoutingOptions } from '@clerk/types';
+import type { RoutingOptions } from '@clerk/shared/types';
 
 import { errorThrower } from '../errors/errorThrower';
 import { incompatibleRoutingWithPathProvidedError, noPathProvidedError } from '../errors/messages';

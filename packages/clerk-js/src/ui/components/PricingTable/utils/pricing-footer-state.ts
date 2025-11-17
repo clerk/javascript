@@ -1,4 +1,8 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
+} from '@clerk/shared/types';
 
 type UsePricingFooterStateParams = {
   subscription: BillingSubscriptionItemResource | undefined;
@@ -34,7 +38,7 @@ const valueResolution = (params: UsePricingFooterStateParams): [boolean, boolean
   // Active subscription
   if (subscription.status === 'active') {
     const isCanceled = !!subscription.canceledAt;
-    const isSwitchingPaidPeriod = planPeriod !== subscription.planPeriod && plan.annualMonthlyFee.amount > 0;
+    const isSwitchingPaidPeriod = planPeriod !== subscription.planPeriod && Boolean(plan.annualMonthlyFee);
     const isActiveFreeTrial = plan.freeTrialEnabled && subscription.isFreeTrial;
 
     if (isCanceled || isSwitchingPaidPeriod) {

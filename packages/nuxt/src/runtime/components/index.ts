@@ -3,6 +3,7 @@ export {
   SignUp,
   SignIn,
   UserProfile,
+  UserAvatar,
   UserButton,
   OrganizationSwitcher,
   OrganizationProfile,
@@ -29,4 +30,5 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   PricingTable,
+  APIKeys,
 } from '@clerk/vue';

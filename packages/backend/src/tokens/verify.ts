@@ -40,21 +40,10 @@ export type VerifyTokenOptions = Simplify<
  * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
  *
  * @param token - The token to verify.
- * @param options - Options for verifying the token.
+ * @param options - Options for verifying the token. It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })`.
  *
  * @displayFunctionSignature
  * @hideReturns
- *
- * @paramExtension
- *
- * ### `VerifyTokenOptions`
- *
- * It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
- *
- * > [!WARNING]
- * You must provide either `jwtKey` or `secretKey`.
- *
- * <Typedoc src="backend/verify-token-options" />
  *
  * @example
  *

@@ -17,6 +17,11 @@ export const zhTW: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '複製並關閉',
+      formHint: '基於安全理由，我們不會允許您稍後再次查看。',
+      formTitle: '立即複製您的"{{name}}" API 金鑰',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const zhTW: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const zhTW: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const zhTW: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API 金鑰',
+  formFieldLabel__apiKeyDescription: '描述',
+  formFieldLabel__apiKeyExpiration: '過期時間',
+  formFieldLabel__apiKeyName: '金鑰名稱',
   formFieldLabel__automaticInvitations: '為此網域啟用自動邀請',
   formFieldLabel__backupCode: '備用碼',
   formFieldLabel__confirmDeletion: '確定',
@@ -479,9 +486,11 @@ export const zhTW: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '建立組織',
     action__invitationAccept: '加入',
     action__manageOrganization: '管理組織',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: '請求加入',
     notSelected: '未選取組織',
     personalWorkspace: '個人工作區',
@@ -593,6 +602,12 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       title: '檢查您的電子郵件',
     },
+    emailCodeMfa: {
+      formTitle: '檢查您的電子郵件',
+      resendButton: '沒收到驗證碼？重新傳送',
+      subtitle: '以繼續前往 {{applicationName}}',
+      title: '檢查您的電子郵件',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -628,6 +643,16 @@ export const zhTW: LocalizationResource = {
         titleNewTab: '已在其他分頁登入',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '使用發送到您電子郵件的驗證連結',
+      resendButton: '沒有收到連結？重新發送',
+      subtitle: '繼續使用 {{applicationName}}',
+      title: '查看您的電子郵件',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '重設密碼代碼',
       resendButton: '重新傳送代碼',
@@ -641,6 +666,7 @@ export const zhTW: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登入。',
       title: '忘記密碼？',
     },
+    newDeviceVerificationNotice: '您正在從新裝置登入。我們需要驗證以保護您的帳戶安全。',
     noAvailableMethods: {
       message: '無法繼續登入。沒有可用的驗證方式。',
       subtitle: '發生錯誤',
@@ -747,6 +773,10 @@ export const zhTW: LocalizationResource = {
         subtitleNewTab: '返回上一個分頁以繼續',
         title: '電子郵件驗證成功',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -916,7 +946,9 @@ export const zhTW: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '新增帳戶',
+    action__closeUserMenu: '關閉使用者選單',
     action__manageAccount: '管理帳戶',
+    action__openUserMenu: '開啟使用者選單',
     action__signOut: '登出',
     action__signOutAll: '登出所有帳戶',
   },

@@ -1,4 +1,4 @@
-import type { SignUpModes } from '@clerk/types';
+import type { SignUpModes } from '@clerk/shared/types';
 
 // TODO: Do we still have a use for this or can we simply preserve all params?
 export const PRESERVED_QUERYSTRING_PARAMS = [
@@ -54,4 +54,4 @@ export const SIGN_UP_MODES = {
 } satisfies Record<string, SignUpModes>;
 
 // This is the currently supported version of the Frontend API
-export const SUPPORTED_FAPI_VERSION = '2025-04-10';
+export const SUPPORTED_FAPI_VERSION = '2025-11-10';

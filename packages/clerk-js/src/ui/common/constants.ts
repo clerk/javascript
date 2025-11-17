@@ -1,4 +1,4 @@
-import type { Attribute, LastAuthenticationStrategy } from '@clerk/types';
+import type { Attribute, LastAuthenticationStrategy } from '@clerk/shared/types';
 
 import type { LocalizationKey } from '../localization/localizationKeys';
 import { localizationKeys } from '../localization/localizationKeys';

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { localizationKeys, useLocalizations } from '../localization';
 import type { PrimitiveProps, RequiredProp, StyleVariants } from '../styledSystem';
 import { common, createVariants, mqu } from '../styledSystem';
 import { sanitizeInputProps, useFormField } from './hooks/useFormField';
@@ -63,6 +64,7 @@ export type InputProps = PrimitiveProps<'input'> & StyleVariants<typeof applyVar
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref) => {
   const fieldControl = useFormField() || {};
+  const { t } = useLocalizations();
   // @ts-expect-error Typescript is complaining that `feedbackMessageId` does not exist. We are clearly passing them from above.
   const { feedbackMessageId, ignorePasswordManager, feedbackType, ...fieldControlProps } = sanitizeInputProps(
     fieldControl,
@@ -86,7 +88,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
 
   const typeProps =
     type === 'email'
-      ? { type: 'text' as const, pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$', inputMode: 'email' as const }
+      ? {
+          type: 'text' as const,
+          pattern: '^.*@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$',
+          inputMode: 'email' as const,
+          title: t(localizationKeys('formFieldInput__emailAddress_format')),
+        }
       : { type: type || ('text' as const) };
 
   const passwordManagerProps = ignorePasswordManager

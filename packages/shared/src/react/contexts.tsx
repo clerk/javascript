@@ -1,5 +1,8 @@
 'use client';
 
+import type { PropsWithChildren } from 'react';
+import React from 'react';
+
 import type {
   BillingSubscriptionPlanPeriod,
   ClerkOptions,
@@ -9,12 +12,9 @@ import type {
   OrganizationResource,
   SignedInSessionResource,
   UserResource,
-} from '@clerk/types';
-import type { PropsWithChildren } from 'react';
-import React from 'react';
-
-import { SWRConfig } from './clerk-swr';
+} from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
+import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
@@ -25,9 +25,23 @@ const [SessionContext, useSessionContext] = createContextAndHook<SignedInSession
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
-type UseCheckoutOptions = {
+/**
+ * @interface
+ */
+export type UseCheckoutOptions = {
+  /**
+   * Specifies if the checkout is for an organization.
+   *
+   * @default 'user'
+   */
   for?: ForPayerType;
+  /**
+   * The billing period for the plan.
+   */
   planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   * The ID of the subscription plan to check out (e.g. `cplan_xxx`).
+   */
   planId: string;
 };
 
@@ -66,7 +80,7 @@ const OrganizationProvider = ({
   }
 >) => {
   return (
-    <SWRConfig value={swrConfig}>
+    <SWRConfigCompat swrConfig={swrConfig}>
       <OrganizationContextInternal.Provider
         value={{
           value: { organization },
@@ -74,7 +88,7 @@ const OrganizationProvider = ({
       >
         {children}
       </OrganizationContextInternal.Provider>
-    </SWRConfig>
+    </SWRConfigCompat>
   );
 };
 
@@ -103,19 +117,19 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
 }
 
 export {
+  __experimental_CheckoutProvider,
+  ClerkInstanceContext,
   ClientContext,
-  useClientContext,
+  OptionsContext,
   OrganizationProvider,
+  SessionContext,
+  useAssertWrappedByClerkProvider,
+  useCheckoutContext,
+  useClerkInstanceContext,
+  useClientContext,
+  useOptionsContext,
   useOrganizationContext,
   UserContext,
-  OptionsContext,
-  useOptionsContext,
-  useUserContext,
-  SessionContext,
   useSessionContext,
-  ClerkInstanceContext,
-  useClerkInstanceContext,
-  useCheckoutContext,
-  __experimental_CheckoutProvider,
-  useAssertWrappedByClerkProvider,
+  useUserContext,
 };

@@ -10,10 +10,12 @@ const { createFixtures } = bindCreateFixtures('SubscriptionDetails');
 
 describe('SubscriptionDetails', () => {
   it('Displays spinner when init loading', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue(null);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -36,6 +38,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -85,7 +91,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month',
           status: 'active',
         },
@@ -140,6 +145,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -189,7 +198,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -244,6 +252,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -264,18 +276,8 @@ describe('SubscriptionDetails', () => {
               currencySymbol: '$',
               currency: 'USD',
             },
-            annualFee: {
-              amount: 0,
-              amountFormatted: '0.00',
-              currencySymbol: '$',
-              currency: 'USD',
-            },
-            annualMonthlyFee: {
-              amount: 0,
-              amountFormatted: '0.00',
-              currencySymbol: '$',
-              currency: 'USD',
-            },
+            annualFee: null,
+            annualMonthlyFee: null,
             description: 'Free Plan description',
             hasBaseFee: false,
             isRecurring: true,
@@ -285,7 +287,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -327,6 +328,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const planAnnual = {
       id: 'plan_annual',
@@ -414,7 +420,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: new Date('2021-04-01'),
-          paymentMethodId: 'src_annual',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -425,7 +430,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2022-02-01'),
           periodEnd: new Date('2022-03-01'),
           canceledAt: null,
-          paymentMethodId: 'src_monthly',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -487,6 +491,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const planMonthly = {
       id: 'plan_monthly',
@@ -568,7 +577,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: new Date('2021-01-03'),
-          paymentMethodId: 'src_free_active',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -578,7 +586,6 @@ describe('SubscriptionDetails', () => {
           createdAt: new Date('2021-01-03'),
           periodStart: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_free_upcoming',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -626,6 +633,11 @@ describe('SubscriptionDetails', () => {
     });
 
     const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -675,7 +687,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
           cancel: cancelSubscriptionMock,
@@ -730,6 +741,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
@@ -774,7 +790,6 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: new Date('2021-04-01'),
-      paymentMethodId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
       cancel: vi.fn(),
@@ -833,6 +848,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const plan = {
       id: 'plan_annual',
       name: 'Annual Plan',
@@ -875,7 +895,6 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: null,
-      paymentMethodId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
       cancel: vi.fn(),
@@ -939,6 +958,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const plan = {
       id: 'plan_monthly',
       name: 'Monthly Plan',
@@ -993,7 +1017,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month' as const,
           status: 'past_due' as const,
           pastDueAt: new Date('2021-01-15'),
@@ -1028,6 +1051,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -1077,7 +1105,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,
@@ -1138,6 +1165,11 @@ describe('SubscriptionDetails', () => {
       f.withBilling();
     });
 
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
+
     const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -1188,7 +1220,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,

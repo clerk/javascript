@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpModalProps, SignUpProps } from '@clerk/types';
+import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';

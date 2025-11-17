@@ -1,4 +1,4 @@
-import type { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
@@ -103,6 +103,14 @@ export function getButtonLabel(factor: SignInFactor): LocalizationKey {
       return localizationKeys('signIn.alternativeMethods.blockButton__totp');
     case 'backup_code':
       return localizationKeys('signIn.alternativeMethods.blockButton__backupCode');
+    case 'email_code':
+      return localizationKeys('signIn.alternativeMethods.blockButton__emailCode', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
+    case 'email_link':
+      return localizationKeys('signIn.alternativeMethods.blockButton__emailLink', {
+        identifier: formatSafeIdentifier(factor.safeIdentifier) || '',
+      });
     default:
       throw new Error(`Invalid sign in strategy: "${factor.strategy}"`);
   }

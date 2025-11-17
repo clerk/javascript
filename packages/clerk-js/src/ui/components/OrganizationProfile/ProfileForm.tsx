@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { UpdateOrganizationParams } from '@clerk/types';
+import type { UpdateOrganizationParams } from '@clerk/shared/types';
 import React from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
@@ -63,6 +63,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       .setLogo({ file })
       .then(() => {
         card.setIdle();
+        onSuccess?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };
@@ -72,6 +73,7 @@ export const ProfileForm = withCardStateProvider((props: ProfileFormProps) => {
       .setLogo({ file: null })
       .then(() => {
         card.setIdle();
+        onSuccess?.();
       })
       .catch(err => handleError(err, [], card.setError));
   };

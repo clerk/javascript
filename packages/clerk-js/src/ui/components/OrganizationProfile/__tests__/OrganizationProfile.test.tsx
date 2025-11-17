@@ -1,4 +1,4 @@
-import type { CustomPage } from '@clerk/types';
+import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -70,6 +70,9 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
+      fixtures.clerk.billing.getSubscription.mockRejectedValue(null);
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
@@ -82,8 +85,8 @@ describe('OrganizationProfile', () => {
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
-      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
-      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
     });
 
     it('does not include Billing when missing billing permission even with paid plans', async () => {
@@ -105,6 +108,9 @@ describe('OrganizationProfile', () => {
 
       render(<OrganizationProfile />, { wrapper });
       await waitFor(() => expect(screen.queryByText('Billing')).toBeNull());
+
+      expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).not.toHaveBeenCalled();
     });
     it('does not include Billing when organization billing is disabled', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
@@ -168,8 +174,13 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = true;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+      fixtures.clerk.billing.getSubscription.mockRejectedValue(null);
+
       render(<OrganizationProfile />, { wrapper });
       expect(await screen.findByText('Billing')).toBeDefined();
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
 
     it('does not include Billing in organization when user billing has paid plans but organization billing is disabled', async () => {
@@ -213,6 +224,7 @@ describe('OrganizationProfile', () => {
       fixtures.environment.commerceSettings.billing.organization.enabled = true;
       fixtures.environment.commerceSettings.billing.organization.hasPaidPlans = false;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
@@ -378,6 +390,92 @@ describe('OrganizationProfile', () => {
       expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
   });
+
+  describe('API Keys visibility', () => {
+    it('does not include API Keys when hide prop is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: true } });
+
+      render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+    });
+
+    it('includes API Keys when hide prop is false and orgs_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('API keys')).toBeDefined();
+    });
+
+    it('includes API Keys when hide prop is not set and orgs_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = true;
+
+      render(<OrganizationProfile />, { wrapper });
+      expect(await screen.findByText('API keys')).toBeDefined();
+    });
+
+    it('does not include API Keys when orgs_api_keys_enabled is false even if hide is false', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [
+            {
+              name: 'Org1',
+              permissions: ['org:sys_api_keys:read'],
+            },
+          ],
+        });
+      });
+
+      fixtures.environment.apiKeysSettings.orgs_api_keys_enabled = false;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<OrganizationProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByText('API keys')).toBeNull());
+    });
+  });
+
   it('removes member nav item if user is lacking permissions', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();

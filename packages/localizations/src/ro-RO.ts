@@ -17,6 +17,11 @@ export const roRO: LocalizationResource = {
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiază și închide',
+      formHint: 'Din motive de securitate, nu vă vom permite să îl vizualizați din nou mai târziu.',
+      formTitle: 'Copiați acum cheia API "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",
     createdAndExpirationStatus__never: "Creată {{ createdDate | shortDate('ro-RO') }} • Nu expiră niciodată",
@@ -127,7 +132,6 @@ export const roRO: LocalizationResource = {
     monthly: 'Lunar',
     pastDue: 'Restanță',
     pay: 'Plătește {{amount}}',
-    paymentMethods__label: 'Metode de plată',
     paymentMethod: {
       applePayDescription: {
         annual: 'Plată anuală',
@@ -142,6 +146,7 @@ export const roRO: LocalizationResource = {
         testCardInfo: 'Informații card de test',
       },
     },
+    paymentMethods__label: 'Metode de plată',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
@@ -226,6 +231,8 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Introdu parola',
   formFieldInputPlaceholder__phoneNumber: 'Introdu numărul de telefon',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Cheie API',
   formFieldLabel__apiKeyDescription: 'Descriere',
   formFieldLabel__apiKeyExpiration: 'Expirare',
   formFieldLabel__apiKeyName: 'Numele cheii secrete',
@@ -496,9 +503,11 @@ export const roRO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Creează organizație',
     action__invitationAccept: 'Alătură-te',
     action__manageOrganization: 'Gestionează',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicită alăturarea',
     notSelected: 'Nicio organizație selectată',
     personalWorkspace: 'Cont personal',
@@ -613,6 +622,12 @@ export const roRO: LocalizationResource = {
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verifică-ți emailul',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifică-ți emailul',
+      resendButton: 'Nu ai primit un cod? Retrimite',
+      subtitle: 'pentru a continua la {{applicationName}}',
+      title: 'Verifică-ți emailul',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -649,6 +664,16 @@ export const roRO: LocalizationResource = {
         titleNewTab: 'Autentificat în altă filă',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Folosiți linkul de verificare trimis la adresa dvs. de e-mail',
+      resendButton: 'Nu ați primit linkul? Retrimiteți',
+      subtitle: 'pentru a continua către {{applicationName}}',
+      title: 'Verificați-vă e-mailul',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Cod pentru resetarea parolei',
       resendButton: 'Nu ai primit un cod? Retrimite',
@@ -662,6 +687,8 @@ export const roRO: LocalizationResource = {
       label__alternativeMethods: 'Sau autentifică-te cu altă metodă',
       title: 'Ai uitat parola?',
     },
+    newDeviceVerificationNotice:
+      'Te conectezi de pe un dispozitiv nou. Solicităm verificarea pentru a menține contul tău sigur.',
     noAvailableMethods: {
       message: 'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
       subtitle: 'A apărut o eroare',
@@ -770,6 +797,10 @@ export const roRO: LocalizationResource = {
         subtitleNewTab: 'Revino în fila precedentă pentru a continua',
         title: 'Email verificat cu succes',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -946,7 +977,9 @@ export const roRO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adaugă cont',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestionează contul',
+    action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
   },

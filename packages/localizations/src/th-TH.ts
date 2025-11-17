@@ -17,6 +17,11 @@ export const thTH: LocalizationResource = {
   apiKeys: {
     action__add: 'เพิ่มคีย์ใหม่',
     action__search: 'ค้นหาคีย์',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'คัดลอกและปิด',
+      formHint: 'ด้วยเหตุผลด้านความปลอดภัย เราจะไม่อนุญาตให้คุณดูอีกครั้งในภายหลัง',
+      formTitle: 'คัดลอกคีย์ API "{{name}}" ของคุณตอนนี้',
+    },
     createdAndExpirationStatus__expiresOn:
       "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • หมดอายุ {{ expiresDate | longDate('th-TH') }}",
     createdAndExpirationStatus__never: "สร้างเมื่อ {{ createdDate | shortDate('th-TH') }} • ไม่มีวันหมดอายุ",
@@ -125,7 +130,6 @@ export const thTH: LocalizationResource = {
     monthly: 'รายเดือน',
     pastDue: 'เกินกำหนด',
     pay: 'ชำระ {{amount}}',
-    paymentMethods__label: 'วิธีการชำระเงิน',
     paymentMethod: {
       applePayDescription: {
         annual: 'ชำระรายปี',
@@ -140,6 +144,7 @@ export const thTH: LocalizationResource = {
         testCardInfo: 'ข้อมูลบัตรทดสอบ',
       },
     },
+    paymentMethods__label: 'วิธีการชำระเงิน',
     popular: 'ยอดนิยม',
     pricingTable: {
       billingCycle: 'รอบการเรียกเก็บเงิน',
@@ -223,6 +228,8 @@ export const thTH: LocalizationResource = {
   formFieldInputPlaceholder__password: 'ใส่รหัสผ่านของคุณ',
   formFieldInputPlaceholder__phoneNumber: 'ใส่หมายเลขโทรศัพท์ของคุณ',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'คีย์ API',
   formFieldLabel__apiKeyDescription: 'คำอธิบาย',
   formFieldLabel__apiKeyExpiration: 'วันหมดอายุ',
   formFieldLabel__apiKeyName: 'ชื่อคีย์ลับ',
@@ -489,9 +496,11 @@ export const thTH: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'สร้างองค์กร',
     action__invitationAccept: 'เข้าร่วม',
     action__manageOrganization: 'จัดการ',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'ขอเข้าร่วม',
     notSelected: 'ไม่ได้เลือกองค์กร',
     personalWorkspace: 'บัญชีส่วนตัว',
@@ -605,6 +614,12 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
       title: 'ตรวจสอบอีเมลของคุณ',
     },
+    emailCodeMfa: {
+      formTitle: 'ตรวจสอบอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
+      subtitle: 'เพื่อดำเนินการต่อไปยัง {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'เพื่อดำเนินการต่อ เปิดลิงก์ยืนยันในอุปกรณ์และเบราว์เซอร์ที่คุณเริ่มต้นการเข้าสู่ระบบ',
@@ -640,6 +655,16 @@ export const thTH: LocalizationResource = {
         titleNewTab: 'เข้าสู่ระบบในแท็บอื่น',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'ใช้ลิงก์ยืนยันที่ส่งไปยังอีเมลของคุณ',
+      resendButton: 'ไม่ได้รับลิงก์? ส่งอีกครั้ง',
+      subtitle: 'เพื่อดำเนินการต่อที่ {{applicationName}}',
+      title: 'ตรวจสอบอีเมลของคุณ',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'รหัสรีเซ็ตรหัสผ่าน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -653,6 +678,8 @@ export const thTH: LocalizationResource = {
       label__alternativeMethods: 'หรือ เข้าสู่ระบบด้วยวิธีอื่น',
       title: 'ลืมรหัสผ่าน?',
     },
+    newDeviceVerificationNotice:
+      'คุณกำลังเข้าสู่ระบบจากอุปกรณ์ใหม่ เรากำลังขอการยืนยันเพื่อรักษาความปลอดภัยของบัญชีของคุณ',
     noAvailableMethods: {
       message: 'ไม่สามารถดำเนินการเข้าสู่ระบบได้ ไม่มีปัจจัยการยืนยันตัวตนที่สามารถใช้ได้',
       subtitle: 'เกิดข้อผิดพลาด',
@@ -759,6 +786,10 @@ export const thTH: LocalizationResource = {
         subtitleNewTab: 'กลับไปยังแท็บก่อนหน้าเพื่อดำเนินการต่อ',
         title: 'ยืนยันอีเมลสำเร็จ',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -932,7 +963,9 @@ export const thTH: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'เพิ่มบัญชี',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'จัดการบัญชี',
+    action__openUserMenu: undefined,
     action__signOut: 'ออกจากระบบ',
     action__signOutAll: 'ออกจากระบบทุกบัญชี',
   },

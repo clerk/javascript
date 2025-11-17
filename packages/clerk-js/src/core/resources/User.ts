@@ -29,7 +29,7 @@ import type {
   UserResource,
   VerifyTOTPParams,
   Web3WalletResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';

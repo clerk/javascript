@@ -17,6 +17,11 @@ export const csCZ: LocalizationResource = {
   apiKeys: {
     action__add: 'Přidat nový klíč',
     action__search: 'Vyhledat klíče',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopírovat a zavřít',
+      formHint: 'Z bezpečnostních důvodů vám to později nebudeme moci znovu zobrazit.',
+      formTitle: 'Zkopírujte nyní svůj API klíč "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Platí do {{ expiresDate | longDate('cs-CZ') }}",
     createdAndExpirationStatus__never: "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Nikdy nevyprší",
@@ -125,7 +130,6 @@ export const csCZ: LocalizationResource = {
     monthly: 'Měsíčně',
     pastDue: 'Po splatnosti',
     pay: 'Zaplatit {{amount}}',
-    paymentMethods__label: 'Platební metody',
     paymentMethod: {
       applePayDescription: {
         annual: 'Roční platba',
@@ -140,6 +144,7 @@ export const csCZ: LocalizationResource = {
         testCardInfo: 'Informace o testovací kartě',
       },
     },
+    paymentMethods__label: 'Platební metody',
     popular: 'Populární',
     pricingTable: {
       billingCycle: 'Fakturační cyklus',
@@ -224,6 +229,8 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadejte své heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API klíč',
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -493,9 +500,11 @@ export const csCZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
     action__manageOrganization: 'Spravovat organizaci',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požádat o připojení',
     notSelected: 'Není vybrána žádná organizace',
     personalWorkspace: 'Osobní účet',
@@ -610,6 +619,12 @@ export const csCZ: LocalizationResource = {
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zkontrolujte svůj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Zkontrolujte svůj e-mail',
+      resendButton: 'Neobdrželi jste kód? Znovu poslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -646,6 +661,16 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',
+      resendButton: 'Nedostali jste odkaz? Znovu odeslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -659,6 +684,8 @@ export const csCZ: LocalizationResource = {
       label__alternativeMethods: 'Nebo se přihlaste jinou metodou',
       title: 'Zapomněli jste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Přihlašujete se z nového zařízení. Žádáme o ověření, abychom udrželi váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nelze pokračovat v přihlášení. Není k dispozici žádný autentizační faktor.',
       subtitle: 'Došlo k chybě',
@@ -767,6 +794,10 @@ export const csCZ: LocalizationResource = {
         subtitleNewTab: 'Vraťte se na předchozí kartu pro pokračování',
         title: 'E-mail úspěšně ověřen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -942,7 +973,9 @@ export const csCZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Přidat účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovat účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },

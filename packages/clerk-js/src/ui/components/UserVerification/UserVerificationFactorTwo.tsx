@@ -1,4 +1,4 @@
-import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/types';
+import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';

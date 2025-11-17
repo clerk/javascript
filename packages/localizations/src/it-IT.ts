@@ -17,6 +17,11 @@ export const itIT: LocalizationResource = {
   apiKeys: {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copia e chiudi',
+      formHint: 'Per motivi di sicurezza, non ti permetteremo di visualizzarlo di nuovo in seguito.',
+      formTitle: 'Copia la tua chiave API "{{name}}" ora',
+    },
     createdAndExpirationStatus__expiresOn:
       "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
     createdAndExpirationStatus__never: "Creata {{ createdDate | shortDate('it-IT') }} • Nessuna scadenza",
@@ -127,7 +132,6 @@ export const itIT: LocalizationResource = {
     monthly: 'Mensile',
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
-    paymentMethods__label: 'Metodi di pagamento',
     paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento annuale',
@@ -142,6 +146,7 @@ export const itIT: LocalizationResource = {
         testCardInfo: 'Informazioni carta di prova',
       },
     },
+    paymentMethods__label: 'Metodi di pagamento',
     popular: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
@@ -227,6 +232,8 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Inserisci la tua password',
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Chiave API',
   formFieldLabel__apiKeyDescription: 'Descrizione',
   formFieldLabel__apiKeyExpiration: 'Scadenza',
   formFieldLabel__apiKeyName: 'Nome chiave segreta',
@@ -496,9 +503,11 @@ export const itIT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea Organizzazione',
     action__invitationAccept: 'Unisciti',
     action__manageOrganization: 'Gestisci Organizzazione',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Richiedi di unirti',
     notSelected: 'Nessuna organizzazione selezionata',
     personalWorkspace: 'Spazio di lavoro personale',
@@ -611,6 +620,12 @@ export const itIT: LocalizationResource = {
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Controlla la tua email',
     },
+    emailCodeMfa: {
+      formTitle: 'Controlla la tua email',
+      resendButton: 'Non hai ricevuto un codice? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Il client utilizzato non corrisponde al tipo di account associato.',
@@ -646,6 +661,16 @@ export const itIT: LocalizationResource = {
         titleNewTab: "Accedi da un'altra scheda",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Usa il link di verifica inviato alla tua email',
+      resendButton: 'Non hai ricevuto il link? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codice di reset della password',
       resendButton: 'Non hai ricevuto un codice? Reinvia',
@@ -659,6 +684,8 @@ export const itIT: LocalizationResource = {
       label__alternativeMethods: 'Oppure, accedi con un altro metodo',
       title: 'Hai dimenticato la password?',
     },
+    newDeviceVerificationNotice:
+      "Stai effettuando l'accesso da un nuovo dispositivo. Richiediamo la verifica per mantenere il tuo account sicuro.",
     noAvailableMethods: {
       message: "Impossibile procedere con l'accesso. Non ci sono strumenti di autenticazione disponibili.",
       subtitle: 'Si è verificato un errore',
@@ -765,6 +792,10 @@ export const itIT: LocalizationResource = {
         subtitleNewTab: 'Ritorna alla tab precedente per continuare',
         title: 'Email verificata con successo',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -940,7 +971,9 @@ export const itIT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Aggiungi account',
+    action__closeUserMenu: 'Chiudi menu utente',
     action__manageAccount: 'Gestisci account',
+    action__openUserMenu: 'Apri menu utente',
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },

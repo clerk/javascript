@@ -1,4 +1,4 @@
-import type { CreateOrganizationModalProps } from '@clerk/types';
+import type { CreateOrganizationModalProps } from '@clerk/shared/types';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
 

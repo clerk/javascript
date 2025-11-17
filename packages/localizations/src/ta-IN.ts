@@ -17,6 +17,11 @@ export const taIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'நகலெடுத்து மூடு',
+      formHint: 'பாதுகாப்பு காரணங்களுக்காக, நாங்கள் பின்னர் அதை மீண்டும் பார்க்க அனுமதிக்க மாட்டோம்.',
+      formTitle: 'இப்போது உங்கள் "{{name}}" API விசையை நகலெடுக்கவும்',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const taIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const taIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const taIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   formFieldInputPlaceholder__phoneNumber: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API விசை',
+  formFieldLabel__apiKeyDescription: 'விளக்கம்',
+  formFieldLabel__apiKeyExpiration: 'காலாவதி',
+  formFieldLabel__apiKeyName: 'இரகசிய விசையின் பெயர்',
   formFieldLabel__automaticInvitations: 'இந்த டொமைனுக்கு தானியங்கி அழைப்புகளை இயக்கவும்',
   formFieldLabel__backupCode: 'காப்புக் குறியீடு',
   formFieldLabel__confirmDeletion: 'உறுதிப்படுத்தல்',
@@ -491,9 +498,11 @@ export const taIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'நிறுவனத்தை உருவாக்கு',
     action__invitationAccept: 'சேரவும்',
     action__manageOrganization: 'நிர்வகி',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'சேர கோரிக்கை',
     notSelected: 'நிறுவனம் எதுவும் தேர்ந்தெடுக்கப்படவில்லை',
     personalWorkspace: 'தனிப்பட்ட கணக்கு',
@@ -608,6 +617,12 @@ export const taIN: LocalizationResource = {
       subtitle: '{{applicationName}} க்கு தொடர',
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
+    emailCodeMfa: {
+      formTitle: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+      resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'தொடர, நீங்கள் உள்நுழைவைத் தொடங்கிய சாதனத்திலும் உலாவியிலும் சரிபார்ப்பு இணைப்பைத் திறக்கவும்',
@@ -643,6 +658,16 @@ export const taIN: LocalizationResource = {
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',
+      resendButton: 'இணைப்பு கிடைக்கவில்லையா? மீண்டும் அனுப்பவும்',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'கடவுச்சொல் மீட்டமைப்பு குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -656,6 +681,8 @@ export const taIN: LocalizationResource = {
       label__alternativeMethods: 'அல்லது, வேறு முறையில் உள்நுழையவும்',
       title: 'கடவுச்சொல் மறந்துவிட்டதா?',
     },
+    newDeviceVerificationNotice:
+      'நீங்கள் ஒரு புதிய சாதனத்திலிருந்து உள்நுழைகிறீர்கள். உங்கள் கணக்கை பாதுகாப்பாக வைத்திருக்க நாங்கள் சரிபார்ப்பு கோருகிறோம்.',
     noAvailableMethods: {
       message: 'உள்நுழைவைத் தொடர முடியாது. எந்த அங்கீகார காரணியும் கிடைக்கவில்லை.',
       subtitle: 'பிழை ஏற்பட்டது',
@@ -763,6 +790,10 @@ export const taIN: LocalizationResource = {
         subtitleNewTab: 'தொடர முந்தைய தாவலுக்குத் திரும்பவும்',
         title: 'மின்னஞ்சல் வெற்றிகரமாக சரிபார்க்கப்பட்டது',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -947,7 +978,9 @@ export const taIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'கணக்கைச் சேர்',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'கணக்கை நிர்வகி',
+    action__openUserMenu: undefined,
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
   },

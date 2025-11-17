@@ -1,4 +1,8 @@
-import type { BillingPlanResource, BillingSubscriptionItemResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type {
+  BillingPlanResource,
+  BillingSubscriptionItemResource,
+  BillingSubscriptionPlanPeriod,
+} from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { getPricingFooterState } from './pricing-footer-state';
@@ -30,7 +34,6 @@ const makeSub = (overrides: Partial<BillingSubscriptionItemResource>): BillingSu
   planPeriod: 'month',
   status: 'active',
   createdAt: new Date('2021-01-01'),
-  paymentMethodId: 'src_1',
   pastDueAt: null,
   periodStart: new Date('2021-01-01'),
   periodEnd: new Date('2021-01-31'),

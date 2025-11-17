@@ -1,4 +1,4 @@
-import type { Appearance, Elements } from '@clerk/types';
+import type { Appearance, Elements } from '@clerk/shared/types';
 
 import type { InternalTheme } from './foundations';
 

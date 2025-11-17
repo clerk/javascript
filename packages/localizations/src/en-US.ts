@@ -5,6 +5,11 @@ export const enUS: LocalizationResource = {
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
+    },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
@@ -58,6 +63,7 @@ export const enUS: LocalizationResource = {
   badge__userDevice: 'User device',
   badge__you: 'You',
   billing: {
+    addPaymentMethod__label: 'Add payment method',
     alwaysFree: 'Always free',
     annually: 'Annually',
     availableFeatures: 'Available features',
@@ -115,6 +121,21 @@ export const enUS: LocalizationResource = {
     monthly: 'Monthly',
     pastDue: 'Past due',
     pay: 'Pay {{amount}}',
+    paymentMethod: {
+      applePayDescription: {
+        annual: 'Annual payment',
+        monthly: 'Monthly payment',
+      },
+      dev: {
+        anyNumbers: 'Any numbers',
+        cardNumber: 'Card number',
+        cvcZip: 'CVC, ZIP',
+        developmentMode: 'Development mode',
+        expirationDate: 'Expiration date',
+        testCardInfo: 'Test card information',
+      },
+    },
+    paymentMethods__label: 'Payment Methods',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Billing cycle',
@@ -151,22 +172,6 @@ export const enUS: LocalizationResource = {
     viewFeatures: 'View features',
     viewPayment: 'View payment',
     year: 'Year',
-    addPaymentMethod__label: 'Add payment method',
-    paymentMethods__label: 'Payment Methods',
-    paymentMethod: {
-      applePayDescription: {
-        annual: 'Annual payment',
-        monthly: 'Monthly payment',
-      },
-      dev: {
-        anyNumbers: 'Any numbers',
-        cardNumber: 'Card number',
-        cvcZip: 'CVC, ZIP',
-        developmentMode: 'Development mode',
-        expirationDate: 'Expiration date',
-        testCardInfo: 'Test card information',
-      },
-    },
   },
   createOrganization: {
     formButtonSubmit: 'Create organization',
@@ -214,6 +219,8 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Enter your password',
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: 'Example format: name@example.com',
+  formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Secret key name',
@@ -484,9 +491,11 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: 'Close organization switcher',
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
+    action__openOrganizationSwitcher: 'Open organization switcher',
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organization selected',
     personalWorkspace: 'Personal account',
@@ -601,6 +610,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
+    emailCodeMfa: {
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -637,6 +652,16 @@ export const enUS: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use the verification link sent to your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
+    enterpriseConnections: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
+    },
     forgotPassword: {
       formTitle: 'Reset password code',
       resendButton: "Didn't receive a code? Resend",
@@ -650,6 +675,8 @@ export const enUS: LocalizationResource = {
       label__alternativeMethods: 'Or, sign in with another method',
       title: 'Forgot Password?',
     },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     noAvailableMethods: {
       message: "Cannot proceed with sign in. There's no available authentication factor.",
       subtitle: 'An error occurred',
@@ -714,10 +741,6 @@ export const enUS: LocalizationResource = {
       subtitle: 'To continue, please enter the verification code generated by your authenticator app',
       title: 'Two-step verification',
     },
-    enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
-    },
   },
   signInEnterPasswordTitle: 'Enter your password',
   signUp: {
@@ -762,6 +785,10 @@ export const enUS: LocalizationResource = {
         title: 'Successfully verified email',
       },
     },
+    enterpriseConnections: {
+      subtitle: 'Select the enterprise account with which you wish to continue.',
+      title: 'Choose your enterprise account',
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'I agree to the {{ privacyPolicyLink || link("Privacy Policy") }}',
@@ -805,10 +832,6 @@ export const enUS: LocalizationResource = {
       subtitleCombined: 'Welcome! Please fill in the details to get started.',
       title: 'Create your account',
       titleCombined: 'Create your account',
-    },
-    enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -939,7 +962,9 @@ export const enUS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Add account',
+    action__closeUserMenu: 'Close user menu',
     action__manageAccount: 'Manage account',
+    action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
   },

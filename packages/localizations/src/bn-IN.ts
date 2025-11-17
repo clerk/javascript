@@ -17,6 +17,11 @@ export const bnIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'কপি করুন এবং বন্ধ করুন',
+      formHint: 'নিরাপত্তার কারণে, আমরা আপনাকে পরে এটি আবার দেখতে অনুমতি দেব না।',
+      formTitle: 'এখনই আপনার "{{name}}" API কী কপি করুন',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const bnIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const bnIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const bnIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'আপনার পাসওয়ার্ড লিখুন',
   formFieldInputPlaceholder__phoneNumber: 'আপনার ফোন নম্বর লিখুন',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API কী',
+  formFieldLabel__apiKeyDescription: 'বিবরণ',
+  formFieldLabel__apiKeyExpiration: 'মেয়াদ শেষ',
+  formFieldLabel__apiKeyName: 'গোপন কী-এর নাম',
   formFieldLabel__automaticInvitations: 'এই ডোমেনের জন্য স্বয়ংক্রিয় আমন্ত্রণ সক্ষম করুন',
   formFieldLabel__backupCode: 'ব্যাকআপ কোড',
   formFieldLabel__confirmDeletion: 'নিশ্চিতকরণ',
@@ -489,9 +496,11 @@ export const bnIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'সংগঠন তৈরি করুন',
     action__invitationAccept: 'যোগ দিন',
     action__manageOrganization: 'পরিচালনা',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
     notSelected: 'কোনো সংগঠন নির্বাচিত নেই',
     personalWorkspace: 'ব্যক্তিগত অ্যাকাউন্ট',
@@ -606,6 +615,12 @@ export const bnIN: LocalizationResource = {
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল চেক করুন',
     },
+    emailCodeMfa: {
+      formTitle: 'আপনার ইমেইল চেক করুন',
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
+      subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
+      title: 'আপনার ইমেইল চেক করুন',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-ইন শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
@@ -641,6 +656,16 @@ export const bnIN: LocalizationResource = {
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',
+      resendButton: 'লিঙ্ক পাননি? আবার পাঠান',
+      subtitle: '{{applicationName}} এ চালিয়ে যেতে',
+      title: 'আপনার ইমেইল পরীক্ষা করুন',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'পাসওয়ার্ড রিসেট কোড',
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
@@ -654,6 +679,8 @@ export const bnIN: LocalizationResource = {
       label__alternativeMethods: 'অথবা, অন্য পদ্ধতি দিয়ে সাইন ইন করুন',
       title: 'পাসওয়ার্ড ভুলে গেছেন?',
     },
+    newDeviceVerificationNotice:
+      'আপনি একটি নতুন ডিভাইস থেকে সাইন ইন করছেন। আমরা আপনার অ্যাকাউন্ট নিরাপদ রাখতে যাচাইকরণ চাইছি।',
     noAvailableMethods: {
       message: 'সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।',
       subtitle: 'একটি ত্রুটি ঘটেছে',
@@ -762,6 +789,10 @@ export const bnIN: LocalizationResource = {
         subtitleNewTab: 'চালিয়ে যেতে আগের ট্যাবে ফিরে যান',
         title: 'সফলভাবে ইমেইল যাচাই করা হয়েছে',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -941,7 +972,9 @@ export const bnIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'অ্যাকাউন্ট যোগ করুন',
+    action__closeUserMenu: 'ব্যবহারকারী মেনু বন্ধ করুন',
     action__manageAccount: 'অ্যাকাউন্ট পরিচালনা করুন',
+    action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
   },

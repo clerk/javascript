@@ -1,5 +1,5 @@
+import type { FieldId } from '@clerk/shared/types';
 import { titleize } from '@clerk/shared/underscore';
-import type { FieldId } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
@@ -9,12 +9,13 @@ import {
   FormInfoText,
   FormSuccessText,
   FormWarningText,
+  Span,
   useAppearance,
 } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import type { FeedbackType, useFormControlFeedback } from '../utils/useFormControl';
 
 function useFormTextAnimation() {
@@ -161,38 +162,50 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
   return (
-    <Flex
-      style={{
-        height: feedback ? maxHeight : 0, // dynamic height
-        position: 'relative',
-      }}
-      center={center}
-      sx={[getFormTextAnimation(!!feedback), sx]}
-    >
-      <InfoComponentA
-        {...getElementProps(feedbacks.a?.feedbackType)}
-        ref={calculateHeightA}
-        sx={[
-          () => ({
-            visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
-          }),
-          getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
-        ]}
-        localizationKey={titleize(feedbacks.a?.feedback)}
-        aria-live={feedbacks.a?.shouldEnter ? 'polite' : 'off'}
-      />
-      <InfoComponentB
-        {...getElementProps(feedbacks.b?.feedbackType)}
-        ref={calculateHeightB}
-        sx={[
-          () => ({
-            visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
-          }),
-          getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
-        ]}
-        localizationKey={titleize(feedbacks.b?.feedback)}
-        aria-live={feedbacks.b?.shouldEnter ? 'polite' : 'off'}
-      />
-    </Flex>
+    <>
+      {/* Screen reader only live region that updates when feedback changes */}
+      <Span
+        aria-live='polite'
+        aria-atomic='true'
+        sx={{
+          ...common.visuallyHidden(),
+        }}
+      >
+        {feedback ? titleize(feedback) : ''}
+      </Span>
+      <Flex
+        style={{
+          height: feedback ? maxHeight : 0, // dynamic height
+          position: 'relative',
+        }}
+        center={center}
+        sx={[getFormTextAnimation(!!feedback), sx]}
+      >
+        <InfoComponentA
+          {...getElementProps(feedbacks.a?.feedbackType)}
+          {...(feedbacks.a?.feedbackType && { 'data-testid': `form-feedback-${feedbacks.a.feedbackType}` })}
+          ref={calculateHeightA}
+          sx={[
+            () => ({
+              visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
+            }),
+            getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
+          ]}
+          localizationKey={titleize(feedbacks.a?.feedback)}
+        />
+        <InfoComponentB
+          {...getElementProps(feedbacks.b?.feedbackType)}
+          {...(feedbacks.b?.feedbackType && { 'data-testid': `form-feedback-${feedbacks.b.feedbackType}` })}
+          ref={calculateHeightB}
+          sx={[
+            () => ({
+              visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
+            }),
+            getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
+          ]}
+          localizationKey={titleize(feedbacks.b?.feedback)}
+        />
+      </Flex>
+    </>
   );
 };

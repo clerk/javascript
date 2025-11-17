@@ -8,7 +8,7 @@ import type {
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
 
@@ -28,8 +28,9 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   status!: 'needs_confirmation' | 'completed';
   totals!: BillingCheckoutTotals;
   isImmediatePlanChange!: boolean;
-  freeTrialEndsAt!: Date | null;
+  freeTrialEndsAt?: Date;
   payer!: BillingPayerResource;
+  needsPaymentMethod!: boolean;
 
   constructor(data: BillingCheckoutJSON) {
     super();
@@ -51,8 +52,11 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     this.status = data.status;
     this.totals = billingTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
-    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    if (data.free_trial_ends_at) {
+      this.freeTrialEndsAt = unixEpochToDate(data.free_trial_ends_at);
+    }
     this.payer = new BillingPayer(data.payer);
+    this.needsPaymentMethod = data.needs_payment_method;
     return this;
   }
 

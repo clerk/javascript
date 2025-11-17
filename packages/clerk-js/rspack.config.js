@@ -117,6 +117,12 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
             enforce: true,
           },
+          queryCoreVendor: {
+            test: /[\\/]node_modules[\\/](@tanstack\/query-core)[\\/]/,
+            name: 'query-core-vendors',
+            chunks: 'all',
+            enforce: true,
+          },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.
            */

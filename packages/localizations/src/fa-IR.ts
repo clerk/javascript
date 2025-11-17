@@ -17,6 +17,11 @@ export const faIR: LocalizationResource = {
   apiKeys: {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'کپی و بستن',
+      formHint: 'به دلایل امنیتی، ما بعداً به شما اجازه مشاهده دوباره آن را نخواهیم داد.',
+      formTitle: 'اکنون کلید API "{{name}}" خود را کپی کنید',
+    },
     createdAndExpirationStatus__expiresOn:
       "ایجاد شده {{ createdDate | shortDate('en-US') }} • منقضی می‌شود {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "ایجاد شده {{ createdDate | shortDate('en-US') }} • هرگز منقضی نمی‌شود",
@@ -126,7 +131,6 @@ export const faIR: LocalizationResource = {
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
-    paymentMethods__label: 'روش های پرداخت',
     paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
@@ -141,6 +145,7 @@ export const faIR: LocalizationResource = {
         testCardInfo: 'تست اطلاعات کارت',
       },
     },
+    paymentMethods__label: 'روش های پرداخت',
     popular: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
@@ -225,6 +230,8 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'کلید API',
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',
@@ -494,9 +501,11 @@ export const faIR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'ایجاد سازمان',
     action__invitationAccept: 'بپیوندید',
     action__manageOrganization: 'مدیریت',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'درخواست عضویت',
     notSelected: 'هیچ سازمانی انتخاب نشده است',
     personalWorkspace: 'حساب شخصی',
@@ -611,6 +620,12 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
     },
+    emailCodeMfa: {
+      formTitle: 'ایمیل خود را بررسی کنید',
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -647,6 +662,16 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
+      resendButton: 'لینک را دریافت نکردید؟ ارسال مجدد',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -660,6 +685,8 @@ export const faIR: LocalizationResource = {
       label__alternativeMethods: 'یا با روش دیگری وارد شوید',
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
+    newDeviceVerificationNotice:
+      'شما از یک دستگاه جدید وارد می‌شوید. برای حفظ امنیت حساب کاربری شما، درخواست تأیید می‌کنیم.',
     noAvailableMethods: {
       message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',
@@ -767,6 +794,10 @@ export const faIR: LocalizationResource = {
         subtitleNewTab: 'برای ادامه به برگه قبلی برگردید',
         title: 'ایمیل با موفقیت تأیید شد',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -941,7 +972,9 @@ export const faIR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'افزودن حساب',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'مدیریت حساب',
+    action__openUserMenu: undefined,
     action__signOut: 'خروج',
     action__signOutAll: 'خروج از همه حساب‌ها',
   },

@@ -17,6 +17,11 @@ export const fiFI: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopioi ja sulje',
+      formHint: 'Tietoturvasyistä emme voi sallia sen tarkastelua myöhemmin.',
+      formTitle: 'Kopioi API-avaimesi "{{name}}" nyt',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const fiFI: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const fiFI: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-avain',
+  formFieldLabel__apiKeyDescription: 'Kuvaus',
+  formFieldLabel__apiKeyExpiration: 'Vanheneminen',
+  formFieldLabel__apiKeyName: 'Salaisen avaimen nimi',
   formFieldLabel__automaticInvitations: 'Ota automaattiset kutsut käyttöön tälle verkkotunnukselle',
   formFieldLabel__backupCode: 'Varakoodi',
   formFieldLabel__confirmDeletion: 'Vahvistus',
@@ -489,9 +496,11 @@ export const fiFI: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Luo organisaatio',
     action__invitationAccept: 'Liity',
     action__manageOrganization: 'Hallitse',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Pyydä liittymistä',
     notSelected: 'Ei valittua organisaatiota',
     personalWorkspace: 'Henkilökohtainen tili',
@@ -604,6 +613,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',
     },
+    emailCodeMfa: {
+      formTitle: 'Tarkista sähköpostisi',
+      resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
@@ -639,6 +654,16 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
+      resendButton: 'Etkö saanut linkkiä? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nollaa salasana',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
@@ -652,6 +677,8 @@ export const fiFI: LocalizationResource = {
       label__alternativeMethods: 'tai kirjaudu sisään toisella tavalla',
       title: 'Unohditko salasanasi?',
     },
+    newDeviceVerificationNotice:
+      'Kirjaudut sisään uudesta laitteesta. Pyydämme vahvistusta tilisi turvallisuuden varmistamiseksi.',
     noAvailableMethods: {
       message: 'Kirjautuminen ei onnistu. Käytettävissä ei ole yhtään todennusmenetelmää.',
       subtitle: 'Tapahtui virhe',
@@ -759,6 +786,10 @@ export const fiFI: LocalizationResource = {
         subtitleNewTab: 'Palaa uuteen välilehteen jatkaaksesi',
         title: 'Rekisteröitynyt toiseen välilehteen',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -932,7 +963,9 @@ export const fiFI: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lisää tili',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hallitse tiliä',
+    action__openUserMenu: undefined,
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },

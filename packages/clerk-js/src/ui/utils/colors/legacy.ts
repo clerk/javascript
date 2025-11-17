@@ -8,7 +8,7 @@
  * https://github.com/Qix-/color
  */
 
-import type { HslaColor, HslaColorString } from '@clerk/types';
+import type { HslaColor, HslaColorString } from '@clerk/shared/types';
 
 import { resolveCSSVariable } from '../cssVariables';
 

@@ -1,4 +1,4 @@
-import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/types';
+import type { BillingPlanResource, BillingSubscriptionPlanPeriod } from '@clerk/shared/types';
 import * as React from 'react';
 
 import { Avatar } from '@/ui/elements/Avatar';
@@ -60,7 +60,7 @@ export function PricingTableMatrix({
 
   const gridTemplateColumns = React.useMemo(() => `repeat(${plans.length + 1}, minmax(9.375rem,1fr))`, [plans.length]);
 
-  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => plan.annualMonthlyFee.amount > 0), [plans]);
+  const renderBillingCycleControls = React.useMemo(() => plans.some(plan => Boolean(plan.annualMonthlyFee)), [plans]);
 
   const getAllFeatures = React.useMemo(() => {
     const featuresSet = new Set<string>();
@@ -156,12 +156,11 @@ export function PricingTableMatrix({
               </Box>
               {plans.map(plan => {
                 const highlight = plan.slug === highlightedPlan;
-                const planFee =
-                  plan.annualMonthlyFee.amount <= 0
-                    ? plan.fee
-                    : planPeriod === 'annual'
-                      ? plan.annualMonthlyFee
-                      : plan.fee;
+                const planFee = !plan.annualMonthlyFee
+                  ? plan.fee
+                  : planPeriod === 'annual'
+                    ? plan.annualMonthlyFee
+                    : plan.fee;
 
                 return (
                   <Box
@@ -253,7 +252,7 @@ export function PricingTableMatrix({
                               })}
                               localizationKey={localizationKeys('billing.month')}
                             />
-                            {plan.annualMonthlyFee.amount > 0 ? (
+                            {plan.annualMonthlyFee ? (
                               <Box
                                 elementDescriptor={descriptors.pricingTableMatrixFeePeriodNotice}
                                 sx={[

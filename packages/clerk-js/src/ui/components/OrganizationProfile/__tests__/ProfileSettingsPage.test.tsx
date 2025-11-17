@@ -1,4 +1,4 @@
-import type { OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';

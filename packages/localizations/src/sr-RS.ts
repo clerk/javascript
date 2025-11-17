@@ -17,6 +17,11 @@ export const srRS: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копирај и затвори',
+      formHint: 'Из безбедносних разлога, нећемо вам дозволити да га поново погледате касније.',
+      formTitle: 'Копирајте свој API кључ "{{name}}" сада',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -121,7 +126,6 @@ export const srRS: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods__label: undefined,
     paymentMethod: {
       applePayDescription: {
         annual: undefined,
@@ -136,6 +140,7 @@ export const srRS: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const srRS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API кључ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Истиче',
+  formFieldLabel__apiKeyName: 'Назив тајног кључа',
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovaj domen',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -487,9 +494,11 @@ export const srRS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
     notSelected: 'Organizacija nije izabrana',
     personalWorkspace: 'Lični nalog',
@@ -602,6 +611,12 @@ export const srRS: LocalizationResource = {
       subtitle: 'da nastaviš na {{applicationName}}',
       title: 'Proveri svoj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Proveri svoj e-mail',
+      resendButton: 'Nisi primio kod? Pošalji ponovo',
+      subtitle: 'da nastaviš na {{applicationName}}',
+      title: 'Proveri svoj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -637,6 +652,16 @@ export const srRS: LocalizationResource = {
         titleNewTab: 'Prijavljen na drugom tabu',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Користите везу за верификацију послату на вашу е-пошту',
+      resendButton: 'Нисте примили везу? Пошаљи поново',
+      subtitle: 'да наставите на {{applicationName}}',
+      title: 'Проверите своју е-пошту',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod za resetovanje lozinke',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
@@ -650,6 +675,8 @@ export const srRS: LocalizationResource = {
       label__alternativeMethods: 'Ili, prijavi se drugom metodom',
       title: 'Zaboravljena lozinka?',
     },
+    newDeviceVerificationNotice:
+      'Prijavljuješ se sa novog uređaja. Tražimo verifikaciju kako bismo zadržali tvoj nalog sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
       subtitle: 'Došlo je do greške',
@@ -757,6 +784,10 @@ export const srRS: LocalizationResource = {
         subtitleNewTab: 'Vrati se na prethodni tab da nastaviš',
         title: 'Uspešno verifikovan e-mail',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -931,7 +962,9 @@ export const srRS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj nalog',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Upravljaj nalogom',
+    action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih naloga',
   },

@@ -36,7 +36,6 @@ describe('Typedoc output', () => {
         "nextjs",
         "react",
         "shared",
-        "types",
       ]
     `);
   });

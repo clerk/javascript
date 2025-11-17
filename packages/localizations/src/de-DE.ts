@@ -17,6 +17,11 @@ export const deDE: LocalizationResource = {
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopieren und schließen',
+      formHint: 'Aus Sicherheitsgründen können Sie es später nicht mehr einsehen.',
+      formTitle: 'Kopieren Sie jetzt Ihren API-Key "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft ab {{ expiresDate | longDate('de-DE') }}",
     createdAndExpirationStatus__never: "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft nie ab",
@@ -127,7 +132,6 @@ export const deDE: LocalizationResource = {
     monthly: 'Monatlich',
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
-    paymentMethods__label: 'Zahlungsmethoden',
     paymentMethod: {
       applePayDescription: {
         annual: 'Jährlich abgerechnet',
@@ -142,6 +146,7 @@ export const deDE: LocalizationResource = {
         testCardInfo: 'Test-Kreditkarteninformationen',
       },
     },
+    paymentMethods__label: 'Zahlungsmethoden',
     popular: 'Beliebt',
     pricingTable: {
       billingCycle: 'Abrechnungszyklus',
@@ -227,6 +232,8 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Passwort eingeben',
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-Key',
   formFieldLabel__apiKeyDescription: 'Beschreibung',
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',
@@ -499,9 +506,11 @@ export const deDE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organisation erstellen',
     action__invitationAccept: 'Beitreten',
     action__manageOrganization: 'Organisation verwalten',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Beitritt anfragen',
     notSelected: 'Keine Organisation ausgewählt',
     personalWorkspace: 'Persönlicher Arbeitsbereich',
@@ -616,6 +625,12 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Überprüfen Sie Ihren Posteingang',
     },
+    emailCodeMfa: {
+      formTitle: 'Überprüfen Sie Ihren Posteingang',
+      resendButton: 'Bestätigungscode nicht erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Die Anfrage stammt von einem nicht kompatiblen Client.',
@@ -651,6 +666,16 @@ export const deDE: LocalizationResource = {
         titleNewTab: 'In einem anderen Tab angemeldet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Verwenden Sie den an Ihre E-Mail gesendeten Bestätigungslink',
+      resendButton: 'Keinen Link erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Passwort-Code zurücksetzen',
       resendButton: 'Sie haben keinen Code erhalten? Erneut senden',
@@ -664,6 +689,8 @@ export const deDE: LocalizationResource = {
       label__alternativeMethods: 'Oder melden Sie sich mit einer anderen Methode an',
       title: 'Passwort vergessen?',
     },
+    newDeviceVerificationNotice:
+      'Sie melden sich von einem neuen Gerät an. Wir bitten um eine Überprüfung, um Ihr Konto sicher zu halten.',
     noAvailableMethods: {
       message: 'Die Anmeldung kann nicht fortgesetzt werden. Es ist kein Authentifizierungsfaktor verfügbar.',
       subtitle: 'Ein Fehler ist aufgetreten',
@@ -773,6 +800,10 @@ export const deDE: LocalizationResource = {
         subtitleNewTab: 'Kehren Sie zum vorherigen Tab zurück, um fortzufahren',
         title: 'E-Mail erfolgreich verifiziert',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -958,7 +989,9 @@ export const deDE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Konto hinzufügen',
+    action__closeUserMenu: 'Benutzermenü schließen',
     action__manageAccount: 'Konto verwalten',
+    action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },

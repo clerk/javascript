@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { BillingMoneyAmount, BillingPaymentMethodResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { BillingPaymentMethodResource, ConfirmCheckoutParams } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -15,6 +15,7 @@ import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
 import { SubscriptionBadge } from '../Subscriptions/badge';
@@ -38,7 +39,11 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
+  const fee =
+    planPeriod === 'month'
+      ? plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.annualMonthlyFee!;
 
   return (
     <Drawer.Body>
@@ -96,7 +101,7 @@ export const CheckoutForm = withCardStateProvider(() => {
             </LineItems.Group>
           )}
 
-          {!!freeTrialEndsAt && !!plan.freeTrialDays && (
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
                 title={localizationKeys('billing.checkout.totalDueAfterTrial', {
@@ -104,7 +109,7 @@ export const CheckoutForm = withCardStateProvider(() => {
                 })}
               />
               <LineItems.Description
-                text={`${totals.grandTotal?.currencySymbol}${totals.grandTotal?.amountFormatted}`}
+                text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
               />
             </LineItems.Group>
           )}
@@ -138,7 +143,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 });
 
 const useCheckoutMutations = () => {
-  const { for: _for, onSubscriptionComplete } = useCheckoutContext();
+  const { onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
   const card = useCardState();
@@ -165,11 +170,16 @@ const useCheckoutMutations = () => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    const paymentSourceId = data.get(HIDDEN_INPUT_NAME) as string;
+    const paymentMethodId = data.get(HIDDEN_INPUT_NAME) as string;
 
     return confirmCheckout({
-      paymentSourceId,
+      paymentMethodId,
     });
+  };
+
+  const payWithoutPaymentMethod = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    return confirmCheckout({});
   };
 
   const addPaymentMethodAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
@@ -184,6 +194,7 @@ const useCheckoutMutations = () => {
     payWithExistingPaymentMethod,
     addPaymentMethodAndPay,
     payWithTestCard,
+    payWithoutPaymentMethod,
   };
 };
 
@@ -212,14 +223,14 @@ const CheckoutFormElements = () => {
 
 const CheckoutFormElementsInternal = () => {
   const { checkout } = useCheckout();
-  const { id, totals, isImmediatePlanChange, freeTrialEndsAt } = checkout;
+  const { id, isImmediatePlanChange, needsPaymentMethod } = checkout;
   const { data: paymentMethods } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
     paymentMethods.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
-  const showPaymentMethods = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt);
+  const showTabs = isImmediatePlanChange && needsPaymentMethod;
 
   if (!id) {
     return null;
@@ -233,7 +244,7 @@ const CheckoutFormElementsInternal = () => {
     >
       {__BUILD_DISABLE_RHC__ ? null : (
         <>
-          {paymentMethods.length > 0 && showPaymentMethods && (
+          {paymentMethods.length > 0 && showTabs && (
             <SegmentedControl.Root
               aria-label='Payment method source'
               value={paymentMethodSource}
@@ -254,14 +265,13 @@ const CheckoutFormElementsInternal = () => {
         </>
       )}
 
-      {paymentMethodSource === 'existing' && (
-        <ExistingPaymentMethodForm
-          paymentMethods={paymentMethods}
-          totalDueNow={totals.totalDueNow}
-        />
+      {!needsPaymentMethod ? (
+        <FreeTrialButton />
+      ) : paymentMethodSource === 'existing' ? (
+        <ExistingPaymentMethodForm paymentMethods={paymentMethods} />
+      ) : (
+        !__BUILD_DISABLE_RHC__ && paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />
       )}
-
-      {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />}
     </Col>
   );
 };
@@ -344,6 +354,22 @@ const useSubmitLabel = () => {
   return localizationKeys('billing.subscribe');
 };
 
+const FreeTrialButton = withCardStateProvider(() => {
+  const { for: _for } = useCheckoutContext();
+  const { payWithoutPaymentMethod } = useCheckoutMutations();
+  const card = useCardState();
+
+  return (
+    <Form
+      onSubmit={payWithoutPaymentMethod}
+      sx={formProps}
+    >
+      <Card.Alert>{card.error}</Card.Alert>
+      <CheckoutSubmitButton />
+    </Form>
+  );
+});
+
 const AddPaymentMethodForCheckout = withCardStateProvider(() => {
   const { addPaymentMethodAndPay } = useCheckoutMutations();
   const submitLabel = useSubmitLabel();
@@ -363,17 +389,36 @@ const AddPaymentMethodForCheckout = withCardStateProvider(() => {
   );
 });
 
+const CheckoutSubmitButton = (props: PropsOfComponent<typeof Button>) => {
+  const card = useCardState();
+  const submitLabel = useSubmitLabel();
+
+  return (
+    <Button
+      type='submit'
+      colorScheme='primary'
+      size='sm'
+      textVariant={'buttonLarge'}
+      sx={{
+        width: '100%',
+      }}
+      isLoading={card.isLoading}
+      localizationKey={submitLabel}
+      {...props}
+    />
+  );
+};
+
+const formProps: ThemableCssProp = t => ({
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: t.space.$4,
+});
+
 const ExistingPaymentMethodForm = withCardStateProvider(
-  ({
-    totalDueNow,
-    paymentMethods,
-  }: {
-    totalDueNow: BillingMoneyAmount;
-    paymentMethods: BillingPaymentMethodResource[];
-  }) => {
-    const submitLabel = useSubmitLabel();
+  ({ paymentMethods }: { paymentMethods: BillingPaymentMethodResource[] }) => {
     const { checkout } = useCheckout();
-    const { paymentMethod, isImmediatePlanChange, freeTrialEndsAt } = checkout;
+    const { paymentMethod, isImmediatePlanChange, needsPaymentMethod } = checkout;
 
     const { payWithExistingPaymentMethod } = useCheckoutMutations();
     const card = useCardState();
@@ -385,8 +430,12 @@ const ExistingPaymentMethodForm = withCardStateProvider(
       return paymentMethods.map(method => {
         const label =
           method.paymentType !== 'card'
-            ? `${capitalize(method.paymentType)}`
-            : `${capitalize(method.cardType)} ⋯ ${method.last4}`;
+            ? method.paymentType
+              ? `${capitalize(method.paymentType)}`
+              : '–'
+            : method.cardType
+              ? `${capitalize(method.cardType)} ⋯ ${method.last4}`
+              : '–';
 
         return {
           value: method.id,
@@ -395,16 +444,12 @@ const ExistingPaymentMethodForm = withCardStateProvider(
       });
     }, [paymentMethods]);
 
-    const showPaymentMethods = isImmediatePlanChange && (totalDueNow.amount > 0 || !!freeTrialEndsAt);
+    const showPaymentMethods = isImmediatePlanChange && needsPaymentMethod;
 
     return (
       <Form
         onSubmit={payWithExistingPaymentMethod}
-        sx={t => ({
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: t.space.$4,
-        })}
+        sx={formProps}
       >
         {showPaymentMethods ? (
           <Select
@@ -447,17 +492,7 @@ const ExistingPaymentMethodForm = withCardStateProvider(
           />
         )}
         <Card.Alert>{card.error}</Card.Alert>
-        <Button
-          type='submit'
-          colorScheme='primary'
-          size='sm'
-          textVariant={'buttonLarge'}
-          sx={{
-            width: '100%',
-          }}
-          isLoading={card.isLoading}
-          localizationKey={submitLabel}
-        />
+        <CheckoutSubmitButton />
       </Form>
     );
   },

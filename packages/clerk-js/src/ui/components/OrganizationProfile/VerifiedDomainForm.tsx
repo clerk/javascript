@@ -3,7 +3,7 @@ import type {
   OrganizationDomainResource,
   OrganizationEnrollmentMode,
   OrganizationSettingsResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useEffect } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
