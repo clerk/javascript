@@ -10,6 +10,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const HOOK_NAME = 'useSubscription';
@@ -25,7 +26,7 @@ export const subscriptionQuery = <T extends Record<string, unknown>, U extends R
   trackedKeys: T;
   untrackedKeys?: U;
 }) => {
-  const stableKey = 'commerce-subscription';
+  const stableKey = STABLE_KEYS.SUBSCRIPTION_KEY;
   const { trackedKeys, untrackedKeys } = params;
   return {
     queryKey: [stableKey, trackedKeys, untrackedKeys] as const,
