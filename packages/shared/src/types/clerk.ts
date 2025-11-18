@@ -323,9 +323,9 @@ export interface Clerk {
   /**
    * Attempts to enable a environment setting from a development instance, prompting if disabled.
    */
-  __internal_attemptToEnableEnvironmentSetting: (options: __internal_AttemptToEnableEnvironmentSettingParams) => {
-    status: 'enabled' | 'prompt-shown' | 'rejected';
-  };
+  __internal_attemptToEnableEnvironmentSetting: (
+    options: __internal_AttemptToEnableEnvironmentSettingParams,
+  ) => __internal_AttemptToEnableEnvironmentSettingResult;
 
   /**
    * Opens the Clerk Enable Organizations prompt for development instance
@@ -1469,6 +1469,10 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;
+};
+
+export type __internal_AttemptToEnableEnvironmentSettingResult = {
+  status: 'enabled' | 'prompt-shown' | 'rejected';
 };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;
