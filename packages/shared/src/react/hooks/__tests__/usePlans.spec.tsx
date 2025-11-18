@@ -1,4 +1,4 @@
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -202,5 +202,78 @@ describe('usePlans', () => {
     expect(result.current.data).toEqual(initialData);
     expect(result.current.data.length).toBe(5);
     expect(result.current.count).toBe(25);
+  });
+
+  it('revalidate refetches plans and updates cache', async () => {
+    const firstResponse = {
+      data: [{ id: 'plan_initial', forPayerType: 'user' } as Partial<BillingPlanResource>],
+      total_count: 1,
+    };
+
+    const secondResponse = {
+      data: [{ id: 'plan_updated', forPayerType: 'user' } as Partial<BillingPlanResource>],
+      total_count: 1,
+    };
+
+    getPlansSpy.mockImplementationOnce(() => Promise.resolve(firstResponse));
+    getPlansSpy.mockImplementationOnce(() => Promise.resolve(secondResponse));
+
+    const { result } = renderHook(() => usePlans({ initialPage: 1, pageSize: 1 }), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual(firstResponse.data);
+
+    await act(async () => {
+      await result.current.revalidate();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual(secondResponse.data));
+    expect(getPlansSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('revalidate for user plans does not refetch organization plans', async () => {
+    getPlansSpy.mockImplementation(({ for: forParam, initialPage, pageSize }) =>
+      Promise.resolve({
+        data: [
+          {
+            id: `${forParam}-plan-${initialPage}-${pageSize}`,
+            forPayerType: forParam,
+          } as Partial<BillingPlanResource>,
+        ],
+        total_count: 1,
+      }),
+    );
+
+    const useBoth = () => {
+      const userPlans = usePlans({ initialPage: 1, pageSize: 1 });
+      const orgPlans = usePlans({ initialPage: 1, pageSize: 1, for: 'organization' } as any);
+      return { userPlans, orgPlans };
+    };
+
+    const { result } = renderHook(useBoth, { wrapper });
+
+    await waitFor(() => expect(result.current.userPlans.isLoading).toBe(false));
+    await waitFor(() => expect(result.current.orgPlans.isLoading).toBe(false));
+
+    getPlansSpy.mockClear();
+
+    await act(async () => {
+      await result.current.userPlans.revalidate();
+    });
+
+    const isRQ = Boolean((globalThis as any).__CLERK_USE_RQ__);
+    const calls = getPlansSpy.mock.calls.map(call => call[0]?.for);
+
+    if (isRQ) {
+      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBeGreaterThanOrEqual(1));
+      expect(calls.every(value => value === 'user')).toBe(true);
+    } else {
+      await waitFor(() => expect(getPlansSpy.mock.calls.length).toBe(1));
+      expect(getPlansSpy.mock.calls[0][0]).toEqual(
+        expect.objectContaining({
+          for: 'user',
+        }),
+      );
+    }
   });
 });

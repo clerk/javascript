@@ -101,8 +101,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   } = useSWRMutation('api-keys-create', (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
   const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
-  const [selectedApiKeyId, setSelectedApiKeyId] = useState('');
-  const [selectedApiKeyName, setSelectedApiKeyName] = useState('');
+  const [selectedAPIKeyID, setSelectedAPIKeyID] = useState('');
+  const [selectedAPIKeyName, setSelectedAPIKeyName] = useState('');
   const [isCopyModalOpen, setIsCopyModalOpen] = useState(false);
 
   const handleCreateAPIKey = async (params: OnCreateParams) => {
@@ -123,9 +123,9 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     }
   };
 
-  const handleRevoke = (apiKeyId: string, apiKeyName: string) => {
-    setSelectedApiKeyId(apiKeyId);
-    setSelectedApiKeyName(apiKeyName);
+  const handleRevoke = (apiKeyID: string, apiKeyName: string) => {
+    setSelectedAPIKeyID(apiKeyID);
+    setSelectedAPIKeyName(apiKeyName);
     setIsRevokeModalOpen(true);
   };
 
@@ -220,12 +220,12 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         isOpen={isRevokeModalOpen}
         onOpen={() => setIsRevokeModalOpen(true)}
         onClose={() => {
-          setSelectedApiKeyId('');
-          setSelectedApiKeyName('');
+          setSelectedAPIKeyID('');
+          setSelectedAPIKeyName('');
           setIsRevokeModalOpen(false);
         }}
-        apiKeyId={selectedApiKeyId}
-        apiKeyName={selectedApiKeyName}
+        apiKeyID={selectedAPIKeyID}
+        apiKeyName={selectedAPIKeyName}
         onRevokeSuccess={invalidateAll}
         modalRoot={revokeModalRoot}
       />

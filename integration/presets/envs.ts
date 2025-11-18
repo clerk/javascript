@@ -189,6 +189,12 @@ const withAPIKeys = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-api-keys').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-api-keys').pk);
 
+const withProtectService = base
+  .clone()
+  .setId('withProtectService')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service').pk);
+
 export const envs = {
   base,
   sessionsProd1,
@@ -216,4 +222,5 @@ export const envs = {
   withSignInOrUpwithRestrictedModeFlow,
   withWaitlistdMode,
   withWhatsappPhoneCode,
+  withProtectService,
 } as const;

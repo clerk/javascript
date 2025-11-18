@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ClerkResource } from '../../../types';
@@ -484,6 +484,68 @@ describe('createBillingPaginatedHook', () => {
       expect(result.current.count).toBe(originalCount);
       expect(result.current.page).toBe(1);
       expect(result.current.pageCount).toBe(5);
+    });
+  });
+
+  describe('revalidate behavior', () => {
+    it('revalidate fetches fresh data for authenticated hook', async () => {
+      fetcherMock
+        .mockResolvedValueOnce({
+          data: [{ id: 'initial-1' } as DummyResource, { id: 'initial-2' } as DummyResource],
+          total_count: 2,
+        })
+        .mockResolvedValueOnce({
+          data: [{ id: 'refetched-1' } as DummyResource, { id: 'refetched-2' } as DummyResource],
+          total_count: 2,
+        });
+
+      const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 2 }), { wrapper });
+
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      expect(result.current.data).toEqual([{ id: 'initial-1' }, { id: 'initial-2' }]);
+
+      await act(async () => {
+        await result.current.revalidate();
+      });
+
+      await waitFor(() => expect(result.current.data).toEqual([{ id: 'refetched-1' }, { id: 'refetched-2' }]));
+      expect(fetcherMock).toHaveBeenCalledTimes(2);
+    });
+
+    it('revalidate propagates to infinite counterpart only for React Query', async () => {
+      let seq = 0;
+      fetcherMock.mockImplementation(async (params: DummyParams) => {
+        seq++;
+        return {
+          data: Array.from({ length: params.pageSize ?? 2 }, (_, i) => ({
+            id: `item-${params.initialPage ?? 1}-${seq}-${i}`,
+          })) as DummyResource[],
+          total_count: 10,
+        };
+      });
+
+      const useBoth = () => {
+        const paginated = useDummyAuth({ initialPage: 1, pageSize: 2 });
+        const infinite = useDummyAuth({ initialPage: 1, pageSize: 2, infinite: true } as any);
+        return { paginated, infinite };
+      };
+
+      const { result } = renderHook(useBoth, { wrapper });
+
+      await waitFor(() => expect(result.current.paginated.isLoading).toBe(false));
+      await waitFor(() => expect(result.current.infinite.isLoading).toBe(false));
+
+      fetcherMock.mockClear();
+
+      await act(async () => {
+        await result.current.paginated.revalidate();
+      });
+
+      if (__CLERK_USE_RQ__) {
+        await waitFor(() => expect(fetcherMock.mock.calls.length).toBeGreaterThanOrEqual(2));
+      } else {
+        await waitFor(() => expect(fetcherMock).toHaveBeenCalledTimes(1));
+      }
     });
   });
 });
