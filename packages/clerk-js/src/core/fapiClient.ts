@@ -66,7 +66,7 @@ export interface FapiClient {
 }
 
 // List of paths that should not receive the session ID parameter in the URL
-const unauthorizedPathPrefixes = ['/client', '/waitlist', '/dev_tools'];
+const unauthorizedPathPrefixes = ['/client', '/waitlist'];
 
 type FapiClientOptions = {
   frontendApi: string;
