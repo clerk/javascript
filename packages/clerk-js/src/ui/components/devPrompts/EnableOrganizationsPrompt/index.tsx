@@ -34,7 +34,7 @@ const EnableOrganizationsPromptInternal = ({
   const [isEnabled, setIsEnabled] = useState(false);
   const [allowPersonalAccount, setAllowPersonalAccount] = useState(false);
 
-  const initialFocusRef = useRef<HTMLButtonElement>(null);
+  const initialFocusRef = useRef<HTMLHeadingElement>(null);
 
   // @ts-expect-error - __unstable__environment is not typed
   const environment = clerk?.__unstable__environment as Environment | undefined;
@@ -198,8 +198,11 @@ const EnableOrganizationsPromptInternal = ({
                     color: white;
                     font-size: 0.875rem;
                     font-weight: 500;
+                    outline: none;
                   `,
                 ]}
+                tabIndex={-1}
+                ref={initialFocusRef}
               >
                 {isEnabled ? 'Organizations feature enabled' : 'Organizations feature required'}
               </h1>
@@ -347,7 +350,6 @@ const EnableOrganizationsPromptInternal = ({
                   variant='solid'
                   onClick={handleEnableOrganizations}
                   disabled={isLoading}
-                  ref={initialFocusRef}
                 >
                   Enable Organizations
                 </PromptButton>
@@ -372,7 +374,7 @@ export const EnableOrganizationsPrompt = (props: __internal_EnableOrganizationsP
   );
 };
 
-const mainCTAStyles = css`
+const baseButtonStyles = css`
   ${basePromptElementStyles};
   cursor: pointer;
   display: flex;
@@ -389,86 +391,70 @@ const mainCTAStyles = css`
   white-space: nowrap;
   user-select: none;
   color: white;
-  transition: all 120ms ease-in-out;
+  outline: none;
+
+  &:not(:disabled) {
+    transition: 120ms ease-in-out;
+    transition-property: background-color, border-color, box-shadow, color;
+  }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
 
-  &:focus-visible {
-    outline: none;
+  &:focus-visible:not(:disabled) {
+    outline: 2px solid white;
+    outline-offset: 2px;
   }
 `;
 
-type PromptButtonVariant = 'solid' | 'outline';
+const buttonSolidStyles = css`
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
+  box-shadow:
+    0 0 3px 0 rgba(253, 224, 71, 0) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 1.5px 2px 0 rgba(0, 0, 0, 0.48);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.15) 100%), #5f5f5f;
+    box-shadow:
+      0 0 3px 0 rgba(253, 224, 71, 0) inset,
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 0 0 1px rgba(0, 0, 0, 0.12),
+      0 1.5px 2px 0 rgba(0, 0, 0, 0.48);
+  }
+`;
+
+const buttonOutlineStyles = css`
+  border: 1px solid rgba(118, 118, 132, 0.25);
+  background: rgba(69, 69, 69, 0.1);
+
+  &:hover:not(:disabled) {
+    border-color: rgba(118, 118, 132, 0.5);
+  }
+`;
+
+const buttonVariantStyles = {
+  solid: buttonSolidStyles,
+  outline: buttonOutlineStyles,
+} as const;
+
+type PromptButtonVariant = keyof typeof buttonVariantStyles;
 
 type PromptButtonProps = Pick<React.ComponentProps<'button'>, 'onClick' | 'children' | 'disabled'> & {
   variant?: PromptButtonVariant;
 };
 
 const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant = 'solid', ...props }, ref) => {
-  const solidStyles = css`
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-    box-shadow:
-      0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-      0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-      0px 1.5px 2px 0px rgba(0, 0, 0, 0.48),
-      0px 0px 4px 0px rgba(243, 107, 22, 0) inset;
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.15) 100%), #5f5f5f;
-      box-shadow:
-        0 0 3px 0 rgba(253, 224, 71, 0) inset,
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
-        0 0 0 1px rgba(0, 0, 0, 0.12),
-        0 1.5px 2px 0 rgba(0, 0, 0, 0.48);
-    }
-
-    &:focus:not(:disabled) {
-      border: 1px solid rgba(115, 115, 115);
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
-      box-shadow:
-        0 0 0 4px rgba(255, 255, 255, 0.05),
-        0 0 3px 0 rgba(255, 255, 255, 0) inset,
-        0 0 0 1px rgba(255, 255, 255, 0.25) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
-        0 0 0 1px rgba(0, 0, 0, 0.12),
-        0 1.5px 2px 0 rgba(0, 0, 0, 0.48);
-    }
-  `;
-
-  const outlineStyles = css`
-    background: rgba(69, 69, 69, 0.1);
-    border: 1px solid rgba(118, 118, 132, 0.25);
-
-    &:hover:not(:disabled) {
-      box-shadow:
-        0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset,
-        0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset,
-        0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset,
-        0px 0px 0px 1px rgba(0, 0, 0, 0.1),
-        0px 1.5px 2px 0px rgba(0, 0, 0, 0.48);
-    }
-
-    &:hover:not(:disabled) {
-      border: 1px solid rgba(115, 115, 115);
-    }
-
-    &:focus:not(:disabled) {
-      border: 1px solid rgba(115, 115, 115);
-
-      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
-    }
-  `;
-
   return (
     <button
       ref={ref}
       type='button'
-      css={[mainCTAStyles, variant === 'solid' ? solidStyles : outlineStyles]}
+      css={[baseButtonStyles, buttonVariantStyles[variant]]}
       {...props}
     />
   );
@@ -557,7 +543,7 @@ const AllowPersonalAccountSwitch = forwardRef<HTMLDivElement, AllowPersonalAccou
           direction='col'
           gap={1}
         >
-          <p
+          <span
             css={[
               basePromptElementStyles,
               css`
@@ -569,7 +555,7 @@ const AllowPersonalAccountSwitch = forwardRef<HTMLDivElement, AllowPersonalAccou
             ]}
           >
             Allow personal account
-          </p>
+          </span>
 
           <span
             css={[
