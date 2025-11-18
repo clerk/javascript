@@ -110,7 +110,7 @@ export const createSignals = () => {
       const error = errorSignal().error;
       const fetchStatus = fetchSignal().status;
 
-      const errors = errorsToParsedErrors(error);
+      const errors = errorsToParsedErrors(error, {});
       return { errors: errors, fetchStatus, checkout: resource };
     },
   );
