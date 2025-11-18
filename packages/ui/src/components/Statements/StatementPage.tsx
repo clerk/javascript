@@ -28,6 +28,7 @@ export const StatementPage = () => {
   const { t, translateError } = useLocalizations();
   const clerk = useClerk();
 
+  // TODO: Replace useSWR with the react-query equivalent.
   const {
     data: statement,
     isLoading,

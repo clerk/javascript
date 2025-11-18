@@ -97,6 +97,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
         }
       : null;
 
+  // TODO: Replace useSWR with the react-query equivalent.
   const {
     data: swrData,
     isValidating: swrIsValidating,
@@ -121,6 +122,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
   // - Without `keepPreviousData`, the hook will naturally reflect the empty/invalid state
   //
   // Result: No special transition logic needed - just return `null` from key getter when `isSignedIn === false`.
+  // TODO: Replace useSWRInfinite with the react-query equivalent.
   const {
     data: swrInfiniteData,
     isLoading: swrInfiniteIsLoading,

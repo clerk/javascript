@@ -37,6 +37,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     : environment?.commerceSettings.billing.user.enabled;
   const isEnabled = (params?.enabled ?? true) && billingEnabled;
 
+  // TODO: Replace useSWR with the react-query equivalent.
   const swr = useSWR(
     isEnabled
       ? {

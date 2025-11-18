@@ -82,6 +82,7 @@ const PlanDetailsInternal = ({
   const clerk = useClerk();
   const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(initialPlanPeriod);
 
+  // TODO: Replace useSWR with the react-query equivalent.
   const {
     data: plan,
     isLoading,

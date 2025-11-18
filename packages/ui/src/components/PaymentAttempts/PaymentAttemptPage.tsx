@@ -34,6 +34,7 @@ export const PaymentAttemptPage = () => {
   const { t, translateError } = useLocalizations();
   const clerk = useClerk();
 
+  // TODO: Replace useSWR with the react-query equivalent.
   const {
     data: paymentAttempt,
     isLoading,
