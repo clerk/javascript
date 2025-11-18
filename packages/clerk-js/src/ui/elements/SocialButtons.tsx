@@ -20,6 +20,7 @@ import {
   useAppearance,
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
+import { useTotalEnabledAuthMethods } from '../hooks/useTotalEnabledAuthMethods';
 import { mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils/sleep';
 import { LastAuthenticationStrategyBadge } from './Badge';
@@ -65,6 +66,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   } = props;
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
+  const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const card = useCardState();
   const clerk = useClerk();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
@@ -215,7 +217,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 label={label}
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
-                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy}
+                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1}
               />
             );
           })}
