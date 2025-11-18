@@ -25,7 +25,8 @@
 
 </div>
 
-> [!WARNING] > `@clerk/remix` is deprecated and no longer receiving updates. If you're starting a new project with React Router v7 or are in the process of upgrading a Remix v2 application to Remix v3, please use the [`@clerk/react-router`](https://clerk.com/docs/references/react-router/overview) SDK.
+> [!WARNING]
+> `@clerk/remix` is deprecated and no longer receiving updates. If you're starting a new project with React Router v7 or are in the process of upgrading a Remix v2 application to Remix v3, please use the [`@clerk/react-router`](https://clerk.com/docs/references/react-router/overview) SDK.
 
 ## Getting Started
 
