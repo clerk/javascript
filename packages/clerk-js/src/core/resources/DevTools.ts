@@ -14,7 +14,7 @@ export class DevTools extends BaseResource implements DevToolsResource {
 
   async __internal_enableEnvironmentSetting(params: EnableEnvironmentSettingParams) {
     await this._basePatch({
-      path: `${this.pathRoot}/${BaseResource.clerk.session?.id}/enable_environment_setting`,
+      path: `${this.pathRoot}/enable_environment_setting`,
       body: params,
     });
   }
