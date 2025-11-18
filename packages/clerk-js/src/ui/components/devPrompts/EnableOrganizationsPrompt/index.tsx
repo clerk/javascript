@@ -518,9 +518,8 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
             {...props}
             ref={ref}
             role='switch'
-            checked={checked}
+            {...(isControlled ? { checked } : { defaultChecked })}
             onChange={handleChange}
-            defaultChecked={defaultChecked}
             css={{ ...common.visuallyHidden() }}
             aria-describedby={description ? descriptionId : undefined}
           />
@@ -583,7 +582,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
               basePromptElementStyles,
               {
                 display: 'block',
-                paddingInlineStart: `calc(${t.sizes.$6} + 2px + ${t.sizes.$2})`,
+                paddingInlineStart: `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING} + ${t.sizes.$2})`,
                 fontSize: '0.75rem',
                 lineHeight: '1.3333333333',
                 color: '#c3c3c6',
