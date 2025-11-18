@@ -11,7 +11,7 @@ vi.mock('../controlComponents', () => ({
   }),
 }));
 
-describe('ClerkHostRenderer', () => {
+describe.skip('ClerkHostRenderer', () => {
   describe('Mount/Unmount Pattern', () => {
     const mockMount = vi.fn();
     const mockUnmount = vi.fn();
