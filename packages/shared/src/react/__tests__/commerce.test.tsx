@@ -84,6 +84,7 @@ describe('PaymentElement Localization', () => {
   const mockCheckout = {
     id: 'checkout_123',
     needsPaymentMethod: true,
+    paymentMethod: null,
     plan: {
       id: 'plan_123',
       name: 'Test Plan',
@@ -137,6 +138,7 @@ describe('PaymentElement Localization', () => {
     isConfirming: false,
     isStarting: false,
     planPeriod: 'month' as const,
+    planPeriodStart: undefined,
     externalClientSecret: 'seti_123',
     externalGatewayId: 'acct_123',
     isImmediatePlanChange: false,
