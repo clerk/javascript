@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.28.1
+
+### Patch Changes
+
+- Add Hebrew translations for waitlist component ([#7204](https://github.com/clerk/javascript/pull/7204)) by [@galeshayek](https://github.com/galeshayek)
+
+  - Translated waitlist start screen (title, subtitle, form button, action links)
+  - Translated waitlist success screen (title, subtitle, message)
+  - corrected userProfile deletePage actionDescription
+
+- Updated dependencies [[`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787)]:
+  - @clerk/types@4.101.0
+
 ## 3.28.0
 
 ### Minor Changes
