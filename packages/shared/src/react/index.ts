@@ -1,5 +1,13 @@
 export * from './hooks';
 
+export { useClerkQuery } from './clerk-rq/useQuery';
+export type { UseSubscriptionParams } from './hooks/useSubscription.types';
+export {
+  billingPlanDetailQueryKeys,
+  billingStatementQueryKeys,
+  billingPaymentAttemptQueryKeys,
+} from './clerk-rq/billingQueryKeys';
+
 export {
   ClerkInstanceContext,
   ClientContext,

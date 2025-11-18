@@ -1,5 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import useSWR from 'swr';
+import type { BillingStatementResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -16,37 +15,29 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
+import { __internal_useStatementQuery } from '../../hooks';
 import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
+type StatementGroup = BillingStatementResource['groups'][number];
+type StatementItem = StatementGroup['items'][number];
+
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
-  // TODO: Replace useSWR with the react-query equivalent.
   const {
     data: statement,
     isLoading,
     error,
-  } = useSWR(
-    params.statementId
-      ? {
-          type: 'statement',
-          id: params.statementId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getStatement({
-        id: params.statementId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
-      }),
-  );
+  } = __internal_useStatementQuery({
+    statementId: params.statementId ?? null,
+    for: requesterType,
+  });
 
   if (isLoading) {
     return (
@@ -99,11 +90,11 @@ export const StatementPage = () => {
             status={statement.status}
           />
           <Statement.Body>
-            {statement.groups.map(group => (
+            {statement.groups.map((group: StatementGroup) => (
               <Statement.Section key={group.timestamp.toISOString()}>
                 <Statement.SectionHeader text={formatDate(group.timestamp, 'long')} />
                 <Statement.SectionContent>
-                  {group.items.map(item => (
+                  {group.items.map((item: StatementItem) => (
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}

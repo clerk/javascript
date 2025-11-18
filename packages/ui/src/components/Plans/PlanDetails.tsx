@@ -1,4 +1,3 @@
-import { useClerk } from '@clerk/shared/react';
 import type {
   __internal_PlanDetailsProps,
   BillingPlanResource,
@@ -7,7 +6,6 @@ import type {
 } from '@clerk/shared/types';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Avatar } from '@/ui/elements/Avatar';
@@ -28,6 +26,9 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
+import { __internal_usePlanDetailsQuery } from '../../hooks';
+
+type PlanFeature = BillingPlanResource['features'][number];
 
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
@@ -79,25 +80,17 @@ const PlanDetailsInternal = ({
   plan: initialPlan,
   initialPlanPeriod = 'month',
 }: __internal_PlanDetailsProps) => {
-  const clerk = useClerk();
   const [planPeriod, setPlanPeriod] = useState<BillingSubscriptionPlanPeriod>(initialPlanPeriod);
 
-  // TODO: Replace useSWR with the react-query equivalent.
   const {
     data: plan,
     isLoading,
     error,
-  } = useSWR<BillingPlanResource, ClerkAPIResponseError>(
-    planId || initialPlan ? { type: 'plan', id: planId || initialPlan?.id } : null,
-    // @ts-expect-error we are handling it above
-    () => clerk.billing.getPlan({ id: planId || initialPlan?.id }),
-    {
-      fallbackData: initialPlan,
-      revalidateOnFocus: false,
-      shouldRetryOnError: false,
-      keepPreviousData: true,
-    },
-  );
+  } = __internal_usePlanDetailsQuery({
+    planId,
+    initialPlan,
+    enabled: Boolean(planId || initialPlan?.id),
+  });
 
   if (isLoading && !initialPlan) {
     return (
@@ -162,7 +155,7 @@ const PlanDetailsInternal = ({
               margin: 0,
             })}
           >
-            {features.map(feature => (
+            {features.map((feature: PlanFeature) => (
               <Box
                 key={feature.id}
                 elementDescriptor={descriptors.planDetailFeaturesListItem}
