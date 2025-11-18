@@ -15,7 +15,7 @@ function cacheKey(options: { userId: string; orgId?: string; planId: string; pla
 }
 
 /**
- * Stores the state of checkout instances in a cached based on their configuration as a cache key.
+ * Stores the state of checkout instances based on their configuration as a cache key.
  */
 const CheckoutSignalCache = new Map<
   CheckoutKey,
@@ -33,7 +33,9 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
   }
 
   if (forOrganization === 'organization' && clerk.organization === null) {
-    throw new Error('Clerk: Use `setActive` to set the organization');
+    throw new Error(
+      'Clerk: The current session does not have an active organization. Use `setActive` to set the organization',
+    );
   }
 
   const checkoutKey = cacheKey({

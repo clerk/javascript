@@ -1,3 +1,5 @@
+import type { ClerkError } from '@/errors/clerkError';
+
 import type { SetActiveNavigate } from './clerk';
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
@@ -936,7 +938,7 @@ export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
    */
-  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: unknown }>;
+  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -947,13 +949,13 @@ export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  start: () => Promise<{ error: unknown }>;
+  start: () => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
    * subscription state (such as the `useSubscription()` hook) to update automatically.
    */
-  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: unknown }>;
+  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 };
 
 export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
@@ -962,7 +964,7 @@ export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
    */
-  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: unknown }>;
+  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
@@ -973,11 +975,11 @@ export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
    * <ClerkProvider clerkJsVersion="x.x.x" />
    * ```
    */
-  start: () => Promise<{ error: unknown }>;
+  start: () => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
    * subscription state (such as the `useSubscription()` hook) to update automatically.
    */
-  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: unknown }>;
+  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 };

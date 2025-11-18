@@ -118,11 +118,13 @@ export const createSignals = () => {
   return { resourceSignal, errorSignal, fetchSignal, computedSignal };
 };
 
+type CheckoutTask = 'start' | 'confirm' | 'finalize';
+
 export class CheckoutFuture implements CheckoutFutureResourceLax {
   private resource = new BillingCheckout(null);
   private readonly config: CreateCheckoutParams;
   private readonly signals: ReturnType<typeof createSignals>;
-  private readonly pendingOperations = new Map<string, Promise<{ error: unknown }> | null>();
+  private readonly pendingOperations = new Map<CheckoutTask, Promise<{ error: unknown }> | null>();
 
   constructor(signals: ReturnType<typeof createSignals>, config: CreateCheckoutParams) {
     this.config = config;
@@ -174,7 +176,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
   }
 
   async start(): Promise<{ error: ClerkError | null }> {
-    return this.runAsyncResourceTask(
+    return this.runAsyncCheckoutTask(
       'start',
       async () => {
         const checkout = (await BillingCheckout.clerk.billing?.startCheckout(this.config)) as BillingCheckout;
@@ -188,41 +190,41 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
   }
 
   async confirm(params: ConfirmCheckoutParams): Promise<{ error: ClerkError | null }> {
-    return this.runAsyncResourceTask('confirm', async () => {
-      if (!this.resource.id) {
-        throw new Error('Clerk: Call `start` before `confirm`');
-      }
+    if (!this.resource.id) {
+      throw new Error('Clerk: `start()` must be called before `confirm()`');
+    }
+    return this.runAsyncCheckoutTask('confirm', async () => {
       await this.resource.confirm(params);
     });
   }
 
   async finalize(params?: CheckoutFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
-    return this.runAsyncResourceTask('finalize', async () => {
+    return this.runAsyncCheckoutTask('finalize', async () => {
       if (this.resource.status !== 'completed') {
-        throw new Error('Clerk: Call `confirm` before `finalize`');
+        throw new Error('Clerk: `confirm()` must be called before `finalize()`');
       }
 
       await BillingCheckout.clerk.setActive({ session: BillingCheckout.clerk.session?.id, navigate });
     });
   }
 
-  private runAsyncResourceTask<T>(operationType: string, task: () => Promise<T>, beforeTask?: () => void) {
+  private runAsyncCheckoutTask<T>(operationType: CheckoutTask, task: () => Promise<T>, beforeTask?: () => void) {
     // Noops during transitive state
     if (typeof BillingCheckout.clerk.user === 'undefined') {
       console.warn('Clerk: Checkout operations cannot be performed during transitive state');
       return { error: null };
     }
-    return createRunAsyncResourceTask(this, this.signals, this.pendingOperations)(operationType, task, beforeTask);
+    return createRunAsyncCheckoutTask(this, this.signals, this.pendingOperations)(operationType, task, beforeTask);
   }
 }
 
-function createRunAsyncResourceTask(
+function createRunAsyncCheckoutTask(
   resource: CheckoutFuture,
   signals: ReturnType<typeof createSignals>,
-  pendingOperations: Map<string, Promise<{ error: unknown }> | null>,
+  pendingOperations: Map<CheckoutTask, Promise<{ error: unknown }> | null>,
 ): <T>(
-  operationType: string,
+  operationType: CheckoutTask,
   task: () => Promise<T>,
   beforeTask?: () => void,
 ) => Promise<{ error: ClerkError | null }> {

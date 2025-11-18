@@ -158,7 +158,6 @@ const useCheckoutMutations = () => {
     const { error } = await checkout.confirm(params);
 
     if (error) {
-      // @ts-expect-error - error is not an Error
       handleError(error, [], card.setError);
     } else {
       onSubscriptionComplete?.();

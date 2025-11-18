@@ -97,7 +97,7 @@ export type CheckoutErrors = {
 };
 
 /**
- * The value returned by the `useSignInSignal` hook.
+ * The value returned by the `useCheckout` hook.
  */
 export interface CheckoutSignalValue {
   /**
@@ -105,11 +105,11 @@ export interface CheckoutSignalValue {
    */
   errors: CheckoutErrors;
   /**
-   * The fetch status of the underlying `SignIn` resource.
+   * The fetch status of the underlying `Checkout` resource.
    */
   fetchStatus: 'idle' | 'fetching';
   /**
-   * An instance representing the currently active `SignIn`, with new APIs designed specifically for custom flows.
+   * An instance representing the currently active `Checkout`.
    */
   checkout: CheckoutFutureResource;
 }
