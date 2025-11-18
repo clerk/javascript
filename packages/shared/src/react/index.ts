@@ -1,5 +1,7 @@
 export * from './hooks';
 
+export type { UseSubscriptionParams } from './hooks/useSubscription.types';
+
 export {
   ClerkInstanceContext,
   ClientContext,

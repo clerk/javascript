@@ -32,6 +32,7 @@ const [StripeLibsContext, useStripeLibsContext] = createContextAndHook<{
 
 const StripeLibsProvider = ({ children }: PropsWithChildren) => {
   const clerk = useClerk();
+  // TODO: Replace useSWR with the react-query equivalent.
   const { data: stripeClerkLibs } = useSWR(
     'clerk-stripe-sdk',
     async () => {
@@ -85,6 +86,7 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const resource = forResource === 'organization' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
 
+  // TODO: Replace useSWRMutation with the react-query equivalent.
   const { data: initializedPaymentMethod, trigger: initializePaymentMethod } = useSWRMutation(
     {
       key: 'billing-payment-method-initialize',
@@ -113,6 +115,7 @@ const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
   const paymentMethodOrder = initializedPaymentMethod?.paymentMethodOrder;
   const stripePublishableKey = environment?.commerceSettings.billing.stripePublishableKey;
 
+  // TODO: Replace useSWR with the react-query equivalent.
   const { data: stripe } = useSWR(
     stripeClerkLibs && externalGatewayId && stripePublishableKey
       ? { key: 'stripe-sdk', externalGatewayId, stripePublishableKey }

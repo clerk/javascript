@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import type { EnvironmentResource } from '../../types';
@@ -10,7 +10,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
-import { STABLE_KEYS } from '../stable-keys';
+import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const HOOK_NAME = 'useSubscription';
@@ -21,19 +21,6 @@ const HOOK_NAME = 'useSubscription';
 function KeepPreviousDataFn<Data>(previousData: Data): Data {
   return previousData;
 }
-
-export const subscriptionQuery = <T extends Record<string, unknown>, U extends Record<string, unknown>>(params: {
-  trackedKeys: T;
-  untrackedKeys?: U;
-}) => {
-  const stableKey = STABLE_KEYS.SUBSCRIPTION_KEY;
-  const { trackedKeys, untrackedKeys } = params;
-  return {
-    queryKey: [stableKey, trackedKeys, untrackedKeys] as const,
-    invalidationKey: [stableKey, trackedKeys] as const,
-    stableKey,
-  };
-};
 
 /**
  * This is the new implementation of useSubscription using React Query.
@@ -61,21 +48,18 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   const [queryClient] = useClerkQueryClient();
 
-  const { queryKey, invalidationKey } = useMemo(() => {
-    return subscriptionQuery({
-      trackedKeys: {
-        userId: user?.id,
-        args: { orgId: isOrganization ? organization?.id : undefined },
-      },
-    });
-  }, [user?.id, isOrganization, organization?.id]);
+  const { queryKey, invalidationKey } = useSubscriptionCacheKeys({
+    userId: user?.id,
+    orgId: organization?.id,
+    for: params?.for,
+  });
 
   const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
 
   const query = useClerkQuery({
     queryKey,
     queryFn: ({ queryKey }) => {
-      const obj = queryKey[1] as { args: { orgId?: string } };
+      const obj = queryKey[3];
       return clerk.billing.getSubscription(obj.args);
     },
     staleTime: 1_000 * 60,

@@ -94,6 +94,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   };
   const card = useCardState();
   const clerk = useClerk();
+  // TODO: Replace useSWRMutation with the react-query equivalent.
   const {
     data: createdAPIKey,
     trigger: createAPIKey,

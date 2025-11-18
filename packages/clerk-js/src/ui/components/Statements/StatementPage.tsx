@@ -1,5 +1,5 @@
-import { useClerk, useOrganizationContext } from '@clerk/shared/react';
-import useSWR from 'swr';
+import { __internal_useStatementQuery } from '@clerk/shared/react/index';
+import type { BillingStatementResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -20,33 +20,24 @@ import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
+type StatementGroup = BillingStatementResource['groups'][number];
+type StatementItem = StatementGroup['items'][number];
+
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
-  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
     data: statement,
     isLoading,
     error,
-  } = useSWR(
-    params.statementId
-      ? {
-          type: 'statement',
-          id: params.statementId,
-          orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getStatement({
-        id: params.statementId,
-        orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
-      }),
-  );
+  } = __internal_useStatementQuery({
+    statementId: params.statementId ?? null,
+    for: requesterType,
+  });
 
   if (isLoading) {
     return (
@@ -99,11 +90,11 @@ export const StatementPage = () => {
             status={statement.status}
           />
           <Statement.Body>
-            {statement.groups.map(group => (
+            {statement.groups.map((group: StatementGroup) => (
               <Statement.Section key={group.timestamp.toISOString()}>
                 <Statement.SectionHeader text={formatDate(group.timestamp, 'long')} />
                 <Statement.SectionContent>
-                  {group.items.map(item => (
+                  {group.items.map((item: StatementItem) => (
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}
