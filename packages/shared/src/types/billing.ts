@@ -922,13 +922,24 @@ interface CheckoutFlowProperties {
   needsPaymentMethod: boolean;
 }
 
-type CheckoutPropertiesPerStatus =
-  | ({
-      status: 'needs_initialization';
-    } & ForceNull<CheckoutFlowProperties>)
-  | ({
-      status: 'needs_confirmation' | 'completed';
-    } & CheckoutFlowProperties);
+/**
+ * Checkout flow in uninitialized state. All properties are null until `start()` is called.
+ */
+type CheckoutFlowUninitialized = {
+  status: 'needs_initialization';
+} & ForceNull<CheckoutFlowProperties>;
+
+/**
+ * Checkout flow in initialized state. All properties are populated after `start()` is called.
+ */
+type CheckoutFlowInitialized = {
+  status: 'needs_confirmation' | 'completed';
+} & CheckoutFlowProperties;
+
+/**
+ * Discriminated union of checkout flow states based on status.
+ */
+type CheckoutPropertiesPerStatus = CheckoutFlowUninitialized | CheckoutFlowInitialized;
 
 export interface CheckoutFlowFinalizeParams {
   navigate: SetActiveNavigate;
