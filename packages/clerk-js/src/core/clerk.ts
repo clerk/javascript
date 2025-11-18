@@ -759,10 +759,6 @@ export class Clerk implements ClerkInterface {
     }
 
     if (
-      // Do not open the prompt if the user is not loaded, since the endpoint
-      // relies on the session
-      // Organization components already don't render if the session is not active
-      !this.user ||
       // If not in development instance, return enabled status in order to not open the prompt
       this.#instanceType !== 'development'
     ) {

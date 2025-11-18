@@ -226,8 +226,9 @@ const EnableOrganizationsPromptInternal = ({
                     `,
                   ]}
                 >
-                  The Organizations feature has been enabled for your application. A default organization named &quot;My
-                  Organization&quot; was created automatically. You can manage or rename it in your{' '}
+                  {clerk.user
+                    ? `The Organizations feature has been enabled for your application. A default organization named "My Organization" was created automatically. You can manage or rename it in your`
+                    : `The Organizations feature has been enabled for your application. You can manage it in your`}{' '}
                   <a
                     css={[
                       basePromptElementStyles,
@@ -299,7 +300,7 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {!isEnabled && (
+            {!isEnabled && clerk?.user && (
               <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
                 <AllowPersonalAccountSwitch
                   checked={allowPersonalAccount}
