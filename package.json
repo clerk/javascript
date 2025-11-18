@@ -163,6 +163,7 @@
       "msw"
     ],
     "overrides": {
+      "@react-native-community/cli": "17.0.1",
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3",
       "react": "catalog:react",
