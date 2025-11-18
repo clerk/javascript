@@ -10,7 +10,7 @@ import type {
   BillingSubscriptionPlanPeriod,
   CheckoutFlowFinalizeParams,
   CheckoutFlowResource,
-  CheckoutFlowResourceLax,
+  CheckoutFlowResourceNonStrict,
   CheckoutSignalValue,
   ConfirmCheckoutParams,
   CreateCheckoutParams,
@@ -120,7 +120,7 @@ export const createSignals = () => {
 
 type CheckoutTask = 'start' | 'confirm' | 'finalize';
 
-export class CheckoutFlow implements CheckoutFlowResourceLax {
+export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
   private resource = new BillingCheckout(null);
   private readonly config: CreateCheckoutParams;
   private readonly signals: ReturnType<typeof createSignals>;

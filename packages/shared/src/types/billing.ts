@@ -869,7 +869,7 @@ export interface BillingPayerResource extends ClerkResource {
   organizationName?: string | null;
 }
 
-export interface CheckoutFlowProperties {
+interface CheckoutFlowProperties {
   /**
    * A client secret from an external payment provider (such as Stripe) used to complete the payment on the client-side.
    */
@@ -934,7 +934,10 @@ export interface CheckoutFlowFinalizeParams {
   navigate: SetActiveNavigate;
 }
 
-export type CheckoutFlowResource = CheckoutPropertiesPerStatus & {
+/**
+ * Common methods available on all checkout flow instances.
+ */
+interface CheckoutFlowMethods {
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
    */
@@ -956,30 +959,21 @@ export type CheckoutFlowResource = CheckoutPropertiesPerStatus & {
    * subscription state (such as the `useSubscription()` hook) to update automatically.
    */
   finalize: (params?: CheckoutFlowFinalizeParams) => Promise<{ error: ClerkError | null }>;
-};
+}
 
-export type CheckoutFlowResourceLax = CheckoutFlowProperties & {
+/**
+ * Public API type for checkout flow. Properties are null when status is 'needs_initialization'
+ * and present when status is 'needs_confirmation' or 'completed'.
+ */
+export type CheckoutFlowResource = CheckoutPropertiesPerStatus & CheckoutFlowMethods;
+
+/**
+ * Non-strict version of checkout flow resource. All properties are always present,
+ * allowing the class implementation to access properties regardless of status.
+ * This is the type that the `CheckoutFlow` class implements.
+ *
+ * @internal
+ */
+export type CheckoutFlowResourceNonStrict = CheckoutFlowProperties & {
   status: 'needs_initialization' | 'needs_confirmation' | 'completed';
-} & {
-  /**
-   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
-   */
-  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
-
-  /**
-   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
-   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
-   *
-   * @example
-   * ```tsx
-   * <ClerkProvider clerkJsVersion="x.x.x" />
-   * ```
-   */
-  start: () => Promise<{ error: ClerkError | null }>;
-
-  /**
-   * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
-   * subscription state (such as the `useSubscription()` hook) to update automatically.
-   */
-  finalize: (params?: CheckoutFlowFinalizeParams) => Promise<{ error: ClerkError | null }>;
-};
+} & CheckoutFlowMethods;
