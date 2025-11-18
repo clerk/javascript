@@ -118,6 +118,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           minWidth: '13.4rem',
           paddingLeft: `${t.space.$3}`,
           borderRadius: '1.25rem',
+          transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
           '&[data-expanded="false"]:hover': {
             background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
