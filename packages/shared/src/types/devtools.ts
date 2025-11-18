@@ -2,7 +2,7 @@ import type { ClerkResource } from './resource';
 
 export type EnableEnvironmentSettingParams = {
   enable_organizations: boolean;
-  organizations_allow_personal_account: boolean;
+  organization_allow_personal_accounts: boolean;
 };
 
 /**
