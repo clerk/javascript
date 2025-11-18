@@ -2,14 +2,14 @@ import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import { forwardRef, useMemo, useRef, useState } from 'react';
+import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
 import { common, InternalThemeProvider } from '@/ui/styledSystem';
 
 import { DevTools } from '../../../../core/resources/DevTools';
 import type { Environment } from '../../../../core/resources/Environment';
-import { Flex } from '../../../customizables';
+import { Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
 
@@ -301,10 +301,11 @@ const EnableOrganizationsPromptInternal = ({
 
             {!isEnabled && (
               <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
-                <AllowPersonalAccountSwitch
+                <Switch
+                  label='Allow personal account'
+                  description='This is an uncommon setting, meant for applications that sell to both organizations and individual users. Most B2B applications require users to be part of an organization, and should keep this setting disabled.'
                   checked={allowPersonalAccount}
-                  onChange={() => setAllowPersonalAccount(!allowPersonalAccount)}
-                  isDisabled={false}
+                  onChange={() => setAllowPersonalAccount(prev => !prev)}
                 />
               </Flex>
             )}
@@ -460,119 +461,97 @@ const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant
   );
 });
 
-type AllowPersonalAccountSwitchProps = {
-  checked: boolean;
-  isDisabled: boolean;
-  onChange: (checked: boolean) => void;
+type SwitchProps = React.ComponentProps<'input'> & {
+  label: string;
+  description?: string;
 };
 
-const AllowPersonalAccountSwitch = forwardRef<HTMLDivElement, AllowPersonalAccountSwitchProps>(
-  ({ checked, onChange, isDisabled = false }, ref) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (isDisabled) {
-        return;
-      }
-
-      onChange?.(e.target.checked);
-    };
-
-    return (
+const Switch = forwardRef<HTMLInputElement, SwitchProps>(({ label, description, ...props }, ref) => {
+  const descriptionId = useId();
+  return (
+    <Flex
+      direction='col'
+      gap={1}
+    >
       <Flex
-        ref={ref}
-        direction='row'
-        align='center'
         as='label'
         gap={2}
-        sx={t => ({
+        align='center'
+        sx={{
           isolation: 'isolate',
-          width: 'fit-content',
+          userSelect: 'none',
           '&:has(input:focus-visible) > input + span': {
-            ...common.focusRingStyles(t),
+            outline: '2px solid white',
+            outlineOffset: '2px',
           },
-        })}
+        }}
       >
-        {/* The order of the elements is important here for the focus ring to work. The input is visually hidden, so the focus ring is applied to the span. */}
         <input
           type='checkbox'
+          {...props}
+          ref={ref}
           role='switch'
-          disabled={isDisabled}
-          checked={checked}
-          onChange={handleChange}
-          style={{
-            ...common.visuallyHidden(),
-          }}
+          css={{ ...common.visuallyHidden() }}
+          aria-describedby={description ? descriptionId : undefined}
         />
-        <Flex
-          as='span'
-          data-checked={checked}
+        <Span
           sx={t => ({
-            minWidth: t.sizes.$7,
-            alignSelf: 'flex-start',
-            height: t.sizes.$4,
+            display: 'flex',
             alignItems: 'center',
-            position: 'relative',
-            borderColor: '#DBDBE0',
-            backgroundColor: checked ? '#DBDBE0' : t.colors.$primary500,
+            paddingInline: '2px',
+            width: `calc(${t.sizes.$6} + 2px)`,
+            height: `calc(${t.sizes.$4} + 2px)`,
+            border: `1px solid rgba(118, 118, 132, 0.25)`,
+            backgroundColor: props.checked ? 'rgba(255, 255, 255, 0.75)' : `rgba(255, 255, 255, 0.1)`,
             borderRadius: 999,
-            transition: 'background-color 0.2s',
-            opacity: isDisabled ? 0.6 : 1,
-            cursor: isDisabled ? 'not-allowed' : 'pointer',
-            outline: 'none',
-            boxSizing: 'border-box',
-            boxShadow:
-              '0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
+            '&:hover:not(:disabled)': {
+              borderColor: `rgba(118, 118, 132, 0.5)`,
+            },
           })}
         >
-          <Flex
+          <Span
             sx={t => ({
-              position: 'absolute',
-              left: t.sizes.$0x5,
               width: t.sizes.$3,
               height: t.sizes.$3,
-              borderRadius: '50%',
+              borderRadius: 9999,
               backgroundColor: 'white',
-              boxShadow: t.shadows.$switchControl,
-              transform: `translateX(${checked ? t.sizes.$3 : 0})`,
+              transform: `translateX(${props.checked ? t.sizes.$2 : 0})`,
               transition: 'transform 0.2s',
-              zIndex: 1,
             })}
           />
-        </Flex>
-
-        <Flex
-          direction='col'
-          gap={1}
+        </Span>
+        <span
+          css={[
+            basePromptElementStyles,
+            css`
+              font-size: 0.875rem;
+              font-weight: 500;
+              line-height: 1.25;
+              color: white;
+            `,
+          ]}
         >
-          <span
-            css={[
-              basePromptElementStyles,
-              css`
-                font-size: 0.875rem;
-                font-weight: 400;
-                line-height: 1.23;
-                color: white;
-              `,
-            ]}
-          >
-            Allow personal account
-          </span>
-
-          <span
-            css={[
-              basePromptElementStyles,
-              css`
-                color: #b4b4b4;
-                font-size: 0.8125rem;
-                font-weight: 400;
-                line-height: 1.23;
-              `,
-            ]}
-          >
-            This is an uncommon setting, meant for applications that sell to both organizations and individual users.
-            Most B2B applications require users to be part of an organization, and should keep this setting disabled.
-          </span>
-        </Flex>
+          {label}
+        </span>
       </Flex>
-    );
-  },
-);
+      {description ? (
+        <Span
+          id={descriptionId}
+          sx={t => [
+            basePromptElementStyles,
+            {
+              display: 'block',
+              paddingInlineStart: `calc(${t.sizes.$6} + 2px + ${t.sizes.$2})`,
+              fontSize: '0.75rem',
+              lineHeight: '1.3333333333',
+              color: '#c3c3c6',
+              textWrap: 'pretty',
+            },
+          ]}
+        >
+          {description}
+        </Span>
+      ) : null}
+    </Flex>
+  );
+});
