@@ -11,6 +11,7 @@ import type {
   UserOrganizationInvitationResource,
 } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -318,7 +319,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       pageSize: userMembershipsSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'userMemberships',
+      stablePrefix: STABLE_KEYS.USER_MEMBERSHIPS_KEY,
       authenticated: Boolean(user),
       tracked: {
         userId: user?.id,
@@ -341,7 +342,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       pageSize: userInvitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'userInvitations',
+      stablePrefix: STABLE_KEYS.USER_INVITATIONS_KEY,
       authenticated: Boolean(user),
       tracked: {
         userId: user?.id,
@@ -363,7 +364,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
       pageSize: userSuggestionsSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'userSuggestions',
+      stablePrefix: STABLE_KEYS.USER_SUGGESTIONS_KEY,
       authenticated: Boolean(user),
       tracked: {
         userId: user?.id,

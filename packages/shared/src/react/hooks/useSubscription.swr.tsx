@@ -9,6 +9,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const hookName = 'useSubscription';
@@ -40,7 +41,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const swr = useSWR(
     isEnabled
       ? {
-          type: 'commerce-subscription',
+          type: STABLE_KEYS.SUBSCRIPTION_KEY,
           userId: user?.id,
           args: { orgId: isOrganization ? organization?.id : undefined },
         }

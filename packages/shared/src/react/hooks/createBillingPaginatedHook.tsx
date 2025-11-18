@@ -6,6 +6,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import type { ResourceCacheStableKey } from '../stable-keys';
 import type { PagesOrInfiniteOptions, PaginatedHookConfig, PaginatedResources } from '../types';
 import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -15,7 +16,7 @@ import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
  */
 type BillingHookConfig<TResource extends ClerkResource, TParams extends PagesOrInfiniteOptions> = {
   hookName: string;
-  resourceType: string;
+  resourceType: ResourceCacheStableKey;
   useFetcher: (
     param: ForPayerType,
   ) => ((params: TParams & { orgId?: string }) => Promise<ClerkPaginatedResponse<TResource>>) | undefined;
