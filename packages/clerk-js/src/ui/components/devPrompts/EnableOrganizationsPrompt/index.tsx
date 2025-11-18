@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import { css } from '@emotion/react';
-import { forwardRef, useMemo, useState } from 'react';
+import { forwardRef, useMemo, useRef, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
 import { common, InternalThemeProvider } from '@/ui/styledSystem';
@@ -33,6 +33,8 @@ const EnableOrganizationsPromptInternal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
   const [allowPersonalAccount, setAllowPersonalAccount] = useState(false);
+
+  const initialFocusRef = useRef<HTMLButtonElement>(null);
 
   // @ts-expect-error - __unstable__environment is not typed
   const environment = clerk?.__unstable__environment as Environment | undefined;
@@ -80,6 +82,7 @@ const EnableOrganizationsPromptInternal = ({
       <Modal
         canCloseModal={false}
         containerSx={() => ({ alignItems: 'center' })}
+        initialFocusRef={initialFocusRef}
       >
         <PromptContainer
           sx={() => ({
@@ -236,7 +239,6 @@ const EnableOrganizationsPromptInternal = ({
                     href={organizationsDashboardUrl}
                     target='_blank'
                     rel='noopener noreferrer'
-                    tabIndex={-1}
                   >
                     dashboard
                   </a>
@@ -287,7 +289,6 @@ const EnableOrganizationsPromptInternal = ({
                     href='https://clerk.com/docs/guides/organizations/overview'
                     target='_blank'
                     rel='noopener noreferrer'
-                    tabIndex={-1}
                   >
                     Learn more about Organizations.
                   </a>
@@ -346,6 +347,7 @@ const EnableOrganizationsPromptInternal = ({
                   variant='solid'
                   onClick={handleEnableOrganizations}
                   disabled={isLoading}
+                  ref={initialFocusRef}
                 >
                   Enable Organizations
                 </PromptButton>
@@ -405,7 +407,7 @@ type PromptButtonProps = Pick<React.ComponentProps<'button'>, 'onClick' | 'child
   variant?: PromptButtonVariant;
 };
 
-const PromptButton = ({ variant = 'solid', ...props }: PromptButtonProps) => {
+const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant = 'solid', ...props }, ref) => {
   const solidStyles = css`
     background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30.5%, rgba(0, 0, 0, 0.05) 100%), #454545;
     box-shadow:
@@ -464,12 +466,13 @@ const PromptButton = ({ variant = 'solid', ...props }: PromptButtonProps) => {
 
   return (
     <button
+      ref={ref}
       type='button'
       css={[mainCTAStyles, variant === 'solid' ? solidStyles : outlineStyles]}
       {...props}
     />
   );
-};
+});
 
 type AllowPersonalAccountSwitchProps = {
   checked: boolean;
@@ -509,7 +512,6 @@ const AllowPersonalAccountSwitch = forwardRef<HTMLDivElement, AllowPersonalAccou
           disabled={isDisabled}
           checked={checked}
           onChange={handleChange}
-          tabIndex={-1}
           style={{
             ...common.visuallyHidden(),
           }}
