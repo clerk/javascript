@@ -72,4 +72,5 @@ export type InternalUIComponentId =
   | 'user-profile'
   | 'google-one-tap'
   | 'waitlist'
-  | 'pricing-table';
+  | 'pricing-table'
+  | 'api-keys';

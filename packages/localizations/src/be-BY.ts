@@ -616,6 +616,12 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Праверце вашу пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Праверце вашу пошту',
+      resendButton: 'Не атрымалі код? Адпраўце яшчэ раз',
+      subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      title: 'Праверце вашу пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -652,6 +658,12 @@ export const beBY: LocalizationResource = {
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Выкарыстоўвайце спасылку для пацвярджэння, адпраўленую на вашу электронную пошту',
+      resendButton: 'Не атрымалі спасылку? Адправіць зноў',
+      subtitle: 'каб працягнуць да {{applicationName}}',
+      title: 'Праверце сваю электронную пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -669,6 +681,8 @@ export const beBY: LocalizationResource = {
       label__alternativeMethods: 'Або ўвайдзіце іншым спосабам',
       title: 'Забыўся пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы ўваходзіце з новай прылады. Мы просім пацверджанне для забеспячэння бяспекі вашага акаўнта.',
     noAvailableMethods: {
       message: 'Немагчыма ўвайсці. Няма даступных фактараў аўтэнтыфікацыі.',
       subtitle: 'Адбылася памылка',

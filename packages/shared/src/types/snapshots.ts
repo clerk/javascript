@@ -31,6 +31,7 @@ import type {
   Web3WalletJSON,
 } from './json';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { ProtectConfigJSON } from './protectConfig';
 import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
 import type { Nullable, Override } from './utils';
@@ -118,6 +119,8 @@ export type AuthConfigJSONSnapshot = AuthConfigJSON;
 export type EnvironmentJSONSnapshot = EnvironmentJSON;
 
 export type DisplayConfigJSONSnapshot = DisplayConfigJSON;
+
+export type ProtectConfigJSONSnapshot = ProtectConfigJSON;
 
 export type EmailAddressJSONSnapshot = Override<
   EmailAddressJSON,
