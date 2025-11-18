@@ -1,15 +1,15 @@
 import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/react';
-import { forwardRef, useMemo, useRef, useState } from 'react';
+import { css, type Theme } from '@emotion/react';
+import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
 import { common, InternalThemeProvider } from '@/ui/styledSystem';
 
 import { DevTools } from '../../../../core/resources/DevTools';
 import type { Environment } from '../../../../core/resources/Environment';
-import { Flex } from '../../../customizables';
+import { Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
 
@@ -88,7 +88,8 @@ const EnableOrganizationsPromptInternal = ({
           sx={() => ({
             display: 'flex',
             flexDirection: 'column',
-            maxWidth: '30rem',
+            width: '30rem',
+            maxWidth: 'calc(100vw - 2rem)',
           })}
         >
           <Flex
@@ -302,10 +303,11 @@ const EnableOrganizationsPromptInternal = ({
 
             {!isEnabled && clerk?.user && (
               <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
-                <AllowPersonalAccountSwitch
+                <Switch
+                  label='Allow personal account'
+                  description='This is an uncommon setting, meant for applications that sell to both organizations and individual users. Most B2B applications require users to be part of an organization, and should keep this setting disabled.'
                   checked={allowPersonalAccount}
-                  onChange={() => setAllowPersonalAccount(!allowPersonalAccount)}
-                  isDisabled={false}
+                  onChange={() => setAllowPersonalAccount(prev => !prev)}
                 />
               </Flex>
             )}
@@ -314,8 +316,10 @@ const EnableOrganizationsPromptInternal = ({
           <span
             css={css`
               height: 1px;
+              display: block;
+              width: calc(100% - 2px);
+              margin-inline: auto;
               background-color: #151515;
-              width: 100%;
               box-shadow: 0px 1px 0px 0px #424242;
             `}
           />
@@ -461,118 +465,134 @@ const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant
   );
 });
 
-type AllowPersonalAccountSwitchProps = {
-  checked: boolean;
-  isDisabled: boolean;
-  onChange: (checked: boolean) => void;
+type SwitchProps = React.ComponentProps<'input'> & {
+  label: string;
+  description?: string;
 };
 
-const AllowPersonalAccountSwitch = forwardRef<HTMLDivElement, AllowPersonalAccountSwitchProps>(
-  ({ checked, onChange, isDisabled = false }, ref) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (isDisabled) {
-        return;
-      }
+const TRACK_PADDING = '2px';
+const TRACK_INNER_WIDTH = (t: Theme) => t.sizes.$6;
+const TRACK_HEIGHT = (t: Theme) => t.sizes.$4;
+const THUMB_WIDTH = (t: Theme) => t.sizes.$3;
 
-      onChange?.(e.target.checked);
+const Switch = forwardRef<HTMLInputElement, SwitchProps>(
+  ({ label, description, checked: controlledChecked, defaultChecked, onChange, ...props }, ref) => {
+    const descriptionId = useId();
+
+    const isControlled = controlledChecked !== undefined;
+    const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
+    const checked = isControlled ? controlledChecked : internalChecked;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!isControlled) {
+        setInternalChecked(e.target.checked);
+      }
+      onChange?.(e);
     };
 
     return (
       <Flex
-        ref={ref}
-        direction='row'
-        align='center'
-        as='label'
-        gap={2}
-        sx={t => ({
-          isolation: 'isolate',
-          width: 'fit-content',
-          '&:has(input:focus-visible) > input + span': {
-            ...common.focusRingStyles(t),
-          },
-        })}
+        direction='col'
+        gap={1}
       >
-        {/* The order of the elements is important here for the focus ring to work. The input is visually hidden, so the focus ring is applied to the span. */}
-        <input
-          type='checkbox'
-          role='switch'
-          disabled={isDisabled}
-          checked={checked}
-          onChange={handleChange}
-          style={{
-            ...common.visuallyHidden(),
+        <Flex
+          as='label'
+          gap={2}
+          align='center'
+          sx={{
+            isolation: 'isolate',
+            userSelect: 'none',
+            '&:has(input:focus-visible) > input + span': {
+              outline: '2px solid white',
+              outlineOffset: '2px',
+            },
+            '&:has(input:disabled) > input + span': {
+              opacity: 0.6,
+              cursor: 'not-allowed',
+              pointerEvents: 'none',
+            },
           }}
-        />
-        <Flex
-          as='span'
-          data-checked={checked}
-          sx={t => ({
-            minWidth: t.sizes.$7,
-            alignSelf: 'flex-start',
-            height: t.sizes.$4,
-            alignItems: 'center',
-            position: 'relative',
-            borderColor: '#DBDBE0',
-            backgroundColor: checked ? '#DBDBE0' : t.colors.$primary500,
-            borderRadius: 999,
-            transition: 'background-color 0.2s',
-            opacity: isDisabled ? 0.6 : 1,
-            cursor: isDisabled ? 'not-allowed' : 'pointer',
-            outline: 'none',
-            boxSizing: 'border-box',
-            boxShadow:
-              '0px 0px 6px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(255, 255, 255, 0.04) inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.04) inset, 0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
-          })}
         >
-          <Flex
-            sx={t => ({
-              position: 'absolute',
-              left: t.sizes.$0x5,
-              width: t.sizes.$3,
-              height: t.sizes.$3,
-              borderRadius: '50%',
-              backgroundColor: 'white',
-              boxShadow: t.shadows.$switchControl,
-              transform: `translateX(${checked ? t.sizes.$3 : 0})`,
-              transition: 'transform 0.2s',
-              zIndex: 1,
-            })}
+          <input
+            type='checkbox'
+            {...props}
+            ref={ref}
+            role='switch'
+            {...(isControlled ? { checked } : { defaultChecked })}
+            onChange={handleChange}
+            css={{ ...common.visuallyHidden() }}
+            aria-describedby={description ? descriptionId : undefined}
           />
-        </Flex>
-
-        <Flex
-          direction='col'
-          gap={1}
-        >
+          <Span
+            sx={t => {
+              const trackWidth = `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING})`;
+              const trackHeight = `calc(${TRACK_HEIGHT(t)} + ${TRACK_PADDING})`;
+              return {
+                display: 'flex',
+                alignItems: 'center',
+                paddingInline: TRACK_PADDING,
+                width: trackWidth,
+                height: trackHeight,
+                border: `1px solid rgba(118, 118, 132, 0.25)`,
+                backgroundColor: checked ? 'rgba(255, 255, 255, 0.75)' : `rgba(255, 255, 255, 0.1)`,
+                borderRadius: 999,
+                transition: 'background-color 0.2s ease-in-out',
+                '&:hover': {
+                  borderColor: `rgba(118, 118, 132, 0.5)`,
+                },
+              };
+            }}
+          >
+            <Span
+              sx={t => {
+                const size = THUMB_WIDTH(t);
+                const maxTranslateX = `calc(${TRACK_INNER_WIDTH(t)} - ${size} - ${TRACK_PADDING})`;
+                return {
+                  width: size,
+                  height: size,
+                  borderRadius: 9999,
+                  backgroundColor: 'white',
+                  transform: `translateX(${checked ? maxTranslateX : '0'})`,
+                  transition: 'transform 0.2s ease-in-out',
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transition: 'none',
+                  },
+                };
+              }}
+            />
+          </Span>
           <span
             css={[
               basePromptElementStyles,
               css`
                 font-size: 0.875rem;
-                font-weight: 400;
-                line-height: 1.23;
+                font-weight: 500;
+                line-height: 1.25;
                 color: white;
               `,
             ]}
           >
-            Allow personal account
-          </span>
-
-          <span
-            css={[
-              basePromptElementStyles,
-              css`
-                color: #b4b4b4;
-                font-size: 0.8125rem;
-                font-weight: 400;
-                line-height: 1.23;
-              `,
-            ]}
-          >
-            This is an uncommon setting, meant for applications that sell to both organizations and individual users.
-            Most B2B applications require users to be part of an organization, and should keep this setting disabled.
+            {label}
           </span>
         </Flex>
+        {description ? (
+          <Span
+            id={descriptionId}
+            sx={t => [
+              basePromptElementStyles,
+              {
+                display: 'block',
+                paddingInlineStart: `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING} + ${t.sizes.$2})`,
+                fontSize: '0.75rem',
+                lineHeight: '1.3333333333',
+                color: '#c3c3c6',
+                textWrap: 'pretty',
+              },
+            ]}
+          >
+            {description}
+          </Span>
+        ) : null}
       </Flex>
     );
   },
