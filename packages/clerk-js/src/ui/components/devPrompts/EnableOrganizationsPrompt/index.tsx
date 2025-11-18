@@ -335,9 +335,16 @@ const EnableOrganizationsPromptInternal = ({
             {isEnabled ? (
               <PromptButton
                 variant='solid'
-                onClick={() => onSuccess?.()}
+                onClick={() => {
+                  if (!clerk.user) {
+                    void clerk.redirectToSignIn();
+                    clerk.__internal_closeEnableOrganizationsPrompt?.();
+                  } else {
+                    onSuccess?.();
+                  }
+                }}
               >
-                Continue
+                {clerk.user ? 'Continue' : 'Sign in to continue'}
               </PromptButton>
             ) : (
               <>
