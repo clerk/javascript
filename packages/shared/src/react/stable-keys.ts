@@ -13,13 +13,13 @@ const INVITATIONS_KEY = 'invitations';
 const API_KEYS_KEY = 'apiKeys';
 
 // Keys for `usePlans`
-const PLANS_KEY = 'plans';
+const PLANS_KEY = 'billing-plans';
 
 // Keys for `useSubscription`
-const SUBSCRIPTION_KEY = 'commerce-subscription';
+const SUBSCRIPTION_KEY = 'billing-subscription';
 
 // Keys for `usePaymentMethods`
-const PAYMENT_METHODS_KEY = 'commerce-payment-methods';
+const PAYMENT_METHODS_KEY = 'billing-payment-methods';
 
 // Keys for `usePaymentAttempts`
 const PAYMENT_ATTEMPTS_KEY = 'billing-payment-attempts';
