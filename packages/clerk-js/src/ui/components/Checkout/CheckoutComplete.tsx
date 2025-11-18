@@ -12,6 +12,7 @@ import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
 const SuccessRing = ({ positionX, positionY }: { positionX: number; positionY: number }) => {
@@ -161,7 +162,7 @@ export const CheckoutComplete = () => {
   const { setIsOpen } = useDrawerContext();
   const { newSubscriptionRedirectUrl } = useCheckoutContext();
   const { checkout } = useCheckout();
-  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt, needsPaymentMethod } = checkout;
+  const { totals, paymentMethod, planPeriodStart, freeTrialEndsAt } = checkout;
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
 
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -331,7 +332,7 @@ export const CheckoutComplete = () => {
               localizationKey={
                 freeTrialEndsAt
                   ? localizationKeys('billing.checkout.title__trialSuccess')
-                  : needsPaymentMethod
+                  : totals.totalDueNow.amount > 0
                     ? localizationKeys('billing.checkout.title__paymentSuccessful')
                     : localizationKeys('billing.checkout.title__subscriptionSuccessful')
               }
@@ -386,7 +387,7 @@ export const CheckoutComplete = () => {
                 }),
               })}
               localizationKey={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0
                   ? localizationKeys('billing.checkout.description__paymentSuccessful')
                   : localizationKeys('billing.checkout.description__subscriptionSuccessful')
               }
@@ -430,18 +431,23 @@ export const CheckoutComplete = () => {
           <LineItems.Group variant='secondary'>
             <LineItems.Title
               title={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? localizationKeys('billing.checkout.lineItems.title__paymentMethod')
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
+
             <LineItems.Description
               text={
-                needsPaymentMethod
+                totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? paymentMethod
                     ? paymentMethod.paymentType !== 'card'
-                      ? `${capitalize(paymentMethod.paymentType)}`
-                      : `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
+                      ? paymentMethod.paymentType
+                        ? `${capitalize(paymentMethod.paymentType)}`
+                        : '–'
+                      : paymentMethod.cardType
+                        ? `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
+                        : '–'
                     : '–'
                   : planPeriodStart
                     ? formatDate(new Date(planPeriodStart))

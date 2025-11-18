@@ -318,6 +318,7 @@ export const Form = {
   Checkbox,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
+  CommonInputWrapper,
 };
 
 export { useFormState };

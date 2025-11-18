@@ -1,11 +1,11 @@
 import { useUser } from '@clerk/shared/react';
 
-import { ApiKeysContext, useUserProfileContext } from '@/ui/contexts';
+import { APIKeysContext, useUserProfileContext } from '@/ui/contexts';
 import { Col, descriptors, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
 
-import { APIKeysPage as APIKeysPageInternal } from '../ApiKeys/ApiKeys';
+import { APIKeysPage as APIKeysPageInternal } from '../APIKeys/APIKeys';
 
 export const APIKeysPage = () => {
   const { user } = useUser();
@@ -28,12 +28,12 @@ export const APIKeysPage = () => {
           textVariant='h2'
         />
       </Header.Root>
-      <ApiKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps }}>
+      <APIKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps }}>
         <APIKeysPageInternal
           subject={user.id}
           revokeModalRoot={contentRef}
         />
-      </ApiKeysContext.Provider>
+      </APIKeysContext.Provider>
     </Col>
   );
 };

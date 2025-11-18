@@ -1,11 +1,11 @@
 import { useOrganization } from '@clerk/shared/react';
 
-import { ApiKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
+import { APIKeysContext, useOrganizationProfileContext } from '@/ui/contexts';
 import { Col, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
 
-import { APIKeysPage } from '../ApiKeys/ApiKeys';
+import { APIKeysPage } from '../APIKeys/APIKeys';
 
 export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();
@@ -25,12 +25,12 @@ export const OrganizationAPIKeysPage = () => {
           textVariant='h2'
         />
       </Header.Root>
-      <ApiKeysContext.Provider value={{ ...apiKeysProps, componentName: 'APIKeys' }}>
+      <APIKeysContext.Provider value={{ ...apiKeysProps, componentName: 'APIKeys' }}>
         <APIKeysPage
           subject={organization.id}
           revokeModalRoot={contentRef}
         />
-      </ApiKeysContext.Provider>
+      </APIKeysContext.Provider>
     </Col>
   );
 };

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-expo",
-  "version": "2.17.3",
+  "version": "2.19.2",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -94,7 +94,9 @@
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
     "@types/base-64": "^1.0.2",
+    "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
+    "expo-crypto": "^15.0.7",
     "expo-local-authentication": "^13.8.0",
     "expo-secure-store": "^12.8.1",
     "expo-web-browser": "^12.8.2",
@@ -102,7 +104,9 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
+    "expo-crypto": ">=12",
     "expo-local-authentication": ">=13.5.0",
     "expo-secure-store": ">=12.4.0",
     "expo-web-browser": ">=12.5.0",
@@ -112,6 +116,12 @@
   },
   "peerDependenciesMeta": {
     "@clerk/expo-passkeys": {
+      "optional": true
+    },
+    "expo-apple-authentication": {
+      "optional": true
+    },
+    "expo-crypto": {
       "optional": true
     },
     "expo-local-authentication": {

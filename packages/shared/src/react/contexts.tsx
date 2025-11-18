@@ -13,8 +13,8 @@ import type {
   SignedInSessionResource,
   UserResource,
 } from '../types';
-import { SWRConfig } from './clerk-swr';
 import { createContextAndHook } from './hooks/createContextAndHook';
+import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
@@ -25,9 +25,23 @@ const [SessionContext, useSessionContext] = createContextAndHook<SignedInSession
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
-type UseCheckoutOptions = {
+/**
+ * @interface
+ */
+export type UseCheckoutOptions = {
+  /**
+   * Specifies if the checkout is for an organization.
+   *
+   * @default 'user'
+   */
   for?: ForPayerType;
+  /**
+   * The billing period for the plan.
+   */
   planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   * The ID of the subscription plan to check out (e.g. `cplan_xxx`).
+   */
   planId: string;
 };
 
@@ -66,7 +80,7 @@ const OrganizationProvider = ({
   }
 >) => {
   return (
-    <SWRConfig value={swrConfig}>
+    <SWRConfigCompat swrConfig={swrConfig}>
       <OrganizationContextInternal.Provider
         value={{
           value: { organization },
@@ -74,7 +88,7 @@ const OrganizationProvider = ({
       >
         {children}
       </OrganizationContextInternal.Provider>
-    </SWRConfig>
+    </SWRConfigCompat>
   );
 };
 

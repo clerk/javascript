@@ -282,13 +282,17 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
   const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
   const { name, annualMonthlyFee } = plan;
 
-  const planSupportsAnnual = annualMonthlyFee.amount > 0;
+  const planSupportsAnnual = Boolean(annualMonthlyFee);
 
   const fee = React.useMemo(() => {
     if (!planSupportsAnnual) {
       return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
+
+    return planPeriod === 'annual'
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.annualMonthlyFee!
+      : plan.fee;
   }, [planSupportsAnnual, planPeriod, plan.fee, plan.annualMonthlyFee]);
 
   const feeFormatted = React.useMemo(() => {

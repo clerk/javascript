@@ -17,6 +17,11 @@ export const teIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'కాపీ చేసి మూసివేయి',
+      formHint: 'భద్రత కారణాల కోసం, మేము మీకు తర్వాత దాన్ని మళ్లీ చూడడానికి అనుమతించము.',
+      formTitle: 'ఇప్పుడే మీ "{{name}}" API కీని కాపీ చేయండి',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const teIN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'మీ ఫోన్ నంబర్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API కీ',
+  formFieldLabel__apiKeyDescription: 'వివరణ',
+  formFieldLabel__apiKeyExpiration: 'కాలం ముగిసింది',
+  formFieldLabel__apiKeyName: 'రహస్య కీ పేరు',
   formFieldLabel__automaticInvitations: 'ఈ డొమైన్ కోసం స్వయంచాలక ఆహ్వానాలను ప్రారంభించండి',
   formFieldLabel__backupCode: 'బ్యాకప్ కోడ్',
   formFieldLabel__confirmDeletion: 'నిర్ధారణ',
@@ -610,6 +616,12 @@ export const teIN: LocalizationResource = {
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
+    emailCodeMfa: {
+      formTitle: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
+      subtitle: '{{applicationName}}కి కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'కొనసాగించడానికి, మీరు సైన్-ఇన్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
@@ -645,6 +657,12 @@ export const teIN: LocalizationResource = {
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'మీ ఇమెయిల్‌కు పంపబడిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
+      resendButton: 'లింక్ రాలేదా? మళ్లీ పంపండి',
+      subtitle: '{{applicationName}} కు కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -662,6 +680,8 @@ export const teIN: LocalizationResource = {
       label__alternativeMethods: 'లేదా, మరొక పద్ధతితో సైన్ ఇన్ చేయండి',
       title: 'పాస్‌వర్డ్ మర్చిపోయారా?',
     },
+    newDeviceVerificationNotice:
+      'మీరు కొత్త పరికరం నుండి సైన్ ఇన్ చేస్తున్నారు. మీ ఖాతాను సురక్షితంగా ఉంచడానికి మేము ధృవీకరణను అభ్యర్థిస్తున్నాము.',
     noAvailableMethods: {
       message: 'సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.',
       subtitle: 'లోపం సంభవించింది',
