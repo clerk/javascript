@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
-import { css, type Theme } from '@emotion/react';
+import { css, type SerializedStyles, type Theme } from '@emotion/react';
 import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
@@ -211,12 +211,13 @@ const EnableOrganizationsPromptInternal = ({
 
             <Flex
               direction='col'
+              align='start'
               sx={t => ({
                 gap: t.sizes.$0x5,
               })}
             >
               {isEnabled ? (
-                <span
+                <p
                   css={[
                     basePromptElementStyles,
                     css`
@@ -229,28 +230,18 @@ const EnableOrganizationsPromptInternal = ({
                 >
                   The Organizations feature has been enabled for your application. A default organization named &quot;My
                   Organization&quot; was created automatically. You can manage or rename it in your{' '}
-                  <a
-                    css={[
-                      basePromptElementStyles,
-                      css`
-                        color: #a8a8ff;
-                        font-size: inherit;
-                        font-weight: 500;
-                        line-height: 1.3;
-                        font-size: 0.8125rem;
-                      `,
-                    ]}
+                  <Link
                     href={organizationsDashboardUrl}
                     target='_blank'
                     rel='noopener noreferrer'
                   >
                     dashboard
-                  </a>
+                  </Link>
                   .
-                </span>
+                </p>
               ) : (
                 <>
-                  <span
+                  <p
                     css={[
                       basePromptElementStyles,
                       css`
@@ -277,25 +268,15 @@ const EnableOrganizationsPromptInternal = ({
                     </code>{' '}
                     {isComponent ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations feature for your
                     app first.
-                  </span>
+                  </p>
 
-                  <a
-                    css={[
-                      basePromptElementStyles,
-                      css`
-                        color: #a8a8ff;
-                        font-size: inherit;
-                        font-weight: 500;
-                        line-height: 1.5;
-                        font-size: 0.8125rem;
-                      `,
-                    ]}
+                  <Link
                     href='https://clerk.com/docs/guides/organizations/overview'
                     target='_blank'
                     rel='noopener noreferrer'
                   >
                     Learn more about Organizations.
-                  </a>
+                  </Link>
                 </>
               )}
             </Flex>
@@ -593,6 +574,31 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           </Span>
         ) : null}
       </Flex>
+    );
+  },
+);
+
+const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: SerializedStyles }>(
+  ({ children, css: cssProp, ...props }, ref) => {
+    return (
+      <a
+        ref={ref}
+        {...props}
+        css={[
+          basePromptElementStyles,
+          css`
+            color: #a8a8ff;
+            font-size: inherit;
+            font-weight: 500;
+            line-height: 1.3;
+            font-size: 0.8125rem;
+            min-width: 0;
+          `,
+          cssProp,
+        ]}
+      >
+        {children}
+      </a>
     );
   },
 );
