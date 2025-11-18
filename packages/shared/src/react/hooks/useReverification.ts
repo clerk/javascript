@@ -37,9 +37,18 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
 /**
  * @interface
  */
-type NeedsReverificationParameters = {
+export type NeedsReverificationParameters = {
+  /**
+   * Marks the reverification process as cancelled and rejects the original request.
+   */
   cancel: () => void;
+  /**
+   * Marks the reverification process as complete and retries the original request.
+   */
   complete: () => void;
+  /**
+   * The verification level required for the reverification process.
+   */
   level: SessionVerificationLevel | undefined;
 };
 
@@ -48,13 +57,14 @@ type NeedsReverificationParameters = {
  *
  * @interface
  */
-type UseReverificationOptions = {
+export type UseReverificationOptions = {
   /**
-   * A handler that is called when reverification is needed, this will opt-out of using the default UI when provided.
+   * Handler for the reverification process. Opts out of using the default UI. Use this to build a custom UI.
    *
-   * @param cancel - A function that will cancel the reverification process.
-   * @param complete - A function that will retry the original request after reverification.
-   * @param level - The level returned with the reverification hint.
+   * @param properties - Callbacks and info to control the reverification flow.
+   * @param properties.cancel - A function that will cancel the reverification process.
+   * @param properties.complete - A function that will retry the original request after reverification.
+   * @param properties.level - The level returned with the reverification hint.
    */
   onNeedsReverification?: (properties: NeedsReverificationParameters) => void;
 };
@@ -73,7 +83,13 @@ type UseReverification = <
   Fetcher extends (...args: any[]) => Promise<any> | undefined,
   Options extends UseReverificationOptions = UseReverificationOptions,
 >(
+  /**
+   * A function that returns a promise.
+   */
   fetcher: Fetcher,
+  /**
+   * Optional configuration object extending [`UseReverificationOptions`](https://clerk.com/docs/reference/hooks/use-reverification#use-reverification-options).
+   */
   options?: Options,
 ) => UseReverificationResult<Fetcher>;
 

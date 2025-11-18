@@ -169,11 +169,14 @@ export type PaymentElementProviderProps = {
    */
   stripeAppearance?: internalStripeAppearance;
   /**
-   * Default to `user` if not provided.
+   * Specifies whether to fetch for the current user or organization.
    *
    * @default 'user'
    */
   for?: ForPayerType;
+  /**
+   * An optional description to display to the user within the payment element UI.
+   */
   paymentDescription?: string;
 };
 
@@ -257,7 +260,17 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
   return <DummyStripeUtils>{props.children}</DummyStripeUtils>;
 };
 
-const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
+/**
+ * @interface
+ */
+export type PaymentElementProps = {
+  /**
+   * Optional fallback content, such as a loading skeleton, to display while the payment form is being initialized.
+   */
+  fallback?: ReactNode;
+};
+
+const PaymentElement = ({ fallback }: PaymentElementProps) => {
   const {
     setIsPaymentElementReady,
     paymentMethodOrder,
@@ -324,7 +337,13 @@ const throwLibsMissingError = () => {
   );
 };
 
-type UsePaymentElementReturn = {
+/**
+ * @interface
+ */
+export type UsePaymentElementReturn = {
+  /**
+   * A function that submits the payment form data to the payment provider. It returns a promise that resolves with either a `data` object containing a payment token on success, or an `error` object on failure.
+   */
   submit: () => Promise<
     | {
         data: { gateway: 'stripe'; paymentToken: string };
@@ -335,13 +354,25 @@ type UsePaymentElementReturn = {
         error: PaymentElementError;
       }
   >;
+  /**
+   * A function that resets the payment form to its initial, empty state.
+   */
   reset: () => Promise<void>;
+  /**
+   * A boolean that indicates if the payment form UI has been rendered and is ready for user input. This is useful for disabling a submit button until the form is interactive.
+   */
   isFormReady: boolean;
 } & (
   | {
+      /**
+       * An object containing information about the initialized payment provider. It is `undefined` until `isProviderReady` is `true`.
+       */
       provider: {
         name: 'stripe';
       };
+      /**
+       * A boolean that indicates if the underlying payment provider (e.g. Stripe) has been fully initialized.
+       */
       isProviderReady: true;
     }
   | {

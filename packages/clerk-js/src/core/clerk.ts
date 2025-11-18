@@ -170,6 +170,7 @@ import { createClientFromJwt } from './jwt-client';
 import { APIKeys } from './modules/apiKeys';
 import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
+import { Protect } from './protect';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -235,6 +236,7 @@ export class Clerk implements ClerkInterface {
   #domain: DomainOrProxyUrl['domain'];
   #proxyUrl: DomainOrProxyUrl['proxyUrl'];
   #authService?: AuthCookieService;
+  #protect?: Protect;
   #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: BroadcastChannel | null = null;
   #clerkUi?: Promise<ClerkUi>;
@@ -437,6 +439,7 @@ export class Clerk implements ClerkInterface {
 
     // This line is used for the piggy-backing mechanism
     BaseResource.clerk = this;
+    this.#protect = new Protect();
   }
 
   public getFapiClient = (): FapiClient => this.#fapiClient;
@@ -537,6 +540,7 @@ export class Clerk implements ClerkInterface {
           ...(telemetryEnabled && this.telemetry ? { telemetryCollector: this.telemetry } : {}),
         });
       }
+      this.#protect?.load(this.environment as Environment);
       debugLogger.info('load() complete', {}, 'clerk');
     } catch (error) {
       this.#publicEventBus.emit(clerkEvents.Status, 'error');
@@ -1200,11 +1204,11 @@ export class Clerk implements ClerkInterface {
   /**
    * @experimental This API is in early access and may change in future releases.
    *
-   * Mount a api keys component at the target element.
+   * Mount a API keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
    * @param props Configuration parameters.
    */
-  public mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
+  public mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps) => {
     logger.warnOnce('Clerk: <APIKeys /> component is in early access and not yet recommended for production use.');
 
     if (disabledAllAPIKeysFeatures(this, this.environment)) {
@@ -1253,12 +1257,12 @@ export class Clerk implements ClerkInterface {
   /**
    * @experimental This API is in early access and may change in future releases.
    *
-   * Unmount a api keys component from the target element.
+   * Unmount a API keys component from the target element.
    * If there is no component mounted at the target node, results in a noop.
    *
-   * @param targetNode Target node to unmount the ApiKeys component from.
+   * @param targetNode Target node to unmount the APIKeys component from.
    */
-  public unmountApiKeys = (node: HTMLDivElement) => {
+  public unmountAPIKeys = (node: HTMLDivElement) => {
     void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 

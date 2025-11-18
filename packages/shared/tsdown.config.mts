@@ -23,6 +23,7 @@ export default defineConfig(({ watch }) => {
       JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
       __DEV__: `${watch}`,
       __BUILD_DISABLE_RHC__: JSON.stringify(false),
+      __CLERK_USE_RQ__: `${process.env.CLERK_USE_RQ === 'true'}`,
     },
   } satisfies Options;
 

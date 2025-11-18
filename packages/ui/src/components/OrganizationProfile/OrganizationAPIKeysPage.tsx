@@ -5,7 +5,7 @@ import { Col, localizationKeys } from '@/ui/customizables';
 import { Header } from '@/ui/elements/Header';
 import { useUnsafeNavbarContext } from '@/ui/elements/Navbar';
 
-import { APIKeysPage } from '../ApiKeys/ApiKeys';
+import { APIKeysPage } from '../APIKeys/APIKeys';
 
 export const OrganizationAPIKeysPage = () => {
   const { organization } = useOrganization();

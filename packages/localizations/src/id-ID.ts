@@ -614,6 +614,12 @@ export const idID: LocalizationResource = {
       subtitle: 'untuk melanjutkan ke {{applicationName}}',
       title: 'Periksa email Anda',
     },
+    emailCodeMfa: {
+      formTitle: 'Periksa email Anda',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -650,6 +656,12 @@ export const idID: LocalizationResource = {
         titleNewTab: 'Masuk di tab lain',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gunakan tautan verifikasi yang dikirim ke email Anda',
+      resendButton: 'Tidak menerima tautan? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -667,6 +679,8 @@ export const idID: LocalizationResource = {
       label__alternativeMethods: 'Atau, masuk dengan metode lain',
       title: 'Lupa Kata Sandi?',
     },
+    newDeviceVerificationNotice:
+      'Anda masuk dari perangkat baru. Kami meminta verifikasi untuk menjaga keamanan akun Anda.',
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan masuk. Tidak ada faktor autentikasi yang tersedia.',
       subtitle: 'Terjadi kesalahan',

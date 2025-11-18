@@ -34,12 +34,13 @@ const cachingSWRInfiniteOptions = {
  *
  * @internal
  */
-export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
-  const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
+export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
+  const { fetcher, config, keys } = params;
+  const [paginatedPage, setPaginatedPage] = useState(config.initialPage ?? 1);
 
   // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(params.initialPage ?? 1);
-  const pageSizeRef = useRef(params.pageSize ?? 10);
+  const initialPageRef = useRef(config.initialPage ?? 1);
+  const pageSizeRef = useRef(config.pageSize ?? 10);
 
   const enabled = config.enabled ?? true;
   const cacheMode = config.__experimental_mode === 'cache';
@@ -48,8 +49,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
   const isSignedIn = config.isSignedIn;
 
   const pagesCacheKey = {
-    ...cacheKeys,
-    ...params,
+    type: keys.queryKey[0],
+    ...keys.queryKey[2],
+    ...keys.queryKey[3].args,
     initialPage: paginatedPage,
     pageSize: pageSizeRef.current,
   };
@@ -89,8 +91,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
           if (isSignedIn === false || shouldFetch === false) {
             return null;
           }
-          const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
-          return fetcher({ ...params, ...requestParams });
+          const requestParams = getDifferentKeys(cacheKeyParams, { type: keys.queryKey[0], ...keys.queryKey[2] });
+          // @ts-ignore - fetcher expects Params subset; narrowing at call-site
+          return fetcher(requestParams);
         }
       : null;
 
@@ -133,17 +136,18 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
       }
 
       return {
-        ...params,
-        ...cacheKeys,
+        type: keys.queryKey[0],
+        ...keys.queryKey[2],
+        ...keys.queryKey[3].args,
         initialPage: initialPageRef.current + pageIndex,
         pageSize: pageSizeRef.current,
       };
     },
     cacheKeyParams => {
-      // @ts-ignore - remove cache-only keys from request params
-      const requestParams = getDifferentKeys(cacheKeyParams, cacheKeys);
       // @ts-ignore - fetcher expects Params subset; narrowing at call-site
-      return fetcher?.({ ...params, ...requestParams });
+      const requestParams = getDifferentKeys(cacheKeyParams, { type: keys.queryKey[0], ...keys.queryKey[2] });
+      // @ts-ignore - fetcher expects Params subset; narrowing at call-site
+      return fetcher?.(requestParams);
     },
     cachingSWRInfiniteOptions,
   );

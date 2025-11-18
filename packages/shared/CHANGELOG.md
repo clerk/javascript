@@ -1,5 +1,47 @@
 # Change Log
 
+## 3.35.0
+
+### Minor Changes
+
+- Introduced initial Clerk Protect dynamic loader and related types to support dynamically enabling and rolling out Protect in the environment. ([#7227](https://github.com/clerk/javascript/pull/7227)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Standardized API keys naming convention ([#7223](https://github.com/clerk/javascript/pull/7223)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add support for sign-up via modal in signals implementation ([#7193](https://github.com/clerk/javascript/pull/7193)) by [@dstaley](https://github.com/dstaley)
+
+- Billing hooks now accept a `{ enabled: boolean }` option, that controls the whether or not a request will fire. ([#7202](https://github.com/clerk/javascript/pull/7202)) by [@panteliselef](https://github.com/panteliselef)
+
+- Ensure all hooks use typedoc for clerk docs ([#6901](https://github.com/clerk/javascript/pull/6901)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+### Patch Changes
+
+- Update how cache keys are created in SWR/RQ hooks. ([#7217](https://github.com/clerk/javascript/pull/7217)) by [@panteliselef](https://github.com/panteliselef)
+
+- Support `keepPreviousData` behaviour in the internal React Query variant of `useSubscription`. ([#7203](https://github.com/clerk/javascript/pull/7203)) by [@panteliselef](https://github.com/panteliselef)
+
+- Relaxing requirements for RQ variant hooks to enable revalidation across different configurations of the same hook. ([#7228](https://github.com/clerk/javascript/pull/7228)) by [@panteliselef](https://github.com/panteliselef)
+
+  ```tsx
+  const { revalidate } = useStatements({ initialPage: 1, pageSize: 10 });
+  useStatements({ initialPage: 1, pageSize: 12 });
+
+  // revalidate from first hook, now invalidates the second hook.
+  void revalidate();
+  ```
+
+## 3.34.0
+
+### Minor Changes
+
+- [Experimental] Update `errors` to have specific field types based on whether it's a sign-in or a sign-up. ([#7195](https://github.com/clerk/javascript/pull/7195)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Removed internal parameter when creating API keys ([#7207](https://github.com/clerk/javascript/pull/7207)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Build internal variants of all paginated hooks that use React Query instead of SWR. ([#7143](https://github.com/clerk/javascript/pull/7143)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.33.0
 
 ### Minor Changes

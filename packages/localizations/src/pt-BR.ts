@@ -621,6 +621,12 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifique seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
@@ -656,6 +662,12 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use o link de verificação enviado para o seu e-mail',
+      resendButton: 'Não recebeu o link? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -673,6 +685,8 @@ export const ptBR: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu a senha?',
     },
+    newDeviceVerificationNotice:
+      'Você está entrando de um novo dispositivo. Estamos solicitando verificação para manter sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',
