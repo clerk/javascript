@@ -28,7 +28,7 @@ import type {
   BillingNamespace,
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
-  CheckoutFutureResource,
+  CheckoutFlowResource,
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
@@ -111,7 +111,7 @@ export interface CheckoutSignalValue {
   /**
    * An instance representing the currently active `Checkout`.
    */
-  checkout: CheckoutFutureResource;
+  checkout: CheckoutFlowResource;
 }
 
 export interface CheckoutSignal {

@@ -869,7 +869,7 @@ export interface BillingPayerResource extends ClerkResource {
   organizationName?: string | null;
 }
 
-export interface CheckoutFutureProperties {
+export interface CheckoutFlowProperties {
   /**
    * A client secret from an external payment provider (such as Stripe) used to complete the payment on the client-side.
    */
@@ -925,16 +925,16 @@ export interface CheckoutFutureProperties {
 type CheckoutPropertiesPerStatus =
   | ({
       status: 'needs_initialization';
-    } & ForceNull<CheckoutFutureProperties>)
+    } & ForceNull<CheckoutFlowProperties>)
   | ({
       status: 'needs_confirmation' | 'completed';
-    } & CheckoutFutureProperties);
+    } & CheckoutFlowProperties);
 
-export interface CheckoutFutureFinalizeParams {
+export interface CheckoutFlowFinalizeParams {
   navigate: SetActiveNavigate;
 }
 
-export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
+export type CheckoutFlowResource = CheckoutPropertiesPerStatus & {
   /**
    * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
    */
@@ -955,10 +955,10 @@ export type CheckoutFutureResource = CheckoutPropertiesPerStatus & {
    * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
    * subscription state (such as the `useSubscription()` hook) to update automatically.
    */
-  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+  finalize: (params?: CheckoutFlowFinalizeParams) => Promise<{ error: ClerkError | null }>;
 };
 
-export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
+export type CheckoutFlowResourceLax = CheckoutFlowProperties & {
   status: 'needs_initialization' | 'needs_confirmation' | 'completed';
 } & {
   /**
@@ -981,5 +981,5 @@ export type CheckoutFutureResourceLax = CheckoutFutureProperties & {
    * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
    * subscription state (such as the `useSubscription()` hook) to update automatically.
    */
-  finalize: (params?: CheckoutFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
+  finalize: (params?: CheckoutFlowFinalizeParams) => Promise<{ error: ClerkError | null }>;
 };

@@ -1,6 +1,6 @@
 import type { __experimental_CheckoutOptions, CheckoutSignalValue } from '@clerk/shared/types';
 
-import { CheckoutFuture, createSignals } from '@/core/resources/BillingCheckout';
+import { CheckoutFlow, createSignals } from '@/core/resources/BillingCheckout';
 
 import type { Clerk } from '../../clerk';
 
@@ -19,7 +19,7 @@ function cacheKey(options: { userId: string; orgId?: string; planId: string; pla
  */
 const CheckoutSignalCache = new Map<
   CheckoutKey,
-  { resource: CheckoutFuture; signals: ReturnType<typeof createSignals> }
+  { resource: CheckoutFlow; signals: ReturnType<typeof createSignals> }
 >();
 
 /**
@@ -52,7 +52,7 @@ function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOp
 
   const signals = createSignals();
 
-  const checkout = new CheckoutFuture(signals, {
+  const checkout = new CheckoutFlow(signals, {
     ...(forOrganization === 'organization' ? { orgId: clerk.organization?.id } : {}),
     planId,
     planPeriod,

@@ -8,9 +8,9 @@ import type {
   BillingPayerResource,
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
-  CheckoutFutureFinalizeParams,
-  CheckoutFutureResource,
-  CheckoutFutureResourceLax,
+  CheckoutFlowFinalizeParams,
+  CheckoutFlowResource,
+  CheckoutFlowResourceLax,
   CheckoutSignalValue,
   ConfirmCheckoutParams,
   CreateCheckoutParams,
@@ -101,10 +101,10 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
 }
 
 export const createSignals = () => {
-  const resourceSignal = signal<{ resource: CheckoutFuture | null }>({ resource: null });
+  const resourceSignal = signal<{ resource: CheckoutFlow | null }>({ resource: null });
   const errorSignal = signal<{ error: ClerkError | null }>({ error: null });
   const fetchSignal = signal<{ status: 'idle' | 'fetching' }>({ status: 'idle' });
-  const computedSignal = computed<Omit<CheckoutSignalValue, 'checkout'> & { checkout: CheckoutFutureResource | null }>(
+  const computedSignal = computed<Omit<CheckoutSignalValue, 'checkout'> & { checkout: CheckoutFlowResource | null }>(
     () => {
       const resource = resourceSignal().resource;
       const error = errorSignal().error;
@@ -120,7 +120,7 @@ export const createSignals = () => {
 
 type CheckoutTask = 'start' | 'confirm' | 'finalize';
 
-export class CheckoutFuture implements CheckoutFutureResourceLax {
+export class CheckoutFlow implements CheckoutFlowResourceLax {
   private resource = new BillingCheckout(null);
   private readonly config: CreateCheckoutParams;
   private readonly signals: ReturnType<typeof createSignals>;
@@ -198,7 +198,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
     });
   }
 
-  async finalize(params?: CheckoutFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
+  async finalize(params?: CheckoutFlowFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
     return this.runAsyncCheckoutTask('finalize', async () => {
       if (this.resource.status !== 'completed') {
@@ -220,7 +220,7 @@ export class CheckoutFuture implements CheckoutFutureResourceLax {
 }
 
 function createRunAsyncCheckoutTask(
-  resource: CheckoutFuture,
+  resource: CheckoutFlow,
   signals: ReturnType<typeof createSignals>,
   pendingOperations: Map<CheckoutTask, Promise<{ error: unknown }> | null>,
 ): <T>(
