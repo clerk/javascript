@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
-import { css } from '@emotion/react';
+import { css, type Theme } from '@emotion/react';
 import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
 import { Modal } from '@/ui/elements/Modal';
@@ -88,7 +88,8 @@ const EnableOrganizationsPromptInternal = ({
           sx={() => ({
             display: 'flex',
             flexDirection: 'column',
-            maxWidth: '30rem',
+            width: '30rem',
+            maxWidth: 'calc(100vw - 2rem)',
           })}
         >
           <Flex
@@ -314,8 +315,10 @@ const EnableOrganizationsPromptInternal = ({
           <span
             css={css`
               height: 1px;
+              display: block;
+              width: calc(100% - 2px);
+              margin-inline: auto;
               background-color: #151515;
-              width: 100%;
               box-shadow: 0px 1px 0px 0px #424242;
             `}
           />
@@ -466,92 +469,131 @@ type SwitchProps = React.ComponentProps<'input'> & {
   description?: string;
 };
 
-const Switch = forwardRef<HTMLInputElement, SwitchProps>(({ label, description, ...props }, ref) => {
-  const descriptionId = useId();
-  return (
-    <Flex
-      direction='col'
-      gap={1}
-    >
+const TRACK_PADDING = '2px';
+const TRACK_INNER_WIDTH = (t: Theme) => t.sizes.$6;
+const TRACK_HEIGHT = (t: Theme) => t.sizes.$4;
+const THUMB_WIDTH = (t: Theme) => t.sizes.$3;
+
+const Switch = forwardRef<HTMLInputElement, SwitchProps>(
+  ({ label, description, checked: controlledChecked, defaultChecked, onChange, ...props }, ref) => {
+    const descriptionId = useId();
+
+    const isControlled = controlledChecked !== undefined;
+    const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
+    const checked = isControlled ? controlledChecked : internalChecked;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!isControlled) {
+        setInternalChecked(e.target.checked);
+      }
+      onChange?.(e);
+    };
+
+    return (
       <Flex
-        as='label'
-        gap={2}
-        align='center'
-        sx={{
-          isolation: 'isolate',
-          userSelect: 'none',
-          '&:has(input:focus-visible) > input + span': {
-            outline: '2px solid white',
-            outlineOffset: '2px',
-          },
-        }}
+        direction='col'
+        gap={1}
       >
-        <input
-          type='checkbox'
-          {...props}
-          ref={ref}
-          role='switch'
-          css={{ ...common.visuallyHidden() }}
-          aria-describedby={description ? descriptionId : undefined}
-        />
-        <Span
-          sx={t => ({
-            display: 'flex',
-            alignItems: 'center',
-            paddingInline: '2px',
-            width: `calc(${t.sizes.$6} + 2px)`,
-            height: `calc(${t.sizes.$4} + 2px)`,
-            border: `1px solid rgba(118, 118, 132, 0.25)`,
-            backgroundColor: props.checked ? 'rgba(255, 255, 255, 0.75)' : `rgba(255, 255, 255, 0.1)`,
-            borderRadius: 999,
-            '&:hover:not(:disabled)': {
-              borderColor: `rgba(118, 118, 132, 0.5)`,
+        <Flex
+          as='label'
+          gap={2}
+          align='center'
+          sx={{
+            isolation: 'isolate',
+            userSelect: 'none',
+            '&:has(input:focus-visible) > input + span': {
+              outline: '2px solid white',
+              outlineOffset: '2px',
             },
-          })}
+            '&:has(input:disabled) > input + span': {
+              opacity: 0.6,
+              cursor: 'not-allowed',
+              pointerEvents: 'none',
+            },
+          }}
         >
-          <Span
-            sx={t => ({
-              width: t.sizes.$3,
-              height: t.sizes.$3,
-              borderRadius: 9999,
-              backgroundColor: 'white',
-              transform: `translateX(${props.checked ? t.sizes.$2 : 0})`,
-              transition: 'transform 0.2s',
-            })}
+          <input
+            type='checkbox'
+            {...props}
+            ref={ref}
+            role='switch'
+            checked={checked}
+            onChange={handleChange}
+            defaultChecked={defaultChecked}
+            css={{ ...common.visuallyHidden() }}
+            aria-describedby={description ? descriptionId : undefined}
           />
-        </Span>
-        <span
-          css={[
-            basePromptElementStyles,
-            css`
-              font-size: 0.875rem;
-              font-weight: 500;
-              line-height: 1.25;
-              color: white;
-            `,
-          ]}
-        >
-          {label}
-        </span>
+          <Span
+            sx={t => {
+              const trackWidth = `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING})`;
+              const trackHeight = `calc(${TRACK_HEIGHT(t)} + ${TRACK_PADDING})`;
+              return {
+                display: 'flex',
+                alignItems: 'center',
+                paddingInline: TRACK_PADDING,
+                width: trackWidth,
+                height: trackHeight,
+                border: `1px solid rgba(118, 118, 132, 0.25)`,
+                backgroundColor: checked ? 'rgba(255, 255, 255, 0.75)' : `rgba(255, 255, 255, 0.1)`,
+                borderRadius: 999,
+                transition: 'background-color 0.2s ease-in-out',
+                '&:hover': {
+                  borderColor: `rgba(118, 118, 132, 0.5)`,
+                },
+              };
+            }}
+          >
+            <Span
+              sx={t => {
+                const size = THUMB_WIDTH(t);
+                const maxTranslateX = `calc(${TRACK_INNER_WIDTH(t)} - ${size} - ${TRACK_PADDING})`;
+                return {
+                  width: size,
+                  height: size,
+                  borderRadius: 9999,
+                  backgroundColor: 'white',
+                  transform: `translateX(${checked ? maxTranslateX : '0'})`,
+                  transition: 'transform 0.2s ease-in-out',
+                  '@media (prefers-reduced-motion: reduce)': {
+                    transition: 'none',
+                  },
+                };
+              }}
+            />
+          </Span>
+          <span
+            css={[
+              basePromptElementStyles,
+              css`
+                font-size: 0.875rem;
+                font-weight: 500;
+                line-height: 1.25;
+                color: white;
+              `,
+            ]}
+          >
+            {label}
+          </span>
+        </Flex>
+        {description ? (
+          <Span
+            id={descriptionId}
+            sx={t => [
+              basePromptElementStyles,
+              {
+                display: 'block',
+                paddingInlineStart: `calc(${t.sizes.$6} + 2px + ${t.sizes.$2})`,
+                fontSize: '0.75rem',
+                lineHeight: '1.3333333333',
+                color: '#c3c3c6',
+                textWrap: 'pretty',
+              },
+            ]}
+          >
+            {description}
+          </Span>
+        ) : null}
       </Flex>
-      {description ? (
-        <Span
-          id={descriptionId}
-          sx={t => [
-            basePromptElementStyles,
-            {
-              display: 'block',
-              paddingInlineStart: `calc(${t.sizes.$6} + 2px + ${t.sizes.$2})`,
-              fontSize: '0.75rem',
-              lineHeight: '1.3333333333',
-              color: '#c3c3c6',
-              textWrap: 'pretty',
-            },
-          ]}
-        >
-          {description}
-        </Span>
-      ) : null}
-    </Flex>
-  );
-});
+    );
+  },
+);
