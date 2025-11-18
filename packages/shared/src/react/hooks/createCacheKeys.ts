@@ -1,13 +1,14 @@
+import type { ResourceCacheStableKey } from '../stable-keys';
+
 /**
  * @internal
  */
 export function createCacheKeys<
   Params,
-  StableKey extends string,
   T extends Record<string, unknown> = Record<string, unknown>,
   U extends Record<string, unknown> | undefined = undefined,
 >(params: {
-  stablePrefix: StableKey;
+  stablePrefix: ResourceCacheStableKey;
   authenticated: boolean;
   tracked: T;
   untracked: U extends { args: Params } ? U : never;

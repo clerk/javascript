@@ -17,6 +17,7 @@ import {
   useOrganizationContext,
   useSessionContext,
 } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
@@ -368,7 +369,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: domainSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'domains',
+      stablePrefix: STABLE_KEYS.DOMAINS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,
@@ -390,7 +391,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: membershipRequestSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'membershipRequests',
+      stablePrefix: STABLE_KEYS.MEMBERSHIP_REQUESTS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,
@@ -412,7 +413,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: membersSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'members',
+      stablePrefix: STABLE_KEYS.MEMBERSHIPS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,
@@ -434,7 +435,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: invitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'invitations',
+      stablePrefix: STABLE_KEYS.INVITATIONS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,

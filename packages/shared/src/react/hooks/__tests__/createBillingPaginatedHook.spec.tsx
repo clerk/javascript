@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ClerkResource } from '../../../types';
+import type { ResourceCacheStableKey } from '../../stable-keys';
 import { createBillingPaginatedHook } from '../createBillingPaginatedHook';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
 import { wrapper } from './wrapper';
@@ -33,13 +34,13 @@ const useFetcherMock = vi.fn(() => fetcherMock);
 
 const useDummyAuth = createBillingPaginatedHook<DummyResource, DummyParams>({
   hookName: 'useDummyAuth',
-  resourceType: 'dummy',
+  resourceType: 'dummy' as ResourceCacheStableKey,
   useFetcher: useFetcherMock,
 });
 
 const useDummyUnauth = createBillingPaginatedHook<DummyResource, DummyParams>({
   hookName: 'useDummyUnauth',
-  resourceType: 'dummy',
+  resourceType: 'dummy' as ResourceCacheStableKey,
   useFetcher: useFetcherMock,
   options: { unauthenticated: true },
 });

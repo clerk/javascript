@@ -1,5 +1,6 @@
 import type { BillingStatementResource, GetStatementsParams } from '../../types';
 import { useClerkInstanceContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
@@ -7,7 +8,7 @@ import { createBillingPaginatedHook } from './createBillingPaginatedHook';
  */
 export const useStatements = createBillingPaginatedHook<BillingStatementResource, GetStatementsParams>({
   hookName: 'useStatements',
-  resourceType: 'billing-statements',
+  resourceType: STABLE_KEYS.STATEMENTS_KEY,
   useFetcher: () => {
     const clerk = useClerkInstanceContext();
     if (clerk.loaded) {
