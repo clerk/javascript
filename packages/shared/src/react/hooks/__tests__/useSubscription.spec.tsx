@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createDeferredPromise } from '../../../utils/createDeferredPromise';
 import { useSubscription } from '../useSubscription';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
 import { wrapper } from './wrapper';
@@ -143,5 +144,91 @@ describe('useSubscription', () => {
 
     expect(getSubscriptionSpy).toHaveBeenCalledTimes(1);
     expect(result.current.isFetching).toBe(false);
+  });
+
+  it('retains previous data while refetching when keepPreviousData=true', async () => {
+    const { result, rerender } = renderHook(
+      ({ orgId, keepPreviousData }) => {
+        mockOrganization = createMockOrganization({ id: orgId });
+        return useSubscription({ for: 'organization', keepPreviousData });
+      },
+      {
+        wrapper,
+        initialProps: { orgId: 'org_1', keepPreviousData: true },
+      },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
+
+    const deferred = createDeferredPromise();
+    getSubscriptionSpy.mockImplementationOnce(() => deferred.promise as Promise<{ id: string }>);
+
+    rerender({ orgId: 'org_2', keepPreviousData: true });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+
+    // Slight difference in behavior between SWR and React Query, but acceptable for the migration.
+    if (__CLERK_USE_RQ__) {
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+    } else {
+      await waitFor(() => expect(result.current.isLoading).toBe(true));
+    }
+    expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
+
+    deferred.resolve({ id: 'sub_org_org_2' });
+
+    await waitFor(() => expect(result.current.data).toEqual({ id: 'sub_org_org_2' }));
+    expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('clears data while refetching when keepPreviousData=false', async () => {
+    const { result, rerender } = renderHook(
+      ({ orgId, keepPreviousData }) => {
+        mockOrganization = createMockOrganization({ id: orgId });
+        return useSubscription({ for: 'organization', keepPreviousData });
+      },
+      {
+        wrapper,
+        initialProps: { orgId: 'org_1', keepPreviousData: false },
+      },
+    );
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_org_org_1' });
+
+    const deferred = createDeferredPromise();
+    getSubscriptionSpy.mockImplementationOnce(() => deferred.promise as Promise<{ id: string }>);
+
+    rerender({ orgId: 'org_2', keepPreviousData: false });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(true));
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data).toBeUndefined();
+
+    deferred.resolve({ id: 'sub_org_org_2' });
+
+    await waitFor(() => expect(result.current.isFetching).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_org_org_2' });
+    expect(result.current.isLoading).toBe(false);
+    expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('revalidate fetches the latest subscription data', async () => {
+    getSubscriptionSpy
+      .mockImplementationOnce(() => Promise.resolve({ id: 'sub_user_initial' }))
+      .mockImplementationOnce(() => Promise.resolve({ id: 'sub_user_refetched' }));
+
+    const { result } = renderHook(() => useSubscription(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual({ id: 'sub_user_initial' });
+
+    await act(async () => {
+      await result.current.revalidate();
+    });
+
+    await waitFor(() => expect(result.current.data).toEqual({ id: 'sub_user_refetched' }));
+    expect(getSubscriptionSpy).toHaveBeenCalledTimes(2);
   });
 });

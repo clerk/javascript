@@ -36,6 +36,8 @@ export async function createClerkClient({
   syncHost,
 }: CreateClerkClientOptions): Promise<Clerk> {
   if (scope === SCOPE.BACKGROUND) {
+    // TODO @nikos
+    // @ts-expect-error will be replaced by clerk ui
     Clerk.mountComponentRenderer = undefined;
   }
 

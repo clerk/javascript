@@ -7,10 +7,6 @@ import 'regenerator-runtime/runtime';
 
 import { Clerk } from './core/clerk';
 
-import { mountComponentRenderer } from './ui/Components';
-
-Clerk.mountComponentRenderer = mountComponentRenderer;
-
 const publishableKey =
   document.querySelector('script[data-clerk-publishable-key]')?.getAttribute('data-clerk-publishable-key') ||
   window.__clerk_publishable_key ||
@@ -28,7 +24,6 @@ const domain =
 if (!window.Clerk) {
   window.Clerk = new Clerk(publishableKey, {
     proxyUrl,
-    // @ts-expect-error
     domain,
   });
 }

@@ -613,6 +613,12 @@ export const svSE: LocalizationResource = {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',
     },
+    emailCodeMfa: {
+      formTitle: 'Kontrollera din e-post',
+      resendButton: 'Fick du ingen kod? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din e-post',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -649,6 +655,12 @@ export const svSE: LocalizationResource = {
         titleNewTab: 'Loggade in på annan flik',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Använd verifieringslänken som skickades till din e-post',
+      resendButton: 'Fick du inte länken? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din e-post',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -666,6 +678,8 @@ export const svSE: LocalizationResource = {
       label__alternativeMethods: 'Eller, logga in med en annan metod',
       title: 'Glömt lösenord?',
     },
+    newDeviceVerificationNotice:
+      'Du loggar in från en ny enhet. Vi ber om verifiering för att hålla ditt konto säkert.',
     noAvailableMethods: {
       message: 'Kan inte fortsätta med inloggning. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',

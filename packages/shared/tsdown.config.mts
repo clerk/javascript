@@ -11,7 +11,7 @@ export default defineConfig(({ watch }) => {
   const common = {
     dts: true,
     sourcemap: true,
-    clean: true,
+    clean: false,
     target: 'es2022',
     platform: 'neutral',
     external: ['react', 'react-dom'],
@@ -22,6 +22,8 @@ export default defineConfig(({ watch }) => {
       PACKAGE_VERSION: `"${sharedPackage.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
       __DEV__: `${watch}`,
+      __BUILD_DISABLE_RHC__: JSON.stringify(false),
+      __CLERK_USE_RQ__: `${process.env.CLERK_USE_RQ === 'true'}`,
     },
   } satisfies Options;
 
@@ -44,6 +46,10 @@ export default defineConfig(({ watch }) => {
         './src/workerTimers/index.ts',
         './src/types/index.ts',
         './src/dom/*.ts',
+        './src/ui/index.ts',
+        './src/import/index.ts',
+        './src/internal/clerk-js/*.ts',
+        './src/internal/clerk-js/**/*.ts',
         '!./src/**/*.{test,spec}.{ts,tsx}',
       ],
       outDir: './dist/runtime',

@@ -10,7 +10,8 @@ export const requestHasAuthObject = (req: ExpressRequest): req is ExpressRequest
 export const loadClientEnv = () => {
   return {
     publishableKey: process.env.CLERK_PUBLISHABLE_KEY || '',
-    clerkJSUrl: process.env.CLERK_JS || '',
+    clerkJSUrl: process.env.CLERK_JS || process.env.CLERK_JS_URL || '',
+    clerkUiUrl: process.env.CLERK_UI_URL || '',
     clerkJSVersion: process.env.CLERK_JS_VERSION || '',
   };
 };

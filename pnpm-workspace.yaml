@@ -16,7 +16,7 @@ catalogs:
     tsup: 8.5.0
     typescript: 5.8.3
     zx: 8.8.5
-    rolldown: 1.0.0-beta.43
+    rolldown: 1.0.0-beta.47
 
 minimumReleaseAge: 2880
 

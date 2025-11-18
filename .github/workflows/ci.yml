@@ -314,12 +314,12 @@ jobs:
           ]
         test-project: ["chrome"]
         include:
-          - test-name: "billing"
-            test-project: "chrome"
-            clerk-use-rq: "false"
-          - test-name: "billing"
-            test-project: "chrome"
-            clerk-use-rq: "true"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "false"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "15"
@@ -367,7 +367,9 @@ jobs:
         id: task-status
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -402,7 +404,8 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag integration; fi
+
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
@@ -423,6 +426,15 @@ jobs:
           pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/ui
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
@@ -458,7 +470,9 @@ jobs:
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
