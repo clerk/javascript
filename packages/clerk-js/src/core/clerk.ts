@@ -752,8 +752,20 @@ export class Clerk implements ClerkInterface {
   ): { status: 'enabled' | 'prompt-shown' } => {
     const { for: setting, caller } = params;
 
-    // If not in development instance, return enabled status in order to not open the prompt
-    if (this.#instanceType !== 'development') {
+    if (!this.user) {
+      console.warn(
+        `Clerk: "${caller}" requires an active user session. Ensure a user is signed in before executing ${caller}.`,
+      );
+    }
+
+    if (
+      // Do not open the prompt if the user is not loaded, since the endpoint
+      // relies on the session
+      // Organization components already don't render if the session is not active
+      !this.user ||
+      // If not in development instance, return enabled status in order to not open the prompt
+      this.#instanceType !== 'development'
+    ) {
       return { status: 'enabled' };
     }
 
