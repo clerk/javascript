@@ -261,7 +261,6 @@ export class StateProxy implements State {
 
   private buildCheckoutProxy(params: CheckoutSignalProps): CheckoutSignalValue {
     const gateProperty = this.gateProperty.bind(this);
-    const gateMethod = this.gateMethod.bind(this);
     const targetCheckout = () => this.checkout(params);
     const target = () => targetCheckout().checkout;
 
@@ -311,7 +310,7 @@ export class StateProxy implements State {
 
         start: this.gateMethod<ReturnType<typeof target>, 'start'>(target, 'start'),
         confirm: this.gateMethod<ReturnType<typeof target>, 'confirm'>(target, 'confirm'),
-        finalize: gateMethod<ReturnType<typeof target>, 'finalize'>(target, 'finalize'),
+        finalize: this.gateMethod<ReturnType<typeof target>, 'finalize'>(target, 'finalize'),
       },
     };
   }
