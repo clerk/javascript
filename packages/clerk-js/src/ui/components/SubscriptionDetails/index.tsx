@@ -18,17 +18,10 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import {
-  normalizeFormatted,
-  SubscriberTypeContext,
-  usePlansContext,
-  useSubscriberTypeContext,
-  useSubscription,
-} from '../../contexts';
+import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -408,16 +401,8 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
         ? {
             label:
               subscription.planPeriod === 'month'
-                ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    currency: subscription.plan.annualFee!.currencySymbol,
-                  })
-                : localizationKeys('billing.switchToMonthlyWithPrice', {
-                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
-                    currency: subscription.plan.fee.currencySymbol,
-                  }),
+                ? localizationKeys('billing.switchToAnnual')
+                : localizationKeys('billing.switchToMonthly'),
             onClick: () => {
               openCheckout({
                 planId: subscription.plan.id,
@@ -471,10 +456,34 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   }
 
   return (
-    <ThreeDotsMenu
-      variant='bordered'
-      actions={actions}
-    />
+    <Flex
+      elementDescriptor={descriptors.subscriptionDetailsCardActions}
+      gap={2}
+      sx={t => ({
+        paddingInline: t.space.$3,
+        paddingBlock: t.space.$3,
+        borderBlockStartWidth: t.borderWidths.$normal,
+        borderBlockStartStyle: t.borderStyles.$solid,
+        borderBlockStartColor: t.colors.$borderAlpha100,
+      })}
+    >
+      {actions.map((action, index) => (
+        <Button
+          key={index}
+          elementDescriptor={
+            action.isDestructive
+              ? descriptors.subscriptionDetailsCancelButton
+              : descriptors.subscriptionDetailsActionButton
+          }
+          variant={action.isDestructive ? 'ghost' : 'outline'}
+          colorScheme={action.isDestructive ? 'danger' : undefined}
+          size='xs'
+          textVariant='buttonSmall'
+          onClick={action.onClick}
+          localizationKey={action.label}
+        />
+      ))}
+    </Flex>
   );
 };
 
@@ -539,7 +548,6 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 
         {/* Pricing details */}
         <Flex
-          elementDescriptor={descriptors.subscriptionDetailsCardActions}
           justify='between'
           align='center'
         >
@@ -555,8 +563,6 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
             {fee.amountFormatted} /{' '}
             {t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
           </Text>
-
-          <SubscriptionCardActions subscription={subscription} />
         </Flex>
       </Col>
 
@@ -599,6 +605,8 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
           value={formatDate(subscription.periodStart)}
         />
       ) : null}
+
+      <SubscriptionCardActions subscription={subscription} />
     </Col>
   );
 };
