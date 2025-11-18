@@ -20,11 +20,13 @@ type ModalProps = React.PropsWithChildren<{
   canCloseModal?: boolean;
   style?: React.CSSProperties;
   portalRoot?: HTMLElement | React.MutableRefObject<HTMLElement | null>;
+  initialFocusRef?: number | React.MutableRefObject<HTMLElement | null>;
 }>;
 
 export const Modal = withFloatingTree((props: ModalProps) => {
   const { disableScrollLock, enableScrollLock } = useScrollLock();
-  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot } = props;
+  const { handleClose, handleOpen, contentSx, containerSx, canCloseModal, id, style, portalRoot, initialFocusRef } =
+    props;
   const overlayRef = useRef<HTMLDivElement>(null);
   const { floating, isOpen, context, nodeId, toggle } = usePopover({
     defaultOpen: true,
@@ -57,6 +59,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
       isOpen={isOpen}
       outsideElementsInert
       root={portalRoot}
+      initialFocus={initialFocusRef}
     >
       <ModalContext.Provider value={modalCtx}>
         <Flex
