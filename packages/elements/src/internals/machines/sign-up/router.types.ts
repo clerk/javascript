@@ -1,4 +1,4 @@
-import type { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/shared/types';
 import type { ActorRefFrom, SnapshotFrom, StateMachine } from 'xstate';
 
 import type { TFormMachine } from '~/internals/machines/form';

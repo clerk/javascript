@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
-import type { Stripe, StripeElements } from '@stripe/stripe-js';
+import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
-import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../types';
+import type { BillingCheckoutResource, CheckoutFlowResource, EnvironmentResource, ForPayerType } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';
@@ -60,6 +60,23 @@ const useInternalEnvironment = () => {
   const clerk = useClerk();
   // @ts-expect-error `__unstable__environment` is not typed
   return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+};
+
+const useLocalization = () => {
+  const clerk = useClerk();
+
+  let locale = 'en';
+  try {
+    const localization = clerk.__internal_getOption('localization');
+    locale = localization?.locale || 'en';
+  } catch {
+    // ignore errors
+  }
+
+  // Normalize locale to 2-letter language code for Stripe compatibility
+  const normalizedLocale = locale.split('-')[0];
+
+  return normalizedLocale;
 };
 
 const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
@@ -139,15 +156,27 @@ type internalStripeAppearance = {
   spacingUnit: string;
 };
 
-type PaymentElementProviderProps = {
-  checkout?: BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+/**
+ * @interface
+ */
+export type PaymentElementProviderProps = {
+  /**
+   * An optional checkout resource object. When provided, the payment element is scoped to the specific checkout session.
+   */
+  checkout?: CheckoutFlowResource | BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  /**
+   * An optional object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
+   */
   stripeAppearance?: internalStripeAppearance;
   /**
-   * Default to `user` if not provided.
+   * Specifies whether to fetch for the current user or organization.
    *
    * @default 'user'
    */
   for?: ForPayerType;
+  /**
+   * An optional description to display to the user within the payment element UI.
+   */
   paymentDescription?: string;
 };
 
@@ -206,6 +235,7 @@ const PaymentElementProvider = ({ children, ...props }: PropsWithChildren<Paymen
 
 const PaymentElementInternalRoot = (props: PropsWithChildren) => {
   const { stripe, externalClientSecret, stripeAppearance } = usePaymentElementContext();
+  const locale = useLocalization();
 
   if (stripe && externalClientSecret) {
     return (
@@ -219,6 +249,7 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
           appearance: {
             variables: stripeAppearance,
           },
+          locale: locale as StripeElementsOptions['locale'],
         }}
       >
         <ValidateStripeUtils>{props.children}</ValidateStripeUtils>
@@ -229,7 +260,17 @@ const PaymentElementInternalRoot = (props: PropsWithChildren) => {
   return <DummyStripeUtils>{props.children}</DummyStripeUtils>;
 };
 
-const PaymentElement = ({ fallback }: { fallback?: ReactNode }) => {
+/**
+ * @interface
+ */
+export type PaymentElementProps = {
+  /**
+   * Optional fallback content, such as a loading skeleton, to display while the payment form is being initialized.
+   */
+  fallback?: ReactNode;
+};
+
+const PaymentElement = ({ fallback }: PaymentElementProps) => {
   const {
     setIsPaymentElementReady,
     paymentMethodOrder,
@@ -296,7 +337,13 @@ const throwLibsMissingError = () => {
   );
 };
 
-type UsePaymentElementReturn = {
+/**
+ * @interface
+ */
+export type UsePaymentElementReturn = {
+  /**
+   * A function that submits the payment form data to the payment provider. It returns a promise that resolves with either a `data` object containing a payment token on success, or an `error` object on failure.
+   */
   submit: () => Promise<
     | {
         data: { gateway: 'stripe'; paymentToken: string };
@@ -307,13 +354,25 @@ type UsePaymentElementReturn = {
         error: PaymentElementError;
       }
   >;
+  /**
+   * A function that resets the payment form to its initial, empty state.
+   */
   reset: () => Promise<void>;
+  /**
+   * A boolean that indicates if the payment form UI has been rendered and is ready for user input. This is useful for disabling a submit button until the form is interactive.
+   */
   isFormReady: boolean;
 } & (
   | {
+      /**
+       * An object containing information about the initialized payment provider. It is `undefined` until `isProviderReady` is `true`.
+       */
       provider: {
         name: 'stripe';
       };
+      /**
+       * A boolean that indicates if the underlying payment provider (e.g. Stripe) has been fully initialized.
+       */
       isProviderReady: true;
     }
   | {

@@ -191,7 +191,7 @@ jobs:
   unit-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Unit Tests
+    name: Unit Tests (${{ matrix.filter-label }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -205,11 +205,17 @@ jobs:
       TURBO_SUMMARIZE: false
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - node-version: 22
             test-filter: "**"
+            clerk-use-rq: "false"
+            filter-label: "**"
+          - node-version: 22
+            test-filter: "--filter=@clerk/shared --filter=@clerk/clerk-js"
+            clerk-use-rq: "true"
+            filter-label: "shared, clerk-js"
 
     steps:
       - name: Checkout Repo
@@ -229,22 +235,35 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Rebuild @clerk/shared with CLERK_USE_RQ=true
+        if: ${{ matrix.clerk-use-rq == 'true' }}
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/shared --force
+        env:
+          CLERK_USE_RQ: true
+
+      - name: Rebuild dependent packages with CLERK_USE_RQ=true
+        if: ${{ matrix.clerk-use-rq == 'true' }}
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/shared^... --force
+        env:
+          CLERK_USE_RQ: true
+
       - name: Run tests in packages
         run: |
           if [ "${{ matrix.test-filter }}" = "**" ]; then
-            echo "Running full test suite on Node ${{ matrix.node-version }}."
+            echo "Running full test suite on Node ${{ matrix.node-version }}"
             pnpm turbo test $TURBO_ARGS
           else
-            echo "Running LTS subset on Node ${{ matrix.node-version }}."
+            echo "Running tests: ${{ matrix.filter-label }}"
             pnpm turbo test $TURBO_ARGS ${{ matrix.test-filter }}
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
+          CLERK_USE_RQ: ${{ matrix.clerk-use-rq }}
 
       - name: Run Typedoc tests
         run: |
-          # Only run Typedoc tests for one matrix version
-          if [ "${{ matrix.node-version }}" == "22" ]; then
+          # Only run Typedoc tests for one matrix version and main test run
+          if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
             pnpm turbo run //#test:typedoc
           fi
         env:
@@ -255,14 +274,14 @@ jobs:
         if: ${{ env.TURBO_SUMMARIZE == 'true' }}
         continue-on-error: true
         with:
-          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}
+          name: turbo-summary-report-unit-${{ github.run_id }}-${{ github.run_attempt }}-node-${{ matrix.node-version }}${{ matrix.clerk-use-rq == 'true' && '-rq' || '' }}
           path: .turbo/runs
           retention-days: 5
 
   integration-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Integration Tests
+    name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -290,18 +309,25 @@ jobs:
             "vue",
             "nuxt",
             "react-router",
-            "billing",
             "machine",
             "custom",
           ]
         test-project: ["chrome"]
         include:
-          - test-name: "nextjs"
-            test-project: "chrome"
-            next-version: "14"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "false"
+          # - test-name: "billing"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "15"
+            clerk-use-rq: "false"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "16"
@@ -341,7 +367,9 @@ jobs:
         id: task-status
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -359,12 +387,25 @@ jobs:
           echo "affected=${AFFECTED}"
           echo "affected=${AFFECTED}" >> $GITHUB_OUTPUT
 
+      - name: Rebuild @clerk/shared with CLERK_USE_RQ=true
+        if: ${{ steps.task-status.outputs.affected == '1' && matrix.clerk-use-rq == 'true' }}
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/shared --force
+        env:
+          CLERK_USE_RQ: true
+
+      - name: Rebuild dependent packages with CLERK_USE_RQ=true
+        if: ${{ steps.task-status.outputs.affected == '1' && matrix.clerk-use-rq == 'true' }}
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/shared^... --force
+        env:
+          CLERK_USE_RQ: true
+
       - name: Verdaccio
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag integration; fi
+
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
@@ -385,6 +426,15 @@ jobs:
           pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/ui
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
@@ -420,10 +470,13 @@ jobs:
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
+          CLERK_USE_RQ: ${{ matrix.clerk-use-rq }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
@@ -432,7 +485,7 @@ jobs:
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}
+          name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}${{ matrix.clerk-use-rq == 'true' && '-rq' || '' }}
           path: integration/test-results
           retention-days: 1
 

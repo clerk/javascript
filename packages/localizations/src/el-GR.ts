@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Αντιγραφή και κλείσιμο',
+      formHint: 'Για λόγους ασφαλείας, δεν θα σας επιτρέψουμε να το δείτε ξανά αργότερα.',
+      formTitle: 'Αντιγράψτε το κλειδί API "{{name}}" σας τώρα',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Κλειδί API',
+  formFieldLabel__apiKeyDescription: 'Περιγραφή',
+  formFieldLabel__apiKeyExpiration: 'Λήξη',
+  formFieldLabel__apiKeyName: 'Όνομα μυστικού κλειδιού',
   formFieldLabel__automaticInvitations: 'Ενεργοποίηση αυτόματων προσκλήσεων για αυτόν τον τομέα',
   formFieldLabel__backupCode: 'Αντίγραφο ασφαλείας κωδικού',
   formFieldLabel__confirmDeletion: 'Επιβεβαίωση',
@@ -607,6 +613,12 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Ελέγξτε το email σας',
     },
+    emailCodeMfa: {
+      formTitle: 'Ελέγξτε το email σας',
+      resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -642,6 +654,12 @@ export const elGR: LocalizationResource = {
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
+      resendButton: 'Δεν λάβατε τον σύνδεσμο; Επανάληψη αποστολής',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +677,8 @@ export const elGR: LocalizationResource = {
       label__alternativeMethods: 'Ή, συνδεθείτε με μια άλλη μέθοδο.',
       title: 'Ξεχάσατε τον κωδικό πρόσβασης;',
     },
+    newDeviceVerificationNotice:
+      'Συνδέεστε από μια νέα συσκευή. Ζητάμε επαλήθευση για να διατηρήσουμε τον λογαριασμό σας ασφαλή.',
     noAvailableMethods: {
       message: 'Δεν είναι δυνατή η σύνδεση. Δεν υπάρχει διαθέσιμος παράγοντας αυθεντικοποίησης.',
       subtitle: 'Προέκυψε σφάλμα',

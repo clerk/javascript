@@ -6,6 +6,7 @@ import type { DisplayConfigJSON } from './displayConfig';
 import type {
   AuthConfigJSON,
   ClientJSON,
+  ClientTrustState,
   EmailAddressJSON,
   EnterpriseAccountConnectionJSON,
   EnterpriseAccountJSON,
@@ -30,6 +31,7 @@ import type {
   Web3WalletJSON,
 } from './json';
 import type { OrganizationSettingsJSON } from './organizationSettings';
+import type { ProtectConfigJSON } from './protectConfig';
 import type { SignInJSON } from './signIn';
 import type { UserSettingsJSON } from './userSettings';
 import type { Nullable, Override } from './utils';
@@ -40,6 +42,7 @@ export type SignInJSONSnapshot = Override<
     first_factor_verification: VerificationJSONSnapshot;
     second_factor_verification: VerificationJSONSnapshot;
     user_data: UserDataJSONSnapshot;
+    client_trust_state?: ClientTrustState;
   }
 >;
 
@@ -116,6 +119,8 @@ export type AuthConfigJSONSnapshot = AuthConfigJSON;
 export type EnvironmentJSONSnapshot = EnvironmentJSON;
 
 export type DisplayConfigJSONSnapshot = DisplayConfigJSON;
+
+export type ProtectConfigJSONSnapshot = ProtectConfigJSON;
 
 export type EmailAddressJSONSnapshot = Override<
   EmailAddressJSON,

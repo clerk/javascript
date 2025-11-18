@@ -1,5 +1,168 @@
 # Change Log
 
+## 5.109.0
+
+### Minor Changes
+
+- Introduced initial Clerk Protect dynamic loader and related types to support dynamically enabling and rolling out Protect in the environment. ([#7227](https://github.com/clerk/javascript/pull/7227)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Standardized API keys naming convention ([#7223](https://github.com/clerk/javascript/pull/7223)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add support for sign-up via modal in signals implementation ([#7193](https://github.com/clerk/javascript/pull/7193)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- fix(clerk-js): update inCrossOriginIframe to handle nested cross origin iframes ([#7212](https://github.com/clerk/javascript/pull/7212)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+- [Experimental] Type method returns using ClerkError ([#7213](https://github.com/clerk/javascript/pull/7213)) by [@dstaley](https://github.com/dstaley)
+
+- Fixes a bug where billing hooks would attempt to fetch billing information for an organization member with insufficient permissions, resulting in a 403 error. ([#7202](https://github.com/clerk/javascript/pull/7202)) by [@panteliselef](https://github.com/panteliselef)
+
+- Ensure scrollbox height fills the available space. ([#7222](https://github.com/clerk/javascript/pull/7222)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`9f48f13`](https://github.com/clerk/javascript/commit/9f48f1372b72334d48b3fd54612c16c964f7cbc1), [`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/localizations@3.28.1
+  - @clerk/shared@3.35.0
+
+## 5.108.0
+
+### Minor Changes
+
+- Support for `email_code` and `email_link` as a second factor when user is signing in on a new device. ([#7116](https://github.com/clerk/javascript/pull/7116)) by [@tmilewski](https://github.com/tmilewski)
+
+- Update SocialButtons to show "Continue with" prefix for last auth strategy, and improve mobile layout consistency. ([#7169](https://github.com/clerk/javascript/pull/7169)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- [Experimental] Update `errors` to have specific field types based on whether it's a sign-in or a sign-up. ([#7195](https://github.com/clerk/javascript/pull/7195)) by [@dstaley](https://github.com/dstaley)
+
+- Removed internal parameter when creating API keys ([#7207](https://github.com/clerk/javascript/pull/7207)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`d64638d`](https://github.com/clerk/javascript/commit/d64638d6c270e0c566d1f2c164a24111314365ee), [`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd)]:
+  - @clerk/localizations@3.28.0
+  - @clerk/shared@3.34.0
+
+## 5.107.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/localizations@3.27.2
+
+## 5.106.0
+
+### Minor Changes
+
+- Implemented server-side pagination and filtering for API keys ([#6453](https://github.com/clerk/javascript/pull/6453)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- [Experimental] Add types for errors used in new custom flow APIs ([#7174](https://github.com/clerk/javascript/pull/7174)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- [Experimental] Add support for modal SSO sign-ins to new APIs ([#7026](https://github.com/clerk/javascript/pull/7026)) by [@dstaley](https://github.com/dstaley)
+
+- Support granular API keys settings for user and organization profiles ([#7179](https://github.com/clerk/javascript/pull/7179)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/localizations@3.27.1
+
+## 5.105.1
+
+### Patch Changes
+
+- Add aria live region to ensure feedback messages are read to screen readers when feedback changes. ([#7111](https://github.com/clerk/javascript/pull/7111)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.105.0
+
+### Minor Changes
+
+- Replaced the persistent key column in the API keys table with a one-time modal that displays the secret immediately after creation. ([#7107](https://github.com/clerk/javascript/pull/7107)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Move clientTrustState to SignIn ([#7163](https://github.com/clerk/javascript/pull/7163)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`d88ea99`](https://github.com/clerk/javascript/commit/d88ea99755e605673111cccb41eb93391e1e68dd), [`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/localizations@3.27.0
+  - @clerk/shared@3.31.1
+
+## 5.104.0
+
+### Minor Changes
+
+- Adds `client_trust_state` field to Client and SignIn resources to support new fraud protection feature. ([#7096](https://github.com/clerk/javascript/pull/7096)) by [@chriscanin](https://github.com/chriscanin)
+
+### Patch Changes
+
+- fix: Appropriately handle last-used SAML strategies ([#7135](https://github.com/clerk/javascript/pull/7135)) by [@tmilewski](https://github.com/tmilewski)
+
+- Experimental: Ground work for fixing stale data between hooks and components by sharing a single cache. ([#6913](https://github.com/clerk/javascript/pull/6913)) by [@panteliselef](https://github.com/panteliselef)
+
+- Updated dependencies [[`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/shared@3.31.0
+  - @clerk/localizations@3.26.6
+
+## 5.103.2
+
+### Patch Changes
+
+- Propagate locale from ClerkProvider to PaymentElement ([#6885](https://github.com/clerk/javascript/pull/6885)) by [@aeliox](https://github.com/aeliox)
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+- Add debug logging to session update flows when browser is offline ([#7113](https://github.com/clerk/javascript/pull/7113)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove last used badge from rendering on sign-up. ([#7100](https://github.com/clerk/javascript/pull/7100)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Bug fix for Checkout success screen to not mention payment if a payment was not made. ([#7140](https://github.com/clerk/javascript/pull/7140)) by [@panteliselef](https://github.com/panteliselef)
+
+- Optimize Session.#hydrateCache to only cache token if it's new/different ([#7105](https://github.com/clerk/javascript/pull/7105)) by [@jacekradko](https://github.com/jacekradko)
+
+- Navigates to `/sign-up/continue` on sign-up with `missing_requirements` status using `ticket` as strategy ([#7101](https://github.com/clerk/javascript/pull/7101)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  It fixes IdP-initiated flows with missing requirements such as accepting legal consent
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/localizations@3.26.5
+
 ## 5.103.1
 
 ### Patch Changes

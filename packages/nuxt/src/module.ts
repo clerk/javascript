@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/types';
+import type { Without } from '@clerk/shared/types';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -65,6 +65,7 @@ export default defineNuxtModule<ModuleOptions>({
           signUpUrl: options.signUpUrl,
           domain: options.domain,
           clerkJSUrl: options.clerkJSUrl,
+          clerkUiUrl: options.clerkUiUrl,
           clerkJSVariant: options.clerkJSVariant,
           clerkJSVersion: options.clerkJSVersion,
           isSatellite: options.isSatellite,
@@ -169,6 +170,8 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
+      // API Keys Components
+      'APIKeys',
     ];
     components.forEach(component => {
       void addComponent({

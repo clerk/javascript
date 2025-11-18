@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копіювати та закрити',
+      formHint: 'З міркувань безпеки ми не дозволимо вам переглянути його пізніше.',
+      formTitle: 'Скопіюйте ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const ukUA: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Термін дії',
+  formFieldLabel__apiKeyName: 'Назва секретного ключа',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код відновлення',
   formFieldLabel__confirmDeletion: 'Підтвердження',
@@ -605,6 +611,12 @@ export const ukUA: LocalizationResource = {
       subtitle: 'продовжити до {{applicationName}}',
       title: 'Перевірте свою електронну пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Перевірте свою електронну пошту',
+      resendButton: 'Не отримали код? Повторно відправити',
+      subtitle: 'продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -640,6 +652,12 @@ export const ukUA: LocalizationResource = {
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',
+      resendButton: 'Не отримали посилання? Надіслати знову',
+      subtitle: 'щоб продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +675,8 @@ export const ukUA: LocalizationResource = {
       label__alternativeMethods: 'Або, увійти іншим способом',
       title: 'Забули пароль?',
     },
+    newDeviceVerificationNotice:
+      'Ви входите з нового пристрою. Ми просимо підтвердження для забезпечення безпеки вашого облікового запису.',
     noAvailableMethods: {
       message: 'Не вдається виконати вхід. Немає доступного фактору автентифікації.',
       subtitle: 'Виникла помилка',

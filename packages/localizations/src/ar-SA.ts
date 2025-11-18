@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'نسخ وإغلاق',
+      formHint: 'لأسباب أمنية، لن نسمح لك بعرضه مرة أخرى لاحقاً.',
+      formTitle: 'انسخ مفتاح API الخاص بك "{{name}}" الآن',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'مفتاح API',
+  formFieldLabel__apiKeyDescription: 'الوصف',
+  formFieldLabel__apiKeyExpiration: 'الانتهاء',
+  formFieldLabel__apiKeyName: 'اسم المفتاح السري',
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
@@ -604,6 +610,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'التحقق من البريد الإلكتروني',
     },
+    emailCodeMfa: {
+      formTitle: 'التحقق من البريد الإلكتروني',
+      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'التحقق من البريد الإلكتروني',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'للمتابعة, قم بفتح رابط التحقق عبر نفس الجهاز والمتصفح الذي انشأت محاولة تسجيل الدخول منه',
@@ -639,6 +651,12 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',
+      resendButton: 'لم تستلم الرابط؟ إعادة الإرسال',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'تحقق من بريدك الإلكتروني',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -656,6 +674,7 @@ export const arSA: LocalizationResource = {
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
+    newDeviceVerificationNotice: 'أنت تسجل الدخول من جهاز جديد. نحن نطلب التحقق للحفاظ على أمان حسابك.',
     noAvailableMethods: {
       message: 'لا يمكن متابعة تسجيل الدخول. لا يوجد وسيلة مصادقة متاحة.',
       subtitle: 'حدث خطأ',

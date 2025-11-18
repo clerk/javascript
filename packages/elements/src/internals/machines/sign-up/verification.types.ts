@@ -1,5 +1,5 @@
 import type { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { Attributes, SignUpResource } from '@clerk/types';
+import type { Attributes, SignUpResource } from '@clerk/shared/types';
 import type { ActorRefFrom, DoneActorEvent, ErrorActorEvent } from 'xstate';
 
 import type { FormMachine } from '~/internals/machines/form';

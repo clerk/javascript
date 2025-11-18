@@ -1,50 +1,36 @@
 import type {
   Clerk,
-  ClerkOptions,
-  ClientResource,
-  DomainOrProxyUrl,
   InitialState,
+  IsomorphicClerkOptions,
   LoadedClerk,
-  MultiDomainAndOrProxy,
   RedirectUrlProp,
   SignInRedirectOptions,
   SignUpRedirectOptions,
   TasksRedirectOptions,
-  Without,
 } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 import type React from 'react';
+
+// Re-export types from @clerk/shared that are used by other modules
+export type {
+  IsomorphicClerkOptions,
+  Clerk,
+  BrowserClerk,
+  BrowserClerkConstructor,
+  ClerkProp,
+  LoadedClerk,
+  HeadlessBrowserClerk,
+  HeadlessBrowserClerkConstructor,
+} from '@clerk/shared/types';
 
 declare global {
   interface Window {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
+    __unstable_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
-
-export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
-  Clerk?: ClerkProp;
-  /**
-   * The URL that `@clerk/clerk-js` should be hot-loaded from.
-   */
-  clerkJSUrl?: string;
-  /**
-   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
-   */
-  clerkJSVariant?: 'headless' | '';
-  /**
-   * The npm version for `@clerk/clerk-js`.
-   */
-  clerkJSVersion?: string;
-  /**
-   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
-   */
-  publishableKey: string;
-  /**
-   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/guides/secure/best-practices/csp-headers#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
-   */
-  nonce?: string;
-} & MultiDomainAndOrProxy;
 
 /**
  * @interface
@@ -62,14 +48,6 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    */
   __internal_bypassMissingPublishableKey?: boolean;
 };
-
-export interface BrowserClerkConstructor {
-  new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
-}
-
-export interface HeadlessBrowserClerkConstructor {
-  new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
-}
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk; component?: string };
 
@@ -91,24 +69,6 @@ export interface OpenProps {
   close: () => void;
   props?: any;
 }
-
-export interface HeadlessBrowserClerk extends Clerk {
-  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
-  updateClient: (client: ClientResource) => void;
-}
-
-export interface BrowserClerk extends HeadlessBrowserClerk {
-  onComponentsReady: Promise<void>;
-  components: any;
-}
-
-export type ClerkProp =
-  | BrowserClerkConstructor
-  | BrowserClerk
-  | HeadlessBrowserClerk
-  | HeadlessBrowserClerkConstructor
-  | undefined
-  | null;
 
 export type SignInWithMetamaskButtonProps = {
   mode?: 'redirect' | 'modal';

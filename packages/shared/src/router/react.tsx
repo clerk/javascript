@@ -9,6 +9,9 @@ import { createClerkRouter } from './router';
 export const ClerkHostRouterContext = createContext<ClerkHostRouter | null>(null);
 export const ClerkRouterContext = createContext<ClerkRouter | null>(null);
 
+/**
+ *
+ */
 export function useClerkHostRouter() {
   const ctx = useContext(ClerkHostRouterContext);
 
@@ -21,6 +24,9 @@ export function useClerkHostRouter() {
   return ctx;
 }
 
+/**
+ *
+ */
 export function useClerkRouter() {
   const ctx = useContext(ClerkRouterContext);
 

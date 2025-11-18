@@ -18,7 +18,7 @@ import { unixEpochToDate } from '../../utils/date';
 import {
   serializePublicKeyCredential,
   webAuthnCreateCredential as webAuthnCreateCredentialOnWindow,
-} from '../../utils/passkeys';
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
 

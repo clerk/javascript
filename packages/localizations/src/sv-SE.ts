@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiera och stäng',
+      formHint: 'Av säkerhetsskäl kommer vi inte att tillåta dig att se det igen senare.',
+      formTitle: 'Kopiera din API-nyckel "{{name}}" nu',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const svSE: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Ange ditt telefonnummer',
   formFieldInputPlaceholder__username: 'Ange ditt användarnamn',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-nyckel',
+  formFieldLabel__apiKeyDescription: 'Beskrivning',
+  formFieldLabel__apiKeyExpiration: 'Förfaller',
+  formFieldLabel__apiKeyName: 'Namn på hemlig nyckel',
   formFieldLabel__automaticInvitations: 'Aktivera automatiska inbjudningar för denna domän',
   formFieldLabel__backupCode: 'Reserv-kod',
   formFieldLabel__confirmDeletion: 'Radera konto',
@@ -607,6 +613,12 @@ export const svSE: LocalizationResource = {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Kontrollera din e-post',
     },
+    emailCodeMfa: {
+      formTitle: 'Kontrollera din e-post',
+      resendButton: 'Fick du ingen kod? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din e-post',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -643,6 +655,12 @@ export const svSE: LocalizationResource = {
         titleNewTab: 'Loggade in på annan flik',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Använd verifieringslänken som skickades till din e-post',
+      resendButton: 'Fick du inte länken? Skicka igen',
+      subtitle: 'för att fortsätta till {{applicationName}}',
+      title: 'Kontrollera din e-post',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +678,8 @@ export const svSE: LocalizationResource = {
       label__alternativeMethods: 'Eller, logga in med en annan metod',
       title: 'Glömt lösenord?',
     },
+    newDeviceVerificationNotice:
+      'Du loggar in från en ny enhet. Vi ber om verifiering för att hålla ditt konto säkert.',
     noAvailableMethods: {
       message: 'Kan inte fortsätta med inloggning. Det finns ingen tillgänglig autentiseringsfaktor.',
       subtitle: 'Ett fel inträffade',

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopier og lukk',
+      formHint: 'Av sikkerhetshensyn kan vi ikke tillate deg å se det igjen senere.',
+      formTitle: 'Kopier API-nøkkelen "{{name}}" din nå',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-nøkkel',
+  formFieldLabel__apiKeyDescription: 'Beskrivelse',
+  formFieldLabel__apiKeyExpiration: 'Utløper',
+  formFieldLabel__apiKeyName: 'Navn på hemmelig nøkkel',
   formFieldLabel__automaticInvitations: 'Skru på automatiske invitasjoner for dette domenet',
   formFieldLabel__backupCode: 'Sikkerhetskode',
   formFieldLabel__confirmDeletion: 'Bekreftelse',
@@ -606,6 +612,12 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Sjekk e-posten din',
     },
+    emailCodeMfa: {
+      formTitle: 'Sjekk e-posten din',
+      resendButton: 'Ikke mottatt kode? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk e-posten din',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -641,6 +653,12 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',
+      resendButton: 'Har du ikke mottatt lenken? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk din e-post',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -658,6 +676,8 @@ export const nbNO: LocalizationResource = {
       label__alternativeMethods: 'Eller logg inn med en annen metode.',
       title: 'Glemt passord?',
     },
+    newDeviceVerificationNotice:
+      'Du logger inn fra en ny enhet. Vi ber om verifisering for å holde kontoen din sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsette med innloggingen. Det er ingen tilgjengelige autentiseringsfaktorer.',
       subtitle: 'En feil oppstod',

@@ -1,4 +1,4 @@
-import type { SignInFirstFactor } from '@clerk/types';
+import type { SignInFirstFactor } from '@clerk/shared/types';
 
 import { SignInSafeIdentifierSelectorForStrategy } from '../router.selectors';
 import type { SignInRouterSnapshot } from '../router.types';

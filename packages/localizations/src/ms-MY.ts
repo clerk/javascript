@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const msMY: LocalizationResource = {
   locale: 'ms-MY',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Salin & Tutup',
+      formHint: 'Atas sebab keselamatan, kami tidak akan membenarkan anda melihatnya semula kemudian.',
+      formTitle: 'Salin kunci API "{{name}}" anda sekarang',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const msMY: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Masukkan nombor telefon anda',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Kunci API',
+  formFieldLabel__apiKeyDescription: 'Penerangan',
+  formFieldLabel__apiKeyExpiration: 'Tamat tempoh',
+  formFieldLabel__apiKeyName: 'Nama kunci rahsia',
   formFieldLabel__automaticInvitations: 'Aktifkan jemputan automatik untuk domain ini',
   formFieldLabel__backupCode: 'Kod sandaran',
   formFieldLabel__confirmDeletion: 'Pengesahan',
@@ -610,6 +616,12 @@ export const msMY: LocalizationResource = {
       subtitle: 'untuk meneruskan ke {{applicationName}}',
       title: 'Periksa e-mel anda',
     },
+    emailCodeMfa: {
+      formTitle: 'Periksa e-mel anda',
+      resendButton: 'Tidak menerima kod? Hantar semula',
+      subtitle: 'untuk meneruskan ke {{applicationName}}',
+      title: 'Periksa e-mel anda',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -646,6 +658,12 @@ export const msMY: LocalizationResource = {
         titleNewTab: 'Didaftarkan masuk pada tab lain',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gunakan pautan pengesahan yang dihantar ke e-mel anda',
+      resendButton: 'Tidak menerima pautan? Hantar semula',
+      subtitle: 'untuk meneruskan ke {{applicationName}}',
+      title: 'Semak e-mel anda',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -663,6 +681,8 @@ export const msMY: LocalizationResource = {
       label__alternativeMethods: 'Atau, daftar masuk dengan kaedah lain',
       title: 'Lupa Kata Laluan?',
     },
+    newDeviceVerificationNotice:
+      'Anda sedang mendaftar masuk dari peranti baharu. Kami meminta pengesahan untuk menjaga keselamatan akaun anda.',
     noAvailableMethods: {
       message: 'Tidak dapat meneruskan pendaftaran masuk. Tiada faktor pengesahan yang tersedia.',
       subtitle: 'Ralat berlaku',

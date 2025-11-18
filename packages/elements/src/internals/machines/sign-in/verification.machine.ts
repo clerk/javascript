@@ -12,7 +12,7 @@ import type {
   SignInResource,
   SignInSecondFactor,
   Web3Attempt,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { DoneActorEvent } from 'xstate';
 import { assign, fromPromise, log, sendTo, setup } from 'xstate';
 
@@ -559,6 +559,7 @@ export const SignInSecondFactorMachine = SignInVerificationMachine.provide({
       assertIsDefined(code, 'Code');
 
       return await parent.getSnapshot().context.clerk.client.signIn.attemptSecondFactor({
+        // @ts-expect-error - email_link is not supported in the attemptSecondFactor params
         strategy: currentFactor.strategy,
         code,
       });

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.26.4",
+  "version": "3.28.1",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -64,7 +64,7 @@
     "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
-    "@clerk/types": "workspace:^"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {},
   "engines": {

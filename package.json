@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "FORCE_COLOR=1 turbo build --concurrency=${TURBO_CONCURRENCY:-80%} --filter=!@clerk/elements",
-    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared --filter=@clerk/types",
+    "build:declarations": "FORCE_COLOR=1 turbo build:declarations --concurrency=${TURBO_CONCURRENCY:-80%} --filter=@clerk/nextjs --filter=@clerk/react --filter=@clerk/shared",
     "bundlewatch": "turbo bundlewatch",
     "changeset": "changeset",
     "changeset:empty": "pnpm changeset --empty",
@@ -56,7 +56,7 @@
     "test:typedoc": "pnpm typedoc:generate && cd ./.typedoc && vitest run",
     "turbo:clean": "turbo daemon clean",
     "typedoc:generate": "pnpm build && pnpm typedoc:generate:skip-build",
-    "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && rm -rf .typedoc/docs && mv .typedoc/temp-docs .typedoc/docs",
+    "typedoc:generate:skip-build": "typedoc --tsconfig tsconfig.typedoc.json && node .typedoc/extract-returns-and-params.mjs && rimraf .typedoc/docs && cpy '.typedoc/temp-docs/**' '.typedoc/docs' && rimraf .typedoc/temp-docs",
     "version-packages": "changeset version && pnpm install --lockfile-only --engine-strict=false",
     "version-packages:canary": "./scripts/canary.mjs",
     "version-packages:snapshot": "./scripts/snapshot.mjs",
@@ -166,7 +166,8 @@
       "jest": "29.7.0",
       "jest-snapshot-prettier": "npm:prettier@^3.5.3",
       "react": "catalog:react",
-      "react-dom": "catalog:react"
+      "react-dom": "catalog:react",
+      "rolldown": "catalog:repo"
     }
   }
 }

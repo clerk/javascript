@@ -63,6 +63,7 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
     __clerkJSUrl,
+    __clerkUiUrl,
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
@@ -92,6 +93,7 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
     clerkJSUrl: __clerkJSUrl,
+    clerkUiUrl: __clerkUiUrl,
     clerkJSVersion: __clerkJSVersion,
     telemetry: {
       disabled: __telemetryDisabled,

@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import { useClerkRouter } from '@clerk/shared/router';
-import type { ClerkOptions } from '@clerk/types';
+import type { ClerkOptions } from '@clerk/shared/types';
 import React from 'react';
 
 type Destination = 'sign-in' | 'sign-up';

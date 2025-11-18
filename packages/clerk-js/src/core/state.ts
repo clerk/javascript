@@ -1,3 +1,4 @@
+import type { ClerkError } from '@clerk/shared/error';
 import type { State as StateInterface } from '@clerk/shared/types';
 import { computed, effect } from 'alien-signals';
 
@@ -55,7 +56,7 @@ export class State implements StateInterface {
     return this._waitlistInstance;
   }
 
-  private onResourceError = (payload: { resource: BaseResource; error: unknown }) => {
+  private onResourceError = (payload: { resource: BaseResource; error: ClerkError | null }) => {
     if (payload.resource instanceof SignIn) {
       this.signInErrorSignal({ error: payload.error });
     }
@@ -71,10 +72,18 @@ export class State implements StateInterface {
 
   private onResourceUpdated = (payload: { resource: BaseResource }) => {
     if (payload.resource instanceof SignIn) {
+      const previousResource = this.signInResourceSignal().resource;
+      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+        return;
+      }
       this.signInResourceSignal({ resource: payload.resource });
     }
 
     if (payload.resource instanceof SignUp) {
+      const previousResource = this.signUpResourceSignal().resource;
+      if (shouldIgnoreNullUpdate(previousResource, payload.resource)) {
+        return;
+      }
       this.signUpResourceSignal({ resource: payload.resource });
     }
 
@@ -96,4 +105,14 @@ export class State implements StateInterface {
       this.waitlistFetchSignal({ status: payload.status });
     }
   };
+}
+
+/**
+ * Returns true if the new resource is null and the previous resource has not been finalized. This is used to prevent
+ * nullifying the resource after it's been completed.
+ */
+function shouldIgnoreNullUpdate(previousResource: SignIn | null, newResource: SignIn | null): boolean;
+function shouldIgnoreNullUpdate(previousResource: SignUp | null, newResource: SignUp | null): boolean;
+function shouldIgnoreNullUpdate(previousResource: SignIn | SignUp | null, newResource: SignIn | SignUp | null) {
+  return !newResource?.id && previousResource && previousResource.__internal_future?.hasBeenFinalized === false;
 }

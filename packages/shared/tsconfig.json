@@ -21,8 +21,14 @@
     "emitDeclarationOnly": true,
     "declaration": true,
     "declarationMap": true,
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "virtual:data-hooks/useSubscription": ["./src/react/hooks/useSubscription.swr.tsx"],
+      "virtual:data-hooks/SWRConfigCompat": ["./src/react/providers/SWRConfigCompat.swr.tsx"],
+      "virtual:data-hooks/usePagesOrInfinite": ["./src/react/hooks/usePagesOrInfinite.swr.tsx"]
+    }
   },
   "exclude": ["node_modules"],
-  "include": ["src", "global.d.ts"]
+  "include": ["src", "global.d.ts", "src/types/virtual-data-hooks.d.ts"]
 }

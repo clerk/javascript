@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '复制并关闭',
+      formHint: '出于安全原因，我们不会允许您稍后再次查看。',
+      formTitle: '立即复制您的"{{name}}" API密钥',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const zhCN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API密钥',
+  formFieldLabel__apiKeyDescription: '描述',
+  formFieldLabel__apiKeyExpiration: '过期时间',
+  formFieldLabel__apiKeyName: '密钥名称',
   formFieldLabel__automaticInvitations: '为此域名启用自动邀请',
   formFieldLabel__backupCode: '备用代码',
   formFieldLabel__confirmDeletion: '确认',
@@ -596,6 +602,12 @@ export const zhCN: LocalizationResource = {
       subtitle: '继续使用 {{applicationName}}',
       title: '查看您的电子邮件',
     },
+    emailCodeMfa: {
+      formTitle: '查看您的电子邮件',
+      resendButton: '未收到验证码？重新发送',
+      subtitle: '继续使用 {{applicationName}}',
+      title: '查看您的电子邮件',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -631,6 +643,12 @@ export const zhCN: LocalizationResource = {
         titleNewTab: '在其他标签页上登录',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '使用发送到您电子邮件的验证链接',
+      resendButton: '没有收到链接？重新发送',
+      subtitle: '继续使用 {{applicationName}}',
+      title: '查看您的电子邮件',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -648,6 +666,7 @@ export const zhCN: LocalizationResource = {
       label__alternativeMethods: '或者，使用其他方式登录。',
       title: '忘记密码？',
     },
+    newDeviceVerificationNotice: '您正在从新设备登录。我们需要验证以保护您的账户安全。',
     noAvailableMethods: {
       message: '无法继续登录。没有可用的身份验证因素。',
       subtitle: '出现错误',

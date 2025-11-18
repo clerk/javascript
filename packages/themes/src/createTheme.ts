@@ -2,7 +2,7 @@
 // theming into its own package
 import type { BaseTheme, DeepPartial, Elements, Theme } from '@clerk/shared/types';
 
-import type { InternalTheme } from '../../clerk-js/src/ui/foundations';
+import type { InternalTheme } from '../../ui/src/foundations';
 
 interface CreateClerkThemeParams extends DeepPartial<Theme>, Pick<BaseTheme, 'cssLayerName'> {
   /**
