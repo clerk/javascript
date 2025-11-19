@@ -400,6 +400,9 @@ export type __internal_LocalizationResource = {
     passwordPwned: {
       title: LocalizationValue;
     };
+    passwordUntrusted: {
+      title: LocalizationValue;
+    };
     passkey: {
       title: LocalizationValue;
       subtitle: LocalizationValue;

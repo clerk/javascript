@@ -20,6 +20,7 @@ import type {
   SignUpForceRedirectUrl,
   SignUpProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -149,6 +150,10 @@ export type SessionTasksCtx = {
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
   componentName: 'TaskChooseOrganization';
+};
+
+export type TaskResetPasswordCtx = TaskResetPasswordProps & {
+  componentName: 'TaskResetPassword';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
