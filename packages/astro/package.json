@@ -100,7 +100,7 @@
     "astro": "^4.15.0 || ^5.0.0"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"
