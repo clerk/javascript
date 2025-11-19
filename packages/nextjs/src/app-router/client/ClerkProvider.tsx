@@ -1,6 +1,6 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
-import { InitialAuthStateProvider as ReactInitialAuthStateProvider } from '@clerk/react/internal';
+import { InitialStateProvider } from '@clerk/shared/react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -112,7 +112,7 @@ export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKey
   if (isNested) {
     if (rest.initialState) {
       // If using <ClerkProvider dynamic> inside a <ClerkProvider>, we do want the initial state to be available for this subtree
-      return <ReactInitialAuthStateProvider initialState={rest.initialState}>{children}</ReactInitialAuthStateProvider>;
+      return <InitialStateProvider initialState={rest.initialState}>{children}</InitialStateProvider>;
     }
     return children;
   }

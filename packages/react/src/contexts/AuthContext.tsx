@@ -1,16 +1,15 @@
 import type { DeriveStateReturnType } from '@clerk/shared/deriveState';
 import { deriveFromClientSideState, deriveFromSsrInitialState } from '@clerk/shared/deriveState';
-import { createContextAndHook } from '@clerk/shared/react';
+import { useInitialStateContext } from '@clerk/shared/react';
 import type {
   ActClaim,
   ClientResource,
-  InitialState,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   SessionStatusClaim,
 } from '@clerk/shared/types';
-import React, { useCallback, useDeferredValue, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useDeferredValue, useMemo, useSyncExternalStore } from 'react';
 
 import { useIsomorphicClerkContext } from './IsomorphicClerkContext';
 
@@ -27,20 +26,6 @@ type AuthStateValue = {
   factorVerificationAge: [number, number] | null;
 };
 
-const [InitialAuthContext, useInitialAuthContext] = createContextAndHook<InitialState | undefined>(
-  'InitialAuthContext',
-);
-export function InitialAuthStateProvider({
-  children,
-  initialState,
-}: {
-  children: React.ReactNode;
-  initialState: InitialState | undefined;
-}) {
-  const initialStateCtx = useMemo(() => ({ value: initialState }), [initialState]);
-  return <InitialAuthContext.Provider value={initialStateCtx}>{children}</InitialAuthContext.Provider>;
-}
-
 export const defaultDerivedInitialState = {
   actor: undefined,
   factorVerificationAge: null,
@@ -56,15 +41,15 @@ export const defaultDerivedInitialState = {
 
 export function useAuthState(): AuthStateValue {
   const clerk = useIsomorphicClerkContext();
-  const initialAuthContext = useInitialAuthContext();
+  const initialStateContext = useInitialStateContext();
   // If we make initialState support a promise in the future, this is where we would use() that promise
   const initialSnapshot = useMemo(() => {
-    if (!initialAuthContext) {
+    if (!initialStateContext) {
       return defaultDerivedInitialState;
     }
-    const fullState = deriveFromSsrInitialState(initialAuthContext);
+    const fullState = deriveFromSsrInitialState(initialStateContext);
     return authStateFromFull(fullState);
-  }, [initialAuthContext]);
+  }, [initialStateContext]);
 
   const snapshot = useMemo(() => {
     if (!clerk.loaded) {

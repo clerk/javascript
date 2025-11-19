@@ -8,6 +8,7 @@ import type {
   ClerkOptions,
   ClientResource,
   ForPayerType,
+  InitialState,
   LoadedClerk,
   OrganizationResource,
   SignedInSessionResource,
@@ -22,6 +23,21 @@ const [ClientContext, useClientContext] = createContextAndHook<ClientResource | 
 const [SessionContext, useSessionContext] = createContextAndHook<SignedInSessionResource | null | undefined>(
   'SessionContext',
 );
+
+const [InitialStateContext, useInitialStateContext] = createContextAndHook<InitialState | undefined>(
+  'InitialStateContext',
+);
+export { useInitialStateContext };
+export function InitialStateProvider({
+  children,
+  initialState,
+}: {
+  children: React.ReactNode;
+  initialState: InitialState | undefined;
+}) {
+  const initialStateCtx = React.useMemo(() => ({ value: initialState }), [initialState]);
+  return <InitialStateContext.Provider value={initialStateCtx}>{children}</InitialStateContext.Provider>;
+}
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
