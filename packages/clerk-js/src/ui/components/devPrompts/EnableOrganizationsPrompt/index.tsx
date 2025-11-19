@@ -262,7 +262,7 @@ const EnableOrganizationsPromptInternal = ({
                       `,
                     ]}
                   >
-                    To use the{' '}
+                    Enable Organizations to use{' '}
                     <code
                       css={[
                         basePromptElementStyles,
@@ -276,8 +276,6 @@ const EnableOrganizationsPromptInternal = ({
                     >
                       {isComponent ? `<${caller} />` : caller}
                     </code>{' '}
-                    {isComponent ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations feature for your
-                    app first.
                   </p>
 
                   <Link
@@ -285,7 +283,7 @@ const EnableOrganizationsPromptInternal = ({
                     target='_blank'
                     rel='noopener noreferrer'
                   >
-                    Learn more about Organizations.
+                    Learn more
                   </Link>
                 </>
               )}
