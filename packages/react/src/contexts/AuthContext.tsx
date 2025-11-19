@@ -41,13 +41,14 @@ export function AuthStateProvider(props: { children: React.ReactNode; state: Res
   return <AuthContext.Provider value={authStateCtxValue}>{props.children}</AuthContext.Provider>;
 }
 
+const emptyAuthCtx = { value: undefined };
+// We want the types to be:
+//   Pass in value known not to be undefined -> { value: AuthContextValue }
+//   Pass in value that might be undefined -> { value: AuthContextValue | undefined }
+type DerivedAuthContextValue<T> = { value: T extends undefined ? undefined : AuthContextValue };
+
 // Narrow full state to only what we need for the AuthContextValue
-function useDeriveAuthContext<T extends DeriveStateReturnType | undefined>(
-  fullState: T,
-  // We want the types to be:
-  //   Pass in value known not to be undefined -> { value: AuthContextValue }
-  //   Pass in value that might be undefined -> { value: AuthContextValue | undefined }
-): { value: T extends undefined ? undefined : AuthContextValue } {
+function useDeriveAuthContext<T extends DeriveStateReturnType | undefined>(fullState: T): DerivedAuthContextValue<T> {
   const fullReturn = React.useMemo(() => {
     const value = {
       sessionId: fullState?.sessionId,
@@ -75,11 +76,9 @@ function useDeriveAuthContext<T extends DeriveStateReturnType | undefined>(
     fullState?.factorVerificationAge,
   ]);
 
-  const emptyAuthCtx = React.useMemo(() => ({ value: undefined }), []);
-
   if (fullState === undefined) {
-    return emptyAuthCtx as { value: T extends undefined ? undefined : AuthContextValue };
+    return emptyAuthCtx as DerivedAuthContextValue<T>;
   }
 
-  return fullReturn as { value: T extends undefined ? undefined : AuthContextValue };
+  return fullReturn as DerivedAuthContextValue<T>;
 }
