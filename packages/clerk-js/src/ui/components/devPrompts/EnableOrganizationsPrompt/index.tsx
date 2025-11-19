@@ -11,7 +11,7 @@ import { Modal } from '@/ui/elements/Modal';
 import { common, InternalThemeProvider } from '@/ui/styledSystem';
 
 import { DevTools } from '../../../../core/resources/DevTools';
-import { Flex, Span } from '../../../customizables';
+import { Box, Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
 
@@ -291,15 +291,35 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {!isEnabled && hasPersonalAccountsEnabled && (
-              <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
-                <Switch
-                  label='Allow personal account'
-                  description='This is an uncommon setting, meant for applications that sell to both organizations and individual users. Most B2B applications require users to be part of an organization, and should keep this setting disabled.'
-                  checked={allowPersonalAccount}
-                  onChange={() => setAllowPersonalAccount(prev => !prev)}
-                />
-              </Flex>
+            {hasPersonalAccountsEnabled && (
+              <Box
+                sx={t => ({
+                  display: 'grid',
+                  gridTemplateRows: isEnabled ? '0fr' : '1fr',
+                  transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+                  marginInline: '-0.5rem',
+                  overflow: 'hidden',
+                })}
+                {...(isEnabled && { inert: '' })}
+              >
+                <Flex
+                  sx={t => ({
+                    minHeight: 0,
+                    paddingInline: '0.5rem',
+                    opacity: isEnabled ? 0 : 1,
+                    transition: `opacity ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
+                  })}
+                >
+                  <Flex sx={t => ({ marginTop: t.sizes.$2 })}>
+                    <Switch
+                      label='Allow personal account'
+                      description='Allow users to work outside of an organization by providing a personal account. We do not recommend for B2B SaaS apps.'
+                      checked={allowPersonalAccount}
+                      onChange={() => setAllowPersonalAccount(prev => !prev)}
+                    />
+                  </Flex>
+                </Flex>
+              </Box>
             )}
           </Flex>
 

@@ -134,7 +134,7 @@ export const useCheckout = (options?: UseCheckoutParams): __experimental_UseChec
     throw new Error('Clerk: Ensure that `useCheckout` is inside a component wrapped with `<SignedIn />`.');
   }
 
-  if (forOrganization === 'organization' && !organizationCtx.organization) {
+  if (forOrganization === 'organization' && !organizationCtx?.organization) {
     throw new Error(
       'Clerk: Ensure your flow checks for an active organization. Retrieve `orgId` from `useAuth()` and confirm it is defined. For SSR, see: https://clerk.com/docs/reference/backend/types/auth-object#how-to-access-the-auth-object',
     );
@@ -142,7 +142,7 @@ export const useCheckout = (options?: UseCheckoutParams): __experimental_UseChec
 
   const manager = useMemo(
     () => clerk.__experimental_checkout({ planId, planPeriod, for: forOrganization }),
-    [user.id, organizationCtx.organization?.id, planId, planPeriod, forOrganization],
+    [user.id, organizationCtx?.organization?.id, planId, planPeriod, forOrganization],
   );
 
   const managerProperties = useSyncExternalStore(
