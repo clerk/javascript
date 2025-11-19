@@ -694,6 +694,9 @@ export const enUS: LocalizationResource = {
     passwordPwned: {
       title: 'Password compromised',
     },
+    passwordUntrusted: {
+      title: 'Password untrusted',
+    },
     phoneCode: {
       formTitle: 'Verification code',
       resendButton: "Didn't receive a code? Resend",

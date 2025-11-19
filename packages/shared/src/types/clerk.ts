@@ -14,6 +14,7 @@ import type {
   SignUpTheme,
   SubscriptionDetailsTheme,
   TaskChooseOrganizationTheme,
+  TaskResetPasswordTheme,
   UserAvatarTheme,
   UserButtonTheme,
   UserProfileTheme,
@@ -2216,6 +2217,14 @@ export type TaskChooseOrganizationProps = {
    */
   redirectUrlComplete: string;
   appearance?: TaskChooseOrganizationTheme;
+};
+
+export type TaskResetPasswordProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: TaskResetPasswordTheme;
 };
 
 export type CreateOrganizationInvitationParams = {
