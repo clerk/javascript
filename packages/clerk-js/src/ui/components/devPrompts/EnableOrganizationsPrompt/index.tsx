@@ -13,7 +13,13 @@ import { common, InternalThemeProvider } from '@/ui/styledSystem';
 import { DevTools } from '../../../../core/resources/DevTools';
 import { Box, Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
-import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
+import {
+  basePromptElementStyles,
+  ClerkLogoIcon,
+  handleDashboardUrlParsing,
+  PromptContainer,
+  PromptSuccessIcon,
+} from '../shared';
 
 /**
  * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
@@ -125,80 +131,118 @@ const EnableOrganizationsPromptInternal = ({
                   transform-style: preserve-3d;
                   transition: transform 0.6s ease-in-out;
                   transform: ${isEnabled ? 'rotateY(180deg)' : 'rotateY(0)'};
+                  animation: ${!isEnabled ? 'coinFlipAnimation 6s infinite linear' : 'none'};
+
+                  @keyframes coinFlipAnimation {
+                    0%,
+                    55% {
+                      transform: rotateY(0);
+                    }
+                    60%,
+                    95% {
+                      transform: rotateY(180deg);
+                    }
+                    100% {
+                      transform: rotateY(0);
+                    }
+                  }
 
                   @media (prefers-reduced-motion: reduce) {
                     transition: none;
+                    animation: none;
                     transform: ${isEnabled ? 'rotateY(180deg)' : 'rotateY(0)'};
                   }
                 `}
               >
-                <span
-                  aria-hidden
-                  css={css`
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    backface-visibility: hidden;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  `}
-                >
-                  <svg
+                {isEnabled ? (
+                  <span
+                    aria-hidden
                     css={css`
-                      width: 1.25rem;
-                      height: 1.25rem;
+                      position: absolute;
+                      width: 100%;
+                      height: 100%;
+                      backface-visibility: hidden;
+                      transform: rotateY(180deg);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
                     `}
-                    viewBox='0 0 20 20'
-                    fill='none'
-                    xmlns='http://www.w3.org/2000/svg'
                   >
-                    <path
-                      opacity='0.2'
-                      d='M17.25 10C17.25 14.0041 14.0041 17.25 10 17.25C5.99594 17.25 2.75 14.0041 2.75 10C2.75 5.99594 5.99594 2.75 10 2.75C14.0041 2.75 17.25 5.99594 17.25 10Z'
-                      fill='#EAB308'
+                    <PromptSuccessIcon
+                      css={css`
+                        width: 1.25rem;
+                        height: 1.25rem;
+                      `}
                     />
-                    <path
-                      fillRule='evenodd'
-                      clipRule='evenodd'
-                      d='M10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 13.5899 6.41015 16.5 10 16.5C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z'
-                      fill='#EAB308'
-                    />
-                    <path
-                      fillRule='evenodd'
-                      clipRule='evenodd'
-                      d='M10 6C10.5523 6 11 6.44772 11 7V9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9V7C9 6.44772 9.44772 6 10 6Z'
-                      fill='#EAB308'
-                    />
-                    <path
-                      fillRule='evenodd'
-                      clipRule='evenodd'
-                      d='M10 12C10.5523 12 11 12.4477 11 13V13.01C11 13.5623 10.5523 14.01 10 14.01C9.44772 14.01 9 13.5623 9 13.01V13C9 12.4477 9.44772 12 10 12Z'
-                      fill='#EAB308'
-                    />
-                  </svg>
-                </span>
+                  </span>
+                ) : (
+                  <>
+                    <span
+                      className='coin-flip-front'
+                      aria-hidden
+                      css={css`
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        backface-visibility: hidden;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                      `}
+                    >
+                      <ClerkLogoIcon />
+                    </span>
 
-                <span
-                  aria-hidden
-                  css={css`
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    backface-visibility: hidden;
-                    transform: rotateY(180deg);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  `}
-                >
-                  <PromptSuccessIcon
-                    css={css`
-                      width: 1.25rem;
-                      height: 1.25rem;
-                    `}
-                  />
-                </span>
+                    <span
+                      className='coin-flip-back'
+                      aria-hidden
+                      css={css`
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        backface-visibility: hidden;
+                        transform: rotateY(180deg);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                      `}
+                    >
+                      <svg
+                        css={css`
+                          width: 1.25rem;
+                          height: 1.25rem;
+                        `}
+                        viewBox='0 0 20 20'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          opacity='0.2'
+                          d='M17.25 10C17.25 14.0041 14.0041 17.25 10 17.25C5.99594 17.25 2.75 14.0041 2.75 10C2.75 5.99594 5.99594 2.75 10 2.75C14.0041 2.75 17.25 5.99594 17.25 10Z'
+                          fill='#EAB308'
+                        />
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 13.5899 6.41015 16.5 10 16.5C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z'
+                          fill='#EAB308'
+                        />
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M10 6C10.5523 6 11 6.44772 11 7V9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9V7C9 6.44772 9.44772 6 10 6Z'
+                          fill='#EAB308'
+                        />
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M10 12C10.5523 12 11 12.4477 11 13V13.01C11 13.5623 10.5523 14.01 10 14.01C9.44772 14.01 9 13.5623 9 13.01V13C9 12.4477 9.44772 12 10 12Z'
+                          fill='#EAB308'
+                        />
+                      </svg>
+                    </span>
+                  </>
+                )}
               </div>
 
               <h1
