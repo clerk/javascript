@@ -18,3 +18,5 @@ export {
 } from './contexts';
 
 export * from './commerce';
+
+export { ClerkContextProvider } from './ClerkContextProvider';

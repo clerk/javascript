@@ -1,3 +1,6 @@
+import React from 'react';
+
+import type { Clerk, LoadedClerk, Resources } from '../types';
 import {
   __experimental_CheckoutProvider as CheckoutProvider,
   ClerkInstanceContext,
@@ -5,13 +8,10 @@ import {
   OrganizationProvider,
   SessionContext,
   UserContext,
-} from '@clerk/shared/react';
-import type { Clerk, LoadedClerk, Resources } from '@clerk/shared/types';
-import React from 'react';
-
+} from './contexts';
 import { assertClerkSingletonExists } from './utils';
 
-type CoreClerkContextWrapperProps = {
+type ClerkContextProps = {
   clerk: Clerk;
   children: React.ReactNode;
   swrConfig?: any;
@@ -19,9 +19,9 @@ type CoreClerkContextWrapperProps = {
 
 type CoreClerkContextProviderState = Resources;
 
-export function CoreClerkContextWrapper(props: CoreClerkContextWrapperProps): JSX.Element | null {
-  // TODO: Revise Clerk and LoadedClerk
+export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | null {
   const clerk = props.clerk as LoadedClerk;
+
   assertClerkSingletonExists(clerk);
 
   const [state, setState] = React.useState<CoreClerkContextProviderState>({
