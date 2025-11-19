@@ -11,6 +11,7 @@ import { useCoreSignIn, useEnvironment } from '../../contexts';
 import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
+import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
 import { hasMultipleEnterpriseConnections } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
@@ -40,6 +41,25 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
   }
   return key;
 };
+
+function determineAlternativeMethodsMode(
+  showForgotPasswordStrategies: boolean,
+  compromisedPasswordErrorCode: string | null,
+): AlternativeMethodsMode {
+  if (!showForgotPasswordStrategies) {
+    return 'default';
+  }
+
+  if (compromisedPasswordErrorCode === 'form_password_pwned__sign_in') {
+    return 'pwned';
+  }
+
+  if (compromisedPasswordErrorCode === 'form_password_untrusted__sign_in') {
+    return 'untrusted-password';
+  }
+
+  return 'forgot';
+}
 
 function SignInFactorOneInternal(): JSX.Element {
   const { __internal_setActiveInProgress } = useClerk();
@@ -84,7 +104,7 @@ function SignInFactorOneInternal(): JSX.Element {
 
   const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
 
-  const [isPasswordPwned, setIsPasswordPwned] = React.useState(false);
+  const [untrustedPasswordErrorCode, setUntrustedPasswordErrorCode] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {
@@ -139,11 +159,11 @@ function SignInFactorOneInternal(): JSX.Element {
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
     const backHandler = () => {
       card.setError(undefined);
-      setIsPasswordPwned(false);
+      setUntrustedPasswordErrorCode(null);
       toggle?.();
     };
 
-    const mode = showForgotPasswordStrategies ? (isPasswordPwned ? 'pwned' : 'forgot') : 'default';
+    const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, untrustedPasswordErrorCode);
 
     return (
       <AlternativeMethods
@@ -175,8 +195,8 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePasswordCard
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
-          onPasswordPwned={() => {
-            setIsPasswordPwned(true);
+          onUntrustedPassword={() => {
+            setUntrustedPasswordErrorCode('form_password_pwned__sign_in');
             toggleForgotPasswordStrategies();
           }}
         />
