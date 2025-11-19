@@ -513,13 +513,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 paddingInline: TRACK_PADDING,
                 width: trackWidth,
                 height: trackHeight,
-                border: `1px solid rgba(118, 118, 132, 0.25)`,
-                backgroundColor: checked ? 'rgba(255, 255, 255, 0.75)' : `rgba(255, 255, 255, 0.1)`,
+                border: `1px solid`,
+                borderColor: checked ? 'rgba(255, 255, 255, 0.4)' : `rgba(255, 255, 255, 0.2)`,
+                backgroundColor: checked ? '#31C854' : `rgba(0, 0, 0, 0.2)`,
                 borderRadius: 999,
                 transition: 'background-color 0.2s ease-in-out',
-                '&:hover': {
-                  borderColor: `rgba(118, 118, 132, 0.5)`,
-                },
               };
             }}
           >
@@ -532,6 +530,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                   height: size,
                   borderRadius: 9999,
                   backgroundColor: 'white',
+                  boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
                   transform: `translateX(${checked ? maxTranslateX : '0'})`,
                   transition: 'transform 0.2s ease-in-out',
                   '@media (prefers-reduced-motion: reduce)': {
