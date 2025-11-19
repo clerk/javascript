@@ -57,7 +57,6 @@ export type * from './router';
 export type * from '../ui/types';
 export type * from './runtime-values';
 export type * from './saml';
-export type * from './samlConnection';
 export type * from './session';
 export type * from './sessionVerification';
 export type * from './signIn';
