@@ -37,4 +37,5 @@ export interface GenerateSignatureParams {
   identifier: string;
   nonce: string;
   provider?: Web3Provider;
+  walletName: string;
 }
