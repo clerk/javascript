@@ -9,8 +9,8 @@ import type {
   UseAuthReturn,
 } from '@clerk/shared/types';
 import { useCallback } from 'react';
+import { useAuthState } from 'src/contexts/AuthContext';
 
-import { useAuthContext, useInitialAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
@@ -96,11 +96,7 @@ export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
 
   const { treatPendingAsSignedOut } = options ?? {};
-  const clerk = useIsomorphicClerkContext();
-  const initialAuthContext = useInitialAuthContext();
-  const authContext = useAuthContext();
-
-  const resolvedAuthContext = !clerk.loaded && initialAuthContext !== undefined ? initialAuthContext : authContext;
+  const authState = useAuthState();
 
   const isomorphicClerk = useIsomorphicClerkContext();
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
@@ -110,7 +106,7 @@ export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
 
   return useDerivedAuth(
     {
-      ...resolvedAuthContext,
+      ...authState,
       getToken,
       signOut,
     },

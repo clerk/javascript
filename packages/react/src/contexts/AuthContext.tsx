@@ -3,16 +3,18 @@ import { deriveFromClientSideState, deriveFromSsrInitialState } from '@clerk/sha
 import { createContextAndHook } from '@clerk/shared/react';
 import type {
   ActClaim,
+  ClientResource,
   InitialState,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
-  Resources,
   SessionStatusClaim,
 } from '@clerk/shared/types';
-import React from 'react';
+import React, { useCallback, useDeferredValue, useMemo, useSyncExternalStore } from 'react';
 
-export type AuthContextValue = {
+import { useIsomorphicClerkContext } from './IsomorphicClerkContext';
+
+type AuthStateValue = {
   userId: string | null | undefined;
   sessionId: string | null | undefined;
   sessionStatus: SessionStatusClaim | null | undefined;
@@ -25,60 +27,83 @@ export type AuthContextValue = {
   factorVerificationAge: [number, number] | null;
 };
 
-export const [InitialAuthContext, useInitialAuthContext] = createContextAndHook<AuthContextValue | undefined>(
+const [InitialAuthContext, useInitialAuthContext] = createContextAndHook<InitialState | undefined>(
   'InitialAuthContext',
 );
-export function InitialAuthStateProvider(props: { children: React.ReactNode; initialState: InitialState | undefined }) {
-  const initialAuthStateCtxValue = useDeriveAuthContext(
-    props.initialState ? deriveFromSsrInitialState(props.initialState) : undefined,
-  );
-  return <InitialAuthContext.Provider value={initialAuthStateCtxValue}>{props.children}</InitialAuthContext.Provider>;
+export function InitialAuthStateProvider({
+  children,
+  initialState,
+}: {
+  children: React.ReactNode;
+  initialState: InitialState | undefined;
+}) {
+  const initialStateCtx = useMemo(() => ({ value: initialState }), [initialState]);
+  return <InitialAuthContext.Provider value={initialStateCtx}>{children}</InitialAuthContext.Provider>;
 }
 
-export const [AuthContext, useAuthContext] = createContextAndHook<AuthContextValue>('AuthContext');
-export function AuthStateProvider(props: { children: React.ReactNode; state: Resources }) {
-  const authStateCtxValue = useDeriveAuthContext(deriveFromClientSideState(props.state));
-  return <AuthContext.Provider value={authStateCtxValue}>{props.children}</AuthContext.Provider>;
-}
+export const defaultDerivedInitialState = {
+  actor: undefined,
+  factorVerificationAge: null,
+  orgId: undefined,
+  orgPermissions: undefined,
+  orgRole: undefined,
+  orgSlug: undefined,
+  sessionClaims: undefined,
+  sessionId: undefined,
+  sessionStatus: undefined,
+  userId: undefined,
+};
 
-const emptyAuthCtx = { value: undefined };
-// We want the types to be:
-//   Pass in value known not to be undefined -> { value: AuthContextValue }
-//   Pass in value that might be undefined -> { value: AuthContextValue | undefined }
-type DerivedAuthContextValue<T> = { value: T extends undefined ? undefined : AuthContextValue };
+export function useAuthState(): AuthStateValue {
+  const clerk = useIsomorphicClerkContext();
+  const initialAuthContext = useInitialAuthContext();
+  // If we make initialState support a promise in the future, this is where we would use() that promise
+  const initialSnapshot = useMemo(() => {
+    if (!initialAuthContext) {
+      return defaultDerivedInitialState;
+    }
+    const fullState = deriveFromSsrInitialState(initialAuthContext);
+    return authStateFromFull(fullState);
+  }, [initialAuthContext]);
 
-// Narrow full state to only what we need for the AuthContextValue
-function useDeriveAuthContext<T extends DeriveStateReturnType | undefined>(fullState: T): DerivedAuthContextValue<T> {
-  const fullReturn = React.useMemo(() => {
-    const value = {
-      sessionId: fullState?.sessionId,
-      sessionStatus: fullState?.sessionStatus,
-      sessionClaims: fullState?.sessionClaims,
-      userId: fullState?.userId,
-      actor: fullState?.actor,
-      orgId: fullState?.orgId,
-      orgRole: fullState?.orgRole,
-      orgSlug: fullState?.orgSlug,
-      orgPermissions: fullState?.orgPermissions,
-      factorVerificationAge: fullState?.factorVerificationAge,
+  const snapshot = useMemo(() => {
+    if (!clerk.loaded) {
+      return initialSnapshot;
+    }
+    const state = {
+      client: clerk.client as ClientResource,
+      session: clerk.session,
+      user: clerk.user,
+      organization: clerk.organization,
     };
-    return { value };
-  }, [
-    fullState?.sessionId,
-    fullState?.sessionStatus,
-    fullState?.sessionClaims,
-    fullState?.userId,
-    fullState?.actor,
-    fullState?.orgId,
-    fullState?.orgRole,
-    fullState?.orgSlug,
-    fullState?.orgPermissions,
-    fullState?.factorVerificationAge,
-  ]);
+    const fullState = deriveFromClientSideState(state);
+    return authStateFromFull(fullState);
+  }, [clerk.client, clerk.session, clerk.user, clerk.organization, initialSnapshot, clerk.loaded]);
 
-  if (fullState === undefined) {
-    return emptyAuthCtx as DerivedAuthContextValue<T>;
-  }
+  const authState = useSyncExternalStore(
+    clerk.addListener,
+    useCallback(() => snapshot, [snapshot]),
+    useCallback(() => initialSnapshot, [initialSnapshot]),
+  );
 
-  return fullReturn as DerivedAuthContextValue<T>;
+  // If an updates comes in during a transition, uSES usually deopts that transition to be synchronous,
+  // which for example means that already mounted <Suspense> boundaries might suddenly show their fallback.
+  // This makes all auth state changes into transitions, but does not deopt to be synchronous. If it's
+  // called during a transition, it immediately uses the new value without deferring.
+  return useDeferredValue(authState);
+}
+
+function authStateFromFull(derivedState: DeriveStateReturnType) {
+  return {
+    sessionId: derivedState.sessionId,
+    sessionStatus: derivedState.sessionStatus,
+    sessionClaims: derivedState.sessionClaims,
+    userId: derivedState.userId,
+    actor: derivedState.actor,
+    orgId: derivedState.orgId,
+    orgRole: derivedState.orgRole,
+    orgSlug: derivedState.orgSlug,
+    orgPermissions: derivedState.orgPermissions,
+    factorVerificationAge: derivedState.factorVerificationAge,
+  };
 }

@@ -11,7 +11,7 @@ import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
-import { AuthStateProvider, InitialAuthStateProvider } from './AuthContext';
+import { InitialAuthStateProvider } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
 type ClerkContextProvider = {
@@ -65,16 +65,14 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationProvider {...organizationCtx.value}>
             <InitialAuthStateProvider initialState={initialState}>
-              <AuthStateProvider state={state}>
-                <UserContext.Provider value={userCtx}>
-                  <CheckoutProvider
-                    // @ts-expect-error - value is not used
-                    value={undefined}
-                  >
-                    {children}
-                  </CheckoutProvider>
-                </UserContext.Provider>
-              </AuthStateProvider>
+              <UserContext.Provider value={userCtx}>
+                <CheckoutProvider
+                  // @ts-expect-error - value is not used
+                  value={undefined}
+                >
+                  {children}
+                </CheckoutProvider>
+              </UserContext.Provider>
             </InitialAuthStateProvider>
           </OrganizationProvider>
         </SessionContext.Provider>
