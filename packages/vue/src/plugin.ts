@@ -76,13 +76,15 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
       void (async () => {
         try {
           const clerkPromise = loadClerkJsScript(options);
-          const clerkUiCtorPromise = (async () => {
-            await loadClerkUiScript(options);
-            if (!window.__unstable_ClerkUiCtor) {
-              throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-            }
-            return window.__unstable_ClerkUiCtor;
-          })();
+          const clerkUiCtorPromise = pluginOptions.clerkUiCtor
+            ? Promise.resolve(pluginOptions.clerkUiCtor)
+            : (async () => {
+                await loadClerkUiScript(options);
+                if (!window.__unstable_ClerkUiCtor) {
+                  throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+                }
+                return window.__unstable_ClerkUiCtor;
+              })();
 
           await clerkPromise;
 
