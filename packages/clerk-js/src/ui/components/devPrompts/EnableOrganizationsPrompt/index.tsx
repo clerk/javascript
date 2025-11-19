@@ -301,7 +301,7 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {!isEnabled && clerk?.user && (
+            {!isEnabled && (
               <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
                 <Switch
                   label='Allow personal account'
