@@ -44,17 +44,17 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 
 function determineAlternativeMethodsMode(
   showForgotPasswordStrategies: boolean,
-  compromisedPasswordErrorCode: string | null,
+  untrustedPasswordErrorCode: string | null,
 ): AlternativeMethodsMode {
   if (!showForgotPasswordStrategies) {
     return 'default';
   }
 
-  if (compromisedPasswordErrorCode === 'form_password_pwned__sign_in') {
+  if (untrustedPasswordErrorCode === 'form_password_pwned__sign_in') {
     return 'pwned';
   }
 
-  if (compromisedPasswordErrorCode === 'form_password_untrusted__sign_in') {
+  if (untrustedPasswordErrorCode === 'form_password_untrusted__sign_in') {
     return 'untrusted-password';
   }
 
