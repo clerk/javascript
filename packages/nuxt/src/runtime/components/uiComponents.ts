@@ -19,31 +19,33 @@ import { useRoutingProps } from '@clerk/vue/internal';
 import { useRoute } from 'nuxt/app';
 import { computed, defineComponent, h } from 'vue';
 
-const usePathnameWithoutSplatRouteParams = () => {
+export const usePathnameWithoutSplatRouteParams = () => {
   const route = useRoute();
 
-  // Get the pathname that includes any named or catch all params
-  // eg:
-  // the filesystem route /profile/[[...slug]]/page.vue
-  // could give us the following pathname /profile/security/x/y
-  // if the user navigates to the security section with additional segments
+  // Get the pathname without catch-all route params
   return computed(() => {
     const pathname = route.path || '';
-    const pathParts = pathname.split('/').filter(Boolean);
 
-    // In Nuxt, catch-all routes use [...paramName] syntax
-    // Named params are strings, catch-all params are arrays
-    // We find all catch-all params by checking if the value is an array
+    // Find catch-all params (they are arrays in Nuxt)
     const catchAllSegments = Object.values(route.params || {})
       .filter((v): v is string[] => Array.isArray(v))
       .flat();
 
-    // Remove catch-all segments from the pathname
-    // so we end up with the pathname where the components are mounted at
-    // eg /profile/security/x/y will return /profile as the path
-    const path = `/${pathParts.slice(0, pathParts.length - catchAllSegments.length).join('/')}`;
+    // If no catch-all segments, return the pathname as-is
+    if (catchAllSegments.length === 0) {
+      return pathname || '/';
+    }
 
-    return path;
+    // Get the splat route param (join array segments into a string)
+    // eg ["world"] becomes "/world"
+    const splatRouteParam = '/' + catchAllSegments.join('/');
+
+    // Remove the splat route param from the pathname
+    // so we end up with the pathname where the components are mounted at
+    // eg /hello/world with slug=["world"] returns /hello
+    const path = pathname.replace(splatRouteParam, '').replace(/\/$/, '').replace(/^\//, '').trim();
+
+    return `/${path}`;
   });
 };
 
