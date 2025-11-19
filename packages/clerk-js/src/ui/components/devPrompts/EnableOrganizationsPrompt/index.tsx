@@ -291,7 +291,7 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {hasPersonalAccountsEnabled && (
+            {!isEnabled && hasPersonalAccountsEnabled && (
               <Box
                 sx={t => ({
                   display: 'grid',
