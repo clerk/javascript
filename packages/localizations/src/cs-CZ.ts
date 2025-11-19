@@ -619,6 +619,12 @@ export const csCZ: LocalizationResource = {
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zkontrolujte svůj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Zkontrolujte svůj e-mail',
+      resendButton: 'Neobdrželi jste kód? Znovu poslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -655,6 +661,12 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',
+      resendButton: 'Nedostali jste odkaz? Znovu odeslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -672,6 +684,8 @@ export const csCZ: LocalizationResource = {
       label__alternativeMethods: 'Nebo se přihlaste jinou metodou',
       title: 'Zapomněli jste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Přihlašujete se z nového zařízení. Žádáme o ověření, abychom udrželi váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nelze pokračovat v přihlášení. Není k dispozici žádný autentizační faktor.',
       subtitle: 'Došlo k chybě',

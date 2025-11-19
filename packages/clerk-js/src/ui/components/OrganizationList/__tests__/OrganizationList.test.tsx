@@ -45,7 +45,7 @@ describe('OrganizationList', () => {
         });
       });
 
-      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
         Promise.resolve({
           data: [
             createFakeUserOrganizationMembership({
@@ -117,7 +117,7 @@ describe('OrganizationList', () => {
         });
       });
 
-      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+      fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
         Promise.resolve({
           data: [
             createFakeUserOrganizationMembership({
@@ -156,7 +156,7 @@ describe('OrganizationList', () => {
         }),
       );
 
-      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValueOnce(
+      fixtures.clerk.user?.getOrganizationInvitations.mockReturnValue(
         Promise.resolve({
           data: [invitation],
           total_count: 1,
@@ -342,7 +342,7 @@ describe('OrganizationList', () => {
         });
 
         await waitFor(async () => {
-          fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+          fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
           await userEvent.click(getByText(/Personal account/i));
 
           expect(fixtures.router.navigate).toHaveBeenCalledWith(`/user/test_user_id`);
@@ -376,7 +376,7 @@ describe('OrganizationList', () => {
           },
         });
 
-        fixtures.clerk.user?.getOrganizationMemberships.mockReturnValueOnce(
+        fixtures.clerk.user?.getOrganizationMemberships.mockReturnValue(
           Promise.resolve({
             data: [membership],
             total_count: 1,
@@ -392,7 +392,7 @@ describe('OrganizationList', () => {
         });
 
         await waitFor(async () => {
-          fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+          fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
           await userEvent.click(getByRole('button', { name: /Org1/i }));
           expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -423,7 +423,7 @@ describe('OrganizationList', () => {
           wrapper,
         });
 
-        fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
+        fixtures.clerk.setActive.mockReturnValue(Promise.resolve());
         await waitFor(async () =>
           expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
         );

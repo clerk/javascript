@@ -611,6 +611,12 @@ export const ptPT: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique o seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifique o seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique o seu e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'O cliente não corresponde ao esperado. Tente novamente.',
@@ -646,6 +652,12 @@ export const ptPT: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilize a ligação de verificação enviada para o seu e-mail',
+      resendButton: 'Não recebeu a ligação? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique o seu e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -663,6 +675,8 @@ export const ptPT: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu-se da palavra-passe?',
     },
+    newDeviceVerificationNotice:
+      'Está a iniciar sessão a partir de um novo dispositivo. Estamos a solicitar verificação para manter a sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Ocorreu um erro',

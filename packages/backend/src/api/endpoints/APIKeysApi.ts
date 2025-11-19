@@ -21,7 +21,6 @@ type GetAPIKeyListParams = ClerkPaginationRequest<{
 }>;
 
 type CreateAPIKeyParams = {
-  type?: 'api_key';
   /**
    * API key name
    */

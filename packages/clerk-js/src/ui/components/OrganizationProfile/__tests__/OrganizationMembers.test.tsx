@@ -30,6 +30,8 @@ describe('OrganizationMembers', () => {
       f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
 
@@ -49,6 +51,9 @@ describe('OrganizationMembers', () => {
       f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { getByRole, container } = render(<OrganizationMembers />, { wrapper });
@@ -64,6 +69,8 @@ describe('OrganizationMembers', () => {
       f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: [{ name: 'Org1', role: 'admin' }] });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { getByRole, findByText } = render(<OrganizationMembers />, { wrapper });
@@ -82,6 +89,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { container, queryByRole } = render(<OrganizationMembers />, { wrapper });
@@ -148,6 +156,8 @@ describe('OrganizationMembers', () => {
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
 
     fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
       Promise.resolve({
@@ -219,7 +229,9 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
         data: [],
         total_count: 14,
@@ -253,7 +265,9 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
         data: [],
         total_count: 5,
@@ -300,11 +314,9 @@ describe('OrganizationMembers', () => {
       });
     });
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
-      Promise.resolve({ data: membersList, total_count: 0 }),
-    );
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(Promise.resolve({ data: membersList, total_count: 0 }));
 
-    fixtures.clerk.organization?.getMemberships.mockReturnValueOnce(
+    fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
         data: [],
         total_count: 0,
@@ -327,6 +339,9 @@ describe('OrganizationMembers', () => {
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
 
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
@@ -367,6 +382,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     fixtures.clerk.organization?.getInvitations.mockReturnValue(
@@ -421,6 +437,9 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+    fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     fixtures.clerk.organization?.getDomains.mockReturnValue(
@@ -460,6 +479,7 @@ describe('OrganizationMembers', () => {
       });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
     fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
@@ -494,6 +514,8 @@ describe('OrganizationMembers', () => {
         organization_memberships: [{ name: 'Org1', id: '1' }],
       });
     });
+
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
 
     fixtures.clerk.organization?.getMemberships.mockReturnValue(
       Promise.resolve({
@@ -550,6 +572,8 @@ describe('OrganizationMembers', () => {
       });
 
       fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
 
       const { container, getByRole } = render(<OrganizationMembers />, { wrapper });
 

@@ -612,6 +612,12 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'E-posta kutunuzu kontrol edin',
     },
+    emailCodeMfa: {
+      formTitle: 'E-posta kutunuzu kontrol edin',
+      resendButton: 'Kod almadınız mı? Tekrar gönderin',
+      subtitle: '{{applicationName}} ile devam etmek için',
+      title: 'E-posta kutunuzu kontrol edin',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -648,6 +654,12 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',
+      resendButton: 'Bağlantıyı almadınız mı? Yeniden gönder',
+      subtitle: '{{applicationName}} uygulamasına devam etmek için',
+      title: 'E-postanızı kontrol edin',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +677,8 @@ export const trTR: LocalizationResource = {
       label__alternativeMethods: 'Veya başka bir yöntem kullanın:',
       title: 'Şifremi unuttum',
     },
+    newDeviceVerificationNotice:
+      'Yeni bir cihazdan oturum açıyorsunuz. Hesabınızın güvenliğini sağlamak için doğrulama istiyoruz.',
     noAvailableMethods: {
       message: 'Hesabınızda giriş yapmak için kullanabileceğiniz bir yöntem bulunmuyor.',
       subtitle: 'Bir hata oluştu',
