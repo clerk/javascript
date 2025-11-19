@@ -78,6 +78,8 @@ const EnableOrganizationsPromptInternal = ({
 
   const isComponent = !caller.startsWith('use');
 
+  const hasPersonalAccountsEnabled = 'forceOrganizationSelection' in (environment?.organizationSettings ?? {});
+
   return (
     <Portal>
       <Modal
@@ -283,7 +285,7 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {!isEnabled && (
+            {!isEnabled && hasPersonalAccountsEnabled && (
               <Flex sx={t => ({ marginTop: t.sizes.$3 })}>
                 <Switch
                   label='Allow personal account'
