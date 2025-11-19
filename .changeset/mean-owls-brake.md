@@ -14,5 +14,5 @@
 "@clerk/vue": major
 ---
 
-Require Node.js 20 or newer across the repo.
+Require Node.js 20 in all packages
 
