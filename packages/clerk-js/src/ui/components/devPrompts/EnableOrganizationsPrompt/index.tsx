@@ -1,14 +1,14 @@
 import { useClerk } from '@clerk/shared/react';
-import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
+import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettingParams } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import type { SerializedStyles } from '@emotion/react';
 import { css, type Theme } from '@emotion/react';
 import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
+import { useEnvironment } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
 import { common, InternalThemeProvider } from '@/ui/styledSystem';
 
-import { useEnvironment } from '@/ui/contexts';
 import { DevTools } from '../../../../core/resources/DevTools';
 import { Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
@@ -66,7 +66,7 @@ const EnableOrganizationsPromptInternal = ({
   const handleEnableOrganizations = () => {
     setIsLoading(true);
 
-    const params: Parameters<DevTools['__internal_enableEnvironmentSetting']>[0] = {
+    const params: EnableEnvironmentSettingParams = {
       enable_organizations: true,
     };
 
