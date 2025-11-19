@@ -60,11 +60,12 @@ const RemoveScreen = ({
   const { close } = useActionContext();
   const card = useCardState();
   const subscriberType = useSubscriberTypeContext();
-  const organizationCtx = useOrganizationContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
     `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
   );
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   if (!ref.current) {
     return null;
@@ -196,9 +197,10 @@ const PaymentMethodMenu = ({
 }) => {
   const { open } = useActionContext();
   const card = useCardState();
-  const organizationCtx = useOrganizationContext();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const actions = [
     {

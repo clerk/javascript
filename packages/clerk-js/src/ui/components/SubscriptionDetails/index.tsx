@@ -173,7 +173,6 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
 
 const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const subscriberType = useSubscriberTypeContext();
-  const organizationCtx = useOrganizationContext();
   const { isLoading, error, setError, setLoading, setIdle } = useCardState();
   const {
     subscription: selectedSubscription,
@@ -183,6 +182,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const { data: subscription } = useSubscription();
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 

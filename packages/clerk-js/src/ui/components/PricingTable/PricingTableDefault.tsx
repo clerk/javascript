@@ -104,6 +104,7 @@ function Card(props: CardProps) {
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
   const organizationCtx = useOrganizationContext();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
