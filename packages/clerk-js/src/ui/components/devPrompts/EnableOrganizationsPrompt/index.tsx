@@ -291,7 +291,7 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {!isEnabled && hasPersonalAccountsEnabled && (
+            {hasPersonalAccountsEnabled && (
               <Box
                 sx={t => ({
                   display: 'grid',
@@ -313,7 +313,7 @@ const EnableOrganizationsPromptInternal = ({
                   <Flex sx={t => ({ marginTop: t.sizes.$2 })}>
                     <Switch
                       label='Allow personal account'
-                      description='This is an uncommon setting, meant for applications that sell to both organizations and individual users. Most B2B applications require users to be part of an organization, and should keep this setting disabled.'
+                      description='Allow users to work outside of an organization by providing a personal account. We do not recommend for B2B SaaS apps.'
                       checked={allowPersonalAccount}
                       onChange={() => setAllowPersonalAccount(prev => !prev)}
                     />
