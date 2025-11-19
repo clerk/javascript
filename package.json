@@ -154,7 +154,7 @@
   },
   "packageManager": "pnpm@10.17.1",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=20.9.0",
     "pnpm": ">=10.17.1"
   },
   "pnpm": {
