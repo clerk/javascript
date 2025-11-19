@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettingParams } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import type { SerializedStyles } from '@emotion/react';
+// eslint-disable-next-line no-restricted-imports
 import { css, type Theme } from '@emotion/react';
 import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
