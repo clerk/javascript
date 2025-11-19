@@ -110,7 +110,7 @@
     "react-router": "^7.9.0"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"
