@@ -22,8 +22,6 @@ import { computed, defineComponent, h } from 'vue';
 const usePathnameWithoutSplatRouteParams = () => {
   const route = useRoute();
 
-  console.log('route', route);
-
   // Get the pathname that includes any named or catch all params
   // eg:
   // the filesystem route /profile/[[...slug]]/page.vue
@@ -57,7 +55,7 @@ export const UserProfile = Object.assign(
     const routingProps = useRoutingProps('UserProfile', props, () => ({ path: path.value }));
     return () => h(BaseUserProfile, routingProps.value);
   }),
-  { ...BaseUserProfile },
+  { Page: BaseUserProfile.Page, Link: BaseUserProfile.Link },
 ) as unknown as typeof BaseUserProfile;
 
 // The assignment of OrganizationProfile with BaseOrganizationProfile props is used
@@ -68,7 +66,7 @@ export const OrganizationProfile = Object.assign(
     const routingProps = useRoutingProps('OrganizationProfile', props, () => ({ path: path.value }));
     return () => h(BaseOrganizationProfile, routingProps.value);
   }),
-  { ...BaseOrganizationProfile },
+  { Page: BaseOrganizationProfile.Page, Link: BaseOrganizationProfile.Link },
 ) as unknown as typeof BaseOrganizationProfile;
 
 export const CreateOrganization = defineComponent((props: CreateOrganizationProps) => {

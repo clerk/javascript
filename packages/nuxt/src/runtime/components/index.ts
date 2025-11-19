@@ -1,7 +1,5 @@
 export { SignIn, SignUp, UserProfile, OrganizationProfile, CreateOrganization, OrganizationList } from './uiComponents';
 
-console.log('hello from componentsi ndex');
-
 export {
   UserAvatar,
   UserButton,
