@@ -25,6 +25,9 @@ catalogs:
     typescript:
       specifier: 5.8.3
       version: 5.8.3
+    vue:
+      specifier: 3.5.21
+      version: 3.5.21
     zx:
       specifier: 8.8.5
       version: 8.8.5
@@ -745,6 +748,9 @@ importers:
       typescript:
         specifier: catalog:repo
         version: 5.8.3
+      vue:
+        specifier: catalog:repo
+        version: 3.5.21(typescript@5.8.3)
 
   packages/react:
     dependencies:
@@ -1085,7 +1091,7 @@ importers:
         specifier: ^6.2.0
         version: 6.2.0(@types/node@22.19.0)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.20.6)(vue@3.5.21(typescript@5.8.3))(yaml@2.8.1)
       vue:
-        specifier: 3.5.21
+        specifier: catalog:repo
         version: 3.5.21(typescript@5.8.3)
       vue-tsc:
         specifier: ^2.2.12
@@ -28119,7 +28125,7 @@ snapshots:
       unplugin-vue-router: 0.16.1(@vue/compiler-sfc@3.5.24)(typescript@5.8.3)(vue-router@4.6.3(vue@3.5.24(typescript@5.8.3)))(vue@3.5.24(typescript@5.8.3))
       untyped: 2.0.0
       vue: 3.5.24(typescript@5.8.3)
-      vue-router: 4.6.3(vue@3.5.24(typescript@5.8.3))
+      vue-router: 4.6.3(vue@3.5.21(typescript@5.8.3))
     optionalDependencies:
       '@parcel/watcher': 2.5.1
       '@types/node': 22.19.0
@@ -31352,7 +31358,7 @@ snapshots:
       unplugin-utils: 0.3.1
       yaml: 2.8.1
     optionalDependencies:
-      vue-router: 4.6.3(vue@3.5.24(typescript@5.8.3))
+      vue-router: 4.6.3(vue@3.5.21(typescript@5.8.3))
     transitivePeerDependencies:
       - typescript
       - vue
@@ -31833,10 +31839,10 @@ snapshots:
 
   vue-devtools-stub@0.1.0: {}
 
-  vue-router@4.6.3(vue@3.5.24(typescript@5.8.3)):
+  vue-router@4.6.3(vue@3.5.21(typescript@5.8.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
-      vue: 3.5.24(typescript@5.8.3)
+      vue: 3.5.21(typescript@5.8.3)
 
   vue-template-compiler@2.7.16:
     dependencies:

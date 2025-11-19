@@ -26,6 +26,6 @@ export default defineConfig(() => {
       PACKAGE_NAME: `"${name}"`,
       PACKAGE_VERSION: `"${version}"`,
     },
-    external: ['#imports'],
+    external: ['#imports', 'vue'],
   };
 });
