@@ -8,8 +8,8 @@ import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 import { Modal } from '@/ui/elements/Modal';
 import { common, InternalThemeProvider } from '@/ui/styledSystem';
 
+import { useEnvironment } from '@/ui/contexts';
 import { DevTools } from '../../../../core/resources/DevTools';
-import type { Environment } from '../../../../core/resources/Environment';
 import { Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
@@ -36,9 +36,7 @@ const EnableOrganizationsPromptInternal = ({
   const [allowPersonalAccount, setAllowPersonalAccount] = useState(false);
 
   const initialFocusRef = useRef<HTMLHeadingElement>(null);
-
-  // @ts-expect-error - __unstable__environment is not typed
-  const environment = clerk?.__unstable__environment as Environment | undefined;
+  const environment = useEnvironment();
 
   const organizationsDashboardUrl = useMemo(() => {
     return withLastActiveFallback(() => {
@@ -78,7 +76,9 @@ const EnableOrganizationsPromptInternal = ({
 
   const isComponent = !caller.startsWith('use');
 
-  const hasPersonalAccountsEnabled = 'forceOrganizationSelection' in (environment?.organizationSettings ?? {});
+  // 'forceOrganizationSelection' is omitted from the environment settings object if the instance does not have it available as a feature
+  const hasPersonalAccountsEnabled =
+    typeof environment?.organizationSettings.forceOrganizationSelection !== 'undefined';
 
   return (
     <Portal>
