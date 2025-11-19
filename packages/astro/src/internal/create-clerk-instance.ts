@@ -41,13 +41,15 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
   if (!clerkJSInstance) {
     // Load both clerk-js and clerk-ui in parallel
     const clerkPromise = loadClerkJsScript(options);
-    clerkUiCtor = loadClerkUiScript(options).then(() => {
-      if (!window.__unstable_ClerkUiCtor) {
-        throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
-      }
-      // After the check, TypeScript knows it's defined
-      return window.__unstable_ClerkUiCtor;
-    });
+    clerkUiCtor = options?.clerkUiCtor
+      ? Promise.resolve(options.clerkUiCtor)
+      : loadClerkUiScript(options).then(() => {
+          if (!window.__unstable_ClerkUiCtor) {
+            throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+          }
+          // After the check, TypeScript knows it's defined
+          return window.__unstable_ClerkUiCtor;
+        });
 
     await clerkPromise;
 

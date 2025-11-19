@@ -21,7 +21,6 @@ type AstroClerkIntegrationParams = Without<
   | 'routerPush'
   | 'polling'
   | 'touchSession'
-  | 'clerkUiCtor'
 > &
   MultiDomainAndOrProxyPrimitives & {
     clerkJSUrl?: string;
