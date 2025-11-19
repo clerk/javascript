@@ -11,9 +11,6 @@ interface ClerkAPIResponseOptions extends Omit<ClerkErrorParams, 'message' | 'co
   retryAfter?: number;
 }
 
-/**
- * Class representing a Clerk API Response Error.
- */
 export class ClerkAPIResponseError extends ClerkError implements ClerkAPIResponseErrorInterface {
   static kind = 'ClerkAPIResponseError';
   status: number;
