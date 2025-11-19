@@ -513,9 +513,8 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 paddingInline: TRACK_PADDING,
                 width: trackWidth,
                 height: trackHeight,
-                border: `1px solid`,
-                borderColor: checked ? 'rgba(255, 255, 255, 0.4)' : `rgba(255, 255, 255, 0.2)`,
-                backgroundColor: checked ? '#31C854' : `rgba(0, 0, 0, 0.2)`,
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backgroundColor: checked ? '#6C47FF' : 'rgba(0, 0, 0, 0.2)',
                 borderRadius: 999,
                 transition: 'background-color 0.2s ease-in-out',
               };
