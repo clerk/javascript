@@ -1,5 +1,10 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { __experimental_useAPIKeys as useAPIKeys, useClerk, useOrganization, useUser } from '@clerk/shared/react';
+import {
+  __experimental_useAPIKeys as useAPIKeys,
+  useClerk,
+  useOrganizationContext,
+  useUser,
+} from '@clerk/shared/react';
 import type { CreateAPIKeyParams } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
@@ -236,9 +241,10 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 const _APIKeys = () => {
   const ctx = useAPIKeysContext();
   const { user } = useUser();
-  const { organization } = useOrganization();
+  const organizationCtx = useOrganizationContext();
 
-  const subject = organization?.id ?? user?.id ?? '';
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const subject = organizationCtx?.organization?.id ?? user?.id ?? '';
 
   return (
     <Flow.Root
