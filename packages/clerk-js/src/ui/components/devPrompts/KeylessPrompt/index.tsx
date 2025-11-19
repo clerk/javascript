@@ -8,8 +8,13 @@ import { createPortal } from 'react-dom';
 import { Flex, Link } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { InternalThemeProvider } from '../../../styledSystem';
-import { basePromptElementStyles, handleDashboardUrlParsing, PromptContainer, PromptSuccessIcon } from '../shared';
-import { ClerkLogoIcon } from './ClerkLogoIcon';
+import {
+  basePromptElementStyles,
+  ClerkLogoIcon,
+  handleDashboardUrlParsing,
+  PromptContainer,
+  PromptSuccessIcon,
+} from '../shared';
 import { KeySlashIcon } from './KeySlashIcon';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
