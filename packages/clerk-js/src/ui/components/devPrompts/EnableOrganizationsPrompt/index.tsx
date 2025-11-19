@@ -1,6 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
+import type { SerializedStyles } from '@emotion/react';
 import { css, type Theme } from '@emotion/react';
 import { forwardRef, useId, useMemo, useRef, useState } from 'react';
 
@@ -211,12 +212,13 @@ const EnableOrganizationsPromptInternal = ({
 
             <Flex
               direction='col'
+              align='start'
               sx={t => ({
                 gap: t.sizes.$0x5,
               })}
             >
               {isEnabled ? (
-                <span
+                <p
                   css={[
                     basePromptElementStyles,
                     css`
@@ -230,28 +232,18 @@ const EnableOrganizationsPromptInternal = ({
                   {clerk.user
                     ? `The Organizations feature has been enabled for your application. A default organization named "My Organization" was created automatically. You can manage or rename it in your`
                     : `The Organizations feature has been enabled for your application. You can manage it in your`}{' '}
-                  <a
-                    css={[
-                      basePromptElementStyles,
-                      css`
-                        color: #a8a8ff;
-                        font-size: inherit;
-                        font-weight: 500;
-                        line-height: 1.3;
-                        font-size: 0.8125rem;
-                      `,
-                    ]}
+                  <Link
                     href={organizationsDashboardUrl}
                     target='_blank'
                     rel='noopener noreferrer'
                   >
                     dashboard
-                  </a>
+                  </Link>
                   .
-                </span>
+                </p>
               ) : (
                 <>
-                  <span
+                  <p
                     css={[
                       basePromptElementStyles,
                       css`
@@ -278,25 +270,15 @@ const EnableOrganizationsPromptInternal = ({
                     </code>{' '}
                     {isComponent ? 'component' : 'hook'}, you&apos;ll need to enable the Organizations feature for your
                     app first.
-                  </span>
+                  </p>
 
-                  <a
-                    css={[
-                      basePromptElementStyles,
-                      css`
-                        color: #a8a8ff;
-                        font-size: inherit;
-                        font-weight: 500;
-                        line-height: 1.5;
-                        font-size: 0.8125rem;
-                      `,
-                    ]}
+                  <Link
                     href='https://clerk.com/docs/guides/organizations/overview'
                     target='_blank'
                     rel='noopener noreferrer'
                   >
                     Learn more about Organizations.
-                  </a>
+                  </Link>
                 </>
               )}
             </Flex>
@@ -540,13 +522,10 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                 paddingInline: TRACK_PADDING,
                 width: trackWidth,
                 height: trackHeight,
-                border: `1px solid rgba(118, 118, 132, 0.25)`,
-                backgroundColor: checked ? 'rgba(255, 255, 255, 0.75)' : `rgba(255, 255, 255, 0.1)`,
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backgroundColor: checked ? '#6C47FF' : 'rgba(0, 0, 0, 0.2)',
                 borderRadius: 999,
                 transition: 'background-color 0.2s ease-in-out',
-                '&:hover': {
-                  borderColor: `rgba(118, 118, 132, 0.5)`,
-                },
               };
             }}
           >
@@ -559,6 +538,7 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
                   height: size,
                   borderRadius: 9999,
                   backgroundColor: 'white',
+                  boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
                   transform: `translateX(${checked ? maxTranslateX : '0'})`,
                   transition: 'transform 0.2s ease-in-out',
                   '@media (prefers-reduced-motion: reduce)': {
@@ -601,6 +581,31 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           </Span>
         ) : null}
       </Flex>
+    );
+  },
+);
+
+const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: SerializedStyles }>(
+  ({ children, css: cssProp, ...props }, ref) => {
+    return (
+      <a
+        ref={ref}
+        {...props}
+        css={[
+          basePromptElementStyles,
+          css`
+            color: #a8a8ff;
+            font-size: inherit;
+            font-weight: 500;
+            line-height: 1.3;
+            font-size: 0.8125rem;
+            min-width: 0;
+          `,
+          cssProp,
+        ]}
+      >
+        {children}
+      </a>
     );
   },
 );
