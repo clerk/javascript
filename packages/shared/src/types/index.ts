@@ -54,9 +54,9 @@ export type * from './router';
 /**
  * TODO @revamp-hooks: Drop this in the next major release.
  */
+export type * from '../ui/types';
 export type * from './runtime-values';
 export type * from './saml';
-export type * from './samlAccount';
 export type * from './samlConnection';
 export type * from './session';
 export type * from './sessionVerification';
@@ -82,4 +82,3 @@ export type * from './verification';
 export type * from './waitlist';
 export type * from './web3';
 export type * from './web3Wallet';
-export type * from '../ui/types';

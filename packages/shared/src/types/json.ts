@@ -26,7 +26,6 @@ import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { ProtectConfigJSON } from './protectConfig';
-import type { SamlIdpSlug } from './saml';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
 import type { SignInJSON } from './signIn';
@@ -277,20 +276,6 @@ export interface EnterpriseAccountConnectionJSON extends ClerkResourceJSON {
   enterprise_connection_id: string | null;
 }
 
-export interface SamlAccountJSON extends ClerkResourceJSON {
-  object: 'saml_account';
-  provider: SamlIdpSlug;
-  provider_user_id: string | null;
-  active: boolean;
-  email_address: string;
-  first_name: string;
-  last_name: string;
-  verification?: VerificationJSON;
-  saml_connection?: SamlAccountConnectionJSON;
-  last_authenticated_at: number | null;
-  enterprise_connection_id: string | null;
-}
-
 export interface UserJSON extends ClerkResourceJSON {
   object: 'user';
   id: string;
@@ -307,11 +292,6 @@ export interface UserJSON extends ClerkResourceJSON {
   external_accounts: ExternalAccountJSON[];
   enterprise_accounts: EnterpriseAccountJSON[];
   passkeys: PasskeyJSON[];
-  /**
-   * @deprecated Use `enterprise_accounts` instead.
-   */
-  saml_accounts: SamlAccountJSON[];
-
   organization_memberships: OrganizationMembershipJSON[];
   password_enabled: boolean;
   profile_image_id: string;

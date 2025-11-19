@@ -50,7 +50,6 @@ export const ObjectType = {
   PhoneNumber: 'phone_number',
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
-  SamlAccount: 'saml_account',
   SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
@@ -601,7 +600,6 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
-  saml_accounts: SamlAccountJSON[];
   password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;
