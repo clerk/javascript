@@ -34,12 +34,6 @@ type CreateOrganizationFormProps = {
     headerTitle?: LocalizationKey;
     headerSubtitle?: LocalizationKey;
   };
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
 };
 
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
@@ -69,8 +63,7 @@ export const CreateOrganizationForm = withCardStateProvider((props: CreateOrgani
   const dataChanged = !!nameField.value;
   const canSubmit = dataChanged;
 
-  // Environment setting takes precedence over prop
-  const organizationSlugEnabled = !organizationSettings.slug.disabled && !props.hideSlug;
+  const organizationSlugEnabled = !organizationSettings.slug.disabled;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

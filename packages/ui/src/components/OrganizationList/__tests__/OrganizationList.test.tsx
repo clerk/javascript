@@ -277,26 +277,6 @@ describe('OrganizationList', () => {
       });
     });
 
-    it('displays CreateOrganization without slug field', async () => {
-      const { wrapper, props } = await createFixtures(f => {
-        f.withOrganizations();
-        f.withUser({
-          email_addresses: ['test@clerk.com'],
-          create_organization_enabled: true,
-        });
-      });
-
-      props.setProps({ hideSlug: true });
-      const { findByRole, getByRole, userEvent, queryByLabelText } = render(<OrganizationList />, { wrapper });
-
-      await waitFor(async () =>
-        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
-      );
-      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
-      expect(queryByLabelText(/Name/i)).toBeInTheDocument();
-      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
-    });
-
     it('does not display CreateOrganization within OrganizationList when disabled', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
