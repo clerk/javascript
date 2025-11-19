@@ -5,7 +5,7 @@ import {
   __experimental_useStatements,
   __experimental_useSubscription,
   useClerk,
-  useOrganization,
+  useOrganizationContext,
   useSession,
 } from '@clerk/shared/react';
 import type {
@@ -32,7 +32,7 @@ export function normalizeFormatted(formatted: string) {
 
 const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
+  const organizationCtx = useOrganizationContext();
   const allowBillingRoutes = useProtect(
     has =>
       has({
@@ -44,7 +44,7 @@ const useBillingHookParams = () => {
     for: subscriberType,
     keepPreviousData: true,
     // If the user is in an organization, only fetch billing data if they have the necessary permissions
-    enabled: subscriberType === 'organization' ? Boolean(organization) && allowBillingRoutes : true,
+    enabled: subscriberType === 'organization' ? Boolean(organizationCtx?.organization) && allowBillingRoutes : true,
   };
 };
 

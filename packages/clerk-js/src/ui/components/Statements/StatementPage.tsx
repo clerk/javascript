@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
 import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -23,7 +23,7 @@ import { Statement } from './Statement';
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
+  const organizationCtx = useOrganizationContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
   const clerk = useClerk();
@@ -37,13 +37,13 @@ export const StatementPage = () => {
       ? {
           type: 'statement',
           id: params.statementId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+          orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
         }
       : null,
     () =>
       clerk.billing.getStatement({
         id: params.statementId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
       }),
   );
 

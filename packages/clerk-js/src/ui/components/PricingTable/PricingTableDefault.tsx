@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext, useSession } from '@clerk/shared/react';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
 import * as React from 'react';
 
@@ -104,7 +104,7 @@ function Card(props: CardProps) {
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
+  const organizationCtx = useOrganizationContext();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
@@ -137,7 +137,7 @@ function Card(props: CardProps) {
     plan,
     planPeriod,
     for: pricingTableProps.for,
-    hasActiveOrganization: !!organization,
+    hasActiveOrganization: !!organizationCtx?.organization,
   });
 
   return (
