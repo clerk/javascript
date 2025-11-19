@@ -40,7 +40,7 @@ export const Checkout = (props: __internal_CheckoutProps) => {
                     <AddEmailForm />
                   </CheckoutPage.FetchStatus>
 
-                  <CheckoutPage.FetchStatus status='error'>
+                  <CheckoutPage.FetchStatus status='generic_error'>
                     <GenericError />
                   </CheckoutPage.FetchStatus>
                 </CheckoutPage.Stage>

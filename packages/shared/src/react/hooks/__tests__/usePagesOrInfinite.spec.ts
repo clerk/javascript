@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createDeferredPromise } from '../../../utils/createDeferredPromise';
+import type { ResourceCacheStableKey } from '../../stable-keys';
 import { createCacheKeys } from '../createCacheKeys';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
@@ -43,7 +44,11 @@ const buildKeys = <Params extends Record<string, unknown>>(
   authenticated = true,
 ) =>
   createCacheKeys({
-    stablePrefix,
+    // Casting to ResourceCacheStableKey to satisfy the type checker,
+    // it is fine because we only want to limit the types to ensure our stable keys
+    // do not diverge when consumed from other pacakges.
+    // Since this is a test mocking most things we can safely ignore the type checker.
+    stablePrefix: stablePrefix as ResourceCacheStableKey,
     authenticated,
     tracked,
     untracked: { args: params },

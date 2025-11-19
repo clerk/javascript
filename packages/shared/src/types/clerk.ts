@@ -1,3 +1,5 @@
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
 import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -26,7 +28,7 @@ import type {
   BillingNamespace,
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
-  ConfirmCheckoutParams,
+  CheckoutFlowResource,
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
@@ -82,29 +84,41 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-/**
- * @inline
- */
-type CheckoutResult =
-  | {
-      data: BillingCheckoutResource;
-      error: null;
-    }
-  | {
-      data: null;
-      error: ClerkAPIResponseError;
-    };
-
-export type __experimental_CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
-  start: () => Promise<CheckoutResult>;
-  clear: () => void;
-  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
-  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
-  getState: () => __experimental_CheckoutCacheState;
+export type CheckoutErrors = {
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
+   */
+  global: ClerkGlobalHookError[] | null;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+/**
+ * The value returned by the `useCheckout` hook.
+ */
+export interface CheckoutSignalValue {
+  /**
+   * Represents the errors that occurred during the last fetch of the parent resource.
+   */
+  errors: CheckoutErrors;
+  /**
+   * The fetch status of the underlying `Checkout` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * An instance representing the currently active `Checkout`.
+   */
+  checkout: CheckoutFlowResource;
+}
+
+export interface CheckoutSignal {
+  (): CheckoutSignalValue;
+}
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
 /**
  * @inline
