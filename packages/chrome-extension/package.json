@@ -52,6 +52,7 @@
     "@clerk/clerk-js": "workspace:^",
     "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
+    "@clerk/ui": "workspace:^",
     "webextension-polyfill": "~0.12.0"
   },
   "devDependencies": {
