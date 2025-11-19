@@ -76,6 +76,8 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithBase: () => Promise<SignInResource>;
 
+  // authenticateWithSolana: () => Promise<SignInResource>;
+
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
   createEmailLinkFlow: () => CreateEmailLinkFlowReturn<SignInStartEmailLinkFlowParams, SignInResource>;

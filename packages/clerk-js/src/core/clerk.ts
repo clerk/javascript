@@ -34,6 +34,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithSolanaParams,
   BillingNamespace,
   Clerk as ClerkInterface,
   ClerkAPIError,
@@ -116,6 +117,7 @@ import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  generateSignatureWithSolana,
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
@@ -2255,6 +2257,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithSolana = async (props: AuthenticateWithSolanaParams = {}): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_solana_signature',
+    });
+  };
+
   public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
@@ -2263,6 +2272,7 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -2282,6 +2292,9 @@ export class Clerk implements ClerkInterface {
         break;
       case 'coinbase_wallet':
         generateSignature = generateSignatureWithCoinbaseWallet;
+        break;
+      case 'solana':
+        generateSignature = generateSignatureWithSolana;
         break;
       default:
         generateSignature = generateSignatureWithOKXWallet;

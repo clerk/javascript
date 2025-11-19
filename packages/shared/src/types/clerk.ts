@@ -2250,6 +2250,7 @@ export interface ClerkAuthenticateWithWeb3Params {
   strategy: Web3Strategy;
   legalAccepted?: boolean;
   secondFactorUrl?: string;
+  walletName?: string;
 }
 
 export type JoinWaitlistParams = {
@@ -2286,6 +2287,14 @@ export interface AuthenticateWithGoogleOneTapParams {
 }
 
 export interface AuthenticateWithBaseParams {
+  customNavigate?: (to: string) => Promise<unknown>;
+  redirectUrl?: string;
+  signUpContinueUrl?: string;
+  unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
+}
+
+export interface AuthenticateWithSolanaParams {
   customNavigate?: (to: string) => Promise<unknown>;
   redirectUrl?: string;
   signUpContinueUrl?: string;

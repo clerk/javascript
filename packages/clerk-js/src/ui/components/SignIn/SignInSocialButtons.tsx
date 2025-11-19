@@ -58,6 +58,10 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={strategy => {
+        // if (strategy === 'web3_solana_signature') {
+        //   return navigate('factor-one');
+        // }
+
         return clerk
           .authenticateWithWeb3({
             customNavigate: navigate,

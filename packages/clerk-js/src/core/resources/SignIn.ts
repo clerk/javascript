@@ -69,12 +69,14 @@ import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  generateSignatureWithSolana,
   getBaseIdentifier,
   getBrowserLocale,
   getClerkQueryParam,
   getCoinbaseWalletIdentifier,
   getMetamaskIdentifier,
   getOKXWalletIdentifier,
+  getSolanaIdentifier,
   windowNavigate,
 } from '../../utils';
 import {
@@ -212,6 +214,7 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'web3_base_signature':
       case 'web3_coinbase_wallet_signature':
       case 'web3_okx_wallet_signature':
+      case 'web3_solana_signature':
         config = { web3WalletId: params.web3WalletId } as Web3SignatureConfig;
         break;
       case 'reset_password_phone_code':
@@ -403,7 +406,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider, walletName: provider });
     } catch (err) {
       // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
       // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -412,7 +415,7 @@ export class SignIn extends BaseResource implements SignInResource {
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
       if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce: message, provider });
+        signature = await generateSignature({ identifier, nonce: message, provider, walletName: provider });
       } else {
         throw err;
       }
@@ -457,6 +460,15 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithOKXWallet,
       strategy: 'web3_okx_wallet_signature',
+    });
+  };
+
+  public authenticateWithSolana = async (walletName: string): Promise<SignInResource> => {
+    const identifier = await getSolanaIdentifier(walletName);
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: generateSignatureWithSolana,
+      strategy: 'web3_solana_signature',
     });
   };
 
@@ -986,6 +998,10 @@ class SignInFuture implements SignInFutureResource {
           identifier = await getOKXWalletIdentifier();
           generateSignature = generateSignatureWithOKXWallet;
           break;
+        case 'solana':
+          identifier = await getSolanaIdentifier(params.provider);
+          generateSignature = generateSignatureWithSolana;
+          break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);
       }
@@ -1011,7 +1027,11 @@ class SignInFuture implements SignInFutureResource {
 
       let signature: string;
       try {
-        signature = await generateSignature({ identifier, nonce: message });
+        signature = await generateSignature({
+          identifier,
+          nonce: message,
+          walletName: params.provider,
+        });
       } catch (err) {
         // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
         // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -1020,7 +1040,11 @@ class SignInFuture implements SignInFutureResource {
         // error code 4001 means the user rejected the request
         // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
         if (provider === 'coinbase_wallet' && err.code === 4001) {
-          signature = await generateSignature({ identifier, nonce: message });
+          signature = await generateSignature({
+            identifier,
+            nonce: message,
+            walletName: provider,
+          });
         } else {
           throw err;
         }
