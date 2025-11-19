@@ -38,6 +38,12 @@ const EnableOrganizationsPromptInternal = ({
   const initialFocusRef = useRef<HTMLHeadingElement>(null);
   const environment = useEnvironment();
 
+  const isComponent = !caller.startsWith('use');
+
+  // 'forceOrganizationSelection' is omitted from the environment settings object if the instance does not have it available as a feature
+  const hasPersonalAccountsEnabled =
+    typeof environment?.organizationSettings.forceOrganizationSelection !== 'undefined';
+
   const organizationsDashboardUrl = useMemo(() => {
     return withLastActiveFallback(() => {
       const currentUrl = window.location.href;
@@ -60,11 +66,16 @@ const EnableOrganizationsPromptInternal = ({
   const handleEnableOrganizations = () => {
     setIsLoading(true);
 
+    const params: Parameters<DevTools['__internal_enableEnvironmentSetting']>[0] = {
+      enable_organizations: true,
+    };
+
+    if (hasPersonalAccountsEnabled) {
+      params.organization_allow_personal_accounts = allowPersonalAccount;
+    }
+
     void new DevTools()
-      .__internal_enableEnvironmentSetting({
-        enable_organizations: true,
-        organization_allow_personal_accounts: allowPersonalAccount,
-      })
+      .__internal_enableEnvironmentSetting(params)
       .then(() => {
         setIsEnabled(true);
         setIsLoading(false);
@@ -73,12 +84,6 @@ const EnableOrganizationsPromptInternal = ({
         setIsLoading(false);
       });
   };
-
-  const isComponent = !caller.startsWith('use');
-
-  // 'forceOrganizationSelection' is omitted from the environment settings object if the instance does not have it available as a feature
-  const hasPersonalAccountsEnabled =
-    typeof environment?.organizationSettings.forceOrganizationSelection !== 'undefined';
 
   return (
     <Portal>
