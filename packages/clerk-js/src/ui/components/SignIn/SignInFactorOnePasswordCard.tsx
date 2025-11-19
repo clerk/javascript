@@ -1,4 +1,4 @@
-import { isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
+import { isPasswordPwnedError, isPasswordUntrustedError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
@@ -21,7 +21,7 @@ import { useResetPasswordFactor } from './useResetPasswordFactor';
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onPasswordPwned?: () => void;
+  onUntrustedPassword?: (errorCode: string) => void;
 };
 
 const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
@@ -50,7 +50,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick, onPasswordPwned } = props;
+  const { onShowAlternativeMethodsClick, onUntrustedPassword } = props;
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
   const card = useCardState();
   const { setActive } = useClerk();
@@ -92,9 +92,18 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
-        if (isPasswordPwnedError(err) && onPasswordPwned) {
-          card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
-          onPasswordPwned();
+        if (onUntrustedPassword) {
+          // TODO(vaggelis): those will eventually be unified into a single error code
+          if (isPasswordPwnedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+            onUntrustedPassword('form_password_pwned__sign_in');
+            return;
+          }
+          if (isPasswordUntrustedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_untrusted__sign_in' });
+            onUntrustedPassword('form_password_untrusted__sign_in');
+            return;
+          }
           return;
         }
 
