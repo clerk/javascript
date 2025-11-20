@@ -59,7 +59,7 @@ export const useOrganization: UseOrganization = () => {
   const unwatch = watch(
     clerk,
     value => {
-      if (value) {
+      if (value?.loaded) {
         value.__internal_attemptToEnableEnvironmentSetting({
           for: 'organizations',
           caller: 'useOrganization',
