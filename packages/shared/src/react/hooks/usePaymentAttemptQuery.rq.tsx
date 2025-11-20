@@ -59,9 +59,7 @@ export function __internal_usePaymentAttemptQuery(params: UsePaymentAttemptQuery
 
   return {
     data: query.data,
-    // Our existing types for SWR return undefined when there is no error, but React Query returns null.
-    // So we need to convert the error to undefined, for backwards compatibility.
-    error: query.error ?? undefined,
+    error: (query.error ?? null) as PaymentAttemptQueryResult['error'],
     isLoading: query.isLoading,
     isFetching: query.isFetching,
   };

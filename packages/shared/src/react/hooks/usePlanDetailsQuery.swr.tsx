@@ -43,7 +43,7 @@ export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams
 
   return {
     data: swr.data,
-    error: swr.error,
+    error: (swr.error ?? null) as PlanDetailsQueryResult['error'],
     isLoading: swr.isLoading,
     isFetching: swr.isValidating,
   };

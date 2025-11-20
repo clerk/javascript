@@ -55,7 +55,7 @@ export function __internal_useStatementQuery(params: UseStatementQueryParams = {
 
   return {
     data: swr.data,
-    error: swr.error,
+    error: (swr.error ?? null) as StatementQueryResult['error'],
     isLoading: swr.isLoading,
     isFetching: swr.isValidating,
   };

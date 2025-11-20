@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
-import type { ForPayerType } from '@/types/billing';
-
+import type { ForPayerType } from '../../types';
 import { STABLE_KEYS } from '../stable-keys';
 import { createCacheKeys } from './createCacheKeys';
 

@@ -53,7 +53,7 @@ export function __internal_usePaymentAttemptQuery(params: UsePaymentAttemptQuery
 
   return {
     data: swr.data,
-    error: swr.error,
+    error: (swr.error ?? null) as PaymentAttemptQueryResult['error'],
     isLoading: swr.isLoading,
     isFetching: swr.isValidating,
   };
