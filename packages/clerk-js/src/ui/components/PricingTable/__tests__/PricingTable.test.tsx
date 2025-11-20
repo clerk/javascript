@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils/index';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -54,6 +55,8 @@ describe('PricingTable - trial info', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [trialPlan as any], total_count: 1 });
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_1',
@@ -113,6 +116,8 @@ describe('PricingTable - trial info', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [trialPlan as any], total_count: 1 });
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_top',
@@ -151,6 +156,7 @@ describe('PricingTable - trial info', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [trialPlan as any], total_count: 1 });
     // When signed out, getSubscription should throw or return empty response
     fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
@@ -182,6 +188,7 @@ describe('PricingTable - trial info', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [nonTrialPlan as any], total_count: 1 });
     // When signed out, getSubscription should throw or return empty response
     fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
@@ -210,6 +217,8 @@ describe('PricingTable - trial info', () => {
       freeTrialDays: 0,
     };
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [nonTrialPlan as any], total_count: 1 });
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_1',
@@ -302,6 +311,8 @@ describe('PricingTable - plans visibility', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     // Mock no subscription for signed-in user - empty subscription object
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -327,6 +338,8 @@ describe('PricingTable - plans visibility', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     // Mock active subscription for signed-in user
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
@@ -374,6 +387,7 @@ describe('PricingTable - plans visibility', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     // When signed out, getSubscription should throw or return empty response
     fixtures.clerk.billing.getSubscription.mockRejectedValue(new Error('Unauthenticated'));
@@ -384,6 +398,11 @@ describe('PricingTable - plans visibility', () => {
       // Should show plans when signed out
       expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
     });
+
+    // Ensure API args reflect user context by default
+    expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
+    // Signed-out users should not fetch subscriptions
+    expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
   });
 
   it('shows no plans when user is signed in but subscription is null', async () => {
@@ -395,6 +414,8 @@ describe('PricingTable - plans visibility', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     // Mock null subscription response (different from throwing error)
     fixtures.clerk.billing.getSubscription.mockResolvedValue(null as any);
@@ -416,15 +437,23 @@ describe('PricingTable - plans visibility', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
-    // Mock undefined subscription response (loading state)
-    fixtures.clerk.billing.getSubscription.mockResolvedValue(undefined as any);
+    const resolver = createDeferredPromise();
 
+    // Mock undefined subscription response (loading state)
+    fixtures.clerk.billing.getSubscription.mockResolvedValue(resolver.promise);
     const { queryByRole } = render(<PricingTable />, { wrapper });
 
     await waitFor(() => {
       // Should not show any plans when signed in but subscription is undefined (loading)
       expect(queryByRole('heading', { name: 'Test Plan' })).not.toBeInTheDocument();
+    });
+    resolver.resolve([]);
+    await waitFor(() => {
+      // Should not show any plans when signed in but subscription is undefined (loading)
+      expect(queryByRole('heading', { name: 'Test Plan' })).toBeInTheDocument();
     });
   });
 
@@ -437,6 +466,8 @@ describe('PricingTable - plans visibility', () => {
     // Provide empty props to the PricingTable context
     props.setProps({});
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
 
     // Create a pending promise and capture its resolver
@@ -491,12 +522,22 @@ describe('PricingTable - plans visibility', () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withBilling();
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: ['org:sys_billing:manage'],
+          },
+        ],
+      });
     });
 
     // Set legacy prop via context provider
     props.setProps({ forOrganizations: true } as any);
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.organization.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_org_active',
@@ -544,12 +585,22 @@ describe('PricingTable - plans visibility', () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withBilling();
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: ['org:sys_billing:read'],
+          },
+        ],
+      });
     });
 
     // Set new prop via context provider
     props.setProps({ for: 'organization' } as any);
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.organization.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_org_active',
@@ -602,6 +653,8 @@ describe('PricingTable - plans visibility', () => {
     // Set new prop via context provider
     props.setProps({ for: 'user' } as any);
 
+    fixtures.clerk.billing.getStatements.mockRejectedValue();
+    fixtures.clerk.user.getPaymentMethods.mockRejectedValue();
     fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       id: 'sub_active',

@@ -612,6 +612,12 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Sjekk e-posten din',
     },
+    emailCodeMfa: {
+      formTitle: 'Sjekk e-posten din',
+      resendButton: 'Ikke mottatt kode? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk e-posten din',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -647,6 +653,12 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',
+      resendButton: 'Har du ikke mottatt lenken? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk din e-post',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -664,6 +676,8 @@ export const nbNO: LocalizationResource = {
       label__alternativeMethods: 'Eller logg inn med en annen metode.',
       title: 'Glemt passord?',
     },
+    newDeviceVerificationNotice:
+      'Du logger inn fra en ny enhet. Vi ber om verifisering for å holde kontoen din sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsette med innloggingen. Det er ingen tilgjengelige autentiseringsfaktorer.',
       subtitle: 'En feil oppstod',

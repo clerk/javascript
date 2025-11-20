@@ -1,5 +1,47 @@
 # Change Log
 
+## 3.28.1
+
+### Patch Changes
+
+- Add Hebrew translations for waitlist component ([#7204](https://github.com/clerk/javascript/pull/7204)) by [@galeshayek](https://github.com/galeshayek)
+
+  - Translated waitlist start screen (title, subtitle, form button, action links)
+  - Translated waitlist success screen (title, subtitle, message)
+  - corrected userProfile deletePage actionDescription
+
+- Updated dependencies [[`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787)]:
+  - @clerk/types@4.101.0
+
+## 3.28.0
+
+### Minor Changes
+
+- Support for `email_code` and `email_link` as a second factor when user is signing in on a new device. ([#7116](https://github.com/clerk/javascript/pull/7116)) by [@tmilewski](https://github.com/tmilewski)
+
+### Patch Changes
+
+- Improve Korean (ko-KR) localization by translating missing strings ([#7200](https://github.com/clerk/javascript/pull/7200)) by [@HwangSB](https://github.com/HwangSB)
+
+  - Translated undefined values to Korean
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854)]:
+  - @clerk/types@4.100.0
+
+## 3.27.2
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/types@4.99.0
+
+## 3.27.1
+
+### Patch Changes
+
+- Updated dependencies [[`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa)]:
+  - @clerk/types@4.98.0
+
 ## 3.27.0
 
 ### Minor Changes

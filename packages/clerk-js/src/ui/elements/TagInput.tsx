@@ -128,7 +128,7 @@ export const TagInput = (props: TagInputProps) => {
           overflowY: 'auto',
           cursor: 'text',
           justifyItems: 'center',
-          ...common.borderVariants(t).normal,
+          ...common.borderVariants(t, { hoverStyles: true }).normal,
         }),
         sx,
       ]}

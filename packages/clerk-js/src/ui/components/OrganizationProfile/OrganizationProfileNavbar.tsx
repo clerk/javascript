@@ -13,7 +13,7 @@ export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
   const { organization } = useOrganization();
-  const { pages } = useOrganizationProfileContext();
+  const { apiKeysProps, pages } = useOrganizationProfileContext();
 
   const allowMembersRoute = useProtect(
     has =>
@@ -39,7 +39,8 @@ export const OrganizationProfileNavbar = (
       r =>
         r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING ||
         (r.id === ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.BILLING && allowBillingRoutes),
-    );
+    )
+    .filter(r => r.id !== ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.API_KEYS || !apiKeysProps?.hide);
   if (!organization) {
     return null;
   }

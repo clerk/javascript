@@ -1,8 +1,31 @@
+import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
+
+const mockAPIKeysEnvironmentSettings = async (
+  page: Page,
+  overrides: Partial<{
+    user_api_keys_enabled: boolean;
+    orgs_api_keys_enabled: boolean;
+  }>,
+) => {
+  await page.route('*/**/v1/environment*', async route => {
+    const response = await route.fetch();
+    const json = await response.json();
+    const newJson = {
+      ...json,
+      api_keys_settings: {
+        user_api_keys_enabled: true,
+        orgs_api_keys_enabled: true,
+        ...overrides,
+      },
+    };
+    await route.fulfill({ response, json: newJson });
+  });
+};
 
 testAgainstRunningApps({
   withEnv: [appConfigs.envs.withAPIKeys],
@@ -64,6 +87,70 @@ testAgainstRunningApps({
 
     // Check if both API keys are created
     await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(2);
+  });
+
+  test('pagination works correctly with multiple pages', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    // Create user and 11 API keys to trigger pagination (default perPage is 10)
+    const fakeUser = u.services.users.createFakeUser();
+    const bapiUser = await u.services.users.createBapiUser(fakeUser);
+    const fakeAPIKeys = await Promise.all(
+      Array.from({ length: 11 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
+    );
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    // Verify first page
+    await expect(u.page.getByText(/Displaying 1 – 10 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(10);
+
+    // Navigate to second page
+    const page2Button = u.page.locator('.cl-paginationButton').filter({ hasText: /^2$/ });
+    await page2Button.click();
+    await expect(u.page.getByText(/Displaying 11 – 11 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(1);
+
+    // Navigate back to first page
+    const page1Button = u.page.locator('.cl-paginationButton').filter({ hasText: /^1$/ });
+    await page1Button.click();
+    await expect(u.page.getByText(/Displaying 1 – 10 of 11/i)).toBeVisible();
+    await expect(u.page.locator('.cl-apiKeysTable .cl-tableBody .cl-tableRow')).toHaveCount(10);
+
+    // Cleanup
+    await Promise.all(fakeAPIKeys.map(key => key.revoke()));
+    await fakeUser.deleteIfExists();
+  });
+
+  test('pagination does not show when items fit in one page', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.page.goToRelative('/api-keys');
+    await u.po.apiKeys.waitForMounted();
+
+    const apiKeyName = `${fakeAdmin.firstName}-single-page-${Date.now()}`;
+    await u.po.apiKeys.clickAddButton();
+    await u.po.apiKeys.waitForFormOpened();
+    await u.po.apiKeys.typeName(apiKeyName);
+    await u.po.apiKeys.selectExpiration('1d');
+    await u.po.apiKeys.clickSaveButton();
+
+    await u.po.apiKeys.waitForCopyModalOpened();
+    await u.po.apiKeys.clickCopyAndCloseButton();
+    await u.po.apiKeys.waitForCopyModalClosed();
+    await u.po.apiKeys.waitForFormClosed();
+
+    await expect(u.page.getByText(/Displaying.*of.*/i)).toBeHidden();
   });
 
   test('can revoke api keys', async ({ page, context }) => {
@@ -150,81 +237,111 @@ testAgainstRunningApps({
     expect(clipboardText).toBe(secret);
   });
 
-  test('component does not render for orgs when user does not have permissions', async ({ page, context }) => {
+  test('UserProfile API keys page visibility', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-
-    const fakeMember = u.services.users.createFakeUser();
-    const member = await u.services.users.createBapiUser(fakeMember);
-
-    await u.services.clerk.organizations.createOrganizationMembership({
-      organizationId: fakeOrganization.organization.id,
-      role: 'org:member',
-      userId: member.id,
-    });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeMember.email, password: fakeMember.password });
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
 
-    let apiKeysRequestWasMade = false;
-    u.page.on('request', request => {
-      if (request.url().includes('/api_keys')) {
-        apiKeysRequestWasMade = true;
-      }
-    });
+    // user_api_keys_enabled: false should hide API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
+    await u.po.page.goToRelative('/user');
+    await u.po.userProfile.waitForMounted();
+    await u.po.page.goToRelative('/user#/api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
 
-    // Check that standalone component is not rendered
-    await u.po.page.goToRelative('/api-keys');
-    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+    // user_api_keys_enabled: true should show API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true });
+    await page.reload();
+    await u.po.userProfile.waitForMounted();
+    await u.po.page.goToRelative('/user#/api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
 
-    // Check that page is not rendered in OrganizationProfile
-    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
-    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
-
-    expect(apiKeysRequestWasMade).toBe(false);
-
-    await fakeMember.deleteIfExists();
+    await u.page.unrouteAll();
   });
 
-  test('user with read permission can view API keys but not manage them', async ({ page, context }) => {
+  test('OrganizationProfile API keys page visibility', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
-
-    const fakeViewer = u.services.users.createFakeUser();
-    const viewer = await u.services.users.createBapiUser(fakeViewer);
-
-    await u.services.clerk.organizations.createOrganizationMembership({
-      organizationId: fakeOrganization.organization.id,
-      role: 'org:viewer',
-      userId: viewer.id,
-    });
 
     await u.po.signIn.goTo();
     await u.po.signIn.waitForMounted();
-    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeViewer.email, password: fakeViewer.password });
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
 
+    // orgs_api_keys_enabled: false should hide API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: false });
+    await u.po.page.goToRelative('/organization-profile');
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeHidden({ timeout: 2000 });
+
+    // orgs_api_keys_enabled: true should show API keys page
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true });
+    await page.reload();
+    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
+    await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
+
+    await u.page.unrouteAll();
+  });
+
+  test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    // user_api_keys_enabled: false should prevent standalone component from rendering
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: false });
+
     let apiKeysRequestWasMade = false;
-    u.page.on('request', request => {
-      if (request.url().includes('/api_keys')) {
-        apiKeysRequestWasMade = true;
-      }
+    await u.page.route('**/api_keys*', async route => {
+      apiKeysRequestWasMade = true;
+      await route.abort();
     });
 
-    // Check that standalone component is rendered and user can read API keys
     await u.po.page.goToRelative('/api-keys');
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+    expect(apiKeysRequestWasMade).toBe(false);
+
+    // user_api_keys_enabled: true should allow standalone component to render
+    await mockAPIKeysEnvironmentSettings(u.page, { user_api_keys_enabled: true });
+    await page.reload();
     await u.po.apiKeys.waitForMounted();
-    await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
-    await expect(u.page.getByRole('columnheader', { name: /Actions/i })).toBeHidden();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
 
-    // Check that page is rendered in OrganizationProfile and user can read API keys
-    await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
-    await expect(u.page.locator('.cl-apiKeys')).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /Add new key/i })).toBeHidden();
-    await expect(u.page.getByRole('columnheader', { name: /Actions/i })).toBeHidden();
+    await u.page.unrouteAll();
+  });
 
-    expect(apiKeysRequestWasMade).toBe(true);
+  test('standalone API keys component in org context based on orgs_api_keys_enabled', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
 
-    await fakeViewer.deleteIfExists();
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    // orgs_api_keys_enabled: false should prevent standalone component from rendering in org context
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: false });
+
+    let apiKeysRequestWasMade = false;
+    await u.page.route('**/api_keys*', async route => {
+      apiKeysRequestWasMade = true;
+      await route.abort();
+    });
+
+    await u.po.page.goToRelative('/api-keys');
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeHidden({ timeout: 1000 });
+    expect(apiKeysRequestWasMade).toBe(false);
+
+    // orgs_api_keys_enabled: true should allow standalone component to render in org context
+    await mockAPIKeysEnvironmentSettings(u.page, { orgs_api_keys_enabled: true });
+    await page.reload();
+    await u.po.apiKeys.waitForMounted();
+    await expect(u.page.locator('.cl-apiKeys-root')).toBeVisible();
+
+    await u.page.unrouteAll();
   });
 });
