@@ -2,7 +2,6 @@
 '@clerk/clerk-js': minor
 '@clerk/shared': minor
 '@clerk/clerk-react': minor
-'@clerk/vue': minor
 ---
 
 Introduce in-app development prompt to enable the Organizations feature
