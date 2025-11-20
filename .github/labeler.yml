@@ -12,9 +12,6 @@ chrome-extension:
 clerk-js:
   - packages/clerk-js/**
 
-elements:
-  - packages/elements/**
-
 expo:
   - packages/expo/**
 

@@ -4,7 +4,6 @@
 '@clerk/backend': patch
 '@clerk/chrome-extension': patch
 '@clerk/clerk-js': patch
-'@clerk/elements': patch
 '@clerk/themes': patch
 '@clerk/vue': patch
 ---

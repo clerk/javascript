@@ -22,7 +22,7 @@ Core Package Categories
 - **Backend**: `@clerk/backend` - Server-side utilities and JWT verification
 - **Shared Utilities**: `@clerk/shared`, `@clerk/types` - Common utilities and TypeScript types
 - **Developer Tools**: `@clerk/testing`, `@clerk/dev-cli`, `@clerk/upgrade`
-- **UI Libraries**: `@clerk/elements` - Unstyled UI primitives, `@clerk/themes` - Pre-built themes
+- **UI Libraries**: `@clerk/themes` - Pre-built themes
 - **Specialized**: `@clerk/agent-toolkit` - AI agent integration tools
 
 Directory Structure
