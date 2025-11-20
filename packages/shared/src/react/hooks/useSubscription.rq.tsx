@@ -10,9 +10,30 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
-const hookName = 'useSubscription';
+const HOOK_NAME = 'useSubscription';
+
+/**
+ * @internal
+ */
+function KeepPreviousDataFn<Data>(previousData: Data): Data {
+  return previousData;
+}
+
+export const subscriptionQuery = <T extends Record<string, unknown>, U extends Record<string, unknown>>(params: {
+  trackedKeys: T;
+  untrackedKeys?: U;
+}) => {
+  const stableKey = STABLE_KEYS.SUBSCRIPTION_KEY;
+  const { trackedKeys, untrackedKeys } = params;
+  return {
+    queryKey: [stableKey, trackedKeys, untrackedKeys] as const,
+    invalidationKey: [stableKey, trackedKeys] as const,
+    stableKey,
+  };
+};
 
 /**
  * This is the new implementation of useSubscription using React Query.
@@ -21,7 +42,7 @@ const hookName = 'useSubscription';
  * @internal
  */
 export function useSubscription(params?: UseSubscriptionParams): SubscriptionResult {
-  useAssertWrappedByClerkProvider(hookName);
+  useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
@@ -30,24 +51,26 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   // @ts-expect-error `__unstable__environment` is not typed
   const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
 
-  clerk.telemetry?.record(eventMethodCalled(hookName));
+  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const isOrganization = params?.for === 'organization';
   const billingEnabled = isOrganization
     ? environment?.commerceSettings.billing.organization.enabled
     : environment?.commerceSettings.billing.user.enabled;
+  const keepPreviousData = params?.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
 
-  const queryKey = useMemo(() => {
-    return [
-      'commerce-subscription',
-      {
+  const { queryKey, invalidationKey } = useMemo(() => {
+    return subscriptionQuery({
+      trackedKeys: {
         userId: user?.id,
         args: { orgId: isOrganization ? organization?.id : undefined },
       },
-    ];
+    });
   }, [user?.id, isOrganization, organization?.id]);
+
+  const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
 
   const query = useClerkQuery({
     queryKey,
@@ -56,10 +79,14 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
       return clerk.billing.getSubscription(obj.args);
     },
     staleTime: 1_000 * 60,
-    enabled: Boolean(user?.id && billingEnabled) && ((params as any)?.enabled ?? true),
+    enabled: queriesEnabled,
+    placeholderData: keepPreviousData && queriesEnabled ? KeepPreviousDataFn : undefined,
   });
 
-  const revalidate = useCallback(() => queryClient.invalidateQueries({ queryKey }), [queryClient, queryKey]);
+  const revalidate = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: invalidationKey }),
+    [queryClient, invalidationKey],
+  );
 
   return {
     data: query.data,

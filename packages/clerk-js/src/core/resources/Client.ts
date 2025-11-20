@@ -3,7 +3,6 @@ import type {
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
-  ClientTrustState,
   LastAuthenticationStrategy,
   SignedInSessionResource,
   SignInResource,
@@ -27,7 +26,6 @@ export class Client extends BaseResource implements ClientResource {
   cookieExpiresAt: Date | null = null;
   /** Last authentication strategy used by this client; `null` when unknown/disabled. */
   lastAuthenticationStrategy: LastAuthenticationStrategy | null = null;
-  clientTrustState?: ClientTrustState = undefined;
   createdAt: Date | null = null;
   updatedAt: Date | null = null;
 
@@ -88,7 +86,6 @@ export class Client extends BaseResource implements ClientResource {
       this.signIn = new SignIn(null);
       this.lastActiveSessionId = null;
       this.lastAuthenticationStrategy = null;
-      this.clientTrustState = undefined;
       this.cookieExpiresAt = null;
       this.createdAt = null;
       this.updatedAt = null;
@@ -138,7 +135,6 @@ export class Client extends BaseResource implements ClientResource {
       this.captchaBypass = data.captcha_bypass || false;
       this.cookieExpiresAt = data.cookie_expires_at ? unixEpochToDate(data.cookie_expires_at) : null;
       this.lastAuthenticationStrategy = data.last_authentication_strategy || null;
-      this.clientTrustState = data.client_trust_state;
       this.createdAt = unixEpochToDate(data.created_at || undefined);
       this.updatedAt = unixEpochToDate(data.updated_at || undefined);
     }
@@ -157,7 +153,6 @@ export class Client extends BaseResource implements ClientResource {
       captcha_bypass: this.captchaBypass,
       cookie_expires_at: this.cookieExpiresAt ? this.cookieExpiresAt.getTime() : null,
       last_authentication_strategy: this.lastAuthenticationStrategy ?? null,
-      ...(this.clientTrustState && { client_trust_state: this.clientTrustState }),
       created_at: this.createdAt?.getTime() ?? null,
       updated_at: this.updatedAt?.getTime() ?? null,
     };

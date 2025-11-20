@@ -185,7 +185,7 @@ describe('SignInFactorTwo', () => {
         );
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        expect(await screen.findByText('Incorrect phone code')).toBeDefined();
+        expect(await screen.findByTestId('form-feedback-error')).toHaveTextContent(/Incorrect phone code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {
@@ -274,7 +274,7 @@ describe('SignInFactorTwo', () => {
         );
         const { userEvent } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(screen.getByLabelText(/Enter verification code/i), '123456');
-        expect(await screen.findByText('Incorrect authenticator code')).toBeDefined();
+        expect(await screen.findByTestId('form-feedback-error')).toHaveTextContent(/Incorrect authenticator code/i);
       });
     });
 
@@ -367,7 +367,7 @@ describe('SignInFactorTwo', () => {
         const { userEvent, getByLabelText, getByText } = render(<SignInFactorTwo />, { wrapper });
         await userEvent.type(getByLabelText('Backup code'), '123456');
         await userEvent.click(getByText('Continue'));
-        expect(await screen.findByText('Incorrect backup code')).toBeDefined();
+        expect(await screen.findByTestId('form-feedback-error')).toHaveTextContent(/Incorrect backup code/i);
       });
 
       it('redirects back to sign-in if the user is locked', async () => {

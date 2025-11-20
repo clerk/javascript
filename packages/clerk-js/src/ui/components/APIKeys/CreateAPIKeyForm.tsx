@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 
-import { useApiKeysContext } from '@/ui/contexts';
+import { useAPIKeysContext } from '@/ui/contexts';
 import { Box, Col, descriptors, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Form } from '@/ui/elements/Form';
@@ -26,8 +26,8 @@ export type OnCreateParams = {
   secondsUntilExpiration: number | undefined;
 };
 
-interface CreateApiKeyFormProps {
-  onCreate: (params: OnCreateParams, closeCardFn: () => void) => void;
+interface CreateAPIKeyFormProps {
+  onCreate: (params: OnCreateParams) => void;
   isSubmitting: boolean;
 }
 
@@ -117,10 +117,10 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
   );
 };
 
-export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, isSubmitting }) => {
+export const CreateAPIKeyForm: React.FC<CreateAPIKeyFormProps> = ({ onCreate, isSubmitting }) => {
   const [selectedExpiration, setSelectedExpiration] = useState<ExpirationOption | null>(null);
   const { close: closeCardFn } = useActionContext();
-  const { showDescription = false } = useApiKeysContext();
+  const { showDescription = false } = useAPIKeysContext();
   const { t } = useLocalizations();
 
   const nameField = useFormControl('name', '', {
@@ -164,14 +164,11 @@ export const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate, is
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate(
-      {
-        name: nameField.value,
-        description: descriptionField.value || undefined,
-        secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value),
-      },
-      closeCardFn,
-    );
+    onCreate({
+      name: nameField.value,
+      description: descriptionField.value || undefined,
+      secondsUntilExpiration: getTimeLeftInSeconds(selectedExpiration?.value),
+    });
   };
 
   return (
