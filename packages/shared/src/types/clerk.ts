@@ -1056,7 +1056,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Clerk UI entrypoint.
      */
-    clerkUiCtor?: Promise<ClerkUiConstructor>;
+    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */

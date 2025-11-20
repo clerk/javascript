@@ -230,7 +230,7 @@ importers:
         specifier: ^14.0.1
         version: 14.0.1(enquirer@2.4.1)
       prettier:
-        specifier: ^3.5.3
+        specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-astro:
         specifier: ^0.14.1
