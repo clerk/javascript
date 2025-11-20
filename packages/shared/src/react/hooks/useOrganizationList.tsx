@@ -1,6 +1,5 @@
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
-  ClerkPaginatedResponse,
   CreateOrganizationParams,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationMembershipParams,
@@ -12,7 +11,9 @@ import type {
   UserOrganizationInvitationResource,
 } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -307,60 +308,72 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
 
   const isClerkLoaded = !!(clerk.loaded && user);
 
-  const memberships = usePagesOrInfinite<
-    GetUserOrganizationMembershipParams,
-    ClerkPaginatedResponse<OrganizationMembershipResource>
-  >(
-    userMembershipsParams || {},
-    user?.getOrganizationMemberships,
-    {
+  const memberships = usePagesOrInfinite({
+    fetcher: user?.getOrganizationMemberships,
+    config: {
       keepPreviousData: userMembershipsSafeValues.keepPreviousData,
       infinite: userMembershipsSafeValues.infinite,
       enabled: !!userMembershipsParams,
+      isSignedIn: Boolean(user),
+      initialPage: userMembershipsSafeValues.initialPage,
+      pageSize: userMembershipsSafeValues.pageSize,
     },
-    {
-      type: 'userMemberships',
-      userId: user?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.USER_MEMBERSHIPS_KEY,
+      authenticated: Boolean(user),
+      tracked: {
+        userId: user?.id,
+      },
+      untracked: {
+        args: userMembershipsParams,
+      },
+    }),
+  });
 
-  const invitations = usePagesOrInfinite<
-    GetUserOrganizationInvitationsParams,
-    ClerkPaginatedResponse<UserOrganizationInvitationResource>
-  >(
-    {
-      ...userInvitationsParams,
-    },
-    user?.getOrganizationInvitations,
-    {
+  const invitations = usePagesOrInfinite({
+    fetcher: user?.getOrganizationInvitations,
+    config: {
       keepPreviousData: userInvitationsSafeValues.keepPreviousData,
       infinite: userInvitationsSafeValues.infinite,
+      // In useOrganizationList, you need to opt in by passing an object or `true`.
       enabled: !!userInvitationsParams,
+      isSignedIn: Boolean(user),
+      initialPage: userInvitationsSafeValues.initialPage,
+      pageSize: userInvitationsSafeValues.pageSize,
     },
-    {
-      type: 'userInvitations',
-      userId: user?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.USER_INVITATIONS_KEY,
+      authenticated: Boolean(user),
+      tracked: {
+        userId: user?.id,
+      },
+      untracked: {
+        args: userInvitationsParams,
+      },
+    }),
+  });
 
-  const suggestions = usePagesOrInfinite<
-    GetUserOrganizationSuggestionsParams,
-    ClerkPaginatedResponse<OrganizationSuggestionResource>
-  >(
-    {
-      ...userSuggestionsParams,
-    },
-    user?.getOrganizationSuggestions,
-    {
+  const suggestions = usePagesOrInfinite({
+    fetcher: user?.getOrganizationSuggestions,
+    config: {
       keepPreviousData: userSuggestionsSafeValues.keepPreviousData,
       infinite: userSuggestionsSafeValues.infinite,
       enabled: !!userSuggestionsParams,
+      isSignedIn: Boolean(user),
+      initialPage: userSuggestionsSafeValues.initialPage,
+      pageSize: userSuggestionsSafeValues.pageSize,
     },
-    {
-      type: 'userSuggestions',
-      userId: user?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.USER_SUGGESTIONS_KEY,
+      authenticated: Boolean(user),
+      tracked: {
+        userId: user?.id,
+      },
+      untracked: {
+        args: userSuggestionsParams,
+      },
+    }),
+  });
 
   // TODO: Properly check for SSR user values
   if (!isClerkLoaded) {

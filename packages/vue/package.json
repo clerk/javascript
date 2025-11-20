@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "1.15.0",
+  "version": "1.16.0",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -77,7 +77,7 @@
     "vue": "^3.2.0"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

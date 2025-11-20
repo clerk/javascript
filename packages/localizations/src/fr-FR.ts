@@ -627,6 +627,12 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre messagerie',
     },
+    emailCodeMfa: {
+      formTitle: 'Vérifiez votre messagerie',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Ce lien ne correspond pas à la demande en cours.',
@@ -662,6 +668,12 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
+      resendButton: "Vous n'avez pas reçu de lien ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -679,6 +691,8 @@ export const frFR: LocalizationResource = {
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       title: 'Mot de passe oublié ?',
     },
+    newDeviceVerificationNotice:
+      'Vous vous connectez depuis un nouvel appareil. Nous demandons une vérification pour sécuriser votre compte.',
     noAvailableMethods: {
       message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
       subtitle: "Une erreur s'est produite",

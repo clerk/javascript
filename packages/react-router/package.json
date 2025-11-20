@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -110,7 +110,7 @@
     "react-router": "^7.9.0"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

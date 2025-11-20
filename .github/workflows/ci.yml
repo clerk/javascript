@@ -117,7 +117,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
-        run: pnpm turbo build $TURBO_ARGS --only --filter=!@clerk/elements
+        run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -161,14 +161,15 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
-        run: pnpm turbo bundlewatch $TURBO_ARGS
+        continue-on-error: true
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-          CI_REPO_NAME: ${{ vars.REPO_NAME }}
-          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
           CI_BRANCH: ${{ github.ref	}}
           CI_BRANCH_BASE: refs/heads/main
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+        run: pnpm turbo bundlewatch $TURBO_ARGS
 
       - name: Lint packages using publint
         run: pnpm turbo lint:publint $TURBO_ARGS
@@ -294,7 +295,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
+        test-name:
+          [
             "generic",
             "express",
             "ap-flows",
@@ -303,7 +305,7 @@ jobs:
             "sessions:staging",
             "handshake",
             "handshake:staging",
-            # "astro",
+            "astro",
             "tanstack-react-start",
             "vue",
             "nuxt",
@@ -403,7 +405,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag integration; fi
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc

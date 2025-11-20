@@ -398,6 +398,11 @@ describe('PricingTable - plans visibility', () => {
       // Should show plans when signed out
       expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
     });
+
+    // Ensure API args reflect user context by default
+    expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'user' }));
+    // Signed-out users should not fetch subscriptions
+    expect(fixtures.clerk.billing.getSubscription).not.toHaveBeenCalled();
   });
 
   it('shows no plans when user is signed in but subscription is null', async () => {
@@ -513,66 +518,19 @@ describe('PricingTable - plans visibility', () => {
     await findByRole('heading', { name: 'Test Plan' });
   });
 
-  it('fetches organization plans and renders when using legacy forOrganizations: true', async () => {
-    const { wrapper, fixtures, props } = await createFixtures(f => {
-      f.withBilling();
-      f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
-    });
-
-    // Set legacy prop via context provider
-    props.setProps({ forOrganizations: true } as any);
-
-    fixtures.clerk.billing.getStatements.mockRejectedValue();
-    fixtures.clerk.organization.getPaymentMethods.mockRejectedValue();
-    fixtures.clerk.billing.getPlans.mockResolvedValue({ data: [testPlan as any], total_count: 1 });
-    fixtures.clerk.billing.getSubscription.mockResolvedValue({
-      id: 'sub_org_active',
-      status: 'active',
-      activeAt: new Date('2021-01-01'),
-      createdAt: new Date('2021-01-01'),
-      nextPayment: null,
-      pastDueAt: null,
-      updatedAt: null,
-      subscriptionItems: [
-        {
-          id: 'si_active_org',
-          plan: { ...testPlan, forPayerType: 'organization' },
-          createdAt: new Date('2021-01-01'),
-          paymentMethodId: 'src_1',
-          pastDueAt: null,
-          canceledAt: null,
-          periodStart: new Date('2021-01-01'),
-          periodEnd: new Date('2021-01-31'),
-          planPeriod: 'month' as const,
-          status: 'active' as const,
-          isFreeTrial: false,
-          cancel: vi.fn(),
-          pathRoot: '',
-          reload: vi.fn(),
-        },
-      ],
-      pathRoot: '',
-      reload: vi.fn(),
-    });
-
-    const { getByRole } = render(<PricingTable />, { wrapper });
-
-    await waitFor(() => {
-      // Ensure plans rendered
-      expect(getByRole('heading', { name: 'Test Plan' })).toBeVisible();
-      // Ensure API args reflect org context
-      expect(fixtures.clerk.billing.getPlans).toHaveBeenCalledWith(expect.objectContaining({ for: 'organization' }));
-      // Ensure subscription called with active org
-      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalledWith(expect.objectContaining({ orgId: 'Org1' }));
-    });
-  });
-
   it('fetches organization plans and renders when using for: organization', async () => {
     const { wrapper, fixtures, props } = await createFixtures(f => {
       f.withBilling();
       f.withOrganizations();
-      f.withUser({ email_addresses: ['test@clerk.com'], organization_memberships: ['Org1'] });
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        organization_memberships: [
+          {
+            name: 'Org1',
+            permissions: ['org:sys_billing:read'],
+          },
+        ],
+      });
     });
 
     // Set new prop via context provider

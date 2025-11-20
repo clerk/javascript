@@ -145,7 +145,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
-  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
 
@@ -250,12 +250,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   constructor(options: IsomorphicClerkOptions) {
-    const { Clerk = null, publishableKey } = options || {};
-    this.#publishableKey = publishableKey;
+    this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
     this.options = options;
-    this.Clerk = Clerk;
+    this.Clerk = options?.Clerk || null;
     this.mode = inBrowser() ? 'browser' : 'server';
     this.#stateProxy = new StateProxy(this);
 
@@ -266,7 +265,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
-      void this.loadClerkEntryChunks();
+      void this.getEntryChunks();
     }
   }
 
@@ -436,7 +435,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
   }
 
-  async loadClerkEntryChunks(): Promise<void> {
+  async getEntryChunks(): Promise<void> {
     if (this.mode !== 'browser' || this.loaded) {
       return;
     }
@@ -456,21 +455,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      const clerkPromise = this.loadClerkJsEntryChunk();
-      const clerkUiCtor = this.loadClerkUiEntryChunk();
-      await clerkPromise;
+      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const clerk = await this.getClerkJsEntryChunk();
 
-      if (!global.Clerk) {
-        // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
-        throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+      if (!clerk.loaded) {
+        this.beforeLoad(clerk);
+        await clerk.load({ ...this.options, clerkUiCtor });
       }
-
-      if (!global.Clerk.loaded) {
-        this.beforeLoad(global.Clerk);
-        await global.Clerk.load({ ...this.options, clerkUiCtor });
-      }
-      if (global.Clerk.loaded) {
-        this.replayInterceptedInvocations(global.Clerk);
+      if (clerk.loaded) {
+        this.replayInterceptedInvocations(clerk);
       }
     } catch (err) {
       const error = err as Error;
@@ -480,10 +473,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  private async loadClerkJsEntryChunk() {
+  private async getClerkJsEntryChunk(): Promise<HeadlessBrowserClerk | BrowserClerk> {
     // Hotload bundle
-    if (!this.Clerk && !__BUILD_DISABLE_RHC__) {
+    if (!this.options.Clerk && !__BUILD_DISABLE_RHC__) {
       // the UMD script sets the global.Clerk instance
+      // we do not want to await here as we
       await loadClerkJsScript({
         ...this.options,
         publishableKey: this.#publishableKey,
@@ -494,15 +488,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     // Otherwise, set global.Clerk to the bundled ctor or instance
-    if (this.Clerk) {
-      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.Clerk)
-        ? new this.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
-        : this.Clerk;
+    if (this.options.Clerk) {
+      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+        ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+        : this.options.Clerk;
     }
+
+    if (!global.Clerk) {
+      // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
+      throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+    }
+
     return global.Clerk;
   }
 
-  private async loadClerkUiEntryChunk() {
+  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
+    if (this.options.clerkUiCtor) {
+      return this.options.clerkUiCtor;
+    }
+
     await loadClerkUiScript({
       ...this.options,
       publishableKey: this.#publishableKey,
@@ -510,9 +514,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       domain: this.domain,
       nonce: this.options.nonce,
     });
+
     if (!global.__unstable_ClerkUiCtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
+
     return global.__unstable_ClerkUiCtor;
   }
 
@@ -661,8 +667,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
-    this.premountApiKeysNodes.forEach((props, node) => {
-      clerkjs.mountApiKeys(node, props);
+    this.premountAPIKeysNodes.forEach((props, node) => {
+      clerkjs.mountAPIKeys(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -759,7 +765,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
-    return this.clerkjs?.__experimental_checkout(...args);
+    return this.loaded && this.clerkjs
+      ? this.clerkjs.__experimental_checkout(...args)
+      : this.#stateProxy.checkoutSignal(...args);
   };
 
   __unstable__setEnvironment(...args: any): void {
@@ -1151,19 +1159,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+  mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountApiKeys(node, props);
+      this.clerkjs.mountAPIKeys(node, props);
     } else {
-      this.premountApiKeysNodes.set(node, props);
+      this.premountAPIKeysNodes.set(node, props);
     }
   };
 
-  unmountApiKeys = (node: HTMLDivElement): void => {
+  unmountAPIKeys = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountApiKeys(node);
+      this.clerkjs.unmountAPIKeys(node);
     } else {
-      this.premountApiKeysNodes.delete(node);
+      this.premountAPIKeysNodes.delete(node);
     }
   };
 

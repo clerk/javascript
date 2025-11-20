@@ -146,6 +146,13 @@ describe('useOrganization', () => {
       expect(result.current.memberships?.count).toBe(0);
 
       await waitFor(() => expect(result.current.memberships?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getMemberships.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        role: undefined,
+        query: undefined,
+      });
 
       expect(result.current.memberships?.count).toBe(4);
       expect(result.current.memberships?.page).toBe(1);
@@ -198,6 +205,13 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.memberships?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.memberships?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getMemberships.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        role: undefined,
+        query: undefined,
+      });
 
       expect(result.current.memberships?.page).toBe(2);
       expect(result.current.memberships?.hasNextPage).toBe(false);
@@ -257,6 +271,12 @@ describe('useOrganization', () => {
       expect(result.current.domains?.count).toBe(0);
 
       await waitFor(() => expect(result.current.domains?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getDomains).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getDomains.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        enrollmentMode: undefined,
+      });
 
       expect(result.current.domains?.isLoading).toBe(false);
       expect(result.current.domains?.count).toBe(4);
@@ -298,6 +318,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.domains?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.domains?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getDomains).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getDomains.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        enrollmentMode: undefined,
+      });
 
       expect(result.current.domains?.page).toBe(2);
       expect(result.current.domains?.hasNextPage).toBe(false);
@@ -363,6 +389,12 @@ describe('useOrganization', () => {
       expect(result.current.membershipRequests?.count).toBe(0);
 
       await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getMembershipRequests.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        status: 'pending',
+      });
 
       expect(result.current.membershipRequests?.isFetching).toBe(false);
       expect(result.current.membershipRequests?.count).toBe(4);
@@ -398,6 +430,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getMembershipRequests.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        status: 'pending',
+      });
 
       expect(result.current.membershipRequests?.page).toBe(2);
       expect(result.current.membershipRequests?.hasNextPage).toBe(false);
@@ -467,6 +505,12 @@ describe('useOrganization', () => {
       expect(result.current.invitations?.count).toBe(0);
 
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getInvitations.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        status: ['pending'],
+      });
 
       expect(result.current.invitations?.isFetching).toBe(false);
       expect(result.current.invitations?.count).toBe(4);
@@ -498,6 +542,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getInvitations.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        status: ['pending'],
+      });
 
       expect(result.current.invitations?.page).toBe(2);
       expect(result.current.invitations?.hasNextPage).toBe(false);
@@ -566,6 +616,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
       expect(result.current.invitations?.isFetching).toBe(false);
+      expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getInvitations.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        status: ['pending'],
+      });
 
       const deferred = createDeferredPromise();
 
@@ -594,6 +650,15 @@ describe('useOrganization', () => {
       });
 
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(false));
+      const organizationInvitationParams = fixtures.clerk.organization?.getInvitations.mock.calls.map(
+        ([params]) => params,
+      );
+      organizationInvitationParams.forEach(params => {
+        expect(Object.keys(params).sort()).toEqual(['initialPage', 'pageSize', 'status']);
+        expect(params.pageSize).toBe(2);
+        expect(params.status).toEqual(['pending']);
+      });
+      expect(organizationInvitationParams.some(params => params.initialPage === 2)).toBe(true);
 
       expect(result.current.invitations?.data).toEqual(
         expect.arrayContaining([

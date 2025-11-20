@@ -1,9 +1,13 @@
-import type { BillingPaymentMethodResource } from '@clerk/shared/types';
+import type { BillingPaymentMethodResource, RemoveFunctions } from '@clerk/shared/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { CreditCard, GenericPayment } from '../../icons';
 
-export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaymentMethodResource }) => {
+export const PaymentMethodRow = ({
+  paymentMethod,
+}: {
+  paymentMethod: RemoveFunctions<BillingPaymentMethodResource>;
+}) => {
   return (
     <Flex
       sx={{ overflow: 'hidden' }}

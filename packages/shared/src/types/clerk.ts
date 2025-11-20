@@ -1,3 +1,5 @@
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
 import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
@@ -26,7 +28,7 @@ import type {
   BillingNamespace,
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
-  ConfirmCheckoutParams,
+  CheckoutFlowResource,
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
@@ -82,26 +84,41 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-type CheckoutResult =
-  | {
-      data: BillingCheckoutResource;
-      error: null;
-    }
-  | {
-      data: null;
-      error: ClerkAPIResponseError;
-    };
-
-export type __experimental_CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
-  start: () => Promise<CheckoutResult>;
-  clear: () => void;
-  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
-  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
-  getState: () => __experimental_CheckoutCacheState;
+export type CheckoutErrors = {
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
+   */
+  global: ClerkGlobalHookError[] | null;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+/**
+ * The value returned by the `useCheckout` hook.
+ */
+export interface CheckoutSignalValue {
+  /**
+   * Represents the errors that occurred during the last fetch of the parent resource.
+   */
+  errors: CheckoutErrors;
+  /**
+   * The fetch status of the underlying `Checkout` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * An instance representing the currently active `Checkout`.
+   */
+  checkout: CheckoutFlowResource;
+}
+
+export interface CheckoutSignal {
+  (): CheckoutSignalValue;
+}
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
 /**
  * @inline
@@ -582,7 +599,7 @@ export interface Clerk {
    * @param targetNode - Target to mount the APIKeys component.
    * @param props - Configuration parameters.
    */
-  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+  mountAPIKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
    * This API is in early access and may change in future releases.
@@ -594,7 +611,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to unmount the ApiKeys component from.
    */
-  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+  unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a OAuth consent component at the target element.
@@ -1039,7 +1056,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Clerk UI entrypoint.
      */
-    clerkUiCtor?: Promise<ClerkUiConstructor>;
+    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
@@ -1722,7 +1739,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
   /*
    * Provide custom menu actions and links to be rendered inside the UserButton.
@@ -1961,16 +1978,9 @@ export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps
 
 export type APIKeysProps = {
   /**
-   * The type of API key to filter by.
-   * Currently, only 'api_key' is supported.
-   *
-   * @default 'api_key'
-   */
-  type?: 'api_key';
-  /**
    * The number of API keys to show per page.
    *
-   * @default 5
+   * @default 10
    */
   perPage?: number;
   /**
@@ -1993,7 +2003,6 @@ export type GetAPIKeysParams = ClerkPaginationParams<{
 }>;
 
 export type CreateAPIKeyParams = {
-  type?: 'api_key';
   name: string;
   subject?: string;
   secondsUntilExpiration?: number;

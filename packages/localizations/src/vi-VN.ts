@@ -619,6 +619,12 @@ export const viVN: LocalizationResource = {
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Kiểm tra email',
     },
+    emailCodeMfa: {
+      formTitle: 'Kiểm tra email',
+      resendButton: 'Không nhận được mã? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng nhập',
@@ -654,6 +660,12 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',
+      resendButton: 'Không nhận được liên kết? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email của bạn',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +683,8 @@ export const viVN: LocalizationResource = {
       label__alternativeMethods: 'Hoặc, đăng nhập với phương thức khác',
       title: 'Quên mật khẩu?',
     },
+    newDeviceVerificationNotice:
+      'Bạn đang đăng nhập từ thiết bị mới. Chúng tôi yêu cầu xác minh để giữ tài khoản của bạn an toàn.',
     noAvailableMethods: {
       message: 'Không thể tiếp tục đăng nhập. Không có yếu tố xác thực phù hợp được cấu hình',
       subtitle: 'Đã xảy ra lỗi',

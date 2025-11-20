@@ -1,5 +1,6 @@
-import { type ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Errors, SignInSignal, SignUpSignal } from '@clerk/shared/types';
+import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
+import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import type { Errors, SignInErrors, SignInSignal, SignUpErrors, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
 
@@ -15,7 +16,7 @@ export const signInComputedSignal: SignInSignal = computed(() => {
   const error = signInErrorSignal().error;
   const fetchStatus = signInFetchSignal().status;
 
-  const errors = errorsToParsedErrors(error);
+  const errors = errorsToSignInErrors(error);
 
   return { errors, fetchStatus, signIn: signIn ? signIn.__internal_future : null };
 });
@@ -29,7 +30,7 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
   const error = signUpErrorSignal().error;
   const fetchStatus = signUpFetchSignal().status;
 
-  const errors = errorsToParsedErrors(error);
+  const errors = errorsToSignUpErrors(error);
 
   return { errors, fetchStatus, signUp: signUp ? signUp.__internal_future : null };
 });
@@ -38,20 +39,12 @@ export const signUpComputedSignal: SignUpSignal = computed(() => {
  * Converts an error to a parsed errors object that reports the specific fields that the error pertains to. Will put
  * generic non-API errors into the global array.
  */
-function errorsToParsedErrors(error: ClerkError | null): Errors {
-  const parsedErrors: Errors = {
-    fields: {
-      firstName: null,
-      lastName: null,
-      emailAddress: null,
-      identifier: null,
-      phoneNumber: null,
-      password: null,
-      username: null,
-      code: null,
-      captcha: null,
-      legalAccepted: null,
-    },
+export function errorsToParsedErrors<T extends Record<string, unknown>>(
+  error: ClerkError | null,
+  initialFields: T,
+): Errors<T> {
+  const parsedErrors: Errors<T> = {
+    fields: { ...initialFields },
     raw: null,
     global: null,
   };
@@ -66,7 +59,11 @@ function errorsToParsedErrors(error: ClerkError | null): Errors {
     return parsedErrors;
   }
 
-  const hasFieldErrors = error.errors.some(error => 'meta' in error && error.meta && 'paramName' in error.meta);
+  function isFieldError(error: ClerkAPIError): boolean {
+    return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
+  }
+
+  const hasFieldErrors = error.errors.some(isFieldError);
   if (hasFieldErrors) {
     error.errors.forEach(error => {
       if (parsedErrors.raw) {
@@ -74,9 +71,11 @@ function errorsToParsedErrors(error: ClerkError | null): Errors {
       } else {
         parsedErrors.raw = [error];
       }
-      if ('meta' in error && error.meta && 'paramName' in error.meta) {
+      if (isFieldError(error)) {
         const name = snakeToCamel(error.meta.paramName);
-        parsedErrors.fields[name as keyof typeof parsedErrors.fields] = error;
+        if (name in parsedErrors.fields) {
+          (parsedErrors.fields as any)[name] = error;
+        }
       }
       // Note that this assumes a given ClerkAPIResponseError will only have either field errors or global errors, but
       // not both. If a global error is present, it will be discarded.
@@ -90,4 +89,26 @@ function errorsToParsedErrors(error: ClerkError | null): Errors {
   parsedErrors.global = [createClerkGlobalHookError(error)];
 
   return parsedErrors;
+}
+
+function errorsToSignInErrors(error: ClerkError | null): SignInErrors {
+  return errorsToParsedErrors(error, {
+    identifier: null,
+    password: null,
+    code: null,
+  });
+}
+
+function errorsToSignUpErrors(error: ClerkError | null): SignUpErrors {
+  return errorsToParsedErrors(error, {
+    firstName: null,
+    lastName: null,
+    emailAddress: null,
+    phoneNumber: null,
+    password: null,
+    username: null,
+    code: null,
+    captcha: null,
+    legalAccepted: null,
+  });
 }

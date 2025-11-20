@@ -3,7 +3,6 @@ import { $ } from 'zx';
 
 export const constants = {
   ChangesetConfigFile: '.changeset/config.json',
-  ElementsPackageJson: 'packages/elements/package.json',
 };
 
 export async function getPackageNames() {

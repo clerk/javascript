@@ -1,3 +1,4 @@
+import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
@@ -192,7 +193,7 @@ export interface SignInFutureSSOParams {
    * await signIn.sso({ popup, strategy: 'oauth_google', redirectUrl: '/dashboard' });
    * ```
    */
-  popup?: { location: { href: string } };
+  popup?: Window;
   /**
    * Optional for `oauth_<provider>` or `enterprise_sso` strategies. The value to pass to the
    * [OIDC prompt parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.)
@@ -203,6 +204,10 @@ export interface SignInFutureSSOParams {
    * @experimental
    */
   enterpriseConnectionId?: string;
+  /**
+   * The unique identifier of the user. Only supported with the `enterprise_sso` strategy.
+   */
+  identifier?: string;
 }
 
 export interface SignInFutureMFAPhoneCodeVerifyParams {
@@ -343,12 +348,12 @@ export interface SignInFutureResource {
    * > Once the sign-in process is complete, call the `signIn.finalize()` method to set the newly created session as
    * > the active session.
    */
-  create: (params: SignInFutureCreateParams) => Promise<{ error: unknown }>;
+  create: (params: SignInFutureCreateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to submit a password to sign-in.
    */
-  password: (params: SignInFuturePasswordParams) => Promise<{ error: unknown }>;
+  password: (params: SignInFuturePasswordParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    *
@@ -357,12 +362,12 @@ export interface SignInFutureResource {
     /**
      * Used to send an email code to sign-in
      */
-    sendCode: (params: SignInFutureEmailCodeSendParams) => Promise<{ error: unknown }>;
+    sendCode: (params: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via email to sign-in
      */
-    verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
@@ -372,12 +377,12 @@ export interface SignInFutureResource {
     /**
      * Used to send an email link to sign-in
      */
-    sendLink: (params: SignInFutureEmailLinkSendParams) => Promise<{ error: unknown }>;
+    sendLink: (params: SignInFutureEmailLinkSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Will wait for verification to complete or expire
      */
-    waitForVerification: () => Promise<{ error: unknown }>;
+    waitForVerification: () => Promise<{ error: ClerkError | null }>;
 
     /**
      * The verification status
@@ -407,12 +412,12 @@ export interface SignInFutureResource {
     /**
      * Used to send a phone code to sign-in
      */
-    sendCode: (params: SignInFuturePhoneCodeSendParams) => Promise<{ error: unknown }>;
+    sendCode: (params: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via phone to sign-in
      */
-    verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
@@ -422,23 +427,23 @@ export interface SignInFutureResource {
     /**
      * Used to send a password reset code to the first email address on the account
      */
-    sendCode: () => Promise<{ error: unknown }>;
+    sendCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a password reset code sent via email. Will cause `signIn.status` to become `'needs_new_password'`.
      */
-    verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to submit a new password, and move the `signIn.status` to `'complete'`.
      */
-    submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: unknown }>;
+    submitPassword: (params: SignInFutureResetPasswordSubmitParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
    * Used to perform OAuth authentication.
    */
-  sso: (params: SignInFutureSSOParams) => Promise<{ error: unknown }>;
+  sso: (params: SignInFutureSSOParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    *
@@ -447,33 +452,33 @@ export interface SignInFutureResource {
     /**
      * Used to send a phone code as a second factor to sign-in
      */
-    sendPhoneCode: () => Promise<{ error: unknown }>;
+    sendPhoneCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a phone code sent as a second factor to sign-in
      */
-    verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a TOTP code as a second factor to sign-in
      */
-    verifyTOTP: (params: SignInFutureTOTPVerifyParams) => Promise<{ error: unknown }>;
+    verifyTOTP: (params: SignInFutureTOTPVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a backup code as a second factor to sign-in
      */
-    verifyBackupCode: (params: SignInFutureBackupCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyBackupCode: (params: SignInFutureBackupCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
    * Used to perform a ticket-based sign-in.
    */
-  ticket: (params?: SignInFutureTicketParams) => Promise<{ error: unknown }>;
+  ticket: (params?: SignInFutureTicketParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to perform a Web3-based sign-in.
    */
-  web3: (params: SignInFutureWeb3Params) => Promise<{ error: unknown }>;
+  web3: (params: SignInFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Initiates a passkey-based authentication flow, enabling users to authenticate using a previously
@@ -481,11 +486,11 @@ export interface SignInFutureResource {
    * `SignIn.create({ strategy: 'passkey' })` to initialize the sign-in context. This pattern is particularly useful in
    * scenarios where the authentication strategy needs to be determined dynamically at runtime.
    */
-  passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: unknown }>;
+  passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a sign-in with `status === 'complete'` into an active session. Will cause anything observing the
    * session state (such as the `useUser()` hook) to update automatically.
    */
-  finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: unknown }>;
+  finalize: (params?: SignInFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 }
