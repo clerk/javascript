@@ -39,10 +39,10 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
-      - name: Safety check - Prevent production releases on alpha-v6 branch
+      - name: Safety check - Prevent production releases on canary-core3 branch
         run: |
-          if [ -f ".alpha-v6-branch" ]; then
-            echo "❌ ERROR: This branch is marked for alpha-v6 releases only!"
+          if [ -f ".canary-core3-branch" ]; then
+            echo "❌ ERROR: This branch is marked for canary-core3 releases only!"
             echo "Production releases (latest tag) are not allowed on this branch."
             echo "If you need to make a production release, use the main production branch."
             exit 1
