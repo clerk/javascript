@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
 import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
 import useSWR from 'swr';
 
@@ -29,10 +29,11 @@ import { useRouter } from '../../router';
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
   const clerk = useClerk();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const {
     data: paymentAttempt,
@@ -43,13 +44,13 @@ export const PaymentAttemptPage = () => {
       ? {
           type: 'payment-attempt',
           id: params.paymentAttemptId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
+          orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
         }
       : null,
     () =>
       clerk.billing.getPaymentAttempt({
         id: params.paymentAttemptId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
+        orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
       }),
   );
 

@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
 ## 2.2.2
 
 ### Patch Changes
@@ -213,7 +223,6 @@
   ```
 
   **After (Recommended):**
-
   1. Enable the `v8_middleware` future flag:
 
   ```ts
@@ -565,7 +574,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`

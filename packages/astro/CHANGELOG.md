@@ -1,5 +1,14 @@
 # @clerk/astro
 
+## 2.16.1
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/types@4.101.1
+
 ## 2.16.0
 
 ### Minor Changes
@@ -91,7 +100,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -1092,7 +1100,6 @@
 - Introduce `protect-fallback` slot to avoid naming conflicts with Astro's server islands [`fallback` slot](https://docs.astro.build/en/guides/server-islands/#server-island-fallback-content). ([#5196](https://github.com/clerk/javascript/pull/5196)) by [@wobsoriano](https://github.com/wobsoriano)
 
   When using Clerk's `<Protect>` component with `server:defer`, you can now use both slots:
-
   - `fallback`: Default loading content
   - `protect-fallback`: Shows when a user doesn't have the `role` or `permission` to access the protected content
 
@@ -2029,7 +2036,6 @@
 - Simplify submodules and drop the `bundled` variant. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Moved
-
   - `@clerk/astro/client/react` to `@clerk/astro/react`
   - `@clerk/astro/client/stores` to `@clerk/astro/client`
     Dropped
@@ -2070,7 +2076,6 @@
 - Drop convenience Astro wrappers for React components ([#3682](https://github.com/clerk/javascript/pull/3682)) by [@wobsoriano](https://github.com/wobsoriano)
 
 - Change prefix for public env variables to `PUBLIC_`. The previous prefix was `PUBLIC_ASTRO_APP_`. ([#3669](https://github.com/clerk/javascript/pull/3669)) by [@panteliselef](https://github.com/panteliselef)
-
   - After this change the publishable key from should be set as `PUBLIC_CLERK_PUBLISHABLE_KEY=xxxxx`
 
 - Implement telemetry for nanostores and middleware usage; include SDK metadata. ([#3662](https://github.com/clerk/javascript/pull/3662)) by [@wobsoriano](https://github.com/wobsoriano)
