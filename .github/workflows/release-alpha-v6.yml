@@ -61,23 +61,13 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
             github.rest.actions.createWorkflowDispatch({
               owner: 'clerk',
               repo: 'sdk-infra-workers',
-              workflow_id: 'update-clerkjs.yml',
+              workflow_id: 'update-pkg-versions.yml',
               ref: 'main',
-              inputs: { version: clerkjsVersion }
+              inputs: { clerkjsVersion, clerkUiVersion }
             })
-
-          #   if (nextjsVersion.includes('canary-core3')) {
-          #     console.log('clerk/nextjs changed with canary-core3, will notify clerk/accounts');
-          #     github.rest.actions.createWorkflowDispatch({
-          #       owner: 'clerk',
-          #       repo: 'accounts',
-          #       workflow_id: 'release-staging.yml',
-          #       ref: 'main',
-          #       inputs: { version: nextjsVersion }
-          #     })
-          #   }
