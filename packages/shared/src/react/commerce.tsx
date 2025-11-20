@@ -5,10 +5,10 @@ import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
 
 import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../types';
+import { useOrganizationContext } from './contexts';
 import { createContextAndHook } from './hooks/createContextAndHook';
 import type { useCheckout } from './hooks/useCheckout';
 import { useClerk } from './hooks/useClerk';
-import { useOrganization } from './hooks/useOrganization';
 import { useUser } from './hooks/useUser';
 import { Elements, PaymentElement as StripePaymentElement, useElements, useStripe } from './stripe-react';
 
@@ -80,7 +80,8 @@ const useLocalization = () => {
 };
 
 const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
-  const { organization } = useOrganization();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const { organization } = useOrganizationContext();
   const { user } = useUser();
   const resource = forResource === 'organization' ? organization : user;
   const stripeClerkLibs = useStripeLibsContext();
