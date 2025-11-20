@@ -10,7 +10,6 @@ export {
   useClientContext,
   useOptionsContext,
   useOrganizationContext,
-  UserContext,
   useSessionContext,
   useUserContext,
   __experimental_CheckoutProvider,

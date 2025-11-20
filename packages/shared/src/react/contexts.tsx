@@ -11,13 +11,12 @@ import type {
   InitialState,
   LoadedClerk,
   OrganizationResource,
-  UserResource,
 } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
 import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
-const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
+export { useUserBase as useUserContext } from './hooks/base/useUserBase';
 const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
 export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
@@ -141,6 +140,4 @@ export {
   useClientContext,
   useOptionsContext,
   useOrganizationContext,
-  UserContext,
-  useUserContext,
 };

@@ -8,7 +8,6 @@ import {
   ClientContext,
   InitialStateProvider,
   OrganizationProvider,
-  UserContext,
 } from './contexts';
 import { assertClerkSingletonExists } from './utils';
 
@@ -49,8 +48,7 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const resolvedState = deriveState(clerk.loaded, state, props.initialState);
-  const { user, organization } = resolvedState;
-  const userCtx = React.useMemo(() => ({ value: user }), [user]);
+  const { organization } = resolvedState;
   const organizationCtx = React.useMemo(
     () => ({
       value: { organization: organization },
@@ -66,14 +64,12 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
             {...organizationCtx.value}
             swrConfig={props.swrConfig}
           >
-            <UserContext.Provider value={userCtx}>
-              <CheckoutProvider
-                // @ts-expect-error - value is not used
-                value={undefined}
-              >
-                {props.children}
-              </CheckoutProvider>
-            </UserContext.Provider>
+            <CheckoutProvider
+              // @ts-expect-error - value is not used
+              value={undefined}
+            >
+              {props.children}
+            </CheckoutProvider>
           </OrganizationProvider>
         </ClientContext.Provider>
       </ClerkInstanceContext.Provider>
