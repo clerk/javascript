@@ -1,8 +1,8 @@
 import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
-import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
 import { usePlanDetailsQueryCacheKeys } from './usePlanDetailsQuery.shared';
+import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
 
 const HOOK_NAME = 'usePlanDetailsQuery';
 
@@ -12,7 +12,7 @@ const HOOK_NAME = 'usePlanDetailsQuery';
  *
  * @internal
  */
-export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams = {}): PlanDetailsQueryResult {
+function usePlanDetailsQuery(params: UsePlanDetailsQueryParams = {}): PlanDetailsQueryResult {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const { planId, initialPlan = null, enabled = true, keepPreviousData = true } = params;
@@ -48,3 +48,5 @@ export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams
     isFetching: swr.isValidating,
   };
 }
+
+export { usePlanDetailsQuery as __internal_usePlanDetailsQuery };

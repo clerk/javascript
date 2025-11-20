@@ -1,5 +1,4 @@
 import { __internal_useStatementQuery } from '@clerk/shared/react/index';
-import type { BillingStatementResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -20,9 +19,6 @@ import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';
 
-type StatementGroup = BillingStatementResource['groups'][number];
-type StatementItem = StatementGroup['items'][number];
-
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
@@ -35,8 +31,9 @@ export const StatementPage = () => {
     isLoading,
     error,
   } = __internal_useStatementQuery({
-    statementId: params.statementId ?? null,
+    statementId: params.statementId,
     for: requesterType,
+    enabled: Boolean(params.statementId),
   });
 
   if (isLoading) {
@@ -90,11 +87,11 @@ export const StatementPage = () => {
             status={statement.status}
           />
           <Statement.Body>
-            {statement.groups.map((group: StatementGroup) => (
+            {statement.groups.map(group => (
               <Statement.Section key={group.timestamp.toISOString()}>
                 <Statement.SectionHeader text={formatDate(group.timestamp, 'long')} />
                 <Statement.SectionContent>
-                  {group.items.map((item: StatementItem) => (
+                  {group.items.map(item => (
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}

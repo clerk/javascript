@@ -1,4 +1,5 @@
 import { eventMethodCalled } from '../../telemetry/events';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
   useAssertWrappedByClerkProvider,
@@ -12,19 +13,12 @@ import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './
 const HOOK_NAME = 'usePaymentAttemptQuery';
 
 /**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
-
-/**
  * This is the new implementation of usePaymentAttemptQuery using React Query.
  * It is exported only if the package is built with the `CLERK_USE_RQ` environment variable set to `true`.
  *
  * @internal
  */
-export function __internal_usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAttemptQueryResult {
+function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAttemptQueryResult {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const { paymentAttemptId, enabled = true, keepPreviousData = false, for: forType = 'user' } = params;
@@ -53,7 +47,7 @@ export function __internal_usePaymentAttemptQuery(params: UsePaymentAttemptQuery
       return clerk.billing.getPaymentAttempt(args);
     },
     enabled: queryEnabled,
-    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
     staleTime: 1_000 * 60,
   });
 
@@ -64,3 +58,5 @@ export function __internal_usePaymentAttemptQuery(params: UsePaymentAttemptQuery
     isFetching: query.isFetching,
   };
 }
+
+export { usePaymentAttemptQuery as __internal_usePaymentAttemptQuery };

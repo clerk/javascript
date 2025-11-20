@@ -37,8 +37,9 @@ export const PaymentAttemptPage = () => {
     isLoading,
     error,
   } = __internal_usePaymentAttemptQuery({
-    paymentAttemptId: params.paymentAttemptId ?? null,
+    paymentAttemptId: params.paymentAttemptId,
     for: requesterType,
+    enabled: Boolean(params.paymentAttemptId),
   });
 
   const subscriptionItem = paymentAttempt?.subscriptionItem;

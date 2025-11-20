@@ -1,17 +1,11 @@
 import { eventMethodCalled } from '../../telemetry/events';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 import { usePlanDetailsQueryCacheKeys } from './usePlanDetailsQuery.shared';
 import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
 
 const HOOK_NAME = 'usePlanDetailsQuery';
-
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
 
 /**
  * This is the new implementation of usePlanDetailsQuery using React Query.
@@ -43,7 +37,7 @@ export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams
     },
     enabled: queryEnabled,
     initialData: initialPlan ?? undefined,
-    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
     refetchOnWindowFocus: false,
     retry: false,
     staleTime: 1_000 * 60,

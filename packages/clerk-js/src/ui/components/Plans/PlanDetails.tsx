@@ -28,8 +28,6 @@ import {
   useLocalizations,
 } from '../../customizables';
 
-type PlanFeature = BillingPlanResource['features'][number];
-
 export const PlanDetails = (props: __internal_PlanDetailsProps) => {
   return (
     <Flow.Root flow='planDetails'>
@@ -155,7 +153,7 @@ const PlanDetailsInternal = ({
               margin: 0,
             })}
           >
-            {features.map((feature: PlanFeature) => (
+            {features.map(feature => (
               <Box
                 key={feature.id}
                 elementDescriptor={descriptors.planDetailFeaturesListItem}

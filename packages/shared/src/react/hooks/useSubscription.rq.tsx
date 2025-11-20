@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
 import type { EnvironmentResource } from '../../types';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
@@ -14,13 +15,6 @@ import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const HOOK_NAME = 'useSubscription';
-
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
 
 /**
  * This is the new implementation of useSubscription using React Query.
@@ -64,7 +58,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     },
     staleTime: 1_000 * 60,
     enabled: queriesEnabled,
-    placeholderData: keepPreviousData && queriesEnabled ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData && queriesEnabled),
   });
 
   const revalidate = useCallback(

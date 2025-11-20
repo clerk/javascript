@@ -28,7 +28,6 @@ export type UsePagesOrInfiniteSignature = <
     invalidationKey: InvalidationQueryKey;
     stableKey: string;
     authenticated: boolean;
-    // toSWRQuery: () => Record<string, unknown>;
   },
   TConfig extends Config = Config,
 >(params: {

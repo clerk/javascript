@@ -1,4 +1,5 @@
 import { eventMethodCalled } from '../../telemetry/events';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
   useAssertWrappedByClerkProvider,
@@ -6,17 +7,10 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
-import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
 import { useStatementQueryCacheKeys } from './useStatementQuery.shared';
+import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
 
 const HOOK_NAME = 'useStatementQuery';
-
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
 
 /**
  * This is the new implementation of useStatementQuery using React Query.
@@ -24,7 +18,7 @@ function KeepPreviousDataFn<Data>(previousData: Data): Data {
  *
  * @internal
  */
-export function __internal_useStatementQuery(params: UseStatementQueryParams = {}): StatementQueryResult {
+function useStatementQuery(params: UseStatementQueryParams = {}): StatementQueryResult {
   useAssertWrappedByClerkProvider(HOOK_NAME);
 
   const { statementId = null, enabled = true, keepPreviousData = false, for: forType = 'user' } = params;
@@ -55,7 +49,7 @@ export function __internal_useStatementQuery(params: UseStatementQueryParams = {
       return clerk.billing.getStatement({ id: statementId, orgId: organizationId ?? undefined });
     },
     enabled: queryEnabled,
-    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
     staleTime: 1_000 * 60,
   });
 
@@ -66,3 +60,5 @@ export function __internal_useStatementQuery(params: UseStatementQueryParams = {
     isFetching: query.isFetching,
   };
 }
+
+export { useStatementQuery as __internal_useStatementQuery };

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
@@ -10,13 +11,6 @@ import type { CacheSetter, ValueOrSetter } from '../types';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
-
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
   const { fetcher, config, keys } = params;
@@ -77,7 +71,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,
     // Use placeholderData to keep previous data while fetching new page
-    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
   });
 
   // Infinite mode: accumulate pages
