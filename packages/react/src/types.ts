@@ -40,7 +40,7 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
    */
-  initialState?: InitialState;
+  initialState?: InitialState | Promise<InitialState>;
   /**
    * Indicates to silently fail the initialization process when the publishable keys is not provided, instead of throwing an error.
    * @default false

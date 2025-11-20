@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/shared/types';
+import type { InitialState, Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
 import React from 'react';
 
@@ -30,11 +30,13 @@ export async function ClerkProvider(
 ) {
   const { children, dynamic, ...rest } = props;
 
-  const statePromiseOrValue = dynamic ? getDynamicClerkState() : null;
+  const statePromiseOrValue = dynamic ? getDynamicClerkState() : undefined;
   const noncePromiseOrValue = dynamic ? getNonceHeaders() : '';
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
+    initialState: statePromiseOrValue as InitialState | Promise<InitialState> | undefined,
+    nonce: await noncePromiseOrValue,
   });
 
   const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
@@ -52,8 +54,6 @@ export async function ClerkProvider(
     return (
       <KeylessProvider
         rest={propsWithEnvs}
-        nonce={await noncePromiseOrValue}
-        initialState={await statePromiseOrValue}
         runningWithClaimedKeys={runningWithClaimedKeys}
       >
         {children}
@@ -61,13 +61,5 @@ export async function ClerkProvider(
     );
   }
 
-  return (
-    <ClientClerkProvider
-      {...propsWithEnvs}
-      nonce={await noncePromiseOrValue}
-      initialState={await statePromiseOrValue}
-    >
-      {children}
-    </ClientClerkProvider>
-  );
+  return <ClientClerkProvider {...propsWithEnvs}>{children}</ClientClerkProvider>;
 }

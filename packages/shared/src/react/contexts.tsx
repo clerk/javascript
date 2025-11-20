@@ -19,19 +19,33 @@ export { useUserBase as useUserContext } from './hooks/base/useUserBase';
 export { useClientBase as useClientContext } from './hooks/base/useClientBase';
 export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
-const [InitialStateContext, useInitialStateContext] = createContextAndHook<InitialState | undefined>(
-  'InitialStateContext',
-);
+const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
+  InitialState | Promise<InitialState> | undefined
+>('InitialStateContext');
 export { useInitialStateContext };
 export function InitialStateProvider({
   children,
   initialState,
 }: {
   children: React.ReactNode;
-  initialState: InitialState | undefined;
+  initialState: InitialState | Promise<InitialState> | undefined;
 }) {
   const initialStateCtx = React.useMemo(() => ({ value: initialState }), [initialState]);
   return <InitialStateContext.Provider value={initialStateCtx}>{children}</InitialStateContext.Provider>;
+}
+function useInitialStateContext(): InitialState | undefined {
+  const initialState = _useInitialStateContext();
+
+  if (!initialState) {
+    return undefined;
+  }
+
+  if (initialState && 'then' in initialState) {
+    // TODO: If we want to preserve backwards compatibility, we'd need to throw here instead
+    // @ts-expect-error See above
+    return React.use(initialState);
+  }
+  return initialState;
 }
 
 const OptionsContext = React.createContext<ClerkOptions>({});
