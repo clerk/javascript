@@ -1287,6 +1287,13 @@ export type __internal_LocalizationResource = {
       action__invitationAccept: LocalizationValue;
     };
   };
+  taskResetPassword: {
+    title: LocalizationValue;
+    signOut: {
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue<'identifier'>;
+    };
+  };
 };
 
 type WithParamName<T> = T &
