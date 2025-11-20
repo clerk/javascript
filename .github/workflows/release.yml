@@ -92,7 +92,7 @@ jobs:
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'sdk-infra-workers',
-                workflow_id: 'update-clerkjs.yml',
+                workflow_id: 'update-pkg-versions',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
               })
