@@ -74,4 +74,47 @@ import { ClerkProvider } from "@clerk/react"
 import { useSignIn, useSignUp } from "@clerk/react/legacy"
 `,
   },
+  {
+    name: 'Handles require statements',
+    source: `
+const { ClerkProvider } = require("@clerk/clerk-react")
+        `,
+    output: `
+const { ClerkProvider } = require("@clerk/react")
+`,
+  },
+  {
+    name: 'Rewrites require statements to legacy imports',
+    source: `
+const { useSignIn, useSignUp } = require("@clerk/clerk-react")
+        `,
+    output: `
+const { useSignIn, useSignUp } = require("@clerk/react/legacy")
+`,
+  },
+  {
+    name: 'Rewrites mixed require statements to legacy imports',
+    source: `
+const { useSignIn, useSignUp, ClerkProvider } = require("@clerk/clerk-react")
+        `,
+    output: `
+const {
+  ClerkProvider
+} = require("@clerk/react")
+
+const {
+  useSignIn,
+  useSignUp
+} = require("@clerk/react/legacy");
+`,
+  },
+  {
+    name: 'Updates require to new package without object destructuring',
+    source: `
+const clerk = require("@clerk/clerk-react")
+        `,
+    output: `
+const clerk = require("@clerk/react")
+`,
+  },
 ];

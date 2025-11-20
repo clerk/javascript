@@ -6,6 +6,10 @@ const PACKAGES = [
   ['@clerk/tanstack-react-start', '@clerk/tanstack-react-start'],
 ];
 
+function isLegacySpecifier(name) {
+  return name === 'useSignIn' || name === 'useSignUp';
+}
+
 /**
  * Transforms imports of `@clerk/clerk-react` to `@clerk/react` and `@clerk/clerk-expo` to `@clerk/expo`, in addition
  * to updating imports of `useSignIn` and `useSignUp` to import from the `/legacy` subpath.
@@ -20,7 +24,7 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
   let dirtyFlag = false;
 
   PACKAGES.forEach(([sourcePackage, targetPackage]) => {
-    // Transform imports from sourcePackage to targetPackage
+    // Transform `import` statements
     root.find(j.ImportDeclaration, { source: { value: sourcePackage } }).forEach(path => {
       const node = path.node;
       const specifiers = node.specifiers || [];
@@ -31,10 +35,7 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
       const nonLegacySpecifiers = [];
 
       for (const spec of specifiers) {
-        if (
-          j.ImportSpecifier.check(spec) &&
-          (spec.imported.name === 'useSignIn' || spec.imported.name === 'useSignUp')
-        ) {
+        if (j.ImportSpecifier.check(spec) && isLegacySpecifier(spec.imported.name)) {
           legacySpecifiers.push(spec);
         } else {
           nonLegacySpecifiers.push(spec);
@@ -74,6 +75,66 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
       }
       dirtyFlag = true;
     });
+
+    // Transform require statements
+    root
+      .find(j.VariableDeclarator, {
+        init: {
+          callee: { name: 'require' },
+          arguments: [{ value: sourcePackage }],
+        },
+      })
+      .forEach(path => {
+        const node = path.node;
+        const id = node.id;
+
+        // Handle destructuring: const { useSignIn } = require(...)
+        if (id.type === 'ObjectPattern') {
+          const legacyProperties = [];
+          const nonLegacyProperties = [];
+
+          for (const prop of id.properties) {
+            // Check if property key matches legacy hooks
+            if (prop.key && isLegacySpecifier(prop.key.name)) {
+              legacyProperties.push(prop);
+            } else {
+              nonLegacyProperties.push(prop);
+            }
+          }
+
+          if (legacyProperties.length > 0 && nonLegacyProperties.length > 0) {
+            // Mixed require: keep non-legacy on targetPackage, create new require for legacy
+            node.id.properties = nonLegacyProperties;
+            node.init.arguments[0] = j.literal(targetPackage);
+
+            // Create new variable declaration for legacy
+            // We need to find the kind (const, let, var) from the parent VariableDeclaration
+            const variableDeclaration = path.parent.node;
+            const kind = variableDeclaration.kind || 'const';
+
+            const legacyDeclarator = j.variableDeclarator(
+              j.objectPattern(legacyProperties),
+              j.callExpression(j.identifier('require'), [j.literal(`${targetPackage}/legacy`)]),
+            );
+            const legacyDeclaration = j.variableDeclaration(kind, [legacyDeclarator]);
+
+            j(path.parent).insertAfter(legacyDeclaration);
+            dirtyFlag = true;
+            return;
+          }
+
+          if (legacyProperties.length > 0) {
+            // Only legacy hooks
+            node.init.arguments[0] = j.literal(`${targetPackage}/legacy`);
+            dirtyFlag = true;
+            return;
+          }
+        }
+
+        // Only non-legacy or not destructuring (e.g. const Clerk = require(...))
+        node.init.arguments[0] = j.literal(targetPackage);
+        dirtyFlag = true;
+      });
   });
 
   return dirtyFlag ? root.toSource() : undefined;
