@@ -60,7 +60,7 @@ export const useOrganization: UseOrganization = () => {
     clerk,
     value => {
       if (value?.loaded) {
-        value.__internal_attemptToEnableEnvironmentSetting({
+        value.__internal_attemptToEnableEnvironmentSetting?.({
           for: 'organizations',
           caller: 'useOrganization',
         });
