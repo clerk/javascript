@@ -5,7 +5,6 @@ export {
   ClientContext,
   OptionsContext,
   OrganizationProvider,
-  SessionContext,
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
   useClientContext,

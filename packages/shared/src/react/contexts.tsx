@@ -11,7 +11,6 @@ import type {
   InitialState,
   LoadedClerk,
   OrganizationResource,
-  SignedInSessionResource,
   UserResource,
 } from '../types';
 import { createContextAndHook } from './hooks/createContextAndHook';
@@ -20,9 +19,7 @@ import { SWRConfigCompat } from './providers/SWRConfigCompat';
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
 const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
-const [SessionContext, useSessionContext] = createContextAndHook<SignedInSessionResource | null | undefined>(
-  'SessionContext',
-);
+export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
 const [InitialStateContext, useInitialStateContext] = createContextAndHook<InitialState | undefined>(
   'InitialStateContext',
@@ -138,7 +135,6 @@ export {
   ClientContext,
   OptionsContext,
   OrganizationProvider,
-  SessionContext,
   useAssertWrappedByClerkProvider,
   useCheckoutContext,
   useClerkInstanceContext,
@@ -146,6 +142,5 @@ export {
   useOptionsContext,
   useOrganizationContext,
   UserContext,
-  useSessionContext,
   useUserContext,
 };

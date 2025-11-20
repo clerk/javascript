@@ -8,7 +8,6 @@ import {
   ClientContext,
   InitialStateProvider,
   OrganizationProvider,
-  SessionContext,
   UserContext,
 } from './contexts';
 import { assertClerkSingletonExists } from './utils';
@@ -46,12 +45,11 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
     // the object will always be the latest value anyway.
     [props.clerkStatus],
   );
+  // TODO: I believe this is not always defined with isomorphic clerk, need to think on that
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
   const resolvedState = deriveState(clerk.loaded, state, props.initialState);
-  const { session, user, organization } = resolvedState;
-
-  const sessionCtx = React.useMemo(() => ({ value: session }), [session]);
+  const { user, organization } = resolvedState;
   const userCtx = React.useMemo(() => ({ value: user }), [user]);
   const organizationCtx = React.useMemo(
     () => ({
@@ -64,21 +62,19 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
     <InitialStateProvider initialState={props.initialState}>
       <ClerkInstanceContext.Provider value={clerkCtx}>
         <ClientContext.Provider value={clientCtx}>
-          <SessionContext.Provider value={sessionCtx}>
-            <OrganizationProvider
-              {...organizationCtx.value}
-              swrConfig={props.swrConfig}
-            >
-              <UserContext.Provider value={userCtx}>
-                <CheckoutProvider
-                  // @ts-expect-error - value is not used
-                  value={undefined}
-                >
-                  {props.children}
-                </CheckoutProvider>
-              </UserContext.Provider>
-            </OrganizationProvider>
-          </SessionContext.Provider>
+          <OrganizationProvider
+            {...organizationCtx.value}
+            swrConfig={props.swrConfig}
+          >
+            <UserContext.Provider value={userCtx}>
+              <CheckoutProvider
+                // @ts-expect-error - value is not used
+                value={undefined}
+              >
+                {props.children}
+              </CheckoutProvider>
+            </UserContext.Provider>
+          </OrganizationProvider>
         </ClientContext.Provider>
       </ClerkInstanceContext.Provider>
     </InitialStateProvider>

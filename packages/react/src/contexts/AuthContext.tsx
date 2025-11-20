@@ -1,6 +1,6 @@
 import type { DeriveStateReturnType } from '@clerk/shared/deriveState';
 import { deriveFromClientSideState, deriveFromSsrInitialState } from '@clerk/shared/deriveState';
-import { useInitialStateContext } from '@clerk/shared/react';
+import { useClerkInstanceContext, useInitialStateContext } from '@clerk/shared/react';
 import type {
   ActClaim,
   ClientResource,
@@ -10,8 +10,6 @@ import type {
   SessionStatusClaim,
 } from '@clerk/shared/types';
 import { useCallback, useDeferredValue, useMemo, useSyncExternalStore } from 'react';
-
-import { useIsomorphicClerkContext } from './IsomorphicClerkContext';
 
 type AuthStateValue = {
   userId: string | null | undefined;
@@ -40,7 +38,7 @@ export const defaultDerivedInitialState = {
 };
 
 export function useAuthState(): AuthStateValue {
-  const clerk = useIsomorphicClerkContext();
+  const clerk = useClerkInstanceContext();
   const initialStateContext = useInitialStateContext();
   // If we make initialState support a promise in the future, this is where we would use() that promise
   const initialSnapshot = useMemo(() => {
