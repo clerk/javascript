@@ -37,9 +37,9 @@ import type {
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
   BillingNamespace,
-  Clerk as ClerkInterface,
   ClerkAPIError,
   ClerkAuthenticateWithWeb3Params,
+  Clerk as ClerkInterface,
   ClerkOptions,
   ClientJSONSnapshot,
   ClientResource,
@@ -1141,20 +1141,6 @@ export class Clerk implements ClerkInterface {
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
-
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
-      for: 'organizations',
-      caller: 'OrganizationSwitcher',
-      onClose: () => {
-        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
-          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
-        });
-      },
-    });
-
-    if (status === 'prompt-shown') {
-      return;
-    }
 
     void this.#componentControls?.ensureMounted({ preloadHint: 'OrganizationSwitcher' }).then(controls =>
       controls.mountComponent({
