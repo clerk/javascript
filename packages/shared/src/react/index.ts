@@ -2,7 +2,6 @@ export * from './hooks';
 
 export {
   ClerkInstanceContext,
-  ClientContext,
   OptionsContext,
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,

@@ -6,7 +6,6 @@ import React from 'react';
 import type {
   BillingSubscriptionPlanPeriod,
   ClerkOptions,
-  ClientResource,
   ForPayerType,
   InitialState,
   LoadedClerk,
@@ -17,7 +16,7 @@ import { createContextAndHook } from './hooks/createContextAndHook';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 export { useUserBase as useUserContext } from './hooks/base/useUserBase';
-const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
+export { useClientBase as useClientContext } from './hooks/base/useClientBase';
 export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
 const [InitialStateContext, useInitialStateContext] = createContextAndHook<InitialState | undefined>(
@@ -106,12 +105,10 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
 export {
   __experimental_CheckoutProvider,
   ClerkInstanceContext,
-  ClientContext,
   OptionsContext,
   useAssertWrappedByClerkProvider,
   useCheckoutContext,
   useClerkInstanceContext,
-  useClientContext,
   useOptionsContext,
   useOrganizationContext,
 };
