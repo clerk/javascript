@@ -16,7 +16,7 @@ export function useClientBase(): ClientResource | null | undefined {
   }, [clerk.client, clerk.loaded]);
 
   const client = useSyncExternalStore(
-    clerk.addListener,
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => snapshot, [snapshot]),
     useCallback(() => initialSnapshot, []),
   );

@@ -23,7 +23,7 @@ export function useSessionBase(): SignedInSessionResource | null | undefined {
   }, [clerk.session, initialSnapshot, clerk.loaded]);
 
   const session = useSyncExternalStore(
-    clerk.addListener,
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => snapshot, [snapshot]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );

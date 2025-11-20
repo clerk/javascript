@@ -23,7 +23,7 @@ export function useOrganizationBase(): OrganizationResource | null | undefined {
   }, [clerk.organization, initialSnapshot, clerk.loaded]);
 
   const organization = useSyncExternalStore(
-    clerk.addListener,
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => snapshot, [snapshot]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );

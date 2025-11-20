@@ -64,7 +64,7 @@ export function useAuthState(): AuthStateValue {
   }, [clerk.client, clerk.session, clerk.user, clerk.organization, initialSnapshot, clerk.loaded]);
 
   const authState = useSyncExternalStore(
-    clerk.addListener,
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => snapshot, [snapshot]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );

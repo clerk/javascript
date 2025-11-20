@@ -23,7 +23,7 @@ export function useUserBase(): UserResource | null | undefined {
   }, [clerk.user, initialSnapshot, clerk.loaded]);
 
   const user = useSyncExternalStore(
-    clerk.addListener,
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
     useCallback(() => snapshot, [snapshot]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );
