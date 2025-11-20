@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 
-import { $, argv, echo } from 'zx';
+import { $, echo } from 'zx';
 
 import { constants, getPackageNames } from './common.mjs';
 
@@ -10,11 +10,9 @@ const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 const snapshot = `---
 ${packageEntries}
 ---
- 
-Snapshot release
-`;
 
-const prefix = argv.name || argv._[0] || 'snapshot';
+canary-core3 release
+`;
 
 await $`pnpm dlx json -I -f ${constants.ChangesetConfigFile} -e "this.changelog = false"`;
 
@@ -32,7 +30,7 @@ try {
   // otherwise, do nothing
 }
 
-const res = await $`pnpm changeset version --snapshot ${prefix}`;
+const res = await $`pnpm changeset version --snapshot canary-core3`;
 const success = !res.stderr.includes('No unreleased changesets found');
 
 await $`git checkout HEAD -- ${constants.ChangesetConfigFile}`;
