@@ -30,12 +30,12 @@ export function useAttemptToEnableOrganizations(caller: 'useOrganization' | 'use
 
   useEffect(() => {
     // Guard to not run this effect twice on Clerk resource update
-    if (hasAttempted.current) {
+    if (hasAttempted.current || !clerk.loaded) {
       return;
     }
 
     hasAttempted.current = true;
-    clerk.__internal_attemptToEnableEnvironmentSetting({
+    clerk.__internal_attemptToEnableEnvironmentSetting?.({
       for: 'organizations',
       caller,
     });
