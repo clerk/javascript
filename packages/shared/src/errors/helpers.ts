@@ -121,15 +121,6 @@ export function isPasswordPwnedError(err: any) {
 }
 
 /**
- * Checks if the provided error is a clerk api response error indicating a password is untrusted.
- *
- * @internal
- */
-export function isPasswordUntrustedError(err: any) {
-  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_untrusted';
-}
-
-/**
  * Checks if the provided error is an EmailLinkError.
  *
  * @internal
