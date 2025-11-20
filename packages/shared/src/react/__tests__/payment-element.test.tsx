@@ -53,11 +53,15 @@ vi.mock('../hooks/useUser', () => ({
   }),
 }));
 
-vi.mock('../hooks/useOrganization', () => ({
-  useOrganization: () => ({
-    organization: null,
-  }),
-}));
+vi.mock('../contexts', async () => {
+  const actual = await vi.importActual('../contexts');
+  return {
+    ...actual,
+    useOrganizationContext: () => ({
+      organization: null,
+    }),
+  };
+});
 
 const mockInitializePaymentMethod = vi.fn().mockResolvedValue({
   externalGatewayId: 'acct_123',
