@@ -18,7 +18,7 @@ concurrency:
 jobs:
   # Check triggering actor permissions to prevent PRs from forks accessing secrets by default, preventing them from exfiltrating secrets for malicious purposes
   check-permissions:
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -48,7 +48,7 @@ jobs:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Formatting | Dedupe | Changeset
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -89,7 +89,7 @@ jobs:
     needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Build Packages
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     permissions:
       contents: read
     defaults:
@@ -117,7 +117,7 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
-        run: pnpm turbo build $TURBO_ARGS --only --filter=!@clerk/elements
+        run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Upload Turbo Summary
         uses: actions/upload-artifact@v4
@@ -135,7 +135,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -196,7 +196,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -210,13 +210,13 @@ jobs:
       matrix:
         include:
           - node-version: 22
-            test-filter: '**'
-            clerk-use-rq: 'false'
-            filter-label: '**'
+            test-filter: "**"
+            clerk-use-rq: "false"
+            filter-label: "**"
           - node-version: 22
-            test-filter: '--filter=@clerk/shared --filter=@clerk/clerk-js'
-            clerk-use-rq: 'true'
-            filter-label: 'shared, clerk-js'
+            test-filter: "--filter=@clerk/shared --filter=@clerk/clerk-js"
+            clerk-use-rq: "true"
+            filter-label: "shared, clerk-js"
 
     steps:
       - name: Checkout Repo
@@ -286,7 +286,7 @@ jobs:
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
@@ -297,23 +297,23 @@ jobs:
       matrix:
         test-name:
           [
-            'generic',
-            'express',
-            'ap-flows',
-            'localhost',
-            'sessions',
-            'sessions:staging',
-            'handshake',
-            'handshake:staging',
-            'astro',
-            'tanstack-react-start',
-            'vue',
-            'nuxt',
-            'react-router',
-            'machine',
-            'custom',
+            "generic",
+            "express",
+            "ap-flows",
+            "localhost",
+            "sessions",
+            "sessions:staging",
+            "handshake",
+            "handshake:staging",
+            "astro",
+            "tanstack-react-start",
+            "vue",
+            "nuxt",
+            "react-router",
+            "machine",
+            "custom",
           ]
-        test-project: ['chrome']
+        test-project: ["chrome"]
         include:
           # - test-name: "billing"
           #   test-project: "chrome"
@@ -321,23 +321,23 @@ jobs:
           # - test-name: "billing"
           #   test-project: "chrome"
           #   clerk-use-rq: "true"
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-            clerk-use-rq: 'false'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-            clerk-use-rq: 'true'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '16'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '16'
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "false"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "true"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "16"
 
     steps:
       - name: Checkout Repo
@@ -369,8 +369,8 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_JS_VERSION: 'latest'
-          E2E_CLERK_UI_VERSION: 'latest'
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -444,8 +444,8 @@ jobs:
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: actions/github-script@v7
         env:
-          INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
-          INTEGRATION_ROOT_CA: '${{secrets.INTEGRATION_ROOT_CA}}'
+          INTEGRATION_CERTS: "${{secrets.INTEGRATION_CERTS}}"
+          INTEGRATION_ROOT_CA: "${{secrets.INTEGRATION_ROOT_CA}}"
         with:
           script: |
             const fs = require('fs');
@@ -471,8 +471,8 @@ jobs:
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
-          E2E_CLERK_JS_VERSION: 'latest'
-          E2E_CLERK_UI_VERSION: 'latest'
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
@@ -493,7 +493,7 @@ jobs:
     name: Publish with pkg-pr-new
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     needs: [check-permissions, build-packages]
-    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    runs-on: "blacksmith-8vcpu-ubuntu-2204"
     defaults:
       run:
         shell: bash
