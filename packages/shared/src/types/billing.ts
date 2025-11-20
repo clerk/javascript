@@ -1,6 +1,10 @@
+import type { ClerkError } from '@/errors/clerkError';
+
+import type { SetActiveNavigate } from './clerk';
 import type { DeletedObjectResource } from './deletedObject';
 import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination';
 import type { ClerkResource } from './resource';
+import type { ForceNull, RemoveFunctions, Simplify } from './utils';
 
 type WithOptionalOrgType<T> = T & {
   /**
@@ -131,17 +135,17 @@ export interface BillingPlanResource extends ClerkResource {
    */
   fee: BillingMoneyAmount;
   /**
-   * The annual price of the plan.
+   * The annual price of the plan or `null` if the plan is not annual.
    */
-  annualFee: BillingMoneyAmount;
+  annualFee: BillingMoneyAmount | null;
   /**
-   * The effective monthly price when billed annually.
+   * The effective monthly price when billed annually or `null` if the plan is not annual.
    */
-  annualMonthlyFee: BillingMoneyAmount;
+  annualMonthlyFee: BillingMoneyAmount | null;
   /**
-   * A short description of what the plan offers.
+   * A short description of what the plan offers, or `null` if no description is provided.
    */
-  description: string;
+  description: string | null;
   /**
    * Whether the plan is the default plan.
    */
@@ -169,9 +173,9 @@ export interface BillingPlanResource extends ClerkResource {
    */
   slug: string;
   /**
-   * The URL of the plan's avatar image.
+   * The URL of the plan's avatar image, or `null` if not set.
    */
-  avatarUrl: string;
+  avatarUrl: string | null;
   /**
    * The features the plan offers.
    */
@@ -201,17 +205,17 @@ export interface FeatureResource extends ClerkResource {
    */
   name: string;
   /**
-   * A short description of what the feature provides.
+   * A short description of what the feature provides, or `null` if not provided.
    */
-  description: string;
+  description: string | null;
   /**
    * A unique, URL-friendly identifier for the feature.
    */
   slug: string;
   /**
-   * The URL of the feature's avatar image.
+   * The URL of the feature's avatar image, or `null` if not set.
    */
-  avatarUrl: string;
+  avatarUrl: string | null;
 }
 
 /**
@@ -220,7 +224,6 @@ export interface FeatureResource extends ClerkResource {
  * @inline
  */
 export type BillingPaymentMethodStatus = 'active' | 'expired' | 'disconnected';
-// TODO(@COMMERCE): Is expired returned from FAPI ?
 
 /**
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -281,23 +284,23 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * The last four digits of the payment method.
    */
-  last4: string;
+  last4: string | null;
   /**
-   * The type of payment method. For example, `'card'` or `'link'`.
+   * The type of payment method. For example, `'card'`.
    */
-  paymentType: 'card' | 'link';
+  paymentType?: 'card';
   /**
    * The brand or type of card. For example, `'visa'` or `'mastercard'`.
    */
-  cardType: string;
+  cardType: string | null;
   /**
    * Whether the payment method is set as the default for the account.
    */
-  isDefault: boolean;
+  isDefault?: boolean;
   /**
    * Whether the payment method can be removed by the user.
    */
-  isRemovable: boolean;
+  isRemovable?: boolean;
   /**
    * The current status of the payment method.
    */
@@ -305,7 +308,23 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * The type of digital wallet, if applicable. For example, `'apple_pay'`, or `'google_pay'`.
    */
-  walletType: string | undefined;
+  walletType?: string | null;
+  /**
+   * The card expiration year, if available.
+   */
+  expiryYear?: number | null;
+  /**
+   * The card expiration month, if available.
+   */
+  expiryMonth?: number | null;
+  /**
+   * The date the payment method was created, if available.
+   */
+  createdAt?: Date | null;
+  /**
+   * The date the payment method was last updated, if available.
+   */
+  updatedAt?: Date | null;
   /**
    * A function that removes this payment method from the account. Accepts the following parameters:
    * <ul>
@@ -315,7 +334,6 @@ export interface BillingPaymentMethodResource extends ClerkResource {
    * @param params - The parameters for the remove operation.
    * @returns A promise that resolves to a `DeletedObjectResource` object.
    */
-  // TODO: orgId should be implied by the payment method
   remove: (params?: RemovePaymentMethodParams) => Promise<DeletedObjectResource>;
   /**
    * A function that sets this payment method as the default for the account. Accepts the following parameters:
@@ -326,7 +344,6 @@ export interface BillingPaymentMethodResource extends ClerkResource {
    * @param params - The parameters for the make default operation.
    * @returns A promise that resolves to `null`.
    */
-  // TODO: orgId should be implied by the payment method
   makeDefault: (params?: MakeDefaultPaymentMethodParams) => Promise<null>;
 }
 
@@ -379,11 +396,11 @@ export interface BillingPaymentResource extends ClerkResource {
   /**
    * The date and time when the payment was successfully completed.
    */
-  paidAt?: Date;
+  paidAt: Date | null;
   /**
    * The date and time when the payment failed.
    */
-  failedAt?: Date;
+  failedAt: Date | null;
   /**
    * The date and time when the payment was last updated.
    */
@@ -391,7 +408,7 @@ export interface BillingPaymentResource extends ClerkResource {
   /**
    * The payment method being used for the payment, such as credit card or bank account.
    */
-  paymentMethod: BillingPaymentMethodResource;
+  paymentMethod: BillingPaymentMethodResource | null;
   /**
    * The subscription item being paid for.
    */
@@ -491,11 +508,6 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    */
   id: string;
   /**
-   * The unique identifier for the payment method being used for the subscription item.
-   */
-  //TODO(@COMMERCE): should this be nullable ?
-  paymentMethodId: string;
-  /**
    * The plan associated with the subscription item.
    */
   plan: BillingPlanResource;
@@ -577,7 +589,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
   /**
    * Information about the next payment, including the amount and the date it's due. Returns null if there is no upcoming payment.
    */
-  nextPayment: {
+  nextPayment?: {
     /**
      * The amount of the next payment.
      */
@@ -586,7 +598,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
      * The date when the next payment is due.
      */
     date: Date;
-  } | null;
+  };
   /**
    * The date when the subscription became past due, or `null` if the subscription is not past due.
    */
@@ -610,7 +622,7 @@ export interface BillingSubscriptionResource extends ClerkResource {
   /**
    * Whether the payer is eligible for a free trial.
    */
-  eligibleForFreeTrial?: boolean;
+  eligibleForFreeTrial: boolean;
 }
 
 /**
@@ -662,11 +674,15 @@ export interface BillingCheckoutTotals {
   /**
    * Any credits (like account balance or promo credits) that are being applied to the checkout.
    */
-  credit: BillingMoneyAmount;
+  credit: BillingMoneyAmount | null;
   /**
    * Any outstanding amount from previous unpaid invoices that is being collected as part of the checkout.
    */
-  pastDue: BillingMoneyAmount;
+  pastDue: BillingMoneyAmount | null;
+  /**
+   * The amount that becomes due after a free trial ends.
+   */
+  totalDueAfterFreeTrial: BillingMoneyAmount | null;
 }
 
 /**
@@ -674,8 +690,20 @@ export interface BillingCheckoutTotals {
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface BillingStatementTotals extends Omit<BillingCheckoutTotals, 'totalDueNow'> {}
+export interface BillingStatementTotals {
+  /**
+   * The price of the items or plan before taxes, credits, or discounts are applied.
+   */
+  subtotal: BillingMoneyAmount;
+  /**
+   * The total amount for the checkout, including taxes and after credits/discounts are applied. This is the final amount due.
+   */
+  grandTotal: BillingMoneyAmount;
+  /**
+   * The amount of tax included in the checkout.
+   */
+  taxTotal: BillingMoneyAmount;
+}
 
 /**
  * The `startCheckout()` method accepts the following parameters.
@@ -694,10 +722,10 @@ export type CreateCheckoutParams = WithOptionalOrgType<{
 }>;
 
 /**
- * The `confirm()` method accepts the following parameters. **Only one of `paymentSourceId`, `paymentToken`, or `useTestCard` should be provided.**
+ * The `confirm()` method accepts the following parameters. **Only one of `paymentMethodId`, `paymentToken`, or `useTestCard` should be provided.**
  *
  * @unionReturnHeadings
- * ["paymentSourceId", "paymentToken", "useTestCard"]
+ * ["paymentMethodId", "paymentToken", "useTestCard"]
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -706,7 +734,7 @@ export type ConfirmCheckoutParams =
       /**
        * The ID of a saved payment method to use for this checkout.
        */
-      paymentSourceId?: string;
+      paymentMethodId?: string;
     }
   | {
       /**
@@ -760,7 +788,7 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   planPeriod: BillingSubscriptionPlanPeriod;
   /**
-   * Unix timestamp (milliseconds) of when the current period starts.
+   * The start date of the plan period, represented as a Unix timestamp.
    */
   planPeriodStart?: number;
   /**
@@ -782,7 +810,7 @@ export interface BillingCheckoutResource extends ClerkResource {
   /**
    * Unix timestamp (milliseconds) of when the free trial ends.
    */
-  freeTrialEndsAt: Date | null;
+  freeTrialEndsAt?: Date;
   /**
    * The payer associated with the checkout.
    */
@@ -806,37 +834,157 @@ export interface BillingPayerResource extends ClerkResource {
   /**
    * The date and time when the payer was created.
    */
-  createdAt: Date;
+  createdAt?: Date;
   /**
    * The date and time when the payer was last updated.
    */
-  updatedAt: Date;
+  updatedAt?: Date;
   /**
    * The URL of the payer's avatar image.
    */
-  imageUrl: string | null;
+  imageUrl?: string;
   /**
    * The unique identifier for the payer.
    */
-  userId?: string;
+  userId: string | null;
   /**
    * The email address of the payer.
    */
-  email?: string;
+  email?: string | null;
   /**
    * The first name of the payer.
    */
-  firstName?: string;
+  firstName?: string | null;
   /**
    * The last name of the payer.
    */
-  lastName?: string;
+  lastName?: string | null;
   /**
    * The unique identifier for the organization that the payer belongs to.
    */
-  organizationId?: string;
+  organizationId: string | null;
   /**
    * The name of the organization that the payer belongs to.
    */
-  organizationName?: string;
+  organizationName?: string | null;
 }
+
+interface CheckoutFlowProperties {
+  /**
+   * A client secret from an external payment provider (such as Stripe) used to complete the payment on the client-side.
+   */
+  externalClientSecret: string;
+  /**
+   * The identifier for the external payment gateway used for this checkout session.
+   */
+  externalGatewayId: string;
+  /**
+   * The payment source being used for the checkout, such as a credit card or bank account.
+   */
+  paymentMethod: Simplify<RemoveFunctions<BillingPaymentMethodResource>> | null;
+  /**
+   * The subscription plan details for the checkout.
+   */
+  plan: Simplify<RemoveFunctions<BillingPlanResource>>;
+  /**
+   * The billing period for the plan.
+   */
+  planPeriod: BillingSubscriptionPlanPeriod;
+  /**
+   * Unix timestamp (milliseconds) of when the current period starts.
+   */
+  planPeriodStart: number | undefined;
+  /**
+   * The total costs, taxes, and other pricing details for the checkout.
+   */
+  totals: BillingCheckoutTotals;
+  /**
+   * Whether the plan change will take effect immediately after checkout.
+   */
+  isImmediatePlanChange: boolean;
+  /**
+   * Unix timestamp (milliseconds) of when the free trial ends.
+   */
+  freeTrialEndsAt?: Date;
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   *
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  payer: Simplify<RemoveFunctions<BillingPayerResource>>;
+  /**
+   * Whether a payment method is required for this checkout.
+   */
+  needsPaymentMethod: boolean;
+}
+
+/**
+ * Checkout flow in uninitialized state. All properties are null until `start()` is called.
+ */
+type CheckoutFlowUninitialized = {
+  status: 'needs_initialization';
+} & ForceNull<CheckoutFlowProperties>;
+
+/**
+ * Checkout flow in initialized state. All properties are populated after `start()` is called.
+ */
+type CheckoutFlowInitialized = {
+  status: 'needs_confirmation' | 'completed';
+} & CheckoutFlowProperties;
+
+/**
+ * Discriminated union of checkout flow states based on status.
+ */
+type CheckoutPropertiesPerStatus = CheckoutFlowUninitialized | CheckoutFlowInitialized;
+
+export interface CheckoutFlowFinalizeParams {
+  navigate: SetActiveNavigate;
+}
+
+/**
+ * Common methods available on all checkout flow instances.
+ */
+interface CheckoutFlowMethods {
+  /**
+   * A function to confirm and finalize the checkout process, usually after payment information has been provided and validated. [Learn more.](#confirm)
+   */
+  confirm: (params: ConfirmCheckoutParams) => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change.
+   * It is advised to pin the SDK version and the clerk-js version to a specific version to avoid breaking changes.
+   *
+   * @example
+   * ```tsx
+   * <ClerkProvider clerkJsVersion="x.x.x" />
+   * ```
+   */
+  start: () => Promise<{ error: ClerkError | null }>;
+
+  /**
+   * Used to convert a checkout with `status === 'completed'` into an active subscription. Will cause anything observing the
+   * subscription state (such as the `useSubscription()` hook) to update automatically.
+   */
+  finalize: (params?: CheckoutFlowFinalizeParams) => Promise<{ error: ClerkError | null }>;
+}
+
+/**
+ * Public API type for checkout flow. Properties are null when status is 'needs_initialization'
+ * and present when status is 'needs_confirmation' or 'completed'.
+ */
+export type CheckoutFlowResource = CheckoutPropertiesPerStatus & CheckoutFlowMethods;
+
+/**
+ * Non-strict version of checkout flow resource. All properties are always present,
+ * allowing the class implementation to access properties regardless of status.
+ * This is the type that the `CheckoutFlow` class implements.
+ *
+ * @internal
+ */
+export type CheckoutFlowResourceNonStrict = CheckoutFlowProperties & {
+  status: 'needs_initialization' | 'needs_confirmation' | 'completed';
+} & CheckoutFlowMethods;

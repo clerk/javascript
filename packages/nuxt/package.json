@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "1.11.2",
+  "version": "1.13.0",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -81,7 +81,7 @@
     "typescript": "catalog:repo"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

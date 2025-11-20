@@ -1,3 +1,6 @@
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
+import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
   APIKeysTheme,
@@ -25,7 +28,7 @@ import type {
   BillingNamespace,
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
-  ConfirmCheckoutParams,
+  CheckoutFlowResource,
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
@@ -35,9 +38,11 @@ import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
+import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
+import type { ClerkPaginationParams } from './pagination';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -59,7 +64,7 @@ import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
 import type { WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
@@ -79,26 +84,41 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-type CheckoutResult =
-  | {
-      data: BillingCheckoutResource;
-      error: null;
-    }
-  | {
-      data: null;
-      error: ClerkAPIResponseError;
-    };
-
-export type __experimental_CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
-  start: () => Promise<CheckoutResult>;
-  clear: () => void;
-  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
-  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
-  getState: () => __experimental_CheckoutCacheState;
+export type CheckoutErrors = {
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
+   */
+  global: ClerkGlobalHookError[] | null;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+/**
+ * The value returned by the `useCheckout` hook.
+ */
+export interface CheckoutSignalValue {
+  /**
+   * Represents the errors that occurred during the last fetch of the parent resource.
+   */
+  errors: CheckoutErrors;
+  /**
+   * The fetch status of the underlying `Checkout` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * An instance representing the currently active `Checkout`.
+   */
+  checkout: CheckoutFlowResource;
+}
+
+export interface CheckoutSignal {
+  (): CheckoutSignalValue;
+}
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
 /**
  * @inline
@@ -579,7 +599,7 @@ export interface Clerk {
    * @param targetNode - Target to mount the APIKeys component.
    * @param props - Configuration parameters.
    */
-  mountApiKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
+  mountAPIKeys: (targetNode: HTMLDivElement, props?: APIKeysProps) => void;
 
   /**
    * This API is in early access and may change in future releases.
@@ -591,7 +611,7 @@ export interface Clerk {
    *
    * @param targetNode - Target node to unmount the ApiKeys component from.
    */
-  unmountApiKeys: (targetNode: HTMLDivElement) => void;
+  unmountAPIKeys: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a OAuth consent component at the target element.
@@ -1033,6 +1053,10 @@ export type ClerkOptions = ClerkOptionsNavigation &
   ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
+    /**
+     * Clerk UI entrypoint.
+     */
+    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
@@ -1563,7 +1587,14 @@ export type UserProfileProps = RoutingOptions & {
    *
    * @experimental
    */
-  apiKeysProps?: APIKeysProps;
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
@@ -1599,7 +1630,14 @@ export type OrganizationProfileProps = RoutingOptions & {
    *
    * @experimental
    */
-  apiKeysProps?: APIKeysProps;
+  apiKeysProps?: APIKeysProps & {
+    /**
+     * Whether to hide the API Keys page. When true, the API Keys page will not be displayed even if API keys are enabled.
+     *
+     * @default false
+     */
+    hide?: boolean;
+  };
 };
 
 export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfileProps>;
@@ -1701,7 +1739,7 @@ export type UserButtonProps = UserButtonProfileMode & {
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'customPages' | 'apiKeysProps'>;
 
   /*
    * Provide custom menu actions and links to be rendered inside the UserButton.
@@ -1940,16 +1978,9 @@ export type PricingTableProps = PricingTableBaseProps & PricingTableDefaultProps
 
 export type APIKeysProps = {
   /**
-   * The type of API key to filter by.
-   * Currently, only 'api_key' is supported.
-   *
-   * @default 'api_key'
-   */
-  type?: 'api_key';
-  /**
    * The number of API keys to show per page.
    *
-   * @default 5
+   * @default 10
    */
   perPage?: number;
   /**
@@ -1966,12 +1997,12 @@ export type APIKeysProps = {
   showDescription?: boolean;
 };
 
-export type GetAPIKeysParams = {
+export type GetAPIKeysParams = ClerkPaginationParams<{
   subject?: string;
-};
+  query?: string;
+}>;
 
 export type CreateAPIKeyParams = {
-  type?: 'api_key';
   name: string;
   subject?: string;
   secondsUntilExpiration?: number;
@@ -2281,6 +2312,60 @@ export interface AuthenticateWithBaseParams {
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
+
+export interface HeadlessBrowserClerkConstructor {
+  new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
+}
+
+export interface BrowserClerkConstructor {
+  new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
+}
+
+export interface HeadlessBrowserClerk extends Clerk {
+  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  updateClient: (client: ClientResource) => void;
+}
+
+export interface BrowserClerk extends HeadlessBrowserClerk {
+  onComponentsReady: Promise<void>;
+  components: any;
+}
+
+export type ClerkProp =
+  | BrowserClerkConstructor
+  | BrowserClerk
+  | HeadlessBrowserClerk
+  | HeadlessBrowserClerkConstructor
+  | undefined
+  | null;
+
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
+  Clerk?: ClerkProp;
+  /**
+   * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   */
+  clerkJSUrl?: string;
+  /**
+   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
+   */
+  clerkJSVariant?: 'headless' | '';
+  /**
+   * The npm version for `@clerk/clerk-js`.
+   */
+  clerkJSVersion?: string;
+  /**
+   * The URL that `@clerk/ui` should be hot-loaded from.
+   */
+  clerkUiUrl?: string;
+  /**
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   */
+  publishableKey: string;
+  /**
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/guides/secure/best-practices/csp-headers#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
+   */
+  nonce?: string;
+} & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {
   client: ClientResource;

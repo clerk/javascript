@@ -427,7 +427,7 @@ describe('HandshakeService', () => {
 
       // Verify all required parameters are present
       expect(url.searchParams.get('redirect_url')).toBeDefined();
-      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-04-10');
+      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-11-10');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
     });

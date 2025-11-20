@@ -7,7 +7,7 @@ import React from 'react';
 import { useSafeLayoutEffect } from '../client-boundary/hooks/useSafeLayoutEffect';
 import { ClerkNextOptionsProvider } from '../client-boundary/NextOptionsContext';
 import type { NextClerkProviderProps } from '../types';
-import { ClerkJSScript } from '../utils/clerk-js-script';
+import { ClerkScripts } from '../utils/clerk-script';
 import { invalidateNextRouterCache } from '../utils/invalidateNextRouterCache';
 import { mergeNextClerkPropsWithEnv } from '../utils/mergeNextClerkPropsWithEnv';
 import { removeBasePath } from '../utils/removeBasePath';
@@ -55,7 +55,7 @@ export function ClerkProvider({ children, ...props }: NextClerkProviderProps): J
         initialState={initialState}
       >
         <RouterTelemetry />
-        <ClerkJSScript router='pages' />
+        <ClerkScripts router='pages' />
         {children}
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>

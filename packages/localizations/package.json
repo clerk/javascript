@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.26.4",
+  "version": "3.28.1",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -68,7 +68,7 @@
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

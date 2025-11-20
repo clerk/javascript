@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "2.4.30",
+  "version": "2.4.37",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",
@@ -55,7 +55,7 @@
     "tsup": "catalog:repo"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

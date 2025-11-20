@@ -17,6 +17,11 @@ export const trTR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopyala ve kapat',
+      formHint: 'Güvenlik nedenleriyle, daha sonra tekrar görüntülemenize izin vermeyeceğiz.',
+      formTitle: '"{{name}}" API anahtarınızı şimdi kopyalayın',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const trTR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Telefon numaranızı girin',
   formFieldInputPlaceholder__username: 'Kullanıcı adınızı girin',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API anahtarı',
+  formFieldLabel__apiKeyDescription: 'Açıklama',
+  formFieldLabel__apiKeyExpiration: 'Son kullanma',
+  formFieldLabel__apiKeyName: 'Gizli anahtar adı',
   formFieldLabel__automaticInvitations: 'Bu alan adı için otomatik davetleri etkinleştir',
   formFieldLabel__backupCode: 'Yedekleme kodu',
   formFieldLabel__confirmDeletion: 'Onayla',
@@ -606,6 +612,12 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'E-posta kutunuzu kontrol edin',
     },
+    emailCodeMfa: {
+      formTitle: 'E-posta kutunuzu kontrol edin',
+      resendButton: 'Kod almadınız mı? Tekrar gönderin',
+      subtitle: '{{applicationName}} ile devam etmek için',
+      title: 'E-posta kutunuzu kontrol edin',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -642,6 +654,12 @@ export const trTR: LocalizationResource = {
         titleNewTab: 'Farklı bir sekmede giriş yapıldı',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'E-postanıza gönderilen doğrulama bağlantısını kullanın',
+      resendButton: 'Bağlantıyı almadınız mı? Yeniden gönder',
+      subtitle: '{{applicationName}} uygulamasına devam etmek için',
+      title: 'E-postanızı kontrol edin',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +677,8 @@ export const trTR: LocalizationResource = {
       label__alternativeMethods: 'Veya başka bir yöntem kullanın:',
       title: 'Şifremi unuttum',
     },
+    newDeviceVerificationNotice:
+      'Yeni bir cihazdan oturum açıyorsunuz. Hesabınızın güvenliğini sağlamak için doğrulama istiyoruz.',
     noAvailableMethods: {
       message: 'Hesabınızda giriş yapmak için kullanabileceğiniz bir yöntem bulunmuyor.',
       subtitle: 'Bir hata oluştu',

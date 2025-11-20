@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.34.1",
+  "version": "6.35.2",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -92,10 +92,10 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "14.2.33"
+    "next": "15.2.3"
   },
   "peerDependencies": {
-    "next": "^13.5.7 || ^14.2.25 || ^15.2.3 || ^16",
+    "next": "^15.2.3 || ^16",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },

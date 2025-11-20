@@ -8,7 +8,7 @@ import { useUserProfileCustomPages } from '../../../utils/useCustomPages';
 import { useUserButtonCustomMenuItems } from '../../../utils/useCustomMenuItems';
 
 type Props = Omit<UserButtonProps, 'userProfileProps' | 'customMenuItems'> & {
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'apiKeysProps'>;
 };
 const props = defineProps<Props>();
 

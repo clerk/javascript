@@ -2,23 +2,13 @@
 
 import { $, argv, echo } from 'zx';
 
-import { constants } from './common.mjs';
+import { constants, getPackageNames } from './common.mjs';
+
+const packageNames = await getPackageNames();
+const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 
 const snapshot = `---
-'@clerk/chrome-extension': patch
-'@clerk/localizations': patch
-'@clerk/clerk-js': patch
-'@clerk/backend': patch
-'@clerk/fastify': patch
-'@clerk/agent-toolkit': patch
-'@clerk/nextjs': patch
-'@clerk/shared': patch
-'@clerk/themes': patch
-'@clerk/react': patch
-'@clerk/expo': patch
-'@clerk/express': patch
-'@clerk/testing': patch
-'@clerk/elements': patch
+${packageEntries}
 ---
 
 Snapshot release

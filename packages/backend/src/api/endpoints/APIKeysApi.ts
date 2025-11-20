@@ -1,5 +1,6 @@
 import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
+import type { PaginatedResourceResponse } from '../../api/resources/Deserializer';
 import { joinPaths } from '../../util/path';
 import type { APIKey } from '../resources/APIKey';
 import { AbstractAPI } from './AbstractApi';
@@ -20,7 +21,6 @@ type GetAPIKeyListParams = ClerkPaginationRequest<{
 }>;
 
 type CreateAPIKeyParams = {
-  type?: 'api_key';
   /**
    * API key name
    */
@@ -52,7 +52,7 @@ type RevokeAPIKeyParams = {
 
 export class APIKeysAPI extends AbstractAPI {
   async list(queryParams: GetAPIKeyListParams) {
-    return this.request<APIKey[]>({
+    return this.request<PaginatedResourceResponse<APIKey[]>>({
       method: 'GET',
       path: basePath,
       queryParams,
