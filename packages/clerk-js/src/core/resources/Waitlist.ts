@@ -38,14 +38,12 @@ export class Waitlist extends BaseResource implements WaitlistResource {
   }
 
   static async join(params: JoinWaitlistParams): Promise<WaitlistResource> {
-    const json = (
-      await BaseResource._fetch<WaitlistJSON>({
-        path: '/waitlist',
-        method: 'POST',
-        body: params as any,
-      })
-    )?.response as unknown as WaitlistJSON;
+    const json = await BaseResource._fetch<WaitlistJSON>({
+      path: '/waitlist',
+      method: 'POST',
+      body: params as any,
+    });
 
-    return new Waitlist(json);
+    return new Waitlist(json as unknown as WaitlistJSON);
   }
 }

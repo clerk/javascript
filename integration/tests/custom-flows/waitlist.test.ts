@@ -3,24 +3,24 @@ import { clerkSetup } from '@clerk/testing/playwright';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
+import { hash } from '../../models/helpers';
 import { appConfigs } from '../../presets';
-import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 
 test.describe('Custom Flows Waitlist @custom', () => {
   test.describe.configure({ mode: 'parallel' });
   let app: Application;
-  let fakeUser: FakeUser;
+  let fakeEmail: string;
 
   test.beforeAll(async () => {
     app = await appConfigs.customFlows.reactVite.clone().commit();
     await app.setup();
-    await app.withEnv(appConfigs.envs.withWaitlistdMode);
+    await app.withEnv(appConfigs.envs.withWaitlistMode);
     await app.dev();
 
-    const publishableKey = appConfigs.envs.withWaitlistdMode.publicVariables.get('CLERK_PUBLISHABLE_KEY');
-    const secretKey = appConfigs.envs.withWaitlistdMode.privateVariables.get('CLERK_SECRET_KEY');
-    const apiUrl = appConfigs.envs.withWaitlistdMode.privateVariables.get('CLERK_API_URL');
+    const publishableKey = appConfigs.envs.withWaitlistMode.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+    const secretKey = appConfigs.envs.withWaitlistMode.privateVariables.get('CLERK_SECRET_KEY');
+    const apiUrl = appConfigs.envs.withWaitlistMode.privateVariables.get('CLERK_API_URL');
     const { frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
 
     await clerkSetup({
@@ -32,14 +32,12 @@ test.describe('Custom Flows Waitlist @custom', () => {
       dotenv: false,
     });
 
-    const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({
-      fictionalEmail: true,
-    });
+    fakeEmail = `${hash()}+clerk_test@clerkcookie.com`;
   });
 
   test.afterAll(async () => {
-    await fakeUser.deleteIfExists();
+    const u = createTestUtils({ app });
+    await u.services.waitlist.clearWaitlistByEmail(fakeEmail);
     await app.teardown();
   });
 
@@ -52,7 +50,7 @@ test.describe('Custom Flows Waitlist @custom', () => {
     const emailInput = u.page.getByTestId('email-input');
     const submitButton = u.page.getByTestId('submit-button');
 
-    await emailInput.fill(fakeUser.email);
+    await emailInput.fill(fakeEmail);
     await submitButton.click();
 
     await expect(u.page.getByText('Successfully joined!')).toBeVisible();
@@ -83,7 +81,7 @@ test.describe('Custom Flows Waitlist @custom', () => {
     const emailInput = u.page.getByTestId('email-input');
     const submitButton = u.page.getByTestId('submit-button');
 
-    await emailInput.fill(fakeUser.email);
+    await emailInput.fill(fakeEmail);
 
     const submitPromise = submitButton.click();
 
