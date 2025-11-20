@@ -187,5 +187,6 @@ export type AvailableComponentCtx =
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
-  | TaskChooseOrganizationCtx;
+  | TaskChooseOrganizationCtx
+  | TaskResetPasswordCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
