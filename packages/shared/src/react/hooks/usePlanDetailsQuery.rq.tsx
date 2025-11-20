@@ -38,9 +38,7 @@ export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams
     enabled: queryEnabled,
     initialData: initialPlan ?? undefined,
     placeholderData: defineKeepPreviousDataFn(keepPreviousData),
-    refetchOnWindowFocus: false,
-    retry: false,
-    staleTime: 1_000 * 60,
+    initialDataUpdatedAt: 0,
   });
 
   return {
