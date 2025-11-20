@@ -21,7 +21,13 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
-import { SubscriberTypeContext, usePlansContext, useSubscriberTypeContext, useSubscription } from '../../contexts';
+import {
+  normalizeFormatted,
+  SubscriberTypeContext,
+  usePlansContext,
+  useSubscriberTypeContext,
+  useSubscription,
+} from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import {
   Button,
@@ -401,8 +407,16 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
         ? {
             label:
               subscription.planPeriod === 'month'
-                ? localizationKeys('billing.switchToAnnual')
-                : localizationKeys('billing.switchToMonthly'),
+                ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currency: subscription.plan.annualFee!.currencySymbol,
+                  })
+                : localizationKeys('billing.switchToMonthlyWithPrice', {
+                    price: normalizeFormatted(subscription.plan.fee.amountFormatted),
+                    currency: subscription.plan.fee.currencySymbol,
+                  }),
             onClick: () => {
               openCheckout({
                 planId: subscription.plan.id,

@@ -131,7 +131,7 @@ describe('SubscriptionDetails', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Switch to annual')).toBeVisible();
+      expect(getByText('Switch to annual $100 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -234,7 +234,7 @@ describe('SubscriptionDetails', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly')).toBeVisible();
+      expect(getByText('Switch to monthly $10 / month')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
     });
   });
@@ -464,8 +464,11 @@ describe('SubscriptionDetails', () => {
     });
 
     await waitFor(() => {
-      expect(getByText('Switch to monthly')).toBeVisible();
+      // Active (canceled) annual subscription buttons
+      expect(getByText('Switch to monthly $13 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
+      // Upcoming monthly subscription buttons
+      expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
       expect(getAllByText('Cancel subscription').length).toBe(1);
     });
   });
