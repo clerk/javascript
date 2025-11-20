@@ -97,7 +97,7 @@ const TaskResetPasswordInternal = () => {
         <Card.Root>
           <Card.Content>
             <Header.Root showLogo>
-              <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
+              <Header.Title localizationKey={localizationKeys('taskResetPassword.title')} />
             </Header.Root>
             <Card.Alert>{card.error}</Card.Alert>
             <Col
@@ -163,7 +163,7 @@ const TaskResetPasswordInternal = () => {
               {identifier && (
                 <Card.ActionText
                   truncate
-                  localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
+                  localizationKey={localizationKeys('taskResetPassword.signOut.actionText', {
                     identifier,
                   })}
                 />
@@ -173,7 +173,7 @@ const TaskResetPasswordInternal = () => {
                 onClick={() => {
                   void handleSignOut();
                 }}
-                localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
+                localizationKey={localizationKeys('taskResetPassword.signOut.actionLink')}
               />
             </Card.Action>
           </Card.Footer>
