@@ -1,3 +1,4 @@
+import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 import type { BillingStatementResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -15,7 +16,6 @@ import {
   Spinner,
   useLocalizations,
 } from '../../customizables';
-import { __internal_useStatementQuery } from '../../hooks';
 import { ArrowRightIcon, Plus, RotateLeftRight } from '../../icons';
 import { useRouter } from '../../router';
 import { Statement } from './Statement';

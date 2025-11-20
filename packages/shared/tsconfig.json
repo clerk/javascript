@@ -26,7 +26,10 @@
       "@/*": ["./src/*"],
       "virtual:data-hooks/useSubscription": ["./src/react/hooks/useSubscription.swr.tsx"],
       "virtual:data-hooks/SWRConfigCompat": ["./src/react/providers/SWRConfigCompat.swr.tsx"],
-      "virtual:data-hooks/usePagesOrInfinite": ["./src/react/hooks/usePagesOrInfinite.swr.tsx"]
+      "virtual:data-hooks/usePagesOrInfinite": ["./src/react/hooks/usePagesOrInfinite.swr.tsx"],
+      "virtual:data-hooks/useStatementQuery": ["./src/react/hooks/useStatementQuery.swr.tsx"],
+      "virtual:data-hooks/usePaymentAttemptQuery": ["./src/react/hooks/usePaymentAttemptQuery.swr.tsx"],
+      "virtual:data-hooks/usePlanDetailsQuery": ["./src/react/hooks/usePlanDetailsQuery.swr.tsx"]
     }
   },
   "exclude": ["node_modules"],

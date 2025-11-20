@@ -9,7 +9,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
-import { STABLE_KEYS } from '../stable-keys';
+import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const hookName = 'useSubscription';
@@ -38,17 +38,18 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     : environment?.commerceSettings.billing.user.enabled;
   const isEnabled = (params?.enabled ?? true) && billingEnabled;
 
-  // TODO: Replace useSWR with the react-query equivalent.
+  const { queryKey } = useSubscriptionCacheKeys({
+    userId: user?.id,
+    orgId: organization?.id,
+    for: params?.for,
+  });
+
   const swr = useSWR(
-    isEnabled
-      ? {
-          type: STABLE_KEYS.SUBSCRIPTION_KEY,
-          userId: user?.id,
-          args: { orgId: isOrganization ? organization?.id : undefined },
-        }
-      : null,
-    ({ args, userId }) => {
-      if (userId) {
+    isEnabled ? { queryKey } : null,
+    ({ queryKey }) => {
+      const args = queryKey[3].args;
+
+      if (queryKey[2].userId) {
         return clerk.billing.getSubscription(args);
       }
       return null;

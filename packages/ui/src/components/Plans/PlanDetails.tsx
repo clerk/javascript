@@ -1,3 +1,4 @@
+import { __internal_usePlanDetailsQuery } from '@clerk/shared/react/index';
 import type {
   __internal_PlanDetailsProps,
   BillingPlanResource,
@@ -26,7 +27,6 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { __internal_usePlanDetailsQuery } from '../../hooks';
 
 type PlanFeature = BillingPlanResource['features'][number];
 

@@ -1,3 +1,4 @@
+import { __internal_usePaymentAttemptQuery } from '@clerk/shared/react/index';
 import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
@@ -20,7 +21,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
-import { __internal_usePaymentAttemptQuery, useClipboard } from '../../hooks';
+import { useClipboard } from '../../hooks';
 import { Check, Copy } from '../../icons';
 import { useRouter } from '../../router';
 
