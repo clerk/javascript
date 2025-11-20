@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
@@ -173,7 +173,6 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
 
 const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const { isLoading, error, setError, setLoading, setIdle } = useCardState();
   const {
     subscription: selectedSubscription,
@@ -183,6 +182,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const { data: subscription } = useSubscription();
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 
@@ -195,7 +196,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setLoading();
 
     await selectedSubscription
-      .cancel({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+      .cancel({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
       .then(() => {
         onSubscriptionCancel?.();
         if (setIsOpen) {
@@ -213,7 +214,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setError,
     setLoading,
     subscriberType,
-    organization?.id,
+    organizationCtx?.organization?.id,
     onSubscriptionCancel,
     setIsOpen,
     setIdle,
