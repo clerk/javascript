@@ -119,7 +119,6 @@ export type FlowMetadata = {
     | 'alternativeMethods'
     | 'forgotPasswordMethods'
     | 'passwordPwnedMethods'
-    | 'untrustedPasswordMethods'
     | 'havingTrouble'
     | 'ssoCallback'
     | 'popupCallback'
