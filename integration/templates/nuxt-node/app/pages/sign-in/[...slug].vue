@@ -1,3 +1,3 @@
 <template>
-  <SignIn path="/sign-in" />
+  <SignIn signUpUrl="/sign-up" />
 </template>
