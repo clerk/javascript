@@ -1,14 +1,13 @@
 import React from 'react';
 
-import { deriveState } from '../deriveState';
 import type { Clerk, ClerkStatus, InitialState, LoadedClerk, Resources } from '../types';
 import {
   __experimental_CheckoutProvider as CheckoutProvider,
   ClerkInstanceContext,
   ClientContext,
   InitialStateProvider,
-  OrganizationProvider,
 } from './contexts';
+import { SWRConfigCompat } from './providers/SWRConfigCompat';
 import { assertClerkSingletonExists } from './utils';
 
 type ClerkContextProps = {
@@ -19,22 +18,15 @@ type ClerkContextProps = {
   initialState?: InitialState;
 };
 
-type CoreClerkContextProviderState = Resources;
-
 export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | null {
   const clerk = props.clerk as LoadedClerk;
 
   assertClerkSingletonExists(clerk);
 
-  const [state, setState] = React.useState<CoreClerkContextProviderState>({
-    client: clerk.client,
-    session: clerk.session,
-    user: clerk.user,
-    organization: clerk.organization,
-  });
+  const [client, setClient] = React.useState<Resources['client']>(clerk.client);
 
   React.useEffect(() => {
-    return clerk.addListener(e => setState({ ...e }));
+    return clerk.addListener(e => setClient(e.client));
   }, []);
 
   const clerkCtx = React.useMemo(
@@ -45,32 +37,20 @@ export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | nu
     [props.clerkStatus],
   );
   // TODO: I believe this is not always defined with isomorphic clerk, need to think on that
-  const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
-
-  const resolvedState = deriveState(clerk.loaded, state, props.initialState);
-  const { organization } = resolvedState;
-  const organizationCtx = React.useMemo(
-    () => ({
-      value: { organization: organization },
-    }),
-    [organization],
-  );
+  const clientCtx = React.useMemo(() => ({ value: client }), [client]);
 
   return (
     <InitialStateProvider initialState={props.initialState}>
       <ClerkInstanceContext.Provider value={clerkCtx}>
         <ClientContext.Provider value={clientCtx}>
-          <OrganizationProvider
-            {...organizationCtx.value}
-            swrConfig={props.swrConfig}
-          >
+          <SWRConfigCompat swrConfig={props.swrConfig}>
             <CheckoutProvider
               // @ts-expect-error - value is not used
               value={undefined}
             >
               {props.children}
             </CheckoutProvider>
-          </OrganizationProvider>
+          </SWRConfigCompat>
         </ClientContext.Provider>
       </ClerkInstanceContext.Provider>
     </InitialStateProvider>

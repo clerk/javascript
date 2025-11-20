@@ -12,8 +12,8 @@ import type {
   LoadedClerk,
   OrganizationResource,
 } from '../types';
+import { useOrganizationBase } from './hooks/base/useOrganizationBase';
 import { createContextAndHook } from './hooks/createContextAndHook';
-import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
 export { useUserBase as useUserContext } from './hooks/base/useUserBase';
@@ -74,35 +74,10 @@ function useOptionsContext(): ClerkOptions {
   return context;
 }
 
-type OrganizationContextProps = {
-  organization: OrganizationResource | null | undefined;
-};
-const [OrganizationContextInternal, useOrganizationContext] = createContextAndHook<{
-  organization: OrganizationResource | null | undefined;
-}>('OrganizationContext');
-
-const OrganizationProvider = ({
-  children,
-  organization,
-  swrConfig,
-}: PropsWithChildren<
-  OrganizationContextProps & {
-    // Exporting inferred types  directly from SWR will result in error while building declarations
-    swrConfig?: any;
-  }
->) => {
-  return (
-    <SWRConfigCompat swrConfig={swrConfig}>
-      <OrganizationContextInternal.Provider
-        value={{
-          value: { organization },
-        }}
-      >
-        {children}
-      </OrganizationContextInternal.Provider>
-    </SWRConfigCompat>
-  );
-};
+function useOrganizationContext(): { organization: OrganizationResource | null | undefined } {
+  const organization = useOrganizationBase();
+  return React.useMemo(() => ({ organization }), [organization]);
+}
 
 /**
  * @internal
@@ -133,7 +108,6 @@ export {
   ClerkInstanceContext,
   ClientContext,
   OptionsContext,
-  OrganizationProvider,
   useAssertWrappedByClerkProvider,
   useCheckoutContext,
   useClerkInstanceContext,
