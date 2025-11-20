@@ -1,3 +1,4 @@
+import type { ClerkError } from '@clerk/shared/error';
 import type { JoinWaitlistParams, WaitlistFutureResource, WaitlistJSON, WaitlistResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
@@ -73,7 +74,7 @@ class WaitlistFuture implements WaitlistFutureResource {
     return this.resource.updatedAt;
   }
 
-  async join(params: JoinWaitlistParams): Promise<{ error: unknown }> {
+  async join(params: JoinWaitlistParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.resource, async () => {
       await this.resource.__internal_basePost({
         path: this.resource.pathRoot,

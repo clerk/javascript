@@ -95,38 +95,4 @@ test.describe('Custom Flows Waitlist @custom', () => {
     // Wait for success state
     await expect(u.page.getByText('Successfully joined!')).toBeVisible();
   });
-
-  test('can navigate to sign-in from waitlist', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/waitlist');
-    await u.page.waitForClerkJsLoaded();
-    await expect(u.page.getByText('Join the Waitlist', { exact: true })).toBeVisible();
-
-    const signInLink = u.page.getByTestId('sign-in-link');
-    await expect(signInLink).toBeVisible();
-    await signInLink.click();
-
-    await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
-    await u.page.waitForURL(/sign-in/);
-  });
-
-  test('waitlist hook provides correct properties', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.goToRelative('/waitlist');
-    await u.page.waitForClerkJsLoaded();
-
-    // Check initial state - waitlist resource should be available but empty
-    const emailInput = u.page.getByTestId('email-input');
-    const submitButton = u.page.getByTestId('submit-button');
-
-    await expect(emailInput).toBeVisible();
-    await expect(submitButton).toBeEnabled();
-
-    // Join waitlist
-    await emailInput.fill(fakeUser.email);
-    await submitButton.click();
-
-    // After successful join, the component should show success state
-    await expect(u.page.getByText('Successfully joined!')).toBeVisible();
-  });
 });

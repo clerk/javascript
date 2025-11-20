@@ -1,3 +1,4 @@
+import type { ClerkError } from '../error';
 import type { ClerkResource } from './resource';
 
 export interface WaitlistResource extends ClerkResource {
@@ -8,7 +9,7 @@ export interface WaitlistResource extends ClerkResource {
 
 export interface WaitlistFutureResource {
   /**
-   * The unique identifier for the waitlist entry. `null` if the user has not joined the waitlist yet.
+   * The unique identifier for the waitlist entry. `undefined` if the user has not joined the waitlist yet.
    */
   readonly id?: string;
 
@@ -23,9 +24,9 @@ export interface WaitlistFutureResource {
   readonly updatedAt: Date | null;
 
   /**
-   * Used to join the waitlist with the provided email address.
+   * Used to add the provided `emailAddress` to the waitlist.
    */
-  join: (params: JoinWaitlistParams) => Promise<{ error: unknown }>;
+  join: (params: JoinWaitlistParams) => Promise<{ error: ClerkError | null }>;
 }
 
 export type JoinWaitlistParams = {
