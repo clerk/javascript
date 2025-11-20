@@ -4,7 +4,7 @@ import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettin
 import type { SerializedStyles } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
 import { css, type Theme } from '@emotion/react';
-import { forwardRef, useId, useMemo, useRef, useState } from 'react';
+import { forwardRef, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
@@ -122,128 +122,7 @@ const EnableOrganizationsPromptInternal = ({
                 gap: t.sizes.$2,
               })}
             >
-              <div
-                css={css`
-                  perspective: 1000px;
-                  position: relative;
-                  width: 1.25rem;
-                  height: 1.25rem;
-                  transform-style: preserve-3d;
-                  transition: transform 0.6s ease-in-out;
-                  transform: ${isEnabled ? 'rotateY(180deg)' : 'rotateY(0)'};
-                  animation: ${!isEnabled ? 'coinFlipAnimation 6s infinite linear' : 'none'};
-
-                  @keyframes coinFlipAnimation {
-                    0%,
-                    55% {
-                      transform: rotateY(0);
-                    }
-                    60%,
-                    95% {
-                      transform: rotateY(180deg);
-                    }
-                    100% {
-                      transform: rotateY(0);
-                    }
-                  }
-
-                  @media (prefers-reduced-motion: reduce) {
-                    transition: none;
-                    animation: none;
-                    transform: ${isEnabled ? 'rotateY(180deg)' : 'rotateY(0)'};
-                  }
-                `}
-              >
-                {isEnabled ? (
-                  <span
-                    aria-hidden
-                    css={css`
-                      position: absolute;
-                      width: 100%;
-                      height: 100%;
-                      backface-visibility: hidden;
-                      transform: rotateY(180deg);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                    `}
-                  >
-                    <PromptSuccessIcon
-                      css={css`
-                        width: 1.25rem;
-                        height: 1.25rem;
-                      `}
-                    />
-                  </span>
-                ) : (
-                  <>
-                    <span
-                      className='coin-flip-front'
-                      aria-hidden
-                      css={css`
-                        position: absolute;
-                        width: 100%;
-                        height: 100%;
-                        backface-visibility: hidden;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                      `}
-                    >
-                      <ClerkLogoIcon />
-                    </span>
-
-                    <span
-                      className='coin-flip-back'
-                      aria-hidden
-                      css={css`
-                        position: absolute;
-                        width: 100%;
-                        height: 100%;
-                        backface-visibility: hidden;
-                        transform: rotateY(180deg);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                      `}
-                    >
-                      <svg
-                        css={css`
-                          width: 1.25rem;
-                          height: 1.25rem;
-                        `}
-                        viewBox='0 0 20 20'
-                        fill='none'
-                        xmlns='http://www.w3.org/2000/svg'
-                      >
-                        <path
-                          opacity='0.2'
-                          d='M17.25 10C17.25 14.0041 14.0041 17.25 10 17.25C5.99594 17.25 2.75 14.0041 2.75 10C2.75 5.99594 5.99594 2.75 10 2.75C14.0041 2.75 17.25 5.99594 17.25 10Z'
-                          fill='#EAB308'
-                        />
-                        <path
-                          fillRule='evenodd'
-                          clipRule='evenodd'
-                          d='M10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 13.5899 6.41015 16.5 10 16.5C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z'
-                          fill='#EAB308'
-                        />
-                        <path
-                          fillRule='evenodd'
-                          clipRule='evenodd'
-                          d='M10 6C10.5523 6 11 6.44772 11 7V9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9V7C9 6.44772 9.44772 6 10 6Z'
-                          fill='#EAB308'
-                        />
-                        <path
-                          fillRule='evenodd'
-                          clipRule='evenodd'
-                          d='M10 12C10.5523 12 11 12.4477 11 13V13.01C11 13.5623 10.5523 14.01 10 14.01C9.44772 14.01 9 13.5623 9 13.01V13C9 12.4477 9.44772 12 10 12Z'
-                          fill='#EAB308'
-                        />
-                      </svg>
-                    </span>
-                  </>
-                )}
-              </div>
+              <CoinFlip isEnabled={isEnabled} />
 
               <h1
                 css={[
@@ -679,3 +558,144 @@ const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: S
     );
   },
 );
+
+const CoinFlip = ({ isEnabled }: { isEnabled: boolean }) => {
+  const [rotation, setRotation] = useState(0);
+
+  useLayoutEffect(() => {
+    if (isEnabled) {
+      setRotation(r => (r === 0 ? 180 : 0));
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setRotation(r => (r === 0 ? 180 : 0));
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isEnabled]);
+
+  let frontFaceType: 'idle' | 'success' = 'idle';
+  let backFaceType: 'warning' | 'success' = 'warning';
+
+  if (isEnabled) {
+    if (rotation === 0) {
+      frontFaceType = 'success';
+      backFaceType = 'warning';
+    } else {
+      backFaceType = 'success';
+      frontFaceType = 'idle';
+    }
+  }
+
+  const renderContent = (type: 'idle' | 'warning' | 'success') => {
+    switch (type) {
+      case 'idle':
+        return <ClerkLogoIcon />;
+      case 'success':
+        return (
+          <PromptSuccessIcon
+            css={css`
+              width: 1.25rem;
+              height: 1.25rem;
+            `}
+          />
+        );
+      case 'warning':
+        return (
+          <svg
+            css={css`
+              width: 1.25rem;
+              height: 1.25rem;
+            `}
+            viewBox='0 0 20 20'
+            fill='none'
+            xmlns='http://www.w3.org/2000/svg'
+          >
+            <path
+              opacity='0.2'
+              d='M17.25 10C17.25 14.0041 14.0041 17.25 10 17.25C5.99594 17.25 2.75 14.0041 2.75 10C2.75 5.99594 5.99594 2.75 10 2.75C14.0041 2.75 17.25 5.99594 17.25 10Z'
+              fill='#EAB308'
+            />
+            <path
+              fillRule='evenodd'
+              clipRule='evenodd'
+              d='M10 3.5C6.41015 3.5 3.5 6.41015 3.5 10C3.5 13.5899 6.41015 16.5 10 16.5C13.5899 16.5 16.5 13.5899 16.5 10C16.5 6.41015 13.5899 3.5 10 3.5ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z'
+              fill='#EAB308'
+            />
+            <path
+              fillRule='evenodd'
+              clipRule='evenodd'
+              d='M10 6C10.5523 6 11 6.44772 11 7V9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9V7C9 6.44772 9.44772 6 10 6Z'
+              fill='#EAB308'
+            />
+            <path
+              fillRule='evenodd'
+              clipRule='evenodd'
+              d='M10 12C10.5523 12 11 12.4477 11 13V13.01C11 13.5623 10.5523 14.01 10 14.01C9.44772 14.01 9 13.5623 9 13.01V13C9 12.4477 9.44772 12 10 12Z'
+              fill='#EAB308'
+            />
+          </svg>
+        );
+    }
+  };
+
+  return (
+    <div
+      css={css`
+        perspective: 1000px;
+        width: 1.25rem;
+        height: 1.25rem;
+      `}
+    >
+      <div
+        css={css`
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transform-style: preserve-3d;
+          transition: transform 0.6s ease-in-out;
+          transform: rotateY(${rotation}deg);
+
+          @media (prefers-reduced-motion: reduce) {
+            transition: none;
+          }
+        `}
+      >
+        <span
+          aria-hidden
+          css={css`
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+            transform: rotateY(0deg);
+          `}
+        >
+          {renderContent(frontFaceType)}
+        </span>
+
+        <span
+          aria-hidden
+          css={css`
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+          `}
+        >
+          {renderContent(backFaceType)}
+        </span>
+      </div>
+    </div>
+  );
+};
