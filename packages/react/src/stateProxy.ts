@@ -8,6 +8,7 @@ import type {
   SignUpErrors,
   State,
   WaitlistErrors,
+  WaitlistResource,
 } from '@clerk/shared/types';
 
 import { errorThrower } from './errors/errorThrower';
@@ -71,10 +72,7 @@ export class StateProxy implements State {
   }
 
   get __internal_waitlist() {
-    if (!inBrowser() || !this.isomorphicClerk.loaded) {
-      return null;
-    }
-    return this.isomorphicClerk.__internal_state.__internal_waitlist;
+    return this.state.__internal_waitlist;
   }
 
   checkoutSignal(params: CheckoutSignalProps) {
@@ -282,30 +280,17 @@ export class StateProxy implements State {
   private buildWaitlistProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const fallbackWaitlistFuture = {
-      id: undefined,
-      createdAt: null,
-      updatedAt: null,
-      join: () => Promise.resolve({ error: null }),
-    };
-    const target = (): typeof fallbackWaitlistFuture => {
-      if (!inBrowser() || !this.isomorphicClerk.loaded) {
-        return fallbackWaitlistFuture;
-      }
-      const state = this.isomorphicClerk.__internal_state;
-      const waitlist = state.__internal_waitlist;
-      if (waitlist && '__internal_future' in waitlist) {
-        return (waitlist as { __internal_future: typeof fallbackWaitlistFuture }).__internal_future;
-      }
-      return fallbackWaitlistFuture;
+    const target = (): WaitlistResource => {
+      return this.state.__internal_waitlist;
     };
 
     return {
       errors: defaultWaitlistErrors(),
       fetchStatus: 'idle' as const,
       waitlist: {
+        pathRoot: '/waitlist',
         get id() {
-          return gateProperty(target, 'id', undefined);
+          return gateProperty(target, 'id', '');
         },
         get createdAt() {
           return gateProperty(target, 'createdAt', null);
@@ -315,6 +300,7 @@ export class StateProxy implements State {
         },
 
         join: gateMethod(target, 'join'),
+        reload: gateMethod(target, 'reload'),
       },
     };
   }
@@ -380,6 +366,14 @@ export class StateProxy implements State {
   }
   __internal_computed<T>(_: (prev?: T) => T): () => T {
     throw new Error('__internal_computed called before Clerk is loaded');
+  }
+
+  private get state() {
+    const s = this.isomorphicClerk.__internal_state;
+    if (!s) {
+      throw new Error('Clerk state not ready');
+    }
+    return s;
   }
 
   private get client() {

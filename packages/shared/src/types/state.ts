@@ -1,7 +1,7 @@
 import type { ClerkGlobalHookError } from '../errors/globalHookError';
 import type { SignInFutureResource } from './signInFuture';
 import type { SignUpFutureResource } from './signUpFuture';
-import type { WaitlistFutureResource, WaitlistResource } from './waitlist';
+import type { WaitlistResource } from './waitlist';
 
 /**
  * Represents an error on a specific field.
@@ -182,10 +182,10 @@ export interface WaitlistSignalValue {
   /**
    * The underlying `Waitlist` resource.
    */
-  waitlist: WaitlistFutureResource;
+  waitlist: WaitlistResource;
 }
 export type NullableWaitlistSignal = Omit<WaitlistSignalValue, 'waitlist'> & {
-  waitlist: WaitlistFutureResource | null;
+  waitlist: WaitlistResource | null;
 };
 export interface WaitlistSignal {
   (): NullableWaitlistSignal;
@@ -228,5 +228,5 @@ export interface State {
   /**
    * An instance of the Waitlist resource.
    */
-  __internal_waitlist: WaitlistResource | null;
+  __internal_waitlist: WaitlistResource;
 }

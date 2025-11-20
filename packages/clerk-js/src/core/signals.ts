@@ -55,7 +55,7 @@ export const waitlistComputedSignal: WaitlistSignal = computed(() => {
 
   const errors = errorsToWaitlistErrors(error);
 
-  return { errors, fetchStatus, waitlist: waitlist ? waitlist.__internal_future : null };
+  return { errors, fetchStatus, waitlist };
 });
 
 /**

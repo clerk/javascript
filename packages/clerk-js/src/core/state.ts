@@ -38,7 +38,7 @@ export class State implements StateInterface {
   waitlistFetchSignal = waitlistFetchSignal;
   waitlistSignal = waitlistComputedSignal;
 
-  private _waitlistInstance: Waitlist | null = null;
+  private _waitlistInstance: Waitlist;
 
   __internal_effect = effect;
   __internal_computed = computed;
