@@ -21,7 +21,6 @@ const TaskResetPasswordInternal = () => {
   const card = useCardState();
   const {
     userSettings: { passwordSettings },
-    authConfig: { reverification },
   } = useEnvironment();
 
   const { t, locale } = useLocalizations();
@@ -31,8 +30,6 @@ const TaskResetPasswordInternal = () => {
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
   );
 
-  const currentPasswordRequired = user && user.passwordEnabled && !reverification;
-
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
       return signOut(navigateAfterSignOut);
@@ -40,13 +37,6 @@ const TaskResetPasswordInternal = () => {
 
     return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
   };
-
-  // TODO: remove this field
-  const currentPasswordField = useFormControl('currentPassword', '', {
-    type: 'password',
-    label: localizationKeys('formFieldLabel__currentPassword'),
-    isRequired: true,
-  });
 
   const passwordField = useFormControl('newPassword', '', {
     type: 'password',
@@ -90,13 +80,12 @@ const TaskResetPasswordInternal = () => {
     try {
       await updatePasswordWithReverification(user, [
         {
-          currentPassword: currentPasswordRequired ? currentPasswordField.value : undefined,
           newPassword: passwordField.value,
           signOutOfOtherSessions: sessionsField.checked,
         },
       ]);
     } catch (e) {
-      return handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
+      return handleError(e, [passwordField, confirmField], card.setError);
     }
   };
 
@@ -132,16 +121,6 @@ const TaskResetPasswordInternal = () => {
                     value={session?.publicUserData.identifier || ''}
                     style={{ display: 'none' }}
                   />
-                  {currentPasswordRequired && (
-                    <Form.ControlRow elementId={currentPasswordField.id}>
-                      <Form.PasswordInput
-                        {...currentPasswordField.props}
-                        minLength={6}
-                        isRequired
-                        autoFocus
-                      />
-                    </Form.ControlRow>
-                  )}
                   <Form.ControlRow elementId={passwordField.id}>
                     <Form.PasswordInput
                       {...passwordField.props}
