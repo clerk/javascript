@@ -51,3 +51,19 @@ export const STABLE_KEYS = {
 } as const;
 
 export type ResourceCacheStableKey = (typeof STABLE_KEYS)[keyof typeof STABLE_KEYS];
+
+/**
+ * Internal stable keys for queries only used by our UI components.
+ * These keys are not used by the hooks themselves.
+ */
+
+const PAYMENT_ATTEMPT_KEY = 'billing-payment-attempt';
+const BILLING_PLANS_KEY = 'billing-plan';
+const BILLING_STATEMENTS_KEY = 'billing-statement';
+export const INTERNAL_STABLE_KEYS = {
+  PAYMENT_ATTEMPT_KEY,
+  BILLING_PLANS_KEY,
+  BILLING_STATEMENTS_KEY,
+} as const;
+
+export type __internal_ResourceCacheStableKey = (typeof INTERNAL_STABLE_KEYS)[keyof typeof INTERNAL_STABLE_KEYS];

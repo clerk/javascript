@@ -1,8 +1,7 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
@@ -10,13 +9,6 @@ import type { CacheSetter, ValueOrSetter } from '../types';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
-
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
   const { fetcher, config, keys } = params;
@@ -77,7 +69,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,
     // Use placeholderData to keep previous data while fetching new page
-    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
   });
 
   // Infinite mode: accumulate pages
@@ -133,16 +125,52 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     }
   }, [isSignedIn, queryClient, previousIsSignedIn, forceUpdate]);
 
-  const page = useMemo(() => {
+  // Compute data, count and page from the same data source to ensure consistency
+  const computedValues = useMemo(() => {
     if (triggerInfinite) {
       // Read from query data first, fallback to cache
       const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
-      // Return pages.length if > 0, otherwise return initialPage (default 1)
-      return pages.length > 0 ? pages.length : initialPageRef.current;
+      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
+
+      // Ensure pages is always an array and filter out null/undefined pages
+      const validPages = Array.isArray(pages) ? pages.filter(Boolean) : [];
+
+      return {
+        data:
+          validPages
+            .map((a: ClerkPaginatedResponse<any>) => a?.data)
+            .flat()
+            .filter(Boolean) ?? [],
+        count: validPages[validPages.length - 1]?.total_count ?? 0,
+        page: validPages.length > 0 ? validPages.length : initialPageRef.current,
+      };
     }
-    return paginatedPage;
-  }, [triggerInfinite, infiniteQuery.data?.pages, paginatedPage, queryClient, infiniteQueryKey]);
+
+    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
+    // This ensures that after cache clearing, we return consistent empty state
+    const pageData = queriesEnabled
+      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
+      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+
+    return {
+      data: Array.isArray(pageData?.data) ? pageData.data : [],
+      count: typeof pageData?.total_count === 'number' ? pageData.total_count : 0,
+      page: paginatedPage,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- forceUpdateCounter is used to trigger re-renders for cache updates
+  }, [
+    queriesEnabled,
+    forceUpdateCounter,
+    triggerInfinite,
+    infiniteQuery.data?.pages,
+    singlePageQuery.data,
+    queryClient,
+    infiniteQueryKey,
+    pagesQueryKey,
+    paginatedPage,
+  ]);
+
+  const { data, count, page } = computedValues;
 
   const fetchPage: ValueOrSetter<number> = useCallback(
     numberOrgFn => {
@@ -162,56 +190,6 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     },
     [infiniteQuery, page, triggerInfinite, queryClient, infiniteQueryKey],
   );
-
-  const data = useMemo(() => {
-    if (triggerInfinite) {
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      // When query is disabled, the hook's data is stale, so only read from cache
-      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
-      return pages.map((a: ClerkPaginatedResponse<any>) => a?.data).flat() ?? [];
-    }
-
-    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
-    // This ensures that after cache clearing, we return empty data
-    const pageData = queriesEnabled
-      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
-      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
-    return pageData?.data ?? [];
-  }, [
-    queriesEnabled,
-    forceUpdateCounter,
-    triggerInfinite,
-    singlePageQuery.data,
-    infiniteQuery.data,
-    queryClient,
-    pagesQueryKey,
-    infiniteQueryKey,
-  ]);
-
-  const count = useMemo(() => {
-    if (triggerInfinite) {
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      // When query is disabled, the hook's data is stale, so only read from cache
-      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
-      return pages[pages.length - 1]?.total_count || 0;
-    }
-
-    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
-    // This ensures that after cache clearing, we return 0
-    const pageData = queriesEnabled
-      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
-      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
-    return pageData?.total_count ?? 0;
-  }, [
-    queriesEnabled,
-    forceUpdateCounter,
-    triggerInfinite,
-    singlePageQuery.data,
-    infiniteQuery.data,
-    queryClient,
-    pagesQueryKey,
-    infiniteQueryKey,
-  ]);
 
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
@@ -252,7 +230,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
         >;
         return { ...prevValue, pages: nextPages };
       });
-      // Force re-render to reflect cache changes
+      // Force immediate re-render to reflect cache changes
       forceUpdate(n => n + 1);
       return Promise.resolve();
     }

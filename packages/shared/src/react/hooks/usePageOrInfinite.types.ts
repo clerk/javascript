@@ -10,7 +10,7 @@ type QueryArgs<Params> = Readonly<{
   args: Params;
 }>;
 
-type QueryKeyWithArgs<Params> = readonly [
+export type QueryKeyWithArgs<Params> = readonly [
   string,
   boolean,
   Record<string, unknown>,
@@ -27,6 +27,7 @@ export type UsePagesOrInfiniteSignature = <
     queryKey: QueryKeyWithArgs<Params>;
     invalidationKey: InvalidationQueryKey;
     stableKey: string;
+    authenticated: boolean;
   },
   TConfig extends Config = Config,
 >(params: {
