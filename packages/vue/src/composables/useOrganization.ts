@@ -60,6 +60,7 @@ export const useOrganization: UseOrganization = () => {
     clerk,
     value => {
       if (value) {
+        // Optional chaining is important for `@clerk/vue` usage with older clerk-js versions that don't have the method
         value.__internal_attemptToEnableEnvironmentSetting?.({
           for: 'organizations',
           caller: 'useOrganization',
