@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
 import { retry } from '@clerk/shared/retry';
 import type {
   ActClaim,
@@ -404,10 +404,20 @@ export class Session extends BaseResource implements SessionResource {
 
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
+    const lastActiveToken = this.lastActiveToken?.getRawString() ?? Session.clerk.__internal_getSessionCookie?.();
 
-    const tokenResolver = Token.create(path, params, skipCache);
-
-    // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
+    const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
+      if (
+        e instanceof ClerkAPIResponseError &&
+        e.status === 422 &&
+        e.errors.length > 0 &&
+        e.errors[0].code === 'missing_expired_token' &&
+        lastActiveToken
+      ) {
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
+      }
+      throw e;
+    });
     SessionTokenCache.set({ tokenId, tokenResolver });
 
     return tokenResolver.then(token => {
