@@ -1,13 +1,13 @@
 import React from 'react';
-import { SWRConfig } from 'swr';
+
+import { SWRConfigCompat } from '../../providers/SWRConfigCompat';
 
 export const wrapper = ({ children }: { children: React.ReactNode }) => (
-  // TODO: Replace SWRConfig with the react-query equivalent.
-  <SWRConfig
-    value={{
+  <SWRConfigCompat
+    swrConfig={{
       provider: () => new Map(),
     }}
   >
     {children}
-  </SWRConfig>
+  </SWRConfigCompat>
 );
