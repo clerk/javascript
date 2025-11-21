@@ -9,7 +9,7 @@ const clerk = useClerk();
 defineProps<SignInProps>();
 
 // Hacking our way to get actual initial uncasted boolean props as vue-tsc
-// is having a hard time with SignInProps
+// is having a hard time with SignInProps type and withDefaults()
 const currentInstance = getCurrentInstance();
 
 const hasInitialTransferable = 'transferable' in (currentInstance?.vnode.props ?? {});
