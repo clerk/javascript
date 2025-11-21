@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.109.1",
+  "version": "5.109.2",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -83,8 +83,7 @@
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.14.1",
-    "swr": "2.3.4"
+    "regenerator-runtime": "0.14.1"
   },
   "devDependencies": {
     "@clerk/testing": "workspace:^",

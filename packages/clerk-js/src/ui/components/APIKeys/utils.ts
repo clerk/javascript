@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useSWRConfig } from 'swr';
+import { useEffect, useRef } from 'react';
 
 type UseAPIKeysPaginationParams = {
   query: string;
   page: number;
   pageCount: number;
   isFetching: boolean;
-  subject: string;
   fetchPage: (page: number) => void;
 };
 
@@ -16,27 +14,7 @@ type UseAPIKeysPaginationParams = {
  * - Adjusts page when current page exceeds available pages (e.g., after deletion)
  * - Provides cache invalidation function for mutations
  */
-export const useAPIKeysPagination = ({
-  query,
-  page,
-  pageCount,
-  isFetching,
-  subject,
-  fetchPage,
-}: UseAPIKeysPaginationParams) => {
-  const { mutate } = useSWRConfig();
-
-  // Invalidate all cache entries for this user or organization
-  const invalidateAll = useCallback(() => {
-    void mutate(key => {
-      if (!key || typeof key !== 'object') {
-        return false;
-      }
-      // Match all apiKeys cache entries for this user or organization, regardless of page, pageSize, or query
-      return 'type' in key && key.type === 'apiKeys' && 'subject' in key && key.subject === subject;
-    });
-  }, [mutate, subject]);
-
+export const useAPIKeysPagination = ({ query, page, pageCount, isFetching, fetchPage }: UseAPIKeysPaginationParams) => {
   // Reset to first page when query changes
   const previousQueryRef = useRef(query);
   useEffect(() => {
@@ -53,8 +31,4 @@ export const useAPIKeysPagination = ({
       fetchPage(Math.max(1, pageCount));
     }
   }, [pageCount, page, isFetching, fetchPage]);
-
-  return {
-    invalidateAll,
-  };
 };

@@ -320,10 +320,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
 
       await u.po.page.getByRole('button', { name: 'Manage' }).first().click();
       await u.po.subscriptionDetails.waitForMounted();
-      await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
       await u.po.subscriptionDetails.root.getByText('Cancel free trial').click();
-      await u.po.subscriptionDetails.root.locator('.cl-drawerConfirmationRoot').waitFor({ state: 'visible' });
-      await u.po.subscriptionDetails.root.getByRole('button', { name: 'Cancel free trial' }).click();
+      const confirmationDialog = u.po.subscriptionDetails.root.locator('.cl-drawerConfirmationRoot');
+      await confirmationDialog.waitFor({ state: 'visible' });
+      // Click the Cancel free trial button within the confirmation dialog
+      await confirmationDialog.getByRole('button', { name: 'Cancel free trial' }).click();
       await u.po.subscriptionDetails.waitForUnmounted();
 
       await expect(
@@ -552,10 +553,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
         .getByRole('button', { name: 'Manage' })
         .click();
       await u.po.subscriptionDetails.waitForMounted();
-      await u.po.subscriptionDetails.root.locator('.cl-menuButtonEllipsisBordered').click();
       await u.po.subscriptionDetails.root.getByText('Cancel subscription').click();
-      await u.po.subscriptionDetails.root.locator('.cl-drawerConfirmationRoot').waitFor({ state: 'visible' });
-      await u.po.subscriptionDetails.root.getByText('Cancel subscription').click();
+      const confirmationDialog = u.po.subscriptionDetails.root.locator('.cl-drawerConfirmationRoot');
+      await confirmationDialog.waitFor({ state: 'visible' });
+      // Click the Cancel subscription button within the confirmation dialog
+      await confirmationDialog.getByText('Cancel subscription').click();
       await u.po.subscriptionDetails.waitForUnmounted();
 
       // Verify the Free plan with Upcoming status exists
