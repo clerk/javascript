@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.4.38
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+
 ## 2.4.37
 
 ### Patch Changes
@@ -69,7 +76,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -361,7 +367,6 @@
   Deprecated variables will continue to work but will be removed in the next major version.
 
   ## New variables
-
   - `colorRing` - The color of the ring when an interactive element is focused.
   - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
   - `colorShadow` - The base shadow color used in the components.
@@ -1378,7 +1383,6 @@
 ### Patch Changes
 
 - Introduces three new element appearance descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
-
   - `tableHead` let's you customize the tables head styles.
   - `paginationButton` let's you customize the pagination buttons.
   - `paginationRowText` let's you customize the pagination text.
