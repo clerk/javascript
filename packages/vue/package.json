@@ -1,6 +1,6 @@
 {
   "name": "@clerk/vue",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "description": "Clerk SDK for Vue",
   "keywords": [
     "clerk",
@@ -69,15 +69,15 @@
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "unplugin-vue": "^6.2.0",
-    "vue": "3.5.21",
-    "vue-tsc": "^2.2.12"
+    "unplugin-vue": "^7.0.8",
+    "vue": "catalog:repo",
+    "vue-tsc": "^3.1.4"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

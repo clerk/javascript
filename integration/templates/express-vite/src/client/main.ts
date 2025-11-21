@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const clerk = new Clerk(publishableKey);
 
   await clerk.load({
-    clerkUiCtor: Promise.resolve(ClerkUi),
+    clerkUiCtor: ClerkUi,
   });
 
   if (clerk.isSignedIn) {

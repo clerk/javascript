@@ -1056,7 +1056,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Clerk UI entrypoint.
      */
-    clerkUiCtor?: Promise<ClerkUiConstructor>;
+    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
@@ -1664,12 +1664,6 @@ export type CreateOrganizationProps = RoutingOptions & {
    * prop of ClerkProvider (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -1838,12 +1832,6 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * @deprecated
-     * This prop will be removed in a future version.
-     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-     */
-    hideSlug?: boolean;
-    /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvider(if one is provided)
@@ -1903,12 +1891,6 @@ export type OrganizationListProps = {
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
 };
 
 export type WaitlistProps = {

@@ -1,7 +1,6 @@
 import type { LongRunningApplication } from '../models/longRunningApplication';
 import { longRunningApplication } from '../models/longRunningApplication';
 import { astro } from './astro';
-import { elements } from './elements';
 import { envs } from './envs';
 import { expo } from './expo';
 import { express } from './express';
@@ -75,7 +74,6 @@ export const createLongRunningApps = () => {
     { id: 'nuxt.node', config: nuxt.node, env: envs.withCustomRoles },
     { id: 'react-router.node', config: reactRouter.reactRouterNode, env: envs.withEmailCodes },
     { id: 'express.vite.withEmailCodes', config: express.vite, env: envs.withEmailCodes },
-    { id: 'elements.next.appRouter', config: elements.nextAppRouter, env: envs.withEmailCodes },
   ] as const;
 
   const apps = configs.map(longRunningApplication);

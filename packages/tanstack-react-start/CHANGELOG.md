@@ -1,5 +1,15 @@
 # @clerk/tanstack-react-start
 
+## 0.27.3
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
 ## 0.27.2
 
 ### Patch Changes
@@ -141,7 +151,6 @@
 - Added support for [TanStack Start v1 RC](https://tanstack.com/blog/announcing-tanstack-start-v1)! Includes a new `clerkMiddleware()` global middleware replacing the custom server handler. ([#6859](https://github.com/clerk/javascript/pull/6859)) by [@wobsoriano](https://github.com/wobsoriano)
 
   Usage:
-
   1. Create a `src/start.ts` file and add `clerkMiddleware()` to the list of request middlewares:
 
   ```ts
@@ -627,7 +636,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`
@@ -1446,7 +1454,6 @@
 ### Minor Changes
 
 - Re-export missing error helpers functions from `@clerk/tanstack-start/errors` ([#4741](https://github.com/clerk/javascript/pull/4741)) by [@octoper](https://github.com/octoper)
-
   - `isClerkAPIResponseError`
   - `isEmailLinkError`
   - `isKnownError`

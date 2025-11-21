@@ -461,7 +461,7 @@ export class Clerk implements ClerkInterface {
 
     // Initialize ClerkUi if it was provided
     if (this.#options.clerkUiCtor) {
-      this.#clerkUi = this.#options.clerkUiCtor.then(
+      this.#clerkUi = Promise.resolve(this.#options.clerkUiCtor).then(
         ClerkUI =>
           new ClerkUI(
             () => this,

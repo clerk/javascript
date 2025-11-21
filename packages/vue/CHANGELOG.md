@@ -1,5 +1,13 @@
 # @clerk/vue
 
+## 1.16.1
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/types@4.101.1
+
 ## 1.16.0
 
 ### Minor Changes
@@ -85,7 +93,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -713,7 +720,6 @@
 ### Minor Changes
 
 - Introduce `sessionClaims` to useAuth(). ([#5587](https://github.com/clerk/javascript/pull/5587)) by [@panteliselef](https://github.com/panteliselef)
-
   - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
 
 ### Patch Changes
@@ -1281,7 +1287,6 @@
 ### Patch Changes
 
 - Add deprecation notices for the following components: ([#4631](https://github.com/clerk/javascript/pull/4631)) by [@alexcarpenter](https://github.com/alexcarpenter)
-
   - `RedirectToUserProfile`
   - `RedirectToOrganizationProfile`
   - `RedirectToCreateOrganization`

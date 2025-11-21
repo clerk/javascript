@@ -79,7 +79,6 @@ export const useOrganizationListContext = () => {
     ...ctx,
     afterCreateOrganizationUrl,
     skipInvitationScreen: ctx.skipInvitationScreen || false,
-    hideSlug: ctx.hideSlug || false,
     hidePersonal: organizationSettings.forceOrganizationSelection || ctx.hidePersonal || false,
     navigateAfterCreateOrganization,
     navigateAfterSelectOrganization,
