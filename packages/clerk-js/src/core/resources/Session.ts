@@ -404,6 +404,7 @@ export class Session extends BaseResource implements SessionResource {
 
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
+    const lastActiveToken = this.lastActiveToken?.getRawString() ?? Session.clerk.__internal_getSessionCookie?.();
 
     const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
       if (
@@ -411,9 +412,9 @@ export class Session extends BaseResource implements SessionResource {
         e.status === 422 &&
         e.errors.length > 0 &&
         e.errors[0].code === 'missing_expired_token' &&
-        this.lastActiveToken
+        lastActiveToken
       ) {
-        return Token.create(path, { ...params }, { expired_token: this.lastActiveToken.getRawString() });
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });

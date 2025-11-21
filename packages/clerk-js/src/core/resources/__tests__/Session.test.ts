@@ -1147,7 +1147,56 @@ describe('Session', () => {
       });
     });
 
-    it('should not retry with expired token when lastActiveToken is not available', async () => {
+    it('should retry with cookie token when lastActiveToken is not available but cookie exists', async () => {
+      const mockGetSessionCookie = vi.fn().mockReturnValue(mockJwt);
+      BaseResource.clerk.__internal_getSessionCookie = mockGetSessionCookie;
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as unknown as SessionJSON);
+
+      SessionTokenCache.clear();
+
+      const errorResponse = new ClerkAPIResponseError('Missing expired token', {
+        data: [
+          { code: 'missing_expired_token', message: 'Missing expired token', long_message: 'Missing expired token' },
+        ],
+        status: 422,
+      });
+      fetchSpy.mockRejectedValueOnce(errorResponse);
+      fetchSpy.mockResolvedValueOnce({ object: 'token', jwt: mockJwt });
+
+      await session.getToken();
+
+      expect(mockGetSessionCookie).toHaveBeenCalled();
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+
+      expect(fetchSpy.mock.calls[0][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null },
+      });
+
+      expect(fetchSpy.mock.calls[1][0]).toMatchObject({
+        path: '/client/sessions/session_1/tokens',
+        method: 'POST',
+        body: { organizationId: null },
+        search: { expired_token: mockJwt },
+      });
+    });
+
+    it('should not retry with expired token when neither lastActiveToken nor cookie are available', async () => {
+      const mockGetSessionCookie = vi.fn().mockReturnValue(undefined);
+      BaseResource.clerk.__internal_getSessionCookie = mockGetSessionCookie;
+
       const session = new Session({
         status: 'active',
         id: 'session_1',
@@ -1175,6 +1224,7 @@ describe('Session', () => {
         errors: [{ code: 'missing_expired_token' }],
       });
 
+      expect(mockGetSessionCookie).toHaveBeenCalled();
       expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
 
