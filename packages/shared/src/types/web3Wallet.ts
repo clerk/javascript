@@ -25,17 +25,25 @@ export interface Web3WalletResource extends ClerkResource {
   __internal_toSnapshot: () => Web3WalletJSONSnapshot;
 }
 
-export type GenerateSignature = (opts: GenerateSignatureParams) => Promise<string>;
+export type GenerateSignature = (opts: GenerateSignatureParams | GenerateSolanaSignatureParams) => Promise<string>;
 
 export interface AuthenticateWithWeb3Params {
   identifier: string;
   generateSignature: GenerateSignature;
   strategy?: Web3Strategy;
+  walletName?: string;
 }
 
 export interface GenerateSignatureParams {
   identifier: string;
   nonce: string;
   provider?: Web3Provider;
+  walletName?: string;
+}
+
+export interface GenerateSolanaSignatureParams {
+  identifier: string;
+  nonce: string;
+  provider: Extract<Web3Provider, 'solana'>;
   walletName: string;
 }

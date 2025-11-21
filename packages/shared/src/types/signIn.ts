@@ -1,3 +1,4 @@
+import type { AuthenticateWithSolanaParams } from './clerk';
 import type {
   ClerkResourceJSON,
   ClientTrustState,
@@ -76,7 +77,7 @@ export interface SignInResource extends ClerkResource {
 
   authenticateWithBase: () => Promise<SignInResource>;
 
-  // authenticateWithSolana: () => Promise<SignInResource>;
+  authenticateWithSolana: (params: AuthenticateWithSolanaParams) => Promise<SignInResource>;
 
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 

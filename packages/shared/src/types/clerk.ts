@@ -2300,6 +2300,7 @@ export interface AuthenticateWithSolanaParams {
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
+  walletName?: string;
 }
 
 export interface LoadedClerk extends Clerk {

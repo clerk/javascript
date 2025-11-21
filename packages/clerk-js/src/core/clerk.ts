@@ -2281,7 +2281,7 @@ export class Clerk implements ClerkInterface {
     const { displayConfig } = this.environment;
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
-    const identifier = await getWeb3Identifier({ provider });
+    const identifier = await getWeb3Identifier({ provider, walletName });
     let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
     switch (provider) {
       case 'metamask':
