@@ -69,9 +69,9 @@
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue.ts/tsx-auto-props": "^0.6.0",
-    "unplugin-vue": "^6.2.0",
+    "unplugin-vue": "^7.0.8",
     "vue": "catalog:repo",
-    "vue-tsc": "^2.2.12"
+    "vue-tsc": "^3.1.4"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
