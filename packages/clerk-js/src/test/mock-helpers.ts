@@ -1,7 +1,7 @@
 import type { ActiveSessionResource, LoadedClerk } from '@clerk/shared/types';
 import { type Mocked, vi } from 'vitest';
 
-import { QueryClient } from '../core/query-core';
+import { InfiniteQueryObserver, QueryClient, QueryObserver } from '../core/query-core';
 import type { RouteContextValue } from '../ui/router';
 
 type FunctionLike = (...args: any) => any;
@@ -58,6 +58,8 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
         },
       },
     }),
+    QueryObserver,
+    InfiniteQueryObserver,
   };
 
   mockMethodsOf(clerkAny);

@@ -1,7 +1,6 @@
 'use client';
 
-import type { DefaultError, InfiniteData, QueryKey, QueryObserver } from '@tanstack/query-core';
-import { InfiniteQueryObserver } from '@tanstack/query-core';
+import type { DefaultError, InfiniteData, QueryKey } from '@tanstack/query-core';
 
 import type { DefinedInitialDataInfiniteOptions, UndefinedInitialDataInfiniteOptions } from './infiniteQueryOptions';
 import type { DefinedUseInfiniteQueryResult, UseInfiniteQueryOptions, UseInfiniteQueryResult } from './types';
@@ -40,5 +39,5 @@ export function useClerkInfiniteQuery<
  *
  */
 export function useClerkInfiniteQuery(options: UseInfiniteQueryOptions) {
-  return useBaseQuery(options, InfiniteQueryObserver as unknown as typeof QueryObserver);
+  return useBaseQuery(options, 'infinite');
 }

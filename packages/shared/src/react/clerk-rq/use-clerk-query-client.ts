@@ -57,13 +57,23 @@ function createRecursiveProxy(label: string): RecursiveMock {
 
 const mockQueryClient = createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient;
 
-const useClerkQueryClient = (): [QueryClient, boolean] => {
+type QueryObserverConstructor = (typeof import('@tanstack/query-core'))['QueryObserver'];
+type InfiniteQueryObserverConstructor = (typeof import('@tanstack/query-core'))['InfiniteQueryObserver'];
+
+export type ClerkInternalQueryClient = {
+  __tag: 'clerk-rq-client';
+  client: QueryClient;
+  QueryObserver: QueryObserverConstructor;
+  InfiniteQueryObserver: InfiniteQueryObserverConstructor;
+};
+
+const useClerkQueryClient = (): [QueryClient, boolean, ClerkInternalQueryClient | undefined] => {
   const clerk = useClerkInstanceContext();
 
   // @ts-expect-error - __internal_queryClient is not typed
-  const queryClient = clerk.__internal_queryClient as { __tag: 'clerk-rq-client'; client: QueryClient } | undefined;
+  const queryClient = clerk.__internal_queryClient as ClerkInternalQueryClient | undefined;
   const [, setQueryClientLoaded] = useState(
-    typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client',
+    typeof queryClient === 'object' && '__tag' in queryClient && queryClient?.__tag === 'clerk-rq-client',
   );
 
   useEffect(() => {
@@ -76,9 +86,10 @@ const useClerkQueryClient = (): [QueryClient, boolean] => {
     };
   }, [clerk, setQueryClientLoaded]);
 
-  const isLoaded = typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client';
+  const isLoaded =
+    typeof queryClient === 'object' && '__tag' in queryClient && queryClient?.__tag === 'clerk-rq-client';
 
-  return [queryClient?.client || mockQueryClient, isLoaded];
+  return [queryClient?.client || mockQueryClient, isLoaded, queryClient];
 };
 
 export { useClerkQueryClient };
