@@ -22,6 +22,9 @@ export function createCacheKeys<
   };
 }
 
+/**
+ * @internal
+ */
 export function toSWRQuery<T extends { queryKey: QueryKeyWithArgs<unknown> }>(keys: T) {
   const { queryKey } = keys;
   return {

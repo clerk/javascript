@@ -1,15 +1,7 @@
-import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
-import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
+import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
 import { useStatementQueryCacheKeys } from './useStatementQuery.shared';
-
-const HOOK_NAME = 'useStatementQuery';
+import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
 
 /**
  * This is the existing implementation of useStatementQuery using SWR.
@@ -18,14 +10,10 @@ const HOOK_NAME = 'useStatementQuery';
  * @internal
  */
 export function __internal_useStatementQuery(params: UseStatementQueryParams = {}): StatementQueryResult {
-  useAssertWrappedByClerkProvider(HOOK_NAME);
-
   const { statementId = null, enabled = true, keepPreviousData = false, for: forType = 'user' } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
   const { organization } = useOrganizationContext();
-
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;

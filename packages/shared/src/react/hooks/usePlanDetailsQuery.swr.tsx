@@ -1,10 +1,7 @@
-import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useClerkInstanceContext } from '../contexts';
 import { usePlanDetailsQueryCacheKeys } from './usePlanDetailsQuery.shared';
 import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
-
-const HOOK_NAME = 'usePlanDetailsQuery';
 
 /**
  * This is the existing implementation of usePlanDetailsQuery using SWR.
@@ -13,12 +10,8 @@ const HOOK_NAME = 'usePlanDetailsQuery';
  * @internal
  */
 function usePlanDetailsQuery(params: UsePlanDetailsQueryParams = {}): PlanDetailsQueryResult {
-  useAssertWrappedByClerkProvider(HOOK_NAME);
-
   const { planId, initialPlan = null, enabled = true, keepPreviousData = true } = params;
   const clerk = useClerkInstanceContext();
-
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const targetPlanId = planId ?? initialPlan?.id ?? null;
 

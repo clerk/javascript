@@ -1,15 +1,7 @@
-import { eventMethodCalled } from '../../telemetry/events';
 import { useSWR } from '../clerk-swr';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
+import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
 import { usePaymentAttemptQueryCacheKeys } from './usePaymentAttemptQuery.shared';
 import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './usePaymentAttemptQuery.types';
-
-const HOOK_NAME = 'usePaymentAttemptQuery';
 
 /**
  * This is the existing implementation of usePaymentAttemptQuery using SWR.
@@ -18,14 +10,10 @@ const HOOK_NAME = 'usePaymentAttemptQuery';
  * @internal
  */
 export function __internal_usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAttemptQueryResult {
-  useAssertWrappedByClerkProvider(HOOK_NAME);
-
   const { paymentAttemptId, enabled = true, keepPreviousData = false, for: forType = 'user' } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
   const { organization } = useOrganizationContext();
-
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;

@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
+import { useBillingHookEnabled } from '../hooks/useBillingHookEnabled';
 import type { UseStripeClerkLibsResult } from './useStripeClerkLibs';
 
 type StripeLoaderOptions = {
@@ -26,7 +27,9 @@ function useStripeLoader(options: StripeLoaderOptions): UseStripeLoaderResult {
     return ['stripe-sdk', { externalGatewayId, stripePublishableKey }] as const;
   }, [externalGatewayId, stripePublishableKey]);
 
-  const isEnabled = Boolean(stripeClerkLibs && externalGatewayId && stripePublishableKey);
+  const billingEnabled = useBillingHookEnabled({ authenticated: true });
+
+  const isEnabled = Boolean(stripeClerkLibs && externalGatewayId && stripePublishableKey) && billingEnabled;
 
   const query = useClerkQuery({
     queryKey,

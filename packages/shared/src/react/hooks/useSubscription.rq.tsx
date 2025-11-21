@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import type { EnvironmentResource } from '../../types';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
@@ -11,6 +10,7 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
+import { useBillingHookEnabled } from './useBillingHookEnabled';
 import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
@@ -29,15 +29,10 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
-  // @ts-expect-error `__unstable__environment` is not typed
-  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  const billingEnabled = useBillingHookEnabled(params);
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
-  const isOrganization = params?.for === 'organization';
-  const billingEnabled = isOrganization
-    ? environment?.commerceSettings.billing.organization.enabled
-    : environment?.commerceSettings.billing.user.enabled;
   const keepPreviousData = params?.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
@@ -48,7 +43,7 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
     for: params?.for,
   });
 
-  const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
+  const queriesEnabled = Boolean(user?.id && billingEnabled);
 
   const query = useClerkQuery({
     queryKey,

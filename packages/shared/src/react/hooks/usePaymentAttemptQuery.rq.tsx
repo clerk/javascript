@@ -1,16 +1,9 @@
-import { eventMethodCalled } from '../../telemetry/events';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
+import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
+import { useBillingHookEnabled } from './useBillingHookEnabled';
 import { usePaymentAttemptQueryCacheKeys } from './usePaymentAttemptQuery.shared';
 import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './usePaymentAttemptQuery.types';
-
-const HOOK_NAME = 'usePaymentAttemptQuery';
 
 /**
  * This is the new implementation of usePaymentAttemptQuery using React Query.
@@ -19,14 +12,10 @@ const HOOK_NAME = 'usePaymentAttemptQuery';
  * @internal
  */
 function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAttemptQueryResult {
-  useAssertWrappedByClerkProvider(HOOK_NAME);
-
-  const { paymentAttemptId, enabled = true, keepPreviousData = false, for: forType = 'user' } = params;
+  const { paymentAttemptId, keepPreviousData = false, for: forType = 'user' } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
   const { organization } = useOrganizationContext();
-
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;
@@ -38,7 +27,9 @@ function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAt
     for: forType,
   });
 
-  const queryEnabled = Boolean(paymentAttemptId) && enabled && (forType !== 'organization' || Boolean(organizationId));
+  const billingEnabled = useBillingHookEnabled(params);
+
+  const queryEnabled = Boolean(paymentAttemptId) && billingEnabled;
 
   const query = useClerkQuery({
     queryKey,

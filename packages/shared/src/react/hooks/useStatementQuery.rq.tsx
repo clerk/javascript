@@ -1,16 +1,9 @@
-import { eventMethodCalled } from '../../telemetry/events';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import {
-  useAssertWrappedByClerkProvider,
-  useClerkInstanceContext,
-  useOrganizationContext,
-  useUserContext,
-} from '../contexts';
+import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
+import { useBillingHookEnabled } from './useBillingHookEnabled';
 import { useStatementQueryCacheKeys } from './useStatementQuery.shared';
 import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
-
-const HOOK_NAME = 'useStatementQuery';
 
 /**
  * This is the new implementation of useStatementQuery using React Query.
@@ -19,14 +12,10 @@ const HOOK_NAME = 'useStatementQuery';
  * @internal
  */
 function useStatementQuery(params: UseStatementQueryParams = {}): StatementQueryResult {
-  useAssertWrappedByClerkProvider(HOOK_NAME);
-
-  const { statementId = null, enabled = true, keepPreviousData = false, for: forType = 'user' } = params;
+  const { statementId = null, keepPreviousData = false, for: forType = 'user' } = params;
   const clerk = useClerkInstanceContext();
   const user = useUserContext();
   const { organization } = useOrganizationContext();
-
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;
@@ -38,7 +27,9 @@ function useStatementQuery(params: UseStatementQueryParams = {}): StatementQuery
     for: forType,
   });
 
-  const queryEnabled = Boolean(statementId) && enabled && (forType !== 'organization' || Boolean(organizationId));
+  const billingEnabled = useBillingHookEnabled(params);
+
+  const queryEnabled = Boolean(statementId) && billingEnabled;
 
   const query = useClerkQuery({
     queryKey,

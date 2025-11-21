@@ -1,11 +1,9 @@
-import { eventMethodCalled } from '../../telemetry/events';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
-import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
+import { useClerkInstanceContext } from '../contexts';
+import { useBillingHookEnabled } from './useBillingHookEnabled';
 import { usePlanDetailsQueryCacheKeys } from './usePlanDetailsQuery.shared';
 import type { PlanDetailsQueryResult, UsePlanDetailsQueryParams } from './usePlanDetailsQuery.types';
-
-const HOOK_NAME = 'usePlanDetailsQuery';
 
 /**
  * This is the new implementation of usePlanDetailsQuery using React Query.
@@ -14,18 +12,18 @@ const HOOK_NAME = 'usePlanDetailsQuery';
  * @internal
  */
 export function __internal_usePlanDetailsQuery(params: UsePlanDetailsQueryParams = {}): PlanDetailsQueryResult {
-  useAssertWrappedByClerkProvider(HOOK_NAME);
-
-  const { planId, initialPlan = null, enabled = true, keepPreviousData = true } = params;
+  const { planId, initialPlan = null, keepPreviousData = true } = params;
   const clerk = useClerkInstanceContext();
-
-  clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
   const targetPlanId = planId ?? initialPlan?.id ?? null;
 
   const { queryKey } = usePlanDetailsQueryCacheKeys({ planId: targetPlanId });
 
-  const queryEnabled = Boolean(targetPlanId) && enabled;
+  const billingEnabled = useBillingHookEnabled({
+    authenticated: false,
+  });
+
+  const queryEnabled = Boolean(targetPlanId) && billingEnabled;
 
   const query = useClerkQuery({
     queryKey,

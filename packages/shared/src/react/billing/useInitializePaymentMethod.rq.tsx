@@ -5,6 +5,7 @@ import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useOrganizationContext, useUserContext } from '../contexts';
+import { useBillingHookEnabled } from '../hooks/useBillingHookEnabled';
 
 type InitializePaymentMethodOptions = {
   for?: ForPayerType;
@@ -22,17 +23,19 @@ export type UseInitializePaymentMethodResult = {
  * @internal
  */
 function useInitializePaymentMethod(options?: InitializePaymentMethodOptions): UseInitializePaymentMethodResult {
-  const { for: forType = 'user' } = options ?? {};
+  const { for: forType } = options ?? {};
   const { organization } = useOrganizationContext();
   const user = useUserContext();
 
   const resource = forType === 'organization' ? organization : user;
 
-  const queryKey = useMemo(() => {
-    return ['billing-payment-method-initialize', { resourceId: resource?.id, for: forType }] as const;
-  }, [resource?.id, forType]);
+  const billingEnabled = useBillingHookEnabled(options);
 
-  const isEnabled = Boolean(resource?.id);
+  const queryKey = useMemo(() => {
+    return ['billing-payment-method-initialize', { resourceId: resource?.id }] as const;
+  }, [resource?.id]);
+
+  const isEnabled = Boolean(resource?.id) && billingEnabled;
 
   const query = useClerkQuery({
     queryKey,
