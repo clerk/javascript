@@ -101,10 +101,14 @@ export const FormMachine = setup({
         if (isKnownError(event.error)) {
           const fields: Record<string, ClerkElementsFieldError[]> = {};
           const globalErrors: ClerkElementsError[] = [];
-          const errors = isClerkAPIResponseError(event.error) ? event.error?.errors : [event.error];
+          const candidate = isClerkAPIResponseError(event.error)
+            ? event.error?.errors || event.error
+            : event?.error || [];
+
+          const errors = Array.isArray(candidate) ? candidate : [candidate];
 
           for (const error of errors) {
-            const name = isClerkAPIError(error) ? snakeToCamel(error.meta?.paramName) : null;
+            const name = isClerkAPIError(error) ? snakeToCamel(error?.meta?.paramName) : null;
 
             if (!name || isMetamaskError(error)) {
               globalErrors.push(ClerkElementsError.fromAPIError(error));
@@ -140,6 +144,7 @@ export const FormMachine = setup({
         }
       }),
     },
+
     'ERRORS.CLEAR': {
       actions: assign({
         errors: () => [],
