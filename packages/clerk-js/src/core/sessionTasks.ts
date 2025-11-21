@@ -8,6 +8,7 @@ import { buildURL, forwardClerkQueryParams } from '../utils';
  */
 export const INTERNAL_SESSION_TASK_ROUTE_BY_KEY: Record<SessionTask['key'], string> = {
   'choose-organization': 'choose-organization',
+  'reset-password': 'reset-password',
 } as const;
 
 /**

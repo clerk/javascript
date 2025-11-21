@@ -20,6 +20,7 @@ import type {
   SignUpForceRedirectUrl,
   SignUpProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -151,6 +152,10 @@ export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
   componentName: 'TaskChooseOrganization';
 };
 
+export type TaskResetPasswordCtx = TaskResetPasswordProps & {
+  componentName: 'TaskResetPassword';
+};
+
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
   componentName: 'OAuthConsent';
 };
@@ -182,5 +187,6 @@ export type AvailableComponentCtx =
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
-  | TaskChooseOrganizationCtx;
+  | TaskChooseOrganizationCtx
+  | TaskResetPasswordCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
