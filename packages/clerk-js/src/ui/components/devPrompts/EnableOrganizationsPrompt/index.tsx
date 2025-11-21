@@ -4,7 +4,7 @@ import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettin
 import type { SerializedStyles } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
 import { css, type Theme } from '@emotion/react';
-import { forwardRef, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
@@ -13,24 +13,9 @@ import { common, InternalThemeProvider } from '@/ui/styledSystem';
 import { DevTools } from '../../../../core/resources/DevTools';
 import { Box, Flex, Span } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
-import {
-  basePromptElementStyles,
-  ClerkLogoIcon,
-  handleDashboardUrlParsing,
-  PromptContainer,
-  PromptSuccessIcon,
-} from '../shared';
+import { basePromptElementStyles, ClerkLogoIcon, PromptContainer, PromptSuccessIcon } from '../shared';
 
-/**
- * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
- */
-function withLastActiveFallback(cb: () => string): string {
-  try {
-    return cb();
-  } catch {
-    return 'https://dashboard.clerk.com/last-active?path=organizations-settings';
-  }
-}
+const organizationsDashboardUrl = 'https://dashboard.clerk.com/~/organizations-settings';
 
 const EnableOrganizationsPromptInternal = ({
   caller,
@@ -50,25 +35,6 @@ const EnableOrganizationsPromptInternal = ({
   // 'forceOrganizationSelection' is omitted from the environment settings object if the instance does not have it available as a feature
   const hasPersonalAccountsEnabled =
     typeof environment?.organizationSettings.forceOrganizationSelection !== 'undefined';
-
-  const organizationsDashboardUrl = useMemo(() => {
-    return withLastActiveFallback(() => {
-      const currentUrl = window.location.href;
-      try {
-        const redirectUrlParts = handleDashboardUrlParsing(currentUrl);
-        const url = new URL(
-          `${redirectUrlParts.baseDomain}/apps/${redirectUrlParts.appId}/instances/${redirectUrlParts.instanceId}/organizations`,
-        );
-        return url.href;
-      } catch {
-        if (!environment?.id) {
-          throw new Error('Cannot construct dashboard URL');
-        }
-
-        return 'https://dashboard.clerk.com/last-active?path=organization-settings';
-      }
-    });
-  }, [environment?.id]);
 
   const handleEnableOrganizations = () => {
     setIsLoading(true);
