@@ -1,9 +1,7 @@
 import type { Web3WalletJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BaseResource } from '@/core/resources/Base';
-
-import { Web3Wallet } from '../internal';
+import { BaseResource, Web3Wallet } from '../internal';
 
 describe('Web3 wallet', () => {
   it('create', async () => {

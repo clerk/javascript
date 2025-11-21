@@ -10,11 +10,11 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import type { Clerk } from '../clerk';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import { Client } from './Client';
+import type { Clerk } from './internal';
+import { Client } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
   forceUpdateClient?: boolean;

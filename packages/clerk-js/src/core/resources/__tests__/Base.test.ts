@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { BaseResource } from '@/core/resources/Base';
+import { BaseResource } from '../internal';
 
 class TestResource extends BaseResource {
   constructor() {

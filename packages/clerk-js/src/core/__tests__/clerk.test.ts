@@ -10,7 +10,6 @@ import type {
 import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
-import { BaseResource } from '@/core/resources/Base';
 import { mockJwt } from '@/test/core-fixtures';
 
 import { mockNativeRuntime } from '../../test/utils';
@@ -18,7 +17,7 @@ import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
 import type { DisplayConfig, Organization } from '../resources/internal';
-import { Client, Environment, SignIn, SignUp } from '../resources/internal';
+import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
 const mockClientFetch = vi.fn();
 const mockEnvironmentFetch = vi.fn(() => Promise.resolve({}));

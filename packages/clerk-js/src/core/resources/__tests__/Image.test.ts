@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { BaseResource } from '@/core/resources/Base';
-
 import { Image } from '../Image';
+import { BaseResource } from '../internal';
 
 describe('Image', () => {
   it('.create returns the newly created image', async () => {
