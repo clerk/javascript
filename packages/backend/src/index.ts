@@ -145,6 +145,7 @@ export type {
   Token,
   User,
   TestingToken,
+  WaitlistEntry,
   BillingPlan,
   BillingSubscription,
   BillingSubscriptionItem,
