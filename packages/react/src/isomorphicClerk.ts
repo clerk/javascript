@@ -628,6 +628,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openWaitlist(this.preOpenWaitlist);
     }
 
+    if (this.preopenEnableOrganizationsPrompt) {
+      clerkjs.__internal_openEnableOrganizationsPrompt(this.preopenEnableOrganizationsPrompt);
+    }
+
     this.premountSignInNodes.forEach((props, node) => {
       clerkjs.mountSignIn(node, props);
     });
