@@ -30,7 +30,7 @@ export function useAttemptToEnableOrganizations(caller: 'useOrganization' | 'use
 
   useEffect(() => {
     // Guard to not run this effect twice on Clerk resource update
-    if (hasAttempted.current || !clerk.loaded) {
+    if (hasAttempted.current) {
       return;
     }
 
