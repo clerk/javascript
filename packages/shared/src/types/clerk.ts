@@ -922,6 +922,14 @@ export interface Clerk {
   __internal_setActiveInProgress: boolean;
 
   /**
+   * Retrieves the session token from the browser cookie.
+   * This is useful as a fallback when the in-memory lastActiveToken is not available.
+   *
+   * @internal
+   */
+  __internal_getSessionCookie?: () => string | undefined;
+
+  /**
    * API Keys Object
    *
    * @experimental

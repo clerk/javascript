@@ -2386,6 +2386,10 @@ export class Clerk implements ClerkInterface {
     }
   };
 
+  __internal_getSessionCookie = (): string | undefined => {
+    return this.#authService?.getSessionCookie();
+  };
+
   get __internal_last_error(): ClerkAPIError | null {
     const value = this.internal_last_error;
     this.internal_last_error = null;
