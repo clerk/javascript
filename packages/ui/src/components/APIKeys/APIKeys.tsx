@@ -1,9 +1,8 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { isOrganizationId } from '@clerk/shared/internal/clerk-js/organization';
 import { __experimental_useAPIKeys as useAPIKeys, useClerk, useOrganization, useUser } from '@clerk/shared/react';
-import type { CreateAPIKeyParams } from '@clerk/shared/types';
+import type { APIKeyResource } from '@clerk/shared/types';
 import { lazy, useState } from 'react';
-import useSWRMutation from 'swr/mutation';
 
 import { useProtect } from '@/ui/common';
 import { useAPIKeysContext, withCoreUserGuard } from '@/ui/contexts';
@@ -69,6 +68,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     fetchPage,
     pageCount,
     count: itemCount,
+    revalidate: invalidateAll,
   } = useAPIKeys({
     subject,
     pageSize: perPage ?? API_KEYS_PAGE_SIZE,
@@ -77,12 +77,11 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     enabled: isOrg ? canReadAPIKeys : true,
   });
 
-  const { invalidateAll } = useAPIKeysPagination({
+  useAPIKeysPagination({
     query,
     page,
     pageCount,
     isFetching,
-    subject,
     fetchPage,
   });
 
@@ -94,11 +93,9 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
   };
   const card = useCardState();
   const clerk = useClerk();
-  const {
-    data: createdAPIKey,
-    trigger: createAPIKey,
-    isMutating,
-  } = useSWRMutation('api-keys-create', (_key, { arg }: { arg: CreateAPIKeyParams }) => clerk.apiKeys.create(arg));
+
+  const [apiKey, setAPIKey] = useState<APIKeyResource | null>(null);
+
   const { t } = useLocalizations();
   const [isRevokeModalOpen, setIsRevokeModalOpen] = useState(false);
   const [selectedAPIKeyID, setSelectedAPIKeyID] = useState('');
@@ -107,19 +104,23 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
 
   const handleCreateAPIKey = async (params: OnCreateParams) => {
     try {
-      await createAPIKey({
+      card.setLoading();
+      const apiKey = await clerk.apiKeys.create({
         ...params,
         subject,
       });
       invalidateAll();
       card.setError(undefined);
       setIsCopyModalOpen(true);
+      setAPIKey(apiKey);
     } catch (err: any) {
       if (isClerkAPIResponseError(err)) {
         if (err.status === 409) {
           card.setError('API Key name already exists');
         }
       }
+    } finally {
+      card.setIdle();
     }
   };
 
@@ -181,10 +182,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
         <Action.Open value='add-api-key'>
           <Flex sx={t => ({ paddingTop: t.space.$6, paddingBottom: t.space.$6 })}>
             <Action.Card sx={{ width: '100%' }}>
-              <CreateAPIKeyForm
-                onCreate={handleCreateAPIKey}
-                isSubmitting={isMutating}
-              />
+              <CreateAPIKeyForm onCreate={handleCreateAPIKey} />
             </Action.Card>
           </Flex>
         </Action.Open>
@@ -193,8 +191,8 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
           isOpen={isCopyModalOpen}
           onOpen={() => setIsCopyModalOpen(true)}
           onClose={() => setIsCopyModalOpen(false)}
-          apiKeyName={createdAPIKey?.name ?? ''}
-          apiKeySecret={createdAPIKey?.secret ?? ''}
+          apiKeyName={apiKey?.name || ''}
+          apiKeySecret={apiKey?.secret || ''}
           modalRoot={revokeModalRoot}
         />
       </Action.Root>

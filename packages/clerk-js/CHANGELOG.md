@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.109.2
+
+### Patch Changes
+
+- Make subscription actions more visible with inline buttons ([#7255](https://github.com/clerk/javascript/pull/7255)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Added debug query param to token requests initiated with `skipCache` option. ([#7155](https://github.com/clerk/javascript/pull/7155)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/localizations@3.28.3
+
 ## 5.109.1
 
 ### Patch Changes
