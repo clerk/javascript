@@ -8,9 +8,8 @@ import type {
   SetActiveNavigate,
 } from '../../types';
 import type { __experimental_CheckoutProvider } from '../contexts';
-import { useCheckoutContext } from '../contexts';
+import { useCheckoutContext, useOrganizationContext } from '../contexts';
 import { useClerk } from './useClerk';
-import { useOrganization } from './useOrganization';
 import { useUser } from './useUser';
 
 /**
@@ -123,7 +122,7 @@ export const useCheckout = (options?: UseCheckoutParams): __experimental_UseChec
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
   const clerk = useClerk();
-  const { organization } = useOrganization();
+  const { organization } = useOrganizationContext();
   const { isLoaded, user } = useUser();
 
   if (!isLoaded) {

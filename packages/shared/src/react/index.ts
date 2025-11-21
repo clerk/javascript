@@ -19,4 +19,4 @@ export {
   __experimental_CheckoutProvider,
 } from './contexts';
 
-export * from './commerce';
+export * from './billing/payment-element';

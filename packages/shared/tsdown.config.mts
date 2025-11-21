@@ -64,9 +64,11 @@ const HookAliasPlugin = () => {
     const chosenRQ = rqHooks.has(name) || useRQ;
     const impl = chosenRQ ? `${name}.rq.tsx` : `${name}.swr.tsx`;
 
-    const candidates = name.toLowerCase().includes('provider')
-      ? [path.join(baseDir, 'src', 'react', 'providers', impl), path.join(baseDir, 'src', 'react', 'hooks', impl)]
-      : [path.join(baseDir, 'src', 'react', 'hooks', impl), path.join(baseDir, 'src', 'react', 'providers', impl)];
+    const candidates = [
+      path.join(baseDir, 'src', 'react', 'hooks', impl),
+      path.join(baseDir, 'src', 'react', 'billing', impl),
+      path.join(baseDir, 'src', 'react', 'providers', impl),
+    ];
 
     for (const candidate of candidates) {
       if (fs.existsSync(candidate)) {
