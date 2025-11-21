@@ -9,7 +9,7 @@ import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';
 import { ClerkComponents } from './components';
 
-const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
+const ClerkContextProvider = lazy(() => import('../contexts').then(m => ({ default: m.ClerkContextProvider })));
 const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
 const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
@@ -40,11 +40,11 @@ export const LazyProviders = (props: LazyProvidersProps) => {
       nonce={props.options.nonce}
       cssLayerName={props.options.appearance?.cssLayerName}
     >
-      <CoreClerkContextWrapper clerk={props.clerk}>
+      <ClerkContextProvider clerk={props.clerk}>
         <EnvironmentProvider value={props.environment}>
           <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
         </EnvironmentProvider>
-      </CoreClerkContextWrapper>
+      </ClerkContextProvider>
     </StyleCacheProvider>
   );
 };

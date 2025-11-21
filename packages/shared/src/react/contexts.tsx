@@ -6,22 +6,47 @@ import React from 'react';
 import type {
   BillingSubscriptionPlanPeriod,
   ClerkOptions,
-  ClientResource,
   ForPayerType,
+  InitialState,
   LoadedClerk,
   OrganizationResource,
-  SignedInSessionResource,
-  UserResource,
 } from '../types';
+import { useOrganizationBase } from './hooks/base/useOrganizationBase';
 import { createContextAndHook } from './hooks/createContextAndHook';
-import { SWRConfigCompat } from './providers/SWRConfigCompat';
 
 const [ClerkInstanceContext, useClerkInstanceContext] = createContextAndHook<LoadedClerk>('ClerkInstanceContext');
-const [UserContext, useUserContext] = createContextAndHook<UserResource | null | undefined>('UserContext');
-const [ClientContext, useClientContext] = createContextAndHook<ClientResource | null | undefined>('ClientContext');
-const [SessionContext, useSessionContext] = createContextAndHook<SignedInSessionResource | null | undefined>(
-  'SessionContext',
-);
+export { useUserBase as useUserContext } from './hooks/base/useUserBase';
+export { useClientBase as useClientContext } from './hooks/base/useClientBase';
+export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
+
+const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
+  InitialState | Promise<InitialState> | undefined
+>('InitialStateContext');
+export { useInitialStateContext };
+export function InitialStateProvider({
+  children,
+  initialState,
+}: {
+  children: React.ReactNode;
+  initialState: InitialState | Promise<InitialState> | undefined;
+}) {
+  const initialStateCtx = React.useMemo(() => ({ value: initialState }), [initialState]);
+  return <InitialStateContext.Provider value={initialStateCtx}>{children}</InitialStateContext.Provider>;
+}
+function useInitialStateContext(): InitialState | undefined {
+  const initialState = _useInitialStateContext();
+
+  if (!initialState) {
+    return undefined;
+  }
+
+  if (initialState && 'then' in initialState) {
+    // TODO: If we want to preserve backwards compatibility, we'd need to throw here instead
+    // @ts-expect-error See above
+    return React.use(initialState);
+  }
+  return initialState;
+}
 
 const OptionsContext = React.createContext<ClerkOptions>({});
 
@@ -62,35 +87,10 @@ function useOptionsContext(): ClerkOptions {
   return context;
 }
 
-type OrganizationContextProps = {
-  organization: OrganizationResource | null | undefined;
-};
-const [OrganizationContextInternal, useOrganizationContext] = createContextAndHook<{
-  organization: OrganizationResource | null | undefined;
-}>('OrganizationContext');
-
-const OrganizationProvider = ({
-  children,
-  organization,
-  swrConfig,
-}: PropsWithChildren<
-  OrganizationContextProps & {
-    // Exporting inferred types  directly from SWR will result in error while building declarations
-    swrConfig?: any;
-  }
->) => {
-  return (
-    <SWRConfigCompat swrConfig={swrConfig}>
-      <OrganizationContextInternal.Provider
-        value={{
-          value: { organization },
-        }}
-      >
-        {children}
-      </OrganizationContextInternal.Provider>
-    </SWRConfigCompat>
-  );
-};
+function useOrganizationContext(): { organization: OrganizationResource | null | undefined } {
+  const organization = useOrganizationBase();
+  return React.useMemo(() => ({ organization }), [organization]);
+}
 
 /**
  * @internal
@@ -119,17 +119,10 @@ Learn more: https://clerk.com/docs/components/clerk-provider`.trim(),
 export {
   __experimental_CheckoutProvider,
   ClerkInstanceContext,
-  ClientContext,
   OptionsContext,
-  OrganizationProvider,
-  SessionContext,
   useAssertWrappedByClerkProvider,
   useCheckoutContext,
   useClerkInstanceContext,
-  useClientContext,
   useOptionsContext,
   useOrganizationContext,
-  UserContext,
-  useSessionContext,
-  useUserContext,
 };

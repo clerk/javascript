@@ -80,6 +80,7 @@ import type {
   InstanceType,
   JoinWaitlistParams,
   ListenerCallback,
+  ListenerOptions,
   NavigateOptions,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -1476,11 +1477,11 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  public addListener = (listener: ListenerCallback): UnsubscribeCallback => {
+  public addListener = (listener: ListenerCallback, options?: ListenerOptions): UnsubscribeCallback => {
     listener = memoizeListenerCallback(listener);
     this.#listeners.push(listener);
     // emit right away
-    if (this.client) {
+    if (this.client && !options?.skipInitialEmit) {
       listener({
         client: this.client,
         session: this.session,
