@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 import { mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
 import { debugLogger } from '@/utils/debug';
 
-import { CLERK_SKIP_CACHE, SUPPORTED_FAPI_VERSION } from '../../constants';
+import { SUPPORTED_FAPI_VERSION } from '../../constants';
 import { createFapiClient } from '../../fapiClient';
 import { BaseResource } from '../internal';
 import { Token } from '../Token';
@@ -113,7 +113,7 @@ describe('Token', () => {
       expect(global.fetch).toHaveBeenCalledTimes(1);
       const [url, options] = (global.fetch as Mock).mock.calls[0];
       expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
-      expect(url.toString()).not.toContain(CLERK_SKIP_CACHE);
+      expect(url.toString()).not.toContain('debug=skip_cache');
       expect(options).toMatchObject({
         body: 'organization_id=org_123',
         credentials: 'include',
@@ -130,7 +130,7 @@ describe('Token', () => {
       await Token.create('/path/to/tokens');
 
       const [url] = (global.fetch as Mock).mock.calls[0];
-      expect(url.toString()).not.toContain(CLERK_SKIP_CACHE);
+      expect(url.toString()).not.toContain('debug=skip_cache');
     });
 
     it('creates token with skipCache=true and includes query parameter', async () => {
@@ -140,7 +140,7 @@ describe('Token', () => {
       await Token.create('/path/to/tokens', {}, true);
 
       const [url] = (global.fetch as Mock).mock.calls[0];
-      expect(url.toString()).toContain(`${CLERK_SKIP_CACHE}=true`);
+      expect(url.toString()).toContain('debug=skip_cache');
     });
 
     it('creates token with skipCache=false explicitly and excludes query parameter', async () => {
@@ -150,7 +150,7 @@ describe('Token', () => {
       await Token.create('/path/to/tokens', {}, false);
 
       const [url] = (global.fetch as Mock).mock.calls[0];
-      expect(url.toString()).not.toContain(CLERK_SKIP_CACHE);
+      expect(url.toString()).not.toContain('debug=skip_cache');
     });
   });
 });
