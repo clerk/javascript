@@ -11,24 +11,28 @@ const isDevelopment = mode => !isProduction(mode);
 
 const variants = {
   clerk: 'clerk',
-  clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
+  clerkBrowserNoRHC: 'clerk.browser.no-rhc',
+  clerkCHIPS: 'clerk.chips.browser',
+  clerkChannelBrowser: 'clerk.channel.browser',
+  clerkExperimentalBrowser: 'clerk.experimental.browser',
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
-  clerkCHIPS: 'clerk.chips.browser',
-  clerkChannelBrowser: 'clerk.channel.browser',
+  clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
 };
 
 const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
-  [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
+  [variants.clerkBrowserNoRHC]: './src/index.browser.ts',
+  [variants.clerkCHIPS]: './src/index.browser.ts',
+  [variants.clerkChannelBrowser]: './src/index.browser.ts',
+  [variants.clerkExperimentalBrowser]: './src/index.browser.ts',
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
-  [variants.clerkCHIPS]: './src/index.browser.ts',
-  [variants.clerkChannelBrowser]: './src/index.browser.ts',
+  [variants.clerkNoRHC]: './src/index.ts',
 };
 
 /**
@@ -52,16 +56,17 @@ const common = ({ mode, variant, disableRHC = false }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
-        __DEV__: isDevelopment(mode),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
-        __PKG_NAME__: JSON.stringify(packageJSON.name),
+        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         /**
          * Build time feature flags.
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
-        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
+        __BUILD_VARIANT_EXPERIMENTAL__: variant === variants.clerkExperimentalBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
+        __DEV__: isDevelopment(mode),
+        __PKG_NAME__: JSON.stringify(packageJSON.name),
+        __PKG_VERSION__: JSON.stringify(packageJSON.version),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -179,6 +184,29 @@ const svgLoader = () => {
   };
 };
 
+/** @type { () => (import('@rspack/core').RuleSetRule) }  */
+const workerLoader = () => {
+  return {
+    test: /\.worker\.ts$/,
+    type: 'asset/source',
+    use: {
+      loader: 'builtin:swc-loader',
+      options: {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+          },
+          minify: {
+            compress: true,
+            mangle: true,
+          },
+        },
+        minify: true,
+      },
+    },
+  };
+};
+
 /** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
 const typescriptLoaderProd = (
   { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
@@ -186,7 +214,7 @@ const typescriptLoaderProd = (
   return [
     {
       test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, /\.worker\.ts$/],
       use: {
         loader: 'builtin:swc-loader',
         options: {
@@ -244,7 +272,7 @@ const typescriptLoaderDev = () => {
   return [
     {
       test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, /\.worker\.ts$/],
       loader: 'builtin:swc-loader',
       options: {
         jsc: {
@@ -277,7 +305,7 @@ const commonForProdChunked = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [workerLoader(), svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -291,7 +319,7 @@ const commonForProdBundled = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [workerLoader(), svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -388,6 +416,13 @@ const prodConfig = ({ mode, env, analysis }) => {
         }
       : {},
     common({ mode, variant: variants.clerkBrowser }),
+    commonForProd(),
+    commonForProdChunked(),
+  );
+
+  const clerkExperimentalBrowser = merge(
+    entryForVariant(variants.clerkExperimentalBrowser),
+    common({ mode, variant: variants.clerkExperimentalBrowser }),
     commonForProd(),
     commonForProdChunked(),
   );
@@ -550,6 +585,7 @@ const prodConfig = ({ mode, env, analysis }) => {
 
   return [
     clerkBrowser,
+    clerkExperimentalBrowser,
     clerkLegacyBrowser,
     clerkHeadless,
     clerkHeadlessBrowser,
@@ -581,7 +617,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), ...typescriptLoaderDev()],
+        rules: [workerLoader(), svgLoader(), ...typescriptLoaderDev()],
       },
       plugins: [
         new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
@@ -645,6 +681,21 @@ const devConfig = ({ mode, env }) => {
       common({ mode, disableRHC: true, variant: variants.clerkBrowserNoRHC }),
       commonForDev(),
     ),
+    [variants.clerkCHIPS]: merge(
+      entryForVariant(variants.clerkCHIPS),
+      common({ mode, variant: variants.clerkCHIPS }),
+      commonForDev(),
+    ),
+    [variants.clerkChannelBrowser]: merge(
+      entryForVariant(variants.clerkChannelBrowser),
+      common({ mode, variant: variants.clerkChannelBrowser }),
+      commonForDev(),
+    ),
+    [variants.clerkExperimentalBrowser]: merge(
+      entryForVariant(variants.clerkExperimentalBrowser),
+      common({ mode, variant: variants.clerkExperimentalBrowser }),
+      commonForDev(),
+    ),
     [variants.clerkHeadless]: merge(
       entryForVariant(variants.clerkHeadless),
       common({ mode, variant: variants.clerkHeadless }),
@@ -656,16 +707,6 @@ const devConfig = ({ mode, env }) => {
       common({ mode, variant: variants.clerkHeadlessBrowser }),
       commonForDev(),
       // externalsForHeadless(),
-    ),
-    [variants.clerkCHIPS]: merge(
-      entryForVariant(variants.clerkCHIPS),
-      common({ mode, variant: variants.clerkCHIPS }),
-      commonForDev(),
-    ),
-    [variants.clerkChannelBrowser]: merge(
-      entryForVariant(variants.clerkChannelBrowser),
-      common({ mode, variant: variants.clerkChannelBrowser }),
-      commonForDev(),
     ),
   };
 
