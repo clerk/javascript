@@ -1,8 +1,8 @@
 import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 
 import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
-import type { Clerk } from './resources/internal';
-import { Client } from './resources/internal';
+import type { Clerk } from './clerk';
+import { Client } from './resources/Client';
 
 export class FraudProtection {
   private static instance: FraudProtection;

@@ -1,7 +1,8 @@
 import type { UserJSON } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BaseResource } from '../internal';
+import { BaseResource } from '@/core/resources/Base';
+
 import { User } from '../User';
 
 describe('User', () => {

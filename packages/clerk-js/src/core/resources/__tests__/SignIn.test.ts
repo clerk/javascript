@@ -1,7 +1,7 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { BaseResource } from '../internal';
-import { SignIn } from '../SignIn';
+import { BaseResource } from '@/core/resources/Base';
+import { SignIn } from '@/core/resources/SignIn';
 
 // Mock the authenticateWithPopup module
 vi.mock('../../../utils/authenticateWithPopup', async () => {
