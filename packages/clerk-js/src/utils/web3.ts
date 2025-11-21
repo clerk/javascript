@@ -1,9 +1,11 @@
-import type { InjectedWeb3ProviderChain, Wallet, Web3Provider } from '@clerk/shared/types';
+import type { Web3Provider } from '@clerk/shared/types';
+import type { Wallet } from '@wallet-standard/core';
 
 import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
+import { getInjectedWeb3SolanaProviders } from '@/utils/injectedWeb3SolanaProviders';
 
 import { toHex } from './hex';
-import { getInjectedWeb3Providers } from './injectedWeb3Providers';
+import { getInjectedWeb3EthProviders } from './injectedWeb3EthProviders';
 
 // type InjectedWeb3Wallet = MetamaskWeb3Provider | OKXWalletWeb3Provider;
 // const web3WalletProviderMap: Record<InjectedWeb3Wallet, string> = {
@@ -11,20 +13,14 @@ import { getInjectedWeb3Providers } from './injectedWeb3Providers';
 //   okx_wallet: 'OKX Wallet',
 // } as const;
 
-type GetWeb3IdentifierParams = GetWeb3EthIdentifierParams | GetWeb3SolanaIdentifierParams;
-
-type GetWeb3EthIdentifierParams = {
-  provider: Exclude<Web3Provider, 'solana'>;
-  chain?: Exclude<InjectedWeb3ProviderChain, 'solana'>;
-};
-
-type GetWeb3SolanaIdentifierParams = {
-  provider: string;
-  chain: 'solana';
+type GetWeb3IdentifierParams = {
+  provider: Web3Provider;
+  walletName?: string;
 };
 
 export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promise<string> {
-  const walletProvider = await getWeb3WalletProvider(params.provider, params?.chain);
+  const { provider, walletName } = params;
+  const walletProvider = await getWeb3WalletProvider(provider, walletName);
 
   // TODO - core-3: Improve error handling for the case when the provider is not found
   if (!walletProvider) {
@@ -33,29 +29,26 @@ export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promis
     return '';
   }
 
-  if (params.chain === 'solana') {
+  if (params.provider === 'solana') {
     // Solana provider
-    const address = (walletProvider as Wallet).accounts[0]?.address;
-    if (address) {
-      return address;
-    }
-    return '';
+    const identifiers = (walletProvider as Wallet).accounts;
+    return (identifiers && identifiers[0].address) || '';
   }
 
-  const identifiers = walletProvider.accounts;
+  const identifiers = await walletProvider.request({ method: 'eth_requestAccounts' });
   // @ts-ignore -- Provider SDKs may return unknown shape; use first address if present
   return (identifiers && identifiers[0]) || '';
 }
 
 type GenerateWeb3SignatureParams = GenerateSignatureParams & {
-  provider: string;
-  chain?: InjectedWeb3ProviderChain;
+  provider: Web3Provider;
+  walletName?: string;
 };
 
 export async function generateWeb3Signature(params: GenerateWeb3SignatureParams): Promise<string> {
   const { identifier, nonce, provider } = params;
 
-  const wallet = await getWeb3WalletProvider(provider, params?.chain);
+  const wallet = await getWeb3WalletProvider(provider, params?.walletName);
 
   // TODO - core-3: Improve error handling for the case when the provider is not found
   if (!wallet) {
@@ -63,7 +56,7 @@ export async function generateWeb3Signature(params: GenerateWeb3SignatureParams)
     // the flow will fail as it has been the expected behavior so far.
     return '';
   }
-  if (params.chain === 'solana' && 'features' in wallet && wallet.features) {
+  if (provider === 'solana' && 'features' in wallet && wallet.features) {
     if (!(wallet as Wallet).accounts.find(a => a.address === identifier)) {
       throw new Error(`The connected wallet does not have the specified identifier.`);
     }
@@ -99,8 +92,8 @@ export async function getBaseIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'base' });
 }
 
-export async function getSolanaIdentifier(walletName: string): Promise<string> {
-  return await getWeb3Identifier({ provider: walletName, chain: 'solana' });
+export async function getSolanaIdentifier({ walletName }: { walletName?: string }): Promise<string> {
+  return await getWeb3Identifier({ provider: 'solana', walletName });
 }
 
 type GenerateSignatureParams = {
@@ -109,11 +102,11 @@ type GenerateSignatureParams = {
 };
 
 type GenerateSolanaSignatureParams = GenerateSignatureParams & {
-  walletName: string;
+  walletName?: string;
 };
 
 export async function generateSignatureWithMetamask(params: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ ...params, provider: 'MetaMask' });
+  return await generateWeb3Signature({ ...params, provider: 'metamask' });
 }
 
 export async function generateSignatureWithCoinbaseWallet(params: GenerateSignatureParams): Promise<string> {
@@ -121,7 +114,7 @@ export async function generateSignatureWithCoinbaseWallet(params: GenerateSignat
 }
 
 export async function generateSignatureWithOKXWallet(params: GenerateSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ ...params, provider: 'OKX Wallet' });
+  return await generateWeb3Signature({ ...params, provider: 'okx_wallet' });
 }
 
 export async function generateSignatureWithBase(params: GenerateSignatureParams): Promise<string> {
@@ -129,10 +122,10 @@ export async function generateSignatureWithBase(params: GenerateSignatureParams)
 }
 
 export async function generateSignatureWithSolana(params: GenerateSolanaSignatureParams): Promise<string> {
-  return await generateWeb3Signature({ ...params, chain: 'solana', provider: params.walletName });
+  return await generateWeb3Signature({ ...params, provider: 'solana', walletName: params.walletName });
 }
 
-async function getWeb3WalletProvider(provider: string, chain?: InjectedWeb3ProviderChain) {
+async function getWeb3WalletProvider(provider: Web3Provider, walletName?: string) {
   if (provider === 'coinbase_wallet') {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
@@ -169,5 +162,12 @@ async function getWeb3WalletProvider(provider: string, chain?: InjectedWeb3Provi
     }
   }
 
-  return getInjectedWeb3Providers().get(provider, chain);
+  if (provider === 'solana') {
+    if (!walletName) {
+      return null;
+    }
+    return getInjectedWeb3SolanaProviders().get(walletName);
+  }
+
+  return getInjectedWeb3EthProviders().get(provider);
 }

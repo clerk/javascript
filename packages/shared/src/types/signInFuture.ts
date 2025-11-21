@@ -4,7 +4,7 @@ import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
-import type { InjectedWeb3ProviderChain } from './web3';
+import type { Web3Provider } from './web3';
 
 export interface SignInFutureCreateParams {
   /**
@@ -248,11 +248,11 @@ export interface SignInFutureWeb3Params {
   /**
    * The Web3 wallet provider to use for the sign-in.
    */
-  provider: string;
+  provider: Web3Provider;
   /**
-   * The blockchain network chain to use for the sign-in.
+   * The name of the wallet to use for Solana sign-ins. Required when `provider` is set to `'solana'`.
    */
-  chain?: InjectedWeb3ProviderChain;
+  walletName?: string;
 }
 
 export interface SignInFuturePasskeyParams {

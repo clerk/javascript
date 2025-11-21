@@ -7,6 +7,7 @@ import type {
   AuthenticateWithPasskeyParams,
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
+  AuthenticateWithSolanaParams,
   AuthenticateWithWeb3Params,
   ClientTrustState,
   CreateEmailLinkFlowReturn,
@@ -382,11 +383,15 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithWeb3 = async (params: AuthenticateWithWeb3Params): Promise<SignInResource> => {
-    const { identifier, generateSignature, strategy = 'web3_metamask_signature' } = params || {};
+    const { identifier, generateSignature, strategy = 'web3_metamask_signature', walletName } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     if (!(typeof generateSignature === 'function')) {
       clerkMissingOptionError('generateSignature');
+    }
+
+    if (provider === 'solana' && !walletName) {
+      clerkMissingOptionError('walletName');
     }
 
     await this.create({ identifier });
@@ -406,7 +411,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider, walletName: provider });
+      signature = await generateSignature({ identifier, nonce: message, provider, walletName });
     } catch (err) {
       // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
       // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -415,7 +420,7 @@ export class SignIn extends BaseResource implements SignInResource {
       // error code 4001 means the user rejected the request
       // Reference: https://docs.cdp.coinbase.com/wallet-sdk/docs/errors
       if (provider === 'coinbase_wallet' && err.code === 4001) {
-        signature = await generateSignature({ identifier, nonce: message, provider, walletName: provider });
+        signature = await generateSignature({ identifier, nonce: message, provider, walletName });
       } else {
         throw err;
       }
@@ -463,8 +468,8 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithSolana = async (walletName: string): Promise<SignInResource> => {
-    const identifier = await getSolanaIdentifier(walletName);
+  public authenticateWithSolana = async ({ walletName }: AuthenticateWithSolanaParams): Promise<SignInResource> => {
+    const identifier = await getSolanaIdentifier({ walletName });
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithSolana,
@@ -1003,7 +1008,12 @@ class SignInFuture implements SignInFutureResource {
           generateSignature = generateSignatureWithOKXWallet;
           break;
         case 'solana':
-          identifier = await getSolanaIdentifier(params.provider);
+          if (!params.walletName) {
+            throw new ClerkRuntimeError('walletName is required for solana web3 authentication', {
+              code: 'missing_wallet_name',
+            });
+          }
+          identifier = await getSolanaIdentifier({ walletName: params.walletName });
           generateSignature = generateSignatureWithSolana;
           break;
         default:
@@ -1034,7 +1044,7 @@ class SignInFuture implements SignInFutureResource {
         signature = await generateSignature({
           identifier,
           nonce: message,
-          walletName: params.provider,
+          walletName: params.walletName,
         });
       } catch (err) {
         // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
@@ -1047,7 +1057,7 @@ class SignInFuture implements SignInFutureResource {
           signature = await generateSignature({
             identifier,
             nonce: message,
-            walletName: provider,
+            walletName: params.walletName,
           });
         } else {
           throw err;
