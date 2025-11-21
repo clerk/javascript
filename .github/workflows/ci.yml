@@ -310,7 +310,6 @@ jobs:
             'vue',
             'nuxt',
             'react-router',
-            'machine',
             'custom',
           ]
         test-project: ["chrome"]
@@ -319,6 +318,12 @@ jobs:
             test-project: 'chrome'
             clerk-use-rq: 'false'
           - test-name: 'billing'
+            test-project: 'chrome'
+            clerk-use-rq: 'true'
+          - test-name: 'machine'
+            test-project: 'chrome'
+            clerk-use-rq: 'false'
+          - test-name: 'machine'
             test-project: 'chrome'
             clerk-use-rq: 'true'
           - test-name: 'nextjs'
