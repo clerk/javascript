@@ -305,15 +305,15 @@ describe('OrganizationSwitcher', () => {
     });
 
     it('opens create organization without slug field', async () => {
-      const { wrapper, fixtures, props } = await createFixtures(f => {
+      const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
+        f.withOrganizationSlug(false);
         f.withUser({
           email_addresses: ['test@clerk.com'],
           create_organization_enabled: true,
         });
       });
 
-      props.setProps({ hideSlug: true });
       const { getByRole, queryByLabelText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
       await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
