@@ -18,6 +18,10 @@ catalogs:
     react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
     react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
 
+  # Can be referenced through "catalog:tanstack"
+  tanstack:
+    '@tanstack/query-core': 5.87.4
+
   # Can be referenced through "catalog:repo"
   repo:
     tslib: 2.8.1

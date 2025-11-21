@@ -70,7 +70,7 @@
     "@formkit/auto-animate": "^0.8.2",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.17",
-    "@tanstack/query-core": "5.87.4",
+    "@tanstack/query-core": "catalog:tanstack",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
     "alien-signals": "2.0.6",
