@@ -137,7 +137,7 @@ describe('Token', () => {
       mockFetch(true, 200, { jwt: mockJwt });
       BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-      await Token.create('/path/to/tokens', {}, true);
+      await Token.create('/path/to/tokens', {}, { debug: 'skip_cache' });
 
       const [url] = (global.fetch as Mock).mock.calls[0];
       expect(url.toString()).toContain('debug=skip_cache');
@@ -147,7 +147,7 @@ describe('Token', () => {
       mockFetch(true, 200, { jwt: mockJwt });
       BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
 
-      await Token.create('/path/to/tokens', {}, false);
+      await Token.create('/path/to/tokens', {});
 
       const [url] = (global.fetch as Mock).mock.calls[0];
       expect(url.toString()).not.toContain('debug=skip_cache');
