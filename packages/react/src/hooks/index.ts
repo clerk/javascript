@@ -1,6 +1,6 @@
 export { useAuth } from './useAuth';
 export { useEmailLink } from './useEmailLink';
-export { useSignIn, useSignUp } from './useClerkSignal';
+export { useSignIn, useSignUp, useWaitlist } from './useClerkSignal';
 export {
   useClerk,
   useOrganization,
