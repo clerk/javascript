@@ -3,6 +3,12 @@ declare module '*.svg' {
   export default value;
 }
 
+declare module '*.worker.ts' {
+  const value: string;
+  export default value;
+}
+
+declare const __BUILD_VARIANT_EXPERIMENTAL__: boolean;
 declare const __PKG_NAME__: string;
 declare const __PKG_VERSION__: string;
 declare const __DEV__: boolean;
