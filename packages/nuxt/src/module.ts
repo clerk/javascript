@@ -111,12 +111,11 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { SessionAuthObject } from '@clerk/backend';
-          import type { AuthFn } from '@clerk/nuxt/server';
+        getContents: () => `import type { AuthFn } from '@clerk/nuxt/server';
 
           declare module 'h3' {
             interface H3EventContext {
-              auth: SessionAuthObject & AuthFn;
+              auth: AuthFn;
             }
           }
         `,
