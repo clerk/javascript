@@ -16,7 +16,7 @@ import type {
   Web3Strategy,
 } from '@clerk/shared/types';
 
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 const defaultMaxPasswordLength = 72;
 const defaultMinPasswordLength = 8;

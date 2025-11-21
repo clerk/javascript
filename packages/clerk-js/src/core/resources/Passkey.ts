@@ -20,7 +20,8 @@ import {
   webAuthnCreateCredential as webAuthnCreateCredentialOnWindow,
 } from '../../utils/passkeys';
 import { clerkMissingWebAuthnPublicKeyOptions } from '../errors';
-import { BaseResource, DeletedObject, PasskeyVerification } from './internal';
+import { BaseResource } from './Base';
+import { DeletedObject, PasskeyVerification } from './internal';
 
 export class Passkey extends BaseResource implements PasskeyResource {
   id!: string;

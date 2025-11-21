@@ -99,7 +99,8 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource, UserData, Verification } from './internal';
+import { BaseResource } from './Base';
+import { UserData, Verification } from './internal';
 
 export class SignIn extends BaseResource implements SignInResource {
   pathRoot = '/client/sign_ins';

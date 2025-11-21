@@ -9,7 +9,7 @@ import type {
   PreferredSignInStrategy,
 } from '@clerk/shared/types';
 
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class DisplayConfig extends BaseResource implements DisplayConfigResource {
   afterCreateOrganizationUrl: string = '';

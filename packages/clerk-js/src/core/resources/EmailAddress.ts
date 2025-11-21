@@ -13,7 +13,8 @@ import type {
   VerificationResource,
 } from '@clerk/shared/types';
 
-import { BaseResource, IdentificationLink, Verification } from './internal';
+import { BaseResource } from './Base';
+import { IdentificationLink, Verification } from './internal';
 
 export class EmailAddress extends BaseResource implements EmailAddressResource {
   id!: string;

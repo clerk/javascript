@@ -7,7 +7,8 @@ import type {
 
 import { billingMoneyAmountFromJSON } from '@/utils/billing';
 
-import { BaseResource, Feature } from './internal';
+import { BaseResource } from './Base';
+import { Feature } from './internal';
 
 export class BillingPlan extends BaseResource implements BillingPlanResource {
   id!: string;

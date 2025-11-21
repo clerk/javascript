@@ -9,7 +9,7 @@ import type {
 
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class UserOrganizationInvitation extends BaseResource implements UserOrganizationInvitationResource {
   id!: string;

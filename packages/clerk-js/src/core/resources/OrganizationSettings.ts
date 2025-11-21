@@ -5,7 +5,7 @@ import type {
   OrganizationSettingsResource,
 } from '@clerk/shared/types';
 
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class OrganizationSettings extends BaseResource implements OrganizationSettingsResource {
   actions: { adminDelete: boolean } = { adminDelete: false };

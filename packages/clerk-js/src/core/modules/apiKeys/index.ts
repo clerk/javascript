@@ -10,9 +10,10 @@ import type {
 } from '@clerk/shared/types';
 
 import type { FapiRequestInit } from '@/core/fapiClient';
+import { BaseResource } from '@/core/resources/Base';
 import { convertPageToOffsetSearchParams } from '@/utils/convertPageToOffsetSearchParams';
 
-import { APIKey, BaseResource } from '../../resources/internal';
+import { APIKey } from '../../resources/internal';
 
 export class APIKeys implements APIKeysNamespace {
   /**

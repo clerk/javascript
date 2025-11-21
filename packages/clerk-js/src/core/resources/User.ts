@@ -38,8 +38,8 @@ import { getFullName } from '../../utils/user';
 import { eventBus, events } from '../events';
 import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '../modules/billing';
 import { BackupCode } from './BackupCode';
+import { BaseResource } from './Base';
 import {
-  BaseResource,
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,

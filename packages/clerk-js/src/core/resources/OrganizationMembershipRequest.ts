@@ -5,7 +5,8 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource, PublicUserData } from './internal';
+import { BaseResource } from './Base';
+import { PublicUserData } from './internal';
 
 export class OrganizationMembershipRequest extends BaseResource implements OrganizationMembershipRequestResource {
   id!: string;

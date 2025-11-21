@@ -1,7 +1,7 @@
 import type { JoinWaitlistParams, WaitlistJSON, WaitlistResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class Waitlist extends BaseResource implements WaitlistResource {
   pathRoot = '/waitlist';

@@ -1,7 +1,7 @@
 import type { ApiKeyJSON, APIKeyResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class APIKey extends BaseResource implements APIKeyResource {
   pathRoot = '/api_keys';

@@ -7,8 +7,10 @@ import type {
   InitializePaymentMethodParams,
 } from '@clerk/shared/types';
 
+import { BaseResource } from '@/core/resources/Base';
+
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
-import { BaseResource, BillingInitializedPaymentMethod, BillingPaymentMethod } from '../../resources/internal';
+import { BillingInitializedPaymentMethod, BillingPaymentMethod } from '../../resources/internal';
 import { Billing } from './namespace';
 
 const PAYMENT_METHODS_PATH = '/payment_methods';

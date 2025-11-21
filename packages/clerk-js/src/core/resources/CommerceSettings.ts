@@ -1,6 +1,6 @@
 import type { CommerceSettingsJSON, CommerceSettingsJSONSnapshot, CommerceSettingsResource } from '@clerk/shared/types';
 
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 /**
  * @internal

@@ -1,7 +1,7 @@
 import type { RoleJSON, RoleResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 import { Permission } from './Permission';
 
 export class Role extends BaseResource implements RoleResource {

@@ -1,7 +1,7 @@
 import type { ClerkError } from '@clerk/shared/error';
 
 import { eventBus } from '../core/events';
-import type { BaseResource } from '../core/resources/internal';
+import type { BaseResource } from '../core/resources/Base';
 
 /**
  * Wrap an async task with handling for emitting error and fetch events, which reduces boilerplate. Used in our Custom

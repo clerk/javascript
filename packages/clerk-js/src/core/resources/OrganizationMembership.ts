@@ -12,7 +12,8 @@ import type {
 import { convertPageToOffsetSearchParams } from '../../utils/convertPageToOffsetSearchParams';
 import { unixEpochToDate } from '../../utils/date';
 import { clerkUnsupportedReloadMethod } from '../errors';
-import { BaseResource, Organization, PublicUserData } from './internal';
+import { BaseResource } from './Base';
+import { Organization, PublicUserData } from './internal';
 
 export class OrganizationMembership extends BaseResource implements OrganizationMembershipResource {
   id!: string;

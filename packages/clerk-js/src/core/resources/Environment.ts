@@ -12,7 +12,8 @@ import type {
 
 import { eventBus, events } from '../../core/events';
 import { APIKeySettings } from './APIKeySettings';
-import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
+import { BaseResource } from './Base';
+import { AuthConfig, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
 export class Environment extends BaseResource implements EnvironmentResource {

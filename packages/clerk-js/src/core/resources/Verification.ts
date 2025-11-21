@@ -18,7 +18,7 @@ import type {
 
 import { unixEpochToDate } from '../../utils/date';
 import { convertJSONToPublicKeyCreateOptions } from '../../utils/passkeys';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class Verification extends BaseResource implements VerificationResource {
   pathRoot = '';

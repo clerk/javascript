@@ -10,7 +10,8 @@ import type {
 } from '@clerk/shared/types';
 import { deepSnakeToCamel } from '@clerk/shared/underscore';
 
-import { BaseResource, Session, Verification } from './internal';
+import { BaseResource } from './Base';
+import { Session, Verification } from './internal';
 
 export class SessionVerification extends BaseResource implements SessionVerificationResource {
   status!: SessionVerificationStatus;

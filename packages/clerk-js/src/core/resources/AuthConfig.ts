@@ -1,7 +1,7 @@
 import type { AuthConfigJSON, AuthConfigJSONSnapshot, AuthConfigResource, PhoneCodeChannel } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class AuthConfig extends BaseResource implements AuthConfigResource {
   claimedAt: Date | null = null;

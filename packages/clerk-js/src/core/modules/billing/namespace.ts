@@ -17,9 +17,10 @@ import type {
   GetSubscriptionParams,
 } from '@clerk/shared/types';
 
+import { BaseResource } from '@/core/resources/Base';
+
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
-  BaseResource,
   BillingCheckout,
   BillingPayment,
   BillingPlan,

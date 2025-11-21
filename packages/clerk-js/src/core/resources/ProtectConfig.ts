@@ -5,7 +5,7 @@ import type {
   ProtectLoader,
 } from '@clerk/shared/types';
 
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class ProtectConfig extends BaseResource implements ProtectConfigResource {
   id: string = '';

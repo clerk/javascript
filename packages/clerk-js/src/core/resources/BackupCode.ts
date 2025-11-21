@@ -1,7 +1,7 @@
 import type { BackupCodeJSON, BackupCodeResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class BackupCode extends BaseResource implements BackupCodeResource {
   pathRoot = '/me';

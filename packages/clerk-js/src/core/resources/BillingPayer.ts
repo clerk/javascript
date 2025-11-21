@@ -2,7 +2,7 @@ import type { BillingPayerJSON, BillingPayerResource } from '@clerk/shared/types
 
 import { unixEpochToDate } from '@/utils/date';
 
-import { BaseResource } from './internal';
+import { BaseResource } from './Base';
 
 export class BillingPayer extends BaseResource implements BillingPayerResource {
   id!: string;
