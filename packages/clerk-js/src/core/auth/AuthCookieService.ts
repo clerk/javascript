@@ -20,7 +20,37 @@ import { createSessionCookie } from './cookies/session';
 import { getCookieSuffix } from './cookieSuffix';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
-import { SessionCookiePoller } from './SessionCookiePoller';
+import { SessionRefreshCoordinator } from './SessionRefreshCoordinator';
+
+type CrossTabSyncOverride = 'disabled' | 'enabled';
+
+const CROSS_TAB_SYNC_STORAGE_KEY = 'clerk:crossTabSessionSync';
+
+const readCrossTabSyncOverride = (): CrossTabSyncOverride | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const override = (window as Window & { __clerkCrossTabSync?: CrossTabSyncOverride }).__clerkCrossTabSync;
+  if (override === 'enabled' || override === 'disabled') {
+    return override;
+  }
+
+  try {
+    const storedValue = window.localStorage?.getItem(CROSS_TAB_SYNC_STORAGE_KEY);
+    if (storedValue === 'enabled' || storedValue === 'disabled') {
+      return storedValue;
+    }
+  } catch (error) {
+    debugLogger.warn(
+      'AuthCookieService: Unable to read cross-tab sync preference from storage',
+      { error },
+      'authCookieService',
+    );
+  }
+
+  return null;
+};
 
 // TODO(@dimkl): make AuthCookieService singleton since it handles updating cookies using a poller
 // and we need to avoid updating them concurrently.
@@ -41,11 +71,12 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
  */
 export class AuthCookieService {
-  private poller: SessionCookiePoller | null = null;
-  private clientUat: ClientUatCookieHandler;
-  private sessionCookie: SessionCookieHandler;
   private activeCookie: ReturnType<typeof createCookieHandler>;
+  private clientUat: ClientUatCookieHandler;
+  private crossTabSyncEnabled: boolean | null = null;
   private devBrowser: DevBrowser;
+  private refreshCoordinator: SessionRefreshCoordinator | null = null;
+  private sessionCookie: SessionCookieHandler;
 
   public static async create(
     clerk: Clerk,
@@ -125,16 +156,18 @@ export class AuthCookieService {
   }
 
   public startPollingForToken() {
-    if (!this.poller) {
-      this.poller = new SessionCookiePoller();
-      this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
+    if (!this.refreshCoordinator) {
+      this.refreshCoordinator = new SessionRefreshCoordinator();
+      this.refreshCoordinator.startPollingForSessionToken(() => this.refreshSessionToken(), {
+        enableEventDrivenSync: this.shouldUseCrossTabSessionSync(),
+      });
     }
   }
 
   public stopPollingForToken() {
-    if (this.poller) {
-      this.poller.stopPollingForSessionToken();
-      this.poller = null;
+    if (this.refreshCoordinator) {
+      this.refreshCoordinator.stopPollingForSessionToken();
+      this.refreshCoordinator = null;
     }
   }
 
@@ -166,6 +199,13 @@ export class AuthCookieService {
       if (updateCookieImmediately) {
         this.updateSessionCookie(token);
       }
+
+      if (this.refreshCoordinator?.isEventDriven()) {
+        const expiresAt = this.clerk.session.expireAt?.getTime() || null;
+        if (expiresAt) {
+          this.refreshCoordinator.notifyRefreshComplete(expiresAt);
+        }
+      }
     } catch (e) {
       return this.handleGetTokenError(e);
     }
@@ -182,6 +222,13 @@ export class AuthCookieService {
     }
 
     this.setActiveContextInStorage();
+
+    if (this.refreshCoordinator?.isEventDriven()) {
+      const sessionId = this.clerk.session?.id || null;
+      const organizationId = this.clerk.organization?.id || null;
+      const expiresAt = this.clerk.session?.expireAt?.getTime() || null;
+      this.refreshCoordinator.updateSession({ expiresAt, organizationId, sessionId });
+    }
 
     return token ? this.sessionCookie.set(token) : this.sessionCookie.remove();
   }
@@ -222,6 +269,37 @@ export class AuthCookieService {
     this.activeCookie.remove();
     this.sessionCookie.remove();
     this.setClientUatCookieForDevelopmentInstances();
+
+    if (this.refreshCoordinator?.isEventDriven()) {
+      this.refreshCoordinator.clearSession();
+    }
+  }
+
+  private determineCrossTabSessionSyncPreference(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    const override = readCrossTabSyncOverride();
+    if (override === 'enabled') {
+      debugLogger.info('AuthCookieService: Cross-tab sync enabled via override', {}, 'authCookieService');
+      return true;
+    }
+
+    if (override === 'disabled') {
+      debugLogger.info('AuthCookieService: Cross-tab sync disabled via override', {}, 'authCookieService');
+      return false;
+    }
+
+    return __BUILD_EXPERIMENTAL_CROSS_TAB_SYNC__;
+  }
+
+  private shouldUseCrossTabSessionSync(): boolean {
+    if (this.crossTabSyncEnabled === null) {
+      this.crossTabSyncEnabled = this.determineCrossTabSessionSyncPreference();
+    }
+
+    return this.crossTabSyncEnabled;
   }
 
   /**

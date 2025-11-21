@@ -52,16 +52,17 @@ const common = ({ mode, variant, disableRHC = false }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
-        __DEV__: isDevelopment(mode),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
-        __PKG_NAME__: JSON.stringify(packageJSON.name),
+        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
+        __BUILD_EXPERIMENTAL_CROSS_TAB_SYNC__: isDevelopment(mode),
         /**
          * Build time feature flags.
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
-        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
+        __DEV__: isDevelopment(mode),
+        __PKG_NAME__: JSON.stringify(packageJSON.name),
+        __PKG_VERSION__: JSON.stringify(packageJSON.version),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,
@@ -179,6 +180,29 @@ const svgLoader = () => {
   };
 };
 
+/** @type { () => (import('@rspack/core').RuleSetRule) }  */
+const workerLoader = () => {
+  return {
+    test: /\.worker\.ts$/,
+    type: 'asset/source',
+    use: {
+      loader: 'builtin:swc-loader',
+      options: {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+          },
+          minify: {
+            compress: true,
+            mangle: true,
+          },
+        },
+        minify: true,
+      },
+    },
+  };
+};
+
 /** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
 const typescriptLoaderProd = (
   { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
@@ -186,7 +210,7 @@ const typescriptLoaderProd = (
   return [
     {
       test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, /\.worker\.ts$/],
       use: {
         loader: 'builtin:swc-loader',
         options: {
@@ -244,7 +268,7 @@ const typescriptLoaderDev = () => {
   return [
     {
       test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, /\.worker\.ts$/],
       loader: 'builtin:swc-loader',
       options: {
         jsc: {
@@ -277,7 +301,7 @@ const commonForProdChunked = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [workerLoader(), svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -291,7 +315,7 @@ const commonForProdBundled = (
 ) => {
   return {
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
+      rules: [workerLoader(), svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
   };
 };
@@ -581,7 +605,7 @@ const devConfig = ({ mode, env }) => {
   const commonForDev = () => {
     return {
       module: {
-        rules: [svgLoader(), ...typescriptLoaderDev()],
+        rules: [workerLoader(), svgLoader(), ...typescriptLoaderDev()],
       },
       plugins: [
         new ReactRefreshPlugin(/** @type {any} **/ ({ overlay: { sockHost: devUrl.host } })),
