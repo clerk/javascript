@@ -3,12 +3,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
 
+import { OrganizationList } from '../';
 import { createFakeOrganization } from '../../CreateOrganization/__tests__/CreateOrganization.test';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
 } from '../../OrganizationSwitcher/__tests__/test-utils';
-import { OrganizationList } from '../';
 
 const { createFixtures } = bindCreateFixtures('OrganizationList');
 
@@ -275,6 +275,46 @@ describe('OrganizationList', () => {
       await waitFor(async () => {
         expect(await findByText(/Invite new members/i)).toBeInTheDocument();
       });
+    });
+
+    it("does not display slug field if it's disabled on environment", async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(false);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+        });
+      });
+
+      const { findByRole, getByRole, userEvent, queryByLabelText } = render(<OrganizationList />, { wrapper });
+
+      await waitFor(async () =>
+        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+      );
+      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      expect(queryByLabelText(/Name/i)).toBeInTheDocument();
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+    });
+
+    it("display slug field if it's enabled on environment", async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(true);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          create_organization_enabled: true,
+        });
+      });
+
+      const { findByRole, getByRole, userEvent, queryByLabelText } = render(<OrganizationList />, { wrapper });
+
+      await waitFor(async () =>
+        expect(await findByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument(),
+      );
+      await userEvent.click(getByRole('menuitem', { name: 'Create organization' }));
+      expect(queryByLabelText(/Name/i)).toBeInTheDocument();
+      expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
     });
 
     it('does not display CreateOrganization within OrganizationList when disabled', async () => {

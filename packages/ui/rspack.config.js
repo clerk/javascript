@@ -1,10 +1,14 @@
 // @ts-check
-const rspack = require('@rspack/core');
-const packageJSON = require('./package.json');
-const path = require('path');
-const { merge } = require('webpack-merge');
-const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
-const { svgLoader, typescriptLoaderProd, typescriptLoaderDev } = require('../../scripts/rspack-common');
+import rspack from '@rspack/core';
+import packageJSON from './package.json' with { type: 'json' };
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { merge } from 'webpack-merge';
+import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -228,23 +232,6 @@ const prodConfig = mode => {
     },
   });
 
-  // CJS module bundle (no chunks)
-  const uiCjs = merge(entryForVariant(variants.ui), common({ mode, variant: variants.ui }), commonForProdBundled(), {
-    output: {
-      filename: '[name].js',
-      libraryTarget: 'commonjs',
-    },
-    plugins: [
-      // Bundle everything into a single file for CJS
-      new rspack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
-    ],
-    optimization: {
-      splitChunks: false,
-    },
-  });
-
   // Entry ESM module bundle (no chunks)
   const entryEsm = merge(
     entryForVariant(variants.entry),
@@ -270,29 +257,7 @@ const prodConfig = mode => {
     },
   );
 
-  // Entry CJS module bundle (no chunks)
-  const entryCjs = merge(
-    entryForVariant(variants.entry),
-    common({ mode, variant: variants.entry }),
-    commonForProdBundled(),
-    {
-      output: {
-        filename: '[name].js',
-        libraryTarget: 'commonjs',
-      },
-      plugins: [
-        // Bundle everything into a single file for CJS
-        new rspack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
-      optimization: {
-        splitChunks: false,
-      },
-    },
-  );
-
-  return [uiBrowser, uiEsm, uiCjs, entryEsm, entryCjs];
+  return [uiBrowser, uiEsm, entryEsm];
 };
 
 /**
@@ -338,7 +303,7 @@ const devConfig = (mode, env) => {
   });
 };
 
-module.exports = env => {
+export default env => {
   const mode = env.production ? 'production' : 'development';
   return isProduction(mode) ? prodConfig(mode) : devConfig(mode, env);
 };

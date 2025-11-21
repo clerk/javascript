@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useSWR, useSWRInfinite } from '../clerk-swr';
 import type { CacheSetter, ValueOrSetter } from '../types';
+import { toSWRQuery } from './createCacheKeys';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
@@ -49,9 +50,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
   const isSignedIn = config.isSignedIn;
 
   const pagesCacheKey = {
-    type: keys.queryKey[0],
-    ...keys.queryKey[2],
-    ...keys.queryKey[3].args,
+    ...toSWRQuery(keys),
     initialPage: paginatedPage,
     pageSize: pageSizeRef.current,
   };
@@ -136,9 +135,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
       }
 
       return {
-        type: keys.queryKey[0],
-        ...keys.queryKey[2],
-        ...keys.queryKey[3].args,
+        ...toSWRQuery(keys),
         initialPage: initialPageRef.current + pageIndex,
         pageSize: pageSizeRef.current,
       };

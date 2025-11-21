@@ -1,6 +1,5 @@
 import { astro } from './astro';
 import { customFlows } from './custom-flows';
-import { elements } from './elements';
 import { envs, instanceKeys } from './envs';
 import { expo } from './expo';
 import { express } from './express';
@@ -19,7 +18,6 @@ export const appConfigs = {
   longRunningApps: createLongRunningApps(),
   next,
   react,
-  elements,
   expo,
   astro,
   tanstack,

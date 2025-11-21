@@ -337,19 +337,6 @@
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:elements": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/ui#build",
-        "@clerk/backend#build",
-        "@clerk/nextjs#build",
-        "@clerk/elements#build"
-      ],
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
-      "inputs": ["integration/**"],
-      "outputLogs": "new-only"
-    },
     "//#test:integration:expo-web": {
       "dependsOn": [
         "@clerk/testing#build",

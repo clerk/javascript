@@ -1,6 +1,5 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { __internal_usePaymentAttemptQuery } from '@clerk/shared/react/index';
 import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
-import useSWR from 'swr';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -29,29 +28,19 @@ import { useRouter } from '../../router';
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
     data: paymentAttempt,
     isLoading,
     error,
-  } = useSWR(
-    params.paymentAttemptId
-      ? {
-          type: 'payment-attempt',
-          id: params.paymentAttemptId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getPaymentAttempt({
-        id: params.paymentAttemptId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
-      }),
-  );
+  } = __internal_usePaymentAttemptQuery({
+    paymentAttemptId: params.paymentAttemptId,
+    for: requesterType,
+    enabled: Boolean(params.paymentAttemptId),
+  });
 
   const subscriptionItem = paymentAttempt?.subscriptionItem;
 

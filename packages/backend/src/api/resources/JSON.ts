@@ -50,7 +50,6 @@ export const ObjectType = {
   PhoneNumber: 'phone_number',
   ProxyCheck: 'proxy_check',
   RedirectUrl: 'redirect_url',
-  SamlAccount: 'saml_account',
   SamlConnection: 'saml_connection',
   Session: 'session',
   SignInAttempt: 'sign_in_attempt',
@@ -235,21 +234,6 @@ export interface JwtTemplateJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
 }
-
-export interface SamlAccountJSON extends ClerkResourceJSON {
-  object: typeof ObjectType.SamlAccount;
-  provider: string;
-  provider_user_id: string | null;
-  active: boolean;
-  email_address: string;
-  first_name: string;
-  last_name: string;
-  verification: VerificationJSON | null;
-  saml_connection: SamlAccountConnectionJSON | null;
-  last_authenticated_at: number | null;
-  enterprise_connection_id: string | null;
-}
-
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
   type: string;
 }
@@ -601,7 +585,6 @@ export interface UserJSON extends ClerkResourceJSON {
   web3_wallets: Web3WalletJSON[];
   organization_memberships: OrganizationMembershipJSON[] | null;
   external_accounts: ExternalAccountJSON[];
-  saml_accounts: SamlAccountJSON[];
   password_last_updated_at: number | null;
   public_metadata: UserPublicMetadata;
   private_metadata: UserPrivateMetadata;
@@ -730,20 +713,6 @@ export interface PermissionJSON extends ClerkResourceJSON {
   key: string;
   name: string;
   description: string;
-  created_at: number;
-  updated_at: number;
-}
-
-export interface SamlAccountConnectionJSON extends ClerkResourceJSON {
-  id: string;
-  name: string;
-  domain: string;
-  active: boolean;
-  provider: string;
-  sync_user_attributes: boolean;
-  allow_subdomains: boolean;
-  allow_idp_initiated: boolean;
-  disable_additional_identifications: boolean;
   created_at: number;
   updated_at: number;
 }
