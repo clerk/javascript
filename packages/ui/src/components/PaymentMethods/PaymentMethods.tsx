@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 import { Fragment, useMemo, useRef } from 'react';
 
@@ -60,11 +60,12 @@ const RemoveScreen = ({
   const { close } = useActionContext();
   const card = useCardState();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
     `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
   );
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   if (!ref.current) {
     return null;
@@ -72,7 +73,7 @@ const RemoveScreen = ({
 
   const removePaymentMethod = async () => {
     await paymentMethod
-      .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+      .remove({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
       .then(revalidate)
       .catch((error: any) => {
         handleError(error, [], card.setError);
@@ -196,9 +197,10 @@ const PaymentMethodMenu = ({
 }) => {
   const { open } = useActionContext();
   const card = useCardState();
-  const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const actions = [
     {
@@ -215,7 +217,7 @@ const PaymentMethodMenu = ({
       isDestructive: false,
       onClick: () => {
         paymentMethod
-          .makeDefault({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+          .makeDefault({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
           .then(revalidate)
           .catch((error: Error) => {
             handleError(error, [], card.setError);
