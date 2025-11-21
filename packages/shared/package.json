@@ -163,7 +163,7 @@
   "devDependencies": {
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
-    "@tanstack/query-core": "5.87.4",
+    "@tanstack/query-core": "catalog:tanstack",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.1.0",

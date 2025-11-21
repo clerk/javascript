@@ -94,7 +94,7 @@ import type {
 } from '@clerk/shared/types';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
-import type { QueryClient } from '@tanstack/query-core';
+import type { QueryClient, QueryClientConfig } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
 
@@ -198,6 +198,24 @@ const defaultOptions: ClerkOptions = {
   newSubscriptionRedirectUrl: undefined,
 };
 
+const RQ_CLIENT_TAG = 'clerk-rq-client' as const;
+
+type ClerkRQClient = { __tag: typeof RQ_CLIENT_TAG; client: QueryClient };
+
+const clerkQueryClientConfig: QueryClientConfig = {
+  defaultOptions: {
+    queries: {
+      // use the retry logic that fapiClient uses
+      retry: false,
+      // Note: to refetch onWindowFocus, you need to call `queryClient.mount()`
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      // the query will refetch on mount if the data is stale
+      refetchOnMount: true,
+    },
+  },
+};
+
 export class Clerk implements ClerkInterface {
   public static mountComponentRenderer?: MountComponentRenderer;
 
@@ -243,23 +261,12 @@ export class Clerk implements ClerkInterface {
   #touchThrottledUntil = 0;
   #publicEventBus = createClerkEventBus();
 
-  get __internal_queryClient(): { __tag: 'clerk-rq-client'; client: QueryClient } | undefined {
-    if (!this.#queryClient) {
-      void import('./query-core')
-        .then(module => module.QueryClient)
-        .then(QueryClient => {
-          if (this.#queryClient) {
-            return;
-          }
-          this.#queryClient = new QueryClient();
-          // @ts-expect-error - queryClientStatus is not typed
-          this.#publicEventBus.emit('queryClientStatus', 'ready');
-        });
-    }
+  get __internal_queryClient(): ClerkRQClient | undefined {
+    this.#initQueryClient();
 
     return this.#queryClient
       ? {
-          __tag: 'clerk-rq-client',
+          __tag: RQ_CLIENT_TAG,
           client: this.#queryClient,
         }
       : undefined;
@@ -288,6 +295,25 @@ export class Clerk implements ClerkInterface {
   public __internal_isWebAuthnPlatformAuthenticatorSupported: (() => Promise<boolean>) | undefined;
 
   public __internal_setActiveInProgress = false;
+
+  #initQueryClient = (): void => {
+    if (this.#queryClient) {
+      return;
+    }
+
+    void import('./query-core')
+      .then(module => module.QueryClient)
+      .then(QueryClientCtor => {
+        if (this.#queryClient) {
+          return;
+        }
+
+        this.#queryClient = new QueryClientCtor(clerkQueryClientConfig);
+
+        // @ts-expect-error - queryClientStatus is not typed
+        this.#publicEventBus.emit('queryClientStatus', 'ready');
+      });
+  };
 
   get publishableKey(): string {
     return this.#publishableKey;
