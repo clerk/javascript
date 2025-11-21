@@ -68,6 +68,7 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     fetchPage,
     pageCount,
     count: itemCount,
+    revalidate: invalidateAll,
   } = useAPIKeys({
     subject,
     pageSize: perPage ?? API_KEYS_PAGE_SIZE,
@@ -76,12 +77,11 @@ export const APIKeysPage = ({ subject, perPage, revokeModalRoot }: APIKeysPagePr
     enabled: isOrg ? canReadAPIKeys : true,
   });
 
-  const { invalidateAll } = useAPIKeysPagination({
+  useAPIKeysPagination({
     query,
     page,
     pageCount,
     isFetching,
-    subject,
     fetchPage,
   });
 
