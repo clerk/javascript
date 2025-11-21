@@ -2,4 +2,4 @@
 '@clerk/elements': patch
 ---
 
-Update peerDependencies to allow NextJs v16
+Update peerDependencies to allow Next.js v16
