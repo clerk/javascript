@@ -10,23 +10,21 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/ui.mjs",
-      "require": "./dist/ui.js",
       "default": "./dist/ui.mjs"
     },
     "./entry": {
       "types": "./dist/types/entry.d.ts",
       "import": "./dist/entry.mjs",
-      "require": "./dist/entry.js",
       "default": "./dist/entry.mjs"
     },
     "./internal": {
       "types": "./dist/types/internal.d.ts",
       "import": "./dist/ui.mjs",
-      "require": "./dist/ui.js",
       "default": "./dist/ui.mjs"
     },
     "./package.json": "./package.json"
@@ -37,14 +35,14 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
-    "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
-    "build:bundle": "rspack build --config rspack.config.js --env production",
+    "build:analyze": "rspack build --config rspack.config.mjs --env production --analyze",
+    "build:bundle": "rspack build --config rspack.config.mjs --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
-    "dev": "rspack serve --config rspack.config.js",
-    "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4001}",
+    "dev": "rspack serve --config rspack.config.mjs",
+    "dev:origin": "rspack serve --config rspack.config.mjs --env devOrigin=http://localhost:${PORT:-4001}",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
