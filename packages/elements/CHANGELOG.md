@@ -1,5 +1,16 @@
 # @clerk/elements
 
+## 0.23.85
+
+### Patch Changes
+
+- Update peerDependencies to allow Next.js v16 ([#7274](https://github.com/clerk/javascript/pull/7274)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
 ## 0.23.84
 
 ### Patch Changes
