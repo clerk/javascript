@@ -12,9 +12,9 @@ export const PRESERVED_QUERYSTRING_PARAMS = [
 ];
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
-export const CLERK_SYNCED = '__clerk_synced';
-export const CLERK_SUFFIXED_COOKIES = 'suffixed_cookies';
 export const CLERK_SATELLITE_URL = '__clerk_satellite_url';
+export const CLERK_SUFFIXED_COOKIES = 'suffixed_cookies';
+export const CLERK_SYNCED = '__clerk_synced';
 export const ERROR_CODES = {
   FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
   FORM_PASSWORD_INCORRECT: 'form_password_incorrect',

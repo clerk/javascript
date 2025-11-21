@@ -1,5 +1,23 @@
 # Change Log
 
+## 1.7.52
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/backend@2.23.2
+  - @clerk/types@4.101.2
+
+## 1.7.51
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/types@4.101.1
+
 ## 1.7.50
 
 ### Patch Changes
@@ -1768,7 +1786,6 @@
 ### Patch Changes
 
 - 8d73bea16: Introduce [Express](https://expressjs.com/) specific Clerk SDK called `@clerk/express`. The SDK exposes the following APIs:
-
   - `clerkClient`: Default [`@clerk/backend`](https://clerk.com/docs/references/backend/overview) client initialized from environment variables and used to make backend API requests
   - `clerkMiddleware`: Centralized middleware that authenticates all requests without blocking them (also triggers handshake mechanism)
   - `getAuth`: Utility to retrieve the auth state from a request (requires `clerkMiddleware` to be executed)
@@ -1936,7 +1953,6 @@
 ### Patch Changes
 
 - Introduce [Express](https://expressjs.com/) specific Clerk SDK called `@clerk/express`. The SDK exposes the following APIs: ([#2918](https://github.com/clerk/javascript/pull/2918)) by [@dimkl](https://github.com/dimkl)
-
   - `clerkClient`: Default [`@clerk/backend`](https://clerk.com/docs/references/backend/overview) client initialized from environment variables and used to make backend API requests
   - `clerkMiddleware`: Centralized middleware that authenticates all requests without blocking them (also triggers handshake mechanism)
   - `getAuth`: Utility to retrieve the auth state from a request (requires `clerkMiddleware` to be executed)
