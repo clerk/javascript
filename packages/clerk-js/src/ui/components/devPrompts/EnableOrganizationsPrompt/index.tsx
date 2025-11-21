@@ -28,7 +28,7 @@ function withLastActiveFallback(cb: () => string): string {
   try {
     return cb();
   } catch {
-    return 'https://dashboard.clerk.com/last-active?path=organization-settings';
+    return 'https://dashboard.clerk.com/last-active?path=organizations-settings';
   }
 }
 
