@@ -1,5 +1,3 @@
-'use client';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type { APIKeyResource, GetAPIKeysParams } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
