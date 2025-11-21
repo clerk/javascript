@@ -131,6 +131,10 @@ interface SessionTokenEvent {
   traceId: string;
 }
 
+const generateTabId = (): string => {
+  return Math.random().toString(36).slice(2);
+};
+
 /**
  * Creates an in-memory token cache with optional BroadcastChannel synchronization across tabs.
  * Automatically manages token expiration and cleanup via scheduled timeouts.
@@ -138,6 +142,7 @@ interface SessionTokenEvent {
  */
 const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   const cache = new Map<string, TokenCacheValue>();
+  const tabId = generateTabId();
 
   let broadcastChannel: BroadcastChannel | null = null;
 
@@ -213,6 +218,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
           expectedTokenId,
           organizationId: data.organizationId,
           receivedTokenId: data.tokenId,
+          tabId,
           template: data.template,
           traceId: data.traceId,
         },
@@ -227,7 +233,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     } catch (error) {
       debugLogger.warn(
         'Failed to parse token from broadcast, skipping cache update',
-        { error, tokenId: data.tokenId, traceId: data.traceId },
+        { error, tabId, tokenId: data.tokenId, traceId: data.traceId },
         'tokenCache',
       );
       return;
@@ -238,7 +244,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     if (!iat || !exp) {
       debugLogger.warn(
         'Token missing iat/exp claim, skipping cache update',
-        { tokenId: data.tokenId, traceId: data.traceId },
+        { tabId, tokenId: data.tokenId, traceId: data.traceId },
         'tokenCache',
       );
       return;
@@ -252,7 +258,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         if (existingIat && existingIat >= iat) {
           debugLogger.debug(
             'Ignoring older token broadcast',
-            { existingIat, incomingIat: iat, tokenId: data.tokenId, traceId: data.traceId },
+            { existingIat, incomingIat: iat, tabId, tokenId: data.tokenId, traceId: data.traceId },
             'tokenCache',
           );
           return;
@@ -261,7 +267,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     } catch (error) {
       debugLogger.warn(
         'Existing entry compare failed; proceeding with broadcast update',
-        { error, tokenId: data.tokenId, traceId: data.traceId },
+        { error, tabId, tokenId: data.tokenId, traceId: data.traceId },
         'tokenCache',
       );
     }
@@ -271,6 +277,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       {
         iat,
         organizationId: data.organizationId,
+        tabId,
         template: data.template,
         tokenId: data.tokenId,
         traceId: data.traceId,
@@ -362,6 +369,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
                 {
                   organizationId,
                   sessionId,
+                  tabId,
                   template,
                   tokenId: entry.tokenId,
                   traceId,
