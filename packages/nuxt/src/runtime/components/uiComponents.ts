@@ -51,8 +51,8 @@ export const usePathnameWithoutSplatRouteParams = () => {
 /**
  * In the components below, we don't use the props object directly.
  * Instead, we use `attrs` to pass-through props to the base components.
- * We're declaring the type of props (CreateOrganizationProps, OrganizationListProps)
- * just to type the component for TypeScript, but all actual prop values come from `attrs`.
+ * We're declaring the type of props just to type the component for TypeScript,
+ * but all actual prop values come from `attrs`.
  */
 
 // The assignment of UserProfile with BaseUserProfile props is used
