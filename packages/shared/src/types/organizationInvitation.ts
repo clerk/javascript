@@ -5,7 +5,7 @@ declare global {
   /**
    * If you want to provide custom types for the organizationInvitation.publicMetadata
    * object, simply redeclare this rule in the global namespace.
-   * Every organizationInvitation object will use the provided type.
+   * Every OrganizationInvitation object will use the provided type.
    */
   interface OrganizationInvitationPublicMetadata {
     [k: string]: unknown;
@@ -17,7 +17,7 @@ declare global {
 }
 
 /**
- * The `OrganizationInvitation` object is the model around an organization invitation.
+ * The `OrganizationInvitation` object is the model around an Organization invitation.
  *
  * @interface
  */

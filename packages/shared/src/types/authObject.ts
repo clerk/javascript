@@ -26,19 +26,19 @@ export type SharedSignedInAuthObjectProperties = {
    */
   userId: string;
   /**
-   * The ID of the user's active organization.
+   * The ID of the user's Active Organization.
    */
   orgId: string | undefined;
   /**
-   * The current user's role in their active organization.
+   * The current user's Role in their Active Organization.
    */
   orgRole: OrganizationCustomRoleKey | undefined;
   /**
-   * The URL-friendly identifier of the user's active organization.
+   * The URL-friendly identifier of the user's Active Organization.
    */
   orgSlug: string | undefined;
   /**
-   * The current user's active organization permissions.
+   * The current user's Organization Permissions.
    */
   orgPermissions: OrganizationCustomPermissionKey[] | undefined;
   /**

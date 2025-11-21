@@ -18,7 +18,7 @@ export type OrganizationDomainVerificationStatus = 'unverified' | 'verified';
 export type OrganizationEnrollmentMode = 'manual_invitation' | 'automatic_invitation' | 'automatic_suggestion';
 
 /**
- * The `OrganizationDomain` object is the model around an organization domain.
+ * The `OrganizationDomain` object is the model around an Organization domain.
  * @interface
  */
 export interface OrganizationDomainResource extends ClerkResource {

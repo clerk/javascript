@@ -5,7 +5,7 @@ import type { BillingSubscriptionResource, ForPayerType } from '../../types';
  */
 export type UseSubscriptionParams = {
   /**
-   * Specifies whether to fetch the subscription for an organization or a user.
+   * Specifies whether to fetch the Subscription for an Organization or a user.
    *
    * @default 'user'
    */

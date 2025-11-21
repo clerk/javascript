@@ -169,7 +169,7 @@ export type PaymentElementProviderProps = {
    */
   stripeAppearance?: internalStripeAppearance;
   /**
-   * Specifies whether to fetch for the current user or organization.
+   * Specifies whether to fetch for the current user or Organization.
    *
    * @default 'user'
    */

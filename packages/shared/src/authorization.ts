@@ -73,9 +73,9 @@ const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 
 /**
- * Checks if a user has the required organization-level authorization.
- * Verifies if the user has the specified role or permission within their organization.
- * @returns null, if unable to determine due to missing data or unspecified role/permission.
+ * Checks if a user has the required Organization-level authorization.
+ * Verifies if the user has the specified Role or Permission within their Organization.
+ * @returns null, if unable to determine due to missing data or unspecified Role/Permission.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;

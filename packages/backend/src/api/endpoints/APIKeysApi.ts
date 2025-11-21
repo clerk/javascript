@@ -9,7 +9,7 @@ const basePath = '/api_keys';
 
 type GetAPIKeyListParams = ClerkPaginationRequest<{
   /**
-   * The user or organization ID to query API keys by
+   * The user or Organization ID to query API keys by
    */
   subject: string;
   /**
@@ -26,7 +26,7 @@ type CreateAPIKeyParams = {
    */
   name: string;
   /**
-   * The user or organization ID to associate the API key with
+   * The user or Organization ID to associate the API key with
    */
   subject: string;
   /**

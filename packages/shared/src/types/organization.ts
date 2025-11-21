@@ -12,7 +12,7 @@ declare global {
   /**
    * If you want to provide custom types for the organization.publicMetadata object,
    * simply redeclare this rule in the global namespace.
-   * Every organization object will use the provided type.
+   * Every Organization object will use the provided type.
    */
   interface OrganizationPublicMetadata {
     [k: string]: unknown;
@@ -21,7 +21,7 @@ declare global {
   /**
    * If you want to provide custom types for the organization.privateMetadata object,
    * simply redeclare this rule in the global namespace.
-   * Every organization object will use the provided type.
+   * Every Organization object will use the provided type.
    */
   interface OrganizationPrivateMetadata {
     [k: string]: unknown;
@@ -29,7 +29,7 @@ declare global {
 }
 
 /**
- * The `Organization` object holds information about an organization, as well as methods for managing it.
+ * The `Organization` object holds information about an Organization, as well as methods for managing it.
  *
  * To use these methods, you must have the **Organizations** feature [enabled in your app's settings in the Clerk Dashboard](https://clerk.com/docs/guides/organizations/configure#enable-organizations).
  *
