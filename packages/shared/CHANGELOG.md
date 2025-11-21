@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.36.0
+
+### Minor Changes
+
+- Creates compatibility layer for SWR hooks that were previously inside `@clerk/clerk-js` ([#7270](https://github.com/clerk/javascript/pull/7270)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.35.2
 
 ### Patch Changes

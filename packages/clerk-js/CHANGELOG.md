@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.110.0
+
+### Minor Changes
+
+- Removes SWR as direct dependency ([#7270](https://github.com/clerk/javascript/pull/7270)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44)]:
+  - @clerk/shared@3.36.0
+  - @clerk/localizations@3.28.4
+
 ## 5.109.2
 
 ### Patch Changes
