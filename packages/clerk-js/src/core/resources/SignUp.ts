@@ -71,8 +71,7 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource } from './Base';
-import { SignUpVerifications } from './internal';
+import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {

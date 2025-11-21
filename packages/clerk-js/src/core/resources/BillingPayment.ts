@@ -10,8 +10,7 @@ import type {
 
 import { billingMoneyAmountFromJSON } from '../../utils';
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './Base';
-import { BillingPaymentMethod, BillingSubscriptionItem } from './internal';
+import { BaseResource, BillingPaymentMethod, BillingSubscriptionItem } from './internal';
 
 export class BillingPayment extends BaseResource implements BillingPaymentResource {
   id!: string;

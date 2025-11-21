@@ -38,8 +38,7 @@ import { TokenId } from '@/utils/tokenId';
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
-import { BaseResource } from './Base';
-import { PublicUserData, Token, User } from './internal';
+import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
 
 export class Session extends BaseResource implements SessionResource {

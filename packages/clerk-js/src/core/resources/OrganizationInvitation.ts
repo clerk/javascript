@@ -8,7 +8,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './Base';
+import { BaseResource } from './internal';
 
 export class OrganizationInvitation extends BaseResource implements OrganizationInvitationResource {
   id!: string;

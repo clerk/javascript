@@ -1,6 +1,6 @@
 import type { FeatureJSON, FeatureResource } from '@clerk/shared/types';
 
-import { BaseResource } from './Base';
+import { BaseResource } from './internal';
 
 export class Feature extends BaseResource implements FeatureResource {
   id!: string;

@@ -1,7 +1,7 @@
 import type { TOTPJSON, TOTPResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './Base';
+import { BaseResource } from './internal';
 
 export class TOTP extends BaseResource implements TOTPResource {
   pathRoot = '/me';

@@ -12,8 +12,7 @@ import type {
 import { Billing } from '@/core/modules/billing';
 import { unixEpochToDate } from '@/utils/date';
 
-import { BaseResource } from './Base';
-import { DeletedObject } from './internal';
+import { BaseResource, DeletedObject } from './internal';
 
 export class BillingPaymentMethod extends BaseResource implements BillingPaymentMethodResource {
   id!: string;

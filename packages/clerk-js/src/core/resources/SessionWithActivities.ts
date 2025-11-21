@@ -7,7 +7,7 @@ import type {
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { BaseResource } from './Base';
+import { BaseResource } from './internal';
 
 const mapSessionActivityJSONToSessionActivity = (data: SessionActivityJSON): SessionActivity => ({
   id: data.id,

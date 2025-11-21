@@ -14,9 +14,8 @@ import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
 import { Billing } from '../modules/billing/namespace';
-import { BaseResource } from './Base';
 import { BillingPayer } from './BillingPayer';
-import { BillingPaymentMethod, BillingPlan } from './internal';
+import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
 export class BillingCheckout extends BaseResource implements BillingCheckoutResource {
   id!: string;
