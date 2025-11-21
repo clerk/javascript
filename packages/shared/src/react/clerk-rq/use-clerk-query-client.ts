@@ -57,28 +57,47 @@ function createRecursiveProxy(label: string): RecursiveMock {
 
 const mockQueryClient = createRecursiveProxy('ClerkMockQueryClient') as unknown as QueryClient;
 
+type ClerkRQClient = { __tag: 'clerk-rq-client'; client: QueryClient };
+
+const isTaggedRQClient = (value: unknown): value is ClerkRQClient => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '__tag' in (value as Record<string, unknown>) &&
+    (value as Record<string, unknown>).__tag === 'clerk-rq-client'
+  );
+};
+
+const getQueryClientState = (clerk: unknown): { client: QueryClient; isLoaded: boolean } => {
+  const internal = (clerk as { __internal_queryClient?: ClerkRQClient | undefined }).__internal_queryClient;
+
+  if (isTaggedRQClient(internal)) {
+    return { client: internal.client, isLoaded: true };
+  }
+
+  return { client: mockQueryClient, isLoaded: false };
+};
+
 const useClerkQueryClient = (): [QueryClient, boolean] => {
   const clerk = useClerkInstanceContext();
 
-  // @ts-expect-error - __internal_queryClient is not typed
-  const queryClient = clerk.__internal_queryClient as { __tag: 'clerk-rq-client'; client: QueryClient } | undefined;
-  const [, setQueryClientLoaded] = useState(
-    typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client',
-  );
+  const [state, setState] = useState<{ client: QueryClient; isLoaded: boolean }>(() => getQueryClientState(clerk));
 
   useEffect(() => {
-    const _setQueryClientLoaded = () => setQueryClientLoaded(true);
-    // @ts-expect-error - queryClientStatus is not typed
-    clerk.on('queryClientStatus', _setQueryClientLoaded);
-    return () => {
-      // @ts-expect-error - queryClientStatus is not typed
-      clerk.off('queryClientStatus', _setQueryClientLoaded);
+    const handleStatusChange = () => {
+      setState(getQueryClientState(clerk));
     };
-  }, [clerk, setQueryClientLoaded]);
 
-  const isLoaded = typeof queryClient === 'object' && '__tag' in queryClient && queryClient.__tag === 'clerk-rq-client';
+    // @ts-expect-error - queryClientStatus is not typed on Clerk
+    clerk.on('queryClientStatus', handleStatusChange);
 
-  return [queryClient?.client || mockQueryClient, isLoaded];
+    return () => {
+      // @ts-expect-error - queryClientStatus is not typed on Clerk
+      clerk.off('queryClientStatus', handleStatusChange);
+    };
+  }, [clerk]);
+
+  return [state.client, state.isLoaded];
 };
 
 export { useClerkQueryClient };

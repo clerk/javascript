@@ -55,6 +55,9 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
           // Setting staleTime to Infinity will not cause issues between tests as long as each test
           // case has its own wrapper that initializes a Clerk instance with a new QueryClient.
           staleTime: Infinity,
+          refetchOnWindowFocus: false,
+          refetchOnReconnect: false,
+          refetchOnMount: false,
         },
       },
     }),
