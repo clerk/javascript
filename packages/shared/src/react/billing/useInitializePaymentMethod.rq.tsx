@@ -17,9 +17,6 @@ export type UseInitializePaymentMethodResult = {
 };
 
 /**
- * This is the new implementation of the payment method initializer using React Query.
- * It is exported only if the package is built with the `CLERK_USE_RQ` environment variable set to `true`.
- *
  * @internal
  */
 function useInitializePaymentMethod(options?: InitializePaymentMethodOptions): UseInitializePaymentMethodResult {

@@ -6,9 +6,6 @@ import { usePaymentAttemptQueryCacheKeys } from './usePaymentAttemptQuery.shared
 import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './usePaymentAttemptQuery.types';
 
 /**
- * This is the new implementation of usePaymentAttemptQuery using React Query.
- * It is exported only if the package is built with the `CLERK_USE_RQ` environment variable set to `true`.
- *
  * @internal
  */
 function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAttemptQueryResult {

@@ -6,9 +6,6 @@ import { useStatementQueryCacheKeys } from './useStatementQuery.shared';
 import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
 
 /**
- * This is the new implementation of useStatementQuery using React Query.
- * It is exported only if the package is built with the `CLERK_USE_RQ` environment variable set to `true`.
- *
  * @internal
  */
 function useStatementQuery(params: UseStatementQueryParams = {}): StatementQueryResult {
