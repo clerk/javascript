@@ -1,4 +1,4 @@
-import { getCurrentOrganizationMembership } from '../../organization';
+import { getCurrentOrganizationMembership, useAttemptToEnableOrganizations } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   GetDomainsParams,
@@ -280,6 +280,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization');
 
   const { organization } = useOrganizationContext();
   const session = useSessionContext();

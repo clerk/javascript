@@ -12,6 +12,7 @@ export type * from './commerceSettings';
 export type * from './customMenuItems';
 export type * from './customPages';
 export type * from './deletedObject';
+export type * from './devtools';
 export type * from './displayConfig';
 export type * from './elementIds';
 export type * from './emailAddress';

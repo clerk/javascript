@@ -1,3 +1,4 @@
+import { useAttemptToEnableOrganizations } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   CreateOrganizationParams,
@@ -251,6 +252,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
+  useAttemptToEnableOrganizations('useOrganizationList');
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,
