@@ -111,11 +111,40 @@ export function useSignInWithGoogle() {
       // Sign in with Google
       const response = await GoogleSignin.signIn();
 
+      console.log('[useSignInWithGoogle] iOS: Full Google Sign-In response:', JSON.stringify(response, null, 2));
+      console.log('[useSignInWithGoogle] iOS: Response keys:', Object.keys(response));
+      if (response.data) {
+        console.log('[useSignInWithGoogle] iOS: Response.data keys:', Object.keys(response.data));
+      }
+
       // Extract the ID token from the response
       const idToken = response.data?.idToken;
 
       if (!idToken) {
         return errorThrower.throw('No ID token received from Google Sign-In.');
+      }
+
+      // Debug: Decode the JWT to see what's in it
+      try {
+        const [, payloadBase64] = idToken.split('.');
+        const payload = JSON.parse(atob(payloadBase64));
+        console.log('[useSignInWithGoogle] iOS: ID Token payload:', JSON.stringify(payload, null, 2));
+        console.log('[useSignInWithGoogle] iOS: Token audience (aud):', payload.aud);
+        console.log('[useSignInWithGoogle] iOS: Token issuer (iss):', payload.iss);
+        console.log('[useSignInWithGoogle] iOS: Token unique ID (jti):', payload.jti || 'NONE');
+        console.log('[useSignInWithGoogle] iOS: Token nonce:', payload.nonce || 'NONE');
+        console.log(
+          '[useSignInWithGoogle] iOS: Token issued at (iat):',
+          payload.iat,
+          '(' + new Date(payload.iat * 1000).toISOString() + ')',
+        );
+        console.log(
+          '[useSignInWithGoogle] iOS: Token expires at (exp):',
+          payload.exp,
+          '(' + new Date(payload.exp * 1000).toISOString() + ')',
+        );
+      } catch (e) {
+        console.log('[useSignInWithGoogle] iOS: Could not decode token:', e);
       }
 
       try {
