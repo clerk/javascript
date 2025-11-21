@@ -1,6 +1,12 @@
 ---
 "@clerk/nuxt": major
-"@clerk/vue": patch
 ---
 
-Update routing strategy to "path"
+Routing strategy for the ff. UI components now default to `path`:
+
+-  `SignIn`
+-  `SignUp`
+-  `UserProfile`
+-  `OrganizationProfile`
+-  `CreateOrganization`
+-  `OrganizationList`
