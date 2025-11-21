@@ -145,7 +145,14 @@ const { applyVariants, filterProps } = createVariants(
           true: { width: '100%' },
         },
         focusRing: {
-          true: { ...common.focusRing(theme) },
+          true: {
+            '&:focus-visible': {
+              outlineWidth: '2px',
+              outlineStyle: 'solid',
+              outlineColor: theme.colors.$primary500,
+              outlineOffset: '3px',
+            },
+          },
         },
       },
       defaultVariants: {
