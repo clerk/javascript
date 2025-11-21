@@ -21,7 +21,7 @@ export function useBillingHookEnabled(params?: { for?: ForPayerType; enabled?: b
     : environment?.commerceSettings.billing.user.enabled;
 
   const requireUserAndOrganizationWhenAuthenticated =
-    (params?.authenticated ?? true) ? (isOrganization ? Boolean(organization?.id) : true) && user?.id : true;
+    (params?.authenticated ?? true) ? (isOrganization ? Boolean(organization?.id) : true) && Boolean(user?.id) : true;
 
   return billingEnabled && enabledFromParam && clerk.loaded && requireUserAndOrganizationWhenAuthenticated;
 }
