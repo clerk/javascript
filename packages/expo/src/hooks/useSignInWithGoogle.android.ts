@@ -1,19 +1,11 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
-import Constants from 'expo-constants';
-
-import { errorThrower } from '../utils/errors';
-
-// Define our own interface to avoid importing types from an optional dependency
-// This keeps @react-native-google-signin/google-signin as an optional peer dependency
-interface GoogleSigninInterface {
-  configure(config: { webClientId: string; androidClientId?: string }): void;
-  hasPlayServices(options?: { showPlayServicesUpdateDialog?: boolean }): Promise<boolean>;
-  signIn(): Promise<{ data?: { idToken?: string } }>;
-}
+import * as AuthSession from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
 
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
+  redirectUrl?: string;
 };
 
 export type StartGoogleAuthenticationFlowReturnType = {
@@ -24,11 +16,11 @@ export type StartGoogleAuthenticationFlowReturnType = {
 };
 
 /**
- * Hook for native Google Authentication on Android using @react-native-google-signin/google-signin.
+ * Hook for Google Authentication on Android using web-based OAuth flow.
  *
  * This hook provides a simplified way to authenticate users with their Google account
- * using the native Android Google Sign-In UI. The authentication flow automatically
- * handles the ID token exchange with Clerk's backend and manages the transfer flow
+ * using Clerk's OAuth flow through a web browser. The authentication flow automatically
+ * handles the OAuth redirect with Clerk's backend and manages the transfer flow
  * between sign-in and sign-up.
  *
  * @example
@@ -36,7 +28,7 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * import { useSignInWithGoogle } from '@clerk/clerk-expo';
  * import { Button } from 'react-native';
  *
- * function GoogleSigninButton() {
+ * function GoogleSignInButton() {
  *   const { startGoogleAuthenticationFlow } = useSignInWithGoogle();
  *
  *   const onPress = async () => {
@@ -55,8 +47,7 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * }
  * ```
  *
- * @requires @react-native-google-signin/google-signin - Must be installed as a peer dependency
- * @platform Android - This is the Android-specific implementation
+ * @platform Android - This is the Android-specific implementation using web-based OAuth
  *
  * @returns An object containing the `startGoogleAuthenticationFlow` function
  */
@@ -76,143 +67,83 @@ export function useSignInWithGoogle() {
       };
     }
 
-    try {
-      // Dynamically import GoogleSignin to keep it as an optional dependency
-      // This will only fail at runtime if the user tries to use it without installing the package
-      let GoogleSignin: GoogleSigninInterface;
-      try {
-        const module = await import('@react-native-google-signin/google-signin');
-        GoogleSignin = module.GoogleSignin;
-      } catch {
-        return errorThrower.throw(
-          'Google Sign-In package not found. Please install @react-native-google-signin/google-signin to use this feature.',
-        );
-      }
-
-      // Get environment variables from expo-constants
-      const webClientId =
-        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
-        process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
-      const androidClientId =
-        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID ||
-        process.env.EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID;
-
-      if (!webClientId || !androidClientId) {
-        return errorThrower.throw(
-          'Google Sign-In credentials not found. Please set EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID and EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID in your .env file.',
-        );
-      }
-
-      // Configure Google Sign-In (can be called multiple times safely)
-      GoogleSignin.configure({
-        webClientId,
-        androidClientId,
+    // Create a redirect url for the current platform and environment.
+    // This redirect URL needs to be whitelisted for your Clerk production instance.
+    // For more information: https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturi
+    const oauthRedirectUrl =
+      startGoogleAuthenticationFlowParams?.redirectUrl ||
+      AuthSession.makeRedirectUri({
+        path: 'oauth-native-callback',
       });
 
-      // Check Google Play Services availability on Android
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    console.log('[useSignInWithGoogle] Android: Starting OAuth flow');
+    console.log('[useSignInWithGoogle] Android: Redirect URL:', oauthRedirectUrl);
 
-      // Sign in with Google
-      const response = await GoogleSignin.signIn();
+    // Create a sign-in attempt with the Google OAuth strategy
+    await signIn.create({
+      strategy: 'oauth_google',
+      redirectUrl: oauthRedirectUrl,
+    });
 
-      // Extract the ID token from the response
-      const idToken = response.data?.idToken;
+    const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
 
-      if (!idToken) {
-        return errorThrower.throw('No ID token received from Google Sign-In.');
-      }
-
-      try {
-        // Try to sign in with the Google One Tap strategy
-        await signIn.create({
-          strategy: 'google_one_tap',
-          token: idToken,
-        });
-
-        // Check if we need to transfer to SignUp (user doesn't exist yet)
-        const userNeedsToBeCreated = signIn.firstFactorVerification.status === 'transferable';
-
-        if (userNeedsToBeCreated) {
-          // User doesn't exist - create a new SignUp with transfer
-          await signUp.create({
-            transfer: true,
-            unsafeMetadata: startGoogleAuthenticationFlowParams?.unsafeMetadata,
-          });
-
-          return {
-            createdSessionId: signUp.createdSessionId,
-            setActive,
-            signIn,
-            signUp,
-          };
-        }
-
-        // User exists - return the SignIn session
-        return {
-          createdSessionId: signIn.createdSessionId,
-          setActive,
-          signIn,
-          signUp,
-        };
-      } catch (signInError: unknown) {
-        // Handle the case where the user doesn't exist (external_account_not_found)
-        // In this case, we need to create a sign-up with the same token
-        const isClerkError =
-          signInError &&
-          typeof signInError === 'object' &&
-          'clerkError' in signInError &&
-          (signInError as any).clerkError === true;
-
-        const hasExternalAccountNotFoundError =
-          signInError &&
-          typeof signInError === 'object' &&
-          'errors' in signInError &&
-          Array.isArray((signInError as any).errors) &&
-          (signInError as any).errors.some((err: any) => err.code === 'external_account_not_found');
-
-        if (isClerkError && hasExternalAccountNotFoundError) {
-          // User doesn't exist - create a new SignUp with the token
-          await signUp.create({
-            strategy: 'google_one_tap',
-            token: idToken,
-            unsafeMetadata: startGoogleAuthenticationFlowParams?.unsafeMetadata,
-          });
-
-          return {
-            createdSessionId: signUp.createdSessionId,
-            setActive,
-            signIn,
-            signUp,
-          };
-        }
-
-        // Re-throw if it's a different error
-        throw signInError;
-      }
-    } catch (error: unknown) {
-      // Handle Google Sign-In errors
-      if (error && typeof error === 'object' && 'code' in error) {
-        const errorCode = (error as { code: string }).code;
-
-        // User canceled the sign-in flow
-        if (errorCode === 'SIGN_IN_CANCELLED' || errorCode === '-5') {
-          return {
-            createdSessionId: null,
-            setActive,
-            signIn,
-            signUp,
-          };
-        }
-
-        // Play Services not available or outdated
-        if (errorCode === 'PLAY_SERVICES_NOT_AVAILABLE') {
-          return errorThrower.throw('Google Play Services is not available or outdated on this device.');
-        }
-      }
-
-      // Re-throw other errors
-      throw error;
+    if (!externalVerificationRedirectURL) {
+      throw new Error('No external verification redirect URL received from Clerk');
     }
+
+    console.log('[useSignInWithGoogle] Android: Opening browser for OAuth');
+
+    // Open the OAuth flow in a web browser
+    const authSessionResult = await WebBrowser.openAuthSessionAsync(
+      externalVerificationRedirectURL.toString(),
+      oauthRedirectUrl,
+    );
+
+    console.log('[useSignInWithGoogle] Android: Auth session result:', authSessionResult.type);
+
+    // Handle different auth session results
+    if (authSessionResult.type !== 'success') {
+      // User canceled or something else happened
+      return {
+        createdSessionId: null,
+        setActive,
+        signIn,
+        signUp,
+      };
+    }
+
+    // Extract the rotating token nonce from the callback URL
+    const { url } = authSessionResult;
+    const params = new URL(url).searchParams;
+    const rotatingTokenNonce = params.get('rotating_token_nonce') || '';
+
+    console.log('[useSignInWithGoogle] Android: Got rotating token nonce');
+
+    // Reload the sign-in with the nonce to complete the flow
+    await signIn.reload({ rotatingTokenNonce });
+
+    const { status, firstFactorVerification } = signIn;
+
+    let createdSessionId: string | null = null;
+
+    if (status === 'complete') {
+      // Sign-in complete - user exists
+      createdSessionId = signIn.createdSessionId ?? null;
+    } else if (firstFactorVerification.status === 'transferable') {
+      // User doesn't exist - create a new SignUp with transfer
+      await signUp.create({
+        transfer: true,
+        unsafeMetadata: startGoogleAuthenticationFlowParams?.unsafeMetadata,
+      });
+      createdSessionId = signUp.createdSessionId ?? null;
+    }
+
+    return {
+      createdSessionId,
+      setActive,
+      signIn,
+      signUp,
+    };
   }
 
   return {
