@@ -6,7 +6,6 @@ import type {
   SignedOutAuthObject,
 } from '@clerk/backend/internal';
 import type {
-  LegacyRedirectProps,
   MultiDomainAndOrProxy,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
@@ -47,8 +46,7 @@ export type ClerkMiddlewareOptions = {
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  SignUpFallbackRedirectUrl;
 
 export type RootAuthLoaderOptions = ClerkMiddlewareOptions & {
   /**
@@ -69,8 +67,7 @@ export type RequestStateWithRedirectUrls = RequestState &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  SignUpFallbackRedirectUrl;
 
 export type RootAuthLoaderCallback<Options extends RootAuthLoaderOptions> = (
   args: LoaderFunctionArgsWithAuth<Options>,

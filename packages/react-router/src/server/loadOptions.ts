@@ -47,8 +47,6 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     overrides.signInFallbackRedirectUrl || getPublicEnvVariables(context).signInFallbackRedirectUrl;
   const signUpFallbackRedirectUrl =
     overrides.signUpFallbackRedirectUrl || getPublicEnvVariables(context).signUpFallbackRedirectUrl;
-  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables(context).afterSignInUrl;
-  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables(context).afterSignUpUrl;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -80,8 +78,6 @@ export const loadOptions = (args: DataFunctionArgs, overrides: ClerkMiddlewareOp
     proxyUrl,
     signInUrl,
     signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
     signInForceRedirectUrl,
     signUpForceRedirectUrl,
     signInFallbackRedirectUrl,

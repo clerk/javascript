@@ -12,8 +12,6 @@ export type ClerkState = {
     __isSatellite: boolean;
     __signInUrl: string | undefined;
     __signUpUrl: string | undefined;
-    __afterSignInUrl: string | undefined;
-    __afterSignUpUrl: string | undefined;
     __signInForceRedirectUrl: string | undefined;
     __signUpForceRedirectUrl: string | undefined;
     __signInFallbackRedirectUrl: string | undefined;

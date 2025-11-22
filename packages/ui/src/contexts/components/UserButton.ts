@@ -1,4 +1,3 @@
-import { deprecatedObjectProperty } from '@clerk/shared/deprecated';
 import { useClerk } from '@clerk/shared/react';
 import { createContext, useContext, useMemo } from 'react';
 
@@ -26,22 +25,10 @@ export const useUserButtonContext = () => {
   const signInUrl = ctx.signInUrl || options.signInUrl || displayConfig.signInUrl;
   const userProfileUrl = ctx.userProfileUrl || displayConfig.userProfileUrl;
 
-  if (ctx.afterSignOutUrl) {
-    deprecatedObjectProperty(ctx, 'afterSignOutUrl', `Move 'afterSignOutUrl' to '<ClerkProvider/>`);
-  }
-
-  const afterSignOutUrl = ctx.afterSignOutUrl || clerk.buildAfterSignOutUrl();
+  const afterSignOutUrl = clerk.buildAfterSignOutUrl();
   const navigateAfterSignOut = () => navigate(afterSignOutUrl);
 
-  if (ctx.afterSignOutUrl) {
-    deprecatedObjectProperty(
-      ctx,
-      'afterMultiSessionSingleSignOutUrl',
-      `Move 'afterMultiSessionSingleSignOutUrl' to '<ClerkProvider/>`,
-    );
-  }
-  const afterMultiSessionSingleSignOutUrl =
-    ctx.afterMultiSessionSingleSignOutUrl || clerk.buildAfterMultiSessionSingleSignOutUrl();
+  const afterMultiSessionSingleSignOutUrl = clerk.buildAfterMultiSessionSingleSignOutUrl();
   const navigateAfterMultiSessionSingleSignOut = () => clerk.redirectWithAuth(afterMultiSessionSingleSignOutUrl);
 
   const afterSwitchSessionUrl = ctx.afterSwitchSessionUrl || displayConfig.afterSwitchSessionUrl;

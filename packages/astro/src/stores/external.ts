@@ -70,7 +70,7 @@ export const $organizationStore = computed([$authStore], auth => auth.organizati
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * $clientStore.subscribe((client) => console.log(client.activeSessions))
+ * $clientStore.subscribe((client) => console.log(client?.signedInSessions?.length))
  */
 export const $clientStore = computed([$csrState], csr => csr.client);
 

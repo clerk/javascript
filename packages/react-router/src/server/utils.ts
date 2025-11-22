@@ -87,8 +87,6 @@ export function getResponseClerkState(requestState: RequestStateWithRedirectUrls
     __isSatellite: requestState.isSatellite,
     __signInUrl: requestState.signInUrl,
     __signUpUrl: requestState.signUpUrl,
-    __afterSignInUrl: requestState.afterSignInUrl,
-    __afterSignUpUrl: requestState.afterSignUpUrl,
     __signInForceRedirectUrl: requestState.signInForceRedirectUrl,
     __signUpForceRedirectUrl: requestState.signUpForceRedirectUrl,
     __signInFallbackRedirectUrl: requestState.signInFallbackRedirectUrl,

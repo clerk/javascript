@@ -82,26 +82,6 @@ describe('UserButton', () => {
     expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
   });
 
-  it('redirects to afterSignOutUrl when "Sign out" is clicked and afterSignOutUrl prop is passed', async () => {
-    const { wrapper, fixtures, props } = await createFixtures(f => {
-      f.withUser({
-        first_name: 'First',
-        last_name: 'Last',
-        username: 'username1',
-        email_addresses: ['test@clerk.com'],
-      });
-    });
-
-    fixtures.clerk.signOut.mockImplementation(callback => callback());
-    props.setProps({ afterSignOutUrl: '/after-sign-out' });
-
-    const { getByText, getByRole, userEvent } = render(<UserButton />, { wrapper });
-    await userEvent.click(getByRole('button', { name: 'Open user menu' }));
-    await userEvent.click(getByText('Sign out'));
-
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/after-sign-out');
-  });
-
   it.todo('navigates to sign in url when "Add account" is clicked');
 
   describe('Multi Session Popover', () => {

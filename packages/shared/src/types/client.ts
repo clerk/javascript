@@ -1,6 +1,6 @@
 import type { LastAuthenticationStrategy } from './json';
 import type { ClerkResource } from './resource';
-import type { ActiveSessionResource, SessionResource, SignedInSessionResource } from './session';
+import type { SessionResource, SignedInSessionResource } from './session';
 import type { SignInResource } from './signIn';
 import type { SignUpResource } from './signUp';
 import type { ClientJSONSnapshot } from './snapshots';
@@ -26,8 +26,4 @@ export interface ClientResource extends ClerkResource {
   updatedAt: Date | null;
   __internal_sendCaptchaToken: (params: unknown) => Promise<ClientResource>;
   __internal_toSnapshot: () => ClientJSONSnapshot;
-  /**
-   * @deprecated Use `signedInSessions` instead.
-   */
-  activeSessions: ActiveSessionResource[];
 }

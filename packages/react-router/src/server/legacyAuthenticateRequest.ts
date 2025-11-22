@@ -14,7 +14,7 @@ export async function legacyAuthenticateRequest(
   const { audience, authorizedParties } = opts;
 
   const { apiUrl, secretKey, jwtKey, proxyUrl, isSatellite, domain, publishableKey, machineSecretKey } = opts;
-  const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = opts;
+  const { signInUrl, signUpUrl } = opts;
 
   const requestState = await clerkClient(args).authenticateRequest(patchRequest(request), {
     apiUrl,
@@ -29,8 +29,6 @@ export async function legacyAuthenticateRequest(
     authorizedParties,
     signInUrl,
     signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
   });
 
   const locationHeader = requestState.headers.get(constants.Headers.Location);

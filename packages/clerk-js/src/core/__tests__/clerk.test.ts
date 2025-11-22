@@ -246,100 +246,6 @@ describe('Clerk singleton', () => {
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
       });
 
-      it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
-        const beforeEmitMock = vi.fn();
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-
-        (window as any).__unstable__onAfterSetActive = () => {
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalled();
-        };
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-      });
-
-      // TODO: @dimkl include set transitive state
-      it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
-        const mockSession2 = {
-          id: '2',
-          remove: vi.fn(),
-          status: 'active',
-          user: {},
-          touch: vi.fn(),
-          getToken: vi.fn(),
-        };
-        mockClientFetch.mockReturnValue(
-          Promise.resolve({
-            signedInSessions: [mockSession, mockSession2],
-          }),
-        );
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession2.touch.mockImplementationOnce(() => {
-          sut.session = mockSession2 as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession2.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token-2';
-        });
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-          executionOrder.push('before emit');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ session: mockSession2 as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession2.touch).toHaveBeenCalled();
-          expect(mockSession2.getToken).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
-          expect(sut.session).toMatchObject(mockSession2);
-        });
-      });
-
-      // TODO: @dimkl include set transitive state
-      it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession.touch.mockImplementationOnce(() => {
-          sut.session = mockSession as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token';
-        });
-
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-          executionOrder.push('before emit');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-          expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
-          expect(sut.session).toMatchObject(mockSession);
-        });
-      });
-
       it('sets active organization by slug', async () => {
         const mockSession2 = {
           id: '1',
@@ -465,24 +371,16 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ standardBrowser: false });
 
-          const executionOrder: string[] = [];
           mockSession.touch.mockImplementationOnce(() => {
             sut.session = mockSession as any;
-            executionOrder.push('session.touch');
-            return Promise.resolve();
-          });
-          const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-            executionOrder.push('before emit');
             return Promise.resolve();
           });
 
-          await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
+          await sut.setActive({ organization: { id: 'org_id' } as Organization });
 
-          expect(executionOrder).toEqual(['session.touch', 'before emit']);
           expect(mockSession.touch).toHaveBeenCalled();
           expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(mockSession.getToken).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
           expect(sut.session).toMatchObject(mockSession);
         });
       });

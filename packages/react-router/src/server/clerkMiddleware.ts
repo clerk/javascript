@@ -50,8 +50,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       authorizedParties,
       signInUrl,
       signUpUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       organizationSyncOptions,
     } = loadedOptions;
 
@@ -69,8 +67,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       organizationSyncOptions,
       signInUrl,
       signUpUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       acceptsToken: 'any',
     });
 

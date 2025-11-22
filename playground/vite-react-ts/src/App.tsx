@@ -37,7 +37,7 @@ function NavBar() {
           <a href='/user'>User Profile</a>
         </li>
       </ul>
-      <UserButton afterSignOutUrl='/' />
+      <UserButton />
     </nav>
   );
 }

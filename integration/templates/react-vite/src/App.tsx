@@ -6,7 +6,7 @@ import { ClientId } from './client-id';
 function App() {
   return (
     <main>
-      <UserButton afterSignOutUrl={'/'} />
+      <UserButton />
       <OrganizationSwitcher fallback={<>Loading organization switcher</>} />
       <ClientId />
       <SignedOut>SignedOut</SignedOut>

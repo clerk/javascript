@@ -10,7 +10,7 @@ function App() {
         <SignIn />
       </SignedOut>
       <SignedIn>Signed In</SignedIn>
-      <UserButton afterSignOutUrl={'/'} />
+      <UserButton />
     </main>
   );
 }

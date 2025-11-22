@@ -23,7 +23,6 @@ export default async function Page() {
         <h2>Clerk loaded</h2>
       </ClerkLoaded>
       <UserButton />
-      <UserButton afterSignOutUrl='/' />
 
       <ClientSideWrapper>
         server content
