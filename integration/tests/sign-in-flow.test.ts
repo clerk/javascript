@@ -152,4 +152,35 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('sign in f
 
     await u.po.expect.toBeSignedIn();
   });
+
+  test('redirects when attempting to sign in with existing session in another tab', async ({
+    page,
+    context,
+    browser,
+  }) => {
+    const u = createTestUtils({ app, page, context, browser });
+
+    // Open sign-in page in both tabs before signing in
+    await u.po.signIn.goTo();
+
+    let secondTabUtils: any;
+    await u.tabs.runInNewTab(async u2 => {
+      secondTabUtils = u2;
+      await u2.po.signIn.goTo();
+    });
+
+    // Sign in on the first tab
+    await u.po.signIn.setIdentifier(fakeUser.email);
+    await u.po.signIn.continue();
+    await u.po.signIn.setPassword(fakeUser.password);
+    await u.po.signIn.continue();
+    await u.po.expect.toBeSignedIn();
+
+    // Attempt to sign in on the second tab (which already has sign-in mounted)
+    await secondTabUtils.po.signIn.setIdentifier(fakeUser.email);
+    await secondTabUtils.po.signIn.continue();
+
+    // Should redirect and be signed in without error
+    await secondTabUtils.po.expect.toBeSignedIn();
+  });
 });

@@ -434,6 +434,9 @@ function SignInStartInternal(): JSX.Element {
         e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
+    const sessionAlreadyExistsError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
+    );
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
     );
@@ -444,6 +447,13 @@ function SignInStartInternal(): JSX.Element {
 
     if (instantPasswordError) {
       await signInWithFields(identifierField);
+    } else if (sessionAlreadyExistsError) {
+      await clerk.setActive({
+        session: clerk.client.lastActiveSessionId,
+        navigate: async ({ session }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+        },
+      });
     } else if (alreadySignedInError) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
