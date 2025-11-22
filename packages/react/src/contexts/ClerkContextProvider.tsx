@@ -10,6 +10,7 @@ import type { ClientResource, InitialState, Resources } from '@clerk/shared/type
 import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
+import { authStore } from '../stores/authStore';
 import type { IsomorphicClerkOptions } from '../types';
 import { AuthContext } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
@@ -24,7 +25,7 @@ export type ClerkContextProviderState = Resources;
 
 export function ClerkContextProvider(props: ClerkContextProvider) {
   const { isomorphicClerkOptions, initialState, children } = props;
-  const { isomorphicClerk: clerk, clerkStatus } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
+  const { isomorphicClerk: clerk } = useLoadedIsomorphicClerk(isomorphicClerkOptions);
 
   const [state, setState] = React.useState<ClerkContextProviderState>({
     client: clerk.client as ClientResource,
@@ -35,58 +36,47 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
 
   React.useEffect(() => {
     return clerk.addListener(e => setState({ ...e }));
-  }, []);
+  }, [clerk]);
 
   const derivedState = deriveState(clerk.loaded, state, initialState);
-  const clerkCtx = React.useMemo(
-    () => ({ value: clerk }),
-    [
-      // Only update the clerk reference on status change
-      clerkStatus,
-    ],
-  );
+
+  const { session, user, organization } = derivedState;
+
+  // Set server snapshot for SSR/hydration and connect to Clerk for live updates
+  React.useLayoutEffect(() => {
+    if (initialState) {
+      authStore.setServerSnapshot({
+        actor: initialState.actor,
+        factorVerificationAge: initialState.factorVerificationAge,
+        orgId: initialState.orgId,
+        orgPermissions: initialState.orgPermissions,
+        orgRole: initialState.orgRole,
+        orgSlug: initialState.orgSlug,
+        sessionClaims: initialState.sessionClaims,
+        sessionId: initialState.sessionId,
+        sessionStatus: initialState.sessionStatus,
+        userId: initialState.userId,
+      });
+    }
+
+    authStore.connect(clerk);
+
+    return () => {
+      authStore.disconnect();
+    };
+  }, [clerk, initialState]);
+
+  // This automatically handles SSR/hydration/client transitions!
+  const authValue = React.useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getServerSnapshot);
+
+  const clerkCtx = React.useMemo(() => ({ value: clerk }), [clerk]);
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
-  const {
-    sessionId,
-    sessionStatus,
-    sessionClaims,
-    session,
-    userId,
-    user,
-    orgId,
-    actor,
-    organization,
-    orgRole,
-    orgSlug,
-    orgPermissions,
-    factorVerificationAge,
-  } = derivedState;
+  const authCtx = React.useMemo(() => ({ value: authValue }), [authValue]);
 
-  const authCtx = React.useMemo(() => {
-    const value = {
-      sessionId,
-      sessionStatus,
-      sessionClaims,
-      userId,
-      actor,
-      orgId,
-      orgRole,
-      orgSlug,
-      orgPermissions,
-      factorVerificationAge,
-    };
-    return { value };
-  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge, sessionClaims?.__raw]);
-
-  const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
-  const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
-  const organizationCtx = React.useMemo(() => {
-    const value = {
-      organization: organization,
-    };
-    return { value };
-  }, [orgId, organization]);
+  const sessionCtx = React.useMemo(() => ({ value: session }), [session]);
+  const userCtx = React.useMemo(() => ({ value: user }), [user]);
+  const organizationCtx = React.useMemo(() => ({ value: { organization } }), [organization]);
 
   return (
     // @ts-expect-error value passed is of type IsomorphicClerk where the context expects LoadedClerk
@@ -121,13 +111,14 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
 
   React.useEffect(() => {
     void isomorphicClerkRef.current.__unstable__updateProps({ options });
-  }, [options.localization]);
+  }, [options]);
 
   React.useEffect(() => {
-    isomorphicClerkRef.current.on('status', setClerkStatus);
+    const clerk = isomorphicClerkRef.current;
+    clerk.on('status', setClerkStatus);
     return () => {
-      if (isomorphicClerkRef.current) {
-        isomorphicClerkRef.current.off('status', setClerkStatus);
+      if (clerk) {
+        clerk.off('status', setClerkStatus);
       }
       IsomorphicClerk.clearInstance();
     };
