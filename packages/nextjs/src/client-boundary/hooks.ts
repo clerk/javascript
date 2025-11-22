@@ -7,11 +7,10 @@ export {
   useOrganizationList,
   useSession,
   useSessionList,
-  useSignIn,
-  useSignUp,
   useUser,
   useReverification,
 } from '@clerk/clerk-react';
+export { useSignInSignal as useSignIn, useSignUpSignal as useSignUp } from '@clerk/clerk-react/experimental';
 
 export {
   isClerkAPIResponseError,
