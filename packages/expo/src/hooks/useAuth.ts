@@ -8,8 +8,8 @@ import { SessionJWTCache } from '../cache';
  * This hook extends the useAuth hook to add experimental JWT caching.
  * The caching is used only when no options are passed to getToken.
  */
-export const useAuth = (initialAuthState?: any): UseAuthReturn => {
-  const { getToken: getTokenBase, ...rest } = useAuthBase(initialAuthState);
+export const useAuth = (options?: Parameters<typeof useAuthBase>[0]): UseAuthReturn => {
+  const { getToken: getTokenBase, ...rest } = useAuthBase(options);
 
   const getToken: GetToken = (opts?: GetTokenOptions): Promise<string | null> =>
     getTokenBase(opts)
