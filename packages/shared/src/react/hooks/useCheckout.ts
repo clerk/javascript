@@ -2,7 +2,7 @@ import { useCallback, useSyncExternalStore } from 'react';
 
 import type { CheckoutSignalValue } from '../../types/clerk';
 import type { __experimental_CheckoutProvider } from '../contexts';
-import { useCheckoutContext, useOrganizationContext, useClerkInstanceContext } from '../contexts';
+import { useCheckoutContext, useClerkInstanceContext, useOrganizationContext } from '../contexts';
 import { useUser } from './useUser';
 
 type UseCheckoutParams = Parameters<typeof __experimental_CheckoutProvider>[0];

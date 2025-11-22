@@ -1,4 +1,4 @@
-import type { PasswordSettingsData, ZxcvbnResult } from '../../../types';
+import type { PasswordSettingsData, ZxcvbnResult } from '@/types';
 
 type zxcvbnFN = (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
 

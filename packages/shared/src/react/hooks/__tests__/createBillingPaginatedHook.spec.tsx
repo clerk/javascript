@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ClerkResource } from '../../../types';
+import type { ClerkResource } from '@/types';
+
 import type { ResourceCacheStableKey } from '../../stable-keys';
 import { createBillingPaginatedHook } from '../createBillingPaginatedHook';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';

@@ -1,5 +1,3 @@
-/* eslint-disable jsdoc/require-jsdoc */
-
 type Value = unknown;
 
 /**
