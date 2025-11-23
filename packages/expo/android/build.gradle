@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+group = 'com.clerk.expo'
+version = '1.0.0'
+
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+  namespace "expo.modules.clerk.googlesignin"
+
+  compileSdk safeExtGet("compileSdkVersion", 36)
+
+  defaultConfig {
+    minSdk safeExtGet("minSdkVersion", 24)
+    targetSdk safeExtGet("targetSdkVersion", 36)
+    versionCode 1
+    versionName "1.0.0"
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  kotlinOptions {
+    jvmTarget = "17"
+  }
+
+  sourceSets {
+    main {
+      java.srcDirs = ['src/main/java']
+    }
+  }
+}
+
+dependencies {
+  // Expo modules core
+  implementation project(':expo-modules-core')
+
+  // Credential Manager for Google Sign-In with nonce support
+  implementation "androidx.credentials:credentials:1.3.0"
+  implementation "androidx.credentials:credentials-play-services-auth:1.3.0"
+  implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
+
+  // Coroutines for async operations
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
+}
