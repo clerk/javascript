@@ -1,5 +1,18 @@
 # Change Log
 
+## 5.111.0
+
+### Minor Changes
+
+- When a session already exists on sign in, complete the sign in and redirect instead of only rendering an error. ([#7156](https://github.com/clerk/javascript/pull/7156)) by [@brkalow](https://github.com/brkalow)
+
+- Optimized session token poller to share token with other open tabs ([#7302](https://github.com/clerk/javascript/pull/7302)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`e6ad12f`](https://github.com/clerk/javascript/commit/e6ad12fb92604d6b5c03951429ef91d04bc85351)]:
+  - @clerk/localizations@3.28.5
+
 ## 5.110.0
 
 ### Minor Changes
