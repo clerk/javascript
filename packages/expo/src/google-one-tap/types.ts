@@ -5,8 +5,17 @@ export type ConfigureParams = {
   /**
    * The web client ID from Google Cloud Console.
    * This is required for Google Sign-In to work.
+   * On iOS, this is used as the serverClientID for token audience.
    */
   webClientId: string;
+
+  /**
+   * The iOS client ID from Google Cloud Console.
+   * This is only used on iOS for the OAuth flow.
+   * If not provided, webClientId will be used.
+   * @platform iOS
+   */
+  iosClientId?: string;
 
   /**
    * Optional hosted domain to restrict sign-in to a specific domain.

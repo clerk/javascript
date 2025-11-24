@@ -69,6 +69,7 @@
   "files": [
     "dist",
     "android",
+    "ios",
     "expo-module.config.json",
     "app.plugin.js",
     "web",
