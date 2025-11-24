@@ -733,7 +733,6 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // Check if it's an OAuth JWT (no prefix, but has at+jwt header type)
     const { data: decoded } = decodeJwt(tokenInHeader);
     if (decoded && isOAuthAccessTokenJwt(decoded.header.typ)) {
-      // Check if oauth_token is accepted
       const mismatchState = checkTokenTypeMismatch(TokenType.OAuthToken, acceptsToken, authenticateContext);
       if (mismatchState) {
         return mismatchState;

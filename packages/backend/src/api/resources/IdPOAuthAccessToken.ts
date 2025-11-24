@@ -34,25 +34,21 @@ export class IdPOAuthAccessToken {
   }
 
   static fromJwtPayload(payload: JwtPayload, clockSkewInMs = 5000): IdPOAuthAccessToken {
-    const exp = payload.exp;
-    const iat = payload.iat;
-    // OAuth-specific claims not in standard JwtPayload
     const oauthPayload = payload as JwtPayload & { scope?: string; scp?: string[]; client_id?: string; jti?: string };
-    const scope = oauthPayload.scope;
-    const scp = oauthPayload.scp;
 
+    // Map JWT claims to IdPOAuthAccessToken fields
     return new IdPOAuthAccessToken(
-      oauthPayload.jti ?? '', // id
-      oauthPayload.client_id ?? '', // clientId
-      'oauth_access_token', // type (default)
-      payload.sub, // subject
-      scp ?? scope?.split(' ') ?? [], // scopes (scp array or space-delimited scope)
-      false, // revoked (n/a for JWT)
-      null, // revocationReason (n/a for JWT)
-      exp * 1000 <= Date.now() - clockSkewInMs, // expired (computed with clock skew tolerance)
-      exp, // expiration
-      iat ?? 0, // createdAt
-      iat ?? 0, // updatedAt (same as iat for JWT)
+      oauthPayload.jti ?? '',
+      oauthPayload.client_id ?? '',
+      'oauth_access_token',
+      payload.sub,
+      oauthPayload.scp ?? oauthPayload.scope?.split(' ') ?? [],
+      false,
+      null,
+      payload.exp * 1000 <= Date.now() - clockSkewInMs,
+      payload.exp,
+      payload.iat ?? 0,
+      payload.iat ?? 0,
     );
   }
 }

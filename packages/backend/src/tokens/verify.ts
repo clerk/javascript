@@ -258,7 +258,6 @@ async function verifyOAuthToken(
     let key: JsonWebKey;
 
     if (options.jwtKey) {
-      // Verify JWT networklessly if jwtKey is available
       key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
     } else if (options.secretKey) {
       // Fetch JWKS from Backend API using the key
