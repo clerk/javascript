@@ -1290,6 +1290,7 @@ export type __internal_LocalizationResource = {
       actionLink: LocalizationValue;
       actionText: LocalizationValue<'identifier'>;
     };
+    formButtonPrimary: LocalizationValue;
   };
 };
 

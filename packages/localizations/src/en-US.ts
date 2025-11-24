@@ -866,6 +866,7 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
+    formButtonPrimary: 'Reset Password',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',

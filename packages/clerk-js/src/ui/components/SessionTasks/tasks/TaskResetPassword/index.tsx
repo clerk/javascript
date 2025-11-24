@@ -146,7 +146,7 @@ const TaskResetPasswordInternal = () => {
                 <Col gap={3}>
                   <Form.SubmitButton
                     isDisabled={!canSubmit}
-                    localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
+                    localizationKey={localizationKeys('taskResetPassword.formButtonPrimary')}
                   />
                 </Col>
               </Form.Root>
