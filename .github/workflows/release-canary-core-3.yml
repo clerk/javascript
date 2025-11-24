@@ -1,17 +1,17 @@
-name: Canary release
-run-name: Canary release from ${{ github.ref_name }}
+name: canary-core3 release
+run-name: canary-core3 release from ${{ github.ref_name }}
 
 on:
   push:
     branches:
-      - main
+      - vincent-and-the-doctor
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  canary-release:
+  canary-core3-release:
     if: ${{ github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
     timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
@@ -36,22 +36,23 @@ jobs:
           playwright-enabled: true # Must be present to enable caching on branched workflows
           registry-url: "https://registry.npmjs.org"
 
-      - name: Version packages for canary
+      - name: Version packages for canary-core3
         id: version-packages
-        run: pnpm version-packages:canary | tail -1 >> "$GITHUB_OUTPUT"
+        run: pnpm version-packages:canary-core3 | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
         run: pnpm turbo build $TURBO_ARGS
 
-      - name: Canary release
+      - name: canary-core3 release
         if: steps.version-packages.outputs.success == '1'
-        run: pnpm release:canary
+        run: pnpm release:canary-core3
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
+        if: steps.version-packages.outputs.success == '1'
         uses: actions/github-script@v7
         with:
           result-encoding: string
@@ -60,23 +61,13 @@ jobs:
           github-token: ${{ secrets.CLERK_COOKIE_PAT }}
           script: |
             const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+            const clerkUiVersion = require('./packages/ui/package.json').version;
             const nextjsVersion = require('./packages/nextjs/package.json').version;
 
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'sdk-infra-workers',
-                workflow_id: 'update-pkg-versions',
-                ref: 'main',
-                inputs: { version: clerkjsVersion }
-              })
-
-            if (nextjsVersion.includes('canary')) {
-              console.log('clerk/nextjs changed, will notify clerk/accounts');
-              github.rest.actions.createWorkflowDispatch({
-                owner: 'clerk',
-                repo: 'accounts',
-                workflow_id: 'release-staging.yml',
-                ref: 'main',
-                inputs: { version: nextjsVersion }
-              })
-            }
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'clerk',
+              repo: 'sdk-infra-workers',
+              workflow_id: 'update-pkg-versions.yml',
+              ref: 'main',
+              inputs: { clerkjsVersion, clerkUiVersion }
+            })

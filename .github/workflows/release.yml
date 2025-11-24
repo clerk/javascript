@@ -39,6 +39,15 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
+      - name: Safety check - Prevent production releases on canary-core3 branch
+        run: |
+          if [ -f ".canary-core3-branch" ]; then
+            echo "❌ ERROR: This branch is marked for canary-core3 releases only!"
+            echo "Production releases (latest tag) are not allowed on this branch."
+            echo "If you need to make a production release, use the main production branch."
+            exit 1
+          fi
+
       - name: Setup
         id: config
         uses: ./.github/actions/init
@@ -55,8 +64,8 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: 'ci(repo): Version packages'
-          title: 'ci(repo): Version packages'
+          commit: "ci(repo): Version packages"
+          title: "ci(repo): Version packages"
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
@@ -83,7 +92,7 @@ jobs:
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'sdk-infra-workers',
-                workflow_id: 'update-clerkjs.yml',
+                workflow_id: 'update-pkg-versions',
                 ref: 'main',
                 inputs: { version: clerkjsVersion }
               })
@@ -145,5 +154,5 @@ jobs:
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
-          turbo-team: ''
-          turbo-token: ''
+          turbo-team: ""
+          turbo-token: ""
