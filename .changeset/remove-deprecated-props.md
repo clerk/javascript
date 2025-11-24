@@ -1,6 +1,6 @@
 ---
 "@clerk/nextjs": major
-"@clerk/clerk-react": major
+"@clerk/react": major
 "@clerk/clerk-js": major
 "@clerk/shared": major
 "@clerk/ui": major
