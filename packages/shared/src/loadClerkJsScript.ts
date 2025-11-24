@@ -71,12 +71,13 @@ function hasScriptRequestError(scriptUrl: string): boolean {
     return false;
   }
 
-  const entries = performance.getEntries() as PerformanceResourceTiming[];
-  const scriptEntry = entries.find(entry => entry.name === scriptUrl);
+  const entries = performance.getEntriesByName(scriptUrl, 'resource') as PerformanceResourceTiming[];
 
-  if (!scriptEntry) {
+  if (entries.length === 0) {
     return false;
   }
+
+  const scriptEntry = entries[entries.length - 1];
 
   // transferSize === 0 with responseEnd === 0 indicates network failure
   // transferSize === 0 with responseEnd > 0 might be a 4xx/5xx error or blocked request
@@ -90,8 +91,14 @@ function hasScriptRequestError(scriptUrl: string): boolean {
       return true;
     }
 
-    if (scriptEntry.responseStatus === 0) {
-      return true;
+    if ('responseStatus' in scriptEntry) {
+      const status = (scriptEntry as any).responseStatus;
+      if (status >= 400) {
+        return true;
+      }
+      if (scriptEntry.responseStatus === 0) {
+        return true;
+      }
     }
   }
 
@@ -103,9 +110,13 @@ function hasScriptRequestError(scriptUrl: string): boolean {
  * Uses polling to check if Clerk becomes available within the specified timeout.
  *
  * @param timeoutMs - Maximum time to wait in milliseconds.
+ * @param existingScript - The existing script element to wait for. Optional, for existing scripts.
  * @returns Promise that resolves with null if Clerk loads successfully, or rejects with an error if timeout is reached.
  */
-function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement | null> {
+function waitForClerkWithTimeout(
+  timeoutMs: number,
+  existingScript?: HTMLScriptElement,
+): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
     let resolved = false;
 
@@ -113,6 +124,12 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
       clearTimeout(timeoutId);
       clearInterval(pollInterval);
     };
+
+    // Bail out early if the script fails to load, instead of waiting for the entire timeout
+    existingScript?.addEventListener('error', () => {
+      cleanup(timeoutId, pollInterval);
+      reject(new ClerkRuntimeError(FAILED_TO_LOAD_ERROR, { code: ERROR_CODE }));
+    });
 
     const checkAndResolve = () => {
       if (resolved) {
@@ -198,7 +215,8 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLS
       existingScript.remove();
     } else {
       try {
-        return await waitForClerkWithTimeout(timeout);
+        await waitForClerkWithTimeout(timeout, existingScript);
+        return null;
       } catch {
         existingScript.remove();
       }
