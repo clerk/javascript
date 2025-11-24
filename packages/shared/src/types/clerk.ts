@@ -1472,7 +1472,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
 };
 
 export type __internal_AttemptToEnableEnvironmentSettingResult = {
-  status: 'enabled' | 'prompt-shown' | 'rejected';
+  isEnabled: boolean;
 };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;

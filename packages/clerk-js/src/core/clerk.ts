@@ -23,6 +23,7 @@ import type {
   __experimental_CheckoutInstance,
   __experimental_CheckoutOptions,
   __internal_AttemptToEnableEnvironmentSettingParams,
+  __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
   __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
@@ -749,7 +750,7 @@ export class Clerk implements ClerkInterface {
 
   public __internal_attemptToEnableEnvironmentSetting = (
     params: __internal_AttemptToEnableEnvironmentSettingParams,
-  ): { status: 'enabled' | 'prompt-shown' } => {
+  ): __internal_AttemptToEnableEnvironmentSettingResult => {
     const { for: setting, caller } = params;
 
     if (!this.user) {
@@ -758,30 +759,28 @@ export class Clerk implements ClerkInterface {
       );
     }
 
-    if (
-      // If not in development instance, return enabled status in order to not open the prompt
-      this.#instanceType !== 'development'
-    ) {
-      return { status: 'enabled' };
-    }
-
     switch (setting) {
-      case 'organizations':
-        if (!disabledOrganizationsFeature(this, this.environment)) {
-          return { status: 'enabled' };
+      case 'organizations': {
+        const isSettingDisabled = disabledOrganizationsFeature(this, this.environment);
+
+        if (!isSettingDisabled) {
+          return { isEnabled: true };
         }
 
-        this.__internal_openEnableOrganizationsPrompt({
-          caller,
-          // Reload current window to all invalidate all resources
-          // related to organizations, eg: roles
-          onSuccess: () => window.location.reload(),
-          onClose: params.onClose,
-        } as __internal_EnableOrganizationsPromptProps);
+        if (this.#instanceType === 'development') {
+          this.__internal_openEnableOrganizationsPrompt({
+            caller,
+            // Reload current window to all invalidate all resources
+            // related to organizations, eg: roles
+            onSuccess: () => window.location.reload(),
+            onClose: params.onClose,
+          } as __internal_EnableOrganizationsPromptProps);
+        }
 
-        return { status: 'prompt-shown' };
+        return { isEnabled: false };
+      }
       default:
-        return { status: 'enabled' };
+        return { isEnabled: true };
     }
   };
 
@@ -871,7 +870,7 @@ export class Clerk implements ClerkInterface {
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationProfile',
       onClose: () => {
@@ -881,7 +880,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -908,7 +907,7 @@ export class Clerk implements ClerkInterface {
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'CreateOrganization',
       onClose: () => {
@@ -918,7 +917,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -1057,7 +1056,7 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationProfile',
       onClose: () => {
@@ -1067,7 +1066,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -1104,7 +1103,7 @@ export class Clerk implements ClerkInterface {
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'CreateOrganization',
       onClose: () => {
@@ -1114,7 +1113,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -1142,7 +1141,7 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationSwitcher',
       onClose: () => {
@@ -1152,7 +1151,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -1188,7 +1187,7 @@ export class Clerk implements ClerkInterface {
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'OrganizationList',
       onClose: () => {
@@ -1198,7 +1197,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -1390,7 +1389,7 @@ export class Clerk implements ClerkInterface {
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
     this.assertComponentsReady(this.#componentControls);
 
-    const { status } = this.__internal_attemptToEnableEnvironmentSetting({
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
       for: 'organizations',
       caller: 'TaskChooseOrganization',
       onClose: () => {
@@ -1400,7 +1399,7 @@ export class Clerk implements ClerkInterface {
       },
     });
 
-    if (status === 'prompt-shown') {
+    if (!isOrganizationsEnabled) {
       return;
     }
 
