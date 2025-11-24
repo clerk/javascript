@@ -1,5 +1,4 @@
-import { useClerk, useOrganizationContext } from '@clerk/shared/react';
-import useSWR from 'swr';
+import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -25,28 +24,17 @@ export const StatementPage = () => {
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
-  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
-  const organizationCtx = useOrganizationContext();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
     data: statement,
     isLoading,
     error,
-  } = useSWR(
-    params.statementId
-      ? {
-          type: 'statement',
-          id: params.statementId,
-          orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getStatement({
-        id: params.statementId,
-        orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined,
-      }),
-  );
+  } = __internal_useStatementQuery({
+    statementId: params.statementId,
+    for: requesterType,
+    enabled: Boolean(params.statementId),
+  });
 
   if (isLoading) {
     return (

@@ -22,11 +22,6 @@
       "import": "./dist/entry.mjs",
       "default": "./dist/entry.mjs"
     },
-    "./internal": {
-      "types": "./dist/types/internal.d.ts",
-      "import": "./dist/ui.mjs",
-      "default": "./dist/ui.mjs"
-    },
     "./package.json": "./package.json"
   },
   "types": "dist/types/index.d.ts",
@@ -35,18 +30,18 @@
   ],
   "scripts": {
     "build": "pnpm build:bundle && pnpm build:declarations",
-    "build:analyze": "rspack build --config rspack.config.mjs --env production --analyze",
-    "build:bundle": "rspack build --config rspack.config.mjs --env production",
+    "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
+    "build:bundle": "rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
-    "dev": "rspack serve --config rspack.config.mjs",
-    "dev:origin": "rspack serve --config rspack.config.mjs --env devOrigin=http://localhost:${PORT:-4001}",
+    "dev": "rspack serve --config rspack.config.js",
+    "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4001}",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16",
+    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "publint",
     "showerrors": "tsc",
     "test:ci": "vitest --maxWorkers=70%",

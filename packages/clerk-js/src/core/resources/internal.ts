@@ -1,7 +1,9 @@
 export type { Clerk } from '../clerk';
+//  Ordering matters. If you move this you will be fired !! jk
+export * from './Base';
+
 export * from './APIKey';
 export * from './AuthConfig';
-export * from './Base';
 export * from './BillingCheckout';
 export * from './BillingPayment';
 export * from './BillingPaymentMethod';

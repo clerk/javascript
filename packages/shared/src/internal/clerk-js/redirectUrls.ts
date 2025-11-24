@@ -1,19 +1,16 @@
 import { applyFunctionToObj, filterProps, removeUndefined } from '../../object';
 import type { ClerkOptions, RedirectOptions } from '../../types';
 import { camelToSnake } from '../../underscore';
-import { assertNoLegacyProp, warnForNewPropShadowingLegacyProp } from './assertNoLegacyProp';
 import { isAllowedRedirect, relativeToAbsoluteUrl } from './url';
 
 type ComponentMode = 'modal' | 'mounted';
 
 export class RedirectUrls {
-  private static keys: (keyof RedirectOptions)[] = [
+  private static keys: (keyof RedirectOptions | 'redirectUrl')[] = [
     'signInForceRedirectUrl',
     'signInFallbackRedirectUrl',
     'signUpForceRedirectUrl',
     'signUpFallbackRedirectUrl',
-    'afterSignInUrl',
-    'afterSignUpUrl',
     'redirectUrl',
   ];
 
@@ -77,19 +74,13 @@ export class RedirectUrls {
       this.fromSearchParams.signInFallbackRedirectUrl ||
       this.fromProps.signInFallbackRedirectUrl ||
       this.fromOptions.signInFallbackRedirectUrl;
-    const afterSignInUrl =
-      this.fromSearchParams.afterSignInUrl || this.fromProps.afterSignInUrl || this.fromOptions.afterSignInUrl;
-    const afterSignUpUrl =
-      this.fromSearchParams.afterSignUpUrl || this.fromProps.afterSignUpUrl || this.fromOptions.afterSignUpUrl;
-    const redirectUrl = this.fromSearchParams.redirectUrl || this.fromProps.redirectUrl || this.fromOptions.redirectUrl;
+    const redirectUrl = this.fromSearchParams.redirectUrl;
 
-    const res: RedirectOptions = {
+    const res: RedirectOptions & { redirectUrl?: string | null } = {
       signUpForceRedirectUrl,
       signUpFallbackRedirectUrl,
       signInFallbackRedirectUrl,
       signInForceRedirectUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       redirectUrl,
     };
 
@@ -107,37 +98,14 @@ export class RedirectUrls {
   #getRedirectUrl(prefix: 'signIn' | 'signUp') {
     const forceKey = `${prefix}ForceRedirectUrl` as const;
     const fallbackKey = `${prefix}FallbackRedirectUrl` as const;
-    let newKeyInUse: string | undefined;
-
-    const legacyPropKey = `after${prefix[0].toUpperCase()}${prefix.slice(1)}Url` as 'afterSignInUrl' | 'afterSignUpUrl';
 
     let result;
     // Prioritize forceRedirectUrl
     result = this.fromSearchParams[forceKey] || this.fromProps[forceKey] || this.fromOptions[forceKey];
-    if (result) {
-      newKeyInUse = forceKey;
-    }
     // Try to get redirect_url, only allowed as a search param
     result ||= this.fromSearchParams.redirectUrl;
-    if (result) {
-      newKeyInUse = 'redirectUrl';
-    }
     // Otherwise, fallback to fallbackRedirectUrl
     result ||= this.fromSearchParams[fallbackKey] || this.fromProps[fallbackKey] || this.fromOptions[fallbackKey];
-    if (result) {
-      newKeyInUse = fallbackKey;
-    }
-
-    // TODO: v6
-    // Remove the compatibility layer for afterSignInUrl and afterSignUpUrl
-    const legacyValue =
-      this.fromSearchParams[legacyPropKey] ||
-      this.fromProps[legacyPropKey] ||
-      this.fromProps.redirectUrl ||
-      this.fromOptions[legacyPropKey];
-
-    warnForNewPropShadowingLegacyProp(newKeyInUse, result, legacyPropKey, legacyValue);
-    result ||= legacyValue;
 
     if (!result && this.mode === 'modal') {
       return window.location.href;
@@ -147,8 +115,7 @@ export class RedirectUrls {
   }
 
   #parse(obj: unknown) {
-    assertNoLegacyProp(obj as any);
-    const res = {} as RedirectOptions;
+    const res = {} as RedirectOptions & { redirectUrl?: string | null };
     RedirectUrls.keys.forEach(key => {
       // @ts-expect-error
       res[key] = obj[key];
@@ -159,7 +126,6 @@ export class RedirectUrls {
   }
 
   #parseSearchParams(obj: any) {
-    assertNoLegacyProp(obj);
     const res = {} as typeof this.fromSearchParams;
     RedirectUrls.keys.forEach(key => {
       if (obj instanceof URLSearchParams) {

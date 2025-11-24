@@ -10,7 +10,7 @@ const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
 const snapshot = `---
 ${packageEntries}
 ---
-
+ 
 Snapshot release
 `;
 

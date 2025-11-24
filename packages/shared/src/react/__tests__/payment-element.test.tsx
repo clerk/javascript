@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../commerce';
-import { OptionsContext } from '../contexts';
+import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../billing/payment-element';
+import { ClerkInstanceContext, OptionsContext, OrganizationProvider, UserContext } from '../contexts';
 
 // Mock the Stripe components
 vi.mock('../stripe-react', () => ({
@@ -44,7 +44,7 @@ vi.mock('../hooks/useUser', () => ({
   useUser: () => ({
     user: {
       id: 'user_123',
-      initializePaymentSource: vi.fn().mockResolvedValue({
+      initializePaymentMethod: vi.fn().mockResolvedValue({
         externalGatewayId: 'acct_123',
         externalClientSecret: 'seti_123',
         paymentMethodOrder: ['card'],
@@ -59,25 +59,35 @@ vi.mock('../hooks/useOrganization', () => ({
   }),
 }));
 
-vi.mock('swr', () => ({
-  __esModule: true,
-  default: () => ({ data: { loadStripe: vi.fn().mockResolvedValue({}) } }),
-}));
+const mockInitializePaymentMethod = vi.fn().mockResolvedValue({
+  externalGatewayId: 'acct_123',
+  externalClientSecret: 'seti_123',
+  paymentMethodOrder: ['card'],
+});
 
-vi.mock('swr/mutation', () => ({
-  __esModule: true,
-  default: () => ({
-    data: {
+vi.mock('../billing/useInitializePaymentMethod', () => ({
+  __internal_useInitializePaymentMethod: vi.fn(() => ({
+    initializedPaymentMethod: {
       externalGatewayId: 'acct_123',
       externalClientSecret: 'seti_123',
       paymentMethodOrder: ['card'],
     },
-    trigger: vi.fn().mockResolvedValue({
-      externalGatewayId: 'acct_123',
-      externalClientSecret: 'seti_123',
-      paymentMethodOrder: ['card'],
-    }),
-  }),
+    initializePaymentMethod: mockInitializePaymentMethod,
+  })),
+}));
+
+const mockStripeLibs = {
+  loadStripe: vi.fn().mockResolvedValue({}),
+};
+
+vi.mock('../billing/useStripeClerkLibs', () => ({
+  __internal_useStripeClerkLibs: vi.fn(() => mockStripeLibs),
+}));
+
+const mockStripeInstance = {} as any;
+
+vi.mock('../billing/useStripeLoader', () => ({
+  __internal_useStripeLoader: vi.fn(() => mockStripeInstance),
 }));
 
 describe('PaymentElement Localization', () => {
@@ -160,6 +170,27 @@ describe('PaymentElement Localization', () => {
     },
   };
 
+  const mockClerk = {
+    __internal_loadStripeJs: vi.fn().mockResolvedValue(() => Promise.resolve({})),
+    __internal_getOption: mockGetOption,
+    __unstable__environment: {
+      commerceSettings: {
+        billing: {
+          stripePublishableKey: 'pk_test_123',
+        },
+      },
+      displayConfig: {
+        userProfileUrl: 'https://example.com/profile',
+        organizationProfileUrl: 'https://example.com/org-profile',
+      },
+    },
+  };
+
+  const mockUser = {
+    id: 'user_123',
+    initializePaymentMethod: mockInitializePaymentMethod,
+  };
+
   const renderWithLocale = (locale: string) => {
     // Mock the __internal_getOption to return the expected localization
     mockGetOption.mockImplementation(key => {
@@ -174,11 +205,17 @@ describe('PaymentElement Localization', () => {
     };
 
     return render(
-      <OptionsContext.Provider value={options}>
-        <__experimental_PaymentElementProvider checkout={mockCheckout}>
-          <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-        </__experimental_PaymentElementProvider>
-      </OptionsContext.Provider>,
+      <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
+        <UserContext.Provider value={{ value: mockUser as any }}>
+          <OrganizationProvider organization={null}>
+            <OptionsContext.Provider value={options}>
+              <__experimental_PaymentElementProvider checkout={mockCheckout}>
+                <__experimental_PaymentElement fallback={<div>Loading...</div>} />
+              </__experimental_PaymentElementProvider>
+            </OptionsContext.Provider>
+          </OrganizationProvider>
+        </UserContext.Provider>
+      </ClerkInstanceContext.Provider>,
     );
   };
 
@@ -201,11 +238,17 @@ describe('PaymentElement Localization', () => {
     const options = {};
 
     render(
-      <OptionsContext.Provider value={options}>
-        <__experimental_PaymentElementProvider checkout={mockCheckout}>
-          <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-        </__experimental_PaymentElementProvider>
-      </OptionsContext.Provider>,
+      <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
+        <UserContext.Provider value={{ value: mockUser as any }}>
+          <OrganizationProvider organization={null}>
+            <OptionsContext.Provider value={options}>
+              <__experimental_PaymentElementProvider checkout={mockCheckout}>
+                <__experimental_PaymentElement fallback={<div>Loading...</div>} />
+              </__experimental_PaymentElementProvider>
+            </OptionsContext.Provider>
+          </OrganizationProvider>
+        </UserContext.Provider>
+      </ClerkInstanceContext.Provider>,
     );
 
     const elements = screen.getByTestId('stripe-elements');
@@ -237,11 +280,17 @@ describe('PaymentElement Localization', () => {
       };
 
       const { unmount } = render(
-        <OptionsContext.Provider value={options}>
-          <__experimental_PaymentElementProvider checkout={mockCheckout}>
-            <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-          </__experimental_PaymentElementProvider>
-        </OptionsContext.Provider>,
+        <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
+          <UserContext.Provider value={{ value: mockUser as any }}>
+            <OrganizationProvider organization={null}>
+              <OptionsContext.Provider value={options}>
+                <__experimental_PaymentElementProvider checkout={mockCheckout}>
+                  <__experimental_PaymentElement fallback={<div>Loading...</div>} />
+                </__experimental_PaymentElementProvider>
+              </OptionsContext.Provider>
+            </OrganizationProvider>
+          </UserContext.Provider>
+        </ClerkInstanceContext.Provider>,
       );
 
       const elements = screen.getByTestId('stripe-elements');

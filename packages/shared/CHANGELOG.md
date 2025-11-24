@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.35.2
+
+### Patch Changes
+
+- Make subscription actions more visible with inline buttons ([#7255](https://github.com/clerk/javascript/pull/7255)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
 ## 3.35.1
 
 ### Patch Changes
