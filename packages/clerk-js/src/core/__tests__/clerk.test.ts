@@ -2508,4 +2508,128 @@ describe('Clerk singleton', () => {
       });
     });
   });
+
+  describe('__internal_attemptToEnableEnvironmentSetting', () => {
+    describe('for organizations', () => {
+      it('does not open prompt if organizations is enabled in development', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: true,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      it('does not open prompt if organizations is enabled in production', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => true,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: true,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      it('opens prompt if organizations is disabled in development', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        const sut = new Clerk(developmentPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).toHaveBeenCalled();
+      });
+
+      it('does not open prompt if organizations is disabled in production', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+    });
+  });
 });
