@@ -1,5 +1,25 @@
 # Change Log
 
+## 5.110.0
+
+### Minor Changes
+
+- Removes SWR as direct dependency ([#7270](https://github.com/clerk/javascript/pull/7270)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce in-app development prompt to enable the Organizations feature ([#7159](https://github.com/clerk/javascript/pull/7159)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  In development instances, when using organization components or hooks for the first time, developers will see a prompt to enable the Organizations feature directly in their app, eliminating the need to visit the Clerk Dashboard.
+
+### Patch Changes
+
+- Fix useFetch to update fetcher ref ([#7145](https://github.com/clerk/javascript/pull/7145)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Ensure that organization component warnings are only shown when no user session exists in development ([#7298](https://github.com/clerk/javascript/pull/7298)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44)]:
+  - @clerk/shared@3.36.0
+  - @clerk/localizations@3.28.4
+
 ## 5.109.2
 
 ### Patch Changes
