@@ -85,7 +85,7 @@ jobs:
                 repo: 'sdk-infra-workers',
                 workflow_id: 'update-pkg-versions.yml',
                 ref: 'main',
-                inputs: { version: clerkjsVersion }
+                inputs: { clerkjsVersion: clerkjsVersion }
               })
 
               github.rest.actions.createWorkflowDispatch({
