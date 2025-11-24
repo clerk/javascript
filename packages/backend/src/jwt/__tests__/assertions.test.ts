@@ -8,7 +8,9 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertOAuthHeaderType,
   assertSubClaim,
+  isOAuthAccessTokenJwt,
 } from '../assertions';
 
 function formatToUTCString(ts: number) {
@@ -317,5 +319,107 @@ describe('assertIssuedAtClaim(iat, clockSkewInMs)', () => {
   it('does not throw error if iat is in the future but less than clock skew', () => {
     const nowInSeconds = Date.now() / 1000;
     expect(() => assertIssuedAtClaim(nowInSeconds + 5, 6000)).not.toThrow();
+  });
+});
+
+describe('isOAuthAccessTokenJwt(typ?)', () => {
+  describe('valid OAuth access token JWT types (RFC 9068)', () => {
+    it('returns true for at+jwt', () => {
+      expect(isOAuthAccessTokenJwt('at+jwt')).toBe(true);
+    });
+
+    it('returns true for application/at+jwt', () => {
+      expect(isOAuthAccessTokenJwt('application/at+jwt')).toBe(true);
+    });
+  });
+
+  describe('invalid OAuth access token JWT types', () => {
+    it('returns false for JWT (session token type)', () => {
+      expect(isOAuthAccessTokenJwt('JWT')).toBe(false);
+    });
+
+    it('returns false for undefined', () => {
+      expect(isOAuthAccessTokenJwt(undefined)).toBe(false);
+    });
+
+    it('returns false for null', () => {
+      expect(isOAuthAccessTokenJwt(null)).toBe(false);
+    });
+
+    it('returns false for empty string', () => {
+      expect(isOAuthAccessTokenJwt('')).toBe(false);
+    });
+
+    it('returns false for other strings', () => {
+      expect(isOAuthAccessTokenJwt('other')).toBe(false);
+      expect(isOAuthAccessTokenJwt('jwt')).toBe(false);
+      expect(isOAuthAccessTokenJwt('bearer')).toBe(false);
+    });
+
+    it('returns false for case variations (typ is case-sensitive per RFC 9068)', () => {
+      expect(isOAuthAccessTokenJwt('AT+JWT')).toBe(false);
+      expect(isOAuthAccessTokenJwt('At+Jwt')).toBe(false);
+      expect(isOAuthAccessTokenJwt('APPLICATION/AT+JWT')).toBe(false);
+    });
+
+    it('returns false for non-string values', () => {
+      expect(isOAuthAccessTokenJwt(123)).toBe(false);
+      expect(isOAuthAccessTokenJwt({})).toBe(false);
+      expect(isOAuthAccessTokenJwt([])).toBe(false);
+      expect(isOAuthAccessTokenJwt(true)).toBe(false);
+    });
+  });
+});
+
+describe('assertOAuthHeaderType(typ?)', () => {
+  describe('valid OAuth access token JWT types (RFC 9068)', () => {
+    it('does not throw for at+jwt', () => {
+      expect(() => assertOAuthHeaderType('at+jwt')).not.toThrow();
+    });
+
+    it('does not throw for application/at+jwt', () => {
+      expect(() => assertOAuthHeaderType('application/at+jwt')).not.toThrow();
+    });
+  });
+
+  describe('invalid OAuth access token JWT types', () => {
+    it('throws error for JWT (session token type)', () => {
+      expect(() => assertOAuthHeaderType('JWT')).toThrow(
+        'Invalid OAuth JWT type "JWT". Expected "at+jwt" or "application/at+jwt".',
+      );
+    });
+
+    it('throws error for undefined', () => {
+      expect(() => assertOAuthHeaderType(undefined)).toThrow(
+        'Invalid OAuth JWT type undefined. Expected "at+jwt" or "application/at+jwt".',
+      );
+    });
+
+    it('throws error for null', () => {
+      expect(() => assertOAuthHeaderType(null)).toThrow(
+        'Invalid OAuth JWT type null. Expected "at+jwt" or "application/at+jwt".',
+      );
+    });
+
+    it('throws error for empty string', () => {
+      expect(() => assertOAuthHeaderType('')).toThrow(
+        'Invalid OAuth JWT type "". Expected "at+jwt" or "application/at+jwt".',
+      );
+    });
+
+    it('throws error for other strings', () => {
+      expect(() => assertOAuthHeaderType('other')).toThrow(
+        'Invalid OAuth JWT type "other". Expected "at+jwt" or "application/at+jwt".',
+      );
+    });
+
+    it('throws error for case variations (typ is case-sensitive per RFC 9068)', () => {
+      expect(() => assertOAuthHeaderType('AT+JWT')).toThrow(
+        'Invalid OAuth JWT type "AT+JWT". Expected "at+jwt" or "application/at+jwt".',
+      );
+      expect(() => assertOAuthHeaderType('At+Jwt')).toThrow(
+        'Invalid OAuth JWT type "At+Jwt". Expected "at+jwt" or "application/at+jwt".',
+      );
+    });
   });
 });

@@ -3,6 +3,7 @@ import type { JwtPayload } from '@clerk/types';
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
 import { MachineTokenVerificationError, TokenVerificationError, TokenVerificationErrorReason } from '../errors';
+import { isOAuthAccessTokenJwt } from '../jwt/assertions';
 import { decodeJwt } from '../jwt/verifyJwt';
 import { assertValidSecretKey } from '../util/optionsAssertions';
 import { isDevelopmentFromSecretKey } from '../util/shared';
@@ -105,7 +106,13 @@ function isTokenTypeInAcceptedArray(acceptsToken: TokenType[], authenticateConte
     if (isMachineTokenByPrefix(tokenInHeader)) {
       parsedTokenType = getMachineTokenType(tokenInHeader);
     } else {
-      parsedTokenType = TokenType.SessionToken;
+      // Check if it's an OAuth JWT (no prefix, but has at+jwt header type)
+      const { data: decoded } = decodeJwt(tokenInHeader);
+      if (decoded && isOAuthAccessTokenJwt(decoded.header.typ)) {
+        parsedTokenType = TokenType.OAuthToken;
+      } else {
+        parsedTokenType = TokenType.SessionToken;
+      }
     }
   }
   const typeToCheck = parsedTokenType ?? TokenType.SessionToken;
@@ -703,31 +710,53 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(new Error('Missing token in header'), 'header');
     }
 
-    // Handle case where tokenType is any and the token is not a machine token
-    if (!isMachineTokenByPrefix(tokenInHeader)) {
-      return signedOut({
-        tokenType: acceptsToken as TokenType,
+    // Check if token is a machine token by prefix
+    if (isMachineTokenByPrefix(tokenInHeader)) {
+      const parsedTokenType = getMachineTokenType(tokenInHeader);
+      const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
+      if (mismatchState) {
+        return mismatchState;
+      }
+
+      const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
+      if (errors) {
+        return handleMachineError(tokenType, errors[0]);
+      }
+      return signedIn({
+        tokenType,
         authenticateContext,
-        reason: AuthErrorReason.TokenTypeMismatch,
-        message: '',
+        machineData: data,
+        token: tokenInHeader,
       });
     }
 
-    const parsedTokenType = getMachineTokenType(tokenInHeader);
-    const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
-    if (mismatchState) {
-      return mismatchState;
+    // Check if it's an OAuth JWT (no prefix, but has at+jwt header type)
+    const { data: decoded } = decodeJwt(tokenInHeader);
+    if (decoded && isOAuthAccessTokenJwt(decoded.header.typ)) {
+      // Check if oauth_token is accepted
+      const mismatchState = checkTokenTypeMismatch(TokenType.OAuthToken, acceptsToken, authenticateContext);
+      if (mismatchState) {
+        return mismatchState;
+      }
+
+      const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
+      if (errors) {
+        return handleMachineError(tokenType, errors[0]);
+      }
+      return signedIn({
+        tokenType,
+        authenticateContext,
+        machineData: data,
+        token: tokenInHeader,
+      });
     }
 
-    const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
-    if (errors) {
-      return handleMachineError(tokenType, errors[0]);
-    }
-    return signedIn({
-      tokenType,
+    // Token is not a recognized machine token type
+    return signedOut({
+      tokenType: acceptsToken as TokenType,
       authenticateContext,
-      machineData: data,
-      token: tokenInHeader,
+      reason: AuthErrorReason.TokenTypeMismatch,
+      message: '',
     });
   }
 
@@ -738,7 +767,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(new Error('Missing token in header'), 'header');
     }
 
-    // Handle as a machine token
+    // Handle as a machine token (with prefix)
     if (isMachineTokenByPrefix(tokenInHeader)) {
       const parsedTokenType = getMachineTokenType(tokenInHeader);
       const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
@@ -746,6 +775,22 @@ export const authenticateRequest: AuthenticateRequest = (async (
         return mismatchState;
       }
 
+      const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
+      if (errors) {
+        return handleMachineError(tokenType, errors[0]);
+      }
+
+      return signedIn({
+        tokenType,
+        authenticateContext,
+        machineData: data,
+        token: tokenInHeader,
+      });
+    }
+
+    // Check if it's an OAuth JWT (no prefix, but has at+jwt header type)
+    const { data: decoded } = decodeJwt(tokenInHeader);
+    if (decoded && isOAuthAccessTokenJwt(decoded.header.typ)) {
       const { data, tokenType, errors } = await verifyMachineAuthToken(tokenInHeader, authenticateContext);
       if (errors) {
         return handleMachineError(tokenType, errors[0]);

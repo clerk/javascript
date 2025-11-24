@@ -1,3 +1,5 @@
+import { isOAuthAccessTokenJwt } from '../jwt/assertions';
+import { decodeJwt } from '../jwt/verifyJwt';
 import type { AuthenticateRequestOptions } from '../tokens/types';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -80,4 +82,16 @@ export const isTokenTypeAccepted = (
  */
 export function isMachineTokenType(type: string): type is MachineTokenType {
   return type === TokenType.ApiKey || type === TokenType.M2MToken || type === TokenType.OAuthToken;
+}
+
+/**
+ * Checks if a token is an OAuth JWT by decoding and checking the header type.
+ * OAuth JWTs have header type `at+jwt` or `application/at+jwt` per RFC 9068.
+ *
+ * @param token - The token string to check
+ * @returns true if the token is an OAuth JWT (has at+jwt or application/at+jwt header type)
+ */
+export function isOAuthJwtToken(token: string): boolean {
+  const { data: decoded } = decodeJwt(token);
+  return decoded ? isOAuthAccessTokenJwt(decoded.header.typ) : false;
 }

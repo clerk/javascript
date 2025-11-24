@@ -10,7 +10,7 @@ import {
   signedJwt,
   someOtherPublicKey,
 } from '../../fixtures';
-import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
+import { decodeJwt, hasValidSignature, isJwtFormat, JwtFormatRegExp, verifyJwt } from '../verifyJwt';
 
 const invalidTokenError = {
   reason: 'token-invalid',
@@ -128,5 +128,133 @@ describe('verifyJwt(jwt, options)', () => {
     };
     const { errors: [error] = [] } = await verifyJwt('invalid-jwt', inputVerifyJwtOptions);
     expect(error).toMatchObject(invalidTokenError);
+  });
+});
+
+describe('JwtFormatRegExp', () => {
+  describe('valid JWT formats', () => {
+    it('matches a standard JWT', () => {
+      const jwt =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(jwt)).toBe(true);
+    });
+
+    it('matches a JWT with underscores', () => {
+      const jwt =
+        'eyJhbGci_iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(jwt)).toBe(true);
+    });
+
+    it('matches a JWT with hyphens', () => {
+      const jwt =
+        'eyJhbGci-iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(jwt)).toBe(true);
+    });
+
+    it('matches a JWT with very long parts', () => {
+      const jwt = 'a'.repeat(100) + '.' + 'b'.repeat(200) + '.' + 'c'.repeat(50);
+      expect(JwtFormatRegExp.test(jwt)).toBe(true);
+    });
+
+    it('matches a JWT with minimal parts (1 char each)', () => {
+      const jwt = 'a.b.c';
+      expect(JwtFormatRegExp.test(jwt)).toBe(true);
+    });
+  });
+
+  describe('invalid JWT formats', () => {
+    it('does not match empty string', () => {
+      expect(JwtFormatRegExp.test('')).toBe(false);
+    });
+
+    it('does not match with only 2 parts', () => {
+      const notJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match with 4 parts', () => {
+      const notJwt = 'part1.part2.part3.part4';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match with only dots', () => {
+      expect(JwtFormatRegExp.test('..')).toBe(false);
+    });
+
+    it('does not match with empty parts', () => {
+      expect(JwtFormatRegExp.test('..c')).toBe(false);
+      expect(JwtFormatRegExp.test('a..c')).toBe(false);
+      expect(JwtFormatRegExp.test('a.b.')).toBe(false);
+    });
+
+    it('does not match with invalid Base64URL characters (spaces)', () => {
+      const notJwt =
+        'eyJhbGci OiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match with invalid Base64URL characters (plus sign)', () => {
+      const notJwt =
+        'eyJhbGci+iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match with invalid Base64URL characters (slash)', () => {
+      const notJwt =
+        'eyJhbGci/iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match with equals sign (padding)', () => {
+      const notJwt =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9=.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match with newlines', () => {
+      const notJwt =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\n.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      expect(JwtFormatRegExp.test(notJwt)).toBe(false);
+    });
+
+    it('does not match an API key format', () => {
+      const apiKey = 'sk_test_1234567890abcdef';
+      expect(JwtFormatRegExp.test(apiKey)).toBe(false);
+    });
+
+    it('does not match a random string', () => {
+      const randomString = 'this is not a jwt';
+      expect(JwtFormatRegExp.test(randomString)).toBe(false);
+    });
+  });
+});
+
+describe('isJwtFormat(token)', () => {
+  it('returns true for valid JWT format', () => {
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+    expect(isJwtFormat(jwt)).toBe(true);
+  });
+
+  it('returns false for invalid JWT format', () => {
+    expect(isJwtFormat('not.a.jwt!')).toBe(false);
+    expect(isJwtFormat('only.two')).toBe(false);
+    expect(isJwtFormat('')).toBe(false);
+  });
+
+  it('has same behavior as regex test', () => {
+    const testCases = ['valid.jwt.token', 'invalid', 'two.parts', 'one.two.three.four', '', 'a.b.c'];
+
+    testCases.forEach(testCase => {
+      expect(isJwtFormat(testCase)).toBe(JwtFormatRegExp.test(testCase));
+    });
+  });
+
+  it('returns true for the mockJwt fixture', () => {
+    expect(isJwtFormat(mockJwt)).toBe(true);
+  });
+
+  it('returns true for the signedJwt fixture', () => {
+    expect(isJwtFormat(signedJwt)).toBe(true);
   });
 });

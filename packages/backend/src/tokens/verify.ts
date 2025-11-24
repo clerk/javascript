@@ -2,8 +2,9 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Simplify } from '@clerk/shared/types';
 import type { JwtPayload } from '@clerk/types';
 
-import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
+import type { APIKey, M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
+import { IdPOAuthAccessToken } from '../api/resources/IdPOAuthAccessToken';
 import {
   MachineTokenVerificationError,
   MachineTokenVerificationErrorCode,
@@ -12,8 +13,9 @@ import {
   TokenVerificationErrorReason,
 } from '../errors';
 import type { VerifyJwtOptions } from '../jwt';
+import { isOAuthAccessTokenJwt } from '../jwt/assertions';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
-import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
+import { decodeJwt, verifyJwt, verifyOAuthAccessTokenJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
@@ -206,7 +208,7 @@ async function verifyM2MToken(
   }
 }
 
-async function verifyOAuthToken(
+async function verifyOpaqueOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
@@ -216,6 +218,88 @@ async function verifyOAuthToken(
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
+  }
+}
+
+async function verifyOAuthToken(
+  accessToken: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
+  // If token starts with oat_ prefix, use network verification (opaque token)
+  if (accessToken.startsWith(OAUTH_TOKEN_PREFIX)) {
+    return verifyOpaqueOAuthToken(accessToken, options);
+  }
+
+  // Try to decode as JWT
+  const { data: decodedResult, errors: decodeErrors } = decodeJwt(accessToken);
+  if (decodeErrors) {
+    // Not a valid JWT, fall back to network verification
+    return verifyOpaqueOAuthToken(accessToken, options);
+  }
+
+  // Check if it's an OAuth access token JWT by header type
+  if (!isOAuthAccessTokenJwt(decodedResult.header.typ)) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          message: `Invalid OAuth JWT type ${JSON.stringify(decodedResult.header.typ)}. Expected "at+jwt" or "application/at+jwt".`,
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          status: 401,
+        }),
+      ],
+    };
+  }
+
+  const { kid } = decodedResult.header;
+
+  try {
+    let key: JsonWebKey;
+
+    if (options.jwtKey) {
+      // Verify JWT networklessly if jwtKey is available
+      key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
+    } else if (options.secretKey) {
+      // Fetch JWKS from Backend API using the key
+      key = await loadClerkJWKFromRemote({ ...options, kid });
+    } else {
+      // Fall back to network verification if no key is available
+      return verifyOpaqueOAuthToken(accessToken, options);
+    }
+
+    const { data: payload, errors } = await verifyOAuthAccessTokenJwt(accessToken, { ...options, key });
+    if (errors) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            message: errors[0].message,
+            code: MachineTokenVerificationErrorCode.TokenInvalid,
+            status: 401,
+          }),
+        ],
+      };
+    }
+
+    return {
+      data: IdPOAuthAccessToken.fromJwtPayload(payload, options.clockSkewInMs),
+      tokenType: TokenType.OAuthToken,
+      errors: undefined,
+    };
+  } catch (error) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          message: (error as Error).message,
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          status: 401,
+        }),
+      ],
+    };
   }
 }
 
@@ -233,9 +317,9 @@ async function verifyAPIKey(
 }
 
 /**
- * Verifies any type of machine token by detecting its type from the prefix.
+ * Verifies any type of machine token by detecting its type from the prefix or JWT header type.
  *
- * @param token - The token to verify (e.g. starts with "m2m_", "oauth_", "api_key_", etc.)
+ * @param token - The token to verify (e.g. starts with "m2m_", "oauth_", "api_key_", or an OAuth JWT with at+jwt header)
  * @param options - Options including secretKey for BAPI authorization
  */
 export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
@@ -247,6 +331,12 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
   }
   if (token.startsWith(API_KEY_PREFIX)) {
     return verifyAPIKey(token, options);
+  }
+
+  // Check if it's an OAuth JWT (no prefix, but has at+jwt header type)
+  const { data: decoded } = decodeJwt(token);
+  if (decoded && isOAuthAccessTokenJwt(decoded.header.typ)) {
+    return verifyOAuthToken(token, options);
   }
 
   throw new Error('Unknown machine token type');

@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../../api';
-import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
+import { createJwt, mockJwks, mockJwt, mockJwtPayload, mockRsaJwkKid, pemEncodedPublicKey } from '../../fixtures';
 import { mockVerificationResults } from '../../fixtures/machine';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
@@ -311,6 +311,177 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toBe('Unexpected error');
       expect(result.errors?.[0].code).toBe('unexpected-error');
+    });
+  });
+
+  describe('OAuth JWT tokens (at+jwt header type)', () => {
+    it('rejects session JWT as unknown machine token type', async () => {
+      // mockJwt has typ: JWT (session token header), not at+jwt (OAuth token header)
+      // So it should fail as unknown machine token type when passed to verifyMachineAuthToken
+      await expect(
+        verifyMachineAuthToken(mockJwt, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+          skipJwksCache: true,
+        }),
+      ).rejects.toThrow('Unknown machine token type');
+    });
+
+    it('returns error for JWT with wrong typ header (JWT instead of at+jwt)', async () => {
+      // Create a JWT with typ: JWT (session token type, not OAuth)
+      const jwtWithWrongTyp = createJwt({
+        header: { typ: 'JWT', kid: mockRsaJwkKid },
+        payload: {
+          jti: 'oat_test_wrong_typ',
+          client_id: 'client_test_id',
+          sub: 'user_test_id',
+          scope: 'read:user',
+          exp: Date.now() / 1000 + 3600,
+          iat: Date.now() / 1000,
+        },
+      });
+
+      // A JWT with typ: JWT should be rejected as unknown machine token type
+      await expect(
+        verifyMachineAuthToken(jwtWithWrongTyp, {
+          jwtKey: pemEncodedPublicKey,
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        }),
+      ).rejects.toThrow('Unknown machine token type');
+    });
+
+    it('returns error for JWT without typ header', async () => {
+      // Create a JWT without typ header
+      const jwtWithoutTyp = createJwt({
+        header: { typ: undefined, kid: mockRsaJwkKid },
+        payload: {
+          jti: 'oat_test_no_typ',
+          client_id: 'client_test_id',
+          sub: 'user_test_id',
+          scope: 'read:user',
+          exp: Date.now() / 1000 + 3600,
+          iat: Date.now() / 1000,
+        },
+      });
+
+      // A JWT without typ header should be rejected as unknown machine token type
+      await expect(
+        verifyMachineAuthToken(jwtWithoutTyp, {
+          jwtKey: pemEncodedPublicKey,
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        }),
+      ).rejects.toThrow('Unknown machine token type');
+    });
+
+    it('returns error for OAuth JWT with invalid typ header (at+jwt)', async () => {
+      // Create a JWT with at+jwt header - this will be detected as OAuth JWT
+      // but when we try to verify it, it will fail because signature doesn't match
+      const oauthJwt = createJwt({
+        header: { typ: 'at+jwt', kid: mockRsaJwkKid },
+        payload: {
+          jti: 'oat_test_jwt_id',
+          client_id: 'client_test_id',
+          sub: 'user_test_id',
+          scope: 'read:user',
+          exp: Date.now() / 1000 + 3600,
+          iat: Date.now() / 1000,
+        },
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        jwtKey: pemEncodedPublicKey,
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toBeDefined();
+      // The error should be about invalid signature since createJwt uses a mock signature
+      expect(result.errors?.[0].message).toContain('signature');
+    });
+
+    it('returns error for expired OAuth JWT', async () => {
+      // Create an expired OAuth JWT
+      const expiredOauthJwt = createJwt({
+        header: { typ: 'at+jwt', kid: mockRsaJwkKid },
+        payload: {
+          jti: 'oat_test_expired',
+          client_id: 'client_test_id',
+          sub: 'user_test_id',
+          scope: 'read:user',
+          exp: Date.now() / 1000 - 3600, // Expired 1 hour ago
+          iat: Date.now() / 1000 - 7200,
+        },
+      });
+
+      const result = await verifyMachineAuthToken(expiredOauthJwt, {
+        jwtKey: pemEncodedPublicKey,
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toBeDefined();
+      // The error message should indicate the token is expired
+      expect(result.errors?.[0].message).toContain('expired');
+    });
+
+    it('returns error for OAuth JWT with alg=none', async () => {
+      // Create a JWT with alg: none (insecure algorithm that should be rejected)
+      const jwtWithAlgNone = createJwt({
+        header: { typ: 'at+jwt', alg: 'none', kid: mockRsaJwkKid },
+        payload: {
+          jti: 'oat_test_alg_none',
+          client_id: 'client_test_id',
+          sub: 'user_test_id',
+          scope: 'read:user',
+          exp: Date.now() / 1000 + 3600,
+          iat: Date.now() / 1000,
+        },
+        signature: '', // alg=none tokens have empty signature
+      });
+
+      const result = await verifyMachineAuthToken(jwtWithAlgNone, {
+        jwtKey: pemEncodedPublicKey,
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toBeDefined();
+      // The error should be about invalid algorithm
+      expect(result.errors?.[0].message).toContain('algorithm');
+    });
+
+    it('detects OAuth JWT by application/at+jwt header type', async () => {
+      // Create a JWT with application/at+jwt header (alternative valid type per RFC 9068)
+      const oauthJwt = createJwt({
+        header: { typ: 'application/at+jwt', kid: mockRsaJwkKid },
+        payload: {
+          jti: 'oat_test_app_at_jwt',
+          client_id: 'client_test_id',
+          sub: 'user_test_id',
+          scope: 'read:user',
+          exp: Date.now() / 1000 + 3600,
+          iat: Date.now() / 1000,
+        },
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        jwtKey: pemEncodedPublicKey,
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      // Should be detected as OAuth token by the header type
+      expect(result.tokenType).toBe('oauth_token');
+      // Will have errors due to signature mismatch, but it was correctly identified as OAuth
+      expect(result.errors).toBeDefined();
     });
   });
 });

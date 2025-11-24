@@ -61,6 +61,21 @@ export const assertHeaderType = (typ?: unknown) => {
   }
 };
 
+const OAUTH_ACCESS_TOKEN_TYPES = ['at+jwt', 'application/at+jwt'] as const;
+
+export const isOAuthAccessTokenJwt = (typ?: unknown): boolean => {
+  return typeof typ === 'string' && OAUTH_ACCESS_TOKEN_TYPES.includes(typ as (typeof OAUTH_ACCESS_TOKEN_TYPES)[number]);
+};
+
+export const assertOAuthHeaderType = (typ?: unknown) => {
+  if (!isOAuthAccessTokenJwt(typ)) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenInvalid,
+      message: `Invalid OAuth JWT type ${JSON.stringify(typ)}. Expected "at+jwt" or "application/at+jwt".`,
+    });
+  }
+};
+
 export const assertHeaderAlgorithm = (alg: string) => {
   if (!algs.includes(alg)) {
     throw new TokenVerificationError({

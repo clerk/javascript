@@ -12,10 +12,36 @@ import {
   assertHeaderAlgorithm,
   assertHeaderType,
   assertIssuedAtClaim,
+  assertOAuthHeaderType,
   assertSubClaim,
 } from './assertions';
 import { importKey } from './cryptoKeys';
 import type { JwtReturnType } from './types';
+
+/**
+ * Regular expression to validate if a string matches the JWT format.
+ * A valid JWT consists of three Base64URL-encoded parts separated by dots:
+ * - Header (algorithm and token type)
+ * - Payload (claims)
+ * - Signature
+ *
+ * Base64URL characters: A-Z, a-z, 0-9, -, _
+ *
+ * @see https://datatracker.ietf.org/doc/html/rfc7519
+ */
+export const JwtFormatRegExp = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+
+/**
+ * Checks if a string is in valid JWT format.
+ * This only validates the structure (3 Base64URL-encoded parts separated by dots).
+ * It does NOT verify the signature or validate the claims.
+ *
+ * @param token - The string to check
+ * @returns true if the string matches JWT format, false otherwise
+ */
+export function isJwtFormat(token: string): boolean {
+  return JwtFormatRegExp.test(token);
+}
 
 const DEFAULT_CLOCK_SKEW_IN_MS = 5 * 1000;
 
@@ -173,6 +199,65 @@ export async function verifyJwt(
         new TokenVerificationError({
           reason: TokenVerificationErrorReason.TokenInvalidSignature,
           message: 'JWT signature is invalid.',
+        }),
+      ],
+    };
+  }
+
+  return { data: payload };
+}
+
+export async function verifyOAuthAccessTokenJwt(
+  token: string,
+  options: VerifyJwtOptions,
+): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
+  const { audience, clockSkewInMs, key } = options;
+  const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_MS;
+
+  const { data: decoded, errors } = decodeJwt(token);
+  if (errors) {
+    return { errors };
+  }
+
+  const { header, payload } = decoded;
+  try {
+    // Header verifications
+    const { typ, alg } = header;
+
+    assertOAuthHeaderType(typ);
+    assertHeaderAlgorithm(alg);
+
+    // Payload verifications - OAuth tokens don't have azp claim
+    const { sub, aud, iat, exp, nbf } = payload;
+
+    assertSubClaim(sub);
+    assertAudienceClaim([aud], [audience]);
+    assertExpirationClaim(exp, clockSkew);
+    assertActivationClaim(nbf, clockSkew);
+    assertIssuedAtClaim(iat, clockSkew);
+  } catch (err) {
+    return { errors: [err as TokenVerificationError] };
+  }
+
+  const { data: signatureValid, errors: signatureErrors } = await hasValidSignature(decoded, key);
+  if (signatureErrors) {
+    return {
+      errors: [
+        new TokenVerificationError({
+          action: TokenVerificationErrorAction.EnsureClerkJWT,
+          reason: TokenVerificationErrorReason.TokenVerificationFailed,
+          message: `Error verifying OAuth JWT signature. ${signatureErrors[0]}`,
+        }),
+      ],
+    };
+  }
+
+  if (!signatureValid) {
+    return {
+      errors: [
+        new TokenVerificationError({
+          reason: TokenVerificationErrorReason.TokenInvalidSignature,
+          message: 'OAuth JWT signature is invalid.',
         }),
       ],
     };
