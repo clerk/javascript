@@ -1,6 +1,10 @@
 import Lock from 'browser-tabs-lock';
 
-export function SafeLock(key: string) {
+export interface SafeLockReturn {
+  acquireLockAndRun: (cb: () => Promise<unknown>) => Promise<unknown>;
+}
+
+export function SafeLock(key: string): SafeLockReturn {
   const lock = new Lock();
 
   // TODO: Figure out how to fix this linting error
