@@ -753,7 +753,7 @@ export class Clerk implements ClerkInterface {
   ): __internal_AttemptToEnableEnvironmentSettingResult => {
     const { for: setting, caller } = params;
 
-    if (!this.user) {
+    if (!this.user && this.#instanceType === 'development') {
       logger.warnOnce(
         `Clerk: "${caller}" requires an active user session. Ensure a user is signed in before executing ${caller}.`,
       );
