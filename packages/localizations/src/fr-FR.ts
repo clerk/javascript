@@ -877,6 +877,14 @@ export const frFR: LocalizationResource = {
       actionText: 'Connecté en tant que {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
     captcha_invalid:
