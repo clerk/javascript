@@ -1,15 +1,12 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
 import Constants from 'expo-constants';
+import * as Crypto from 'expo-crypto';
 
+import { ClerkGoogleOneTapSignIn, isSuccessResponse } from '../google-one-tap';
 import { errorThrower } from '../utils/errors';
 
-// Define our own interface to avoid importing types from an optional dependency
-// This keeps @react-native-google-signin/google-signin as an optional peer dependency
-interface GoogleSigninInterface {
-  configure(config: { webClientId: string; iosClientId?: string }): void;
-  signIn(): Promise<{ data?: { idToken?: string } }>;
-}
+// Type for unsafe metadata that can be attached to sign-ups
+type SignUpUnsafeMetadata = Record<string, any>;
 
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
@@ -17,18 +14,23 @@ export type StartGoogleAuthenticationFlowParams = {
 
 export type StartGoogleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
-  setActive?: SetActive;
-  signIn?: SignInResource;
-  signUp?: SignUpResource;
+  setActive?: any;
+  signIn?: any;
+  signUp?: any;
 };
 
 /**
- * Hook for native Google Authentication on iOS using @react-native-google-signin/google-signin.
+ * Hook for native Google Authentication on iOS using Clerk's built-in Google Sign-In module.
  *
  * This hook provides a simplified way to authenticate users with their Google account
  * using the native iOS Google Sign-In UI. The authentication flow automatically
  * handles the ID token exchange with Clerk's backend and manages the transfer flow
  * between sign-in and sign-up.
+ *
+ * Features:
+ * - Native Google Sign-In UI
+ * - Built-in nonce support for replay attack protection
+ * - No additional dependencies required
  *
  * @example
  * ```tsx
@@ -54,8 +56,7 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * }
  * ```
  *
- * @requires @react-native-google-signin/google-signin - Must be installed as a peer dependency
- * @platform iOS - This is the iOS-specific implementation
+ * @platform iOS - This is the iOS-specific implementation using Google Sign-In SDK
  *
  * @returns An object containing the `startGoogleAuthenticationFlow` function
  */
@@ -75,77 +76,51 @@ export function useSignInWithGoogle() {
       };
     }
 
+    // Get environment variables from expo-constants
+    const webClientId =
+      Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
+    const iosClientId =
+      Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID ||
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID;
+
+    if (!webClientId || !iosClientId) {
+      return errorThrower.throw(
+        'Google Sign-In credentials not found. Please set EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID and EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID in your .env file.',
+      );
+    }
+
+    // Configure Google Sign-In with both client IDs
+    // - iosClientId: Used for the OAuth flow on iOS
+    // - webClientId: Used as serverClientID for token audience (what Clerk backend verifies)
+    ClerkGoogleOneTapSignIn.configure({
+      webClientId,
+      iosClientId,
+    });
+
+    // Generate a cryptographic nonce for replay attack protection
+    const nonce = Crypto.randomUUID();
+
+    // Hash the nonce with SHA-256 (Google requires the hashed version)
+    const hashedNonce = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, nonce);
+
     try {
-      // Dynamically import GoogleSignin to keep it as an optional dependency
-      // This will only fail at runtime if the user tries to use it without installing the package
-      let GoogleSignin: GoogleSigninInterface;
-      try {
-        const module = await import('@react-native-google-signin/google-signin');
-        GoogleSignin = module.GoogleSignin;
-      } catch {
-        return errorThrower.throw(
-          'Google Sign-In package not found. Please install @react-native-google-signin/google-signin to use this feature.',
-        );
-      }
-
-      // Get environment variables from expo-constants
-      const webClientId =
-        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
-        process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
-      const iosClientId =
-        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID ||
-        process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID;
-
-      if (!webClientId || !iosClientId) {
-        return errorThrower.throw(
-          'Google Sign-In credentials not found. Please set EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID and EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID in your .env file.',
-        );
-      }
-
-      // Configure Google Sign-In (can be called multiple times safely)
-      GoogleSignin.configure({
-        webClientId,
-        iosClientId,
+      // Present Google Sign-In UI with nonce
+      const response = await ClerkGoogleOneTapSignIn.presentExplicitSignIn({
+        nonce: hashedNonce,
       });
 
-      // Sign in with Google
-      const response = await GoogleSignin.signIn();
-
-      console.log('[useSignInWithGoogle] iOS: Full Google Sign-In response:', JSON.stringify(response, null, 2));
-      console.log('[useSignInWithGoogle] iOS: Response keys:', Object.keys(response));
-      if (response.data) {
-        console.log('[useSignInWithGoogle] iOS: Response.data keys:', Object.keys(response.data));
+      // User cancelled
+      if (!isSuccessResponse(response)) {
+        return {
+          createdSessionId: null,
+          setActive,
+          signIn,
+          signUp,
+        };
       }
 
-      // Extract the ID token from the response
-      const idToken = response.data?.idToken;
-
-      if (!idToken) {
-        return errorThrower.throw('No ID token received from Google Sign-In.');
-      }
-
-      // Debug: Decode the JWT to see what's in it
-      try {
-        const [, payloadBase64] = idToken.split('.');
-        const payload = JSON.parse(atob(payloadBase64));
-        console.log('[useSignInWithGoogle] iOS: ID Token payload:', JSON.stringify(payload, null, 2));
-        console.log('[useSignInWithGoogle] iOS: Token audience (aud):', payload.aud);
-        console.log('[useSignInWithGoogle] iOS: Token issuer (iss):', payload.iss);
-        console.log('[useSignInWithGoogle] iOS: Token unique ID (jti):', payload.jti || 'NONE');
-        console.log('[useSignInWithGoogle] iOS: Token nonce:', payload.nonce || 'NONE');
-        console.log(
-          '[useSignInWithGoogle] iOS: Token issued at (iat):',
-          payload.iat,
-          '(' + new Date(payload.iat * 1000).toISOString() + ')',
-        );
-        console.log(
-          '[useSignInWithGoogle] iOS: Token expires at (exp):',
-          payload.exp,
-          '(' + new Date(payload.exp * 1000).toISOString() + ')',
-        );
-      } catch (e) {
-        console.log('[useSignInWithGoogle] iOS: Could not decode token:', e);
-      }
+      const { idToken } = response.data;
 
       try {
         // Try to sign in with the Google One Tap strategy
@@ -181,19 +156,20 @@ export function useSignInWithGoogle() {
         };
       } catch (signInError: unknown) {
         // Handle the case where the user doesn't exist (external_account_not_found)
-        // In this case, we need to create a sign-up with the same token
         const isClerkError =
           signInError &&
           typeof signInError === 'object' &&
           'clerkError' in signInError &&
-          (signInError as any).clerkError === true;
+          (signInError as { clerkError: boolean }).clerkError === true;
 
         const hasExternalAccountNotFoundError =
           signInError &&
           typeof signInError === 'object' &&
           'errors' in signInError &&
-          Array.isArray((signInError as any).errors) &&
-          (signInError as any).errors.some((err: any) => err.code === 'external_account_not_found');
+          Array.isArray((signInError as { errors: unknown[] }).errors) &&
+          (signInError as { errors: Array<{ code: string }> }).errors.some(
+            err => err.code === 'external_account_not_found',
+          );
 
         if (isClerkError && hasExternalAccountNotFoundError) {
           // User doesn't exist - create a new SignUp with the token
@@ -220,7 +196,7 @@ export function useSignInWithGoogle() {
         const errorCode = (error as { code: string }).code;
 
         // User canceled the sign-in flow
-        if (errorCode === 'SIGN_IN_CANCELLED' || errorCode === '-5') {
+        if (errorCode === 'SIGN_IN_CANCELLED') {
           return {
             createdSessionId: null,
             setActive,
