@@ -1,16 +1,21 @@
 import { createWorkerTimers } from '@clerk/shared/workerTimers';
 
+import type { SafeLockReturn } from './safeLock';
 import { SafeLock } from './safeLock';
 
-const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
+export const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 const INTERVAL_IN_MS = 5 * 1_000;
 
 export class SessionCookiePoller {
-  private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
+  private lock: SafeLockReturn;
   private workerTimers = createWorkerTimers();
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;
   // Disallows for multiple `startPollingForSessionToken()` calls before `callback` is executed.
   private initiated = false;
+
+  constructor(lock?: SafeLockReturn) {
+    this.lock = lock ?? SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
+  }
 
   public startPollingForSessionToken(cb: () => Promise<unknown>): void {
     if (this.timerId || this.initiated) {

@@ -20,7 +20,9 @@ import { createSessionCookie } from './cookies/session';
 import { getCookieSuffix } from './cookieSuffix';
 import type { DevBrowser } from './devBrowser';
 import { createDevBrowser } from './devBrowser';
-import { SessionCookiePoller } from './SessionCookiePoller';
+import type { SafeLockReturn } from './safeLock';
+import { SafeLock } from './safeLock';
+import { REFRESH_SESSION_TOKEN_LOCK_KEY, SessionCookiePoller } from './SessionCookiePoller';
 
 // TODO(@dimkl): make AuthCookieService singleton since it handles updating cookies using a poller
 // and we need to avoid updating them concurrently.
@@ -41,11 +43,12 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
  */
 export class AuthCookieService {
-  private poller: SessionCookiePoller | null = null;
-  private clientUat: ClientUatCookieHandler;
-  private sessionCookie: SessionCookieHandler;
   private activeCookie: ReturnType<typeof createCookieHandler>;
+  private clientUat: ClientUatCookieHandler;
   private devBrowser: DevBrowser;
+  private poller: SessionCookiePoller | null = null;
+  private sessionCookie: SessionCookieHandler;
+  private tokenRefreshLock: SafeLockReturn;
 
   public static async create(
     clerk: Clerk,
@@ -66,6 +69,11 @@ export class AuthCookieService {
     private instanceType: InstanceType,
     private clerkEventBus: ReturnType<typeof createClerkEventBus>,
   ) {
+    // Create shared lock for cross-tab token refresh coordination.
+    // This lock is used by both the poller and the focus handler to prevent
+    // concurrent token fetches across tabs.
+    this.tokenRefreshLock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
+
     // set cookie on token update
     eventBus.on(events.TokenUpdate, ({ token }) => {
       this.updateSessionCookie(token && token.getRawString());
@@ -77,14 +85,14 @@ export class AuthCookieService {
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(cookieSuffix);
-    this.sessionCookie = createSessionCookie(cookieSuffix);
     this.activeCookie = createActiveContextCookie();
+    this.clientUat = createClientUatCookie(cookieSuffix);
     this.devBrowser = createDevBrowser({
-      frontendApi: clerk.frontendApi,
-      fapiClient,
       cookieSuffix,
+      fapiClient,
+      frontendApi: clerk.frontendApi,
     });
+    this.sessionCookie = createSessionCookie(cookieSuffix);
   }
 
   public async setup() {
@@ -126,7 +134,7 @@ export class AuthCookieService {
 
   public startPollingForToken() {
     if (!this.poller) {
-      this.poller = new SessionCookiePoller();
+      this.poller = new SessionCookiePoller(this.tokenRefreshLock);
       this.poller.startPollingForSessionToken(() => this.refreshSessionToken());
     }
   }
@@ -147,7 +155,11 @@ export class AuthCookieService {
         // is updated as part of the scheduled microtask. Our existing event-based mechanism to update the cookie schedules a task, and so the cookie
         // is updated too late and not guaranteed to be fresh before the refetch occurs.
         // While online `.schedule()` executes synchronously and immediately, ensuring the above mechanism will not break.
-        void this.refreshSessionToken({ updateCookieImmediately: true });
+        //
+        // We use the shared lock to coordinate with the poller and other tabs, preventing
+        // concurrent token fetches when multiple tabs become visible or when focus events
+        // fire while the poller is already refreshing the token.
+        void this.tokenRefreshLock.acquireLockAndRun(() => this.refreshSessionToken({ updateCookieImmediately: true }));
       }
     });
   }
