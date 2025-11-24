@@ -6,7 +6,6 @@ import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from '../utils';
-import { getPublicEnvVariables } from '../utils/env';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
 
@@ -22,8 +21,6 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
   const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, request.clerkUrl, commonEnv.PROXY_URL);
   const signInUrl = overrides.signInUrl || commonEnv.SIGN_IN_URL;
   const signUpUrl = overrides.signUpUrl || commonEnv.SIGN_UP_URL;
-  const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables().afterSignInUrl;
-  const afterSignUpUrl = overrides.afterSignUpUrl || getPublicEnvVariables().afterSignUpUrl;
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
@@ -60,7 +57,5 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl,
     signInUrl,
     signUpUrl,
-    afterSignInUrl,
-    afterSignUpUrl,
   };
 };
