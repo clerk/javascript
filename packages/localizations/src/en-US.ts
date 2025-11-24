@@ -861,12 +861,12 @@ export const enUS: LocalizationResource = {
     },
   },
   taskResetPassword: {
-    title: 'Reset password',
+    formButtonPrimary: 'Reset Password',
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
-    formButtonPrimary: 'Reset Password',
+    title: 'Reset password',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
