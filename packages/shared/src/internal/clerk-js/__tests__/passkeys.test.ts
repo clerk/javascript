@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '../../../types';
+} from '@/types';
+
 import {
   bufferToBase64Url,
   convertJSONToPublicKeyCreateOptions,
