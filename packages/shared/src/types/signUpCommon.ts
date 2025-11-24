@@ -117,6 +117,10 @@ export type SignUpAuthenticateWithWeb3Params = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
 
+export type SignUpAuthenticateWithSolanaParams = SignUpAuthenticateWithWeb3Params & {
+  walletName: string;
+};
+
 export interface SignUpVerificationsResource {
   emailAddress: SignUpVerificationResource;
   phoneNumber: SignUpVerificationResource;

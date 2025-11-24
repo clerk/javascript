@@ -468,12 +468,13 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithSolana = async ({ walletName }: AuthenticateWithSolanaParams): Promise<SignInResource> => {
-    const identifier = await getSolanaIdentifier({ walletName });
+  public authenticateWithSolana = async (params?: AuthenticateWithSolanaParams): Promise<SignInResource> => {
+    const identifier = await getSolanaIdentifier({ walletName: params?.walletName });
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithSolana,
       strategy: 'web3_solana_signature',
+      walletName: params?.walletName,
     });
   };
 

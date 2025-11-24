@@ -870,6 +870,11 @@ export interface Clerk {
   authenticateWithBase: (params?: AuthenticateWithBaseParams) => Promise<unknown>;
 
   /**
+   * Authenticates user using their Solana supported Web3 wallet browser extension
+   */
+  authenticateWithSolana: (params?: AuthenticateWithSolanaParams) => Promise<unknown>;
+
+  /**
    * Authenticates user using their Web3 Wallet browser extension
    */
   authenticateWithWeb3: (params: ClerkAuthenticateWithWeb3Params) => Promise<unknown>;
