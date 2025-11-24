@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render } from '@/test/utils';
+import { render, waitFor } from '@/test/utils';
 
 import { TaskResetPassword } from '..';
 
@@ -13,6 +13,7 @@ describe('TaskResetPassword', () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
+        identifier: 'test@clerk.com',
       });
     });
 
@@ -28,6 +29,7 @@ describe('TaskResetPassword', () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
+        identifier: 'test@clerk.com',
         tasks: [{ key: 'reset-password' }],
       });
     });
@@ -40,12 +42,13 @@ describe('TaskResetPassword', () => {
     expect(queryByRole('link', { name: /sign out/i })).toBeInTheDocument();
   });
 
-  it('renders the task components in the order of the tasks', async () => {
+  it('renders the task components in the exact order of the tasks returned by the API', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withOrganizations();
       f.withForceOrganizationSelection();
       f.withUser({
         email_addresses: ['test@clerk.com'],
+        identifier: 'test@clerk.com',
         tasks: [{ key: 'reset-password' }, { key: 'choose-organization' }],
       });
     });
@@ -58,10 +61,48 @@ describe('TaskResetPassword', () => {
     expect(queryByRole('link', { name: /sign out/i })).toBeInTheDocument();
   });
 
+  it('tries to reset the password and calls the appropriate function', async () => {
+    const { wrapper, fixtures } = await createFixtures(f =>
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        identifier: 'test@clerk.com',
+        tasks: [{ key: 'reset-password' }],
+      }),
+    );
+
+    fixtures.clerk.user?.updatePassword.mockResolvedValue({});
+    const { getByRole, userEvent, getByLabelText } = render(<TaskResetPassword />, { wrapper });
+    await waitFor(() => getByRole('heading', { name: /Reset password/i }));
+
+    await userEvent.type(getByLabelText(/new password/i), 'testtest');
+    await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
+    await userEvent.click(getByRole('button', { name: /reset password$/i }));
+    expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
+      newPassword: 'testtest',
+      signOutOfOtherSessions: true,
+    });
+  });
+
+  it('renders a hidden identifier field', async () => {
+    const { wrapper } = await createFixtures(f => {
+      f.withUser({
+        email_addresses: ['test@clerk.com'],
+        identifier: 'test@clerk.com',
+        tasks: [{ key: 'reset-password' }],
+      });
+    });
+    const { getByRole, getByTestId } = render(<TaskResetPassword />, { wrapper });
+    await waitFor(() => getByRole('heading', { name: /Reset password/i }));
+
+    const identifierField = getByTestId('hidden-identifier');
+    expect(identifierField).toHaveValue('test@clerk.com');
+  });
+
   it('displays user identifier in sign out section', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withUser({
         email_addresses: ['user@test.com'],
+        identifier: 'user@test.com',
         tasks: [{ key: 'reset-password' }],
       });
     });
@@ -76,6 +117,7 @@ describe('TaskResetPassword', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({
         email_addresses: ['test@clerk.com'],
+        identifier: 'test@clerk.com',
         tasks: [{ key: 'reset-password' }],
       });
     });
