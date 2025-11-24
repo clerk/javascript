@@ -1,5 +1,30 @@
 # Change Log
 
+## 5.56.2
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+
+## 5.56.1
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+
+## 5.56.0
+
+### Minor Changes
+
+- Standardized API keys naming convention ([#7223](https://github.com/clerk/javascript/pull/7223)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/shared@3.35.0
+
 ## 5.55.0
 
 ### Minor Changes
@@ -392,7 +417,6 @@
 ### Minor Changes
 
 - Expose commerce hooks and components under the experimental module. ([#6383](https://github.com/clerk/javascript/pull/6383)) by [@panteliselef](https://github.com/panteliselef)
-
   - PaymentElementProvider,
   - usePaymentElement,
   - PaymentElement,
@@ -491,7 +515,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`
@@ -634,18 +657,15 @@
 - Expose Clerk Billing APIs. ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   ## Render the pricing table component
-
   - `Clerk.mountPricingTable`
   - `Clerk.unmountPricingTable`
 
   ## Manage payment methods
-
   - `Clerk.[user|organization].initializePaymentSource()`
   - `Clerk.[user|organization].addPaymentSource()`
   - `Clerk.[user|organization].getPaymentSources()`
 
   ## Billing namespace
-
   - `Clerk.billing`
     - `Clerk.billing.getPlans()`
     - `Clerk.billing.getSubscriptions()`
@@ -725,7 +745,6 @@
   ### `useClerk().status`
 
   Possible values for `useClerk().status` are:
-
   - `"loading"`: Set during initialization
   - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
   - `"ready"`: Set when Clerk is fully operational
@@ -797,15 +816,12 @@
   ## `useAuth()`
 
   ### Plan
-
   - `useAuth().has({ plan: "my-plan" })`
 
   ### Feature
-
   - `useAuth().has({ feature: "my-feature" })`
 
   ### Scoped per user or per org
-
   - `useAuth().has({ feature: "org:my-feature" })`
   - `useAuth().has({ feature: "user:my-feature" })`
   - `useAuth().has({ plan: "user:my-plan" })`
@@ -814,15 +830,12 @@
   ## `<Protect />`
 
   ### Plan
-
   - `<Protect plan="my-plan" />`
 
   ### Feature
-
   - `<Protect feature="my-feature" />`
 
   ### Scoped per user or per org
-
   - `<Protect feature="org:my-feature" />`
   - `<Protect feature="user:my-feature" />`
   - `<Protect plan="org:my-plan" />`
@@ -843,7 +856,6 @@
 ### Minor Changes
 
 - Introduce `sessionClaims` to useAuth(). ([#5565](https://github.com/clerk/javascript/pull/5565)) by [@panteliselef](https://github.com/panteliselef)
-
   - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
 
 ### Patch Changes
@@ -1229,7 +1241,6 @@
 - Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
 
   This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
-
   - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
   - `__internal_reloadInitialResources()`: This function is used to reload the initial resources (Environment/Client) from the Frontend API.
 
@@ -1282,7 +1293,6 @@
 - Various internal changes have been made to support a new feature called "Keyless mode". You'll be able to use this feature with Next.js and `@clerk/nextjs` initially. Read the `@clerk/nextjs` changelog to learn more. ([#4602](https://github.com/clerk/javascript/pull/4602)) by [@panteliselef](https://github.com/panteliselef)
 
   List of changes:
-
   - A new internal prop called `__internal_bypassMissingPublishableKey` has been added. Normally an error is thrown when the publishable key is missing, this disables this behavior.
   - Loading of `clerk-js` won't be attempted when a missing key is present
   - A new instance of `IsomorphicClerk` (an internal Clerk class) is created for each new publishable key
@@ -1336,7 +1346,6 @@
 - Re-export `isClerkRuntimeError` from `@clerk/clerk-react/errors`. ([#4656](https://github.com/clerk/javascript/pull/4656)) by [@panteliselef](https://github.com/panteliselef)
 
 - Add deprecation notices for the following components: ([#4631](https://github.com/clerk/javascript/pull/4631)) by [@alexcarpenter](https://github.com/alexcarpenter)
-
   - `RedirectToUserProfile`
   - `RedirectToOrganizationProfile`
   - `RedirectToCreateOrganization`
@@ -1346,7 +1355,6 @@
 ### Minor Changes
 
 - Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
-
   - Replaces `__experimental_useReverification` with `useReverification`
 
 ### Patch Changes
@@ -1436,7 +1444,6 @@
 ### Minor Changes
 
 - New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
-
   - Allow users to request access with an email address via the new `<Waitlist />` component.
   - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
   - Appropriate the text in the Sign Up component when mode is `waitlist`.
@@ -1536,7 +1543,6 @@
 ### Minor Changes
 
 - Introducing experimental `asProvider`, `asStandalone`, and `<X.Outlet />` for `<UserButton />` and `<OrganizationSwitcher />` components. ([#4042](https://github.com/clerk/javascript/pull/4042)) by [@panteliselef](https://github.com/panteliselef)
-
   - `asProvider` converts `<UserButton />` and `<OrganizationSwitcher />` to a provider that defers rendering until `<Outlet />` is mounted.
   - `<Outlet />` also accepts a `asStandalone` prop. It will skip the trigger of these components and display only the UI which was previously inside the popover. This allows developers to create their own triggers.
 
@@ -1591,7 +1597,6 @@
 ### Minor Changes
 
 - Rename `__experimental_assurance` to `__experimental_reverification`. ([#4268](https://github.com/clerk/javascript/pull/4268)) by [@panteliselef](https://github.com/panteliselef)
-
   - Supported levels are now are `firstFactor`, `secondFactor`, `multiFactor`.
   - Support maxAge is now replaced by maxAgeMinutes and afterMinutes depending on usage.
   - Introduced `____experimental_SessionVerificationTypes` that abstracts away the level and maxAge
@@ -1610,7 +1615,6 @@
 - Drop the experimental mounted variant of `UserVerification`. ([#4266](https://github.com/clerk/javascript/pull/4266)) by [@panteliselef](https://github.com/panteliselef)
 
   Removes:
-
   - `<__experimental_UserVerification/>`
   - `__experimental_mountUserVerification()`
   - `__experimental_unmountUserVerification()`
@@ -1856,7 +1860,6 @@
 ### Minor Changes
 
 - Introduce support for custom menu items in `<UserButton/>`. ([#3784](https://github.com/clerk/javascript/pull/3784)) by [@nikospapcom](https://github.com/nikospapcom)
-
   - Use `<UserButton.MenuItems>` as a child component to wrap custom menu items.
   - Use `<UserButton.Link/>` for creating external or internal links.
   - Use `<UserButton.Action/>` for opening a specific custom page of "UserProfile" or to trigger your own custom logic via `onClick`.
@@ -1984,7 +1987,6 @@
 - Add support for GoogleOneTap. New APIs listed: ([#3392](https://github.com/clerk/javascript/pull/3392)) by [@panteliselef](https://github.com/panteliselef)
 
   ### React component
-
   - `<GoogleOneTap/>`
 
   Customize the UX of the prompt
@@ -1998,12 +2000,10 @@
   ```
 
   ### Use the component from with Vanilla JS
-
   - `Clerk.openGoogleOneTap(props: GoogleOneTapProps)`
   - `Clerk.closeGoogleOneTap()`
 
   ### Low level APIs for custom flows
-
   - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
   - `await Clerk.handleGoogleOneTapCallback()`
 
@@ -2299,7 +2299,6 @@
 - 844847e0b: Align return types for redirectTo\* methods in ClerkJS [SDK-1037]
 
   Breaking Changes:
-
   - `redirectToUserProfile` now returns `Promise<unknown>` instead of `void`
   - `redirectToOrganizationProfile` now returns `Promise<unknown>` instead of `void`
   - `redirectToCreateOrganization` now returns `Promise<unknown>` instead of `void`
@@ -2329,7 +2328,6 @@
 
 - c7e6d00f5: Experimental support for `<Gate/>` with role checks.
 - 4bb57057e: Breaking Changes:
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -2338,7 +2336,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -2376,13 +2373,11 @@
 - 18c0d015d: Pass environment into `sdkMetadata` in order to detect if production clerk-js is used by other sdks in dev mode. When it is log dev warning from clerk-js.
 - d6a7ea61a: Update the TypeScript types of `<ClerkProvider />`. If you use the `routerPush` prop you're now required to also provide the `routerReplace` prop (or other way around). You can also not provide them at all since both props are optional.
 - db2d82901: Apply the following changes to components with routing props:
-
   - default is `routing="path"` and `path` prop is required to be set via env or context
   - when `routing="hash"` or `routing="virtual"` is set the implicit (via env or context) `path` option is ignored
   - when `routing="hash"` or `routing="virtual"` then `path` prop is not allowed to be set
 
   Examples of components with routing props:
-
   - `<CreateOrganization />`
   - `<OrganizationProfile />`
   - `<SignIn />`
@@ -2539,14 +2534,12 @@
 ### Minor Changes
 
 - Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
-
   - React Component `<__experimental_GoogleOneTap/>`
   - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
 
 - Speed up loading of clerk-js by using a `<script/>` tag when html is generated. ([#3156](https://github.com/clerk/javascript/pull/3156)) by [@panteliselef](https://github.com/panteliselef)
 
   This is supported during SSR, SSG in
-
   - Next.js Pages Router
   - Next.js App Router
 
@@ -2735,13 +2728,11 @@
 ### Minor Changes
 
 - Apply the following changes to components with routing props: ([#2543](https://github.com/clerk/javascript/pull/2543)) by [@dimkl](https://github.com/dimkl)
-
   - default is `routing="path"` and `path` prop is required to be set via env or context
   - when `routing="hash"` or `routing="virtual"` is set the implicit (via env or context) `path` option is ignored
   - when `routing="hash"` or `routing="virtual"` then `path` prop is not allowed to be set
 
   Examples of components with routing props:
-
   - `<CreateOrganization />`
   - `<OrganizationProfile />`
   - `<SignIn />`
@@ -2941,7 +2932,6 @@
 - Align return types for redirectTo\* methods in ClerkJS [SDK-1037] ([#2316](https://github.com/clerk/javascript/pull/2316)) by [@tmilewski](https://github.com/tmilewski)
 
   Breaking Changes:
-
   - `redirectToUserProfile` now returns `Promise<unknown>` instead of `void`
   - `redirectToOrganizationProfile` now returns `Promise<unknown>` instead of `void`
   - `redirectToCreateOrganization` now returns `Promise<unknown>` instead of `void`
@@ -2952,7 +2942,6 @@
 - Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
 
   Changes in public APIs:
-
   - Rename Gate to Protect
   - Support for permission checks. (Previously only roles could be used)
   - Remove the `experimental` tags and prefixes
@@ -3054,7 +3043,6 @@
 ### Minor Changes
 
 - Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -3063,7 +3051,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -3095,7 +3082,6 @@
 ### Major Changes
 
 - Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
-
   - use `import { Clerk } from '@clerk/backend';`
   - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
   - use `import { Clerk } from '@clerk/clerk-sdk-node';`
@@ -3104,7 +3090,6 @@
   - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
 
 - Drop deprecations. Migration steps: ([#2102](https://github.com/clerk/javascript/pull/2102)) by [@dimkl](https://github.com/dimkl)
-
   - use `EmailLinkError` instead of `MagicLinkError`
   - use `isEmailLinkError` instead of `isMagicLinkError`
   - use `EmailLinkErrorCode` instead of `MagicLinkErrorCode`
@@ -3114,7 +3099,6 @@
   - use `userMemberships` instead of `organizationList` from `useOrganizationList`
 
 - Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
-
   - use `publishableKey` instead of `frontendApi`
   - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
   - use `isEmailLinkError` instead of `isMagicLinkError`
@@ -3145,7 +3129,6 @@
   - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
 
 - Drop deprecations. Migration steps: ([#2109](https://github.com/clerk/javascript/pull/2109)) by [@dimkl](https://github.com/dimkl)
-
   - drop `orgs` jwt claim from session token
   - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
     - use `auth.sessionClaims` instead of `auth.claims`
@@ -3154,7 +3137,6 @@
   - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
 
 - Drop deprecations. Migration steps: ([#2151](https://github.com/clerk/javascript/pull/2151)) by [@dimkl](https://github.com/dimkl)
-
   - drop `formFieldLabel__emailAddress_phoneNumber` from localization keys
   - drop `formFieldLabel__phoneNumber_username` from localization keys
   - drop `formFieldLabel__emailAddress_phoneNumber_username` from localization keys
@@ -3169,7 +3151,6 @@
   - use `deDE` instead of `deDe` localization from `@clerk/localizations`
 
 - Drop deprecations. Migration steps: ([#1993](https://github.com/clerk/javascript/pull/1993)) by [@dimkl](https://github.com/dimkl)
-
   - use `setActive` instead of `setSession` from `useSessionList | useSignUp | useSignIn` hooks
   - use `publishableKey` instead of `frontendApi`
   - use `handleEmailLinkVerification` instead of `handleMagicLinkVerification` from `IsomorphicClerk`
@@ -3295,7 +3276,6 @@
 ### Patch Changes
 
 - Warn about _MagicLink_ deprecations: ([#1836](https://github.com/clerk/javascript/pull/1836)) by [@dimkl](https://github.com/dimkl)
-
   - `MagicLinkError`
   - `isMagicLinkError`
   - `MagicLinkErrorCode`
@@ -3320,7 +3300,6 @@
 - Make `types` the first key in all `exports` maps defined in our packages' `package.json`. The [TypeScript docs](https://www.typescriptlang.org/docs/handbook/esm-node.html#packagejson-exports-imports-and-self-referencing) recommends so, as the `exports` map is order-based. by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerk/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
-
   - `orgs` jwt claims
   - `apiKey`
   - `frontendApi`
@@ -3363,7 +3342,6 @@
 ### Patch Changes
 
 - Apply deprecation warnings for `@clerk/clerk-react`: ([#1788](https://github.com/clerk/javascript/pull/1788)) by [@dimkl](https://github.com/dimkl)
-
   - `setSession`
 
 - Updated dependencies [[`7ffa6fac3`](https://github.com/clerk/javascript/commit/7ffa6fac3762f6fb130ba2f2fcaa28e52b36b3b4), [`5c8754239`](https://github.com/clerk/javascript/commit/5c8754239e9ef13656fb73f30c9c6a6187b9aa81), [`2f6a6ac99`](https://github.com/clerk/javascript/commit/2f6a6ac9991469bf8532019bb22ff50adecdb434), [`753f7bbda`](https://github.com/clerk/javascript/commit/753f7bbda9bbb7444f96222a3b6cae815a09058f), [`55c8ebd39`](https://github.com/clerk/javascript/commit/55c8ebd390dd88036aee06866009be6a50c63138)]:
@@ -3392,7 +3370,6 @@
 ### Minor Changes
 
 - Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerk/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
-
   - Lists all the memberships, invitations or suggestions an active user may have
   - Powered by our `useOrganizationList` react hook
 
@@ -3548,7 +3525,6 @@
 - ESM/CJS support for `@clerk/clerk-react` by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Changes that should affect users and OS contributors:
-
   - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
   - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
   - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb

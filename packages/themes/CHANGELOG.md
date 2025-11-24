@@ -1,5 +1,26 @@
 # Change Log
 
+## 2.4.39
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+
+## 2.4.38
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+
+## 2.4.37
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/shared@3.35.0
+
 ## 2.4.36
 
 ### Patch Changes
@@ -62,7 +83,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -354,7 +374,6 @@
   Deprecated variables will continue to work but will be removed in the next major version.
 
   ## New variables
-
   - `colorRing` - The color of the ring when an interactive element is focused.
   - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
   - `colorShadow` - The base shadow color used in the components.
@@ -1371,7 +1390,6 @@
 ### Patch Changes
 
 - Introduces three new element appearance descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
-
   - `tableHead` let's you customize the tables head styles.
   - `paginationButton` let's you customize the pagination buttons.
   - `paginationRowText` let's you customize the pagination text.

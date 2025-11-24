@@ -1,29 +1,23 @@
-'use client';
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
-import { getDifferentKeys, useWithSafeValues } from './usePagesOrInfinite.shared';
+import { useWithSafeValues } from './usePagesOrInfinite.shared';
 import { usePreviousValue } from './usePreviousValue';
 
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
+export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
+  const { fetcher, config, keys } = params;
 
-export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher, config, cacheKeys) => {
-  const [paginatedPage, setPaginatedPage] = useState(params.initialPage ?? 1);
+  const [paginatedPage, setPaginatedPage] = useState(config.initialPage ?? 1);
 
   // Cache initialPage and initialPageSize until unmount
-  const initialPageRef = useRef(params.initialPage ?? 1);
-  const pageSizeRef = useRef(params.pageSize ?? 10);
+  const initialPageRef = useRef(config.initialPage ?? 1);
+  const pageSizeRef = useRef(config.pageSize ?? 10);
 
   const enabled = config.enabled ?? true;
   const isSignedIn = config.isSignedIn;
@@ -44,62 +38,61 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
 
   // Non-infinite mode: single page query
   const pagesQueryKey = useMemo(() => {
+    const [stablePrefix, authenticated, tracked, untracked] = keys.queryKey;
+
     return [
-      'clerk-pages',
+      stablePrefix,
+      authenticated,
+      tracked,
       {
-        ...cacheKeys,
-        ...params,
-        initialPage: paginatedPage,
-        pageSize: pageSizeRef.current,
+        ...untracked,
+        args: {
+          ...untracked.args,
+          initialPage: paginatedPage,
+          pageSize: pageSizeRef.current,
+        },
       },
-    ];
-  }, [cacheKeys, params, paginatedPage]);
+    ] as const;
+  }, [keys.queryKey, paginatedPage]);
 
   const singlePageQuery = useClerkQuery({
     queryKey: pagesQueryKey,
     queryFn: ({ queryKey }) => {
-      const [, key] = queryKey as [string, Record<string, unknown>];
+      const { args } = queryKey[3];
 
       if (!fetcher) {
         return undefined as any;
       }
 
-      const requestParams = getDifferentKeys(key, cacheKeys);
-
-      // @ts-ignore - params type differs slightly but is structurally compatible
-      return fetcher({ ...params, ...requestParams } as Params);
+      return fetcher(args);
     },
     staleTime: 60_000,
     enabled: queriesEnabled && !triggerInfinite,
     // Use placeholderData to keep previous data while fetching new page
-    placeholderData: keepPreviousData ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData),
   });
 
   // Infinite mode: accumulate pages
   const infiniteQueryKey = useMemo(() => {
-    return [
-      'clerk-pages-infinite',
-      {
-        ...cacheKeys,
-        ...params,
-      },
-    ];
-  }, [cacheKeys, params]);
+    const [stablePrefix, authenticated, tracked, untracked] = keys.queryKey;
 
-  const infiniteQuery = useClerkInfiniteQuery<ClerkPaginatedResponse<any>>({
+    return [stablePrefix + '-inf', authenticated, tracked, untracked] as const;
+  }, [keys.queryKey]);
+
+  const infiniteQuery = useClerkInfiniteQuery<ClerkPaginatedResponse<any>, any, any, typeof infiniteQueryKey, any>({
     queryKey: infiniteQueryKey,
-    initialPageParam: params.initialPage ?? 1,
+    initialPageParam: config.initialPage ?? 1,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       const total = lastPage?.total_count ?? 0;
-      const consumed = (allPages.length + (params.initialPage ? params.initialPage - 1 : 0)) * (params.pageSize ?? 10);
+      const consumed = (allPages.length + (config.initialPage ? config.initialPage - 1 : 0)) * (config.pageSize ?? 10);
       return consumed < total ? (lastPageParam as number) + 1 : undefined;
     },
-    queryFn: ({ pageParam }) => {
+    queryFn: ({ pageParam, queryKey }) => {
+      const { args } = queryKey[3];
       if (!fetcher) {
         return undefined as any;
       }
-      // @ts-ignore - merging page params for fetcher call
-      return fetcher({ ...params, initialPage: pageParam, pageSize: pageSizeRef.current } as Params);
+      return fetcher({ ...args, initialPage: pageParam, pageSize: pageSizeRef.current });
     },
     staleTime: 60_000,
     enabled: queriesEnabled && triggerInfinite,
@@ -113,15 +106,13 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     const isNowSignedOut = isSignedIn === false;
 
     if (previousIsSignedIn && isNowSignedOut) {
-      // Clear ALL queries matching the base query keys (including old userId)
-      // Use predicate to match queries that start with 'clerk-pages' or 'clerk-pages-infinite'
-
       queryClient.removeQueries({
         predicate: query => {
-          const key = query.queryKey;
+          const [stablePrefix, authenticated] = query.queryKey;
           return (
-            (Array.isArray(key) && key[0] === 'clerk-pages') ||
-            (Array.isArray(key) && key[0] === 'clerk-pages-infinite')
+            authenticated === true &&
+            typeof stablePrefix === 'string' &&
+            (stablePrefix === keys.queryKey[0] || stablePrefix === keys.queryKey[0] + '-inf')
           );
         },
       });
@@ -134,16 +125,52 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     }
   }, [isSignedIn, queryClient, previousIsSignedIn, forceUpdate]);
 
-  const page = useMemo(() => {
+  // Compute data, count and page from the same data source to ensure consistency
+  const computedValues = useMemo(() => {
     if (triggerInfinite) {
       // Read from query data first, fallback to cache
       const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      const pages = infiniteQuery.data?.pages ?? cachedData?.pages ?? [];
-      // Return pages.length if > 0, otherwise return initialPage (default 1)
-      return pages.length > 0 ? pages.length : initialPageRef.current;
+      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
+
+      // Ensure pages is always an array and filter out null/undefined pages
+      const validPages = Array.isArray(pages) ? pages.filter(Boolean) : [];
+
+      return {
+        data:
+          validPages
+            .map((a: ClerkPaginatedResponse<any>) => a?.data)
+            .flat()
+            .filter(Boolean) ?? [],
+        count: validPages[validPages.length - 1]?.total_count ?? 0,
+        page: validPages.length > 0 ? validPages.length : initialPageRef.current,
+      };
     }
-    return paginatedPage;
-  }, [triggerInfinite, infiniteQuery.data?.pages, paginatedPage, queryClient, infiniteQueryKey]);
+
+    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
+    // This ensures that after cache clearing, we return consistent empty state
+    const pageData = queriesEnabled
+      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
+      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
+
+    return {
+      data: Array.isArray(pageData?.data) ? pageData.data : [],
+      count: typeof pageData?.total_count === 'number' ? pageData.total_count : 0,
+      page: paginatedPage,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- forceUpdateCounter is used to trigger re-renders for cache updates
+  }, [
+    queriesEnabled,
+    forceUpdateCounter,
+    triggerInfinite,
+    infiniteQuery.data?.pages,
+    singlePageQuery.data,
+    queryClient,
+    infiniteQueryKey,
+    pagesQueryKey,
+    paginatedPage,
+  ]);
+
+  const { data, count, page } = computedValues;
 
   const fetchPage: ValueOrSetter<number> = useCallback(
     numberOrgFn => {
@@ -164,59 +191,9 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     [infiniteQuery, page, triggerInfinite, queryClient, infiniteQueryKey],
   );
 
-  const data = useMemo(() => {
-    if (triggerInfinite) {
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      // When query is disabled, the hook's data is stale, so only read from cache
-      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
-      return pages.map((a: ClerkPaginatedResponse<any>) => a?.data).flat() ?? [];
-    }
-
-    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
-    // This ensures that after cache clearing, we return empty data
-    const pageData = queriesEnabled
-      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
-      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
-    return pageData?.data ?? [];
-  }, [
-    queriesEnabled,
-    forceUpdateCounter,
-    triggerInfinite,
-    singlePageQuery.data,
-    infiniteQuery.data,
-    queryClient,
-    pagesQueryKey,
-    infiniteQueryKey,
-  ]);
-
-  const count = useMemo(() => {
-    if (triggerInfinite) {
-      const cachedData = queryClient.getQueryData<{ pages?: Array<ClerkPaginatedResponse<any>> }>(infiniteQueryKey);
-      // When query is disabled, the hook's data is stale, so only read from cache
-      const pages = queriesEnabled ? (infiniteQuery.data?.pages ?? cachedData?.pages ?? []) : (cachedData?.pages ?? []);
-      return pages[pages.length - 1]?.total_count || 0;
-    }
-
-    // When query is disabled (via enabled flag), the hook's data is stale, so only read from cache
-    // This ensures that after cache clearing, we return 0
-    const pageData = queriesEnabled
-      ? (singlePageQuery.data ?? queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey))
-      : queryClient.getQueryData<ClerkPaginatedResponse<any>>(pagesQueryKey);
-    return pageData?.total_count ?? 0;
-  }, [
-    queriesEnabled,
-    forceUpdateCounter,
-    triggerInfinite,
-    singlePageQuery.data,
-    infiniteQuery.data,
-    queryClient,
-    pagesQueryKey,
-    infiniteQueryKey,
-  ]);
-
   const isLoading = triggerInfinite ? infiniteQuery.isLoading : singlePageQuery.isLoading;
   const isFetching = triggerInfinite ? infiniteQuery.isFetching : singlePageQuery.isFetching;
-  const error = (triggerInfinite ? (infiniteQuery.error as any) : singlePageQuery.error) ?? null;
+  const error = (triggerInfinite ? infiniteQuery.error : singlePageQuery.error) ?? null;
   const isError = !!error;
 
   const fetchNext = useCallback(() => {
@@ -253,7 +230,7 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
         >;
         return { ...prevValue, pages: nextPages };
       });
-      // Force re-render to reflect cache changes
+      // Force immediate re-render to reflect cache changes
       forceUpdate(n => n + 1);
       return Promise.resolve();
     }
@@ -266,11 +243,10 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = (params, fetcher,
     return Promise.resolve();
   };
 
-  const revalidate = () => {
-    if (triggerInfinite) {
-      return queryClient.invalidateQueries({ queryKey: infiniteQueryKey });
-    }
-    return queryClient.invalidateQueries({ queryKey: pagesQueryKey });
+  const revalidate = async () => {
+    await queryClient.invalidateQueries({ queryKey: keys.invalidationKey });
+    const [stablePrefix, ...rest] = keys.invalidationKey;
+    return queryClient.invalidateQueries({ queryKey: [stablePrefix + '-inf', ...rest] });
   };
 
   return {

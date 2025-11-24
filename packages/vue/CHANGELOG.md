@@ -1,5 +1,33 @@
 # @clerk/vue
 
+## 1.16.2
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/types@4.101.2
+
+## 1.16.1
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/types@4.101.1
+
+## 1.16.0
+
+### Minor Changes
+
+- Introduce `<APIKeys />` component ([#7225](https://github.com/clerk/javascript/pull/7225)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/shared@3.35.0
+  - @clerk/types@4.101.0
+
 ## 1.15.1
 
 ### Patch Changes
@@ -73,7 +101,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -701,7 +728,6 @@
 ### Minor Changes
 
 - Introduce `sessionClaims` to useAuth(). ([#5587](https://github.com/clerk/javascript/pull/5587)) by [@panteliselef](https://github.com/panteliselef)
-
   - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
 
 ### Patch Changes
@@ -1269,7 +1295,6 @@
 ### Patch Changes
 
 - Add deprecation notices for the following components: ([#4631](https://github.com/clerk/javascript/pull/4631)) by [@alexcarpenter](https://github.com/alexcarpenter)
-
   - `RedirectToUserProfile`
   - `RedirectToOrganizationProfile`
   - `RedirectToCreateOrganization`

@@ -25,6 +25,7 @@ import type { OrganizationCustomRoleKey, OrganizationPermissionKey } from './org
 import type { OrganizationSettingsJSON } from './organizationSettings';
 import type { OrganizationSuggestionStatus } from './organizationSuggestion';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
+import type { ProtectConfigJSON } from './protectConfig';
 import type { SamlIdpSlug } from './saml';
 import type { SessionStatus, SessionTask } from './session';
 import type { SessionVerificationLevel, SessionVerificationStatus } from './sessionVerification';
@@ -90,6 +91,7 @@ export interface EnvironmentJSON extends ClerkResourceJSON {
   maintenance_mode: boolean;
   organization_settings: OrganizationSettingsJSON;
   user_settings: UserSettingsJSON;
+  protect_config: ProtectConfigJSON;
 }
 
 export type LastAuthenticationStrategy =

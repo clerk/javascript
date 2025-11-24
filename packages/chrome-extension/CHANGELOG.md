@@ -1,5 +1,32 @@
 # Change Log
 
+## 2.8.4
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7), [`a234b32`](https://github.com/clerk/javascript/commit/a234b325b3b20ecc34b1d0736cf62a41be782910)]:
+  - @clerk/clerk-js@5.109.2
+  - @clerk/shared@3.35.2
+  - @clerk/clerk-react@5.56.2
+
+## 2.8.3
+
+### Patch Changes
+
+- Updated dependencies [[`5966383`](https://github.com/clerk/javascript/commit/5966383a9034e1a06760296a0257bfe4bcedaf33), [`5e5e24a`](https://github.com/clerk/javascript/commit/5e5e24a3207583d78138a1845a1e214b7fff5221), [`3438d17`](https://github.com/clerk/javascript/commit/3438d1791f557a493b7579e87edcafe2314a5079), [`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b), [`77e022f`](https://github.com/clerk/javascript/commit/77e022f25d70380ff3aae39eba1722dbfaeb87e6)]:
+  - @clerk/clerk-js@5.109.1
+  - @clerk/shared@3.35.1
+  - @clerk/clerk-react@5.56.1
+
+## 2.8.2
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`de5acba`](https://github.com/clerk/javascript/commit/de5acba7ed9e1558a4e6b79e9d6fe3ef2065eeff), [`c6d73ad`](https://github.com/clerk/javascript/commit/c6d73add905634e816e4d46aa209c0592d0a9ee3), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`4d7a6e0`](https://github.com/clerk/javascript/commit/4d7a6e006922eda736bc93a7b01d6195987ce791), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/clerk-js@5.109.0
+  - @clerk/shared@3.35.0
+  - @clerk/clerk-react@5.56.0
+
 ## 2.8.1
 
 ### Patch Changes
@@ -84,7 +111,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -1311,7 +1337,6 @@
 ### Patch Changes
 
 - Introduce the `useReverification()` hook that handles the session reverification flow: ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
-
   - Replaces `__experimental_useReverification` with `useReverification`
 
 - Updated dependencies [[`4da28fa857d1e5538eb5bbe28ecc4bf9dba1ce7d`](https://github.com/clerk/javascript/commit/4da28fa857d1e5538eb5bbe28ecc4bf9dba1ce7d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`fe9e147e366153d664af7fc325655ecb299a1f9d`](https://github.com/clerk/javascript/commit/fe9e147e366153d664af7fc325655ecb299a1f9d), [`d84d7e31235c5c7da3415981dc76db4473a71a39`](https://github.com/clerk/javascript/commit/d84d7e31235c5c7da3415981dc76db4473a71a39), [`dce4f7ffca7248c0500f0ec9a978672b1f2fad69`](https://github.com/clerk/javascript/commit/dce4f7ffca7248c0500f0ec9a978672b1f2fad69), [`7c27b0cfda6ace9693e9c184392481b00f24a64d`](https://github.com/clerk/javascript/commit/7c27b0cfda6ace9693e9c184392481b00f24a64d)]:
@@ -2844,7 +2869,6 @@
 - Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
 
   Changes in public APIs:
-
   - Rename Gate to Protect
   - Support for permission checks. (Previously only roles could be used)
   - Remove the `experimental` tags and prefixes
@@ -2943,7 +2967,6 @@
 ### Major Changes
 
 - Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
-
   - use `import { Clerk } from '@clerk/backend';`
   - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
   - use `import { Clerk } from '@clerk/clerk-sdk-node';`
@@ -2952,7 +2975,6 @@
   - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
 
 - Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
-
   - use `publishableKey` instead of `frontendApi`
   - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
   - use `isEmailLinkError` instead of `isMagicLinkError`
@@ -2983,7 +3005,6 @@
   - use `signature` instead of `generatedSignature` in `Signup.attemptWeb3WalletVerification()`
 
 - Drop deprecations. Migration steps: ([#1993](https://github.com/clerk/javascript/pull/1993)) by [@dimkl](https://github.com/dimkl)
-
   - use `setActive` instead of `setSession` from `useSessionList | useSignUp | useSignIn` hooks
   - use `publishableKey` instead of `frontendApi`
   - use `handleEmailLinkVerification` instead of `handleMagicLinkVerification` from `IsomorphicClerk`
@@ -3110,7 +3131,6 @@
 ### Minor Changes
 
 - Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerk/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
-
   - Lists all the memberships, invitations or suggestions an active user may have
   - Powered by our `useOrganizationList` react hook
 

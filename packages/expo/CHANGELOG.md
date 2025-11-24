@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.19.4
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7), [`a234b32`](https://github.com/clerk/javascript/commit/a234b325b3b20ecc34b1d0736cf62a41be782910)]:
+  - @clerk/clerk-js@5.109.2
+  - @clerk/shared@3.35.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
+## 2.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`5966383`](https://github.com/clerk/javascript/commit/5966383a9034e1a06760296a0257bfe4bcedaf33), [`5e5e24a`](https://github.com/clerk/javascript/commit/5e5e24a3207583d78138a1845a1e214b7fff5221), [`3438d17`](https://github.com/clerk/javascript/commit/3438d1791f557a493b7579e87edcafe2314a5079), [`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b), [`77e022f`](https://github.com/clerk/javascript/commit/77e022f25d70380ff3aae39eba1722dbfaeb87e6)]:
+  - @clerk/clerk-js@5.109.1
+  - @clerk/shared@3.35.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
+## 2.19.2
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`de5acba`](https://github.com/clerk/javascript/commit/de5acba7ed9e1558a4e6b79e9d6fe3ef2065eeff), [`c6d73ad`](https://github.com/clerk/javascript/commit/c6d73add905634e816e4d46aa209c0592d0a9ee3), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`4d7a6e0`](https://github.com/clerk/javascript/commit/4d7a6e006922eda736bc93a7b01d6195987ce791), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/clerk-js@5.109.0
+  - @clerk/shared@3.35.0
+  - @clerk/clerk-react@5.56.0
+  - @clerk/types@4.101.0
+
 ## 2.19.1
 
 ### Patch Changes
@@ -1135,7 +1165,6 @@
 ### Minor Changes
 
 - Introduce support for SSO with SAML ([#4880](https://github.com/clerk/javascript/pull/4880)) by [@LauraBeatris](https://github.com/LauraBeatris)
-
   - Introduce `useSSO` hook to support a wider range of SSO flow types
   - Deprecate `useOAuth` in favor of new `useSSO` hook
 
@@ -1327,13 +1356,11 @@
   We're introducing an improved offline support for the `@clerk/clerk-expo` package to enhance reliability and user experience. This new improvement allows apps to bootstrap without an internet connection by using cached Clerk resources, ensuring quick initialization.
 
   It solves issues as the following:
-
   - Faster resolution of the `isLoaded` property and the `ClerkLoaded` component, with only a single network fetch attempt, and if it fails, it falls back to the cached resources.
   - The `getToken` function of `useAuth` hook now returns a cached token if network errors occur.
   - Developers can now catch and handle network errors gracefully in their custom flows, as the errors are no longer muted.
 
   How to use it:
-
   1. Install the `expo-secure-store` package in your project by running:
 
      ```bash
@@ -2423,7 +2450,6 @@
 
 - 2b1d76752: Use `base-64` package for Expo instead of the isomorphic from `@clerk/shared` due to errors about `Maximum call stack size exceeded` on `global.Buffer`
 - 4bb57057e: Breaking Changes:
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -2432,7 +2458,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -3108,7 +3133,6 @@
 ### Minor Changes
 
 - Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -3117,7 +3141,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -3149,7 +3172,6 @@
 ### Major Changes
 
 - Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
-
   - use `import { Clerk } from '@clerk/backend';`
   - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
   - use `import { Clerk } from '@clerk/clerk-sdk-node';`
@@ -3158,7 +3180,6 @@
   - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
 
 - Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
-
   - use `publishableKey` instead of `frontendApi`
   - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
   - use `isEmailLinkError` instead of `isMagicLinkError`
@@ -3202,7 +3223,6 @@
 - Internal update default apiUrl domain from clerk.dev to clerk.com ([#1878](https://github.com/clerk/javascript/pull/1878)) by [@dimkl](https://github.com/dimkl)
 
 - Drop deprecations. Migration steps: ([#1991](https://github.com/clerk/javascript/pull/1991)) by [@dimkl](https://github.com/dimkl)
-
   - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
   - use `publishableKey` instead of `frontendApi`
   - use `isEmailLinkError` instead of `isMagicLinkError`
@@ -3251,7 +3271,6 @@
 ### Patch Changes
 
 - Warn about environment variables deprecations: ([#1859](https://github.com/clerk/javascript/pull/1859)) by [@dimkl](https://github.com/dimkl)
-
   - `CLERK_API_KEY`
   - `CLERK_FRONTEND_API`
   - `NEXT_PUBLIC_CLERK_FRONTEND_API`
