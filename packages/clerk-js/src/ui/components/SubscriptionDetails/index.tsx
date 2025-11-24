@@ -1,4 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
@@ -18,7 +18,6 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
@@ -173,7 +172,6 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
 
 const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const { isLoading, error, setError, setLoading, setIdle } = useCardState();
   const {
     subscription: selectedSubscription,
@@ -183,6 +181,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const { data: subscription } = useSubscription();
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 
@@ -195,7 +195,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setLoading();
 
     await selectedSubscription
-      .cancel({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+      .cancel({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
       .then(() => {
         onSubscriptionCancel?.();
         if (setIsOpen) {
@@ -213,7 +213,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setError,
     setLoading,
     subscriberType,
-    organization?.id,
+    organizationCtx?.organization?.id,
     onSubscriptionCancel,
     setIsOpen,
     setIdle,
@@ -374,7 +374,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isSwitchable =
-    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyFee.amount > 0) ||
+    ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
@@ -409,8 +409,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
             label:
               subscription.planPeriod === 'month'
                 ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
-                    price: normalizeFormatted(subscription.plan.annualFee.amountFormatted),
-                    currency: subscription.plan.annualFee.currencySymbol,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currency: subscription.plan.annualFee!.currencySymbol,
                   })
                 : localizationKeys('billing.switchToMonthlyWithPrice', {
                     price: normalizeFormatted(subscription.plan.fee.amountFormatted),
@@ -469,10 +471,34 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   }
 
   return (
-    <ThreeDotsMenu
-      variant='bordered'
-      actions={actions}
-    />
+    <Flex
+      elementDescriptor={descriptors.subscriptionDetailsCardActions}
+      gap={2}
+      sx={t => ({
+        paddingInline: t.space.$3,
+        paddingBlock: t.space.$3,
+        borderBlockStartWidth: t.borderWidths.$normal,
+        borderBlockStartStyle: t.borderStyles.$solid,
+        borderBlockStartColor: t.colors.$borderAlpha100,
+      })}
+    >
+      {actions.map((action, index) => (
+        <Button
+          key={index}
+          elementDescriptor={
+            action.isDestructive
+              ? descriptors.subscriptionDetailsCancelButton
+              : descriptors.subscriptionDetailsActionButton
+          }
+          variant={action.isDestructive ? 'ghost' : 'outline'}
+          colorScheme={action.isDestructive ? 'danger' : undefined}
+          size='xs'
+          textVariant='buttonSmall'
+          onClick={action.onClick}
+          localizationKey={action.label}
+        />
+      ))}
+    </Flex>
   );
 };
 
@@ -480,7 +506,11 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
 
-  const fee = subscription.planPeriod === 'month' ? subscription.plan.fee : subscription.plan.annualFee;
+  const fee =
+    subscription.planPeriod === 'month'
+      ? subscription.plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscription.plan.annualFee!;
 
   return (
     <Col
@@ -533,7 +563,6 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 
         {/* Pricing details */}
         <Flex
-          elementDescriptor={descriptors.subscriptionDetailsCardActions}
           justify='between'
           align='center'
         >
@@ -549,8 +578,6 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
             {fee.amountFormatted} /{' '}
             {t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
           </Text>
-
-          <SubscriptionCardActions subscription={subscription} />
         </Flex>
       </Col>
 
@@ -593,6 +620,8 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
           value={formatDate(subscription.periodStart)}
         />
       ) : null}
+
+      <SubscriptionCardActions subscription={subscription} />
     </Col>
   );
 };

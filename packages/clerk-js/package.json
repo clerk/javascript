@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.103.1",
+  "version": "5.109.2",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -71,6 +71,7 @@
     "@formkit/auto-animate": "^0.8.2",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.17",
+    "@tanstack/query-core": "5.87.4",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
     "alien-signals": "2.0.6",
@@ -81,8 +82,7 @@
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.14.1",
-    "swr": "2.3.4"
+    "regenerator-runtime": "0.14.1"
   },
   "devDependencies": {
     "@clerk/testing": "workspace:^",

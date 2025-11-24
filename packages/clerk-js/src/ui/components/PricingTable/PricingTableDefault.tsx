@@ -1,4 +1,4 @@
-import { useClerk, useOrganization, useSession } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext, useSession } from '@clerk/shared/react';
 import type { BillingPlanResource, BillingSubscriptionPlanPeriod, PricingTableProps } from '@clerk/shared/types';
 import * as React from 'react';
 
@@ -104,7 +104,8 @@ function Card(props: CardProps) {
   const { isSignedIn } = useSession();
   const { mode = 'mounted', ctaPosition: ctxCtaPosition } = usePricingTableContext();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const ctaPosition = pricingTableProps.ctaPosition || ctxCtaPosition || 'bottom';
   const collapseFeatures = pricingTableProps.collapseFeatures || false;
@@ -137,7 +138,7 @@ function Card(props: CardProps) {
     plan,
     planPeriod,
     for: pricingTableProps.for,
-    hasActiveOrganization: !!organization,
+    hasActiveOrganization: !!organizationCtx?.organization,
   });
 
   return (
@@ -282,13 +283,17 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>((props, ref
   const { plan, isCompact, planPeriod, setPlanPeriod, badge } = props;
   const { name, annualMonthlyFee } = plan;
 
-  const planSupportsAnnual = annualMonthlyFee.amount > 0;
+  const planSupportsAnnual = Boolean(annualMonthlyFee);
 
   const fee = React.useMemo(() => {
     if (!planSupportsAnnual) {
       return plan.fee;
     }
-    return planPeriod === 'annual' ? plan.annualMonthlyFee : plan.fee;
+
+    return planPeriod === 'annual'
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.annualMonthlyFee!
+      : plan.fee;
   }, [planSupportsAnnual, planPeriod, plan.fee, plan.annualMonthlyFee]);
 
   const feeFormatted = React.useMemo(() => {

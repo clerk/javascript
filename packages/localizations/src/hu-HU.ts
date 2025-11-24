@@ -17,6 +17,11 @@ export const huHU: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Másolás és bezárás',
+      formHint: 'Biztonsági okokból később nem fogjuk tudni újra megengedni, hogy megtekintsd.',
+      formTitle: 'Másold le az "{{name}}" API kulcsot most',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API kulcs',
+  formFieldLabel__apiKeyDescription: 'Leírás',
+  formFieldLabel__apiKeyExpiration: 'Lejárat',
+  formFieldLabel__apiKeyName: 'API kulcs neve',
   formFieldLabel__automaticInvitations: 'Automatikus meghívások engedélyezése ezen a domainen',
   formFieldLabel__backupCode: 'Tartalék kód',
   formFieldLabel__confirmDeletion: 'Megerősítés',
@@ -606,6 +612,12 @@ export const huHU: LocalizationResource = {
       subtitle: 'hogy folytathasd a(z) {{applicationName}}',
       title: 'Ellenőrizd az emailed',
     },
+    emailCodeMfa: {
+      formTitle: 'Ellenőrizd az emailed',
+      resendButton: 'Nem kaptad meg a kódot? Újraküldés',
+      subtitle: 'hogy folytathasd a(z) {{applicationName}}',
+      title: 'Ellenőrizd az emailed',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -641,6 +653,12 @@ export const huHU: LocalizationResource = {
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Használja az e-mail címére küldött megerősítő linket',
+      resendButton: 'Nem kapta meg a linket? Újraküldés',
+      subtitle: 'a folytatáshoz a {{applicationName}} alkalmazásban',
+      title: 'Ellenőrizze az e-mailjét',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -658,6 +676,8 @@ export const huHU: LocalizationResource = {
       label__alternativeMethods: 'Vagy jelentkezz be más módon',
       title: 'Efelejtetted a jelszavad?',
     },
+    newDeviceVerificationNotice:
+      'Új eszközről jelentkezel be. Kérünk egy ellenőrzést, hogy fiókod biztonságban maradjon.',
     noAvailableMethods: {
       message: 'Nem lehet bejelentkezni. Nincs elérhető hitelesítő tényező.',
       subtitle: 'Hiba történt',

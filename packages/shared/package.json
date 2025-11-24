@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.29.0",
+  "version": "3.35.2",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -163,6 +163,7 @@
   "devDependencies": {
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
+    "@tanstack/query-core": "5.87.4",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
     "cross-fetch": "^4.1.0",

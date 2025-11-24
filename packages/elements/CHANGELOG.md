@@ -1,5 +1,127 @@
 # @clerk/elements
 
+## 0.23.85
+
+### Patch Changes
+
+- Update peerDependencies to allow Next.js v16 ([#7274](https://github.com/clerk/javascript/pull/7274)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
+## 0.23.84
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
+## 0.23.83
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/shared@3.35.0
+  - @clerk/clerk-react@5.56.0
+  - @clerk/types@4.101.0
+
+## 0.23.82
+
+### Patch Changes
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd), [`791e942`](https://github.com/clerk/javascript/commit/791e9426181f89012d4c5380a99141f3bb7ae88a)]:
+  - @clerk/types@4.100.0
+  - @clerk/shared@3.34.0
+  - @clerk/clerk-react@5.55.0
+
+## 0.23.81
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/clerk-react@5.54.0
+  - @clerk/types@4.99.0
+
+## 0.23.80
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/types@4.98.0
+  - @clerk/clerk-react@5.53.9
+
+## 0.23.79
+
+### Patch Changes
+
+- Updated dependencies [[`92fba5d`](https://github.com/clerk/javascript/commit/92fba5d2874bf8a740f21ab0a4e21e63beb099f9)]:
+  - @clerk/clerk-react@5.53.8
+
+## 0.23.78
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+  - @clerk/clerk-react@5.53.7
+  - @clerk/types@4.97.2
+
+## 0.23.77
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+  - @clerk/clerk-react@5.53.6
+
+## 0.23.76
+
+### Patch Changes
+
+- Deprecate `@clerk/types` in favor of `@clerk/shared/types` ([#7022](https://github.com/clerk/javascript/pull/7022)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  The `@clerk/types` package is now deprecated. All type definitions have been consolidated and moved to `@clerk/shared/types` to improve consistency across the Clerk ecosystem.
+
+  **Backward Compatibility:**
+
+  The `@clerk/types` package will remain available and will continue to re-export all types from `@clerk/shared/types` to ensure backward compatibility. Existing applications will continue to work without any immediate breaking changes. However, we strongly recommend migrating to `@clerk/shared/types` as new type definitions and updates will only be added to `@clerk/shared/types` starting with the next major release.
+
+  **Migration Steps:**
+
+  Please update your imports from `@clerk/types` to `@clerk/shared/types`:
+
+  ```typescript
+  // Before
+  import type { ClerkResource, UserResource } from '@clerk/types';
+
+  // After
+  import type { ClerkResource, UserResource } from '@clerk/shared/types';
+  ```
+
+  **What Changed:**
+
+  All type definitions including:
+  - Resource types (User, Organization, Session, etc.)
+  - API response types
+  - Configuration types
+  - Authentication types
+  - Error types
+  - And all other shared types
+
+  Have been moved from `packages/types/src` to `packages/shared/src/types` and are now exported via `@clerk/shared/types`.
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/types@4.97.0
+  - @clerk/clerk-react@5.53.5
+
 ## 0.23.75
 
 ### Patch Changes
@@ -1542,7 +1664,6 @@
 - Improve `<FieldState>` and re-organize some data attributes related to validity states. These changes might be breaking changes for you. ([#3594](https://github.com/clerk/javascript/pull/3594)) by [@LekoArts](https://github.com/LekoArts)
 
   Overview of changes:
-
   - `<form>` no longer has `data-valid` and `data-invalid` attributes. If there are global errors (same heuristics as `<GlobalError>`) then a `data-global-error` attribute will be present.
   - Fixed a bug where `<Field>` could contain `data-valid` and `data-invalid` at the same time.
   - The field state (accessible through e.g. `<FieldState>`) now also incorporates the field's [ValidityState](https://developer.mozilla.org/en-US/docs/Web/API/ValidityState) into its output. If the `ValidityState` is invalid, the field state will be an `error`. You can access this information in three places:
@@ -1563,7 +1684,6 @@
 - The `path` prop on the `<SignIn.Root>` and `<SignUp.Root>` component is now automatically inferred. Previously, the default values were `/sign-in` and `/sign-up`, on other routes you had to explicitly define your route. ([#3557](https://github.com/clerk/javascript/pull/3557)) by [@LekoArts](https://github.com/LekoArts)
 
   The new heuristic for determining the path where `<SignIn.Root>` and `<SignUp.Root>` are mounted is:
-
   1. `path` prop
   2. Automatically inferred
   3. If it can't be inferred, fallback to `CLERK_SIGN_IN_URL` and `CLERK_SIGN_UP_URL` env var
@@ -1583,14 +1703,12 @@
 - Support passkeys in `<SignIn>` flows. ([#3472](https://github.com/clerk/javascript/pull/3472)) by [@panteliselef](https://github.com/panteliselef)
 
   APIs introduced:
-
   - `<SignIn.Passkey />`
   - `<SignIn.SupportedStrategy name='passkey'>`
   - `<SignIn.Strategy name='passkey'>`
   - Detects the usage of `webauthn` to trigger passkey autofill `<Clerk.Input autoComplete="webauthn" />`
 
   Usage examples:
-
   - `<SignIn.Action passkey />`
 
     ```tsx
@@ -1720,7 +1838,6 @@
 ### Patch Changes
 
 - This release includes various smaller fixes and one dependency update: ([#3343](https://github.com/clerk/javascript/pull/3343)) by [@tmilewski](https://github.com/tmilewski)
-
   - `xstate` was updated from `5.12.0` to `5.13.0`
   - Previously, the contents of the `fallback` prop were sometimes shown even if the user wasn't on the `start` step. This bug is fixed now.
   - Upon completion of an sign-in/sign-up attempt, don't immediately return to the `start` step. This fixes the issue of a "flash of content" that could e.g. be seen during sign-in with OAuth providers.

@@ -164,6 +164,7 @@ function SignUpStartInternal(): JSX.Element {
           redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          continuePath: 'continue',
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');

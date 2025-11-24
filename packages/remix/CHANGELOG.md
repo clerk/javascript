@@ -1,5 +1,102 @@
 # Change Log
 
+## 4.13.19
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/backend@2.23.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
+## 4.13.18
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
+## 4.13.17
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`50e630a`](https://github.com/clerk/javascript/commit/50e630a6359e8c8cc7ae0e7fe8d99451ab7344ee), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/shared@3.35.0
+  - @clerk/clerk-react@5.56.0
+  - @clerk/backend@2.23.0
+  - @clerk/types@4.101.0
+
+## 4.13.16
+
+### Patch Changes
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd), [`791e942`](https://github.com/clerk/javascript/commit/791e9426181f89012d4c5380a99141f3bb7ae88a)]:
+  - @clerk/types@4.100.0
+  - @clerk/shared@3.34.0
+  - @clerk/clerk-react@5.55.0
+  - @clerk/backend@2.22.0
+
+## 4.13.15
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/backend@2.21.0
+  - @clerk/clerk-react@5.54.0
+  - @clerk/types@4.99.0
+
+## 4.13.14
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/types@4.98.0
+  - @clerk/backend@2.20.1
+  - @clerk/clerk-react@5.53.9
+
+## 4.13.13
+
+### Patch Changes
+
+- Updated dependencies [[`92fba5d`](https://github.com/clerk/javascript/commit/92fba5d2874bf8a740f21ab0a4e21e63beb099f9)]:
+  - @clerk/clerk-react@5.53.8
+
+## 4.13.12
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`b505755`](https://github.com/clerk/javascript/commit/b505755a8da834186922e2a5db8c82e530434d18), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+  - @clerk/backend@2.20.0
+  - @clerk/clerk-react@5.53.7
+  - @clerk/types@4.97.2
+
+## 4.13.11
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+  - @clerk/clerk-react@5.53.6
+  - @clerk/backend@2.19.3
+
+## 4.13.10
+
+### Patch Changes
+
+- Updated dependencies [[`3e0ef92`](https://github.com/clerk/javascript/commit/3e0ef9281194714f56dcf656d0caf4f75dcf097c), [`2587aa6`](https://github.com/clerk/javascript/commit/2587aa671dac1ca66711889bf1cd1c2e2ac8d7c8)]:
+  - @clerk/shared@3.30.0
+  - @clerk/types@4.97.0
+  - @clerk/backend@2.19.2
+  - @clerk/clerk-react@5.53.5
+
 ## 4.13.9
 
 ### Patch Changes
@@ -417,7 +514,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`
@@ -1784,14 +1880,12 @@
 - Support new redirect urls as environment variables or options to rootAuthLoader ([#3442](https://github.com/clerk/javascript/pull/3442)) by [@panteliselef](https://github.com/panteliselef)
 
   As options
-
   - signInForceRedirectUrl
   - signUpForceRedirectUrl
   - signInFallbackRedirectUrl
   - signUpFallbackRedirectUrl
 
   As environment variables
-
   - CLERK_SIGN_IN_FORCE_REDIRECT_URL
   - CLERK_SIGN_UP_FORCE_REDIRECT_URL
   - CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
@@ -1967,7 +2061,6 @@
   - use `publishableKey` instead of `frontendApi`
   - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
 - c08f804cf: Drop deprecations. Migration steps:
-
   - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
   - use `secretKey` instead of `apiKey`
   - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
@@ -2628,7 +2721,6 @@
   ```
 
 - Changes in exports of `@clerk/backend`: ([#2363](https://github.com/clerk/javascript/pull/2363)) by [@dimkl](https://github.com/dimkl)
-
   - Expose the following helpers and enums from `@clerk/backend/internal`:
     ```typescript
     import {
@@ -2656,7 +2748,6 @@
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
 
 - Changes in exports of `@clerk/backend`: ([#2365](https://github.com/clerk/javascript/pull/2365)) by [@dimkl](https://github.com/dimkl)
-
   - Drop the following internal exports from the top-level api:
     ```typescript
     // Before
@@ -2866,7 +2957,6 @@
 ### Major Changes
 
 - Drop deprecations. Migration steps: ([#2109](https://github.com/clerk/javascript/pull/2109)) by [@dimkl](https://github.com/dimkl)
-
   - drop `orgs` jwt claim from session token
   - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
     - use `auth.sessionClaims` instead of `auth.claims`
@@ -2886,7 +2976,6 @@
 ### Major Changes
 
 - Drop deprecations. Migration steps: ([#2022](https://github.com/clerk/javascript/pull/2022)) by [@dimkl](https://github.com/dimkl)
-
   - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
   - use `secretKey` instead of `apiKey`
   - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
@@ -2947,7 +3036,6 @@
 ### Patch Changes
 
 - Warn about environment variables deprecations: ([#1859](https://github.com/clerk/javascript/pull/1859)) by [@dimkl](https://github.com/dimkl)
-
   - `CLERK_API_KEY`
   - `CLERK_FRONTEND_API`
   - `NEXT_PUBLIC_CLERK_FRONTEND_API`
@@ -3023,12 +3111,10 @@
   Thus `@clerk/remix` was updated to support Remix `^2.0.0` and later. If you want/need to continue using Remix `^1.0.0`, keep using the previous major `@clerk/remix` version.
 
   **Breaking changes:**
-
   - Renamed `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
   - Removed `ClerkCatchBoundary`
 
   **Migration guide:**
-
   - Rename `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
 
     ```diff
@@ -3236,7 +3322,6 @@
 ### Patch Changes
 
 - Allow `clerkJSVersion` to be passed when loading interstitial. Support for ([#1354](https://github.com/clerk/javascript/pull/1354)) by [@panteliselef](https://github.com/panteliselef)
-
   - Nextjs
   - Remix
   - Node
@@ -3255,7 +3340,6 @@
   (when the user provides a list).
 
   Resolves:
-
   - [#978](https://github.com/clerk/javascript/pull/978)
   - [#1004](https://github.com/clerk/javascript/pull/1004)
 
@@ -3272,7 +3356,6 @@
 - ESM/CJS support for `@clerk/clerk-react` by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Changes that should affect users and OS contributors:
-
   - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
   - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
   - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
