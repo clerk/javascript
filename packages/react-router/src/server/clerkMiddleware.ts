@@ -55,7 +55,7 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       organizationSyncOptions,
     } = loadedOptions;
 
-    const requestState = await clerkClient(args).authenticateRequest(clerkRequest, {
+    const requestState = await clerkClient(args, options).authenticateRequest(clerkRequest, {
       apiUrl,
       secretKey,
       jwtKey,
