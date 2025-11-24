@@ -86,7 +86,7 @@ type SessionTasksProps = {
  */
 export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
-  const { navigate } = useRouter();
+  const { navigate, matches } = useRouter();
   const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   // If there are no pending tasks, navigate away from the tasks flow.
@@ -102,8 +102,19 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
       return;
     }
 
+    // If the current path does does not match any of the tasks, navigate away to the initial path,
+    // this handles cases where a user uses browser back navigation to the tasks URL.
+    if (
+      task &&
+      clerk.session?.tasks &&
+      clerk.session.tasks.length > 0 &&
+      !clerk.session.tasks.find(t => matches(INTERNAL_SESSION_TASK_ROUTE_BY_KEY[t.key]))
+    ) {
+      void navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[task.key]}`);
+    }
+
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
-  }, [clerk, navigate, redirectUrlComplete]);
+  }, [clerk, matches, navigate, redirectUrlComplete]);
 
   if (!clerk.session?.currentTask) {
     return (

@@ -1,7 +1,9 @@
-import { useClerk, useReverification, useSession } from '@clerk/shared/react';
+import { useClerk, useReverification } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/shared/types';
+import { useCallback } from 'react';
 
 import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
+import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -16,8 +18,8 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { withTaskGuard } from './withTaskGuard';
 
 const TaskResetPasswordInternal = () => {
-  const { signOut, user } = useClerk();
-  const { session } = useSession();
+  const { signOut, user, session } = useClerk();
+  const { redirectUrlComplete, navigateOnSetActive } = useSessionTasksContext();
   const card = useCardState();
   const {
     userSettings: { passwordSettings },
@@ -71,7 +73,7 @@ const TaskResetPasswordInternal = () => {
     }
   };
 
-  const resetPassword = async () => {
+  const resetPassword = useCallback(async () => {
     if (!user) {
       return;
     }
@@ -87,7 +89,7 @@ const TaskResetPasswordInternal = () => {
     } catch (e) {
       return handleError(e, [passwordField, confirmField], card.setError);
     }
-  };
+  }, [user, passwordField, confirmField, updatePasswordWithReverification, sessionsField.checked, card]);
 
   const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
