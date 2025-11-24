@@ -641,6 +641,8 @@ export type ElementsConfig = {
   subscriptionDetailsCardBody: WithOptions;
   subscriptionDetailsCardFooter: WithOptions;
   subscriptionDetailsCardActions: WithOptions;
+  subscriptionDetailsActionButton: WithOptions;
+  subscriptionDetailsCancelButton: WithOptions;
   subscriptionDetailsDetailRow: WithOptions;
   subscriptionDetailsDetailRowLabel: WithOptions;
   subscriptionDetailsDetailRowValue: WithOptions;

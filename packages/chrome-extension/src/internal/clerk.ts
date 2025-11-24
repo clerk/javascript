@@ -28,13 +28,13 @@ export type CreateClerkClientOptions = {
   syncHost?: string;
 };
 
-export async function createClerkClient({
+export function createClerkClient({
   __experimental_syncHostListener = false,
   publishableKey,
   scope,
   storageCache = BrowserStorageCache,
   syncHost,
-}: CreateClerkClientOptions): Promise<Clerk> {
+}: CreateClerkClientOptions) {
   if (scope === SCOPE.BACKGROUND) {
     // TODO @nikos
     // @ts-expect-error will be replaced by clerk ui
@@ -66,7 +66,7 @@ export async function createClerkClient({
   const url = syncHost ? syncHost : DEFAULT_LOCAL_HOST_PERMISSION;
 
   // Create Clerk instance
-  clerk = new Clerk(publishableKey);
+  clerk = new Clerk(publishableKey, {});
 
   // @ts-expect-error - TODO: sync is evaluating to true vs boolean
   const jwtOptions: JWTHandlerParams = {

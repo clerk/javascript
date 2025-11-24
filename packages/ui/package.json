@@ -10,24 +10,17 @@
   "license": "MIT",
   "author": "Clerk",
   "sideEffects": false,
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/ui.mjs",
-      "require": "./dist/ui.js",
       "default": "./dist/ui.mjs"
     },
     "./entry": {
       "types": "./dist/types/entry.d.ts",
       "import": "./dist/entry.mjs",
-      "require": "./dist/entry.js",
       "default": "./dist/entry.mjs"
-    },
-    "./internal": {
-      "types": "./dist/types/internal.d.ts",
-      "import": "./dist/ui.mjs",
-      "require": "./dist/ui.js",
-      "default": "./dist/ui.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -48,7 +41,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16",
+    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
     "lint:publint": "publint",
     "showerrors": "tsc",
     "test:ci": "vitest --maxWorkers=70%",

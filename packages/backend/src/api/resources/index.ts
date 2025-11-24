@@ -22,7 +22,11 @@ export type {
 
 export type { SignUpStatus } from '@clerk/shared/types';
 
+export * from './CommercePlan';
+export * from './CommerceSubscription';
+export * from './CommerceSubscriptionItem';
 export * from './ExternalAccount';
+export * from './Feature';
 export * from './IdentificationLink';
 export * from './IdPOAuthAccessToken';
 export * from './Instance';
@@ -30,11 +34,11 @@ export * from './InstanceRestrictions';
 export * from './InstanceSettings';
 export * from './Invitation';
 export * from './JSON';
+export * from './JwtTemplate';
+export * from './M2MToken';
 export * from './Machine';
 export * from './MachineScope';
 export * from './MachineSecretKey';
-export * from './M2MToken';
-export * from './JwtTemplate';
 export * from './OauthAccessToken';
 export * from './OAuthApplication';
 export * from './Organization';
@@ -45,7 +49,6 @@ export * from './OrganizationSettings';
 export * from './PhoneNumber';
 export * from './ProxyCheck';
 export * from './RedirectUrl';
-export * from './SamlAccount';
 export * from './SamlConnection';
 export * from './Session';
 export * from './SignInTokens';
@@ -57,17 +60,13 @@ export * from './User';
 export * from './Verification';
 export * from './WaitlistEntry';
 export * from './Web3Wallet';
-export * from './CommercePlan';
-export * from './CommerceSubscription';
-export * from './CommerceSubscriptionItem';
-export * from './Feature';
 
 export type {
   EmailWebhookEvent,
-  OrganizationWebhookEvent,
   OrganizationDomainWebhookEvent,
   OrganizationInvitationWebhookEvent,
   OrganizationMembershipWebhookEvent,
+  OrganizationWebhookEvent,
   PermissionWebhookEvent,
   RoleWebhookEvent,
   SessionWebhookEvent,
