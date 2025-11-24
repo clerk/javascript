@@ -1,5 +1,4 @@
 import type {
-  ActiveSessionResource,
   ClientJSON,
   ClientJSONSnapshot,
   ClientResource,
@@ -55,13 +54,6 @@ export class Client extends BaseResource implements ClientResource {
 
   get signInAttempt(): SignInResource {
     return this.signIn;
-  }
-
-  /**
-   * @deprecated Use `signedInSessions()` instead.
-   */
-  get activeSessions(): ActiveSessionResource[] {
-    return this.sessions.filter(s => s.status === 'active') as ActiveSessionResource[];
   }
 
   get signedInSessions(): SignedInSessionResource[] {
