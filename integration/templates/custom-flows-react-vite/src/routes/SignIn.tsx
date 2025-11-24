@@ -104,7 +104,7 @@ export function SignIn({ className, ...props }: React.ComponentProps<'div'>) {
           </CardHeader>
           <CardContent>
             <div className='grid gap-6'>
-              {signIn.availableStrategies
+              {signIn.supportedFirstFactors
                 .filter(({ strategy }) => strategy !== 'reset_password_email_code')
                 .map(({ strategy }) => (
                   <Button

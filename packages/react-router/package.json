@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "1.10.2",
+  "version": "2.2.5",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -30,6 +30,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
     "./ssr.server": {
       "types": "./dist/ssr/index.d.ts",
       "default": "./dist/ssr/index.js"
@@ -54,6 +58,9 @@
       "*": [
         "dist/*.d.ts",
         "dist/index.d.ts"
+      ],
+      "server": [
+        "dist/server/index.d.ts"
       ],
       "ssr.server": [
         "dist/ssr/index.d.ts"
@@ -92,12 +99,12 @@
   "devDependencies": {
     "@types/cookie": "^0.6.0",
     "esbuild-plugin-file-path-extensions": "^2.1.4",
-    "react-router": "7.9.1"
+    "react-router": "7.9.4"
   },
   "peerDependencies": {
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react",
-    "react-router": "^7.1.2"
+    "react-router": "^7.9.0"
   },
   "engines": {
     "node": ">=20.0.0"

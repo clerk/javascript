@@ -5,7 +5,7 @@ import type {
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
   SessionStatusClaim,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export type AuthContextValue = {
   userId: string | null | undefined;

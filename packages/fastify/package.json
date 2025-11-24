@@ -1,6 +1,6 @@
 {
   "name": "@clerk/fastify",
-  "version": "2.4.33",
+  "version": "2.6.5",
   "description": "Clerk SDK for Fastify",
   "keywords": [
     "auth",
@@ -25,28 +25,28 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/types/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/types/index.d.ts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
     },
     "./webhooks": {
       "import": {
-        "types": "./dist/types/webhooks.d.ts",
-        "default": "./dist/esm/webhooks.js"
+        "types": "./dist/webhooks.d.mts",
+        "default": "./dist/webhooks.mjs"
       },
       "require": {
-        "types": "./dist/types/webhooks.d.ts",
+        "types": "./dist/webhooks.d.ts",
         "default": "./dist/webhooks.js"
       }
     }
   },
   "main": "./dist/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "webhooks"
@@ -58,7 +58,7 @@
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint": "eslint src",
-    "lint:attw": "attw --pack . --profile node16 --ignore-rules unexpected-module-syntax",
+    "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
     "test": "vitest run",
@@ -72,7 +72,7 @@
     "fastify-plugin": "^5.0.1"
   },
   "devDependencies": {
-    "fastify": "^5.6.0"
+    "fastify": "^5.6.1"
   },
   "peerDependencies": {
     "fastify": ">=5"

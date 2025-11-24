@@ -1,5 +1,9 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import type { EmailAddressResource, EnvironmentResource, PrepareEmailAddressVerificationParams } from '@clerk/types';
+import type {
+  EmailAddressResource,
+  EnvironmentResource,
+  PrepareEmailAddressVerificationParams,
+} from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

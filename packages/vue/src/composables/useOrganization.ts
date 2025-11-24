@@ -1,6 +1,6 @@
 import { getCurrentOrganizationMembership } from '@clerk/shared/organization';
-import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/types';
-import { computed } from 'vue';
+import type { OrganizationMembershipResource, OrganizationResource } from '@clerk/shared/types';
+import { computed, watch } from 'vue';
 
 import type { ToComputedRefs } from '../utils';
 import { toComputedRefs } from '../utils';
@@ -55,6 +55,21 @@ type UseOrganization = () => ToComputedRefs<UseOrganizationReturn>;
 export const useOrganization: UseOrganization = () => {
   const { clerk, organizationCtx } = useClerkContext('useOrganization');
   const { session } = useSession();
+
+  const unwatch = watch(
+    clerk,
+    value => {
+      if (value) {
+        // Optional chaining is important for `@clerk/vue` usage with older clerk-js versions that don't have the method
+        value.__internal_attemptToEnableEnvironmentSetting?.({
+          for: 'organizations',
+          caller: 'useOrganization',
+        });
+        unwatch();
+      }
+    },
+    { immediate: true },
+  );
 
   const result = computed<UseOrganizationReturn>(() => {
     if (organizationCtx.value === undefined) {

@@ -5,6 +5,7 @@ import {
   __experimental_useStatements,
   __experimental_useSubscription,
   useClerk,
+  useOrganizationContext,
   useSession,
 } from '@clerk/shared/react';
 import type {
@@ -12,9 +13,10 @@ import type {
   BillingPlanResource,
   BillingSubscriptionItemResource,
   BillingSubscriptionPlanPeriod,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useCallback, useMemo } from 'react';
 
+import { useProtect } from '@/ui/common/Gate';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
 import type { LocalizationKey } from '../../localization';
@@ -28,44 +30,43 @@ export function normalizeFormatted(formatted: string) {
   return formatted.endsWith('.00') ? formatted.slice(0, -3) : formatted;
 }
 
-// TODO(@COMMERCE): Rename payment sources to payment methods at the API level
-export const usePaymentMethods = () => {
+const useBillingHookParams = () => {
   const subscriberType = useSubscriberTypeContext();
-  return __experimental_usePaymentMethods({
+  const allowBillingRoutes = useProtect(
+    has =>
+      has({
+        permission: 'org:sys_billing:read',
+      }) || has({ permission: 'org:sys_billing:manage' }),
+  );
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
+
+  return {
     for: subscriberType,
-    initialPage: 1,
-    pageSize: 10,
     keepPreviousData: true,
-  });
+    // If the user is in an organization, only fetch billing data if they have the necessary permissions
+    enabled: subscriberType === 'organization' ? Boolean(organizationCtx?.organization) && allowBillingRoutes : true,
+  };
+};
+
+export const usePaymentMethods = () => {
+  const params = useBillingHookParams();
+  return __experimental_usePaymentMethods(params);
 };
 
 export const usePaymentAttempts = () => {
-  const subscriberType = useSubscriberTypeContext();
-  return __experimental_usePaymentAttempts({
-    for: subscriberType,
-    initialPage: 1,
-    pageSize: 10,
-    keepPreviousData: true,
-  });
+  const params = useBillingHookParams();
+  return __experimental_usePaymentAttempts(params);
 };
 
-export const useStatements = (params?: { mode: 'cache' }) => {
-  const subscriberType = useSubscriberTypeContext();
-  return __experimental_useStatements({
-    for: subscriberType,
-    initialPage: 1,
-    pageSize: 10,
-    keepPreviousData: true,
-    __experimental_mode: params?.mode,
-  });
+export const useStatements = (externalParams?: { mode: 'cache' }) => {
+  const params = useBillingHookParams();
+  return __experimental_useStatements({ ...params, __experimental_mode: externalParams?.mode });
 };
 
 export const useSubscription = () => {
-  const subscriberType = useSubscriberTypeContext();
-  const subscription = __experimental_useSubscription({
-    for: subscriberType,
-    keepPreviousData: true,
-  });
+  const params = useBillingHookParams();
+  const subscription = __experimental_useSubscription(params);
   const subscriptionItems = useMemo(
     () => subscription.data?.subscriptionItems || [],
     [subscription.data?.subscriptionItems],
@@ -85,6 +86,7 @@ export const usePlans = (params?: { mode: 'cache' }) => {
     initialPage: 1,
     pageSize: 50,
     keepPreviousData: true,
+    enabled: true,
     __experimental_mode: params?.mode,
   });
 };
@@ -123,15 +125,15 @@ export const usePlansContext = () => {
   // Invalidates cache but does not fetch immediately
   const { revalidate: revalidateStatements } = useStatements({ mode: 'cache' });
 
-  const { revalidate: revalidatePaymentSources } = usePaymentMethods();
+  const { revalidate: revalidatePaymentMethods } = usePaymentMethods();
 
   const revalidateAll = useCallback(() => {
     // Revalidate the plans and subscriptions
     void revalidateSubscriptions();
     void revalidatePlans();
     void revalidateStatements();
-    void revalidatePaymentSources();
-  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentSources]);
+    void revalidatePaymentMethods();
+  }, [revalidateSubscriptions, revalidatePlans, revalidateStatements, revalidatePaymentMethods]);
 
   // should the default plan be shown as active
   const isDefaultPlanImplicitlyActiveOrUpcoming = useMemo(() => {
@@ -213,7 +215,7 @@ export const usePlansContext = () => {
       const subscription =
         sub ?? (plan ? activeOrUpcomingSubscriptionWithPlanPeriod(plan, selectedPlanPeriod) : undefined);
       let _selectedPlanPeriod = selectedPlanPeriod;
-      const isEligibleForSwitchToAnnual = (plan?.annualMonthlyFee.amount ?? 0) > 0;
+      const isEligibleForSwitchToAnnual = Boolean(plan?.annualMonthlyFee);
 
       if (_selectedPlanPeriod === 'annual' && !isEligibleForSwitchToAnnual) {
         _selectedPlanPeriod = 'month';
@@ -226,7 +228,7 @@ export const usePlansContext = () => {
           const isEligibleForTrial = topLevelSubscription?.eligibleForFreeTrial;
 
           if (isSignedOut || isEligibleForTrial) {
-            return localizationKeys('commerce.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
+            return localizationKeys('billing.startFreeTrial__days', { days: plan.freeTrialDays ?? 0 });
           }
         }
         return localizationKey;
@@ -237,31 +239,31 @@ export const usePlansContext = () => {
         if (subscription) {
           if (_selectedPlanPeriod !== subscription.planPeriod && subscription.canceledAt) {
             if (_selectedPlanPeriod === 'month') {
-              return localizationKeys('commerce.switchToMonthly');
+              return localizationKeys('billing.switchToMonthly');
             }
 
             if (isEligibleForSwitchToAnnual) {
-              return localizationKeys('commerce.switchToAnnual');
+              return localizationKeys('billing.switchToAnnual');
             }
           }
 
           if (subscription.canceledAt) {
-            return localizationKeys('commerce.reSubscribe');
+            return localizationKeys('billing.reSubscribe');
           }
 
           if (_selectedPlanPeriod !== subscription.planPeriod) {
             if (_selectedPlanPeriod === 'month') {
-              return localizationKeys('commerce.switchToMonthly');
+              return localizationKeys('billing.switchToMonthly');
             }
 
             if (isEligibleForSwitchToAnnual) {
-              return localizationKeys('commerce.switchToAnnual');
+              return localizationKeys('billing.switchToAnnual');
             }
 
-            return localizationKeys('commerce.manageSubscription');
+            return localizationKeys('billing.manageSubscription');
           }
 
-          return localizationKeys('commerce.manageSubscription');
+          return localizationKeys('billing.manageSubscription');
         }
 
         // Handle non-subscription cases
@@ -269,8 +271,8 @@ export const usePlansContext = () => {
           subscriptionItems.filter(subscription => !subscription.plan.isDefault).length > 0;
 
         return hasNonDefaultSubscriptions
-          ? localizationKeys('commerce.switchPlan')
-          : freeTrialOr(localizationKeys('commerce.subscribe'));
+          ? localizationKeys('billing.switchPlan')
+          : freeTrialOr(localizationKeys('billing.subscribe'));
       };
 
       return {
@@ -326,7 +328,7 @@ export const usePlansContext = () => {
       clerk.__internal_openCheckout({
         planId: plan.id,
         // if the plan doesn't support annual, use monthly
-        planPeriod: planPeriod === 'annual' && plan.annualMonthlyFee.amount === 0 ? 'month' : planPeriod,
+        planPeriod: planPeriod === 'annual' && !plan.annualMonthlyFee ? 'month' : planPeriod,
         for: subscriberType,
         onSubscriptionComplete: () => {
           revalidateAll();

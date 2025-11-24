@@ -1,8 +1,9 @@
-import { describe, it } from '@jest/globals';
 import { render } from '@testing-library/react';
 import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { bindCreateFixtures } from '../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+
 import { LinkRenderer } from '../LinkRenderer';
 
 const { createFixtures } = bindCreateFixtures('SignUp');

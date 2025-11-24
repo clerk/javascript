@@ -1,5 +1,5 @@
+import type { FieldId } from '@clerk/shared/types';
 import { titleize } from '@clerk/shared/underscore';
-import type { FieldId } from '@clerk/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
@@ -9,12 +9,13 @@ import {
   FormInfoText,
   FormSuccessText,
   FormWarningText,
+  Span,
   useAppearance,
 } from '../customizables';
 import type { ElementDescriptor } from '../customizables/elementDescriptors';
 import { usePrefersReducedMotion } from '../hooks';
 import type { ThemableCssProp } from '../styledSystem';
-import { animations } from '../styledSystem';
+import { animations, common } from '../styledSystem';
 import type { FeedbackType, useFormControlFeedback } from '../utils/useFormControl';
 
 function useFormTextAnimation() {
@@ -40,7 +41,7 @@ function useFormTextAnimation() {
         transitionTimingFunction: t.transitionTiming.$common,
       });
     },
-    [prefersReducedMotion],
+    [prefersReducedMotion, appearanceAnimations],
   );
 
   return {
@@ -71,14 +72,13 @@ export type FormFeedbackDescriptorsKeys = 'error' | 'warning' | 'info' | 'succes
 type Feedback = { feedback?: string; feedbackType?: FeedbackType; shouldEnter: boolean };
 
 export type FormFeedbackProps = Partial<ReturnType<typeof useFormControlFeedback>['debounced'] & { id: FieldId }> & {
-  errorMessageId?: string;
   elementDescriptors?: Partial<Record<FormFeedbackDescriptorsKeys, ElementDescriptor>>;
   center?: boolean;
   sx?: ThemableCssProp;
 };
 
 export const FormFeedback = (props: FormFeedbackProps) => {
-  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false, errorMessageId } = props;
+  const { id, elementDescriptors, sx, feedback, feedbackType = 'info', center = false } = props;
   const feedbacksRef = useRef<{
     a?: Feedback;
     b?: Feedback;
@@ -143,10 +143,8 @@ export const FormFeedback = (props: FormFeedbackProps) => {
     return {
       elementDescriptor: descriptor,
       elementId: id ? descriptor?.setId?.(id) : undefined,
-      // We only want the id applied when the feedback type is an error
-      // to avoid having multiple elements in the dom with the same id attribute.
-      // We also only have aria-describedby applied to the input when it is an error.
-      id: type === 'error' ? errorMessageId : undefined,
+      // Use legacy pattern for errors (backwards compatible), new pattern for other types
+      id: type === 'error' ? `error-${id}` : `${id}-${type}-feedback`,
     };
   };
 
@@ -164,36 +162,50 @@ export const FormFeedback = (props: FormFeedbackProps) => {
   const InfoComponentB = FormInfoComponent[feedbacks.b?.feedbackType || 'info'];
 
   return (
-    <Flex
-      style={{
-        height: feedback ? maxHeight : 0, // dynamic height
-        position: 'relative',
-      }}
-      center={center}
-      sx={[getFormTextAnimation(!!feedback), sx]}
-    >
-      <InfoComponentA
-        {...getElementProps(feedbacks.a?.feedbackType)}
-        ref={calculateHeightA}
-        sx={[
-          () => ({
-            visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
-          }),
-          getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
-        ]}
-        localizationKey={titleize(feedbacks.a?.feedback)}
-      />
-      <InfoComponentB
-        {...getElementProps(feedbacks.b?.feedbackType)}
-        ref={calculateHeightB}
-        sx={[
-          () => ({
-            visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
-          }),
-          getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
-        ]}
-        localizationKey={titleize(feedbacks.b?.feedback)}
-      />
-    </Flex>
+    <>
+      {/* Screen reader only live region that updates when feedback changes */}
+      <Span
+        aria-live='polite'
+        aria-atomic='true'
+        sx={{
+          ...common.visuallyHidden(),
+        }}
+      >
+        {feedback ? titleize(feedback) : ''}
+      </Span>
+      <Flex
+        style={{
+          height: feedback ? maxHeight : 0, // dynamic height
+          position: 'relative',
+        }}
+        center={center}
+        sx={[getFormTextAnimation(!!feedback), sx]}
+      >
+        <InfoComponentA
+          {...getElementProps(feedbacks.a?.feedbackType)}
+          {...(feedbacks.a?.feedbackType && { 'data-testid': `form-feedback-${feedbacks.a.feedbackType}` })}
+          ref={calculateHeightA}
+          sx={[
+            () => ({
+              visibility: feedbacks.a?.shouldEnter ? 'visible' : 'hidden',
+            }),
+            getFormTextAnimation(!!feedbacks.a?.shouldEnter, { inDelay: true }),
+          ]}
+          localizationKey={titleize(feedbacks.a?.feedback)}
+        />
+        <InfoComponentB
+          {...getElementProps(feedbacks.b?.feedbackType)}
+          {...(feedbacks.b?.feedbackType && { 'data-testid': `form-feedback-${feedbacks.b.feedbackType}` })}
+          ref={calculateHeightB}
+          sx={[
+            () => ({
+              visibility: feedbacks.b?.shouldEnter ? 'visible' : 'hidden',
+            }),
+            getFormTextAnimation(!!feedbacks.b?.shouldEnter, { inDelay: true }),
+          ]}
+          localizationKey={titleize(feedbacks.b?.feedback)}
+        />
+      </Flex>
+    </>
   );
 };

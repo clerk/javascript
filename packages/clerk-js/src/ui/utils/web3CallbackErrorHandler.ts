@@ -1,5 +1,5 @@
 import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
-import type { ClerkAPIError, ClerkRuntimeError as ClerkRuntimeErrorType } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError as ClerkRuntimeErrorType } from '@clerk/shared/types';
 
 import { handleError } from './errorHandler';
 

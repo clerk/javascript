@@ -1,7 +1,7 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useOrganizationList, useUser } from '@clerk/shared/react';
-import type { OrganizationResource } from '@clerk/types';
+import type { OrganizationResource } from '@clerk/shared/types';
 
-import { isClerkAPIResponseError } from '@/index.headless';
 import { sharedMainIdentifierSx } from '@/ui/common/organizations/OrganizationPreview';
 import { localizationKeys, useLocalizations } from '@/ui/customizables';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';

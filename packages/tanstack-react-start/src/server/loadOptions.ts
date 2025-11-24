@@ -1,4 +1,4 @@
-import { createClerkRequest } from '@clerk/backend/internal';
+import type { ClerkRequest } from '@clerk/backend/internal';
 import { apiUrlFromPublishableKey } from '@clerk/shared/apiUrlFromPublishableKey';
 import { getEnvVariable } from '@clerk/shared/getEnvVariable';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
@@ -9,10 +9,8 @@ import { errorThrower } from '../utils';
 import { getPublicEnvVariables } from '../utils/env';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
-import { patchRequest } from './utils';
 
-export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => {
-  const clerkRequest = createClerkRequest(patchRequest(request));
+export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}) => {
   const commonEnv = commonEnvs();
   const secretKey = overrides.secretKey || commonEnv.SECRET_KEY;
   const machineSecretKey = overrides.machineSecretKey || commonEnv.MACHINE_SECRET_KEY;
@@ -21,7 +19,7 @@ export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => 
   const apiUrl = getEnvVariable('CLERK_API_URL') || apiUrlFromPublishableKey(publishableKey);
   const domain = handleValueOrFn(overrides.domain, new URL(request.url)) || commonEnv.DOMAIN;
   const isSatellite = handleValueOrFn(overrides.isSatellite, new URL(request.url)) || commonEnv.IS_SATELLITE;
-  const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, clerkRequest.clerkUrl, commonEnv.PROXY_URL);
+  const relativeOrAbsoluteProxyUrl = handleValueOrFn(overrides?.proxyUrl, request.clerkUrl, commonEnv.PROXY_URL);
   const signInUrl = overrides.signInUrl || commonEnv.SIGN_IN_URL;
   const signUpUrl = overrides.signUpUrl || commonEnv.SIGN_UP_URL;
   const afterSignInUrl = overrides.afterSignInUrl || getPublicEnvVariables().afterSignInUrl;
@@ -29,7 +27,7 @@ export const loadOptions = (request: Request, overrides: LoaderOptions = {}) => 
 
   let proxyUrl;
   if (!!relativeOrAbsoluteProxyUrl && isProxyUrlRelative(relativeOrAbsoluteProxyUrl)) {
-    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, clerkRequest.clerkUrl).toString();
+    proxyUrl = new URL(relativeOrAbsoluteProxyUrl, request.clerkUrl).toString();
   } else {
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }

@@ -1,13 +1,14 @@
-import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
-
-import { buildErrorThrower } from './error';
+import { buildErrorThrower, ClerkRuntimeError } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
+import type { ClerkOptions, SDKMetadata, Without } from './types';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
 
-const FAILED_TO_LOAD_ERROR = 'Clerk: Failed to load Clerk';
+const ERROR_CODE = 'failed_to_load_clerk_js';
+const ERROR_CODE_TIMEOUT = 'failed_to_load_clerk_js_timeout';
+const FAILED_TO_LOAD_ERROR = 'Failed to load Clerk';
 
 const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 
@@ -134,7 +135,7 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
       cleanup(timeoutId, pollInterval);
 
       if (!isClerkProperlyLoaded()) {
-        reject(new Error(FAILED_TO_LOAD_ERROR));
+        reject(new ClerkRuntimeError(FAILED_TO_LOAD_ERROR, { code: ERROR_CODE_TIMEOUT }));
       } else {
         resolve(null);
       }
@@ -211,8 +212,11 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLS
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
     beforeLoad: applyClerkJsScriptAttributes(opts),
-  }).catch(() => {
-    throw new Error(FAILED_TO_LOAD_ERROR);
+  }).catch(error => {
+    throw new ClerkRuntimeError(FAILED_TO_LOAD_ERROR + (error.message ? `, ${error.message}` : ''), {
+      code: ERROR_CODE,
+      cause: error,
+    });
   });
 
   return loadPromise;

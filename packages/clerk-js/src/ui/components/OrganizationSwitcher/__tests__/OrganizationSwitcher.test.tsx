@@ -1,15 +1,16 @@
-import type { MembershipRole } from '@clerk/types';
-import { describe } from '@jest/globals';
+import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
-import { act, render } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { act, render } from '@/test/utils';
+
 import { OrganizationSwitcher } from '../';
 import {
   createFakeUserOrganizationInvitation,
   createFakeUserOrganizationMembership,
   createFakeUserOrganizationSuggestion,
-} from './utlis';
+} from './test-utils';
 
 const { createFixtures } = bindCreateFixtures('OrganizationSwitcher');
 
@@ -61,6 +62,52 @@ describe('OrganizationSwitcher', () => {
   });
 
   describe('OrganizationSwitcherTrigger', () => {
+    it('shows OrganizationPreview when user has an active organization', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+          organization_memberships: [{ name: 'Test Organization', id: '1', role: 'admin' }],
+        });
+      });
+
+      // Set the active organization in the context
+      fixtures.clerk.organization = {
+        id: '1',
+        name: 'Test Organization',
+        slug: 'test-organization',
+        membersCount: 1,
+        pendingInvitationsCount: 0,
+        adminDeleteEnabled: true,
+        maxAllowedMemberships: 100,
+      } as any;
+
+      const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+      expect(getByText('Test Organization')).toBeInTheDocument();
+    });
+
+    it('shows PersonalWorkspacePreview when user has no active organization and hidePersonal is false', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      props.setProps({ hidePersonal: false });
+      const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+      expect(getByText('Personal account')).toBeInTheDocument();
+    });
+
+    it('shows "No organization selected" when user has no active organization and hidePersonal is true', async () => {
+      const { wrapper, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      props.setProps({ hidePersonal: true });
+      const { getByText } = render(<OrganizationSwitcher />, { wrapper });
+      expect(getByText('No organization selected')).toBeInTheDocument();
+    });
+
     it('shows the counter for pending suggestions and invitations', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withOrganizations();
@@ -194,6 +241,11 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: false });
       const { getAllByText, getByText, getByRole, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
+      expect(fixtures.clerk.user?.getOrganizationMemberships).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.user?.getOrganizationMemberships.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 10,
+      });
       expect(getAllByText('Org1')).not.toBeNull();
       expect(getByText('Personal account')).toBeInTheDocument();
       expect(getByText('Org2')).toBeInTheDocument();
@@ -424,6 +476,11 @@ describe('OrganizationSwitcher', () => {
       props.setProps({ hidePersonal: true });
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
+      expect(fixtures.clerk.user?.getOrganizationMemberships).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.user?.getOrganizationMemberships.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 10,
+      });
       await userEvent.click(getByText('Org2'));
 
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(
@@ -450,6 +507,11 @@ describe('OrganizationSwitcher', () => {
       fixtures.clerk.setActive.mockReturnValueOnce(Promise.resolve());
       const { getByRole, getByText, userEvent } = render(<OrganizationSwitcher />, { wrapper });
       await userEvent.click(getByRole('button'));
+      expect(fixtures.clerk.user?.getOrganizationMemberships).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.user?.getOrganizationMemberships.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 10,
+      });
       await userEvent.click(getByText(/Personal account/i));
 
       expect(fixtures.clerk.setActive).toHaveBeenCalledWith(

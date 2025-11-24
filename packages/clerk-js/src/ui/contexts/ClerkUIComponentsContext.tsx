@@ -5,12 +5,12 @@ import type {
   TaskChooseOrganizationProps,
   UserButtonProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  ApiKeysContext,
+  APIKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -95,7 +95,12 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'organization' : 'user'}>
+        <SubscriberTypeContext.Provider
+          value={
+            // Backward compatibility: support legacy `forOrganizations: true`
+            (props as any).forOrganizations ? 'organization' : (props as PricingTableProps).for || 'user'
+          }
+        >
           <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
             {children}
           </PricingTableContext.Provider>
@@ -103,9 +108,9 @@ export function ComponentContextProvider({
       );
     case 'APIKeys':
       return (
-        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
+        <APIKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
           {children}
-        </ApiKeysContext.Provider>
+        </APIKeysContext.Provider>
       );
     case 'OAuthConsent':
       return (

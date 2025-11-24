@@ -1,8 +1,11 @@
 import { EmailLinkError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { render, runFakeTimers, screen, waitFor } from '../../../../testUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen, waitFor } from '@/test/utils';
+
 import { SignUpEmailLinkFlowComplete } from '../../../common/EmailLinkCompleteFlowCard';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
 
@@ -21,11 +24,8 @@ describe('SignUpEmailLinkFlowComplete', () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress({ required: true });
     });
-    await runFakeTimers(async timers => {
-      render(<SignUpEmailLinkFlowComplete />, { wrapper });
-      timers.runOnlyPendingTimers();
-      await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
-    });
+    render(<SignUpEmailLinkFlowComplete />, { wrapper });
+    await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
   });
 
   describe('Success', () => {
@@ -33,12 +33,9 @@ describe('SignUpEmailLinkFlowComplete', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      await runFakeTimers(async timers => {
-        render(<SignUpEmailLinkFlowComplete />, { wrapper });
-        timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
-        screen.getByText(/success/i);
-      });
+      render(<SignUpEmailLinkFlowComplete />, { wrapper });
+      await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
+      screen.getByText(/success/i);
     });
   });
 
@@ -47,35 +44,25 @@ describe('SignUpEmailLinkFlowComplete', () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(
-        await Promise.resolve(() => {
-          throw new EmailLinkError(EmailLinkErrorCodeStatus.Expired);
-        }),
+      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(() =>
+        Promise.reject(new EmailLinkError(EmailLinkErrorCodeStatus.Expired)),
       );
 
-      await runFakeTimers(async timers => {
-        render(<SignUpEmailLinkFlowComplete />, { wrapper });
-        timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
-        screen.getByText(/expired/i);
-      });
+      render(<SignUpEmailLinkFlowComplete />, { wrapper });
+      await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
+      screen.getByText(/expired/i);
     });
 
     it('shows the failed error message when the appropriate error is thrown', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress({ required: true });
       });
-      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(
-        await Promise.resolve(() => {
-          throw new EmailLinkError(EmailLinkErrorCodeStatus.Failed);
-        }),
+      fixtures.clerk.handleEmailLinkVerification.mockImplementationOnce(() =>
+        Promise.reject(new EmailLinkError(EmailLinkErrorCodeStatus.Failed)),
       );
-      await runFakeTimers(async timers => {
-        render(<SignUpEmailLinkFlowComplete />, { wrapper });
-        timers.runOnlyPendingTimers();
-        await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
-        screen.getByText(/invalid/i);
-      });
+      render(<SignUpEmailLinkFlowComplete />, { wrapper });
+      await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
+      screen.getByText(/invalid/i);
     });
   });
 });

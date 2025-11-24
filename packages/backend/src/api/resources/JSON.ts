@@ -246,6 +246,8 @@ export interface SamlAccountJSON extends ClerkResourceJSON {
   last_name: string;
   verification: VerificationJSON | null;
   saml_connection: SamlAccountConnectionJSON | null;
+  last_authenticated_at: number | null;
+  enterprise_connection_id: string | null;
 }
 
 export interface IdentificationLinkJSON extends ClerkResourceJSON {
@@ -261,6 +263,7 @@ export interface OrganizationSettingsJSON extends ClerkResourceJSON {
   creator_role: string;
   admin_delete_enabled: boolean;
   domains_enabled: boolean;
+  slug_disabled: boolean;
   domains_enrollment_modes: Array<DomainsEnrollmentModes>;
   domains_default_role: string;
 }
@@ -392,6 +395,11 @@ export interface OrganizationInvitationJSON extends ClerkResourceJSON {
   expires_at: number;
 }
 
+export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitationJSON {
+  status: 'accepted';
+  user_id: string;
+}
+
 /**
  * @interface
  */
@@ -488,6 +496,17 @@ export interface SessionJSON extends ClerkResourceJSON {
   abandon_at: number;
   created_at: number;
   updated_at: number;
+}
+
+/**
+ * Session webhook event payload extending `SessionJSON` interface with associated `User` information.
+ * Used for `session.created`, `session.ended`, `session.removed`, and `session.revoked` webhook events.
+ */
+export interface SessionWebhookEventJSON extends SessionJSON {
+  /**
+   * The user associated with the session, or null if not available.
+   */
+  user: UserJSON | null;
 }
 
 export interface SignInJSON extends ClerkResourceJSON {
@@ -600,6 +619,10 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
   legal_accepted_at: number | null;
+  /**
+   * The locale of the user in BCP-47 format.
+   */
+  locale: string | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -635,6 +658,18 @@ export interface DeletedObjectJSON {
   id?: string;
   slug?: string;
   deleted: boolean;
+}
+
+/**
+ * User deletion webhook event payload that extends `DeletedObjectJSON`.
+ * Includes the `external_id` field to identify the deleted user in external systems.
+ * Used for `user.deleted` webhook events.
+ */
+export interface UserDeletedJSON extends DeletedObjectJSON {
+  /**
+   * The external identifier associated with the deleted user, if one was set.
+   */
+  external_id?: string;
 }
 
 export interface PaginatedResponseJSON {
@@ -822,9 +857,9 @@ interface BillingTotalsJSON {
 export interface FeatureJSON extends ClerkResourceJSON {
   object: typeof ObjectType.Feature;
   name: string;
-  description: string;
+  description?: string | null;
   slug: string;
-  avatar_url: string;
+  avatar_url?: string | null;
 }
 
 /**
@@ -833,19 +868,18 @@ export interface FeatureJSON extends ClerkResourceJSON {
 export interface BillingPlanJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingPlan;
   id: string;
-  product_id: string;
   name: string;
   slug: string;
-  description?: string;
+  description: string | null;
   is_default: boolean;
   is_recurring: boolean;
   has_base_fee: boolean;
   publicly_visible: boolean;
   fee: BillingMoneyAmountJSON;
-  annual_fee: BillingMoneyAmountJSON;
-  annual_monthly_fee: BillingMoneyAmountJSON;
+  annual_fee: BillingMoneyAmountJSON | null;
+  annual_monthly_fee: BillingMoneyAmountJSON | null;
   for_payer_type: 'org' | 'user';
-  features: FeatureJSON[];
+  features?: FeatureJSON[];
 }
 
 type BillingSubscriptionItemStatus =
@@ -865,7 +899,7 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   object: typeof ObjectType.BillingSubscriptionItem;
   status: BillingSubscriptionItemStatus;
   plan_period: 'month' | 'annual';
-  payer_id: string;
+  payer_id?: string;
   period_start: number;
   period_end: number | null;
   is_free_trial?: boolean;
@@ -874,12 +908,12 @@ export interface BillingSubscriptionItemJSON extends ClerkResourceJSON {
   updated_at: number;
   canceled_at: number | null;
   past_due_at: number | null;
-  lifetime_paid: BillingMoneyAmountJSON;
-  next_payment: {
+  lifetime_paid: BillingMoneyAmountJSON | null;
+  next_payment?: {
     amount: number;
     date: number;
   } | null;
-  amount: BillingMoneyAmountJSON | null;
+  amount: BillingMoneyAmountJSON;
   plan?: BillingPlanJSON | null;
   plan_id?: string | null;
 }
@@ -924,6 +958,7 @@ export interface BillingSubscriptionItemWebhookEventJSON extends ClerkResourceJS
     publicly_visible: boolean;
   } | null;
   plan_id?: string | null;
+  payer?: BillingPayerJSON;
 }
 
 /**

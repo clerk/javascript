@@ -10,6 +10,7 @@ export class OrganizationSettings {
     readonly creatorRole: string,
     readonly adminDeleteEnabled: boolean,
     readonly domainsEnabled: boolean,
+    readonly slugDisabled: boolean,
     readonly domainsEnrollmentModes: Array<DomainsEnrollmentModes>,
     readonly domainsDefaultRole: string,
   ) {}
@@ -23,6 +24,7 @@ export class OrganizationSettings {
       data.creator_role,
       data.admin_delete_enabled,
       data.domains_enabled,
+      data.slug_disabled,
       data.domains_enrollment_modes,
       data.domains_default_role,
     );

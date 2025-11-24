@@ -1,11 +1,11 @@
-import type { DeletedObjectResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
+import type { DeletedObjectResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
 import { CardStateProvider } from '@/ui/elements/contexts';
 
-import { render } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { LeaveOrganizationForm } from '../ActionConfirmationPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -25,8 +25,8 @@ describe('LeaveOrganizationPage', () => {
     const { getByRole, userEvent, getByLabelText } = render(
       <CardStateProvider>
         <LeaveOrganizationForm
-          onSuccess={jest.fn()}
-          onReset={jest.fn()}
+          onSuccess={vi.fn()}
+          onReset={vi.fn()}
         />
       </CardStateProvider>,
       { wrapper },
@@ -50,8 +50,8 @@ describe('LeaveOrganizationPage', () => {
     const { getByRole, userEvent, getByLabelText, findByRole } = render(
       <CardStateProvider>
         <LeaveOrganizationForm
-          onSuccess={jest.fn()}
-          onReset={jest.fn()}
+          onSuccess={vi.fn()}
+          onReset={vi.fn()}
         />
       </CardStateProvider>,
       { wrapper },

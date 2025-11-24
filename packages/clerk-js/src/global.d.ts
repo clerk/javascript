@@ -11,6 +11,7 @@ declare const __DEV__: boolean;
  * Build time feature flags.
  */
 declare const __BUILD_DISABLE_RHC__: string;
+declare const __BUILD_VARIANT_CHANNEL__: boolean;
 declare const __BUILD_VARIANT_CHIPS__: boolean;
 
 interface Window {

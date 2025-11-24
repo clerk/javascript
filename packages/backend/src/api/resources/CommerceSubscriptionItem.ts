@@ -4,7 +4,7 @@ import { BillingPlan } from './CommercePlan';
 import type { BillingSubscriptionItemJSON } from './JSON';
 
 /**
- * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](/docs/reference/javascript/types/commerce-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/subscription_items) and is not directly accessible from the Frontend API.
+ * The `BillingSubscriptionItem` object is similar to the [`BillingSubscriptionItemResource`](/docs/reference/javascript/types/billing-subscription-item-resource) object as it holds information about a subscription item, as well as methods for managing it. However, the `BillingSubscriptionItem` object is different in that it is used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/commerce/get/commerce/subscription_items) and is not directly accessible from the Frontend API.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -29,20 +29,23 @@ export class BillingSubscriptionItem {
     /**
      * The next payment information.
      */
-    readonly nextPayment: {
-      /**
-       * The amount of the next payment.
-       */
-      amount: number;
-      /**
-       * Unix timestamp (milliseconds) of when the next payment is scheduled.
-       */
-      date: number;
-    } | null,
+    readonly nextPayment:
+      | {
+          /**
+           * The amount of the next payment.
+           */
+          amount: number;
+          /**
+           * Unix timestamp (milliseconds) of when the next payment is scheduled.
+           */
+          date: number;
+        }
+      | null
+      | undefined,
     /**
      * The current amount for the subscription item.
      */
-    readonly amount: BillingMoneyAmount | null | undefined,
+    readonly amount: BillingMoneyAmount | undefined,
     /**
      * The plan associated with this subscription item.
      */
@@ -78,7 +81,7 @@ export class BillingSubscriptionItem {
     /**
      * The payer ID.
      */
-    readonly payerId: string,
+    readonly payerId: string | undefined,
     /**
      * Whether this subscription item is currently in a free trial period.
      */
@@ -86,7 +89,7 @@ export class BillingSubscriptionItem {
     /**
      * The lifetime amount paid for this subscription item.
      */
-    readonly lifetimePaid?: BillingMoneyAmount | null,
+    readonly lifetimePaid?: BillingMoneyAmount,
   ) {}
 
   static fromJSON(data: BillingSubscriptionItemJSON): BillingSubscriptionItem {
@@ -111,7 +114,7 @@ export class BillingSubscriptionItem {
       data.plan_period,
       data.period_start,
       data.next_payment,
-      formatAmountJSON(data.amount),
+      formatAmountJSON(data.amount) ?? undefined,
       data.plan ? BillingPlan.fromJSON(data.plan) : null,
       data.plan_id ?? null,
       data.created_at,
@@ -122,7 +125,7 @@ export class BillingSubscriptionItem {
       data.ended_at,
       data.payer_id,
       data.is_free_trial,
-      formatAmountJSON(data.lifetime_paid),
+      formatAmountJSON(data.lifetime_paid) ?? undefined,
     );
   }
 }

@@ -1,8 +1,10 @@
-import { renderHook } from '../../../testUtils';
-import { OptionsProvider } from '../../contexts';
-import { useLocalizations } from '../../customizables';
-import { createPasswordError } from '../passwordUtils';
-import { bindCreateFixtures } from '../test/createFixtures';
+import { describe, expect, it } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { renderHook } from '@/test/utils';
+import { OptionsProvider } from '@/ui/contexts';
+import { useLocalizations } from '@/ui/customizables';
+import { createPasswordError } from '@/ui/utils/passwordUtils';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

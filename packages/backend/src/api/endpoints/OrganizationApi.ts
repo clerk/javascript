@@ -43,6 +43,7 @@ type GetOrganizationParams = ({ organizationId: string } | { slug: string }) & {
 type UpdateParams = {
   name?: string;
   slug?: string;
+  adminDeleteEnabled?: boolean;
   maxAllowedMemberships?: number;
 } & MetadataParams;
 

@@ -1,6 +1,7 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
+import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -163,6 +164,7 @@ function SignUpStartInternal(): JSX.Element {
           redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          continuePath: 'continue',
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');
@@ -355,7 +357,19 @@ function SignUpStartInternal(): JSX.Element {
           oidcPrompt,
         }),
       )
-      .catch(err => handleError(err, fieldsToSubmit, card.setError))
+      .catch(err => {
+        /**
+         * @experimental
+         */
+        if (
+          isClerkAPIResponseError(err) &&
+          err.errors?.[0]?.code === 'enterprise_connection_id_is_required_with_multiple_connections'
+        ) {
+          return navigate('./enterprise-connections');
+        }
+
+        return handleError(err, fieldsToSubmit, card.setError);
+      })
       .finally(() => card.setIdle());
   };
 

@@ -1,12 +1,14 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { OrganizationInvitationResource } from '@clerk/types';
-import { describe } from '@jest/globals';
-import { waitFor } from '@testing-library/dom';
+import type { OrganizationInvitationResource } from '@clerk/shared/types';
+import { waitFor } from '@testing-library/react';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../testUtils';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+
 import { Action } from '../../../elements/Action';
 import { clearFetchCache } from '../../../hooks';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { InviteMembersScreen } from '../InviteMembersScreen';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
@@ -28,6 +30,7 @@ describe('InviteMembersPage', () => {
       });
     });
 
+    fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
     fixtures.clerk.organization?.getRoles.mockRejectedValue(null);
 
     const { findByText, getByText } = render(
@@ -54,12 +57,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -70,7 +74,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -81,7 +85,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: defaultRole,
             key: defaultRole,
             name: defaultRole,
@@ -113,12 +117,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 1,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -150,12 +155,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 1,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -166,7 +172,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'admin',
@@ -201,12 +207,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 3,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -217,7 +224,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -228,7 +235,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: defaultRole,
             key: defaultRole,
             name: defaultRole,
@@ -264,12 +271,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -280,7 +288,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -318,12 +326,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -334,7 +343,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -375,12 +384,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -391,7 +401,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -435,12 +445,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -451,7 +462,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -491,12 +502,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -507,7 +519,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -561,12 +573,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -577,7 +590,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',
@@ -627,12 +640,13 @@ describe('InviteMembersPage', () => {
         });
       });
 
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
       fixtures.clerk.organization?.getRoles.mockResolvedValue({
         total_count: 2,
         data: [
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'member',
             key: 'member',
             name: 'member',
@@ -643,7 +657,7 @@ describe('InviteMembersPage', () => {
           },
           {
             pathRoot: '',
-            reload: jest.fn(),
+            reload: vi.fn(),
             id: 'admin',
             key: 'admin',
             name: 'Admin',

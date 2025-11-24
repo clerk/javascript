@@ -12,6 +12,7 @@ const mountAllClerkAstroJSComponents = () => {
     'organization-list': 'mountOrganizationList',
     'organization-profile': 'mountOrganizationProfile',
     'organization-switcher': 'mountOrganizationSwitcher',
+    'user-avatar': 'mountUserAvatar',
     'user-button': 'mountUserButton',
     'user-profile': 'mountUserProfile',
     'sign-in': 'mountSignIn',
@@ -19,6 +20,7 @@ const mountAllClerkAstroJSComponents = () => {
     'google-one-tap': 'openGoogleOneTap',
     waitlist: 'mountWaitlist',
     'pricing-table': 'mountPricingTable',
+    'api-keys': 'mountAPIKeys',
   } as const satisfies Record<InternalUIComponentId, keyof Clerk>;
 
   Object.entries(mountFns).forEach(([category, mountFn]) => {

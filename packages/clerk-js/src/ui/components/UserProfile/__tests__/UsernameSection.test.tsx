@@ -1,9 +1,10 @@
-import type { UserResource } from '@clerk/types';
-import { describe, it } from '@jest/globals';
+import type { UserResource } from '@clerk/shared/types';
 import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { render, screen, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen, waitFor } from '@/test/utils';
+
 import { UsernameSection } from '../UsernameSection';
 
 const { createFixtures } = bindCreateFixtures('UsernameSection');

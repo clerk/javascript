@@ -1,4 +1,4 @@
-import type { SignUpResource } from '@clerk/types';
+import type { SignUpResource } from '@clerk/shared/types';
 
 import { forwardClerkQueryParams } from './getClerkQueryParam';
 

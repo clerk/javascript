@@ -1,5 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { OrganizationInvitationResource } from '@clerk/types';
+import type { OrganizationInvitationResource } from '@clerk/shared/types';
 
 import { useCardState } from '@/ui/elements/contexts';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
@@ -80,6 +80,7 @@ const InvitationRow = (props: {
         <UserPreview
           sx={{ maxWidth: '30ch' }}
           user={{ primaryEmailAddress: { emailAddress: invitation.emailAddress } } as any}
+          subtitleProps={{ variant: 'caption' }}
         />
       </Td>
       <Td>

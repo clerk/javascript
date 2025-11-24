@@ -1,5 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { Appearance } from '@clerk/types';
+import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';
@@ -201,6 +201,23 @@ export const LazyImpersonationFabProvider = (
         <AppearanceProvider
           globalAppearance={props.globalAppearance}
           appearanceKey={'impersonationFab'}
+        >
+          {props.children}
+        </AppearanceProvider>
+      </VirtualRouter>
+    </Suspense>
+  );
+};
+
+export const LazyEnableOrganizationsPromptProvider = (
+  props: React.PropsWithChildren<{ globalAppearance: Appearance | undefined }>,
+) => {
+  return (
+    <Suspense>
+      <VirtualRouter startPath=''>
+        <AppearanceProvider
+          globalAppearance={props.globalAppearance}
+          appearanceKey={'enableOrganizationsPrompt'}
         >
           {props.children}
         </AppearanceProvider>

@@ -20,7 +20,7 @@ describe('useCustomElementPortal', () => {
     expect(portals.value).toHaveLength(1);
 
     expect(portals.value[0].type).toBe(Teleport);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(portals.value[0].props!.to).toBe(el);
 
     unmount(el);

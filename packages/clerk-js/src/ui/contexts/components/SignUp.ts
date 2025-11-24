@@ -1,6 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
+import type { SessionResource } from '@clerk/shared/types';
 import { isAbsoluteUrl } from '@clerk/shared/url';
-import type { SessionResource } from '@clerk/types';
 import { createContext, useContext, useMemo } from 'react';
 
 import { getTaskEndpoint, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@/core/sessionTasks';

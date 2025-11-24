@@ -29,7 +29,6 @@
     "test": {
       "inputs": [
         "*.d.ts",
-        "jest.*",
         "src/**",
         "svgTransform.js",
         "tests/**",

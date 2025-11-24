@@ -1,5 +1,7 @@
 import { useOrganizationList } from '@clerk/shared/react';
+import type { CreateOrganizationParams } from '@clerk/shared/types';
 
+import { useEnvironment } from '@/ui/contexts';
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
 import { useCardState } from '@/ui/elements/contexts';
@@ -25,6 +27,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
   });
+  const { organizationSettings } = useEnvironment();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -37,6 +40,8 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__slug'),
   });
 
+  const organizationSlugEnabled = !organizationSettings.slug.disabled;
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -45,7 +50,13 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
     }
 
     try {
-      const organization = await createOrganization({ name: nameField.value, slug: slugField.value });
+      const createOrgParams: CreateOrganizationParams = { name: nameField.value };
+
+      if (organizationSlugEnabled) {
+        createOrgParams.slug = slugField.value;
+      }
+
+      const organization = await createOrganization(createOrgParams);
 
       await setActive({
         organization,
@@ -90,15 +101,17 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
               ignorePasswordManager
             />
           </Form.ControlRow>
-          <Form.ControlRow elementId={slugField.id}>
-            <Form.PlainInput
-              {...slugField.props}
-              onChange={event => updateSlugField(event.target.value)}
-              isRequired
-              pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
-              ignorePasswordManager
-            />
-          </Form.ControlRow>
+          {organizationSlugEnabled && (
+            <Form.ControlRow elementId={slugField.id}>
+              <Form.PlainInput
+                {...slugField.props}
+                onChange={event => updateSlugField(event.target.value)}
+                isRequired
+                pattern='^(?=.*[a-z0-9])[a-z0-9\-]+$'
+                ignorePasswordManager
+              />
+            </Form.ControlRow>
+          )}
 
           <FormButtonContainer sx={() => ({ flexDirection: 'column' })}>
             <Form.SubmitButton

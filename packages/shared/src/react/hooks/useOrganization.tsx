@@ -1,6 +1,6 @@
-/* eslint-disable jsdoc/require-description-complete-sentence */
+import { getCurrentOrganizationMembership, useAttemptToEnableOrganizations } from '../../organization';
+import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
-  ClerkPaginatedResponse,
   GetDomainsParams,
   GetInvitationsParams,
   GetMembershipRequestParams,
@@ -10,17 +10,16 @@ import type {
   OrganizationMembershipRequestResource,
   OrganizationMembershipResource,
   OrganizationResource,
-} from '@clerk/types';
-
-import { getCurrentOrganizationMembership } from '../../organization';
-import { eventMethodCalled } from '../../telemetry/events/method-called';
+} from '../../types';
 import {
   useAssertWrappedByClerkProvider,
   useClerkInstanceContext,
   useOrganizationContext,
   useSessionContext,
 } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
+import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -281,6 +280,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization');
 
   const { organization } = useOrganizationContext();
   const session = useSessionContext();
@@ -359,70 +359,93 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
           status: invitationsSafeValues.status,
         };
 
-  const domains = usePagesOrInfinite<GetDomainsParams, ClerkPaginatedResponse<OrganizationDomainResource>>(
-    {
-      ...domainParams,
-    },
-    organization?.getDomains,
-    {
+  const domains = usePagesOrInfinite({
+    fetcher: organization?.getDomains,
+    config: {
       keepPreviousData: domainSafeValues.keepPreviousData,
       infinite: domainSafeValues.infinite,
       enabled: !!domainParams,
+      isSignedIn: Boolean(organization),
+      initialPage: domainSafeValues.initialPage,
+      pageSize: domainSafeValues.pageSize,
     },
-    {
-      type: 'domains',
-      organizationId: organization?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.DOMAINS_KEY,
+      authenticated: Boolean(organization),
+      tracked: {
+        organizationId: organization?.id,
+      },
+      untracked: {
+        args: domainParams,
+      },
+    }),
+  });
 
-  const membershipRequests = usePagesOrInfinite<
-    GetMembershipRequestParams,
-    ClerkPaginatedResponse<OrganizationMembershipRequestResource>
-  >(
-    {
-      ...membershipRequestParams,
-    },
-    organization?.getMembershipRequests,
-    {
+  const membershipRequests = usePagesOrInfinite({
+    fetcher: organization?.getMembershipRequests,
+    config: {
       keepPreviousData: membershipRequestSafeValues.keepPreviousData,
       infinite: membershipRequestSafeValues.infinite,
       enabled: !!membershipRequestParams,
+      isSignedIn: Boolean(organization),
+      initialPage: membershipRequestSafeValues.initialPage,
+      pageSize: membershipRequestSafeValues.pageSize,
     },
-    {
-      type: 'membershipRequests',
-      organizationId: organization?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.MEMBERSHIP_REQUESTS_KEY,
+      authenticated: Boolean(organization),
+      tracked: {
+        organizationId: organization?.id,
+      },
+      untracked: {
+        args: membershipRequestParams,
+      },
+    }),
+  });
 
-  const memberships = usePagesOrInfinite<GetMembersParams, ClerkPaginatedResponse<OrganizationMembershipResource>>(
-    membersParams || {},
-    organization?.getMemberships,
-    {
+  const memberships = usePagesOrInfinite({
+    fetcher: organization?.getMemberships,
+    config: {
       keepPreviousData: membersSafeValues.keepPreviousData,
       infinite: membersSafeValues.infinite,
       enabled: !!membersParams,
+      isSignedIn: Boolean(organization),
+      initialPage: membersSafeValues.initialPage,
+      pageSize: membersSafeValues.pageSize,
     },
-    {
-      type: 'members',
-      organizationId: organization?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.MEMBERSHIPS_KEY,
+      authenticated: Boolean(organization),
+      tracked: {
+        organizationId: organization?.id,
+      },
+      untracked: {
+        args: membersParams,
+      },
+    }),
+  });
 
-  const invitations = usePagesOrInfinite<GetInvitationsParams, ClerkPaginatedResponse<OrganizationInvitationResource>>(
-    {
-      ...invitationsParams,
-    },
-    organization?.getInvitations,
-    {
+  const invitations = usePagesOrInfinite({
+    fetcher: organization?.getInvitations,
+    config: {
       keepPreviousData: invitationsSafeValues.keepPreviousData,
       infinite: invitationsSafeValues.infinite,
       enabled: !!invitationsParams,
+      isSignedIn: Boolean(organization),
+      initialPage: invitationsSafeValues.initialPage,
+      pageSize: invitationsSafeValues.pageSize,
     },
-    {
-      type: 'invitations',
-      organizationId: organization?.id,
-    },
-  );
+    keys: createCacheKeys({
+      stablePrefix: STABLE_KEYS.INVITATIONS_KEY,
+      authenticated: Boolean(organization),
+      tracked: {
+        organizationId: organization?.id,
+      },
+      untracked: {
+        args: invitationsParams,
+      },
+    }),
+  });
 
   if (organization === undefined) {
     return {

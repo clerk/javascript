@@ -5,29 +5,32 @@ import type {
   BillingCheckoutResource,
   BillingCheckoutTotals,
   BillingPayerResource,
+  BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
+import { Billing } from '../modules/billing/namespace';
 import { BillingPayer } from './BillingPayer';
-import { BaseResource, BillingPaymentSource, BillingPlan } from './internal';
+import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
 export class BillingCheckout extends BaseResource implements BillingCheckoutResource {
   id!: string;
   externalClientSecret!: string;
   externalGatewayId!: string;
-  paymentSource?: BillingPaymentSource;
+  paymentMethod?: BillingPaymentMethodResource;
   plan!: BillingPlan;
   planPeriod!: BillingSubscriptionPlanPeriod;
   planPeriodStart!: number | undefined;
   status!: 'needs_confirmation' | 'completed';
   totals!: BillingCheckoutTotals;
   isImmediatePlanChange!: boolean;
-  freeTrialEndsAt!: Date | null;
+  freeTrialEndsAt?: Date;
   payer!: BillingPayerResource;
+  needsPaymentMethod!: boolean;
 
   constructor(data: BillingCheckoutJSON) {
     super();
@@ -42,15 +45,18 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     this.id = data.id;
     this.externalClientSecret = data.external_client_secret;
     this.externalGatewayId = data.external_gateway_id;
-    this.paymentSource = data.payment_source ? new BillingPaymentSource(data.payment_source) : undefined;
+    this.paymentMethod = data.payment_method ? new BillingPaymentMethod(data.payment_method) : undefined;
     this.plan = new BillingPlan(data.plan);
     this.planPeriod = data.plan_period;
     this.planPeriodStart = data.plan_period_start;
     this.status = data.status;
     this.totals = billingTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
-    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    if (data.free_trial_ends_at) {
+      this.freeTrialEndsAt = unixEpochToDate(data.free_trial_ends_at);
+    }
     this.payer = new BillingPayer(data.payer);
+    this.needsPaymentMethod = data.needs_payment_method;
     return this;
   }
 
@@ -61,9 +67,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     return retry(
       () =>
         this._basePatch({
-          path: this.payer.organizationId
-            ? `/organizations/${this.payer.organizationId}/commerce/checkouts/${this.id}/confirm`
-            : `/me/commerce/checkouts/${this.id}/confirm`,
+          path: Billing.path(`/checkouts/${this.id}/confirm`, { orgId: this.payer.organizationId }),
           body: params as any,
         }),
       {

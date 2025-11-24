@@ -42,6 +42,15 @@ const withEmailCodes = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
+const withBroadcastChannel = withEmailCodes
+  .clone()
+  .setId('withBroadcastChannel')
+  .setEnvVariable(
+    'public',
+    'CLERK_JS_URL',
+    constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.channel.browser.js',
+  );
+
 const sessionsProd1 = base
   .clone()
   .setId('sessionsProd1')
@@ -176,30 +185,38 @@ const withAPIKeys = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-api-keys').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-api-keys').pk);
 
+const withProtectService = base
+  .clone()
+  .setId('withProtectService')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service').pk);
+
 export const envs = {
   base,
-  withKeyless,
-  withEmailCodes,
-  withEmailCodes_destroy_client,
-  withEmailLinks,
-  withCustomRoles,
-  withReverification,
-  withEmailCodesQuickstart,
+  sessionsProd1,
+  withAPIKeys,
   withAPCore1ClerkLatest,
   withAPCore1ClerkV4,
   withAPCore2ClerkLatest,
   withAPCore2ClerkV4,
-  withDynamicKeys,
-  withRestrictedMode,
-  withLegalConsent,
-  withWaitlistdMode,
-  withSignInOrUpFlow,
-  withSignInOrUpEmailLinksFlow,
-  withSignInOrUpwithRestrictedModeFlow,
-  withSessionTasks,
-  withBillingJwtV2,
   withBilling,
+  withBillingJwtV2,
+  withBroadcastChannel,
+  withCustomRoles,
+  withDynamicKeys,
+  withEmailCodes,
+  withEmailCodes_destroy_client,
+  withEmailCodesQuickstart,
+  withEmailLinks,
+  withKeyless,
+  withLegalConsent,
+  withRestrictedMode,
+  withReverification,
+  withSessionTasks,
+  withSignInOrUpEmailLinksFlow,
+  withSignInOrUpFlow,
+  withSignInOrUpwithRestrictedModeFlow,
+  withWaitlistdMode,
   withWhatsappPhoneCode,
-  sessionsProd1,
-  withAPIKeys,
+  withProtectService,
 } as const;

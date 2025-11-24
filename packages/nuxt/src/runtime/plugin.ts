@@ -4,9 +4,6 @@ import { clerkPlugin } from '@clerk/vue';
 import { setErrorThrowerOptions } from '@clerk/vue/internal';
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useState } from 'nuxt/app';
 
-// @ts-expect-error: Handled by Nuxt.
-import { nextTick } from '#imports';
-
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
@@ -28,16 +25,8 @@ export default defineNuxtPlugin(nuxtApp => {
       version: PACKAGE_VERSION,
       environment: process.env.NODE_ENV,
     },
-    routerPush: (to: string) => {
-      return nextTick(() => {
-        void navigateTo(to);
-      });
-    },
-    routerReplace: (to: string) => {
-      return nextTick(() => {
-        void navigateTo(to, { replace: true });
-      });
-    },
+    routerPush: (to: string) => navigateTo(to),
+    routerReplace: (to: string) => navigateTo(to, { replace: true }),
     initialState: initialState.value,
   });
 });

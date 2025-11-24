@@ -1,6 +1,6 @@
-import { createDeferredPromise } from '@clerk/shared/utils';
 import type {
   __internal_CheckoutProps,
+  __internal_EnableOrganizationsPromptProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
@@ -15,7 +15,8 @@ import type {
   SignUpProps,
   UserProfileProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense } from 'react';
 
 import { clerkUIErrorDOMElementNotFound } from '../core/errors';
@@ -27,6 +28,7 @@ import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
   CreateOrganizationModal,
+  EnableOrganizationsPrompt,
   ImpersonationFab,
   KeylessPrompt,
   OrganizationProfileModal,
@@ -40,6 +42,7 @@ import {
 import { MountedCheckoutDrawer, MountedPlanDetailDrawer, MountedSubscriptionDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
+  LazyEnableOrganizationsPromptProvider,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -79,7 +82,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'enableOrganizationsPrompt',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -90,7 +94,9 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : UserProfileProps,
+            : T extends 'enableOrganizationsPrompt'
+              ? __internal_EnableOrganizationsPromptProps
+              : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -102,7 +108,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'enableOrganizationsPrompt',
     options?: {
       notify?: boolean;
     },
@@ -152,6 +159,7 @@ interface ComponentsState {
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
@@ -245,6 +253,7 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
+    enableOrganizationsPromptModal: null,
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
@@ -325,9 +334,10 @@ const Components = (props: ComponentsProps) => {
       clearUrlStateParam();
       setState(s => {
         function handleCloseModalForExperimentalUserVerification() {
-          const modal = s[`${name}Modal`] || {};
+          const modal = s[`${name}Modal`];
           if (modal && typeof modal === 'object' && 'afterVerificationCancelled' in modal && notify) {
-            modal.afterVerificationCancelled?.();
+            // TypeScript doesn't narrow properly with template literal access and 'in' operator
+            (modal as { afterVerificationCancelled?: () => void }).afterVerificationCancelled?.();
           }
         }
 
@@ -342,6 +352,20 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.openModal = (name, props) => {
+      // Prevent opening enableOrganizations prompt if it's already open
+      // It should open the first call and ignore the subsequent calls
+      if (name === 'enableOrganizationsPrompt') {
+        setState(prev => {
+          // Modal is already open, don't update state
+          if (prev.enableOrganizationsPromptModal) {
+            return prev;
+          }
+
+          return { ...prev, [`${name}Modal`]: props };
+        });
+        return;
+      }
+
       function handleCloseModalForExperimentalUserVerification() {
         if (!('afterVerificationCancelled' in props)) {
           return;
@@ -610,6 +634,12 @@ const Components = (props: ComponentsProps) => {
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
           </LazyImpersonationFabProvider>
+        )}
+
+        {state.enableOrganizationsPromptModal && (
+          <LazyEnableOrganizationsPromptProvider globalAppearance={state.appearance}>
+            <EnableOrganizationsPrompt {...state.enableOrganizationsPromptModal} />
+          </LazyEnableOrganizationsPromptProvider>
         )}
 
         {state.options?.__internal_keyless_claimKeylessApplicationUrl &&

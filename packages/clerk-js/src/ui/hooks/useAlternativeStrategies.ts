@@ -1,5 +1,5 @@
+import type { SignInFactor, SignInFirstFactor } from '@clerk/shared/types';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
-import type { SignInFactor, SignInFirstFactor } from '@clerk/types';
 
 import { factorHasLocalStrategy, isResetPasswordStrategy } from '../components/SignIn/utils';
 import { allStrategiesButtonsComparator } from '../utils/factorSorting';

@@ -1,8 +1,9 @@
 import React from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { render } from '../../../testUtils';
-import { bindCreateFixtures } from '../../utils/test/createFixtures';
-import { withRedirect } from '../withRedirect';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+import { withRedirect } from '@/ui/common/withRedirect';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 

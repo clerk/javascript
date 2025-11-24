@@ -1,4 +1,4 @@
-import type { PasswordSettingsData } from '@clerk/types';
+import type { PasswordSettingsData } from '@clerk/shared/types';
 
 export type ComplexityErrors = {
   [key in keyof Partial<Omit<PasswordSettingsData, 'disable_hibp' | 'min_zxcvbn_strength' | 'show_zxcvbn'>>]?: boolean;

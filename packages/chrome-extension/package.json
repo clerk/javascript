@@ -1,6 +1,6 @@
 {
   "name": "@clerk/chrome-extension",
-  "version": "2.6.2",
+  "version": "2.8.5",
   "description": "Clerk SDK for Chrome extensions",
   "keywords": [
     "auth",
@@ -44,10 +44,9 @@
     "lint:attw": "attw --pack . --profile node16",
     "lint:publint": "publint",
     "publish:local": "pnpm yalc push --replace  --sig",
-    "test": "jest",
-    "test:cache:clear": "jest --clearCache --useStderr",
-    "test:ci": "jest --maxWorkers=70%",
-    "test:coverage": "jest --collectCoverage && open coverage/lcov-report/index.html"
+    "test": "vitest run",
+    "test:ci": "vitest run --maxWorkers=70%",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@clerk/clerk-js": "workspace:^",

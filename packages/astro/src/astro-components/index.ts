@@ -21,6 +21,7 @@ export { default as PlanDetailsButton } from './unstyled/PlanDetailsButton.astro
  */
 export { default as SignIn } from './interactive/SignIn.astro';
 export { default as SignUp } from './interactive/SignUp.astro';
+export { default as UserAvatar } from './interactive/UserAvatar.astro';
 export { UserButton } from './interactive/UserButton';
 export { UserProfile } from './interactive/UserProfile';
 export { OrganizationProfile } from './interactive/OrganizationProfile';
@@ -30,3 +31,4 @@ export { default as CreateOrganization } from './interactive/CreateOrganization.
 export { default as GoogleOneTap } from './interactive/GoogleOneTap.astro';
 export { default as Waitlist } from './interactive/Waitlist.astro';
 export { default as PricingTable } from './interactive/PricingTable.astro';
+export { default as APIKeys } from './interactive/APIKeys.astro';

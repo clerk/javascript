@@ -17,6 +17,11 @@ export const ptBR: LocalizationResource = {
   apiKeys: {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que você visualize novamente mais tarde.',
+      formTitle: 'Copie sua chave API "{{name}}" agora',
+    },
     createdAndExpirationStatus__expiresOn:
       "Criada {{ createdDate | shortDate('pt-BR') }} • Expira {{ expiresDate | longDate('pt-BR') }}",
     createdAndExpirationStatus__never: "Criada {{ createdDate | shortDate('pt-BR') }} • Nunca expira",
@@ -55,7 +60,7 @@ export const ptBR: LocalizationResource = {
   badge__default: 'Padrão',
   badge__endsAt: "Termina {{ date | shortDate('pt-BR') }}",
   badge__expired: 'Expirado',
-  badge__freeTrial: undefined,
+  badge__freeTrial: 'Teste gratuito',
   badge__otherImpersonatorDevice: 'Personificar outro dispositivo',
   badge__pastDueAt: "Vencido em {{ date | shortDate('pt-BR') }}",
   badge__pastDuePlan: 'Vencido',
@@ -64,26 +69,26 @@ export const ptBR: LocalizationResource = {
   badge__requiresAction: 'Requer ação',
   badge__startsAt: "Inicia {{ date | shortDate('pt-BR') }}",
   badge__thisDevice: 'Este dispositivo',
-  badge__trialEndsAt: undefined,
+  badge__trialEndsAt: "Teste termina em {{ date | shortDate('pt-BR') }}",
   badge__unverified: 'Não verificado',
   badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
   badge__you: 'Você',
-  commerce: {
-    addPaymentMethod: 'Adicionar método de pagamento',
+  billing: {
+    addPaymentMethod__label: 'Adicionar método de pagamento',
     alwaysFree: 'Gratuito',
     annually: 'Anualmente',
     availableFeatures: 'Recursos disponíveis',
     billedAnnually: 'Cobrança anual',
     billedMonthlyOnly: 'Apenas cobrança mensal',
-    cancelFreeTrial: undefined,
-    cancelFreeTrialAccessUntil: undefined,
-    cancelFreeTrialTitle: undefined,
+    cancelFreeTrial: 'Cancelar teste gratuito',
+    cancelFreeTrialAccessUntil: "Cancelar acesso ao teste gratuito até {{ date | longDate('pt-BR') }}",
+    cancelFreeTrialTitle: 'Cancelar teste gratuito?',
     cancelSubscription: 'Cancelar assinatura',
     cancelSubscriptionAccessUntil:
       "Você pode continuar usando os recursos de {{plan}} até {{ date | longDate('pt-BR') }}, após o qual você não terá mais acesso.",
     cancelSubscriptionNoCharge: 'Você não será cobrado por esta assinatura.',
-    cancelSubscriptionPastDue: undefined,
+    cancelSubscriptionPastDue: 'Cancelar assinatura em atraso',
     cancelSubscriptionTitle: 'Cancelar assinatura do plano {{plan}}?',
     cannotSubscribeMonthly:
       'Você não pode assinar este plano pagando mensalmente. Para assinar este plano, você precisa escolher pagar anualmente.',
@@ -100,7 +105,7 @@ export const ptBR: LocalizationResource = {
         title: 'Adicionar endereço de e-mail',
       },
       lineItems: {
-        title__freeTrialEndsAt: undefined,
+        title__freeTrialEndsAt: 'Teste gratuito termina em',
         title__paymentMethod: 'Método de pagamento',
         title__statementId: 'ID da declaração',
         title__subscriptionBegins: 'Assinatura começa',
@@ -111,15 +116,15 @@ export const ptBR: LocalizationResource = {
       title: 'Checkout',
       title__paymentSuccessful: 'Pagamento realizado com sucesso!',
       title__subscriptionSuccessful: 'Sucesso!',
-      title__trialSuccess: undefined,
-      totalDueAfterTrial: undefined,
+      title__trialSuccess: 'Teste gratuito ativado com sucesso!',
+      totalDueAfterTrial: 'Total devido após o teste',
     },
     credit: 'Crédito',
     creditRemainder: 'Crédito para o restante da sua assinatura atual.',
     defaultFreePlanActive: 'Você está atualmente no plano Gratuito',
     free: 'Gratuito',
     getStarted: 'Começar',
-    keepFreeTrial: undefined,
+    keepFreeTrial: 'Manter teste gratuito',
     keepSubscription: 'Manter assinatura',
     manage: 'Gerenciar',
     manageSubscription: 'Gerenciar assinatura',
@@ -127,8 +132,7 @@ export const ptBR: LocalizationResource = {
     monthly: 'Mensal',
     pastDue: 'Atrasado',
     pay: 'Pagar {{amount}}',
-    paymentMethods: 'Métodos de pagamento',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento anual',
         monthly: 'Pagamento mensal',
@@ -142,6 +146,7 @@ export const ptBR: LocalizationResource = {
         testCardInfo: 'Informações do cartão de teste',
       },
     },
+    paymentMethods__label: 'Métodos de pagamento',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturamento',
@@ -149,23 +154,23 @@ export const ptBR: LocalizationResource = {
     },
     reSubscribe: 'Assinar novamente',
     seeAllFeatures: 'Ver todos os recursos',
-    startFreeTrial: undefined,
-    startFreeTrial__days: undefined,
+    startFreeTrial: 'Iniciar teste gratuito',
+    startFreeTrial__days: 'Iniciar teste gratuito de {{days}} dias',
     subscribe: 'Assinar',
     subscriptionDetails: {
       beginsOn: 'Inicia em',
       currentBillingCycle: 'Ciclo de faturamento atual',
       endsOn: 'Termina em',
-      firstPaymentAmount: undefined,
-      firstPaymentOn: undefined,
+      firstPaymentAmount: 'Valor do primeiro pagamento',
+      firstPaymentOn: 'Primeiro pagamento em',
       nextPaymentAmount: 'Valor do próximo pagamento',
       nextPaymentOn: 'Próximo pagamento em',
       pastDueAt: 'Vencido em',
       renewsAt: 'Renova em',
       subscribedOn: 'Assinado em',
       title: 'Assinatura',
-      trialEndsOn: undefined,
-      trialStartedOn: undefined,
+      trialEndsOn: 'Teste termina em',
+      trialStartedOn: 'Teste iniciado em',
     },
     subtotal: 'Subtotal',
     switchPlan: 'Mudar de plano',
@@ -226,6 +231,8 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Chave API',
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',
@@ -289,7 +296,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -298,11 +305,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',
@@ -325,7 +332,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
-        actionLabel__manageSubscription: undefined,
+        actionLabel__manageSubscription: 'Gerenciar assinatura',
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -496,9 +503,11 @@ export const ptBR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Gerenciar organização',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar participação',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
@@ -612,6 +621,12 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifique seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
@@ -647,6 +662,16 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use o link de verificação enviado para o seu e-mail',
+      resendButton: 'Não recebeu o link? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -660,6 +685,8 @@ export const ptBR: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu a senha?',
     },
+    newDeviceVerificationNotice:
+      'Você está entrando de um novo dispositivo. Estamos solicitando verificação para manter sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',
@@ -769,6 +796,10 @@ export const ptBR: LocalizationResource = {
         title: 'E-mail verificado com sucesso',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Eu concordo com a {{privacyPolicyLink || link("Política de Privacidade")}}',
@@ -796,7 +827,7 @@ export const ptBR: LocalizationResource = {
       subtitle:
         'Cadastros estão desabilitados no momento. Se você deveria ter acesso, por favor entre em contato com o suporte.',
       subtitleWaitlist:
-        'Cadastros estão desabilitados no momento. Para ser um dos primeiros a saber quando lançaremos, entre na lista de espera.',
+        'Cadastros estão desabilitados no momento. Para ser um dos primeiros a saber quando lançarmos, entre na lista de espera.',
       title: 'Acesso restrito',
     },
     start: {
@@ -884,8 +915,9 @@ export const ptBR: LocalizationResource = {
       'Você chegou ao seu limite de membros da organização, incluindo convites pendentes.',
     organization_minimum_permissions_needed:
       'É necessário que haja pelo menos um membro da organização com as permissões mínimas necessárias.',
-    organization_not_found_or_unauthorized: undefined,
-    organization_not_found_or_unauthorized_with_create_organization_disabled: undefined,
+    organization_not_found_or_unauthorized: 'Organização não encontrada ou não autorizada',
+    organization_not_found_or_unauthorized_with_create_organization_disabled:
+      'Organização não encontrada ou não autorizada, a criação de organizações está desabilitada',
     passkey_already_exists: 'Uma chave de acesso já está registrada neste dispositivo.',
     passkey_not_supported: 'Chaves de acesso não são suportadas neste dispositivo.',
     passkey_pa_not_supported: 'Registro precisa de chave de acesso mas dispositivo não a suporta.',
@@ -946,7 +978,9 @@ export const ptBR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
+    action__closeUserMenu: 'Fechar menu do usuário',
     action__manageAccount: 'Gerenciar conta',
+    action__openUserMenu: 'Abrir menu do usuário',
     action__signOut: 'Sair',
     action__signOutAll: 'Sair de todas as contas',
   },
@@ -978,7 +1012,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -987,11 +1021,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',
@@ -1014,7 +1048,7 @@ export const ptBR: LocalizationResource = {
         totalPaid: 'Total pago',
       },
       subscriptionsListSection: {
-        actionLabel__manageSubscription: undefined,
+        actionLabel__manageSubscription: 'Gerenciar assinatura',
         actionLabel__newSubscription: 'Assinar um plano',
         actionLabel__switchPlan: 'Mudar de plano',
         tableHeader__edit: 'Editar',
@@ -1048,7 +1082,7 @@ export const ptBR: LocalizationResource = {
       actionDescription: 'Digite Excluir conta abaixo para continuar.',
       confirm: 'Excluir conta',
       messageLine1:
-        'Tem certeza de que deseja excluir sua conta do Clerk? Entre em contato com o proprietário do aplicativo para excluir suas informações de seu aplicativo e outros serviços.',
+        'Tem certeza de que deseja excluir sua conta? Alguns dados associados podem ser mantidos. Para solicitar a exclusão completa de dados, entre em contato com o suporte.',
       messageLine2: 'Esta ação é permanente e irreversível.',
       title: 'Excluir conta',
     },

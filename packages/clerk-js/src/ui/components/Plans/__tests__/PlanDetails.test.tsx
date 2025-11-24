@@ -1,7 +1,9 @@
+import { describe, expect, it, vi } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, waitFor } from '@/test/utils';
 import { Drawer } from '@/ui/elements/Drawer';
 
-import { render, waitFor } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
 import { PlanDetails } from '../PlanDetails';
 
 const { createFixtures } = bindCreateFixtures('UserProfile');
@@ -13,9 +15,9 @@ describe('PlanDetails', () => {
     description: 'Feature 1 Description',
     avatarUrl: 'https://example.com/feature1.png',
     slug: 'feature-1',
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   };
 
   const mockFeature2 = {
@@ -24,9 +26,9 @@ describe('PlanDetails', () => {
     description: 'Feature 2 Description',
     avatarUrl: 'https://example.com/feature2.png',
     slug: 'feature-2',
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   };
 
   const mockPlan = {
@@ -60,14 +62,15 @@ describe('PlanDetails', () => {
     slug: 'test-plan',
     avatarUrl: 'https://example.com/avatar.png',
     features: [mockFeature, mockFeature2],
-    __internal_toSnapshot: jest.fn(),
+    __internal_toSnapshot: vi.fn(),
     pathRoot: '',
-    reload: jest.fn(),
+    reload: vi.fn(),
   };
 
   it('displays spinner when loading with planId', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getPlan.mockImplementation(() => new Promise(() => {}));
@@ -116,6 +119,7 @@ describe('PlanDetails', () => {
   it('fetches and renders plan details when planId is provided', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getPlan.mockResolvedValue(mockPlan);
@@ -219,18 +223,8 @@ describe('PlanDetails', () => {
         currencySymbol: '$',
         currency: 'USD',
       },
-      annualFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
-      annualMonthlyFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
+      annualFee: null,
+      annualMonthlyFee: null,
     };
 
     const { wrapper } = await createFixtures(f => {
@@ -263,18 +257,8 @@ describe('PlanDetails', () => {
         currencySymbol: '$',
         currency: 'USD',
       },
-      annualFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
-      annualMonthlyFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
+      annualFee: null,
+      annualMonthlyFee: null,
       isDefault: true,
     };
 

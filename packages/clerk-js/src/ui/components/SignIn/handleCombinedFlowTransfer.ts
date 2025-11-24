@@ -5,7 +5,7 @@ import type {
   SessionResource,
   SignUpModes,
   SignUpResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { SIGN_UP_MODES } from '../../../core/constants';
 import type { RouteContextValue } from '../../router/RouteContext';

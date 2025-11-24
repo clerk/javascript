@@ -17,6 +17,11 @@ export const itIT: LocalizationResource = {
   apiKeys: {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copia e chiudi',
+      formHint: 'Per motivi di sicurezza, non ti permetteremo di visualizzarlo di nuovo in seguito.',
+      formTitle: 'Copia la tua chiave API "{{name}}" ora',
+    },
     createdAndExpirationStatus__expiresOn:
       "Creata {{ createdDate | shortDate('it-IT') }} • Scadenza {{ expiresDate | longDate('it-IT') }}",
     createdAndExpirationStatus__never: "Creata {{ createdDate | shortDate('it-IT') }} • Nessuna scadenza",
@@ -69,8 +74,8 @@ export const itIT: LocalizationResource = {
   badge__upcomingPlan: 'In arrivo',
   badge__userDevice: 'Dispositivo utente',
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: 'Aggiungi metodo di pagamento',
+  billing: {
+    addPaymentMethod__label: 'Aggiungi metodo di pagamento',
     alwaysFree: 'Sempre gratuito',
     annually: 'Annualmente',
     availableFeatures: 'Funzionalità disponibili',
@@ -127,8 +132,7 @@ export const itIT: LocalizationResource = {
     monthly: 'Mensile',
     pastDue: 'Scaduto',
     pay: 'Paga {{amount}}',
-    paymentMethods: 'Metodi di pagamento',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento annuale',
         monthly: 'Pagamento mensile',
@@ -142,6 +146,7 @@ export const itIT: LocalizationResource = {
         testCardInfo: 'Informazioni carta di prova',
       },
     },
+    paymentMethods__label: 'Metodi di pagamento',
     popular: 'Popolare',
     pricingTable: {
       billingCycle: 'Ciclo di fatturazione',
@@ -227,6 +232,8 @@ export const itIT: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Inserisci la tua password',
   formFieldInputPlaceholder__phoneNumber: 'Inserisci il numero di telefono',
   formFieldInputPlaceholder__username: 'Inserisci il nome utente',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Chiave API',
   formFieldLabel__apiKeyDescription: 'Descrizione',
   formFieldLabel__apiKeyExpiration: 'Scadenza',
   formFieldLabel__apiKeyName: 'Nome chiave segreta',
@@ -290,7 +297,7 @@ export const itIT: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Stato',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Imposta come predefinito',
         actionLabel__remove: 'Rimuovi',
         add: 'Aggiungi nuovo metodo di pagamento',
@@ -299,11 +306,11 @@ export const itIT: LocalizationResource = {
         formButtonPrimary__add: 'Aggiungi metodo di pagamento',
         formButtonPrimary__pay: 'Paga {{amount}}',
         payWithTestCardButton: 'Paga con carta di prova',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} verrà rimosso da questo account.',
           messageLine2:
             'Non potrai più utilizzare questo metodo di pagamento e gli abbonamenti ricorrenti che dipendono da esso non funzioneranno più.',
-          successMessage: '{{paymentSource}} è stato rimosso dal tuo account.',
+          successMessage: '{{paymentMethod}} è stato rimosso dal tuo account.',
           title: 'Rimuovi metodo di pagamento',
         },
         title: 'Metodi di pagamento',
@@ -496,9 +503,11 @@ export const itIT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea Organizzazione',
     action__invitationAccept: 'Unisciti',
     action__manageOrganization: 'Gestisci Organizzazione',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Richiedi di unirti',
     notSelected: 'Nessuna organizzazione selezionata',
     personalWorkspace: 'Spazio di lavoro personale',
@@ -611,6 +620,12 @@ export const itIT: LocalizationResource = {
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Controlla la tua email',
     },
+    emailCodeMfa: {
+      formTitle: 'Controlla la tua email',
+      resendButton: 'Non hai ricevuto un codice? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Il client utilizzato non corrisponde al tipo di account associato.',
@@ -646,6 +661,16 @@ export const itIT: LocalizationResource = {
         titleNewTab: "Accedi da un'altra scheda",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Usa il link di verifica inviato alla tua email',
+      resendButton: 'Non hai ricevuto il link? Reinvia',
+      subtitle: 'per continuare su {{applicationName}}',
+      title: 'Controlla la tua email',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Codice di reset della password',
       resendButton: 'Non hai ricevuto un codice? Reinvia',
@@ -659,6 +684,8 @@ export const itIT: LocalizationResource = {
       label__alternativeMethods: 'Oppure, accedi con un altro metodo',
       title: 'Hai dimenticato la password?',
     },
+    newDeviceVerificationNotice:
+      "Stai effettuando l'accesso da un nuovo dispositivo. Richiediamo la verifica per mantenere il tuo account sicuro.",
     noAvailableMethods: {
       message: "Impossibile procedere con l'accesso. Non ci sono strumenti di autenticazione disponibili.",
       subtitle: 'Si è verificato un errore',
@@ -765,6 +792,10 @@ export const itIT: LocalizationResource = {
         subtitleNewTab: 'Ritorna alla tab precedente per continuare',
         title: 'Email verificata con successo',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -940,7 +971,9 @@ export const itIT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Aggiungi account',
+    action__closeUserMenu: 'Chiudi menu utente',
     action__manageAccount: 'Gestisci account',
+    action__openUserMenu: 'Apri menu utente',
     action__signOut: 'Disconnetti',
     action__signOutAll: 'Disconnetti da tutti gli accounts',
   },
@@ -972,7 +1005,7 @@ export const itIT: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Stato',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Imposta come predefinito',
         actionLabel__remove: 'Rimuovi',
         add: 'Aggiungi nuovo metodo di pagamento',
@@ -981,11 +1014,11 @@ export const itIT: LocalizationResource = {
         formButtonPrimary__add: 'Aggiungi metodo di pagamento',
         formButtonPrimary__pay: 'Paga {{amount}}',
         payWithTestCardButton: 'Paga con carta di prova',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} verrà rimosso da questo account.',
           messageLine2:
             'Non potrai più utilizzare questo metodo di pagamento e gli abbonamenti ricorrenti che dipendono da esso non funzioneranno più.',
-          successMessage: '{{paymentSource}} è stato rimosso dal tuo account.',
+          successMessage: '{{paymentMethod}} è stato rimosso dal tuo account.',
           title: 'Rimuovi metodo di pagamento',
         },
         title: 'Metodi di pagamento',
@@ -1042,7 +1075,7 @@ export const itIT: LocalizationResource = {
       actionDescription: 'Digita "Elimina account" qui sotto per continuare.',
       confirm: 'Elimina account',
       messageLine1:
-        "Sei sicuro di voler eliminare il tuo account da Clerk? Si prega di contattare il proprietario dell'applicazione per eliminare le tue informazioni dalla loro applicazione e da altri servizi.",
+        "Sei sicuro di voler eliminare il tuo account? Alcuni dati associati potrebbero essere conservati. Per richiedere la cancellazione completa dei dati, contatta l'assistenza.",
       messageLine2: 'Questa azione è permanente e irreversibile.',
       title: 'Elimina account',
     },

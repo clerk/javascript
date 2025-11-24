@@ -1,10 +1,10 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
 import type {
   __internal_CheckoutProps,
   __internal_SubscriptionDetailsProps,
   BillingPlanResource,
   BillingSubscriptionItemResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
 
@@ -18,7 +18,6 @@ import { CardAlert } from '@/ui/elements/Card/CardAlert';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Drawer, useDrawerContext } from '@/ui/elements/Drawer';
 import { LineItems } from '@/ui/elements/LineItems';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 import { formatDate } from '@/ui/utils/formatDate';
 
@@ -144,7 +143,7 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
         setConfirmationOpen,
       }}
     >
-      <Drawer.Header title={localizationKeys('commerce.subscriptionDetails.title')} />
+      <Drawer.Header title={localizationKeys('billing.subscriptionDetails.title')} />
 
       <Drawer.Body
         sx={t => ({
@@ -173,7 +172,6 @@ const SubscriptionDetailsInternal = (props: __internal_SubscriptionDetailsProps)
 
 const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const { isLoading, error, setError, setLoading, setIdle } = useCardState();
   const {
     subscription: selectedSubscription,
@@ -183,6 +181,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
   const { data: subscription } = useSubscription();
   const { setIsOpen } = useDrawerContext();
   const { onSubscriptionCancel } = useSubscriptionDetailsContext();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const onOpenChange = useCallback((open: boolean) => setConfirmationOpen(open), [setConfirmationOpen]);
 
@@ -195,7 +195,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setLoading();
 
     await selectedSubscription
-      .cancel({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+      .cancel({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
       .then(() => {
         onSubscriptionCancel?.();
         if (setIsOpen) {
@@ -213,7 +213,7 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
     setError,
     setLoading,
     subscriberType,
-    organization?.id,
+    organizationCtx?.organization?.id,
     onSubscriptionCancel,
     setIsOpen,
     setIdle,
@@ -245,8 +245,8 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
                 }}
                 localizationKey={
                   selectedSubscription?.isFreeTrial
-                    ? localizationKeys('commerce.keepFreeTrial')
-                    : localizationKeys('commerce.keepSubscription')
+                    ? localizationKeys('billing.keepFreeTrial')
+                    : localizationKeys('billing.keepSubscription')
                 }
               />
             )}
@@ -259,10 +259,10 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
               onClick={() => void cancelSubscription()}
               localizationKey={
                 selectedSubscription?.isFreeTrial
-                  ? localizationKeys('commerce.cancelFreeTrial', {
+                  ? localizationKeys('billing.cancelFreeTrial', {
                       plan: selectedSubscription.plan.name,
                     })
-                  : localizationKeys('commerce.cancelSubscription')
+                  : localizationKeys('billing.cancelSubscription')
               }
             />
           </>
@@ -276,10 +276,10 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
               textVariant='h3'
               localizationKey={
                 selectedSubscription?.isFreeTrial
-                  ? localizationKeys('commerce.cancelFreeTrialTitle', {
+                  ? localizationKeys('billing.cancelFreeTrialTitle', {
                       plan: selectedSubscription.plan.name,
                     })
-                  : localizationKeys('commerce.cancelSubscriptionTitle', {
+                  : localizationKeys('billing.cancelSubscriptionTitle', {
                       plan: `${selectedSubscription.status === 'upcoming' ? 'upcoming ' : ''}${selectedSubscription.plan.name}`,
                     })
               }
@@ -289,15 +289,15 @@ const SubscriptionDetailsFooter = withCardStateProvider(() => {
               colorScheme='secondary'
               localizationKey={
                 selectedSubscription?.isFreeTrial
-                  ? localizationKeys('commerce.cancelFreeTrialAccessUntil', {
+                  ? localizationKeys('billing.cancelFreeTrialAccessUntil', {
                       plan: selectedSubscription.plan.name,
                       date: selectedSubscription.periodEnd as Date,
                     })
                   : selectedSubscription.status === 'upcoming'
-                    ? localizationKeys('commerce.cancelSubscriptionNoCharge')
+                    ? localizationKeys('billing.cancelSubscriptionNoCharge')
                     : selectedSubscription.status === 'past_due'
-                      ? localizationKeys('commerce.cancelSubscriptionPastDue')
-                      : localizationKeys('commerce.cancelSubscriptionAccessUntil', {
+                      ? localizationKeys('billing.cancelSubscriptionPastDue')
+                      : localizationKeys('billing.cancelSubscriptionAccessUntil', {
                           plan: selectedSubscription.plan.name,
                           // this will always be defined in this state
                           date: selectedSubscription.periodEnd as Date,
@@ -331,19 +331,19 @@ function SubscriptionDetailsSummary() {
   return (
     <LineItems.Root>
       <LineItems.Group>
-        <LineItems.Title description={localizationKeys('commerce.subscriptionDetails.currentBillingCycle')} />
+        <LineItems.Title description={localizationKeys('billing.subscriptionDetails.currentBillingCycle')} />
         <LineItems.Description
           text={
             activeSubscription.planPeriod === 'month'
-              ? localizationKeys('commerce.monthly')
-              : localizationKeys('commerce.annually')
+              ? localizationKeys('billing.monthly')
+              : localizationKeys('billing.annually')
           }
         />
       </LineItems.Group>
       <LineItems.Group>
         <LineItems.Title
           description={localizationKeys(
-            `commerce.subscriptionDetails.${isFreeTrial ? 'firstPaymentOn' : 'nextPaymentOn'}`,
+            `billing.subscriptionDetails.${isFreeTrial ? 'firstPaymentOn' : 'nextPaymentOn'}`,
           )}
         />
         <LineItems.Description text={formatDate(subscription.nextPayment.date)} />
@@ -351,7 +351,7 @@ function SubscriptionDetailsSummary() {
       <LineItems.Group>
         <LineItems.Title
           description={localizationKeys(
-            `commerce.subscriptionDetails.${isFreeTrial ? 'firstPaymentAmount' : 'nextPaymentAmount'}`,
+            `billing.subscriptionDetails.${isFreeTrial ? 'firstPaymentAmount' : 'nextPaymentAmount'}`,
           )}
         />
         <LineItems.Description
@@ -374,7 +374,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   const canManageBilling = subscriberType === 'user' || canOrgManageBilling;
 
   const isSwitchable =
-    ((subscription.planPeriod === 'month' && subscription.plan.annualMonthlyFee.amount > 0) ||
+    ((subscription.planPeriod === 'month' && Boolean(subscription.plan.annualMonthlyFee)) ||
       subscription.planPeriod === 'annual') &&
     subscription.status !== 'past_due';
   const isFree = isFreePlan(subscription.plan);
@@ -408,11 +408,13 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
         ? {
             label:
               subscription.planPeriod === 'month'
-                ? localizationKeys('commerce.switchToAnnualWithAnnualPrice', {
-                    price: normalizeFormatted(subscription.plan.annualFee.amountFormatted),
-                    currency: subscription.plan.annualFee.currencySymbol,
+                ? localizationKeys('billing.switchToAnnualWithAnnualPrice', {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    price: normalizeFormatted(subscription.plan.annualFee!.amountFormatted),
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currency: subscription.plan.annualFee!.currencySymbol,
                   })
-                : localizationKeys('commerce.switchToMonthlyWithPrice', {
+                : localizationKeys('billing.switchToMonthlyWithPrice', {
                     price: normalizeFormatted(subscription.plan.fee.amountFormatted),
                     currency: subscription.plan.fee.currencySymbol,
                   }),
@@ -429,10 +431,10 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
         ? {
             isDestructive: true,
             label: subscription.isFreeTrial
-              ? localizationKeys('commerce.cancelFreeTrial', {
+              ? localizationKeys('billing.cancelFreeTrial', {
                   plan: subscription.plan.name,
                 })
-              : localizationKeys('commerce.cancelSubscription'),
+              : localizationKeys('billing.cancelSubscription'),
             onClick: () => {
               setSubscription(subscription);
               setConfirmationOpen(true);
@@ -441,7 +443,7 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
         : null,
       isReSubscribable
         ? {
-            label: localizationKeys('commerce.reSubscribe'),
+            label: localizationKeys('billing.reSubscribe'),
             onClick: () => {
               openCheckout({
                 planId: subscription.plan.id,
@@ -469,10 +471,34 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
   }
 
   return (
-    <ThreeDotsMenu
-      variant='bordered'
-      actions={actions}
-    />
+    <Flex
+      elementDescriptor={descriptors.subscriptionDetailsCardActions}
+      gap={2}
+      sx={t => ({
+        paddingInline: t.space.$3,
+        paddingBlock: t.space.$3,
+        borderBlockStartWidth: t.borderWidths.$normal,
+        borderBlockStartStyle: t.borderStyles.$solid,
+        borderBlockStartColor: t.colors.$borderAlpha100,
+      })}
+    >
+      {actions.map((action, index) => (
+        <Button
+          key={index}
+          elementDescriptor={
+            action.isDestructive
+              ? descriptors.subscriptionDetailsCancelButton
+              : descriptors.subscriptionDetailsActionButton
+          }
+          variant={action.isDestructive ? 'ghost' : 'outline'}
+          colorScheme={action.isDestructive ? 'danger' : undefined}
+          size='xs'
+          textVariant='buttonSmall'
+          onClick={action.onClick}
+          localizationKey={action.label}
+        />
+      ))}
+    </Flex>
   );
 };
 
@@ -480,7 +506,11 @@ const SubscriptionCardActions = ({ subscription }: { subscription: BillingSubscr
 const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionItemResource }) => {
   const { t } = useLocalizations();
 
-  const fee = subscription.planPeriod === 'month' ? subscription.plan.fee : subscription.plan.annualFee;
+  const fee =
+    subscription.planPeriod === 'month'
+      ? subscription.plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscription.plan.annualFee!;
 
   return (
     <Col
@@ -533,7 +563,6 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 
         {/* Pricing details */}
         <Flex
-          elementDescriptor={descriptors.subscriptionDetailsCardActions}
           justify='between'
           align='center'
         >
@@ -547,16 +576,14 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
           >
             {fee.currencySymbol}
             {fee.amountFormatted} /{' '}
-            {t(localizationKeys(`commerce.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
+            {t(localizationKeys(`billing.${subscription.planPeriod === 'month' ? 'month' : 'year'}`))}
           </Text>
-
-          <SubscriptionCardActions subscription={subscription} />
         </Flex>
       </Col>
 
       {subscription.pastDueAt ? (
         <DetailRow
-          label={localizationKeys('commerce.subscriptionDetails.pastDueAt')}
+          label={localizationKeys('billing.subscriptionDetails.pastDueAt')}
           value={formatDate(subscription.pastDueAt)}
         />
       ) : null}
@@ -566,8 +593,8 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
           <DetailRow
             label={
               subscription.isFreeTrial
-                ? localizationKeys('commerce.subscriptionDetails.trialStartedOn')
-                : localizationKeys('commerce.subscriptionDetails.subscribedOn')
+                ? localizationKeys('billing.subscriptionDetails.trialStartedOn')
+                : localizationKeys('billing.subscriptionDetails.subscribedOn')
             }
             value={formatDate(subscription.createdAt)}
           />
@@ -576,10 +603,10 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
             <DetailRow
               label={
                 subscription.canceledAt
-                  ? localizationKeys('commerce.subscriptionDetails.endsOn')
+                  ? localizationKeys('billing.subscriptionDetails.endsOn')
                   : subscription.isFreeTrial
-                    ? localizationKeys('commerce.subscriptionDetails.trialEndsOn')
-                    : localizationKeys('commerce.subscriptionDetails.renewsAt')
+                    ? localizationKeys('billing.subscriptionDetails.trialEndsOn')
+                    : localizationKeys('billing.subscriptionDetails.renewsAt')
               }
               value={formatDate(subscription.periodEnd)}
             />
@@ -589,10 +616,12 @@ const SubscriptionCard = ({ subscription }: { subscription: BillingSubscriptionI
 
       {subscription.status === 'upcoming' ? (
         <DetailRow
-          label={localizationKeys('commerce.subscriptionDetails.beginsOn')}
+          label={localizationKeys('billing.subscriptionDetails.beginsOn')}
           value={formatDate(subscription.periodStart)}
         />
       ) : null}
+
+      <SubscriptionCardActions subscription={subscription} />
     </Col>
   );
 };

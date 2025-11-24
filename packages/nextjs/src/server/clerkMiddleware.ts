@@ -69,7 +69,7 @@ export type ClerkMiddlewareSessionAuthObject = (SignedInAuthObject | SignedOutAu
  */
 export type ClerkMiddlewareAuthObject = ClerkMiddlewareSessionAuthObject;
 
-export type ClerkMiddlewareAuth = AuthFn<Response>;
+export type ClerkMiddlewareAuth = AuthFn;
 
 type ClerkMiddlewareHandler = (
   auth: ClerkMiddlewareAuth,
@@ -190,7 +190,6 @@ export const clerkMiddleware = ((...args: unknown[]): NextMiddleware | NextMiddl
 
       logger.debug('requestState', () => ({
         status: requestState.status,
-        // @ts-expect-error : FIXME
         headers: JSON.stringify(Object.fromEntries(requestState.headers)),
         reason: requestState.reason,
       }));

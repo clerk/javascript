@@ -1,10 +1,11 @@
-import type { OrganizationResource } from '@clerk/types';
-import { describe, jest } from '@jest/globals';
-import { waitFor } from '@testing-library/dom';
+import type { OrganizationResource } from '@clerk/shared/types';
+import { waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
-import { render } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
-import { CreateOrganization } from '../';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render } from '@/test/utils';
+
+import { CreateOrganization } from '..';
 
 const { createFixtures } = bindCreateFixtures('CreateOrganization');
 
@@ -35,20 +36,20 @@ export const createFakeOrganization = (params: FakeOrganizationParams): Organiza
     maxAllowedMemberships: params?.maxAllowedMemberships,
     createdAt: params?.createdAt || new Date(),
     updatedAt: new Date(),
-    update: jest.fn() as any,
-    getMemberships: jest.fn() as any,
-    addMember: jest.fn() as any,
-    inviteMember: jest.fn() as any,
-    inviteMembers: jest.fn() as any,
-    updateMember: jest.fn() as any,
-    removeMember: jest.fn() as any,
-    createDomain: jest.fn() as any,
-    getDomain: jest.fn() as any,
-    getDomains: jest.fn() as any,
-    getMembershipRequests: jest.fn() as any,
-    destroy: jest.fn() as any,
-    setLogo: jest.fn() as any,
-    reload: jest.fn() as any,
+    update: vi.fn() as any,
+    getMemberships: vi.fn() as any,
+    addMember: vi.fn() as any,
+    inviteMember: vi.fn() as any,
+    inviteMembers: vi.fn() as any,
+    updateMember: vi.fn() as any,
+    removeMember: vi.fn() as any,
+    createDomain: vi.fn() as any,
+    getDomain: vi.fn() as any,
+    getDomains: vi.fn() as any,
+    getMembershipRequests: vi.fn() as any,
+    destroy: vi.fn() as any,
+    setLogo: vi.fn() as any,
+    reload: vi.fn() as any,
   };
 };
 
@@ -79,35 +80,169 @@ describe('CreateOrganization', () => {
     expect(getByRole('heading', { name: 'Create organization', level: 1 })).toBeInTheDocument();
   });
 
-  it('renders component without slug field', async () => {
-    const { wrapper, fixtures, props } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
+  describe('with `hideSlug` prop', () => {
+    it('renders component without slug field', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      fixtures.clerk.createOrganization.mockReturnValue(
+        Promise.resolve(
+          getCreatedOrg({
+            maxAllowedMemberships: 1,
+            slug: 'new-org-1722578361',
+          }),
+        ),
+      );
+
+      props.setProps({ hideSlug: true });
+      const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      await waitFor(() => {
+        expect(queryByText(/Invite new members/i)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('with organization slug configured on environment', () => {
+    it('when disabled, renders component without slug field', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(false);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      fixtures.clerk.createOrganization.mockReturnValue(
+        Promise.resolve(
+          getCreatedOrg({
+            maxAllowedMemberships: 1,
+            slug: 'new-org-1722578361',
+          }),
+        ),
+      );
+
+      const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      await waitFor(() => {
+        expect(queryByText(/Invite new members/i)).toBeInTheDocument();
       });
     });
 
-    fixtures.clerk.createOrganization.mockReturnValue(
-      Promise.resolve(
-        getCreatedOrg({
-          maxAllowedMemberships: 1,
-          slug: 'new-org-1722578361',
-        }),
-      ),
-    );
+    it('when enabled, renders component slug field', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(true);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+        });
+      });
 
-    props.setProps({ hideSlug: true });
-    const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
-      wrapper,
+      fixtures.clerk.createOrganization.mockReturnValue(
+        Promise.resolve(
+          getCreatedOrg({
+            maxAllowedMemberships: 1,
+            slug: 'new-org-1722578361',
+          }),
+        ),
+      );
+
+      const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+
+      expect(queryByLabelText(/Slug/i)).toBeInTheDocument();
+
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      await waitFor(() => {
+        expect(queryByText(/Invite new members/i)).toBeInTheDocument();
+      });
     });
 
-    expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+    it('when enabled and `hideSlug` prop is passed, renders component without slug field', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(true);
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+        });
+      });
 
-    await userEvent.type(getByLabelText(/Name/i), 'new org');
-    await userEvent.click(getByRole('button', { name: /create organization/i }));
+      fixtures.clerk.createOrganization.mockReturnValue(
+        Promise.resolve(
+          getCreatedOrg({
+            maxAllowedMemberships: 1,
+            slug: 'new-org-1722578361',
+          }),
+        ),
+      );
 
-    await waitFor(() => {
-      expect(queryByText(/Invite new members/i)).toBeInTheDocument();
+      props.setProps({ hideSlug: true });
+      const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      await waitFor(() => {
+        expect(queryByText(/Invite new members/i)).toBeInTheDocument();
+      });
+    });
+
+    it('when disabled and `hideSlug` prop is passed, renders component without slug field', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withOrganizationSlug(false); // Environment disables slug
+        f.withUser({
+          email_addresses: ['test@clerk.com'],
+        });
+      });
+
+      fixtures.clerk.createOrganization.mockReturnValue(
+        Promise.resolve(
+          getCreatedOrg({
+            maxAllowedMemberships: 1,
+            slug: 'new-org-1722578361',
+          }),
+        ),
+      );
+
+      props.setProps({ hideSlug: true });
+      const { userEvent, getByRole, queryByText, queryByLabelText, getByLabelText } = render(<CreateOrganization />, {
+        wrapper,
+      });
+
+      expect(queryByLabelText(/Slug/i)).not.toBeInTheDocument();
+
+      await userEvent.type(getByLabelText(/Name/i), 'new org');
+      await userEvent.click(getByRole('button', { name: /create organization/i }));
+
+      await waitFor(() => {
+        expect(queryByText(/Invite new members/i)).toBeInTheDocument();
+      });
     });
   });
 

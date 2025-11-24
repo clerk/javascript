@@ -3,20 +3,33 @@ import type { Server, ServerOptions } from 'node:https';
 import { expect, test } from '@playwright/test';
 
 import { constants } from '../../constants';
+import type { Application } from '../../models/application';
 import { fs } from '../../scripts';
 import { createProxyServer } from '../../scripts/proxyServer';
 import type { FakeUserWithEmail } from '../../testUtils';
-import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
+import { createTestUtils } from '../../testUtils';
+import { prepareApplication } from '../sessions/utils';
 
-testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('handshake flow @handshake', ({ app }) => {
+test.describe('handshake flow @handshake', () => {
   test.describe.configure({ mode: 'serial' });
 
   test.describe('with Production instance', () => {
     // TODO: change host name (see integration/README.md#production-hosts)
-    const host = 'multiple-apps-e2e.clerk.app:8443';
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    const host = `${process.env.E2E_SESSIONS_APP_1_HOST}:8443`;
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    const APP_1_ENV_KEY = process.env.E2E_APP_1_ENV_KEY;
 
     let fakeUser: FakeUserWithEmail;
     let server: Server;
+    let app: Application;
+    let serverUrl: string;
+
+    test.beforeAll(async () => {
+      const res = await prepareApplication(APP_1_ENV_KEY);
+      app = res.app;
+      serverUrl = res.serverUrl;
+    });
 
     test.afterAll(async () => {
       await fakeUser.deleteIfExists();
@@ -34,7 +47,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.sessionsProd1'] })('hands
       server = createProxyServer({
         ssl,
         targets: {
-          [host]: app.serverUrl,
+          [host]: serverUrl,
         },
       });
 

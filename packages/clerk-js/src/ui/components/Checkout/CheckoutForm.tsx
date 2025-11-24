@@ -1,5 +1,5 @@
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
-import type { BillingMoneyAmount, BillingPaymentSourceResource, ConfirmCheckoutParams } from '@clerk/types';
+import type { BillingPaymentMethodResource, ConfirmCheckoutParams } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -15,13 +15,16 @@ import { DevOnly } from '../../common/DevOnly';
 import { useCheckoutContext, usePaymentMethods } from '../../contexts';
 import { Box, Button, Col, descriptors, Flex, Form, localizationKeys, Spinner, Text } from '../../customizables';
 import { ChevronUpDown, InformationCircle } from '../../icons';
-import * as AddPaymentSource from '../PaymentSources/AddPaymentSource';
-import { PaymentSourceRow } from '../PaymentSources/PaymentSourceRow';
+import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
+import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
+import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
 import { SubscriptionBadge } from '../Subscriptions/badge';
 
 type PaymentMethodSource = 'existing' | 'new';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+
+const HIDDEN_INPUT_NAME = 'payment_method_id';
 
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
@@ -36,7 +39,11 @@ export const CheckoutForm = withCardStateProvider(() => {
   const showPastDue = !!totals.pastDue?.amount && totals.pastDue.amount > 0;
   const showDowngradeInfo = !isImmediatePlanChange;
 
-  const fee = planPeriod === 'month' ? plan.fee : plan.annualMonthlyFee;
+  const fee =
+    planPeriod === 'month'
+      ? plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        plan.annualMonthlyFee!;
 
   return (
     <Drawer.Body>
@@ -53,7 +60,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           <LineItems.Group>
             <LineItems.Title
               title={plan.name}
-              description={planPeriod === 'annual' ? localizationKeys('commerce.billedAnnually') : undefined}
+              description={planPeriod === 'annual' ? localizationKeys('billing.billedAnnually') : undefined}
               badge={
                 plan.freeTrialEnabled && freeTrialEndsAt ? (
                   <SubscriptionBadge subscription={{ status: 'free_trial' }} />
@@ -63,19 +70,19 @@ export const CheckoutForm = withCardStateProvider(() => {
             <LineItems.Description
               prefix={planPeriod === 'annual' ? 'x12' : undefined}
               text={`${fee.currencySymbol}${fee.amountFormatted}`}
-              suffix={localizationKeys('commerce.checkout.perMonth')}
+              suffix={localizationKeys('billing.checkout.perMonth')}
             />
           </LineItems.Group>
           <LineItems.Group
             borderTop
             variant='tertiary'
           >
-            <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+            <LineItems.Title title={localizationKeys('billing.subtotal')} />
             <LineItems.Description text={`${totals.subtotal.currencySymbol}${totals.subtotal.amountFormatted}`} />
           </LineItems.Group>
           {showCredits && (
             <LineItems.Group variant='tertiary'>
-              <LineItems.Title title={localizationKeys('commerce.creditRemainder')} />
+              <LineItems.Title title={localizationKeys('billing.creditRemainder')} />
               <LineItems.Description text={`- ${totals.credit?.currencySymbol}${totals.credit?.amountFormatted}`} />
             </LineItems.Group>
           )}
@@ -84,31 +91,31 @@ export const CheckoutForm = withCardStateProvider(() => {
               <Tooltip.Root>
                 <Tooltip.Trigger>
                   <LineItems.Title
-                    title={localizationKeys('commerce.pastDue')}
+                    title={localizationKeys('billing.pastDue')}
                     icon={InformationCircle}
                   />
                 </Tooltip.Trigger>
-                <Tooltip.Content text={localizationKeys('commerce.checkout.pastDueNotice')} />
+                <Tooltip.Content text={localizationKeys('billing.checkout.pastDueNotice')} />
               </Tooltip.Root>
               <LineItems.Description text={`${totals.pastDue?.currencySymbol}${totals.pastDue?.amountFormatted}`} />
             </LineItems.Group>
           )}
 
-          {!!freeTrialEndsAt && !!plan.freeTrialDays && (
+          {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial && (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
-                title={localizationKeys('commerce.checkout.totalDueAfterTrial', {
+                title={localizationKeys('billing.checkout.totalDueAfterTrial', {
                   days: plan.freeTrialDays,
                 })}
               />
               <LineItems.Description
-                text={`${totals.grandTotal?.currencySymbol}${totals.grandTotal?.amountFormatted}`}
+                text={`${totals.totalDueAfterFreeTrial.currencySymbol}${totals.totalDueAfterFreeTrial.amountFormatted}`}
               />
             </LineItems.Group>
           )}
 
           <LineItems.Group borderTop>
-            <LineItems.Title title={localizationKeys('commerce.totalDueToday')} />
+            <LineItems.Title title={localizationKeys('billing.totalDueToday')} />
             <LineItems.Description text={`${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`} />
           </LineItems.Group>
         </LineItems.Root>
@@ -123,7 +130,7 @@ export const CheckoutForm = withCardStateProvider(() => {
           })}
         >
           <Text
-            localizationKey={localizationKeys('commerce.checkout.downgradeNotice')}
+            localizationKey={localizationKeys('billing.checkout.downgradeNotice')}
             variant='caption'
             colorScheme='secondary'
           />
@@ -136,7 +143,7 @@ export const CheckoutForm = withCardStateProvider(() => {
 });
 
 const useCheckoutMutations = () => {
-  const { for: _for, onSubscriptionComplete } = useCheckoutContext();
+  const { onSubscriptionComplete } = useCheckoutContext();
   const { checkout } = useCheckout();
   const { id, confirm } = checkout;
   const card = useCardState();
@@ -159,18 +166,23 @@ const useCheckoutMutations = () => {
     card.setIdle();
   };
 
-  const payWithExistingPaymentSource = (e: React.FormEvent<HTMLFormElement>) => {
+  const payWithExistingPaymentMethod = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const data = new FormData(e.currentTarget);
-    const paymentSourceId = data.get('payment_source_id') as string;
+    const paymentMethodId = data.get(HIDDEN_INPUT_NAME) as string;
 
     return confirmCheckout({
-      paymentSourceId,
+      paymentMethodId,
     });
   };
 
-  const addPaymentSourceAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
+  const payWithoutPaymentMethod = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    return confirmCheckout({});
+  };
+
+  const addPaymentMethodAndPay = (ctx: { gateway: 'stripe'; paymentToken: string }) => confirmCheckout(ctx);
 
   const payWithTestCard = () =>
     confirmCheckout({
@@ -179,9 +191,10 @@ const useCheckoutMutations = () => {
     });
 
   return {
-    payWithExistingPaymentSource,
-    addPaymentSourceAndPay,
+    payWithExistingPaymentMethod,
+    addPaymentMethodAndPay,
     payWithTestCard,
+    payWithoutPaymentMethod,
   };
 };
 
@@ -210,14 +223,14 @@ const CheckoutFormElements = () => {
 
 const CheckoutFormElementsInternal = () => {
   const { checkout } = useCheckout();
-  const { id, totals, isImmediatePlanChange, freeTrialEndsAt } = checkout;
-  const { data: paymentSources } = usePaymentMethods();
+  const { id, isImmediatePlanChange, needsPaymentMethod } = checkout;
+  const { data: paymentMethods } = usePaymentMethods();
 
   const [paymentMethodSource, setPaymentMethodSource] = useState<PaymentMethodSource>(() =>
-    paymentSources.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
+    paymentMethods.length > 0 || __BUILD_DISABLE_RHC__ ? 'existing' : 'new',
   );
 
-  const showPaymentMethods = isImmediatePlanChange && (totals.totalDueNow.amount > 0 || !!freeTrialEndsAt);
+  const showTabs = isImmediatePlanChange && needsPaymentMethod;
 
   if (!id) {
     return null;
@@ -231,7 +244,7 @@ const CheckoutFormElementsInternal = () => {
     >
       {__BUILD_DISABLE_RHC__ ? null : (
         <>
-          {paymentSources.length > 0 && showPaymentMethods && (
+          {paymentMethods.length > 0 && showTabs && (
             <SegmentedControl.Root
               aria-label='Payment method source'
               value={paymentMethodSource}
@@ -241,30 +254,29 @@ const CheckoutFormElementsInternal = () => {
             >
               <SegmentedControl.Button
                 value='existing'
-                text={localizationKeys('commerce.paymentMethods')}
+                text={localizationKeys('billing.paymentMethods__label')}
               />
               <SegmentedControl.Button
                 value='new'
-                text={localizationKeys('commerce.addPaymentMethod')}
+                text={localizationKeys('billing.addPaymentMethod__label')}
               />
             </SegmentedControl.Root>
           )}
         </>
       )}
 
-      {paymentMethodSource === 'existing' && (
-        <ExistingPaymentSourceForm
-          paymentSources={paymentSources}
-          totalDueNow={totals.totalDueNow}
-        />
+      {!needsPaymentMethod ? (
+        <FreeTrialButton />
+      ) : paymentMethodSource === 'existing' ? (
+        <ExistingPaymentMethodForm paymentMethods={paymentMethods} />
+      ) : (
+        !__BUILD_DISABLE_RHC__ && paymentMethodSource === 'new' && <AddPaymentMethodForCheckout />
       )}
-
-      {__BUILD_DISABLE_RHC__ ? null : paymentMethodSource === 'new' && <AddPaymentSourceForCheckout />}
     </Col>
   );
 };
 
-export const PayWithTestPaymentSource = () => {
+export const PayWithTestPaymentMethod = () => {
   const { isLoading } = useCardState();
   const { payWithTestCard } = useCheckoutMutations();
 
@@ -305,13 +317,13 @@ export const PayWithTestPaymentSource = () => {
             color: t.colors.$warning500,
             fontWeight: t.fontWeights.$semibold,
           })}
-          localizationKey={localizationKeys('commerce.paymentSource.dev.developmentMode')}
+          localizationKey={localizationKeys('billing.paymentMethod.dev.developmentMode')}
         />
         <Button
           type='button'
           block
           variant='bordered'
-          localizationKey={localizationKeys('userProfile.billingPage.paymentSourcesSection.payWithTestCardButton')}
+          localizationKey={localizationKeys('userProfile.billingPage.paymentMethodsSection.payWithTestCardButton')}
           colorScheme='secondary'
           isLoading={isLoading}
           onClick={payWithTestCard}
@@ -330,96 +342,131 @@ const useSubmitLabel = () => {
   }
 
   if (freeTrialEndsAt) {
-    return localizationKeys('commerce.startFreeTrial');
+    return localizationKeys('billing.startFreeTrial');
   }
 
   if (totals.totalDueNow.amount > 0) {
-    return localizationKeys('commerce.pay', {
+    return localizationKeys('billing.pay', {
       amount: `${totals.totalDueNow.currencySymbol}${totals.totalDueNow.amountFormatted}`,
     });
   }
 
-  return localizationKeys('commerce.subscribe');
+  return localizationKeys('billing.subscribe');
 };
 
-const AddPaymentSourceForCheckout = withCardStateProvider(() => {
-  const { addPaymentSourceAndPay } = useCheckoutMutations();
+const FreeTrialButton = withCardStateProvider(() => {
+  const { for: _for } = useCheckoutContext();
+  const { payWithoutPaymentMethod } = useCheckoutMutations();
+  const card = useCardState();
+
+  return (
+    <Form
+      onSubmit={payWithoutPaymentMethod}
+      sx={formProps}
+    >
+      <Card.Alert>{card.error}</Card.Alert>
+      <CheckoutSubmitButton />
+    </Form>
+  );
+});
+
+const AddPaymentMethodForCheckout = withCardStateProvider(() => {
+  const { addPaymentMethodAndPay } = useCheckoutMutations();
   const submitLabel = useSubmitLabel();
   const { checkout } = useCheckout();
 
   return (
-    <AddPaymentSource.Root
-      onSuccess={addPaymentSourceAndPay}
+    <AddPaymentMethod.Root
+      onSuccess={addPaymentMethodAndPay}
       checkout={checkout}
     >
       <DevOnly>
-        <PayWithTestPaymentSource />
+        <PayWithTestPaymentMethod />
       </DevOnly>
 
-      <AddPaymentSource.FormButton text={submitLabel} />
-    </AddPaymentSource.Root>
+      <AddPaymentMethod.FormButton text={submitLabel} />
+    </AddPaymentMethod.Root>
   );
 });
 
-const ExistingPaymentSourceForm = withCardStateProvider(
-  ({
-    totalDueNow,
-    paymentSources,
-  }: {
-    totalDueNow: BillingMoneyAmount;
-    paymentSources: BillingPaymentSourceResource[];
-  }) => {
-    const submitLabel = useSubmitLabel();
-    const { checkout } = useCheckout();
-    const { paymentSource, isImmediatePlanChange, freeTrialEndsAt } = checkout;
+const CheckoutSubmitButton = (props: PropsOfComponent<typeof Button>) => {
+  const card = useCardState();
+  const submitLabel = useSubmitLabel();
 
-    const { payWithExistingPaymentSource } = useCheckoutMutations();
+  return (
+    <Button
+      type='submit'
+      colorScheme='primary'
+      size='sm'
+      textVariant={'buttonLarge'}
+      sx={{
+        width: '100%',
+      }}
+      isLoading={card.isLoading}
+      localizationKey={submitLabel}
+      {...props}
+    />
+  );
+};
+
+const formProps: ThemableCssProp = t => ({
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: t.space.$4,
+});
+
+const ExistingPaymentMethodForm = withCardStateProvider(
+  ({ paymentMethods }: { paymentMethods: BillingPaymentMethodResource[] }) => {
+    const { checkout } = useCheckout();
+    const { paymentMethod, isImmediatePlanChange, needsPaymentMethod } = checkout;
+
+    const { payWithExistingPaymentMethod } = useCheckoutMutations();
     const card = useCardState();
-    const [selectedPaymentSource, setSelectedPaymentSource] = useState<BillingPaymentSourceResource | undefined>(
-      paymentSource || paymentSources.find(p => p.isDefault),
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<BillingPaymentMethodResource | undefined>(
+      paymentMethod || paymentMethods.find(p => p.isDefault),
     );
 
     const options = useMemo(() => {
-      return paymentSources.map(source => {
+      return paymentMethods.map(method => {
         const label =
-          source.paymentMethod !== 'card'
-            ? `${capitalize(source.paymentMethod)}`
-            : `${capitalize(source.cardType)} ⋯ ${source.last4}`;
+          method.paymentType !== 'card'
+            ? method.paymentType
+              ? `${capitalize(method.paymentType)}`
+              : '–'
+            : method.cardType
+              ? `${capitalize(method.cardType)} ⋯ ${method.last4}`
+              : '–';
 
         return {
-          value: source.id,
+          value: method.id,
           label,
         };
       });
-    }, [paymentSources]);
+    }, [paymentMethods]);
 
-    const showPaymentMethods = isImmediatePlanChange && (totalDueNow.amount > 0 || !!freeTrialEndsAt);
+    const showPaymentMethods = isImmediatePlanChange && needsPaymentMethod;
 
     return (
       <Form
-        onSubmit={payWithExistingPaymentSource}
-        sx={t => ({
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: t.space.$4,
-        })}
+        onSubmit={payWithExistingPaymentMethod}
+        sx={formProps}
       >
         {showPaymentMethods ? (
           <Select
-            elementId='paymentSource'
+            elementId='paymentMethod'
             options={options}
-            value={selectedPaymentSource?.id || null}
+            value={selectedPaymentMethod?.id || null}
             onChange={option => {
-              const paymentSource = paymentSources.find(source => source.id === option.value);
-              setSelectedPaymentSource(paymentSource);
+              const paymentMethod = paymentMethods.find(source => source.id === option.value);
+              setSelectedPaymentMethod(paymentMethod);
             }}
             portal
           >
             {/*Store value inside an input in order to be accessible as form data*/}
             <input
-              name='payment_source_id'
+              name={HIDDEN_INPUT_NAME}
               type='hidden'
-              value={selectedPaymentSource?.id}
+              value={selectedPaymentMethod?.id}
             />
             <SelectButton
               icon={ChevronUpDown}
@@ -428,7 +475,7 @@ const ExistingPaymentSourceForm = withCardStateProvider(
                 backgroundColor: t.colors.$colorBackground,
               })}
             >
-              {selectedPaymentSource && <PaymentSourceRow paymentSource={selectedPaymentSource} />}
+              {selectedPaymentMethod && <PaymentMethodRow paymentMethod={selectedPaymentMethod} />}
             </SelectButton>
             <SelectOptionList
               sx={t => ({
@@ -439,23 +486,13 @@ const ExistingPaymentSourceForm = withCardStateProvider(
           </Select>
         ) : (
           <input
-            name='payment_source_id'
+            name={HIDDEN_INPUT_NAME}
             type='hidden'
-            value={selectedPaymentSource?.id}
+            value={selectedPaymentMethod?.id}
           />
         )}
         <Card.Alert>{card.error}</Card.Alert>
-        <Button
-          type='submit'
-          colorScheme='primary'
-          size='sm'
-          textVariant={'buttonLarge'}
-          sx={{
-            width: '100%',
-          }}
-          isLoading={card.isLoading}
-          localizationKey={submitLabel}
-        />
+        <CheckoutSubmitButton />
       </Form>
     );
   },

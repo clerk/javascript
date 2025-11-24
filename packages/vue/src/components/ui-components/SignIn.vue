@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import type { SignInProps } from '@clerk/types';
+import type { SignInProps } from '@clerk/shared/types';
 
 const clerk = useClerk();
 
-const props = defineProps<SignInProps>();
+const props = withDefaults(defineProps<SignInProps>(), {
+  transferable: undefined,
+  withSignUp: undefined,
+});
 </script>
 
 <template>

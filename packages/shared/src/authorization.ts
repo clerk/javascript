@@ -12,7 +12,7 @@ import type {
   SessionVerificationTypes,
   SignOut,
   UseAuthReturn,
-} from '@clerk/types';
+} from './types';
 
 type TypesToConfig = Record<SessionVerificationTypes, Exclude<ReverificationConfig, SessionVerificationTypes>>;
 type AuthorizationOptions = {
@@ -341,4 +341,4 @@ const resolveAuthState = ({
   }
 };
 
-export { createCheckAuthorization, validateReverificationConfig, resolveAuthState, splitByScope };
+export { createCheckAuthorization, resolveAuthState, splitByScope, validateReverificationConfig };

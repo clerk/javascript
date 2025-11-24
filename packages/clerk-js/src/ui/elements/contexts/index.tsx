@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/shared/types';
 import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
@@ -100,11 +100,13 @@ export type FlowMetadata = {
     | 'apiKeys'
     | 'oauthConsent'
     | 'subscriptionDetails'
-    | 'subscriptionDetails'
-    | 'taskChooseOrganization';
+    | 'tasks'
+    | 'taskChooseOrganization'
+    | 'enableOrganizations';
   part?:
     | 'start'
     | 'emailCode'
+    | 'emailCode2Fa'
     | 'phoneCode'
     | 'phoneCode2Fa'
     | 'totp2Fa'
@@ -122,14 +124,16 @@ export type FlowMetadata = {
     | 'popupCallback'
     | 'popover'
     | 'complete'
-    | 'accountSwitcher';
+    | 'accountSwitcher'
+    | 'chooseOrganization'
+    | 'enterpriseConnections';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');
 
 export const FlowMetadataProvider = (props: React.PropsWithChildren<FlowMetadata>) => {
   const { flow, part } = props;
-  const value = React.useMemo(() => ({ value: { ...props } }), [flow, part]);
+  const value = React.useMemo(() => ({ value: props }), [flow, part]);
   return <FlowMetadataCtx.Provider value={value}>{props.children}</FlowMetadataCtx.Provider>;
 };
 

@@ -1,4 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import type { Simplify } from '@clerk/shared/types';
 import type { JwtPayload } from '@clerk/types';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
@@ -14,7 +15,7 @@ import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
-import { loadClerkJWKFromLocal, loadClerkJWKFromRemote } from './keys';
+import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
 import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -22,13 +23,15 @@ import { TokenType } from './tokenTypes';
 /**
  * @interface
  */
-export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
-  Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
-    /**
-     * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
-     */
-    jwtKey?: string;
-  };
+export type VerifyTokenOptions = Simplify<
+  Omit<VerifyJwtOptions, 'key'> &
+    Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
+      /**
+       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
+       */
+      jwtKey?: string;
+    }
+>;
 
 /**
  * > [!WARNING]
@@ -37,21 +40,10 @@ export type VerifyTokenOptions = Omit<VerifyJwtOptions, 'key'> &
  * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
  *
  * @param token - The token to verify.
- * @param options - Options for verifying the token.
+ * @param options - Options for verifying the token. It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })`.
  *
  * @displayFunctionSignature
  * @hideReturns
- *
- * @paramExtension
- *
- * ### `VerifyTokenOptions`
- *
- * It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
- *
- * > [!WARNING]
- * You must provide either `jwtKey` or `secretKey`.
- *
- * <Typedoc src="backend/verify-token-options" />
  *
  * @example
  *
@@ -121,10 +113,10 @@ export async function verifyToken(
   const { kid } = header;
 
   try {
-    let key;
+    let key: JsonWebKey;
 
     if (options.jwtKey) {
-      key = loadClerkJWKFromLocal(options.jwtKey);
+      key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
     } else if (options.secretKey) {
       // Fetch JWKS from Backend API using the key
       key = await loadClerkJWKFromRemote({ ...options, kid });

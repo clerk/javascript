@@ -1,8 +1,9 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/types';
+import type { SessionResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
+import { Flow } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
@@ -35,12 +36,14 @@ const SessionTasksStart = () => {
   }, [navigate, clerk, redirectUrlComplete]);
 
   return (
-    <Card.Root>
-      <Card.Content>
-        <LoadingCardContainer />
-      </Card.Content>
-      <Card.Footer />
-    </Card.Root>
+    <Flow.Part part='start'>
+      <Card.Root>
+        <Card.Content>
+          <LoadingCardContainer />
+        </Card.Content>
+        <Card.Footer />
+      </Card.Root>
+    </Flow.Part>
   );
 };
 
@@ -48,18 +51,20 @@ function SessionTasksRoutes(): JSX.Element {
   const ctx = useSessionTasksContext();
 
   return (
-    <Switch>
-      <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
-        <TaskChooseOrganizationContext.Provider
-          value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
-        >
-          <TaskChooseOrganization />
-        </TaskChooseOrganizationContext.Provider>
-      </Route>
-      <Route index>
-        <SessionTasksStart />
-      </Route>
-    </Switch>
+    <Flow.Root flow='tasks'>
+      <Switch>
+        <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['choose-organization']}>
+          <TaskChooseOrganizationContext.Provider
+            value={{ componentName: 'TaskChooseOrganization', redirectUrlComplete: ctx.redirectUrlComplete }}
+          >
+            <TaskChooseOrganization />
+          </TaskChooseOrganizationContext.Provider>
+        </Route>
+        <Route index>
+          <SessionTasksStart />
+        </Route>
+      </Switch>
+    </Flow.Root>
   );
 }
 

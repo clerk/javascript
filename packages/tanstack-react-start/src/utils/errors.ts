@@ -18,10 +18,7 @@ export const noFetchFnCtxPassedInGetAuth = createErrorMessage(`
   });
   `);
 
-export const clerkHandlerNotConfigured = createErrorMessage(`
-It looks like you're trying to use Clerk without configuring the Clerk handler.
+export const clerkMiddlewareNotConfigured = createErrorMessage(`
+It looks like you're trying to use Clerk without configuring the middleware.
 
-To fix this, make sure you have the \`createClerkHandler()\` configured in you custom server handler file (example: src/server.ts).
-
-For more info, check out the docs: https://clerk.com/docs/references/tanstack-react-start/create-clerk-handler,
-    `);
+To fix this, make sure you have the \`clerkMiddleware()\` configured in your \`createStart()\` function in your \`src/start.ts\` file.`);

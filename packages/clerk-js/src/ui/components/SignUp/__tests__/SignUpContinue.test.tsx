@@ -1,10 +1,11 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
-import { waitFor } from '@testing-library/dom';
-import React from 'react';
+import { waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
-import { render, runFakeTimers, screen } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { SignUpContinue } from '../SignUpContinue';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -160,21 +161,15 @@ describe('SignUpContinue', () => {
       }),
     );
 
-    await runFakeTimers(async timers => {
-      const { userEvent } = render(<SignUpContinue />, { wrapper });
-      expect(screen.queryByText(/username/i)).toBeInTheDocument();
-      await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
-      timers.runOnlyPendingTimers();
-      const button = screen.getByText('Continue');
-      await userEvent.click(button);
-      timers.runOnlyPendingTimers();
+    const { userEvent } = render(<SignUpContinue />, { wrapper });
+    expect(screen.queryByText(/username/i)).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
+    const button = screen.getByText('Continue');
+    await userEvent.click(button);
 
-      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-      timers.runOnlyPendingTimers();
-      await waitFor(() =>
-        expect(screen.queryByText(/^Your username must be between 4 and 40 characters long./i)).toBeInTheDocument(),
-      );
-    });
+    await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+    const errorElement = await screen.findByTestId('form-feedback-error');
+    expect(errorElement).toHaveTextContent(/Your username must be between 4 and 40 characters long/i);
   });
 
   it('renders error for existing username', async () => {
@@ -200,21 +195,15 @@ describe('SignUpContinue', () => {
       }),
     );
 
-    await runFakeTimers(async timers => {
-      const { userEvent } = render(<SignUpContinue />, { wrapper });
-      expect(screen.queryByText(/username/i)).toBeInTheDocument();
-      await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
-      timers.runOnlyPendingTimers();
-      const button = screen.getByText('Continue');
-      await userEvent.click(button);
-      timers.runOnlyPendingTimers();
+    const { userEvent } = render(<SignUpContinue />, { wrapper });
+    expect(screen.queryByText(/username/i)).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText(/username/i), 'clerkUser');
+    const button = screen.getByText('Continue');
+    await userEvent.click(button);
 
-      await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
-      timers.runOnlyPendingTimers();
-      await waitFor(() =>
-        expect(screen.queryByText(/^This username is taken. Please try another./i)).toBeInTheDocument(),
-      );
-    });
+    await waitFor(() => expect(fixtures.signUp.update).toHaveBeenCalled());
+    const errorElement = await screen.findByTestId('form-feedback-error');
+    expect(errorElement).toHaveTextContent(/This username is taken. Please try another/i);
   });
 
   describe('Sign in Link', () => {

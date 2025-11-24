@@ -1,4 +1,4 @@
-import type { __internal_LocalizationResource, PathValue, RecordToPath } from '@clerk/types';
+import type { __internal_LocalizationResource, PathValue, RecordToPath } from '@clerk/shared/types';
 
 type Value = string | number | boolean | Date;
 type Whitespace = ' ' | '\t' | '\n' | '\r';

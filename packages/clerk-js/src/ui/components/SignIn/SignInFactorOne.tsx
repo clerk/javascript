@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignInFactor } from '@clerk/types';
+import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -12,9 +12,11 @@ import { useAlternativeStrategies } from '../../hooks/useAlternativeStrategies';
 import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import { AlternativeMethods } from './AlternativeMethods';
+import { hasMultipleEnterpriseConnections } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
+import { SignInFactorOneEnterpriseConnections } from './SignInFactorOneEnterpriseConnections';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
@@ -122,6 +124,15 @@ function SignInFactorOneInternal(): JSX.Element {
       prevCurrentFactor: prev.currentFactor,
     }));
   };
+
+  /**
+   * Prompt to choose between a list of enterprise connections as supported first factors
+   * @experimental
+   */
+  if (hasMultipleEnterpriseConnections(signIn.supportedFirstFactors)) {
+    return <SignInFactorOneEnterpriseConnections />;
+  }
+
   if (showAllStrategies || showForgotPasswordStrategies) {
     const canGoBack = factorHasLocalStrategy(currentFactor);
 

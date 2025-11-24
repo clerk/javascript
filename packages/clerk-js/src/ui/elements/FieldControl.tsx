@@ -1,4 +1,4 @@
-import type { FieldId } from '@clerk/types';
+import type { FieldId } from '@clerk/shared/types';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef } from 'react';
 
@@ -154,12 +154,11 @@ const FieldLabelRow = (props: PropsWithChildren) => {
 };
 
 const FieldFeedback = (props: Pick<FormFeedbackProps, 'elementDescriptors' | 'center'>) => {
-  const { fieldId, debouncedFeedback, errorMessageId } = useFormField();
+  const { fieldId, debouncedFeedback } = useFormField();
 
   return (
     <FormFeedback
       center={props.center}
-      errorMessageId={errorMessageId}
       {...{
         ...debouncedFeedback,
         elementDescriptors: props.elementDescriptors,

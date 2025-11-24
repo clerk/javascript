@@ -3,7 +3,7 @@ import type {
   __experimental_CheckoutInstance,
   BillingCheckoutResource,
   ClerkAPIResponseError,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
 
@@ -192,4 +192,4 @@ function createCheckoutManager(cacheKey: CheckoutKey) {
   };
 }
 
-export { createCheckoutManager, type CheckoutKey };
+export { createCheckoutManager, type __experimental_CheckoutCacheState as CheckoutCacheState, type CheckoutKey };

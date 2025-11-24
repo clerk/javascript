@@ -1,7 +1,9 @@
-import { waitFor } from '@testing-library/dom';
+import { waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
-import { render, screen } from '../../../../testUtils';
-import { bindCreateFixtures } from '../../../utils/test/createFixtures';
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { render, screen } from '@/test/utils';
+
 import { SignUpVerifyEmail } from '../SignUpVerifyEmail';
 
 const { createFixtures } = bindCreateFixtures('SignUp');
@@ -31,8 +33,8 @@ describe('SignUpVerifyEmail', () => {
     fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
         ({
-          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          startEmailLinkFlow: vi.fn(() => new Promise(() => ({}))),
+          cancelEmailLinkFlow: vi.fn(() => new Promise(() => ({}))),
         }) as any,
     );
 
@@ -79,8 +81,8 @@ describe('SignUpVerifyEmail', () => {
     fixtures.signUp.createEmailLinkFlow.mockImplementation(
       () =>
         ({
-          startEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
-          cancelEmailLinkFlow: jest.fn(() => new Promise(() => ({}))),
+          startEmailLinkFlow: vi.fn(() => new Promise(() => ({}))),
+          cancelEmailLinkFlow: vi.fn(() => new Promise(() => ({}))),
         }) as any,
     );
     const { findByText } = render(<SignUpVerifyEmail />, { wrapper });
