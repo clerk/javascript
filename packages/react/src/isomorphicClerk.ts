@@ -18,6 +18,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithSolanaParams,
   BillingNamespace,
   Clerk,
   ClerkAuthenticateWithWeb3Params,
@@ -1429,6 +1430,15 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('authenticateWithOKXWallet', callback);
+    }
+  };
+
+  authenticateWithSolana = async (params?: AuthenticateWithSolanaParams) => {
+    const callback = () => this.clerkjs?.authenticateWithSolana(params);
+    if (this.clerkjs && this.loaded) {
+      return callback() as Promise<void>;
+    } else {
+      this.premountMethodCalls.set('authenticateWithSolana', callback);
     }
   };
 

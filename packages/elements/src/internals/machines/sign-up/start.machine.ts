@@ -47,6 +47,9 @@ export const SignUpStartMachine = setup({
         if (strategy === 'web3_okx_wallet_signature') {
           return parent.getSnapshot().context.clerk.client.signUp.authenticateWithOKXWallet();
         }
+        if (strategy === 'web3_solana_signature') {
+          return parent.getSnapshot().context.clerk.client.signUp.authenticateWithSolana();
+        }
         throw new ClerkElementsRuntimeError(`Unsupported Web3 strategy: ${strategy}`);
       },
     ),

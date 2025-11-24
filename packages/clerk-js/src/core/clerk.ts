@@ -2429,6 +2429,7 @@ export class Clerk implements ClerkInterface {
         identifier,
         generateSignature,
         strategy,
+        walletName,
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
@@ -2438,6 +2439,7 @@ export class Clerk implements ClerkInterface {
           unsafeMetadata,
           strategy,
           legalAccepted,
+          walletName,
         });
 
         if (

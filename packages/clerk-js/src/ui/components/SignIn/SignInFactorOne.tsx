@@ -243,8 +243,6 @@ function SignInFactorOneInternal(): JSX.Element {
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
-    // case 'web3_solana_signature':
-    //   return <SignInFactorOneSolanaWalletsCard />;
     case 'reset_password_phone_code':
       return (
         <SignInFactorOneForgotPasswordCard
