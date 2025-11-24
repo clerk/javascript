@@ -754,7 +754,7 @@ export class Clerk implements ClerkInterface {
     const { for: setting, caller } = params;
 
     if (!this.user) {
-      console.warn(
+      logger.warnOnce(
         `Clerk: "${caller}" requires an active user session. Ensure a user is signed in before executing ${caller}.`,
       );
     }
@@ -780,7 +780,7 @@ export class Clerk implements ClerkInterface {
         return { isEnabled: false };
       }
       default:
-        return { isEnabled: true };
+        throw new Error(`Attempted to enable an unknown or unsupported setting "${setting}".`);
     }
   };
 
