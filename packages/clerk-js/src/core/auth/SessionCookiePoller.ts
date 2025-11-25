@@ -6,6 +6,24 @@ import { SafeLock } from './safeLock';
 export const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 const INTERVAL_IN_MS = 5 * 1_000;
 
+/**
+ * Polls for session token refresh at regular intervals with cross-tab coordination.
+ *
+ * @example
+ * ```typescript
+ * // Create a shared lock for coordination with focus handlers
+ * const sharedLock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
+ *
+ * // Poller uses the shared lock
+ * const poller = new SessionCookiePoller(sharedLock);
+ * poller.startPollingForSessionToken(() => refreshToken());
+ *
+ * // Focus handler can use the same lock to prevent races
+ * window.addEventListener('focus', () => {
+ *   sharedLock.acquireLockAndRun(() => refreshToken());
+ * });
+ * ```
+ */
 export class SessionCookiePoller {
   private lock: SafeLockReturn;
   private workerTimers = createWorkerTimers();
