@@ -2,6 +2,13 @@ import type { JwtPayload } from '@clerk/types';
 
 import type { IdPOAuthAccessTokenJSON } from './JSON';
 
+type OAuthJwtPayload = JwtPayload & {
+  jti?: string;
+  client_id?: string;
+  scope?: string;
+  scp?: string[];
+};
+
 export class IdPOAuthAccessToken {
   constructor(
     readonly id: string,
@@ -38,7 +45,7 @@ export class IdPOAuthAccessToken {
    * Maps standard JWT claims and OAuth-specific fields to token properties.
    */
   static fromJwtPayload(payload: JwtPayload, clockSkewInMs = 5000): IdPOAuthAccessToken {
-    const oauthPayload = payload as JwtPayload & { scope?: string; scp?: string[]; client_id?: string; jti?: string };
+    const oauthPayload = payload as OAuthJwtPayload;
 
     // Map JWT claims to IdPOAuthAccessToken fields
     return new IdPOAuthAccessToken(
