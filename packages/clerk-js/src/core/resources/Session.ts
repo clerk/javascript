@@ -398,13 +398,6 @@ export class Session extends BaseResource implements SessionResource {
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
-      debugLogger.debug(
-        'Using cached token (no fetch needed)',
-        {
-          tokenId,
-        },
-        'session',
-      );
       const cachedToken = await cachedEntry.tokenResolver;
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
