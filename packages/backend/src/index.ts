@@ -93,6 +93,7 @@ export type {
   SignUpVerificationsJSON,
   SMSMessageJSON,
   UserJSON,
+  UserDeletedJSON,
   VerificationJSON,
   WaitlistEntryJSON,
   Web3WalletJSON,
