@@ -171,7 +171,7 @@ export function useDerivedAuth(
         plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
       })(params);
     },
-    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims],
   );
 
   const payload = resolveAuthState({

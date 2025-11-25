@@ -325,7 +325,7 @@ void (async () => {
       Clerk.mountPricingTable(app, componentControls.pricingTable.getProps() ?? {});
     },
     '/api-keys': () => {
-      Clerk.mountApiKeys(app, componentControls.apiKeys.getProps() ?? {});
+      Clerk.mountAPIKeys(app, componentControls.apiKeys.getProps() ?? {});
     },
     '/oauth-consent': () => {
       const searchParams = new URLSearchParams(window.location.search);

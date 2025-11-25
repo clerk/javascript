@@ -495,6 +495,9 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'apiKeysRevokeModal',
   'apiKeysRevokeModalInput',
   'apiKeysRevokeModalSubmitButton',
+  'apiKeysCopyModal',
+  'apiKeysCopyModalInput',
+  'apiKeysCopyModalSubmitButton',
 
   'subscriptionDetailsCard',
   'subscriptionDetailsCardHeader',
@@ -503,6 +506,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'subscriptionDetailsCardBody',
   'subscriptionDetailsCardFooter',
   'subscriptionDetailsCardActions',
+  'subscriptionDetailsActionButton',
+  'subscriptionDetailsCancelButton',
   'subscriptionDetailsDetailRow',
   'subscriptionDetailsDetailRowLabel',
   'subscriptionDetailsDetailRowValue',

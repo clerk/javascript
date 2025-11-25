@@ -106,9 +106,15 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = true;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
+      fixtures.clerk.billing.getSubscription.mockRejectedValue(null);
+
       render(<UserProfile />, { wrapper });
       const billingElements = await screen.findAllByRole('button', { name: /Billing/i });
       expect(billingElements.length).toBeGreaterThan(0);
+
+      expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
+      expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
     });
 
     it('includes Billing when enabled and user has a non-free subscription', async () => {
@@ -119,6 +125,7 @@ describe('UserProfile', () => {
       fixtures.environment.commerceSettings.billing.user.enabled = true;
       fixtures.environment.commerceSettings.billing.user.hasPaidPlans = false;
 
+      fixtures.clerk.billing.getStatements.mockRejectedValue(null);
       fixtures.clerk.billing.getSubscription.mockResolvedValue({
         id: 'sub_top',
         subscriptionItems: [
@@ -239,6 +246,57 @@ describe('UserProfile', () => {
       await waitFor(() => expect(screen.queryByRole('button', { name: /Billing/i })).toBeNull());
       expect(fixtures.clerk.billing.getSubscription).toHaveBeenCalled();
       expect(fixtures.clerk.billing.getStatements).toHaveBeenCalled();
+    });
+  });
+
+  describe('API Keys visibility', () => {
+    it('does not include API Keys when hide prop is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: true } });
+
+      render(<UserProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByRole('button', { name: /API keys/i })).toBeNull());
+    });
+
+    it('includes API Keys when hide prop is false and user_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = true;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<UserProfile />, { wrapper });
+      const apiKeysElements = await screen.findAllByRole('button', { name: /API keys/i });
+      expect(apiKeysElements.length).toBeGreaterThan(0);
+    });
+
+    it('includes API Keys when hide prop is not set and user_api_keys_enabled is true', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = true;
+
+      render(<UserProfile />, { wrapper });
+      const apiKeysElements = await screen.findAllByRole('button', { name: /API keys/i });
+      expect(apiKeysElements.length).toBeGreaterThan(0);
+    });
+
+    it('does not include API Keys when user_api_keys_enabled is false even if hide is false', async () => {
+      const { wrapper, fixtures, props } = await createFixtures(f => {
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      fixtures.environment.apiKeysSettings.user_api_keys_enabled = false;
+      props.setProps({ apiKeysProps: { hide: false } });
+
+      render(<UserProfile />, { wrapper });
+      await waitFor(() => expect(screen.queryByRole('button', { name: /API keys/i })).toBeNull());
     });
   });
 });

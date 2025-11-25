@@ -7,7 +7,9 @@ const { applyVariants, filterProps } = createVariants(theme => ({
   base: {
     padding: `${theme.space.$3} ${theme.space.$4}`,
     backgroundColor: theme.colors.$neutralAlpha50,
-    ...common.borderVariants(theme).normal,
+    ...common.borderVariants(theme, {
+      hoverStyles: false,
+    }).normal,
   },
   variants: {
     colorScheme: {
@@ -21,13 +23,13 @@ const { applyVariants, filterProps } = createVariants(theme => ({
       info: {
         color: theme.colors.$neutralAlpha150,
         background: theme.colors.$neutralAlpha50,
-        ':hover': {
-          boxShadow: 'none',
-          borderColor: 'inherit',
-        },
       },
       warning: {
         backgroundColor: theme.colors.$warningAlpha100,
+        ...common.borderVariants(theme, {
+          hasWarning: true,
+          hoverStyles: false,
+        }).normal,
       },
     },
   },

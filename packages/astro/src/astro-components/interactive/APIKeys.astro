@@ -1,0 +1,11 @@
+---
+import type { APIKeysProps } from '@clerk/shared/types';
+type Props = APIKeysProps;
+
+import InternalUIComponentRenderer from './InternalUIComponentRenderer.astro';
+---
+
+<InternalUIComponentRenderer
+  {...Astro.props}
+  component='api-keys'
+/>

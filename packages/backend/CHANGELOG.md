@@ -1,5 +1,106 @@
 # Change Log
 
+## 2.24.0
+
+### Minor Changes
+
+- Fix TypeScript return type for `clerk.client.waitlistEntries.list()` and export `WaitlistEntry` type. ([#7280](https://github.com/clerk/javascript/pull/7280)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44)]:
+  - @clerk/shared@3.36.0
+  - @clerk/types@4.101.3
+
+## 2.23.2
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/types@4.101.2
+
+## 2.23.1
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/types@4.101.1
+
+## 2.23.0
+
+### Minor Changes
+
+- Add `external_id` field to `user.deleted` webhook events; Add `user` field to `SessionWebhookEventJSON` ([#7209](https://github.com/clerk/javascript/pull/7209)) by [@kduprey](https://github.com/kduprey)
+  - Adds `external_id` field to `user.deleted` webhook events by creating a new `UserDeletedJSON` interface that extends `DeletedObjectJSON` to include an optional `external_id` string.
+  - Creates a new `SessionWebhookEventJSON` interface that extends `SessionJSON` to include a nullable `user` field as the `UserJSON` interface, and updates the webhook event types to use this new interface for `session.created`, `session.ended`, `session.removed`, and `session.revoked` events.
+
+### Patch Changes
+
+- Updated dependencies [[`7be8f45`](https://github.com/clerk/javascript/commit/7be8f458367b2c050b0dc8c0481d7bbe090ea400), [`bdbb0d9`](https://github.com/clerk/javascript/commit/bdbb0d91712a84fc214c534fc47b62b1a2028ac9), [`aa184a4`](https://github.com/clerk/javascript/commit/aa184a46a91f9dec3fd275ec5867a8366d310469), [`1d4e7a7`](https://github.com/clerk/javascript/commit/1d4e7a7769e9efaaa945e4ba6468ad47bd24c807), [`42f0d95`](https://github.com/clerk/javascript/commit/42f0d95e943d82960de3f7e5da17d199eff9fddd), [`c63cc8e`](https://github.com/clerk/javascript/commit/c63cc8e9c38ed0521a22ebab43e10111f04f9daf), [`d32d724`](https://github.com/clerk/javascript/commit/d32d724c34a921a176eca159273f270c2af4e787), [`00291bc`](https://github.com/clerk/javascript/commit/00291bc8ae03c06f7154bd937628e8193f6e3ce9)]:
+  - @clerk/shared@3.35.0
+  - @clerk/types@4.101.0
+
+## 2.22.0
+
+### Minor Changes
+
+- Removed internal parameter when creating API keys ([#7207](https://github.com/clerk/javascript/pull/7207)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- Updated dependencies [[`b5a7e2f`](https://github.com/clerk/javascript/commit/b5a7e2f8af5514e19e06918632d982be65f4a854), [`a1d10fc`](https://github.com/clerk/javascript/commit/a1d10fc6e231f27ec7eabd0db45b8f7e8c98250e), [`b944ff3`](https://github.com/clerk/javascript/commit/b944ff30494a8275450ca0d5129cdf58f02bea81), [`4011c5e`](https://github.com/clerk/javascript/commit/4011c5e0014ede5e480074b73d064a1bc2a577dd)]:
+  - @clerk/types@4.100.0
+  - @clerk/shared@3.34.0
+
+## 2.21.0
+
+### Minor Changes
+
+- Update the supported API version to `2025-11-10`. ([#7095](https://github.com/clerk/javascript/pull/7095)) by [@panteliselef](https://github.com/panteliselef)
+
+### Patch Changes
+
+- Updated dependencies [[`613cb97`](https://github.com/clerk/javascript/commit/613cb97cb7b3b33c3865cfe008ef9b1ea624cc8d)]:
+  - @clerk/shared@3.33.0
+  - @clerk/types@4.99.0
+
+## 2.20.1
+
+### Patch Changes
+
+- Updated dependencies [[`cc11472`](https://github.com/clerk/javascript/commit/cc11472e7318b806ee43d609cd03fb0446f56146), [`539fad7`](https://github.com/clerk/javascript/commit/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2), [`296fb0b`](https://github.com/clerk/javascript/commit/296fb0b8f34aca4f527508a5e6a6bbaad89cfdaa), [`c413433`](https://github.com/clerk/javascript/commit/c413433fee49701f252df574ce6a009d256c0cb9), [`a940c39`](https://github.com/clerk/javascript/commit/a940c39354bd0ee48d2fc9b0f3217ec20b2f32b4)]:
+  - @clerk/shared@3.32.0
+  - @clerk/types@4.98.0
+
+## 2.20.0
+
+### Minor Changes
+
+- Fixed API keys `list` method return type ([#7162](https://github.com/clerk/javascript/pull/7162)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  const apiKeys = await clerkClient.apiKeys.list({ subject: 'user_xxxxx' });
+
+  apiKeys.data;
+  apiKeys.totalCount;
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`a474c59`](https://github.com/clerk/javascript/commit/a474c59e3017358186de15c5b1e5b83002e72527), [`5536429`](https://github.com/clerk/javascript/commit/55364291e245ff05ca1e50e614e502d2081b87fb)]:
+  - @clerk/shared@3.31.1
+  - @clerk/types@4.97.2
+
+## 2.19.3
+
+### Patch Changes
+
+- Updated dependencies [[`85b5acc`](https://github.com/clerk/javascript/commit/85b5acc5ba192a8247f072fa93d5bc7d42986293), [`ea65d39`](https://github.com/clerk/javascript/commit/ea65d390cd6d3b0fdd35202492e858f8c8370f73), [`b09b29e`](https://github.com/clerk/javascript/commit/b09b29e82323c8fc508c49ffe10c77a737ef0bec)]:
+  - @clerk/types@4.97.1
+  - @clerk/shared@3.31.0
+
 ## 2.19.2
 
 ### Patch Changes
@@ -27,7 +128,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -263,7 +363,6 @@
 ### Minor Changes
 
 - [Billing Beta] Use correct casing for past due events types. ([#6687](https://github.com/clerk/javascript/pull/6687)) by [@panteliselef](https://github.com/panteliselef)
-
   - `'subscription.past_due'` -> `'subscription.pastDue'`
   - `'subscriptionItem.past_due'` -> `'subscriptionItem.pastDue'`
 
@@ -689,18 +788,15 @@
   ## Solution
 
   We now use a conditional approach based on payload size:
-
   - **Small payloads (≤2KB)**: Continue using the direct approach for optimal performance
   - **Large payloads (>2KB)**: Use nonce-based fetching to avoid cookie size limits
 
   For large payloads, we:
-
   1. Generate a short nonce (ID) for each handshake instance
   2. Send only the nonce in the `__clerk_handshake_nonce` cookie
   3. Use the nonce to fetch the actual handshake payload via a dedicated BAPI endpoint
 
   ## New Handshake Flow (for payloads >2KB)
-
   1. User visits `example.com`
   2. Client app middleware triggers handshake → `307 FAPI/v1/client/handshake`
   3. FAPI handshake resolves → `307 example.com` with `__clerk_handshake_nonce` cookie containing the nonce
@@ -713,7 +809,6 @@
   No changes. Continues to work as before with direct payload delivery in cookies for optimal performance.
 
   ## Trade-offs
-
   - **Added**: One additional BAPI call per handshake (only for payloads >2KB)
   - **Removed**: Cookie size restrictions that previously limited session token size
 
@@ -1458,7 +1553,6 @@
 ### Minor Changes
 
 - Add waitlist entry types ([#5148](https://github.com/clerk/javascript/pull/5148)) by [@mackenzienolan](https://github.com/mackenzienolan)
-
   - `WaitlistEntryJSON`
   - `WaitlistEntryWebhookEvent`
 
@@ -1629,7 +1723,6 @@
 ### Minor Changes
 
 - Update Session resource with new properties to align with OpenAPI spec ([#4869](https://github.com/clerk/javascript/pull/4869)) by [@octoper](https://github.com/octoper)
-
   - `lastActiveOrganizationId`
   - `latestActivity`
   - `actor`
@@ -1796,7 +1889,6 @@
 - Update AuthObject property from `__experimental_factorVerificationAge` to `factorVerificationAge`. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
 
   Also replaces the following APIs:
-
   - `__experimental_reverificationError` -> `__reverificationError`
   - `__experimental_reverificationErrorResponse` -> `reverificationErrorResponse`
 
@@ -1870,7 +1962,6 @@
 - Send API version through request headers. ([#4458](https://github.com/clerk/javascript/pull/4458)) by [@jacekradko](https://github.com/jacekradko)
 
 - Introduce experimental verification helpers exported from `@clerk/backend/internal` ([#4480](https://github.com/clerk/javascript/pull/4480)) by [@panteliselef](https://github.com/panteliselef)
-
   - \_\_experimental_reverificationMismatch
   - \_\_experimental_reverificationMismatchResponse
 
@@ -2345,7 +2436,6 @@
 ### Minor Changes
 
 - Introduces dynamic keys from `clerkMiddleware`, allowing access by server-side helpers like `auth`. Keys such as `signUpUrl`, `signInUrl`, `publishableKey` and `secretKey` are securely encrypted using AES algorithm. ([#3525](https://github.com/clerk/javascript/pull/3525)) by [@LauraBeatris](https://github.com/LauraBeatris)
-
   - When providing `secretKey`, `CLERK_ENCRYPTION_KEY` is required as the encryption key. If `secretKey` is not provided, `CLERK_SECRET_KEY` is used by default.
   - `clerkClient` from `@clerk/nextjs` should now be called as a function, and its singleton form is deprecated. This change allows the Clerk backend client to read keys from the current request, which is necessary to support dynamic keys.
 
@@ -2453,7 +2543,6 @@
 ### Patch Changes
 
 - Fix the following `@clerk/backend` methods to populate their paginated responses: ([#3276](https://github.com/clerk/javascript/pull/3276)) by [@dimkl](https://github.com/dimkl)
-
   - `clerkClient.allowListIndentifiers.getAllowlistIdentifierList()`
   - `clerkClient.clients.getClientList()`
   - `clerkClient.invitations.getInvitationList`
@@ -2469,7 +2558,6 @@
 ### Minor Changes
 
 - Updated types for `orderBy` in OrganizationApi and UserApi ([#3266](https://github.com/clerk/javascript/pull/3266)) by [@panteliselef](https://github.com/panteliselef)
-
   - `OrganizationAPI.getOrganizationMembershipList` now accepts `orderBy`
     - Acceptable values `phone_number`, `+phone_number`, `-phone_number`, `email_address`, `+email_address`, `-email_address`, `created_at`, `+created_at`, `-created_at`, `first_name`, `+first_name`, `-first_name`
   - `UserAPI.getUserList` expands the acceptable values of the `orderBy` to:
@@ -2554,13 +2642,11 @@
 - 244de5ea3: Make all listing API requests to return consistent `{ data: Resource[], totalCount: number }`.
 
   Support pagination request params `{ limit, offset }` to:
-
   - `sessions.getSessionList({ limit, offset })`
   - `clients.getClientList({ limit, offset })`
 
   Since the `users.getUserList()` does not return the `total_count` as a temporary solution that
   method will perform 2 BAPI requests:
-
   1. retrieve the data
   2. retrieve the total count (invokes `users.getCount()` internally)
 
@@ -2631,13 +2717,11 @@
   ```
 
 - 8e5c881c4: The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier:
-
   - `clerkClient.users.getOrganizationMembershipList(...)`
   - `clerkClient.organization.getOrganizationList(...)`
   - `clerkClient.organization.getOrganizationInvitationList(...)`
 
   Revert changing the `{ data, errors }` return value of the following helpers to throw the `errors` or return the `data` (keep v4 format):
-
   - `import { verifyToken } from '@clerk/backend'`
   - `import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt'`
   - BAPI `clerkClient` methods eg (`clerkClient.users.getUserList(...)`)
@@ -2689,7 +2773,6 @@
   determine the request state.
 
   Migration guide:
-
   - use `request` param in `clerkClient.authenticateRequest()` instead of:
     - `origin`
     - `host`
@@ -2767,7 +2850,6 @@
     ```
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
 - cace85374: Drop deprecated properties. Migration steps:
-
   - use `createClerkClient` instead of `__unstable_options`
   - use `publishableKey` instead of `frontendApi`
   - use `clockSkewInMs` instead of `clockSkewInSeconds`
@@ -2788,7 +2870,6 @@
   - use `localInterstitial` instead of `remotePublicInterstitial` / `remotePublicInterstitialUrl`
 
   Internal changes:
-
   - replaced error enum (and it's) `SetClerkSecretKeyOrAPIKey` with `SetClerkSecretKey`
 
 - 1ad910eb9: Changes in exports of `@clerk/backend`:
@@ -2935,13 +3016,11 @@
 - 12962bc58: Re-use common pagination types for consistency across types.
 
   Types introduced in `@clerk/types`:
-
   - `ClerkPaginationRequest` : describes pagination related props in request payload
   - `ClerkPaginatedResponse` : describes pagination related props in response body
   - `ClerkPaginationParams` : describes pagination related props in api client method params
 
 - 4bb57057e: Breaking Changes:
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -2950,7 +3029,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -3066,7 +3144,6 @@
 - f5d55bb1f: Add clerkTraceId to ClerkBackendApiResponse and ClerkAPIResponseError to allow for better tracing and debugging API error responses.
   Uses `clerk_trace_id` when available in a response and defaults to [`cf-ray` identifier](https://developers.cloudflare.com/fundamentals/reference/cloudflare-ray-id/) if missing.
 - a6308c67e: Add the following properties to `users.updateUser(userId, params)` params:
-
   - `password_hasher`
   - `password_digest`
   - `publicMetadata`
@@ -3292,13 +3369,11 @@
 - Make all listing API requests to return consistent `{ data: Resource[], totalCount: number }`. ([#2714](https://github.com/clerk/javascript/pull/2714)) by [@dimkl](https://github.com/dimkl)
 
   Support pagination request params `{ limit, offset }` to:
-
   - `sessions.getSessionList({ limit, offset })`
   - `clients.getClientList({ limit, offset })`
 
   Since the `users.getUserList()` does not return the `total_count` as a temporary solution that
   method will perform 2 BAPI requests:
-
   1. retrieve the data
   2. retrieve the total count (invokes `users.getCount()` internally)
 
@@ -3346,13 +3421,11 @@
 ### Major Changes
 
 - The following paginated APIs now return `{ data, totalCount }` instead of simple arrays, in order to make building paginated UIs easier: ([#2633](https://github.com/clerk/javascript/pull/2633)) by [@dimkl](https://github.com/dimkl)
-
   - `clerkClient.users.getOrganizationMembershipList(...)`
   - `clerkClient.organization.getOrganizationList(...)`
   - `clerkClient.organization.getOrganizationInvitationList(...)`
 
   Revert changing the `{ data, errors }` return value of the following helpers to throw the `errors` or return the `data` (keep v4 format):
-
   - `import { verifyToken } from '@clerk/backend'`
   - `import { signJwt, hasValidSignature, decodeJwt, verifyJwt } from '@clerk/backend/jwt'`
   - BAPI `clerkClient` methods eg (`clerkClient.users.getUserList(...)`)
@@ -3360,7 +3433,6 @@
 ### Patch Changes
 
 - Add the following properties to `users.updateUser(userId, params)` params: ([#2619](https://github.com/clerk/javascript/pull/2619)) by [@SokratisVidros](https://github.com/SokratisVidros)
-
   - `password_hasher`
   - `password_digest`
   - `publicMetadata`
@@ -3613,7 +3685,6 @@
   ```
 
 - Changes in exports of `@clerk/backend`: ([#2363](https://github.com/clerk/javascript/pull/2363)) by [@dimkl](https://github.com/dimkl)
-
   - Expose the following helpers and enums from `@clerk/backend/internal`:
     ```typescript
     import {
@@ -3641,7 +3712,6 @@
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
 
 - Changes in exports of `@clerk/backend`: ([#2365](https://github.com/clerk/javascript/pull/2365)) by [@dimkl](https://github.com/dimkl)
-
   - Drop the following internal exports from the top-level api:
     ```typescript
     // Before
@@ -3678,7 +3748,6 @@
     ```
 
 - Changes in exports of `@clerk/backend`: ([#2364](https://github.com/clerk/javascript/pull/2364)) by [@dimkl](https://github.com/dimkl)
-
   - Expose the following helpers and enums from `@clerk/backend/jwt`:
     ```typescript
     import { decodeJwt, hasValidSignature, signJwt, verifyJwt } from '@clerk/backend/jwt';
@@ -3693,7 +3762,6 @@
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
 
 - Changes in `@clerk/backend` exports: ([#2362](https://github.com/clerk/javascript/pull/2362)) by [@dimkl](https://github.com/dimkl)
-
   - Drop Internal `deserialize` helper
   - Introduce `/errors` subpath export, eg:
     ```typescript
@@ -3761,7 +3829,6 @@
 - Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
 
   Changes in public APIs:
-
   - Rename Gate to Protect
   - Support for permission checks. (Previously only roles could be used)
   - Remove the `experimental` tags and prefixes
@@ -3845,7 +3912,6 @@
 - Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
 
   Types introduced in `@clerk/types`:
-
   - `ClerkPaginationRequest` : describes pagination related props in request payload
   - `ClerkPaginatedResponse` : describes pagination related props in response body
   - `ClerkPaginationParams` : describes pagination related props in api client method params
@@ -3855,7 +3921,6 @@
 ### Minor Changes
 
 - Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -3864,7 +3929,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -3916,7 +3980,6 @@
 ### Major Changes
 
 - Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
-
   - use `import { Clerk } from '@clerk/backend';`
   - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
   - use `import { Clerk } from '@clerk/clerk-sdk-node';`
@@ -3948,7 +4011,6 @@
   determine the request state.
 
   Migration guide:
-
   - use `request` param in `clerkClient.authenticateRequest()` instead of:
     - `origin`
     - `host`
@@ -4000,7 +4062,6 @@
   ```
 
 - Drop deprecated properties. Migration steps: ([#1899](https://github.com/clerk/javascript/pull/1899)) by [@dimkl](https://github.com/dimkl)
-
   - use `createClerkClient` instead of `__unstable_options`
   - use `publishableKey` instead of `frontendApi`
   - use `clockSkewInMs` instead of `clockSkewInSeconds`
@@ -4021,7 +4082,6 @@
   - use `localInterstitial` instead of `remotePublicInterstitial` / `remotePublicInterstitialUrl`
 
   Internal changes:
-
   - replaced error enum (and it's) `SetClerkSecretKeyOrAPIKey` with `SetClerkSecretKey`
 
 ### Patch Changes
@@ -4113,7 +4173,6 @@
 ### Patch Changes
 
 - Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerk/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
-
   - `orgs` jwt claims
   - `apiKey`
   - `frontendApi`
@@ -4162,7 +4221,6 @@
 ### Patch Changes
 
 - Apply deprecation warnings for `@clerk/backend`: ([#1777](https://github.com/clerk/javascript/pull/1777)) by [@dimkl](https://github.com/dimkl)
-
   - backend api return format
   - `clockSkewInSeconds`
   - `pkgVersion`
@@ -4328,7 +4386,6 @@
 ### Patch Changes
 
 - Simplify the signature of the low-level `authenticateRequest` helper. ([#1329](https://github.com/clerk/javascript/pull/1329)) by [@anagstef](https://github.com/anagstef)
-
   - One pair of legacy or new instance keys are required instead of all 4 of them in `authenticateRequest`
   - `@clerk/backend` now can handle the `"Bearer "` prefix in Authorization header for better DX
   - `host` parameter is now optional in `@clerk/backend`
@@ -4355,7 +4412,6 @@
 ### Patch Changes
 
 - Allow `clerkJSVersion` to be passed when loading interstitial. Support for ([#1354](https://github.com/clerk/javascript/pull/1354)) by [@panteliselef](https://github.com/panteliselef)
-
   - Nextjs
   - Remix
   - Node
@@ -4371,7 +4427,6 @@
   (when the user provides a list).
 
   Resolves:
-
   - [#978](https://github.com/clerk/javascript/pull/978)
   - [#1004](https://github.com/clerk/javascript/pull/1004)
 

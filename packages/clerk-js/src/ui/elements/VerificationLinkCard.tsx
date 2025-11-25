@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Col, descriptors, Flow, localizationKeys, Text } from '../customizables';
+import { Alert, Col, descriptors, Flow, localizationKeys, Text } from '../customizables';
 import { useRouter } from '../router';
 import { Card } from './Card';
 import { useCardState } from './contexts';
@@ -13,7 +13,8 @@ type VerificationLinkCardProps = {
   safeIdentifier: string | undefined | null;
   cardTitle: LocalizationKey;
   cardSubtitle: LocalizationKey;
-  formTitle: LocalizationKey;
+  cardNotice?: LocalizationKey;
+  formTitle?: LocalizationKey;
   formSubtitle: LocalizationKey;
   resendButton: LocalizationKey;
   profileImageUrl?: string;
@@ -49,6 +50,15 @@ export const VerificationLinkCard = (props: VerificationLinkCardProps) => {
             </VerificationLink>
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
+          {props.cardNotice && (
+            <Alert colorScheme='warning'>
+              <Text
+                colorScheme='warning'
+                localizationKey={props.cardNotice}
+                variant='caption'
+              />
+            </Alert>
+          )}
           <Card.Action elementId='alternativeMethods'>
             {props.onShowAlternativeMethodsClicked && (
               <Card.ActionLink

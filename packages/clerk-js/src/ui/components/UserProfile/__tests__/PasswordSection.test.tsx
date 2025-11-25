@@ -538,7 +538,7 @@ describe('PasswordSection', () => {
       await userEvent.type(confirmField, 'test');
       fireEvent.blur(confirmField);
       await waitFor(() => {
-        screen.getByText(/or more/i);
+        expect(screen.getByTestId('form-feedback-error')).toHaveTextContent(/or more/i);
       });
     });
 

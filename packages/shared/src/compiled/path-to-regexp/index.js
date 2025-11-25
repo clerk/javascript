@@ -45,12 +45,12 @@ function _(r) {
         break;
       }
       if (!u) throw new TypeError('Missing parameter name at '.concat(e));
-      n.push({
+      (n.push({
         type: 'NAME',
         index: e,
         value: u,
       }),
-        (e = t);
+        (e = t));
       continue;
     }
     if (a === '(') {
@@ -74,12 +74,12 @@ function _(r) {
       }
       if (o) throw new TypeError('Unbalanced pattern at '.concat(e));
       if (!m) throw new TypeError('Missing pattern at '.concat(e));
-      n.push({
+      (n.push({
         type: 'PATTERN',
         index: e,
         value: m,
       }),
-        (e = t);
+        (e = t));
       continue;
     }
     n.push({
@@ -147,7 +147,7 @@ function F(r, n) {
       C = f('PATTERN');
     if (x || C) {
       var g = T || '';
-      u.indexOf(g) === -1 && ((p += g), (g = '')),
+      (u.indexOf(g) === -1 && ((p += g), (g = '')),
         p && (o.push(p), (p = '')),
         o.push({
           name: x || m++,
@@ -155,7 +155,7 @@ function F(r, n) {
           suffix: '',
           pattern: C || A(g),
           modifier: f('MODIFIER') || '',
-        });
+        }));
       continue;
     }
     var i = T || f('ESCAPED_CHAR');
@@ -170,14 +170,14 @@ function F(r, n) {
         y = f('NAME') || '',
         O = f('PATTERN') || '',
         b = d();
-      w('CLOSE'),
+      (w('CLOSE'),
         o.push({
           name: y || (O ? m++ : ''),
           pattern: y && !O ? A(g) : O,
           prefix: g,
           suffix: b,
           modifier: f('MODIFIER') || '',
-        });
+        }));
       continue;
     }
     w('END');
@@ -240,14 +240,14 @@ function D(r) {
 function $(r, n) {
   if (!n) return r;
   for (var e = /\((?:\?<(.*?)>)?(?!\?)/g, a = 0, u = e.exec(r.source); u; )
-    n.push({
+    (n.push({
       name: u[1] || a++,
       prefix: '',
       suffix: '',
       modifier: '',
       pattern: '',
     }),
-      (u = e.exec(r.source));
+      (u = e.exec(r.source)));
   return r;
 }
 
@@ -316,11 +316,11 @@ function U(r, n, e) {
       else x += '(?:'.concat(R).concat(y, ')').concat(i.modifier);
     }
   }
-  if (m) u || (x += ''.concat(T, '?')), (x += e.endsWith ? '(?='.concat(A, ')') : '$');
+  if (m) (u || (x += ''.concat(T, '?')), (x += e.endsWith ? '(?='.concat(A, ')') : '$'));
   else {
     var b = r[r.length - 1],
       l = typeof b == 'string' ? T.indexOf(b[b.length - 1]) > -1 : b === void 0;
-    u || (x += '(?:'.concat(T, '(?=').concat(A, '))?')), l || (x += '(?='.concat(T, '|').concat(A, ')'));
+    (u || (x += '(?:'.concat(T, '(?=').concat(A, '))?')), l || (x += '(?='.concat(T, '|').concat(A, ')')));
   }
   return new RegExp(x, D(e));
 }

@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 
 import { CaptchaChallenge } from '../utils/captcha/CaptchaChallenge';
 import type { Clerk } from './resources/internal';
@@ -42,6 +42,12 @@ export class FraudProtection {
       return await cb();
     } catch (e) {
       if (!isClerkAPIResponseError(e)) {
+        throw e;
+      }
+
+      // Network errors should bypass captcha logic and be re-thrown immediately
+      // so cache fallback can be triggered
+      if (isClerkRuntimeError(e) && e.code === 'network_error') {
         throw e;
       }
 

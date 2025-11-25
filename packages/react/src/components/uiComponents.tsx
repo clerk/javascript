@@ -79,7 +79,7 @@ type UserButtonPropsWithoutCustomPages = Without<
   UserButtonProps,
   'userProfileProps' | '__experimental_asStandalone'
 > & {
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'apiKeysProps'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
    *
@@ -628,8 +628,8 @@ export const APIKeys = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountApiKeys}
-            unmount={clerk.unmountApiKeys}
+            mount={clerk.mountAPIKeys}
+            unmount={clerk.unmountAPIKeys}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}

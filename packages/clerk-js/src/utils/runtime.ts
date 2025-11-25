@@ -21,7 +21,19 @@ export function inIframe() {
 }
 
 export function inCrossOriginIframe() {
-  // https://developer.mozilla.org/en-US/docs/Web/API/Window/frameElement
-  // frameElement: if the document into which it's embedded has a different origin, the value is null instead.
-  return inIframe() && !window.frameElement;
+  if (!inIframe()) {
+    return false;
+  }
+
+  try {
+    // Try to access top window's location to check if any ancestor is cross-origin
+    // This will throw a SecurityError if any iframe in the chain is cross-origin
+    // Handles nested iframes where immediate parent might be same-origin
+    // but a higher-level ancestor is cross-origin
+    void window.top?.location.href;
+    return false;
+  } catch {
+    // SecurityError thrown - we're in a cross-origin iframe (at any level)
+    return true;
+  }
 }

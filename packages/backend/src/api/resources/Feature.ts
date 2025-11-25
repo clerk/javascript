@@ -18,7 +18,7 @@ export class Feature {
     /**
      * The description of the feature.
      */
-    readonly description: string,
+    readonly description: string | null,
     /**
      * The URL-friendly identifier of the feature.
      */
@@ -26,10 +26,10 @@ export class Feature {
     /**
      * The URL of the feature's avatar image.
      */
-    readonly avatarUrl: string,
+    readonly avatarUrl: string | null,
   ) {}
 
   static fromJSON(data: FeatureJSON): Feature {
-    return new Feature(data.id, data.name, data.description, data.slug, data.avatar_url);
+    return new Feature(data.id, data.name, data.description ?? null, data.slug, data.avatar_url ?? null);
   }
 }

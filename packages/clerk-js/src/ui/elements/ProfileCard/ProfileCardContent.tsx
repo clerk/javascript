@@ -44,6 +44,7 @@ export const ProfileCardContent = (props: ProfileCardContentProps) => {
         borderColor: t.colors.$borderAlpha150,
         marginBlock: '-1px',
         marginInlineEnd: '-1px',
+        flex: 1,
       })}
       data-clerk-profile-scroll-box-root={scrollBoxId}
     >

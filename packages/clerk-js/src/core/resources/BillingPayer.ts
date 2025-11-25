@@ -6,15 +6,15 @@ import { BaseResource } from './internal';
 
 export class BillingPayer extends BaseResource implements BillingPayerResource {
   id!: string;
-  createdAt!: Date;
-  updatedAt!: Date;
-  imageUrl!: string | null;
-  userId?: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  organizationId?: string;
-  organizationName?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  imageUrl?: string;
+  userId: string | null = null;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  organizationId: string | null = null;
+  organizationName?: string | null;
 
   constructor(data: BillingPayerJSON) {
     super();
@@ -27,8 +27,12 @@ export class BillingPayer extends BaseResource implements BillingPayerResource {
     }
 
     this.id = data.id;
-    this.createdAt = unixEpochToDate(data.created_at);
-    this.updatedAt = unixEpochToDate(data.updated_at);
+    if (data.created_at) {
+      this.createdAt = unixEpochToDate(data.created_at);
+    }
+    if (data.updated_at) {
+      this.updatedAt = unixEpochToDate(data.updated_at);
+    }
     this.imageUrl = data.image_url;
     this.userId = data.user_id;
     this.email = data.email;

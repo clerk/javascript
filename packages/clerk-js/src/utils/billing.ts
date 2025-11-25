@@ -25,14 +25,21 @@ export const billingTotalsFromJSON = <T extends BillingStatementTotalsJSON | Bil
     taxTotal: billingMoneyAmountFromJSON(data.tax_total),
   };
 
+  if ('past_due' in data) {
+    totals.pastDue = data.past_due ? billingMoneyAmountFromJSON(data.past_due) : null;
+  }
+  if ('credit' in data) {
+    totals.credit = data.credit ? billingMoneyAmountFromJSON(data.credit) : null;
+  }
+
   if ('total_due_now' in data) {
     totals.totalDueNow = billingMoneyAmountFromJSON(data.total_due_now);
   }
-  if ('credit' in data) {
-    totals.credit = billingMoneyAmountFromJSON(data.credit);
-  }
-  if ('past_due' in data) {
-    totals.pastDue = billingMoneyAmountFromJSON(data.past_due);
+
+  if ('total_due_after_free_trial' in data) {
+    totals.totalDueAfterFreeTrial = data.total_due_after_free_trial
+      ? billingMoneyAmountFromJSON(data.total_due_after_free_trial)
+      : null;
   }
 
   return totals as T extends { total_due_now: BillingMoneyAmountJSON } ? BillingCheckoutTotals : BillingStatementTotals;

@@ -21,7 +21,6 @@ export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaym
         truncate
         elementDescriptor={descriptors.paymentMethodRowType}
       >
-        {/* TODO(@COMMERCE): Localize this */}
         {paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType}
       </Text>
       <Text

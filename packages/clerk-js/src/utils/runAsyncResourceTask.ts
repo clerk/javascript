@@ -1,3 +1,5 @@
+import type { ClerkError } from '@clerk/shared/error';
+
 import { eventBus } from '../core/events';
 import type { BaseResource } from '../core/resources/internal';
 
@@ -8,7 +10,7 @@ import type { BaseResource } from '../core/resources/internal';
 export async function runAsyncResourceTask<T>(
   resource: BaseResource,
   task: () => Promise<T>,
-): Promise<{ result?: T; error: unknown }> {
+): Promise<{ result?: T; error: ClerkError | null }> {
   eventBus.emit('resource:error', { resource, error: null });
   eventBus.emit('resource:fetch', {
     resource,

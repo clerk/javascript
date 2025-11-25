@@ -143,14 +143,4 @@ export type PagesOrInfiniteOptions = {
    * @default 10
    */
   pageSize?: number;
-  /**
-   * On `cache` mode, no request will be triggered when the hook is mounted and the data will be fetched from the cache.
-   *
-   * @default undefined
-   *
-   * @hidden
-   *
-   * @experimental
-   */
-  __experimental_mode?: 'cache';
 };

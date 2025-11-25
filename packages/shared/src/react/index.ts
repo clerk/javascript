@@ -1,5 +1,7 @@
 export * from './hooks';
 
+export type { UseSubscriptionParams } from './hooks/useSubscription.types';
+
 export {
   ClerkInstanceContext,
   ClientContext,
@@ -17,4 +19,4 @@ export {
   __experimental_CheckoutProvider,
 } from './contexts';
 
-export * from './commerce';
+export * from './billing/payment-element';

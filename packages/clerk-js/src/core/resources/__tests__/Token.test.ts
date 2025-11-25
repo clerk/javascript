@@ -1,7 +1,7 @@
 import type { InstanceType } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { mockFetch, mockNetworkFailedFetch } from '@/test/core-fixtures';
+import { mockFetch, mockJwt, mockNetworkFailedFetch } from '@/test/core-fixtures';
 import { debugLogger } from '@/utils/debug';
 
 import { SUPPORTED_FAPI_VERSION } from '../../constants';
@@ -44,7 +44,7 @@ describe('Token', () => {
     });
 
     describe('with offline browser and network failure', () => {
-      let warnSpy;
+      let warnSpy: ReturnType<typeof vi.spyOn>;
 
       beforeEach(() => {
         Object.defineProperty(window.navigator, 'onLine', {
@@ -102,6 +102,55 @@ describe('Token', () => {
           headers: expect.any(Headers),
         });
       });
+    });
+
+    it('creates token successfully with valid response', async () => {
+      mockFetch(true, 200, { jwt: mockJwt });
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+      const token = await Token.create('/path/to/tokens', { organizationId: 'org_123' });
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      const [url, options] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).toContain('https://clerk.example.com/v1/path/to/tokens');
+      expect(url.toString()).not.toContain('debug=skip_cache');
+      expect(options).toMatchObject({
+        body: 'organization_id=org_123',
+        credentials: 'include',
+        method: 'POST',
+      });
+      expect(token).toBeInstanceOf(Token);
+      expect(token.jwt).toBeDefined();
+    });
+
+    it('creates token with skipCache=false by default', async () => {
+      mockFetch(true, 200, { jwt: mockJwt });
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+      await Token.create('/path/to/tokens');
+
+      const [url] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).not.toContain('debug=skip_cache');
+    });
+
+    it('creates token with skipCache=true and includes query parameter', async () => {
+      mockFetch(true, 200, { jwt: mockJwt });
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+      await Token.create('/path/to/tokens', {}, true);
+
+      const [url] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).toContain('debug=skip_cache');
+    });
+
+    it('creates token with skipCache=false explicitly and excludes query parameter', async () => {
+      mockFetch(true, 200, { jwt: mockJwt });
+      BaseResource.clerk = { getFapiClient: () => createFapiClient(baseFapiClientOptions) } as any;
+
+      await Token.create('/path/to/tokens', {}, false);
+
+      const [url] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).not.toContain('debug=skip_cache');
     });
   });
 });

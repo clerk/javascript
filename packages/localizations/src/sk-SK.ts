@@ -17,6 +17,11 @@ export const skSK: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopírovať a zavrieť',
+      formHint: 'Z bezpečnostných dôvodov vám to neskôr nebudeme môcť znova zobraziť.',
+      formTitle: 'Skopírujte teraz svoj API kľúč "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Zadajte telefónne číslo',
   formFieldInputPlaceholder__username: 'Zadajte užívateľské meno',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API kľúč',
+  formFieldLabel__apiKeyDescription: 'Popis',
+  formFieldLabel__apiKeyExpiration: 'Expirácia',
+  formFieldLabel__apiKeyName: 'Názov tajného kľúča',
   formFieldLabel__automaticInvitations: 'Povoliť automatické pozvánky pre túto doménu',
   formFieldLabel__backupCode: 'Záložný kód',
   formFieldLabel__confirmDeletion: 'Potvrdenie',
@@ -608,6 +614,12 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Skontrolujte svoj email',
     },
+    emailCodeMfa: {
+      formTitle: 'Skontrolujte svoj email',
+      resendButton: 'Nedostali ste kód? Znova odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Pre pokračovanie otvorte overovací odkaz na zariadení a prehliadači použitom na prihlásenie.',
@@ -643,6 +655,12 @@ export const skSK: LocalizationResource = {
         titleNewTab: 'Prihlásené v inom okne',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použite overovací odkaz odoslaný na váš e-mail',
+      resendButton: 'Nedostali ste odkaz? Znovu odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +678,8 @@ export const skSK: LocalizationResource = {
       label__alternativeMethods: 'Alebo sa prihláste pomocou inej metódy.',
       title: 'Zabudli ste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Prihlasujete sa z nového zariadenia. Žiadame o overenie, aby sme udržali váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nemožno pokračovať v prihlásení. Nie je k dispozícii žiadna dostupná autentifikačná metóda.',
       subtitle: 'Došlo k chybe',

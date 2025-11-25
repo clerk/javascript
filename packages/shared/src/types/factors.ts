@@ -139,6 +139,11 @@ export type PhoneCodeSecondFactorConfig = {
   phoneNumberId?: string;
 };
 
+export type EmailCodeSecondFactorConfig = {
+  strategy: EmailCodeStrategy;
+  emailAddressId?: string;
+};
+
 export type EmailCodeAttempt = {
   strategy: EmailCodeStrategy;
   code: string;

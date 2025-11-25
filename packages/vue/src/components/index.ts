@@ -5,6 +5,7 @@ export { default as Waitlist } from './ui-components/Waitlist.vue';
 export { default as CreateOrganization } from './ui-components/CreateOrganization.vue';
 export { default as OrganizationList } from './ui-components/OrganizationList.vue';
 export { default as PricingTable } from './ui-components/PricingTable.vue';
+export { default as APIKeys } from './ui-components/APIKeys.vue';
 export { UserProfile } from './ui-components/UserProfile';
 export { OrganizationProfile } from './ui-components/OrganizationProfile';
 export { OrganizationSwitcher } from './ui-components/OrganizationSwitcher';

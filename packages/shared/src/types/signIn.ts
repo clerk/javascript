@@ -1,5 +1,6 @@
 import type {
   ClerkResourceJSON,
+  ClientTrustState,
   SignInFirstFactorJSON,
   SignInSecondFactorJSON,
   UserDataJSON,
@@ -42,6 +43,7 @@ export interface SignInResource extends ClerkResource {
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
+  clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
   identifier: string | null;
@@ -94,6 +96,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   object: 'sign_in';
   id: string;
   status: SignInStatus;
+  client_trust_state?: ClientTrustState;
   /**
    * @deprecated This attribute will be removed in the next major version.
    */

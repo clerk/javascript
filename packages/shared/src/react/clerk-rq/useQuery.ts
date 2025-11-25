@@ -1,4 +1,3 @@
-'use client';
 import type { DefaultError, NoInfer, QueryKey } from '@tanstack/query-core';
 import { QueryObserver } from '@tanstack/query-core';
 

@@ -17,6 +17,11 @@ export const bgBG: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копирай и затвори',
+      formHint: 'От съображения за сигурност няма да можем да ви позволим да го видите отново по-късно.',
+      formTitle: 'Копирайте вашия API ключ "{{name}}" сега',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Изтичане',
+  formFieldLabel__apiKeyName: 'Име на таен ключ',
   formFieldLabel__automaticInvitations: 'Включи автоматични покани за този домейн',
   formFieldLabel__backupCode: 'Резервен код',
   formFieldLabel__confirmDeletion: 'Потвърждение',
@@ -607,6 +613,12 @@ export const bgBG: LocalizationResource = {
       subtitle: 'за да продължите към {{applicationName}}',
       title: 'Проверете вашия имейл',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверете вашия имейл',
+      resendButton: 'Не сте получили код? Изпрати отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете вашия имейл',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -642,6 +654,12 @@ export const bgBG: LocalizationResource = {
         titleNewTab: 'Влезнали сте в друг таб',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Използвайте връзката за потвърждение, изпратена на вашия имейл',
+      resendButton: 'Не получихте връзката? Изпратете отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете имейла си',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +677,8 @@ export const bgBG: LocalizationResource = {
       label__alternativeMethods: 'Или, влезте с друг метод',
       title: 'Забравена парола?',
     },
+    newDeviceVerificationNotice:
+      'Влизате от ново устройство. Искаме потвърждение, за да запазим акаунта ви в безопасност.',
     noAvailableMethods: {
       message: 'Не може да се продължи с влизането. Няма наличен метод за удостоверяване.',
       subtitle: 'Възникна грешка',

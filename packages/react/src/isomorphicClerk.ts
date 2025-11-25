@@ -2,7 +2,10 @@ import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
 import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
 import type {
+  __internal_AttemptToEnableEnvironmentSettingParams,
+  __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
+  __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -122,6 +125,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private clerkjs: BrowserClerk | HeadlessBrowserClerk | null = null;
   private preopenOneTap?: null | GoogleOneTapProps = null;
   private preopenUserVerification?: null | __internal_UserVerificationProps = null;
+  private preopenEnableOrganizationsPrompt?: null | __internal_EnableOrganizationsPromptProps = null;
   private preopenSignIn?: null | SignInProps = null;
   private preopenCheckout?: null | __internal_CheckoutProps = null;
   private preopenPlanDetails: null | __internal_PlanDetailsProps = null;
@@ -143,7 +147,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountMethodCalls = new Map<MethodName<BrowserClerk>, MethodCallback>();
   private premountWaitlistNodes = new Map<HTMLDivElement, WaitlistProps | undefined>();
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
-  private premountApiKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
+  private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
 
@@ -624,6 +628,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.openWaitlist(this.preOpenWaitlist);
     }
 
+    if (this.preopenEnableOrganizationsPrompt) {
+      clerkjs.__internal_openEnableOrganizationsPrompt(this.preopenEnableOrganizationsPrompt);
+    }
+
     this.premountSignInNodes.forEach((props, node) => {
       clerkjs.mountSignIn(node, props);
     });
@@ -656,8 +664,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountPricingTable(node, props);
     });
 
-    this.premountApiKeysNodes.forEach((props, node) => {
-      clerkjs.mountApiKeys(node, props);
+    this.premountAPIKeysNodes.forEach((props, node) => {
+      clerkjs.mountAPIKeys(node, props);
     });
 
     this.premountOAuthConsentNodes.forEach((props, node) => {
@@ -862,6 +870,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.__internal_closeReverification();
     } else {
       this.preopenUserVerification = null;
+    }
+  };
+
+  __internal_openEnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_openEnableOrganizationsPrompt(props);
+    } else {
+      this.preopenEnableOrganizationsPrompt = props;
+    }
+  };
+
+  __internal_closeEnableOrganizationsPrompt = () => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__internal_closeEnableOrganizationsPrompt();
+    } else {
+      this.preopenEnableOrganizationsPrompt = null;
     }
   };
 
@@ -1146,19 +1170,19 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountApiKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
+  mountAPIKeys = (node: HTMLDivElement, props?: APIKeysProps): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.mountApiKeys(node, props);
+      this.clerkjs.mountAPIKeys(node, props);
     } else {
-      this.premountApiKeysNodes.set(node, props);
+      this.premountAPIKeysNodes.set(node, props);
     }
   };
 
-  unmountApiKeys = (node: HTMLDivElement): void => {
+  unmountAPIKeys = (node: HTMLDivElement): void => {
     if (this.clerkjs && this.loaded) {
-      this.clerkjs.unmountApiKeys(node);
+      this.clerkjs.unmountAPIKeys(node);
     } else {
-      this.premountApiKeysNodes.delete(node);
+      this.premountAPIKeysNodes.delete(node);
     }
   };
 
@@ -1460,6 +1484,17 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return callback() as Promise<void>;
     } else {
       this.premountMethodCalls.set('signOut', callback);
+    }
+  };
+
+  __internal_attemptToEnableEnvironmentSetting = (
+    options: __internal_AttemptToEnableEnvironmentSettingParams,
+  ): __internal_AttemptToEnableEnvironmentSettingResult | void => {
+    const callback = () => this.clerkjs?.__internal_attemptToEnableEnvironmentSetting(options);
+    if (this.clerkjs && this.loaded) {
+      return callback() as __internal_AttemptToEnableEnvironmentSettingResult;
+    } else {
+      this.premountMethodCalls.set('__internal_attemptToEnableEnvironmentSetting', callback);
     }
   };
 }

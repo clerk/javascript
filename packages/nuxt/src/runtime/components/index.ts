@@ -30,4 +30,5 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   PricingTable,
+  APIKeys,
 } from '@clerk/vue';

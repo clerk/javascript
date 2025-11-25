@@ -12,6 +12,7 @@ import { usePrefersReducedMotion } from '../../hooks';
 import { useRouter } from '../../router';
 
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
+
 const lerp = (start: number, end: number, amt: number) => start + (end - start) * amt;
 
 const SuccessRing = ({ positionX, positionY }: { positionX: number; positionY: number }) => {
@@ -435,13 +436,18 @@ export const CheckoutComplete = () => {
                   : localizationKeys('billing.checkout.lineItems.title__subscriptionBegins')
               }
             />
+
             <LineItems.Description
               text={
                 totals.totalDueNow.amount > 0 || freeTrialEndsAt !== null
                   ? paymentMethod
                     ? paymentMethod.paymentType !== 'card'
-                      ? `${capitalize(paymentMethod.paymentType)}`
-                      : `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
+                      ? paymentMethod.paymentType
+                        ? `${capitalize(paymentMethod.paymentType)}`
+                        : '–'
+                      : paymentMethod.cardType
+                        ? `${capitalize(paymentMethod.cardType)} ⋯ ${paymentMethod.last4}`
+                        : '–'
                     : '–'
                   : planPeriodStart
                     ? formatDate(new Date(planPeriodStart))

@@ -4,7 +4,7 @@ import type { CommerceSettingsJSONSnapshot } from './snapshots';
 
 export interface CommerceSettingsJSON extends ClerkResourceJSON {
   billing: {
-    stripe_publishable_key: string;
+    stripe_publishable_key: string | null;
     organization: {
       enabled: boolean;
       has_paid_plans: boolean;
@@ -18,7 +18,7 @@ export interface CommerceSettingsJSON extends ClerkResourceJSON {
 
 export interface CommerceSettingsResource extends ClerkResource {
   billing: {
-    stripePublishableKey: string;
+    stripePublishableKey: string | null;
     organization: {
       enabled: boolean;
       hasPaidPlans: boolean;

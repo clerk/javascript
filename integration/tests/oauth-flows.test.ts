@@ -256,5 +256,37 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withLegalConsent] })(
 
       await u.page.waitForAppUrl('/protected');
     });
+
+    test('redirects when attempting OAuth sign in with existing session in another tab', async ({
+      page,
+      context,
+      browser,
+    }) => {
+      const u = createTestUtils({ app, page, context, browser });
+
+      // Open sign-in page in both tabs before signing in
+      await u.po.signIn.goTo();
+
+      let secondTabUtils: any;
+      await u.tabs.runInNewTab(async u2 => {
+        secondTabUtils = u2;
+        await u2.po.signIn.goTo();
+      });
+
+      // Sign in via OAuth on the first tab
+      await u.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+      await u.page.getByText('Sign in to oauth-provider').waitFor();
+      await u.po.signIn.setIdentifier(fakeUser.email);
+      await u.po.signIn.continue();
+      await u.po.signIn.enterTestOtpCode();
+      await u.page.getByText('SignedIn').waitFor();
+      await u.po.expect.toBeSignedIn();
+
+      // Attempt to sign in via OAuth on the second tab (which already has sign-in mounted)
+      await secondTabUtils.page.getByRole('button', { name: 'E2E OAuth Provider' }).click();
+
+      // Should redirect and be signed in without error
+      await secondTabUtils.po.expect.toBeSignedIn();
+    });
   },
 );

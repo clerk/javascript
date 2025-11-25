@@ -1,4 +1,5 @@
 import { useOrganization } from '@clerk/shared/react';
+import { createDeferredPromise } from '@clerk/shared/utils/index';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -42,7 +43,7 @@ const undefinedPaginatedResource = {
 
 describe('useOrganization', () => {
   it('returns default values', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.com'],
@@ -65,10 +66,15 @@ describe('useOrganization', () => {
     expect(result.current.memberships).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.domains).toEqual(expect.objectContaining(undefinedPaginatedResource));
     expect(result.current.membershipRequests).toEqual(expect.objectContaining(undefinedPaginatedResource));
+
+    expect(fixtures.clerk.organization?.getMemberships).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getDomains).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getMembershipRequests).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getInvitations).not.toHaveBeenCalled();
   });
 
-  it('returns null when a organization is not active ', async () => {
-    const { wrapper } = await createFixtures(f => {
+  it('returns null when a organization is not active', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withOrganizations();
       f.withUser({
         email_addresses: ['test@clerk.com'],
@@ -83,6 +89,8 @@ describe('useOrganization', () => {
     expect(result.current.memberships).toBeNull();
     expect(result.current.domains).toBeNull();
     expect(result.current.membershipRequests).toBeNull();
+
+    expect(fixtures.clerk.organization).toBeNull();
   });
 
   describe('memberships', () => {
@@ -94,6 +102,10 @@ describe('useOrganization', () => {
           organization_memberships: [{ name: 'Org1', role: 'basic_member' }],
         });
       });
+
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
 
       fixtures.clerk.organization?.getMemberships.mockReturnValue(
         Promise.resolve({
@@ -134,6 +146,13 @@ describe('useOrganization', () => {
       expect(result.current.memberships?.count).toBe(0);
 
       await waitFor(() => expect(result.current.memberships?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getMemberships.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        role: undefined,
+        query: undefined,
+      });
 
       expect(result.current.memberships?.count).toBe(4);
       expect(result.current.memberships?.page).toBe(1);
@@ -186,6 +205,13 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.memberships?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.memberships?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getMemberships.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        role: undefined,
+        query: undefined,
+      });
 
       expect(result.current.memberships?.page).toBe(2);
       expect(result.current.memberships?.hasNextPage).toBe(false);
@@ -218,6 +244,10 @@ describe('useOrganization', () => {
         });
       });
 
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
       fixtures.clerk.organization?.getDomains.mockReturnValue(
         Promise.resolve({
           data: [
@@ -241,6 +271,12 @@ describe('useOrganization', () => {
       expect(result.current.domains?.count).toBe(0);
 
       await waitFor(() => expect(result.current.domains?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getDomains).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getDomains.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        enrollmentMode: undefined,
+      });
 
       expect(result.current.domains?.isLoading).toBe(false);
       expect(result.current.domains?.count).toBe(4);
@@ -282,6 +318,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.domains?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.domains?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getDomains).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getDomains.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        enrollmentMode: undefined,
+      });
 
       expect(result.current.domains?.page).toBe(2);
       expect(result.current.domains?.hasNextPage).toBe(false);
@@ -314,6 +356,10 @@ describe('useOrganization', () => {
         });
       });
 
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getInvitations.mockRejectedValue(null);
+
       fixtures.clerk.organization?.getMembershipRequests.mockReturnValue(
         Promise.resolve({
           data: [
@@ -343,6 +389,12 @@ describe('useOrganization', () => {
       expect(result.current.membershipRequests?.count).toBe(0);
 
       await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getMembershipRequests.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        status: 'pending',
+      });
 
       expect(result.current.membershipRequests?.isFetching).toBe(false);
       expect(result.current.membershipRequests?.count).toBe(4);
@@ -378,6 +430,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.membershipRequests?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getMembershipRequests).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getMembershipRequests.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        status: 'pending',
+      });
 
       expect(result.current.membershipRequests?.page).toBe(2);
       expect(result.current.membershipRequests?.hasNextPage).toBe(false);
@@ -418,6 +476,10 @@ describe('useOrganization', () => {
         });
       });
 
+      fixtures.clerk.organization?.getMemberships.mockRejectedValue(null);
+      fixtures.clerk.organization?.getDomains.mockRejectedValue(null);
+      fixtures.clerk.organization?.getMembershipRequests.mockRejectedValue(null);
+
       fixtures.clerk.organization?.getInvitations.mockReturnValue(
         Promise.resolve({
           data: [
@@ -443,6 +505,12 @@ describe('useOrganization', () => {
       expect(result.current.invitations?.count).toBe(0);
 
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getInvitations.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        status: ['pending'],
+      });
 
       expect(result.current.invitations?.isFetching).toBe(false);
       expect(result.current.invitations?.count).toBe(4);
@@ -474,6 +542,12 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(true));
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
+      expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalledTimes(2);
+      expect(fixtures.clerk.organization?.getInvitations.mock.calls[1][0]).toStrictEqual({
+        initialPage: 2,
+        pageSize: 2,
+        status: ['pending'],
+      });
 
       expect(result.current.invitations?.page).toBe(2);
       expect(result.current.invitations?.hasNextPage).toBe(false);
@@ -542,53 +616,50 @@ describe('useOrganization', () => {
 
       await waitFor(() => expect(result.current.invitations?.isLoading).toBe(false));
       expect(result.current.invitations?.isFetching).toBe(false);
+      expect(fixtures.clerk.organization?.getInvitations).toHaveBeenCalledTimes(1);
+      expect(fixtures.clerk.organization?.getInvitations.mock.calls[0][0]).toStrictEqual({
+        initialPage: 1,
+        pageSize: 2,
+        status: ['pending'],
+      });
 
-      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeOrganizationInvitation({
-              id: '1',
-              emailAddress: 'admin1@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-            createFakeOrganizationInvitation({
-              id: '2',
-              emailAddress: 'member2@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
+      const deferred = createDeferredPromise();
 
-      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(
-        Promise.resolve({
-          data: [
-            createFakeOrganizationInvitation({
-              id: '3',
-              emailAddress: 'admin3@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-            createFakeOrganizationInvitation({
-              id: '4',
-              emailAddress: 'member4@clerk.com',
-              organizationId: '1',
-              createdAt: new Date('2022-01-01'),
-            }),
-          ],
-          total_count: 4,
-        }),
-      );
-
+      fixtures.clerk.organization?.getInvitations.mockReturnValueOnce(deferred.promise);
       act(() => result.current.invitations?.fetchNext?.());
 
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(true));
       expect(result.current.invitations?.isLoading).toBe(false);
 
+      deferred.resolve({
+        data: [
+          createFakeOrganizationInvitation({
+            id: '3',
+            emailAddress: 'admin3@clerk.com',
+            organizationId: '1',
+            createdAt: new Date('2022-01-01'),
+          }),
+          createFakeOrganizationInvitation({
+            id: '4',
+            emailAddress: 'member4@clerk.com',
+            organizationId: '1',
+            createdAt: new Date('2022-01-01'),
+          }),
+        ],
+        total_count: 4,
+      });
+
       await waitFor(() => expect(result.current.invitations?.isFetching).toBe(false));
+      const organizationInvitationParams = fixtures.clerk.organization?.getInvitations.mock.calls.map(
+        ([params]) => params,
+      );
+      organizationInvitationParams.forEach(params => {
+        expect(Object.keys(params).sort()).toEqual(['initialPage', 'pageSize', 'status']);
+        expect(params.pageSize).toBe(2);
+        expect(params.status).toEqual(['pending']);
+      });
+      expect(organizationInvitationParams.some(params => params.initialPage === 2)).toBe(true);
+
       expect(result.current.invitations?.data).toEqual(
         expect.arrayContaining([
           expect.objectContaining({

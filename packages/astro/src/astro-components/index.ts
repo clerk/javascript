@@ -31,3 +31,4 @@ export { default as CreateOrganization } from './interactive/CreateOrganization.
 export { default as GoogleOneTap } from './interactive/GoogleOneTap.astro';
 export { default as Waitlist } from './interactive/Waitlist.astro';
 export { default as PricingTable } from './interactive/PricingTable.astro';
+export { default as APIKeys } from './interactive/APIKeys.astro';
