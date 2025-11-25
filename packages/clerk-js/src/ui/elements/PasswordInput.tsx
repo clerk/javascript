@@ -108,7 +108,6 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='ghost'
         size='xs'
-        tabIndex={-1}
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',
