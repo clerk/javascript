@@ -1,4 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
+import { PortalProvider } from '@clerk/shared/react';
 import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
@@ -75,16 +76,18 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
       appearanceKey={props.appearanceKey}
       appearance={props.componentAppearance}
     >
-      <Portal
-        node={props.node}
-        component={
-          ClerkComponents[props.componentName as ClerkComponentName] as React.ComponentType<
-            Omit<AvailableComponentCtx, 'componentName'>
-          >
-        }
-        props={props.componentProps}
-        componentName={props.componentName}
-      />
+      <PortalProvider getContainer={() => props?.componentProps?.portalRoot}>
+        <Portal
+          node={props.node}
+          component={
+            ClerkComponents[props.componentName as ClerkComponentName] as React.ComponentType<
+              Omit<AvailableComponentCtx, 'componentName'>
+            >
+          }
+          props={props.componentProps}
+          componentName={props.componentName}
+        />
+      </PortalProvider>
     </AppearanceProvider>
   );
 };

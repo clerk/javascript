@@ -1,3 +1,4 @@
+import { usePortalRoot } from '@clerk/shared/react';
 import type { LoadedClerk, Without } from '@clerk/shared/types';
 import React from 'react';
 
@@ -19,6 +20,7 @@ export const withClerk = <P extends { clerk: LoadedClerk; component?: string }>(
     useAssertWrappedByClerkProvider(displayName || 'withClerk');
 
     const clerk = useIsomorphicClerkContext();
+    const portalRoot = usePortalRoot();
 
     if (!clerk.loaded && !options?.renderWhileLoading) {
       return null;
@@ -26,6 +28,7 @@ export const withClerk = <P extends { clerk: LoadedClerk; component?: string }>(
 
     return (
       <Component
+        portalRoot={portalRoot}
         {...(props as P)}
         component={displayName}
         clerk={clerk}
