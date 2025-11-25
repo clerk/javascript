@@ -1,5 +1,3 @@
-'use client';
-
 import type { DefaultError, InfiniteData, QueryKey, QueryObserver } from '@tanstack/query-core';
 import { InfiniteQueryObserver } from '@tanstack/query-core';
 

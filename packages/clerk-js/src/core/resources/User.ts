@@ -20,7 +20,6 @@ import type {
   PasskeyResource,
   PhoneNumberResource,
   RemoveUserPasswordParams,
-  SamlAccountResource,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
@@ -49,7 +48,6 @@ import {
   OrganizationSuggestion,
   Passkey,
   PhoneNumber,
-  SamlAccount,
   SessionWithActivities,
   TOTP,
   UserOrganizationInvitation,
@@ -68,9 +66,6 @@ export class User extends BaseResource implements UserResource {
   externalAccounts: ExternalAccountResource[] = [];
   enterpriseAccounts: EnterpriseAccountResource[] = [];
   passkeys: PasskeyResource[] = [];
-
-  samlAccounts: SamlAccountResource[] = [];
-
   organizationMemberships: OrganizationMembershipResource[] = [];
   passwordEnabled = false;
   firstName: string | null = null;
@@ -365,8 +360,6 @@ export class User extends BaseResource implements UserResource {
 
     this.organizationMemberships = (data.organization_memberships || []).map(om => new OrganizationMembership(om));
 
-    this.samlAccounts = (data.saml_accounts || []).map(sa => new SamlAccount(sa, this.path() + '/saml_accounts'));
-
     this.enterpriseAccounts = (data.enterprise_accounts || []).map(
       ea => new EnterpriseAccount(ea, this.path() + '/enterprise_accounts'),
     );
@@ -413,7 +406,6 @@ export class User extends BaseResource implements UserResource {
       external_accounts: this.externalAccounts.map(ea => ea.__internal_toSnapshot()),
       passkeys: this.passkeys.map(passkey => passkey.__internal_toSnapshot()),
       organization_memberships: this.organizationMemberships.map(om => om.__internal_toSnapshot()),
-      saml_accounts: this.samlAccounts.map(sa => sa.__internal_toSnapshot()),
       enterprise_accounts: this.enterpriseAccounts.map(ea => ea.__internal_toSnapshot()),
       totp_enabled: this.totpEnabled,
       backup_code_enabled: this.backupCodeEnabled,

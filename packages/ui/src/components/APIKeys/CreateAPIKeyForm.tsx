@@ -3,6 +3,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useAPIKeysContext } from '@/ui/contexts';
 import { Box, Col, descriptors, FormLabel, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
+import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
@@ -28,7 +29,6 @@ export type OnCreateParams = {
 
 interface CreateAPIKeyFormProps {
   onCreate: (params: OnCreateParams) => void;
-  isSubmitting: boolean;
 }
 
 const EXPIRATION_DURATIONS: Record<Exclude<Expiration, 'never'>, (date: Date) => void> = {
@@ -117,10 +117,11 @@ const ExpirationSelector: React.FC<ExpirationSelectorProps> = ({ selectedExpirat
   );
 };
 
-export const CreateAPIKeyForm: React.FC<CreateAPIKeyFormProps> = ({ onCreate, isSubmitting }) => {
+export const CreateAPIKeyForm: React.FC<CreateAPIKeyFormProps> = ({ onCreate }) => {
   const [selectedExpiration, setSelectedExpiration] = useState<ExpirationOption | null>(null);
   const { close: closeCardFn } = useActionContext();
   const { showDescription = false } = useAPIKeysContext();
+  const card = useCardState();
   const { t } = useLocalizations();
 
   const nameField = useFormControl('name', '', {
@@ -251,7 +252,7 @@ export const CreateAPIKeyForm: React.FC<CreateAPIKeyFormProps> = ({ onCreate, is
           submitLabel={localizationKeys('apiKeys.formButtonPrimary__add')}
           isDisabled={!canSubmit}
           onReset={closeCardFn}
-          isLoading={isSubmitting}
+          isLoading={card.isLoading}
           elementDescriptor={descriptors.apiKeysCreateFormSubmitButton}
         />
       </Form.Root>

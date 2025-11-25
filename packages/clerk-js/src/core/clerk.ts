@@ -1,6 +1,5 @@
 import { inBrowser as inClientSide, isValidBrowserOnline } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { deprecated } from '@clerk/shared/deprecated';
 import {
   ClerkRuntimeError,
   EmailLinkError,
@@ -9,7 +8,6 @@ import {
   isClerkAPIResponseError,
   isClerkRuntimeError,
 } from '@clerk/shared/error';
-import { assertNoLegacyProp } from '@clerk/shared/internal/clerk-js/assertNoLegacyProp';
 import {
   disabledAllAPIKeysFeatures,
   disabledAllBillingFeatures,
@@ -496,8 +494,6 @@ export class Clerk implements ClerkInterface {
       this.#setAccessors(this.session);
       this.#emit();
     });
-
-    assertNoLegacyProp(this.#options);
 
     if (this.#options.sdkMetadata) {
       Clerk.sdkMetadata = this.#options.sdkMetadata;
@@ -1301,7 +1297,7 @@ export class Clerk implements ClerkInterface {
    * `setActive` can be used to set the active session and/or organization.
    */
   public setActive = async (params: SetActiveParams): Promise<void> => {
-    const { organization, beforeEmit, redirectUrl, navigate: setActiveNavigate } = params;
+    const { organization, redirectUrl, navigate: setActiveNavigate } = params;
     let { session } = params;
     this.__internal_setActiveInProgress = true;
     debugLogger.debug(
@@ -1406,29 +1402,18 @@ export class Clerk implements ClerkInterface {
         eventBus.emit(events.TokenUpdate, { token: null });
       }
 
-      //2. If there's a beforeEmit, typically we're navigating.  Emit the session as
-      //   undefined, then wait for beforeEmit to complete before emitting the new session.
+      //2. When navigation is required we emit the session as undefined,
+      //   then wait for navigation to finish before emitting the new session.
       //   When undefined, neither SignedIn nor SignedOut renders, which avoids flickers or
       //   automatic reloading when reloading shouldn't be happening.
       const tracker = createBeforeUnloadTracker(this.#options.standardBrowser);
-
-      if (beforeEmit) {
-        deprecated(
-          'Clerk.setActive({beforeEmit})',
-          'Use the `redirectUrl` property instead. Example `Clerk.setActive({redirectUrl:"/"})`',
-        );
-        await tracker.track(async () => {
-          this.#setTransitiveState();
-          await beforeEmit(newSession);
-        });
-      }
 
       const taskUrl =
         newSession?.status === 'pending' &&
         newSession?.currentTask &&
         this.#options.taskUrls?.[newSession?.currentTask.key];
 
-      if (!beforeEmit && (redirectUrl || taskUrl || setActiveNavigate)) {
+      if (redirectUrl || taskUrl || setActiveNavigate) {
         await tracker.track(async () => {
           if (!this.client) {
             // Typescript is not happy because since thinks this.client might have changed to undefined because the function is asynchronous.

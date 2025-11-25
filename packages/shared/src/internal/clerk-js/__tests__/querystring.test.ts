@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { camelToSnake } from '../../../underscore';
+import { camelToSnake } from '@/underscore';
+
 import { getQueryParams, stringifyQueryParams } from '../querystring';
 
 describe('getQueryParams(string)', () => {

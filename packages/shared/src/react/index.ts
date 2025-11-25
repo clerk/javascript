@@ -1,5 +1,7 @@
 export * from './hooks';
 
+export type { UseSubscriptionParams } from './hooks/useSubscription.types';
+
 export {
   ClerkInstanceContext,
   OptionsContext,
@@ -15,6 +17,6 @@ export {
   useInitialStateContext,
 } from './contexts';
 
-export * from './commerce';
-
 export { ClerkContextProvider } from './ClerkContextProvider';
+
+export * from './billing/payment-element';

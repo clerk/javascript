@@ -100,7 +100,6 @@ export const useOrganizationSwitcherContext = () => {
     organizationProfileMode: organizationProfileMode || 'modal',
     createOrganizationMode: createOrganizationMode || 'modal',
     skipInvitationScreen: ctx.skipInvitationScreen || false,
-    hideSlug: ctx.hideSlug || false,
     afterCreateOrganizationUrl,
     afterLeaveOrganizationUrl,
     navigateOrganizationProfile,

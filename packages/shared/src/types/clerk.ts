@@ -46,7 +46,6 @@ import type { ClerkPaginationParams } from './pagination';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
-  LegacyRedirectProps,
   NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
@@ -141,7 +140,6 @@ export type SDKMetadata = {
 export type ListenerCallback = (emission: Resources) => void;
 export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
@@ -959,8 +957,7 @@ export type HandleOAuthCallbackParams = TransferableOption &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps & {
+  SignUpFallbackRedirectUrl & {
     /**
      * Full URL or path where the SignIn component is mounted.
      */
@@ -1030,28 +1027,12 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-type ClerkOptionsLegacyRedirectProps = {
-  /**
-   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
-   */
-  afterSignInUrl?: string | null;
-  /**
-   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
-   */
-  afterSignUpUrl?: string | null;
-  /**
-   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
-   */
-  redirectUrl?: string | null;
-};
-
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
@@ -1298,13 +1279,6 @@ export type SetActiveParams = {
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated Use `redirectUrl` instead.
-   *
-   * Callback run just before the active session and/or organization is set to the passed object. Can be used to set up for pre-navigation actions.
-   */
-  beforeEmit?: BeforeEmitCallback;
-
-  /**
    * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
@@ -1406,7 +1380,6 @@ export type SignInProps = RoutingOptions & {
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
-  LegacyRedirectProps &
   AfterSignOutUrl;
 
 export interface TransferableOption {
@@ -1553,7 +1526,6 @@ export type SignUpProps = RoutingOptions & {
   oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
-  LegacyRedirectProps &
   AfterSignOutUrl;
 
 export type SignUpModalProps = WithoutRouting<SignUpProps>;
@@ -1665,12 +1637,6 @@ export type CreateOrganizationProps = RoutingOptions & {
    * prop of ClerkProvider (if one is provided)
    */
   appearance?: CreateOrganizationTheme;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -1706,19 +1672,6 @@ export type UserButtonProps = UserButtonProfileMode & {
    */
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
-  /**
-   * Full URL or path to navigate to after sign out is complete
-   *
-   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
-   */
-  afterSignOutUrl?: string;
-  /**
-   * Full URL or path to navigate to after signing out the current user is complete.
-   * This option applies to multi-session applications.
-   *
-   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
-   */
-  afterMultiSessionSingleSignOutUrl?: string;
   /**
    * Full URL or path to navigate to on "Add another account" action.
    * Multi-session mode only.
@@ -1794,14 +1747,6 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     hidePersonal?: boolean;
     /**
-     * Full URL or path to navigate to after a successful organization switch.
-     *
-     * @default undefined
-     *
-     * @deprecated Use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`.
-     */
-    afterSwitchOrganizationUrl?: string;
-    /**
      * Full URL or path to navigate to after creating a new organization.
      *
      * @default undefined
@@ -1838,12 +1783,6 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * the number of max allowed members is equal to 1
      */
     skipInvitationScreen?: boolean;
-    /**
-     * @deprecated
-     * This prop will be removed in a future version.
-     * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-     */
-    hideSlug?: boolean;
     /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
@@ -1904,12 +1843,6 @@ export type OrganizationListProps = {
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
 };
 
 export type WaitlistProps = {

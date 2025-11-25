@@ -17,6 +17,7 @@ catalogs:
     typescript: 5.8.3
     zx: 8.8.5
     rolldown: 1.0.0-beta.47
+    vue: 3.5.24
 
 minimumReleaseAge: 2880
 

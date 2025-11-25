@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.109.0",
+  "version": "5.109.2",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -73,8 +73,7 @@
     "core-js": "3.41.0",
     "crypto-js": "^4.2.0",
     "dequal": "2.0.3",
-    "regenerator-runtime": "0.14.1",
-    "swr": "2.3.4"
+    "regenerator-runtime": "0.14.1"
   },
   "devDependencies": {
     "@clerk/testing": "workspace:^",
@@ -90,7 +89,7 @@
     "webpack-merge": "^5.10.0"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"
