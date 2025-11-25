@@ -48,6 +48,9 @@ export class AuthCookieService {
   private devBrowser: DevBrowser;
   private poller: SessionCookiePoller | null = null;
   private sessionCookie: SessionCookieHandler;
+  /**
+   * Shared lock for coordinating token refresh operations across tabs
+   */
   private tokenRefreshLock: SafeLockReturn;
 
   public static async create(
