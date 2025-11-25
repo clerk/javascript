@@ -8,7 +8,6 @@ import * as VerifyJwtModule from '../../jwt/verifyJwt';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
-// Moved helper from fixtures to test file as requested
 function createOAuthJwt(
   payload = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
