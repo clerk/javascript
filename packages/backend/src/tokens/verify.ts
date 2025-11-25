@@ -340,14 +340,11 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
     return verifyM2MToken(token, options);
   }
-  if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
+  if (token.startsWith(OAUTH_TOKEN_PREFIX) || isJwtFormat(token)) {
     return verifyOAuthToken(token, options);
   }
   if (token.startsWith(API_KEY_PREFIX)) {
     return verifyAPIKey(token, options);
-  }
-  if (isJwtFormat(token)) {
-    return verifyOAuthToken(token, options);
   }
 
   throw new Error('Unknown machine token type');
