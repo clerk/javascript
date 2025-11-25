@@ -1,5 +1,16 @@
 # Change Log
 
+## 2.3.0
+
+### Minor Changes
+
+- Options passed to `clerkMiddleware` are now properly forwarded to `clerkClient`, ensuring consistent configuration when manually providing options from router context. ([#7292](https://github.com/clerk/javascript/pull/7292)) by [@spegoraro](https://github.com/spegoraro)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.57.0
+
 ## 2.2.5
 
 ### Patch Changes
