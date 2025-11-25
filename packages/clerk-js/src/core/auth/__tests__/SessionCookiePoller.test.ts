@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { SafeLockReturn } from '../safeLock';
 import { SessionCookiePoller } from '../SessionCookiePoller';
 
 describe('SessionCookiePoller', () => {
@@ -13,108 +12,70 @@ describe('SessionCookiePoller', () => {
     vi.restoreAllMocks();
   });
 
-  describe('shared lock coordination', () => {
-    it('accepts an external lock for coordination with other components', () => {
-      const sharedLock: SafeLockReturn = {
-        acquireLockAndRun: vi.fn().mockResolvedValue(undefined),
-      };
-
-      const poller = new SessionCookiePoller(sharedLock);
-      const callback = vi.fn().mockResolvedValue(undefined);
-
-      poller.startPollingForSessionToken(callback);
-
-      // Verify the shared lock is used
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledWith(callback);
-
-      poller.stopPollingForSessionToken();
-    });
-
-    it('creates internal lock when none provided (backward compatible)', () => {
-      // Should not throw when no lock is provided
-      const poller = new SessionCookiePoller();
-      expect(poller).toBeInstanceOf(SessionCookiePoller);
-    });
-
-    it('enables focus handler and poller to share the same lock', () => {
-      // This test demonstrates the shared lock pattern used in AuthCookieService
-      const sharedLock: SafeLockReturn = {
-        acquireLockAndRun: vi.fn().mockImplementation(async (cb: () => Promise<unknown>) => {
-          return cb();
-        }),
-      };
-
-      const poller = new SessionCookiePoller(sharedLock);
-      const pollerCallback = vi.fn().mockResolvedValue('poller-result');
-
-      // Poller uses the shared lock
-      poller.startPollingForSessionToken(pollerCallback);
-
-      // Simulate focus handler also using the shared lock (like AuthCookieService does)
-      const focusCallback = vi.fn().mockResolvedValue('focus-result');
-      void sharedLock.acquireLockAndRun(focusCallback);
-
-      // Both should use the same lock instance
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(2);
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledWith(pollerCallback);
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledWith(focusCallback);
-
-      poller.stopPollingForSessionToken();
-    });
-  });
-
   describe('startPollingForSessionToken', () => {
-    it('executes callback immediately on start', () => {
-      const sharedLock: SafeLockReturn = {
-        acquireLockAndRun: vi.fn().mockResolvedValue(undefined),
-      };
-
-      const poller = new SessionCookiePoller(sharedLock);
+    it('executes callback immediately on start', async () => {
+      const poller = new SessionCookiePoller();
       const callback = vi.fn().mockResolvedValue(undefined);
 
       poller.startPollingForSessionToken(callback);
 
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledWith(callback);
+      // Flush microtasks to let the async run() execute
+      await Promise.resolve();
+
+      expect(callback).toHaveBeenCalledTimes(1);
 
       poller.stopPollingForSessionToken();
     });
 
-    it('prevents multiple concurrent polling sessions', () => {
-      const sharedLock: SafeLockReturn = {
-        acquireLockAndRun: vi.fn().mockResolvedValue(undefined),
-      };
-
-      const poller = new SessionCookiePoller(sharedLock);
+    it('prevents multiple concurrent polling sessions', async () => {
+      const poller = new SessionCookiePoller();
       const callback = vi.fn().mockResolvedValue(undefined);
 
       poller.startPollingForSessionToken(callback);
       poller.startPollingForSessionToken(callback); // Second call should be ignored
 
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      expect(callback).toHaveBeenCalledTimes(1);
 
       poller.stopPollingForSessionToken();
     });
   });
 
   describe('stopPollingForSessionToken', () => {
-    it('allows restart after stop', async () => {
-      const sharedLock: SafeLockReturn = {
-        acquireLockAndRun: vi.fn().mockResolvedValue(undefined),
-      };
+    it('stops polling when called', async () => {
+      const poller = new SessionCookiePoller();
+      const callback = vi.fn().mockResolvedValue(undefined);
 
-      const poller = new SessionCookiePoller(sharedLock);
+      poller.startPollingForSessionToken(callback);
+      await Promise.resolve();
+
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      poller.stopPollingForSessionToken();
+
+      // Advance time - callback should not be called again
+      await vi.advanceTimersByTimeAsync(10000);
+
+      expect(callback).toHaveBeenCalledTimes(1);
+    });
+
+    it('allows restart after stop', async () => {
+      const poller = new SessionCookiePoller();
       const callback = vi.fn().mockResolvedValue(undefined);
 
       // Start and stop
       poller.startPollingForSessionToken(callback);
+      await Promise.resolve();
       poller.stopPollingForSessionToken();
 
-      // Clear mock to check restart
-      vi.mocked(sharedLock.acquireLockAndRun).mockClear();
+      expect(callback).toHaveBeenCalledTimes(1);
 
       // Should be able to start again
       poller.startPollingForSessionToken(callback);
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+
+      expect(callback).toHaveBeenCalledTimes(2);
 
       poller.stopPollingForSessionToken();
     });
@@ -122,23 +83,58 @@ describe('SessionCookiePoller', () => {
 
   describe('polling interval', () => {
     it('schedules next poll after callback completes', async () => {
-      const sharedLock: SafeLockReturn = {
-        acquireLockAndRun: vi.fn().mockResolvedValue(undefined),
-      };
-
-      const poller = new SessionCookiePoller(sharedLock);
+      const poller = new SessionCookiePoller();
       const callback = vi.fn().mockResolvedValue(undefined);
 
       poller.startPollingForSessionToken(callback);
 
       // Initial call
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(1);
+      await Promise.resolve();
+      expect(callback).toHaveBeenCalledTimes(1);
 
       // Wait for first interval (5 seconds)
       await vi.advanceTimersByTimeAsync(5000);
 
       // Should have scheduled another call
-      expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(2);
+      expect(callback).toHaveBeenCalledTimes(2);
+
+      // Another interval
+      await vi.advanceTimersByTimeAsync(5000);
+      expect(callback).toHaveBeenCalledTimes(3);
+
+      poller.stopPollingForSessionToken();
+    });
+
+    it('waits for callback to complete before scheduling next poll', async () => {
+      const poller = new SessionCookiePoller();
+
+      let resolveCallback: () => void;
+      const callbackPromise = new Promise<void>(resolve => {
+        resolveCallback = resolve;
+      });
+      const callback = vi.fn().mockReturnValue(callbackPromise);
+
+      poller.startPollingForSessionToken(callback);
+
+      // Let the first call start
+      await Promise.resolve();
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      // Advance time while callback is still running - should NOT schedule next poll
+      // because the callback promise hasn't resolved yet
+      await vi.advanceTimersByTimeAsync(5000);
+
+      // Should still only be 1 call since previous call hasn't completed
+      expect(callback).toHaveBeenCalledTimes(1);
+
+      // Complete the callback
+      resolveCallback!();
+      await Promise.resolve();
+
+      // Now advance time for the next interval
+      await vi.advanceTimersByTimeAsync(5000);
+
+      expect(callback).toHaveBeenCalledTimes(2);
 
       poller.stopPollingForSessionToken();
     });
