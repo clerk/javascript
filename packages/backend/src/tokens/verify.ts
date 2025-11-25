@@ -16,7 +16,7 @@ import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
-import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
+import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 
@@ -210,7 +210,7 @@ async function verifyOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  if (isJwt(accessToken)) {
+  if (isJwtFormat(accessToken)) {
     let decoded: JwtReturnType<Jwt, TokenVerificationError>;
     try {
       decoded = decodeJwt(accessToken);
@@ -347,15 +347,9 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
   if (token.startsWith(API_KEY_PREFIX)) {
     return verifyAPIKey(token, options);
   }
-  if (isJwt(token)) {
+  if (isJwtFormat(token)) {
     return verifyOAuthToken(token, options);
   }
 
   throw new Error('Unknown machine token type');
-}
-
-const JwtFormatRegExp = /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/;
-
-function isJwt(token: string): boolean {
-  return JwtFormatRegExp.test(token);
 }
