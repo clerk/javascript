@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Removing `tabIndex={-1}` usage to ensure buttons are keyboard accessible.
+Conditionally apply `tabIndex={-1}` usage when shown to ensure buttons are keyboard accessible.
