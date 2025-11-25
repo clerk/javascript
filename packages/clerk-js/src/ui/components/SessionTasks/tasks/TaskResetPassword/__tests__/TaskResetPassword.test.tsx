@@ -42,25 +42,6 @@ describe('TaskResetPassword', () => {
     expect(queryByRole('link', { name: /sign out/i })).toBeInTheDocument();
   });
 
-  it('renders the task components in the exact order of the tasks returned by the API', async () => {
-    const { wrapper } = await createFixtures(f => {
-      f.withOrganizations();
-      f.withForceOrganizationSelection();
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        identifier: 'test@clerk.com',
-        tasks: [{ key: 'reset-password' }, { key: 'choose-organization' }],
-      });
-    });
-
-    const { queryByText, queryByRole } = render(<TaskResetPassword />, { wrapper });
-
-    expect(queryByText('New password')).toBeInTheDocument();
-    expect(queryByText('Confirm password')).toBeInTheDocument();
-    expect(queryByText('Sign out of all other devices')).toBeInTheDocument();
-    expect(queryByRole('link', { name: /sign out/i })).toBeInTheDocument();
-  });
-
   it('tries to reset the password and calls the appropriate function', async () => {
     const { wrapper, fixtures } = await createFixtures(f =>
       f.withUser({

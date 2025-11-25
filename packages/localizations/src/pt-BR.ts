@@ -874,12 +874,12 @@ export const ptBR: LocalizationResource = {
     },
   },
   taskResetPassword: {
-    formButtonPrimary: undefined,
+    formButtonPrimary: 'Resetar Senha',
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
     },
-    title: undefined,
+    title: 'Resetar senha',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
