@@ -152,7 +152,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
         await expect(page.getByText('Clerk is NOT loaded', { exact: true })).toBeVisible();
         await expect(page.getByText('Clerk is out')).toBeHidden();
         await expect(page.getByText('Clerk is degraded')).toBeHidden();
-        await expect(page.getByText('(comp) Waiting for clerk to fail, ready or regraded.')).toBeVisible();
+        await expect(page.getByText('(comp) Waiting for clerk to fail, ready or degraded.')).toBeVisible();
         await u.po.clerk.toBeLoading();
 
         // Wait for loading to complete and verify final state
@@ -165,7 +165,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('resilienc
         await expect(page.getByText('(comp) Clerk is loaded,(ready or degraded)')).toBeVisible();
 
         // Verify loading component is no longer visible
-        await expect(page.getByText('(comp) Waiting for clerk to fail, ready or regraded.')).toBeHidden();
+        await expect(page.getByText('(comp) Waiting for clerk to fail, ready or degraded.')).toBeHidden();
       });
 
       test('clerk-js hotloading failed', async ({ page, context }) => {
