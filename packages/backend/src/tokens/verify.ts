@@ -1,8 +1,8 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Simplify } from '@clerk/shared/types';
-import type { JwtPayload } from '@clerk/types';
+import type { Jwt, JwtPayload } from '@clerk/types';
 
-import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
+import { type APIKey, IdPOAuthAccessToken, type M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
 import {
   MachineTokenVerificationError,
@@ -210,6 +210,105 @@ async function verifyOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
+  if (isJwt(accessToken)) {
+    let decoded: JwtReturnType<Jwt, TokenVerificationError>;
+    try {
+      decoded = decodeJwt(accessToken);
+    } catch (e) {
+      return {
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenInvalid,
+            message: (e as Error).message,
+          }),
+        ],
+      };
+    }
+
+    const { data: decodedResult, errors } = decoded;
+    if (errors) {
+      return {
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenInvalid,
+            message: errors[0].message,
+          }),
+        ],
+      };
+    }
+
+    const { header } = decodedResult;
+    const { kid } = header;
+    let key: JsonWebKey;
+
+    try {
+      if (options.jwtKey) {
+        key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
+      } else if (options.secretKey) {
+        key = await loadClerkJWKFromRemote({ ...options, kid });
+      } else {
+        return {
+          tokenType: TokenType.OAuthToken,
+          errors: [
+            new MachineTokenVerificationError({
+              action: TokenVerificationErrorAction.SetClerkJWTKey,
+              message: 'Failed to resolve JWK during verification.',
+              code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            }),
+          ],
+        };
+      }
+
+      const { data: payload, errors: verifyErrors } = await verifyJwt(accessToken, {
+        ...options,
+        key,
+        headerType: ['at+jwt', 'application/at+jwt'],
+      });
+
+      if (verifyErrors) {
+        return {
+          tokenType: TokenType.OAuthToken,
+          errors: [
+            new MachineTokenVerificationError({
+              code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+              message: verifyErrors[0].message,
+            }),
+          ],
+        };
+      }
+
+      const jti = payload.jti as string;
+      if (!jti || !/^oat_[0-9A-Za-z]{32}$/.test(jti)) {
+        return {
+          tokenType: TokenType.OAuthToken,
+          errors: [
+            new MachineTokenVerificationError({
+              action: TokenVerificationErrorAction.EnsureClerkJWT,
+              message: `Invalid JWT jti claim ${JSON.stringify(jti)}. Expected a valid OAuth access token ID.`,
+              code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            }),
+          ],
+        };
+      }
+
+      const token = IdPOAuthAccessToken.fromJwtPayload(payload, options.clockSkewInMs);
+
+      return { data: token, tokenType: TokenType.OAuthToken, errors: undefined };
+    } catch (error) {
+      return {
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: (error as Error).message,
+          }),
+        ],
+      };
+    }
+  }
+
   try {
     const client = createBackendApiClient(options);
     const verifiedToken = await client.idPOAuthAccessToken.verifyAccessToken(accessToken);
@@ -248,6 +347,15 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
   if (token.startsWith(API_KEY_PREFIX)) {
     return verifyAPIKey(token, options);
   }
+  if (isJwt(token)) {
+    return verifyOAuthToken(token, options);
+  }
 
   throw new Error('Unknown machine token type');
+}
+
+const JwtFormatRegExp = /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/;
+
+function isJwt(token: string): boolean {
+  return JwtFormatRegExp.test(token);
 }

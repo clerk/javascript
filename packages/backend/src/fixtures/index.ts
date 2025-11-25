@@ -33,6 +33,37 @@ export const mockJwtPayload = {
   sub: 'user_2GIpXOEpVyJw51rkZn9Kmnc6Sxr',
 };
 
+export const mockOAuthAccessTokenJwtPayload = {
+  ...mockJwtPayload,
+  iss: 'https://clerk.oauth.example.test',
+  sub: 'user_2vYVtestTESTtestTESTtestTESTtest',
+  client_id: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
+  scope: 'read:foo write:bar',
+  jti: 'oat_2VTWUzvGC5UhdJCNx6xG1D98edc',
+  exp: mockJwtPayload.iat + 300,
+  iat: mockJwtPayload.iat,
+  nbf: mockJwtPayload.iat - 10,
+};
+
+type CreateJwt = (opts?: { header?: any; payload?: any; signature?: string }) => string;
+export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSignature } = {}) => {
+  const encoder = new TextEncoder();
+
+  const stringifiedHeader = JSON.stringify({ ...mockJwtHeader, ...header });
+  const stringifiedPayload = JSON.stringify({ ...mockJwtPayload, ...payload });
+
+  return [
+    base64url.stringify(encoder.encode(stringifiedHeader), { pad: false }),
+    base64url.stringify(encoder.encode(stringifiedPayload), { pad: false }),
+    signature,
+  ].join('.');
+};
+
+export const mockOAuthAccessTokenJwt = createJwt({
+  header: { typ: 'at+jwt' },
+  payload: mockOAuthAccessTokenJwtPayload,
+});
+
 export const mockRsaJwkKid = 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD';
 
 export const mockRsaJwk = {
@@ -150,20 +181,6 @@ export const signedJwt =
 
 export const pkTest = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 export const pkLive = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
-
-type CreateJwt = (opts?: { header?: any; payload?: any; signature?: string }) => string;
-export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSignature } = {}) => {
-  const encoder = new TextEncoder();
-
-  const stringifiedHeader = JSON.stringify({ ...mockJwtHeader, ...header });
-  const stringifiedPayload = JSON.stringify({ ...mockJwtPayload, ...payload });
-
-  return [
-    base64url.stringify(encoder.encode(stringifiedHeader), { pad: false }),
-    base64url.stringify(encoder.encode(stringifiedPayload), { pad: false }),
-    signature,
-  ].join('.');
-};
 
 export function createCookieHeader(cookies: Record<string, string>): string {
   return Object.keys(cookies)

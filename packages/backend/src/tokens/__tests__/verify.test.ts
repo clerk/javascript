@@ -2,8 +2,9 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../../api';
-import { mockJwks, mockJwt, mockJwtPayload } from '../../fixtures';
+import { createJwt, mockJwks, mockJwt, mockJwtPayload, mockOAuthAccessTokenJwtPayload } from '../../fixtures';
 import { mockVerificationResults } from '../../fixtures/machine';
+import * as VerifyJwtModule from '../../jwt/verifyJwt';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
@@ -311,6 +312,182 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeDefined();
       expect(result.errors?.[0].message).toBe('Unexpected error');
       expect(result.errors?.[0].code).toBe('unexpected-error');
+    });
+  });
+
+  describe('verifyOAuthToken with JWT', () => {
+    it('verifies a valid OAuth JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const validJtiPayload = {
+        ...mockOAuthAccessTokenJwtPayload,
+        jti: 'oat_12345678901234567890123456789012',
+      };
+
+      const spy = vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
+        data: { ...validJtiPayload, __raw: 'mock_jwt_string' },
+      });
+
+      const oauthJwt = createJwt({
+        header: { typ: 'at+jwt', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        payload: validJtiPayload,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeDefined();
+      expect(result.errors).toBeUndefined();
+
+      const data = result.data as IdPOAuthAccessToken;
+      expect(data.id).toBe('oat_12345678901234567890123456789012');
+      expect(data.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
+      expect(data.type).toBe('oauth_token');
+      expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
+      expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headerType: ['at+jwt', 'application/at+jwt'],
+        }),
+      );
+    });
+
+    it('fails if jti is missing or invalid format', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const invalidPayload = { ...mockOAuthAccessTokenJwtPayload, jti: 'invalid' };
+      vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
+        data: { ...invalidPayload, __raw: 'mock_jwt_string' },
+      });
+
+      const oauthJwt = createJwt({
+        header: { typ: 'at+jwt', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        payload: invalidPayload,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].code).toBe('token-verification-failed');
+      expect(result.errors?.[0].message).toContain('Invalid JWT jti claim');
+    });
+
+    it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const oauthJwt = createJwt({
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' }, // Wrong type
+        payload: mockOAuthAccessTokenJwtPayload,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].message).toContain('Invalid JWT type');
+    });
+
+    it('verifies JWT with typ application/at+jwt', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const validJtiPayload = {
+        ...mockOAuthAccessTokenJwtPayload,
+        jti: 'oat_12345678901234567890123456789012',
+      };
+
+      // We mock verifyJwt to ensure we don't hit the real signature check failure (since we use createJwt which signs with a dummy key/algo)
+      // But we want to test headerType validation logic. The real verifyJwt does signature check LAST.
+      // assertHeaderType is called BEFORE signature check.
+      // So if we mock verifyJwt, we skip assertHeaderType inside verifyJwt unless we spy on assertions?
+      // No, VerifyJwtModule.verifyJwt IS the function we call.
+      // If we mock it, we bypass the real logic entirely.
+
+      // To test that verifyOAuthToken accepts 'application/at+jwt', we should let it call verifyJwt.
+      // But verifyJwt will fail signature if we don't provide correct key/signature.
+      // However, if we Mock verifyJwt, we are just testing verifyMachineAuthToken -> verifyOAuthToken flow, not verifyJwt internals.
+
+      // Let's rely on the fact that verifyOAuthToken calls verifyJwt with headerType: ['at+jwt', 'application/at+jwt'].
+      // We verified that call in the first test ("verifies a valid OAuth JWT").
+
+      // But we can add a test case where we simulate a successful verifyJwt call with application/at+jwt.
+
+      const spy = vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
+        data: { ...validJtiPayload, __raw: 'mock_jwt_string' },
+      });
+
+      const oauthJwt = createJwt({
+        header: { typ: 'application/at+jwt', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        payload: validJtiPayload,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.errors).toBeUndefined();
+
+      expect(spy).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          headerType: ['at+jwt', 'application/at+jwt'],
+        }),
+      );
+    });
+
+    it('handles invalid JWT format', async () => {
+      const invalidJwt = 'invalid.jwt.token';
+      // Mock isJwt to return true so it enters verifyOAuthToken,
+      // OR rely on regex. Regex requires 3 parts.
+      // 'invalid.jwt.token' matches 3 parts.
+
+      // But decodeJwt will fail if base64 is bad.
+
+      const result = await verifyMachineAuthToken(invalidJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
     });
   });
 });

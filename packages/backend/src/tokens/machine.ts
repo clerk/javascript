@@ -1,3 +1,4 @@
+import { decodeJwt } from '../jwt/verifyJwt';
 import type { AuthenticateRequestOptions } from '../tokens/types';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -7,6 +8,30 @@ export const OAUTH_TOKEN_PREFIX = 'oat_';
 export const API_KEY_PREFIX = 'ak_';
 
 const MACHINE_TOKEN_PREFIXES = [M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX, API_KEY_PREFIX] as const;
+
+export const JwtFormatRegExp = /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/;
+
+export function isJwtFormat(token: string): boolean {
+  return JwtFormatRegExp.test(token);
+}
+
+/**
+ * Valid OAuth 2.0 JWT access token type values per RFC 9068.
+ * @see https://www.rfc-editor.org/rfc/rfc9068.html#section-2.1
+ */
+const OAUTH_ACCESS_TOKEN_TYPES = ['at+jwt', 'application/at+jwt'] as const;
+
+export function isOAuthJwt(token: string): boolean {
+  if (!isJwtFormat(token)) {
+    return false;
+  }
+  try {
+    const { data, errors } = decodeJwt(token);
+    return !errors && OAUTH_ACCESS_TOKEN_TYPES.includes(data.header.typ as (typeof OAUTH_ACCESS_TOKEN_TYPES)[number]);
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Checks if a token is a machine token by looking at its prefix.
@@ -20,6 +45,16 @@ const MACHINE_TOKEN_PREFIXES = [M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX, API_KEY_PR
  */
 export function isMachineTokenByPrefix(token: string): boolean {
   return MACHINE_TOKEN_PREFIXES.some(prefix => token.startsWith(prefix));
+}
+
+/**
+ * Checks if a token is a machine token by looking at its prefix or if it's a JWT with header typ 'at+jwt'.
+ *
+ * @param token - The token string to check
+ * @returns true if the token is a machine token
+ */
+export function isMachineToken(token: string): boolean {
+  return isMachineTokenByPrefix(token) || isOAuthJwt(token);
 }
 
 /**
@@ -38,7 +73,7 @@ export function getMachineTokenType(token: string): MachineTokenType {
     return TokenType.M2MToken;
   }
 
-  if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
+  if (token.startsWith(OAUTH_TOKEN_PREFIX) || isOAuthJwt(token)) {
     return TokenType.OAuthToken;
   }
 

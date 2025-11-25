@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import { createJwt, mockOAuthAccessTokenJwtPayload } from '../../fixtures';
 import {
   API_KEY_PREFIX,
   getMachineTokenType,
+  isJwtFormat,
   isMachineTokenByPrefix,
   isMachineTokenType,
+  isOAuthJwt,
   isTokenTypeAccepted,
   M2M_TOKEN_PREFIX,
   OAUTH_TOKEN_PREFIX,
@@ -89,5 +92,48 @@ describe('isMachineTokenType', () => {
 
   it('returns false for non-machine token types', () => {
     expect(isMachineTokenType('session_token')).toBe(false);
+  });
+});
+
+describe('isJwtFormat', () => {
+  it('returns true for valid JWT format', () => {
+    expect(isJwtFormat('header.payload.signature')).toBe(true);
+    expect(isJwtFormat('a.b.c')).toBe(true);
+  });
+
+  it('returns false for invalid JWT format', () => {
+    expect(isJwtFormat('invalid')).toBe(false);
+    expect(isJwtFormat('invalid.jwt')).toBe(false);
+    expect(isJwtFormat('invalid.jwt.token.extra')).toBe(false);
+  });
+});
+
+describe('isOAuthJwt', () => {
+  it('returns true for JWT with typ "at+jwt"', () => {
+    const token = createJwt({
+      header: { typ: 'at+jwt', kid: 'ins_whatever' },
+      payload: mockOAuthAccessTokenJwtPayload,
+    });
+    expect(isOAuthJwt(token)).toBe(true);
+  });
+
+  it('returns true for JWT with typ "application/at+jwt"', () => {
+    const token = createJwt({
+      header: { typ: 'application/at+jwt', kid: 'ins_whatever' },
+      payload: mockOAuthAccessTokenJwtPayload,
+    });
+    expect(isOAuthJwt(token)).toBe(true);
+  });
+
+  it('returns false for JWT with other typ', () => {
+    const token = createJwt({
+      header: { typ: 'JWT', kid: 'ins_whatever' },
+      payload: mockOAuthAccessTokenJwtPayload,
+    });
+    expect(isOAuthJwt(token)).toBe(false);
+  });
+
+  it('returns false for non-JWT token', () => {
+    expect(isOAuthJwt('not.a.jwt')).toBe(false);
   });
 });
