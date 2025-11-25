@@ -374,6 +374,18 @@
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
+    },
+    "//#test:integration:outage-mode": {
+      "dependsOn": [
+        "@clerk/testing#build",
+        "@clerk/clerk-js#build",
+        "@clerk/backend#build",
+        "@clerk/nextjs#build",
+        "@clerk/clerk-react#build"
+      ],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "ORIGIN_OUTAGE_MODE_OPT_IN_SECRET"],
+      "inputs": ["integration/**"],
+      "outputLogs": "new-only"
     }
   }
 }

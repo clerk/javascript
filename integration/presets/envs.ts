@@ -191,6 +191,13 @@ const withProtectService = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service').pk);
 
+const withOutageMode = base
+  .clone()
+  .setId('withOutageMode')
+  .setEnvVariable('private', 'ORIGIN_OUTAGE_MODE_OPT_IN_SECRET', '9e890823')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
+
 export const envs = {
   base,
   sessionsProd1,
@@ -219,4 +226,5 @@ export const envs = {
   withWaitlistdMode,
   withWhatsappPhoneCode,
   withProtectService,
+  withOutageMode,
 } as const;
