@@ -20,3 +20,5 @@ export {
 } from './contexts';
 
 export * from './billing/payment-element';
+
+export { PortalProvider, usePortalRoot } from './PortalProvider';

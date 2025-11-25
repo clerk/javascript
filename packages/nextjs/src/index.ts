@@ -8,6 +8,7 @@ export {
   ClerkFailed,
   ClerkLoaded,
   ClerkLoading,
+  PortalProvider,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
