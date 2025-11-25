@@ -15,7 +15,7 @@ import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
-import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
+import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_ACCESS_TOKEN_TYPES, OAUTH_TOKEN_PREFIX } from './machine';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 
@@ -205,107 +205,104 @@ async function verifyM2MToken(
   }
 }
 
+async function verifyJwtOAuthToken(
+  accessToken: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
+  let decoded: JwtReturnType<Jwt, TokenVerificationError>;
+  try {
+    decoded = decodeJwt(accessToken);
+  } catch (e) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: (e as Error).message,
+        }),
+      ],
+    };
+  }
+
+  const { data: decodedResult, errors } = decoded;
+  if (errors) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: errors[0].message,
+        }),
+      ],
+    };
+  }
+
+  const { header } = decodedResult;
+  const { kid } = header;
+  let key: JsonWebKey;
+
+  try {
+    if (options.jwtKey) {
+      key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
+    } else if (options.secretKey) {
+      key = await loadClerkJWKFromRemote({ ...options, kid });
+    } else {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            action: TokenVerificationErrorAction.SetClerkJWTKey,
+            message: 'Failed to resolve JWK during verification.',
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          }),
+        ],
+      };
+    }
+
+    const { data: payload, errors: verifyErrors } = await verifyJwt(accessToken, {
+      ...options,
+      key,
+      headerType: OAUTH_ACCESS_TOKEN_TYPES,
+    });
+
+    if (verifyErrors) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: verifyErrors[0].message,
+          }),
+        ],
+      };
+    }
+
+    const token = IdPOAuthAccessToken.fromJwtPayload(payload, options.clockSkewInMs);
+
+    return { data: token, tokenType: TokenType.OAuthToken, errors: undefined };
+  } catch (error) {
+    return {
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: (error as Error).message,
+        }),
+      ],
+    };
+  }
+}
+
 async function verifyOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   if (isJwtFormat(accessToken)) {
-    let decoded: JwtReturnType<Jwt, TokenVerificationError>;
-    try {
-      decoded = decodeJwt(accessToken);
-    } catch (e) {
-      return {
-        tokenType: TokenType.OAuthToken,
-        errors: [
-          new MachineTokenVerificationError({
-            code: MachineTokenVerificationErrorCode.TokenInvalid,
-            message: (e as Error).message,
-          }),
-        ],
-      };
-    }
-
-    const { data: decodedResult, errors } = decoded;
-    if (errors) {
-      return {
-        tokenType: TokenType.OAuthToken,
-        errors: [
-          new MachineTokenVerificationError({
-            code: MachineTokenVerificationErrorCode.TokenInvalid,
-            message: errors[0].message,
-          }),
-        ],
-      };
-    }
-
-    const { header } = decodedResult;
-    const { kid } = header;
-    let key: JsonWebKey;
-
-    try {
-      if (options.jwtKey) {
-        key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
-      } else if (options.secretKey) {
-        key = await loadClerkJWKFromRemote({ ...options, kid });
-      } else {
-        return {
-          tokenType: TokenType.OAuthToken,
-          errors: [
-            new MachineTokenVerificationError({
-              action: TokenVerificationErrorAction.SetClerkJWTKey,
-              message: 'Failed to resolve JWK during verification.',
-              code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-            }),
-          ],
-        };
-      }
-
-      const { data: payload, errors: verifyErrors } = await verifyJwt(accessToken, {
-        ...options,
-        key,
-        headerType: ['at+jwt', 'application/at+jwt'],
-      });
-
-      if (verifyErrors) {
-        return {
-          tokenType: TokenType.OAuthToken,
-          errors: [
-            new MachineTokenVerificationError({
-              code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-              message: verifyErrors[0].message,
-            }),
-          ],
-        };
-      }
-
-      const jti = payload.jti as string;
-      if (!jti || !/^oat_[0-9A-Za-z]+$/.test(jti)) {
-        return {
-          tokenType: TokenType.OAuthToken,
-          errors: [
-            new MachineTokenVerificationError({
-              action: TokenVerificationErrorAction.EnsureClerkJWT,
-              message: `Invalid JWT jti claim ${JSON.stringify(jti)}. Expected a valid OAuth access token ID.`,
-              code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-            }),
-          ],
-        };
-      }
-
-      const token = IdPOAuthAccessToken.fromJwtPayload(payload, options.clockSkewInMs);
-
-      return { data: token, tokenType: TokenType.OAuthToken, errors: undefined };
-    } catch (error) {
-      return {
-        tokenType: TokenType.OAuthToken,
-        errors: [
-          new MachineTokenVerificationError({
-            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-            message: (error as Error).message,
-          }),
-        ],
-      };
-    }
+    return verifyJwtOAuthToken(accessToken, options);
   }
 
   try {

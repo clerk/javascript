@@ -19,7 +19,7 @@ export function isJwtFormat(token: string): boolean {
  * Valid OAuth 2.0 JWT access token type values per RFC 9068.
  * @see https://www.rfc-editor.org/rfc/rfc9068.html#section-2.1
  */
-const OAUTH_ACCESS_TOKEN_TYPES = ['at+jwt', 'application/at+jwt'] as const;
+export const OAUTH_ACCESS_TOKEN_TYPES = ['at+jwt', 'application/at+jwt'];
 
 export function isOAuthJwt(token: string): boolean {
   if (!isJwtFormat(token)) {

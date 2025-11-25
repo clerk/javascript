@@ -366,33 +366,6 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       );
     });
 
-    it('fails if jti is missing or invalid format', async () => {
-      server.use(
-        http.get(
-          'https://api.clerk.test/v1/jwks',
-          validateHeaders(() => {
-            return HttpResponse.json(mockJwks);
-          }),
-        ),
-      );
-
-      const invalidPayload = { ...mockOAuthAccessTokenJwtPayload, jti: 'invalid' };
-      vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
-        data: { ...invalidPayload, __raw: 'mock_jwt_string' },
-      });
-
-      const oauthJwt = createOAuthJwt(invalidPayload, 'at+jwt');
-
-      const result = await verifyMachineAuthToken(oauthJwt, {
-        apiUrl: 'https://api.clerk.test',
-        secretKey: 'a-valid-key',
-      });
-
-      expect(result.errors).toBeDefined();
-      expect(result.errors?.[0].code).toBe('token-verification-failed');
-      expect(result.errors?.[0].message).toContain('Invalid JWT jti claim');
-    });
-
     it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
       server.use(
         http.get(
@@ -403,7 +376,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT'); // Wrong type
+      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'JWT');
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -455,6 +428,56 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       });
 
       expect(result.errors).toBeDefined();
+    });
+
+    it('rejects JWT with alg: none', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const oauthJwt = createJwt({
+        header: { typ: 'at+jwt', alg: 'none', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
+        payload: mockOAuthAccessTokenJwtPayload,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].message).toContain('Invalid JWT algorithm');
+    });
+
+    it('rejects expired JWT', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const expiredPayload = {
+        ...mockOAuthAccessTokenJwtPayload,
+        exp: mockOAuthAccessTokenJwtPayload.iat - 100,
+      };
+
+      const oauthJwt = createOAuthJwt(expiredPayload, 'at+jwt');
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.[0].message).toContain('expired');
     });
   });
 });
