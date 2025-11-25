@@ -3,8 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../../api';
 import { createJwt, mockJwks, mockJwt, mockJwtPayload, mockOAuthAccessTokenJwtPayload } from '../../fixtures';
-import { mockVerificationResults } from '../../fixtures/machine';
-import * as VerifyJwtModule from '../../jwt/verifyJwt';
+import {
+  mockSignedOAuthAccessTokenJwt,
+  mockSignedOAuthAccessTokenJwtApplicationTyp,
+  mockVerificationResults,
+} from '../../fixtures/machine';
 import { server, validateHeaders } from '../../mock-server';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
@@ -326,6 +329,15 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
   });
 
   describe('verifyOAuthToken with JWT', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(mockJwtPayload.iat * 1000));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
     it('verifies a valid OAuth JWT', async () => {
       server.use(
         http.get(
@@ -336,13 +348,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const spy = vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
-        data: { ...mockOAuthAccessTokenJwtPayload, __raw: 'mock_jwt_string' },
-      });
-
-      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'at+jwt');
-
-      const result = await verifyMachineAuthToken(oauthJwt, {
+      const result = await verifyMachineAuthToken(mockSignedOAuthAccessTokenJwt, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
       });
@@ -357,13 +363,6 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['read:foo', 'write:bar']);
-
-      expect(spy).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          headerType: ['at+jwt', 'application/at+jwt'],
-        }),
-      );
     });
 
     it('fails if JWT type is not at+jwt or application/at+jwt', async () => {
@@ -397,26 +396,13 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const spy = vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
-        data: { ...mockOAuthAccessTokenJwtPayload, __raw: 'mock_jwt_string' },
-      });
-
-      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'application/at+jwt');
-
-      const result = await verifyMachineAuthToken(oauthJwt, {
+      const result = await verifyMachineAuthToken(mockSignedOAuthAccessTokenJwtApplicationTyp, {
         apiUrl: 'https://api.clerk.test',
         secretKey: 'a-valid-key',
       });
 
       expect(result.tokenType).toBe('oauth_token');
       expect(result.errors).toBeUndefined();
-
-      expect(spy).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          headerType: ['at+jwt', 'application/at+jwt'],
-        }),
-      );
     });
 
     it('handles invalid JWT format', async () => {

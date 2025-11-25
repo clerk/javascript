@@ -59,11 +59,6 @@ export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSigna
   ].join('.');
 };
 
-export const mockOAuthAccessTokenJwt = createJwt({
-  header: { typ: 'at+jwt' },
-  payload: mockOAuthAccessTokenJwtPayload,
-});
-
 export const mockRsaJwkKid = 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD';
 
 export const mockRsaJwk = {
