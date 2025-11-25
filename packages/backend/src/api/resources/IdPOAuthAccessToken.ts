@@ -33,6 +33,10 @@ export class IdPOAuthAccessToken {
     );
   }
 
+  /**
+   * Creates an IdPOAuthAccessToken from a JWT payload.
+   * Maps standard JWT claims and OAuth-specific fields to token properties.
+   */
   static fromJwtPayload(payload: JwtPayload, clockSkewInMs = 5000): IdPOAuthAccessToken {
     const oauthPayload = payload as JwtPayload & { scope?: string; scp?: string[]; client_id?: string; jti?: string };
 
