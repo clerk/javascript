@@ -1,6 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Simplify } from '@clerk/shared/types';
-import type { Jwt, JwtPayload } from '@clerk/types';
+import type { Jwt, JwtPayload, Simplify } from '@clerk/shared/types';
 
 import { type APIKey, IdPOAuthAccessToken, type M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
@@ -280,7 +279,7 @@ async function verifyOAuthToken(
       }
 
       const jti = payload.jti as string;
-      if (!jti || !/^oat_[0-9A-Za-z]{32}$/.test(jti)) {
+      if (!jti || !/^oat_[0-9A-Za-z]+$/.test(jti)) {
         return {
           tokenType: TokenType.OAuthToken,
           errors: [

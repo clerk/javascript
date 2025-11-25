@@ -337,16 +337,11 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const validJtiPayload = {
-        ...mockOAuthAccessTokenJwtPayload,
-        jti: 'oat_12345678901234567890123456789012',
-      };
-
       const spy = vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
-        data: { ...validJtiPayload, __raw: 'mock_jwt_string' },
+        data: { ...mockOAuthAccessTokenJwtPayload, __raw: 'mock_jwt_string' },
       });
 
-      const oauthJwt = createOAuthJwt(validJtiPayload, 'at+jwt');
+      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'at+jwt');
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
@@ -358,7 +353,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeUndefined();
 
       const data = result.data as IdPOAuthAccessToken;
-      expect(data.id).toBe('oat_12345678901234567890123456789012');
+      expect(data.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
       expect(data.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
@@ -430,16 +425,11 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         ),
       );
 
-      const validJtiPayload = {
-        ...mockOAuthAccessTokenJwtPayload,
-        jti: 'oat_12345678901234567890123456789012',
-      };
-
       const spy = vi.spyOn(VerifyJwtModule, 'verifyJwt').mockResolvedValueOnce({
-        data: { ...validJtiPayload, __raw: 'mock_jwt_string' },
+        data: { ...mockOAuthAccessTokenJwtPayload, __raw: 'mock_jwt_string' },
       });
 
-      const oauthJwt = createOAuthJwt(validJtiPayload, 'application/at+jwt');
+      const oauthJwt = createOAuthJwt(mockOAuthAccessTokenJwtPayload, 'application/at+jwt');
 
       const result = await verifyMachineAuthToken(oauthJwt, {
         apiUrl: 'https://api.clerk.test',
