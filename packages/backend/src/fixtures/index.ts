@@ -39,7 +39,7 @@ export const mockOAuthAccessTokenJwtPayload = {
   sub: 'user_2vYVtestTESTtestTESTtestTESTtest',
   client_id: 'client_2VTWUzvGC5UhdJCNx6xG1D98edc',
   scope: 'read:foo write:bar',
-  jti: 'oat_01234567890123456789012345678901',
+  jti: 'oat_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE',
   exp: mockJwtPayload.iat + 300,
   iat: mockJwtPayload.iat,
   nbf: mockJwtPayload.iat - 10,

@@ -353,7 +353,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors).toBeUndefined();
 
       const data = result.data as IdPOAuthAccessToken;
-      expect(data.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
+      expect(data.id).toBe('oat_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
       expect(data.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
