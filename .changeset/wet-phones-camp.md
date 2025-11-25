@@ -1,2 +1,3 @@
 ---
+'@clerk/shared': patch
 ---
