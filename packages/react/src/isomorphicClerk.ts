@@ -677,6 +677,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountTaskChooseOrganization(node, props);
     });
 
+    this.premountTaskResetPasswordNodes.forEach((props, node) => {
+      clerkjs.mountTaskResetPassword(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -1219,7 +1223,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  mountTaskResetPassword = (node: HTMLDivElement, props?: TaskResetPasswordProps): void => {
+  __experimental_mountTaskResetPassword = (node: HTMLDivElement, props?: TaskResetPasswordProps): void => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.mountTaskResetPassword(node, props);
     } else {
