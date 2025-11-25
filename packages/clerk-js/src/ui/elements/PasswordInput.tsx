@@ -31,6 +31,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     setWarning,
     setError,
     setHasPassedComplexity,
+    tabIndex,
     ...rest
   } = props;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +87,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     >
       <Input
         {...rest}
+        tabIndex={tabIndex}
         onChange={onChange}
         onBlur={e => {
           rest.onBlur?.(e);
@@ -108,6 +110,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='ghost'
         size='xs'
+        tabIndex={tabIndex}
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',
