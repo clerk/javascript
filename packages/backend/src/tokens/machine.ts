@@ -48,7 +48,7 @@ export function isMachineTokenByPrefix(token: string): boolean {
 }
 
 /**
- * Checks if a token is a machine token by looking at its prefix or if it's a JWT with header typ 'at+jwt'.
+ * Checks if a token is a machine token by looking at its prefix or if it's an OAuth JWT access token (RFC 9068).
  *
  * @param token - The token string to check
  * @returns true if the token is a machine token
