@@ -102,7 +102,6 @@
   },
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
-    "@react-native-google-signin/google-signin": "^16.0.0",
     "@types/base-64": "^1.0.2",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",

@@ -1,17 +1,43 @@
-const { createRunOncePlugin } = require('@expo/config-plugins');
+const { createRunOncePlugin, withInfoPlist } = require('@expo/config-plugins');
 
 /**
  * Expo config plugin for @clerk/clerk-expo.
  *
- * This plugin is currently a no-op because the native Android module is
- * automatically linked via expo-module.config.json and Expo autolinking.
- *
- * The native Google Sign-In module is included in the android/ folder of
- * the package, and Expo autolinking automatically handles the Gradle
- * configuration needed to include it in Android builds.
+ * This plugin configures the iOS URL scheme required for Google Sign-In.
+ * The native Android module is automatically linked via expo-module.config.json.
  */
 function withClerkGoogleSignIn(config) {
-  // No-op: Expo autolinking handles the android module via expo-module.config.json
+  // Get the iOS URL scheme from environment or config.extra
+  // We capture it here before entering the mod callback
+  const iosUrlScheme =
+    process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME || config.extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_URL_SCHEME;
+
+  if (!iosUrlScheme) {
+    // No URL scheme configured, skip iOS configuration
+    return config;
+  }
+
+  // Add iOS URL scheme for Google Sign-In
+  config = withInfoPlist(config, modConfig => {
+    if (!Array.isArray(modConfig.modResults.CFBundleURLTypes)) {
+      modConfig.modResults.CFBundleURLTypes = [];
+    }
+
+    // Check if the scheme is already added to avoid duplicates
+    const schemeExists = modConfig.modResults.CFBundleURLTypes.some(urlType =>
+      urlType.CFBundleURLSchemes?.includes(iosUrlScheme),
+    );
+
+    if (!schemeExists) {
+      // Add Google Sign-In URL scheme
+      modConfig.modResults.CFBundleURLTypes.push({
+        CFBundleURLSchemes: [iosUrlScheme],
+      });
+    }
+
+    return modConfig;
+  });
+
   return config;
 }
 
