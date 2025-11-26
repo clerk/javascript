@@ -2781,8 +2781,8 @@ export class Clerk implements ClerkInterface {
       };
 
       const initComponents = () => {
-        if (Clerk.mountComponentRenderer && !this.#componentControls) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.environment as Environment, this.#options);
+        if (Clerk.mountComponentRenderer && !this.#componentControls && this.environment) {
+          this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
         }
       };
 
