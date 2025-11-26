@@ -45,20 +45,6 @@ export const mockOAuthAccessTokenJwtPayload = {
   nbf: mockJwtPayload.iat - 10,
 };
 
-type CreateJwt = (opts?: { header?: any; payload?: any; signature?: string }) => string;
-export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSignature } = {}) => {
-  const encoder = new TextEncoder();
-
-  const stringifiedHeader = JSON.stringify({ ...mockJwtHeader, ...header });
-  const stringifiedPayload = JSON.stringify({ ...mockJwtPayload, ...payload });
-
-  return [
-    base64url.stringify(encoder.encode(stringifiedHeader), { pad: false }),
-    base64url.stringify(encoder.encode(stringifiedPayload), { pad: false }),
-    signature,
-  ].join('.');
-};
-
 export const mockRsaJwkKid = 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD';
 
 export const mockRsaJwk = {
@@ -176,6 +162,20 @@ export const signedJwt =
 
 export const pkTest = 'pk_test_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
 export const pkLive = 'pk_live_Y2xlcmsuaW5zcGlyZWQucHVtYS03NC5sY2wuZGV2JA';
+
+type CreateJwt = (opts?: { header?: any; payload?: any; signature?: string }) => string;
+export const createJwt: CreateJwt = ({ header, payload, signature = mockJwtSignature } = {}) => {
+  const encoder = new TextEncoder();
+
+  const stringifiedHeader = JSON.stringify({ ...mockJwtHeader, ...header });
+  const stringifiedPayload = JSON.stringify({ ...mockJwtPayload, ...payload });
+
+  return [
+    base64url.stringify(encoder.encode(stringifiedHeader), { pad: false }),
+    base64url.stringify(encoder.encode(stringifiedPayload), { pad: false }),
+    signature,
+  ].join('.');
+};
 
 export function createCookieHeader(cookies: Record<string, string>): string {
   return Object.keys(cookies)
