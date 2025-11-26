@@ -2,7 +2,7 @@ import { useClerk, useReverification } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/shared/types';
 
 import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
-import { useTaskResetPasswordContext } from '@/ui/contexts/components/SessionTasks';
+import { useSessionTasksContext, useTaskResetPasswordContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -10,12 +10,10 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { useConfirmPassword } from '@/ui/hooks';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
-import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
-
-import { withTaskGuard } from './withTaskGuard';
+import { withTaskGuard } from '../withTaskGuard';
 
 const TaskResetPasswordInternal = () => {
   const clerk = useClerk();
@@ -25,8 +23,8 @@ const TaskResetPasswordInternal = () => {
   } = useEnvironment();
 
   const { t, locale } = useLocalizations();
-  const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskResetPasswordContext();
+  const { navigateOnSetActive } = useSessionTasksContext();
   const { otherSessions } = useMultipleSessions({ user: clerk.user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const updatePasswordWithReverification = useReverification(
@@ -74,14 +72,15 @@ const TaskResetPasswordInternal = () => {
     }
   };
 
-  const resetPassword = async () => {
-    await card.runAsync(async () => {
+  const resetPassword = () => {
+    return card.runAsync(async () => {
       if (!clerk.user) {
         return;
       }
 
       passwordField.clearFeedback();
       confirmField.clearFeedback();
+
       try {
         await updatePasswordWithReverification(clerk.user, [
           {
@@ -90,18 +89,13 @@ const TaskResetPasswordInternal = () => {
           },
         ]);
 
-        // Handle the next task if it exists or redirect to the complete url
-        const task = clerk.session?.currentTask;
-        if (task && task.key !== 'reset-password') {
-          await navigate(
-            clerk.buildTasksUrl({
-              redirectUrl: redirectUrlComplete,
-            }),
-          );
-          return;
-        }
-
-        await navigate(redirectUrlComplete);
+        // Update session to have the latest list of tasks (eg: if reset-password gets resolved)
+        await clerk.setActive({
+          session: clerk.session,
+          navigate: async ({ session }) => {
+            await navigateOnSetActive({ session, redirectUrl: redirectUrlComplete });
+          },
+        });
       } catch (e) {
         return handleError(e, [passwordField, confirmField], card.setError);
       }
@@ -164,6 +158,7 @@ const TaskResetPasswordInternal = () => {
                 </Col>
                 <Col gap={3}>
                   <Form.SubmitButton
+                    isLoading={card.isLoading}
                     isDisabled={!canSubmit}
                     localizationKey={localizationKeys('taskResetPassword.formButtonPrimary')}
                   />
@@ -203,5 +198,5 @@ const TaskResetPasswordInternal = () => {
 };
 
 export const TaskResetPassword = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskResetPasswordInternal)),
+  withTaskGuard(withCardStateProvider(TaskResetPasswordInternal), 'reset-password'),
 );
