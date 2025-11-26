@@ -28,7 +28,11 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
-import { TaskChooseOrganizationContext, TaskResetPasswordContext } from './components/SessionTasks';
+import {
+  SessionTasksContext,
+  TaskChooseOrganizationContext,
+  TaskResetPasswordContext,
+} from './components/SessionTasks';
 
 export function ComponentContextProvider({
   componentName,
@@ -124,7 +128,9 @@ export function ComponentContextProvider({
         <TaskChooseOrganizationContext.Provider
           value={{ componentName: 'TaskChooseOrganization', ...(props as TaskChooseOrganizationProps) }}
         >
-          {children}
+          <SessionTasksContext.Provider value={{ ...(props as TaskChooseOrganizationProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
         </TaskChooseOrganizationContext.Provider>
       );
     case 'TaskResetPassword':
@@ -132,7 +138,9 @@ export function ComponentContextProvider({
         <TaskResetPasswordContext.Provider
           value={{ componentName: 'TaskResetPassword', ...(props as TaskResetPasswordProps) }}
         >
-          {children}
+          <SessionTasksContext.Provider value={{ ...(props as TaskResetPasswordProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
         </TaskResetPasswordContext.Provider>
       );
     default:

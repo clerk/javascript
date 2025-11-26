@@ -6,10 +6,18 @@ import { withRedirect } from '@/ui/common';
 import { useSessionTasksContext } from '@/ui/contexts/components/SessionTasks';
 import type { AvailableComponentProps } from '@/ui/types';
 
+/**
+ * Triggers a redirect if current task is not the given task key.
+ *
+ * If there's a current session, it will redirect to the `redirectUrlComplete` prop.
+ * If there's no current session, it will redirect to the sign in URL.
+ *
+ * @internal
+ */
 export const withTaskGuard = <P extends AvailableComponentProps>(
   Component: ComponentType<P>,
   taskKey: SessionTask['key'],
-) => {
+): ((props: P) => null | JSX.Element) => {
   const displayName = Component.displayName || Component.name || 'Component';
   Component.displayName = displayName;
 

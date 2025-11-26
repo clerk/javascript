@@ -1,6 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
 import { Flow } from '@/ui/customizables';
@@ -8,7 +7,7 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
-import { getTaskEndpoint, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
+import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import {
   SessionTasksContext,
   TaskChooseOrganizationContext,
@@ -86,7 +85,7 @@ type SessionTasksProps = {
  */
 export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
-  const { navigate, basePath, startPath } = useRouter();
+  const { navigate } = useRouter();
 
   const currentTaskContainer = useRef<HTMLDivElement>(null);
 
@@ -121,21 +120,8 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
     );
   }
 
-  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
-    const currentTask = session.currentTask;
-    if (!currentTask) {
-      return navigate(redirectUrlComplete);
-    }
-
-    const taskEndpoint = getTaskEndpoint(currentTask);
-
-    // Base path is required for virtual routing with start path
-    // eg: to navigate from /sign-in/factor-one to /sign-in/tasks/choose-organization
-    return navigate(`/${basePath + startPath + taskEndpoint}`);
-  };
-
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );
