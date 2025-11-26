@@ -13,7 +13,7 @@ export const withTaskGuard = <P extends AvailableComponentProps>(Component: Comp
     const ctx = useTaskResetPasswordContext();
     return withRedirect(
       Component,
-      clerk => !clerk.session?.currentTask,
+      clerk => !clerk.session?.currentTask || clerk.session.currentTask.key !== 'reset-password',
       ({ clerk }) =>
         !clerk.session ? clerk.buildSignInUrl() : (ctx.redirectUrlComplete ?? clerk.buildAfterSignInUrl()),
       warnings.cannotRenderComponentWhenTaskDoesNotExist,
