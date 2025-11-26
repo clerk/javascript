@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.24.0
+
+### Minor Changes
+
+- Fix TypeScript return type for `clerk.client.waitlistEntries.list()` and export `WaitlistEntry` type. ([#7280](https://github.com/clerk/javascript/pull/7280)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44)]:
+  - @clerk/shared@3.36.0
+  - @clerk/types@4.101.3
+
 ## 2.23.2
 
 ### Patch Changes

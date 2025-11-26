@@ -762,7 +762,11 @@ export class Clerk implements ClerkInterface {
 
     switch (setting) {
       case 'organizations': {
-        const isSettingDisabled = disabledOrganizationsFeature(this, this.environment);
+        const isSettingDisabled =
+          disabledOrganizationsFeature(this, this.environment) &&
+          // Handles case where environment gets enabled via BAPI, but it gets cached and the user is redirected to the choose-organization task
+          // The enable org prompt should not appear in the task screen since orgs have already been enabled
+          this.session?.currentTask?.key !== 'choose-organization';
 
         if (!isSettingDisabled) {
           return { isEnabled: true };

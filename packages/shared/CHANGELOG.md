@@ -1,5 +1,15 @@
 # Change Log
 
+## 3.36.0
+
+### Minor Changes
+
+- Introduce in-app development prompt to enable the Organizations feature ([#7159](https://github.com/clerk/javascript/pull/7159)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  In development instances, when using organization components or hooks for the first time, developers will see a prompt to enable the Organizations feature directly in their app, eliminating the need to visit the Clerk Dashboard.
+
+- Creates compatibility layer for SWR hooks that were previously inside `@clerk/clerk-js` ([#7270](https://github.com/clerk/javascript/pull/7270)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.35.2
 
 ### Patch Changes

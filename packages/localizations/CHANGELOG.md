@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.28.5
+
+### Patch Changes
+
+- Improve Japanese (ja-JP) translations ([#7216](https://github.com/clerk/javascript/pull/7216)) by [@kaz](https://github.com/kaz)
+
+## 3.28.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.3
+
 ## 3.28.3
 
 ### Patch Changes
