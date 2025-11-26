@@ -1,4 +1,4 @@
-import type { GenerateSignature, GenerateSolanaSignatureParams, Web3Provider } from '@clerk/shared/types';
+import type { GenerateSignature, Web3Provider } from '@clerk/shared/types';
 import type { SolanaWalletAdapterWallet } from '@solana/wallet-standard';
 
 import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
@@ -115,7 +115,7 @@ export async function generateSignatureWithBase(params: GenerateSignatureParams)
   return await generateWeb3Signature({ ...params, provider: 'base' });
 }
 
-export async function generateSignatureWithSolana(params: GenerateSolanaSignatureParams): Promise<string> {
+export async function generateSignatureWithSolana(params: GenerateSignatureParams): Promise<string> {
   return await generateWeb3Signature({ ...params, provider: 'solana' });
 }
 
@@ -157,7 +157,7 @@ async function getWeb3Wallet(provider: Web3Provider, walletName?: string) {
   }
 
   if (provider === 'solana') {
-    if (!walletName) {
+    if (!walletName || walletName.length === 0) {
       errorThrower.throw('Wallet name must be provided to get Solana wallet provider');
       return;
     }
