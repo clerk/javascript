@@ -1,3 +1,5 @@
+import { requireNativeModule } from 'expo-modules-core';
+
 import type {
   CancelledResponse,
   ConfigureParams,
@@ -23,8 +25,7 @@ let _nativeModule: ClerkGoogleSignInNativeModule | null = null;
 
 function getNativeModule(): ClerkGoogleSignInNativeModule {
   if (!_nativeModule) {
-    const { requireNativeModule } = require('expo-modules-core');
-    _nativeModule = requireNativeModule('ClerkGoogleSignIn') as ClerkGoogleSignInNativeModule;
+    _nativeModule = requireNativeModule<ClerkGoogleSignInNativeModule>('ClerkGoogleSignIn');
   }
   return _nativeModule;
 }
