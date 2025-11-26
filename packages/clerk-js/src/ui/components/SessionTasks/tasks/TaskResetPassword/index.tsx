@@ -13,7 +13,8 @@ import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
-import { withTaskGuard } from '../withTaskGuard';
+
+import { withTaskGuard } from '../shared/withTaskGuard';
 
 const TaskResetPasswordInternal = () => {
   const clerk = useClerk();
