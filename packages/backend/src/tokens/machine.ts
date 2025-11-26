@@ -21,13 +21,21 @@ export function isJwtFormat(token: string): boolean {
  */
 export const OAUTH_ACCESS_TOKEN_TYPES = ['at+jwt', 'application/at+jwt'];
 
+/**
+ * Checks if a token is an OAuth 2.0 JWT access token.
+ * Validates the JWT format and verifies the header 'typ' field matches RFC 9068 values.
+ *
+ * @param token - The token string to check
+ * @returns true if the token is a valid OAuth JWT access token
+ * @see https://www.rfc-editor.org/rfc/rfc9068.html#section-2.1
+ */
 export function isOAuthJwt(token: string): boolean {
   if (!isJwtFormat(token)) {
     return false;
   }
   try {
     const { data, errors } = decodeJwt(token);
-    return !errors && OAUTH_ACCESS_TOKEN_TYPES.includes(data.header.typ as (typeof OAUTH_ACCESS_TOKEN_TYPES)[number]);
+    return !errors && !!data && OAUTH_ACCESS_TOKEN_TYPES.includes(data.header.typ as (typeof OAUTH_ACCESS_TOKEN_TYPES)[number]);
   } catch {
     return false;
   }
