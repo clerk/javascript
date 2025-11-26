@@ -25,12 +25,12 @@ const TaskResetPasswordInternal = () => {
 
   const { t, locale } = useLocalizations();
   const { redirectUrlComplete } = useTaskResetPasswordContext();
-  const { navigateOnSetActive } = useSessionTasksContext();
   const { otherSessions } = useMultipleSessions({ user: clerk.user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const updatePasswordWithReverification = useReverification(
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
   );
+  const { navigateOnSetActive } = useSessionTasksContext();
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
@@ -94,7 +94,7 @@ const TaskResetPasswordInternal = () => {
         await clerk.setActive({
           session: clerk.session,
           navigate: async ({ session }) => {
-            await navigateOnSetActive({ session, redirectUrl: redirectUrlComplete });
+            await navigateOnSetActive?.({ session, redirectUrlComplete });
           },
         });
       } catch (e) {
