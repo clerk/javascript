@@ -255,19 +255,19 @@ describe('Clerk singleton', () => {
       try {
         const loadPromise = sut.load();
 
+        // Attach rejection handler before advancing timers to avoid unhandled rejection
+        const expectation = expect(loadPromise).rejects.toThrow(/Something went wrong initializing Clerk/);
         await vi.runAllTimersAsync();
 
-        try {
-          await loadPromise;
-          throw new Error('Expected load to throw');
-        } catch (err) {
-          expect(err).toBeInstanceOf(Error);
-          expect((err as Error).message).toMatch(/Something went wrong initializing Clerk/);
-          const cause = (err as Error).cause as any;
-          expect(cause).toBeDefined();
-          expect(cause.code).toBe('network_error');
-          expect(cause.clerkRuntimeError).toBe(true);
-        }
+        const err = await loadPromise.catch(e => e);
+        expect(err).toBeInstanceOf(Error);
+        expect((err as Error).message).toMatch(/Something went wrong initializing Clerk/);
+        const cause = (err as Error).cause as any;
+        expect(cause).toBeDefined();
+        expect(cause.code).toBe('network_error');
+        expect(cause.clerkRuntimeError).toBe(true);
+
+        await expectation;
 
         expect(mountSpy).toHaveBeenCalledTimes(2);
         expect(mockClientFetch).toHaveBeenCalledTimes(2);

@@ -7,7 +7,7 @@ export interface RetryOptions {
 const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 const calculateBackoff = (attempt: number, jitter: boolean): number => {
-  const baseDelay = Math.pow(2, attempt) * 1_000;
+  const baseDelay = Math.pow(2, attempt + 1) * 1_000;
 
   if (!jitter) {
     return baseDelay;

@@ -54,8 +54,10 @@ describe('withRetry', () => {
       shouldRetry: () => false,
     });
 
+    // Attach rejection handler before advancing timers to avoid unhandled rejection
+    const expectation = expect(promise).rejects.toThrow('failure');
     await vi.runAllTimersAsync();
-    await expect(promise).rejects.toThrow('failure');
+    await expectation;
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
@@ -68,8 +70,10 @@ describe('withRetry', () => {
       shouldRetry: () => true,
     });
 
+    // Attach rejection handler before advancing timers to avoid unhandled rejection
+    const expectation = expect(promise).rejects.toThrow('persistent failure');
     await vi.runAllTimersAsync();
-    await expect(promise).rejects.toThrow('persistent failure');
+    await expectation;
     expect(fn).toHaveBeenCalledTimes(3);
   });
 
@@ -110,8 +114,10 @@ describe('withRetry', () => {
       shouldRetry,
     });
 
+    // Attach rejection handler before advancing timers to avoid unhandled rejection
+    const expectation = expect(promise).rejects.toThrow('failure');
     await vi.runAllTimersAsync();
-    await expect(promise).rejects.toThrow('failure');
+    await expectation;
 
     expect(shouldRetry).toHaveBeenCalledTimes(1);
     expect(shouldRetry).toHaveBeenCalledWith(error);
@@ -146,12 +152,15 @@ describe('withRetry', () => {
       shouldRetry: () => true,
     });
 
+    // Attach rejection handler before advancing timers to avoid unhandled rejection
+    const expectation = expect(promise).rejects.toThrow('failure');
+
     await vi.advanceTimersByTimeAsync(0);
     expect(fn).toHaveBeenCalledTimes(1);
 
     await vi.runAllTimersAsync();
     expect(fn).toHaveBeenCalledTimes(2);
 
-    await expect(promise).rejects.toThrow('failure');
+    await expectation;
   });
 });
