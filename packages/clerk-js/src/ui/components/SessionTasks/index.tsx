@@ -8,7 +8,7 @@ import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 
-import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
+import { getTaskEndpoint, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import {
   SessionTasksContext,
   TaskChooseOrganizationContext,
@@ -86,7 +86,8 @@ type SessionTasksProps = {
  */
 export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
-  const { navigate, matches } = useRouter();
+  const { navigate, basePath, startPath } = useRouter();
+
   const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   // If there are no pending tasks, navigate away from the tasks flow.
@@ -103,7 +104,7 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
     }
 
     clerk.telemetry?.record(eventComponentMounted('SessionTask', { task: task.key }));
-  }, [clerk, matches, navigate, redirectUrlComplete]);
+  }, [clerk, navigate, redirectUrlComplete]);
 
   if (!clerk.session?.currentTask) {
     return (
@@ -126,7 +127,11 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
       return navigate(redirectUrlComplete);
     }
 
-    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+    const taskEndpoint = getTaskEndpoint(currentTask);
+
+    // Base path is required for virtual routing with start path
+    // eg: to navigate from /sign-in/factor-one to /sign-in/tasks/choose-organization
+    return navigate(`/${basePath + startPath + taskEndpoint}`);
   };
 
   return (

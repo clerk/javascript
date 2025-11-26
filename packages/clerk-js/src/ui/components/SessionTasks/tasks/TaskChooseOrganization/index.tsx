@@ -8,9 +8,9 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
+import { withTaskGuard } from '../withTaskGuard';
 import { ChooseOrganizationScreen } from './ChooseOrganizationScreen';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
-import { withTaskGuard } from './withTaskGuard';
 
 const TaskChooseOrganizationInternal = () => {
   const { signOut } = useClerk();
@@ -105,5 +105,5 @@ const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrga
 });
 
 export const TaskChooseOrganization = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskChooseOrganizationInternal)),
+  withTaskGuard(withCardStateProvider(TaskChooseOrganizationInternal), 'choose-organization'),
 );
