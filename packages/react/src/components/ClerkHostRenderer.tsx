@@ -78,9 +78,30 @@ export class ClerkHostRenderer extends React.PureComponent<
     const prevProps = without(_prevProps.props, 'customPages', 'customMenuItems', 'children');
     const newProps = without(this.props.props, 'customPages', 'customMenuItems', 'children');
 
+    // Also strip customPages from nested profile props
+    if (prevProps.userProfileProps) {
+      prevProps.userProfileProps = without(prevProps.userProfileProps, 'customPages');
+    }
+    if (newProps.userProfileProps) {
+      newProps.userProfileProps = without(newProps.userProfileProps, 'customPages');
+    }
+    if (prevProps.organizationProfileProps) {
+      prevProps.organizationProfileProps = without(prevProps.organizationProfileProps, 'customPages');
+    }
+    if (newProps.organizationProfileProps) {
+      newProps.organizationProfileProps = without(newProps.organizationProfileProps, 'customPages');
+    }
+
     // instead, we simply use the length of customPages to determine if it changed or not
-    const customPagesChanged = prevProps.customPages?.length !== newProps.customPages?.length;
-    const customMenuItemsChanged = prevProps.customMenuItems?.length !== newProps.customMenuItems?.length;
+    const customPagesChanged =
+      _prevProps.props.customPages?.length !== this.props.props.customPages?.length ||
+      _prevProps.props.userProfileProps?.customPages?.length !==
+        this.props.props.userProfileProps?.customPages?.length ||
+      _prevProps.props.organizationProfileProps?.customPages?.length !==
+        this.props.props.organizationProfileProps?.customPages?.length;
+
+    const customMenuItemsChanged =
+      _prevProps.props.customMenuItems?.length !== this.props.props.customMenuItems?.length;
 
     // Strip out mountIcon and unmountIcon handlers since they're always generated as new function references,
     // which would cause unnecessary re-renders in deep equality checks
