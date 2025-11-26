@@ -16,6 +16,7 @@ import type {
   EmailLinkConfig,
   EmailLinkFactor,
   EnterpriseSSOConfig,
+  GenerateSignature,
   PassKeyConfig,
   PasskeyFactor,
   PhoneCodeConfig,
@@ -468,8 +469,8 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithSolana = async (params?: AuthenticateWithSolanaParams): Promise<SignInResource> => {
-    const identifier = await getSolanaIdentifier({ walletName: params?.walletName });
+  public authenticateWithSolana = async (params: AuthenticateWithSolanaParams): Promise<SignInResource> => {
+    const identifier = await getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({
       identifier,
       generateSignature: generateSignatureWithSolana,
@@ -982,11 +983,12 @@ class SignInFuture implements SignInFutureResource {
 
   async web3(params: SignInFutureWeb3Params): Promise<{ error: ClerkError | null }> {
     const { strategy } = params;
-    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
+    const provider = strategy.replace('web3_', '').replace('_signature', '');
+    // as Web3Provider;
 
     return runAsyncResourceTask(this.resource, async () => {
       let identifier;
-      let generateSignature;
+      let generateSignature: GenerateSignature;
       switch (provider) {
         case 'metamask':
           identifier = await getMetamaskIdentifier();
@@ -1006,11 +1008,9 @@ class SignInFuture implements SignInFutureResource {
           break;
         case 'solana':
           if (!params.walletName) {
-            throw new ClerkRuntimeError('walletName is required for solana web3 authentication', {
-              code: 'missing_wallet_name',
-            });
+            throw new Error('walletName is required for solana web3 authentication');
           }
-          identifier = await getSolanaIdentifier({ walletName: params.walletName });
+          identifier = await getSolanaIdentifier(params.walletName);
           generateSignature = generateSignatureWithSolana;
           break;
         default:
@@ -1041,7 +1041,7 @@ class SignInFuture implements SignInFutureResource {
         signature = await generateSignature({
           identifier,
           nonce: message,
-          walletName: params.walletName,
+          walletName: params?.walletName,
         });
       } catch (err) {
         // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
@@ -1054,7 +1054,6 @@ class SignInFuture implements SignInFutureResource {
           signature = await generateSignature({
             identifier,
             nonce: message,
-            walletName: params.walletName,
           });
         } else {
           throw err;
