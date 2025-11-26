@@ -744,7 +744,7 @@ export interface Clerk {
   /**
    * Returns the configured url where tasks are mounted.
    */
-  buildTasksUrl({ redirectUrl }?: { redirectUrl?: string }): string;
+  buildTasksUrl(opts?: TasksRedirectOptions): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
