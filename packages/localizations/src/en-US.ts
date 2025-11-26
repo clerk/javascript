@@ -892,6 +892,7 @@ export const enUS: LocalizationResource = {
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

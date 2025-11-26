@@ -194,7 +194,7 @@ export const arSA: LocalizationResource = {
     sameDay: "اليوم في {{ date | timeString('en-US') }}",
   },
   dividerText: 'أو',
-  footerActionLink__alternativePhoneCodeProvider: undefined,
+  footerActionLink__alternativePhoneCodeProvider: 'إرسال الرمز عبر الرسائل النصية',
   footerActionLink__useAnotherMethod: 'أختر طريقة أخرى',
   footerPageLink__help: 'المساعدة',
   footerPageLink__privacy: 'الخصوصية',
@@ -225,7 +225,7 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldInput__emailAddress_format: undefined,
+  formFieldInput__emailAddress_format: 'البريد الإلكتروني',
   formFieldLabel__apiKey: 'مفتاح API',
   formFieldLabel__apiKeyDescription: 'الوصف',
   formFieldLabel__apiKeyExpiration: 'الانتهاء',
@@ -493,11 +493,11 @@ export const arSA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
-    action__closeOrganizationSwitcher: undefined,
+    action__closeOrganizationSwitcher: 'إغلاق محدد المنظمة',
     action__createOrganization: 'أنشاء منظمة',
     action__invitationAccept: 'أنضمام',
     action__manageOrganization: 'أدارة المنظمة',
-    action__openOrganizationSwitcher: undefined,
+    action__openOrganizationSwitcher: 'فتح محدد المنظمة',
     action__suggestionsAccept: 'طلب أنضمام',
     notSelected: 'لم يتم أختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
@@ -743,6 +743,7 @@ export const arSA: LocalizationResource = {
     },
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
+  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   signUp: {
     alternativePhoneCodeProvider: {
       resendButton: undefined,
@@ -833,7 +834,6 @@ export const arSA: LocalizationResource = {
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
-  socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
       action__createOrganization: undefined,
@@ -890,6 +890,7 @@ export const arSA: LocalizationResource = {
     form_password_validation_failed: 'كلمة مرور خاطئة',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access:
       'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',
@@ -959,9 +960,9 @@ export const arSA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'إضافة حساب',
-    action__closeUserMenu: 'إغلاق قائمة المستخدم',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'إدارة الحساب',
-    action__openUserMenu: 'فتح قائمة المستخدم',
+    action__openUserMenu: undefined,
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
@@ -1225,7 +1226,7 @@ export const arSA: LocalizationResource = {
         title: 'العنوان الإلكتروني',
       },
       enterpriseAccountsSection: {
-        title: 'حساب المؤسسات',
+        title: 'الحسابات المؤسسية',
       },
       headerTitle__account: 'الحساب',
       headerTitle__security: 'الأمان',
@@ -1278,7 +1279,7 @@ export const arSA: LocalizationResource = {
       },
       web3WalletsSection: {
         destructiveAction: 'حذف المحفظة',
-        detailsAction__nonPrimary: undefined,
+        detailsAction__nonPrimary: 'تعيين كرئيسي',
         primaryButton: 'محافظ Web3',
         title: 'محافظ Web3',
       },
@@ -1299,7 +1300,7 @@ export const arSA: LocalizationResource = {
       subtitle__unavailableWallets: 'لا توجد اي محفظة web3 متاحة',
       successMessage: 'تمت إضافة المحفظة الى حسابك.',
       title: 'إضافة محفظة web3',
-      web3WalletButtonsBlockButton: undefined,
+      web3WalletButtonsBlockButton: 'ربط محفظة Web3',
     },
   },
   waitlist: {

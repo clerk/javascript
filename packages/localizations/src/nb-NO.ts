@@ -893,6 +893,7 @@ export const nbNO: LocalizationResource = {
     form_password_validation_failed: 'Feil passord',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "E-postadressen eller telefonnummeret ditt er ikke tillatt for registrering. Dette kan være på grunn av bruk av '+', '=', '#' eller '.' i e-postadressen din, bruk av et domenn som er tilknyttet en midlertidig e-posttjeneste, eller eksplisitt blokkering. Hvis du mener dette er en feil, vennligst kontakt støtte.",

@@ -905,6 +905,7 @@ export const csCZ: LocalizationResource = {
     form_password_validation_failed: 'Nesprávné heslo',
     form_username_invalid_character: 'Uživatelské jméno může obsahovat pouze alfanumerické znaky a podtržítka.',
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

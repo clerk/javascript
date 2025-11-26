@@ -901,6 +901,7 @@ export const skSK: LocalizationResource = {
       'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',
     form_username_invalid_length:
       'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
     organization_domain_blocked: undefined,

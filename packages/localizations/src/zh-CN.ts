@@ -877,6 +877,7 @@ export const zhCN: LocalizationResource = {
     form_password_validation_failed: '密码错误',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: '您无法删除最后一个身份标识。',
     not_allowed_access:
       "您使用的电子邮件地址或电话号码不允许注册。这可能是因为您在电子邮件地址中使用了 '+', '=', '#' 或 '.'，使用了与临时电子邮件服务关联的域名，或者有明确的排除。如果您认为这是错误，请联系支持。",

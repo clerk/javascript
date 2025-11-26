@@ -901,6 +901,7 @@ export const idID: LocalizationResource = {
     form_password_validation_failed: 'Kata Sandi Salah',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'Anda tidak dapat menghapus identifikasi terakhir Anda.',
     not_allowed_access:
       "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",
