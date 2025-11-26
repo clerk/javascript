@@ -1,5 +1,5 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
-import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
+import { ClerkWebAuthnError, is4xxError, MissingExpiredTokenError } from '@clerk/shared/error';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -399,15 +399,11 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
+    const lastActiveToken = this.lastActiveToken?.getRawString();
+
     const tokenResolver = Token.create(path, params, skipCache ? { debug: 'skip_cache' } : undefined).catch(e => {
-      if (
-        e instanceof ClerkAPIResponseError &&
-        e.status === 422 &&
-        e.errors.length > 0 &&
-        e.errors[0].code === 'missing_expired_token' &&
-        this.lastActiveToken
-      ) {
-        return Token.create(path, { ...params }, { expired_token: this.lastActiveToken.getRawString() });
+      if (MissingExpiredTokenError.is(e) && lastActiveToken) {
+        return Token.create(path, { ...params }, { expired_token: lastActiveToken });
       }
       throw e;
     });
