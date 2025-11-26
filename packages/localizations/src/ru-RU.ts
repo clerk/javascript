@@ -906,6 +906,7 @@ export const ruRU: LocalizationResource = {
     form_password_validation_failed: 'Неверный пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
     not_allowed_access:
       "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",

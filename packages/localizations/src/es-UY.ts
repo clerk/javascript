@@ -903,6 +903,7 @@ export const esUY: LocalizationResource = {
     form_username_invalid_character:
       'Tu nombre de usuario contiene caracteres inválidos. Por favor, usá solo letras, números y guiones bajos.',
     form_username_invalid_length: 'Tu nombre de usuario debe tener entre {{min_length}} y {{max_length}} caracteres.',
+    form_username_needs_non_number_char: undefined,
     identification_deletion_failed: 'No podés eliminar tu última identificación.',
     not_allowed_access:
       "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
