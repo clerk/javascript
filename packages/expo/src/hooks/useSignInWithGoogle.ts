@@ -2,6 +2,8 @@ import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
 
 import { errorThrower } from '../utils/errors';
 
+type SignUpUnsafeMetadata = Record<string, unknown>;
+
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
@@ -16,7 +18,7 @@ export type StartGoogleAuthenticationFlowReturnType = {
 /**
  * Stub for Google Authentication hook on unsupported platforms.
  *
- * Native Google Authentication using @react-native-google-signin/google-signin is only available on iOS and Android.
+ * Native Google Authentication is only available on iOS and Android.
  * For web platforms, use the OAuth-based Google Sign-In flow instead via useSSO.
  *
  * @example
@@ -58,7 +60,7 @@ export function useSignInWithGoogle(): {
     _startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
   ): Promise<StartGoogleAuthenticationFlowReturnType> {
     return errorThrower.throw(
-      'Google Authentication via @react-native-google-signin/google-signin is only available on iOS and Android. ' +
+      'Native Google Authentication is only available on iOS and Android. ' +
         'For web and other platforms, please use the OAuth-based flow with useSSO and strategy: "oauth_google".',
     );
   }

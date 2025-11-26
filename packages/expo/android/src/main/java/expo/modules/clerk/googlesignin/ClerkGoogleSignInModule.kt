@@ -61,6 +61,7 @@ class GoogleSignInCancelledException : CodedException("SIGN_IN_CANCELLED", "User
 class GoogleSignInNoCredentialException : CodedException("NO_SAVED_CREDENTIAL_FOUND", "No saved credential found", null)
 class GoogleSignInException(message: String) : CodedException("GOOGLE_SIGN_IN_ERROR", message, null)
 class GoogleSignInNotConfiguredException : CodedException("NOT_CONFIGURED", "Google Sign-In is not configured. Call configure() first.", null)
+class GoogleSignInActivityUnavailableException : CodedException("E_ACTIVITY_UNAVAILABLE", "Activity is not available", null)
 
 class ClerkGoogleSignInModule : Module() {
   private var webClientId: String? = null
@@ -91,6 +92,11 @@ class ClerkGoogleSignInModule : Module() {
         return@AsyncFunction
       }
 
+      val activity = appContext.currentActivity ?: run {
+        promise.reject(GoogleSignInActivityUnavailableException())
+        return@AsyncFunction
+      }
+
       mainScope.launch {
         try {
           val googleIdOption = GetGoogleIdOption.Builder()
@@ -108,7 +114,7 @@ class ClerkGoogleSignInModule : Module() {
 
           val result = credentialManager.getCredential(
             request = request,
-            context = requireNotNull(appContext.currentActivity)
+            context = activity
           )
 
           handleSignInResult(result, promise)
@@ -131,6 +137,11 @@ class ClerkGoogleSignInModule : Module() {
         return@AsyncFunction
       }
 
+      val activity = appContext.currentActivity ?: run {
+        promise.reject(GoogleSignInActivityUnavailableException())
+        return@AsyncFunction
+      }
+
       mainScope.launch {
         try {
           val googleIdOption = GetGoogleIdOption.Builder()
@@ -147,7 +158,7 @@ class ClerkGoogleSignInModule : Module() {
 
           val result = credentialManager.getCredential(
             request = request,
-            context = requireNotNull(appContext.currentActivity)
+            context = activity
           )
 
           handleSignInResult(result, promise)
@@ -170,6 +181,11 @@ class ClerkGoogleSignInModule : Module() {
         return@AsyncFunction
       }
 
+      val activity = appContext.currentActivity ?: run {
+        promise.reject(GoogleSignInActivityUnavailableException())
+        return@AsyncFunction
+      }
+
       mainScope.launch {
         try {
           val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(clientId)
@@ -185,7 +201,7 @@ class ClerkGoogleSignInModule : Module() {
 
           val result = credentialManager.getCredential(
             request = request,
-            context = requireNotNull(appContext.currentActivity)
+            context = activity
           )
 
           handleSignInResult(result, promise)

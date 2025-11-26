@@ -75,7 +75,8 @@ export type ExplicitSignInParams = {
  */
 export type GoogleUser = {
   /**
-   * The user's Google ID (also their email).
+   * The user's unique Google identifier (OIDC "sub" claim).
+   * This is distinct from the user's email address.
    */
   id: string;
 
