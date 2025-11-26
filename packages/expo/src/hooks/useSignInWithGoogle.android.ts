@@ -1,10 +1,12 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
-import * as Crypto from 'expo-crypto';
 import Constants from 'expo-constants';
+import * as Crypto from 'expo-crypto';
 
 import { ClerkGoogleOneTapSignIn, isSuccessResponse } from '../google-one-tap';
 import { errorThrower } from '../utils/errors';
+
+type SignUpUnsafeMetadata = Record<string, unknown>;
 
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;

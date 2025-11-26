@@ -1,12 +1,12 @@
 import type {
+  CancelledResponse,
   ConfigureParams,
-  SignInParams,
   CreateAccountParams,
   ExplicitSignInParams,
+  NoSavedCredentialFound,
   OneTapResponse,
   OneTapSuccessResponse,
-  CancelledResponse,
-  NoSavedCredentialFound,
+  SignInParams,
 } from './types';
 
 // Type for the native module methods

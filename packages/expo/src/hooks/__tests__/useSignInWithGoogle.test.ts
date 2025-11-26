@@ -238,5 +238,56 @@ describe('useSignInWithGoogle', () => {
       expect(mocks.GoogleSignin.signIn).not.toHaveBeenCalled();
       expect(response.createdSessionId).toBe(null);
     });
+
+    test('should fall back to signUp when external_account_not_found error occurs', async () => {
+      const mockIdToken = 'mock-id-token';
+      mocks.GoogleSignin.signIn.mockResolvedValue({
+        data: {
+          idToken: mockIdToken,
+        },
+      });
+
+      // Mock signIn.create to throw external_account_not_found Clerk error
+      const externalAccountError = {
+        clerkError: true,
+        errors: [{ code: 'external_account_not_found' }],
+        message: 'External account not found',
+      };
+      mockSignIn.create.mockRejectedValue(externalAccountError);
+
+      // Mock signUp.create to succeed with a new session
+      const mockSignUpWithSession = {
+        ...mockSignUp,
+        create: vi.fn().mockResolvedValue(undefined),
+        createdSessionId: 'new-signup-session-id',
+      };
+      mocks.useSignUp.mockReturnValue({
+        signUp: mockSignUpWithSession,
+        isLoaded: true,
+      });
+
+      const { result } = renderHook(() => useSignInWithGoogle());
+
+      const response = await result.current.startGoogleAuthenticationFlow({
+        unsafeMetadata: { referral: 'google' },
+      });
+
+      // Verify signIn.create was called first
+      expect(mockSignIn.create).toHaveBeenCalledWith({
+        strategy: 'google_one_tap',
+        token: mockIdToken,
+      });
+
+      // Verify signUp.create was called as fallback with the token
+      expect(mockSignUpWithSession.create).toHaveBeenCalledWith({
+        strategy: 'google_one_tap',
+        token: mockIdToken,
+        unsafeMetadata: { referral: 'google' },
+      });
+
+      // Verify the session was created
+      expect(response.createdSessionId).toBe('new-signup-session-id');
+      expect(response.setActive).toBe(mockSetActive);
+    });
   });
 });
