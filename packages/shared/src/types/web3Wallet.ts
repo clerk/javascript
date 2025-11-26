@@ -2,7 +2,7 @@ import type { ClerkResource } from './resource';
 import type { Web3WalletJSONSnapshot } from './snapshots';
 import type { Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
-import type { Web3Provider } from './web3';
+import type { EthereumWeb3Provider, SolanaWeb3Provider } from './web3';
 
 export type PrepareWeb3WalletVerificationParams = {
   strategy: Web3Strategy;
@@ -25,7 +25,9 @@ export interface Web3WalletResource extends ClerkResource {
   __internal_toSnapshot: () => Web3WalletJSONSnapshot;
 }
 
-export type GenerateSignature = (opts: GenerateSignatureParams | GenerateSolanaSignatureParams) => Promise<string>;
+export type GenerateSignature = (
+  opts: GenerateEthereumSignatureParams | GenerateSolanaSignatureParams,
+) => Promise<string>;
 
 export interface AuthenticateWithWeb3Params {
   identifier: string;
@@ -34,16 +36,16 @@ export interface AuthenticateWithWeb3Params {
   walletName?: string;
 }
 
-export interface GenerateSignatureParams {
+export interface GenerateEthereumSignatureParams {
   identifier: string;
   nonce: string;
-  provider?: Web3Provider;
+  provider: EthereumWeb3Provider;
   walletName?: string;
 }
 
 export interface GenerateSolanaSignatureParams {
   identifier: string;
   nonce: string;
-  provider: Extract<Web3Provider, 'solana'>;
+  provider: SolanaWeb3Provider;
   walletName: string;
 }

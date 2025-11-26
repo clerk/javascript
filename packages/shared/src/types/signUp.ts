@@ -108,7 +108,7 @@ export interface SignUpResource extends ClerkResource {
   authenticateWithCoinbaseWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithOKXWallet: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
   authenticateWithBase: (params?: SignUpAuthenticateWithWeb3Params) => Promise<SignUpResource>;
-  authenticateWithSolana: (params?: SignUpAuthenticateWithSolanaParams) => Promise<SignUpResource>;
+  authenticateWithSolana: (params: SignUpAuthenticateWithSolanaParams) => Promise<SignUpResource>;
   __internal_toSnapshot: () => SignUpJSONSnapshot;
 
   /**

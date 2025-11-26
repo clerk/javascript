@@ -872,7 +872,7 @@ export interface Clerk {
   /**
    * Authenticates user using their Solana supported Web3 wallet browser extension
    */
-  authenticateWithSolana: (params?: AuthenticateWithSolanaParams) => Promise<unknown>;
+  authenticateWithSolana: (params: AuthenticateWithSolanaParams) => Promise<unknown>;
 
   /**
    * Authenticates user using their Web3 Wallet browser extension
@@ -2305,7 +2305,7 @@ export interface AuthenticateWithSolanaParams {
   signUpContinueUrl?: string;
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
-  walletName?: string;
+  walletName: string;
 }
 
 export interface LoadedClerk extends Clerk {
