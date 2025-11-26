@@ -47,17 +47,16 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
-export const assertHeaderType = (typ?: unknown, allowedTypes: string | string[] = 'JWT') => {
+export const assertHeaderType = (typ?: unknown) => {
   if (typeof typ === 'undefined') {
     return;
   }
 
-  const allowed = Array.isArray(allowedTypes) ? allowedTypes : [allowedTypes];
-  if (!allowed.includes(typ as string)) {
+  if (typ !== 'JWT') {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.EnsureClerkJWT,
       reason: TokenVerificationErrorReason.TokenInvalid,
-      message: `Invalid JWT type ${JSON.stringify(typ)}. Expected "${allowed.join(', ')}".`,
+      message: `Invalid JWT type ${JSON.stringify(typ)}. Expected "JWT".`,
     });
   }
 };

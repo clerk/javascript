@@ -106,46 +106,14 @@ describe('assertAudienceClaim(audience?, aud?)', () => {
   });
 });
 
-describe('assertHeaderType(typ?, allowedTypes?)', () => {
+describe('assertHeaderType(typ?)', () => {
   it('does not throw error if type is missing', () => {
     expect(() => assertHeaderType(undefined)).not.toThrow();
-    expect(() => assertHeaderType(undefined, 'JWT')).not.toThrow();
-    expect(() => assertHeaderType(undefined, ['JWT', 'at+jwt'])).not.toThrow();
   });
 
-  it('does not throw error if type matches default allowed type (JWT)', () => {
-    expect(() => assertHeaderType('JWT')).not.toThrow();
-  });
-
-  it('throws error if type is not JWT (default)', () => {
+  it('throws error if type is not JWT', () => {
     expect(() => assertHeaderType('')).toThrow(`Invalid JWT type "". Expected "JWT".`);
     expect(() => assertHeaderType('Aloha')).toThrow(`Invalid JWT type "Aloha". Expected "JWT".`);
-  });
-
-  it('does not throw error if type matches single custom allowed type', () => {
-    expect(() => assertHeaderType('at+jwt', 'at+jwt')).not.toThrow();
-    expect(() => assertHeaderType('application/at+jwt', 'application/at+jwt')).not.toThrow();
-  });
-
-  it('throws error if type does not match single custom allowed type', () => {
-    expect(() => assertHeaderType('JWT', 'at+jwt')).toThrow(`Invalid JWT type "JWT". Expected "at+jwt".`);
-    expect(() => assertHeaderType('at+jwt', 'JWT')).toThrow(`Invalid JWT type "at+jwt". Expected "JWT".`);
-  });
-
-  it('does not throw error if type matches array of allowed types', () => {
-    expect(() => assertHeaderType('JWT', ['JWT', 'at+jwt'])).not.toThrow();
-    expect(() => assertHeaderType('at+jwt', ['JWT', 'at+jwt'])).not.toThrow();
-    expect(() => assertHeaderType('at+jwt', ['at+jwt', 'application/at+jwt'])).not.toThrow();
-    expect(() => assertHeaderType('application/at+jwt', ['at+jwt', 'application/at+jwt'])).not.toThrow();
-  });
-
-  it('throws error if type does not match any in array of allowed types', () => {
-    expect(() => assertHeaderType('JWT', ['at+jwt', 'application/at+jwt'])).toThrow(
-      `Invalid JWT type "JWT". Expected "at+jwt, application/at+jwt".`,
-    );
-    expect(() => assertHeaderType('invalid', ['at+jwt', 'application/at+jwt'])).toThrow(
-      `Invalid JWT type "invalid". Expected "at+jwt, application/at+jwt".`,
-    );
   });
 });
 

@@ -119,18 +119,13 @@ export type VerifyJwtOptions = {
    * @internal
    */
   key: JsonWebKey | string;
-  /**
-   * A string or list of allowed [header types](https://datatracker.ietf.org/doc/html/rfc7515#section-4.1.9).
-   * @default 'JWT'
-   */
-  headerType?: string | string[];
 };
 
 export async function verifyJwt(
   token: string,
   options: VerifyJwtOptions,
 ): Promise<JwtReturnType<JwtPayload, TokenVerificationError>> {
-  const { audience, authorizedParties, clockSkewInMs, key, headerType } = options;
+  const { audience, authorizedParties, clockSkewInMs, key } = options;
   const clockSkew = clockSkewInMs || DEFAULT_CLOCK_SKEW_IN_MS;
 
   const { data: decoded, errors } = decodeJwt(token);
@@ -143,7 +138,7 @@ export async function verifyJwt(
     // Header verifications
     const { typ, alg } = header;
 
-    assertHeaderType(typ, headerType);
+    assertHeaderType(typ);
     assertHeaderAlgorithm(alg);
 
     // Payload verifications

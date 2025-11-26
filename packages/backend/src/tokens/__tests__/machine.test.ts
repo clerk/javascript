@@ -9,6 +9,7 @@ import {
   isMachineTokenType,
   isOAuthJwt,
   isTokenTypeAccepted,
+  JwtFormatRegExp,
   M2M_TOKEN_PREFIX,
   OAUTH_TOKEN_PREFIX,
 } from '../machine';
@@ -96,15 +97,24 @@ describe('isMachineTokenType', () => {
 });
 
 describe('isJwtFormat', () => {
-  it('returns true for valid JWT format', () => {
-    expect(isJwtFormat('header.payload.signature')).toBe(true);
-    expect(isJwtFormat('a.b.c')).toBe(true);
+  it('should return true for valid JWT format', () => {
+    const jwt =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+    expect(isJwtFormat(jwt)).toBe(true);
   });
 
-  it('returns false for invalid JWT format', () => {
-    expect(isJwtFormat('invalid')).toBe(false);
-    expect(isJwtFormat('invalid.jwt')).toBe(false);
-    expect(isJwtFormat('invalid.jwt.token.extra')).toBe(false);
+  it('should return false for invalid JWT format', () => {
+    expect(isJwtFormat('not.a.jwt!')).toBe(false);
+    expect(isJwtFormat('only.two')).toBe(false);
+    expect(isJwtFormat('')).toBe(false);
+  });
+
+  it('should have same behavior as regex test', () => {
+    const testCases = ['valid.jwt.token', 'invalid', 'two.parts', 'one.two.three.four', '', 'a.b.c'];
+
+    testCases.forEach(testCase => {
+      expect(isJwtFormat(testCase)).toBe(JwtFormatRegExp.test(testCase));
+    });
   });
 });
 

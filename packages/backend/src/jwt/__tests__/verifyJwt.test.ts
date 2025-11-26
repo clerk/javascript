@@ -1,18 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
-  createJwt,
   mockJwks,
   mockJwt,
   mockJwtHeader,
   mockJwtPayload,
-  mockOAuthAccessTokenJwtPayload,
   pemEncodedPublicKey,
   publicJwks,
   signedJwt,
   someOtherPublicKey,
 } from '../../fixtures';
-import { mockSignedOAuthAccessTokenJwt, mockSignedOAuthAccessTokenJwtApplicationTyp } from '../../fixtures/machine';
 import { decodeJwt, hasValidSignature, verifyJwt } from '../verifyJwt';
 
 const invalidTokenError = {
@@ -131,90 +128,5 @@ describe('verifyJwt(jwt, options)', () => {
     };
     const { errors: [error] = [] } = await verifyJwt('invalid-jwt', inputVerifyJwtOptions);
     expect(error).toMatchObject(invalidTokenError);
-  });
-
-  it('verifies JWT with default headerType (JWT)', async () => {
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      issuer: mockJwtPayload.iss,
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-    };
-    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
-    expect(data).toEqual(mockJwtPayload);
-  });
-
-  it('verifies JWT with explicit headerType as string', async () => {
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      issuer: mockJwtPayload.iss,
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-      headerType: 'JWT',
-    };
-    const { data } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
-    expect(data).toEqual(mockJwtPayload);
-  });
-
-  it('verifies OAuth JWT with headerType as array including at+jwt', async () => {
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-      headerType: ['at+jwt', 'application/at+jwt'],
-    };
-    const { data } = await verifyJwt(mockSignedOAuthAccessTokenJwt, inputVerifyJwtOptions);
-    expect(data).toBeDefined();
-    expect(data?.sub).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
-  });
-
-  it('verifies OAuth JWT with headerType as array including application/at+jwt', async () => {
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-      headerType: ['at+jwt', 'application/at+jwt'],
-    };
-    const { data } = await verifyJwt(mockSignedOAuthAccessTokenJwtApplicationTyp, inputVerifyJwtOptions);
-    expect(data).toBeDefined();
-    expect(data?.sub).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
-  });
-
-  it('rejects JWT when headerType does not match', async () => {
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      issuer: mockJwtPayload.iss,
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-      headerType: 'at+jwt',
-    };
-    const { errors: [error] = [] } = await verifyJwt(mockJwt, inputVerifyJwtOptions);
-    expect(error).toBeDefined();
-    expect(error?.message).toContain('Invalid JWT type');
-    expect(error?.message).toContain('Expected "at+jwt"');
-  });
-
-  it('rejects OAuth JWT when headerType does not match', async () => {
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-      headerType: 'JWT',
-    };
-    const { errors: [error] = [] } = await verifyJwt(mockSignedOAuthAccessTokenJwt, inputVerifyJwtOptions);
-    expect(error).toBeDefined();
-    expect(error?.message).toContain('Invalid JWT type');
-    expect(error?.message).toContain('Expected "JWT"');
-  });
-
-  it('rejects JWT when headerType array does not include the token type', async () => {
-    const jwtWithCustomTyp = createJwt({
-      header: { typ: 'custom-type', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD' },
-      payload: mockOAuthAccessTokenJwtPayload,
-    });
-
-    const inputVerifyJwtOptions = {
-      key: mockJwks.keys[0],
-      authorizedParties: ['https://accounts.inspired.puma-74.lcl.dev'],
-      headerType: ['at+jwt', 'application/at+jwt'],
-    };
-    const { errors: [error] = [] } = await verifyJwt(jwtWithCustomTyp, inputVerifyJwtOptions);
-    expect(error).toBeDefined();
-    expect(error?.message).toContain('Invalid JWT type');
-    expect(error?.message).toContain('Expected "at+jwt, application/at+jwt"');
   });
 });
