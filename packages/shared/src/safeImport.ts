@@ -13,7 +13,7 @@ import { retry } from './retry';
  * const module = await safeImport(() => import('./my-module'));
  * ```
  */
-export const safeImport = async <T = any>(importFn: () => T): T => {
+export const safeImport = async <T = any>(importFn: () => Promise<T>): Promise<T> => {
   return retry(importFn, {
     initialDelay: 100,
     shouldRetry: (_, iterations) => iterations <= 3,

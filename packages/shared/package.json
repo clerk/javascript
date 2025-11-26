@@ -80,16 +80,6 @@
         "default": "./dist/runtime/ui/index.js"
       }
     },
-    "./import": {
-      "import": {
-        "types": "./dist/runtime/import/index.d.mts",
-        "default": "./dist/runtime/import/index.mjs"
-      },
-      "require": {
-        "types": "./dist/runtime/import/index.d.ts",
-        "default": "./dist/runtime/import/index.js"
-      }
-    },
     "./types": {
       "import": {
         "types": "./dist/types/index.d.mts",
