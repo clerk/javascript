@@ -7,11 +7,11 @@ const mocks = vi.hoisted(() => {
   return {
     useSignIn: vi.fn(),
     useSignUp: vi.fn(),
-    GoogleSignin: {
-      signIn: vi.fn(),
-      hasPlayServices: vi.fn(),
+    ClerkGoogleOneTapSignIn: {
       configure: vi.fn(),
+      presentExplicitSignIn: vi.fn(),
     },
+    isSuccessResponse: vi.fn(),
   };
 });
 
@@ -22,9 +22,10 @@ vi.mock('@clerk/clerk-react', () => {
   };
 });
 
-vi.mock('@react-native-google-signin/google-signin', () => {
+vi.mock('../../google-one-tap', () => {
   return {
-    GoogleSignin: mocks.GoogleSignin,
+    ClerkGoogleOneTapSignIn: mocks.ClerkGoogleOneTapSignIn,
+    isSuccessResponse: mocks.isSuccessResponse,
   };
 });
 
@@ -39,6 +40,7 @@ vi.mock('react-native', () => {
 vi.mock('expo-modules-core', () => {
   return {
     EventEmitter: vi.fn(),
+    requireNativeModule: vi.fn(),
   };
 });
 
@@ -48,9 +50,18 @@ vi.mock('expo-constants', () => {
       expoConfig: {
         extra: {
           EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID: 'mock-web-client-id.apps.googleusercontent.com',
-          EXPO_PUBLIC_CLERK_GOOGLE_ANDROID_CLIENT_ID: 'mock-android-client-id.apps.googleusercontent.com',
         },
       },
+    },
+  };
+});
+
+vi.mock('expo-crypto', () => {
+  return {
+    randomUUID: vi.fn(() => 'mock-uuid-nonce'),
+    digestStringAsync: vi.fn(() => Promise.resolve('mock-hashed-nonce')),
+    CryptoDigestAlgorithm: {
+      SHA256: 'SHA256',
     },
   };
 });
@@ -84,8 +95,6 @@ describe('useSignInWithGoogle', () => {
       signUp: mockSignUp,
       isLoaded: true,
     });
-
-    mocks.GoogleSignin.hasPlayServices.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -102,11 +111,11 @@ describe('useSignInWithGoogle', () => {
 
     test('should successfully sign in existing user', async () => {
       const mockIdToken = 'mock-id-token';
-      mocks.GoogleSignin.signIn.mockResolvedValue({
-        data: {
-          idToken: mockIdToken,
-        },
+      mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
+        type: 'success',
+        data: { idToken: mockIdToken },
       });
+      mocks.isSuccessResponse.mockReturnValue(true);
 
       mockSignIn.create.mockResolvedValue(undefined);
       mockSignIn.firstFactorVerification.status = 'verified';
@@ -116,8 +125,12 @@ describe('useSignInWithGoogle', () => {
 
       const response = await result.current.startGoogleAuthenticationFlow();
 
-      expect(mocks.GoogleSignin.hasPlayServices).toHaveBeenCalledWith({ showPlayServicesUpdateDialog: true });
-      expect(mocks.GoogleSignin.signIn).toHaveBeenCalled();
+      expect(mocks.ClerkGoogleOneTapSignIn.configure).toHaveBeenCalledWith({
+        webClientId: 'mock-web-client-id.apps.googleusercontent.com',
+      });
+      expect(mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn).toHaveBeenCalledWith({
+        nonce: 'mock-hashed-nonce',
+      });
       expect(mockSignIn.create).toHaveBeenCalledWith({
         strategy: 'google_one_tap',
         token: mockIdToken,
@@ -128,11 +141,11 @@ describe('useSignInWithGoogle', () => {
 
     test('should handle transfer flow for new user', async () => {
       const mockIdToken = 'mock-id-token';
-      mocks.GoogleSignin.signIn.mockResolvedValue({
-        data: {
-          idToken: mockIdToken,
-        },
+      mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
+        type: 'success',
+        data: { idToken: mockIdToken },
       });
+      mocks.isSuccessResponse.mockReturnValue(true);
 
       mockSignIn.create.mockResolvedValue(undefined);
       mockSignIn.firstFactorVerification.status = 'transferable';
@@ -161,66 +174,30 @@ describe('useSignInWithGoogle', () => {
     });
 
     test('should handle user cancellation gracefully', async () => {
-      const cancelError = Object.assign(new Error('User canceled'), { code: 'SIGN_IN_CANCELLED' });
-      mocks.GoogleSignin.signIn.mockRejectedValue(cancelError);
-
-      const { result } = renderHook(() => useSignInWithGoogle());
-
-      const response = await result.current.startGoogleAuthenticationFlow();
-
-      expect(response.createdSessionId).toBe(null);
-      expect(response.setActive).toBe(mockSetActive);
-    });
-
-    test('should handle user cancellation with numeric code', async () => {
-      const cancelError = Object.assign(new Error('User canceled'), { code: '-5' });
-      mocks.GoogleSignin.signIn.mockRejectedValue(cancelError);
-
-      const { result } = renderHook(() => useSignInWithGoogle());
-
-      const response = await result.current.startGoogleAuthenticationFlow();
-
-      expect(response.createdSessionId).toBe(null);
-      expect(response.setActive).toBe(mockSetActive);
-    });
-
-    test('should throw error when Play Services not available', async () => {
-      const playServicesError = Object.assign(new Error('Play Services not available'), {
-        code: 'PLAY_SERVICES_NOT_AVAILABLE',
-      });
-      mocks.GoogleSignin.hasPlayServices.mockRejectedValue(playServicesError);
-
-      const { result } = renderHook(() => useSignInWithGoogle());
-
-      await expect(result.current.startGoogleAuthenticationFlow()).rejects.toThrow(
-        'Google Play Services is not available or outdated on this device.',
-      );
-    });
-
-    test('should throw error when no ID token received', async () => {
-      mocks.GoogleSignin.signIn.mockResolvedValue({
-        data: {
-          idToken: null,
-        },
-      });
-
-      const { result } = renderHook(() => useSignInWithGoogle());
-
-      await expect(result.current.startGoogleAuthenticationFlow()).rejects.toThrow(
-        'No ID token received from Google Sign-In.',
-      );
-    });
-
-    test('should throw error when response data is missing', async () => {
-      mocks.GoogleSignin.signIn.mockResolvedValue({
+      mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
+        type: 'cancelled',
         data: null,
       });
+      mocks.isSuccessResponse.mockReturnValue(false);
 
       const { result } = renderHook(() => useSignInWithGoogle());
 
-      await expect(result.current.startGoogleAuthenticationFlow()).rejects.toThrow(
-        'No ID token received from Google Sign-In.',
-      );
+      const response = await result.current.startGoogleAuthenticationFlow();
+
+      expect(response.createdSessionId).toBe(null);
+      expect(response.setActive).toBe(mockSetActive);
+    });
+
+    test('should handle SIGN_IN_CANCELLED error code', async () => {
+      const cancelError = Object.assign(new Error('User canceled'), { code: 'SIGN_IN_CANCELLED' });
+      mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockRejectedValue(cancelError);
+
+      const { result } = renderHook(() => useSignInWithGoogle());
+
+      const response = await result.current.startGoogleAuthenticationFlow();
+
+      expect(response.createdSessionId).toBe(null);
+      expect(response.setActive).toBe(mockSetActive);
     });
 
     test('should return early when clerk is not loaded', async () => {
@@ -234,18 +211,18 @@ describe('useSignInWithGoogle', () => {
 
       const response = await result.current.startGoogleAuthenticationFlow();
 
-      expect(mocks.GoogleSignin.hasPlayServices).not.toHaveBeenCalled();
-      expect(mocks.GoogleSignin.signIn).not.toHaveBeenCalled();
+      expect(mocks.ClerkGoogleOneTapSignIn.configure).not.toHaveBeenCalled();
+      expect(mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn).not.toHaveBeenCalled();
       expect(response.createdSessionId).toBe(null);
     });
 
     test('should fall back to signUp when external_account_not_found error occurs', async () => {
       const mockIdToken = 'mock-id-token';
-      mocks.GoogleSignin.signIn.mockResolvedValue({
-        data: {
-          idToken: mockIdToken,
-        },
+      mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn.mockResolvedValue({
+        type: 'success',
+        data: { idToken: mockIdToken },
       });
+      mocks.isSuccessResponse.mockReturnValue(true);
 
       // Mock signIn.create to throw external_account_not_found Clerk error
       const externalAccountError = {
