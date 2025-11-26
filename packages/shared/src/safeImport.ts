@@ -1,20 +1,20 @@
-import { retry } from '../retry';
+import { retry } from './retry';
 
 /**
  * Safely imports a module with automatic retries on failure.
  * Useful for dynamic imports that might fail due to network issues or temporary loading problems.
  * Retries up to 3 times with exponential backoff.
  *
- * @param modulePath - The path to the module to import
+ * @param importFn - A function that returns a dynamic import promise
  * @returns A promise that resolves to the imported module
  *
  * @example
  * ```typescript
- * const module = await safeImport('./my-module');
+ * const module = await safeImport(() => import('./my-module'));
  * ```
  */
-export const safeImport = async <T = any>(modulePath: string): Promise<T> => {
-  return retry(() => import(modulePath) as Promise<T>, {
+export const safeImport = async <T = any>(importFn: () => T): T => {
+  return retry(importFn, {
     initialDelay: 100,
     shouldRetry: (_, iterations) => iterations <= 3,
     retryImmediately: true,
