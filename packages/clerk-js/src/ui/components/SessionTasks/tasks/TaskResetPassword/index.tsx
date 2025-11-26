@@ -14,7 +14,7 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { withTaskGuard } from '../shared/withTaskGuard';
+import { withTaskGuard } from '../shared';
 
 const TaskResetPasswordInternal = () => {
   const clerk = useClerk();
