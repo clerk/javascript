@@ -122,16 +122,8 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
       try {
         await setActive({
           organization,
-          navigate: async ({ session }) => {
-            const task = session.currentTask;
-            if (task && task.key !== 'choose-organization') {
-              await navigate(
-                clerk.buildTasksUrl({
-                  redirectUrl: redirectUrlComplete,
-                }),
-              );
-              return;
-            }
+          navigate: async () => {
+            // TODO(after-auth) ORGS-779 - Handle next tasks
             await navigate(redirectUrlComplete);
           },
         });

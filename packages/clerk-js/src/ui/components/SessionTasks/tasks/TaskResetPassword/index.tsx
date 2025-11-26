@@ -75,34 +75,37 @@ const TaskResetPasswordInternal = () => {
   };
 
   const resetPassword = async () => {
-    if (!clerk.user) {
-      return;
-    }
-    passwordField.clearFeedback();
-    confirmField.clearFeedback();
-    try {
-      await updatePasswordWithReverification(clerk.user, [
-        {
-          newPassword: passwordField.value,
-          signOutOfOtherSessions: sessionsField.checked,
-        },
-      ]);
-
-      // Handle the next task if it exists or redirect to the complete url
-      const task = clerk.session?.currentTask;
-      if (task && task.key !== 'reset-password') {
-        await navigate(
-          clerk.buildTasksUrl({
-            redirectUrl: redirectUrlComplete,
-          }),
-        );
+    await card.runAsync(async () => {
+      if (!clerk.user) {
         return;
       }
 
-      await navigate(redirectUrlComplete);
-    } catch (e) {
-      return handleError(e, [passwordField, confirmField], card.setError);
-    }
+      passwordField.clearFeedback();
+      confirmField.clearFeedback();
+      try {
+        await updatePasswordWithReverification(clerk.user, [
+          {
+            newPassword: passwordField.value,
+            signOutOfOtherSessions: sessionsField.checked,
+          },
+        ]);
+
+        // Handle the next task if it exists or redirect to the complete url
+        const task = clerk.session?.currentTask;
+        if (task && task.key !== 'reset-password') {
+          await navigate(
+            clerk.buildTasksUrl({
+              redirectUrl: redirectUrlComplete,
+            }),
+          );
+          return;
+        }
+
+        await navigate(redirectUrlComplete);
+      } catch (e) {
+        return handleError(e, [passwordField, confirmField], card.setError);
+      }
+    });
   };
 
   const identifier = clerk.user?.primaryEmailAddress?.emailAddress ?? clerk.user?.username;
