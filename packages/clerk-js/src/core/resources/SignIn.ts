@@ -412,7 +412,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider, walletName });
+      signature = await generateSignature({ identifier, nonce: message, walletName, provider });
     } catch (err) {
       // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
       // Passkey in order to authenticate, the initial generate signature request to be rejected. For this
@@ -983,8 +983,7 @@ class SignInFuture implements SignInFutureResource {
 
   async web3(params: SignInFutureWeb3Params): Promise<{ error: ClerkError | null }> {
     const { strategy } = params;
-    const provider = strategy.replace('web3_', '').replace('_signature', '');
-    // as Web3Provider;
+    const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
     return runAsyncResourceTask(this.resource, async () => {
       let identifier;
@@ -1042,6 +1041,7 @@ class SignInFuture implements SignInFutureResource {
           identifier,
           nonce: message,
           walletName: params?.walletName,
+          provider,
         });
       } catch (err) {
         // There is a chance that as a user when you try to setup and use the Coinbase Wallet with an existing
@@ -1054,6 +1054,7 @@ class SignInFuture implements SignInFutureResource {
           signature = await generateSignature({
             identifier,
             nonce: message,
+            provider,
           });
         } else {
           throw err;
