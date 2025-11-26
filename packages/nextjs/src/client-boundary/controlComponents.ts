@@ -15,6 +15,7 @@ export {
   AuthenticateWithRedirectCallback,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
+  PortalProvider,
 } from '@clerk/clerk-react';
 
 export { MultisessionAppSupport } from '@clerk/clerk-react/internal';
