@@ -3,6 +3,7 @@ import type { UserResource } from '@clerk/shared/types';
 import { useCallback } from 'react';
 
 import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
+import { useTaskResetPasswordContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -17,14 +18,15 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { withTaskGuard } from './withTaskGuard';
 
 const TaskResetPasswordInternal = () => {
-  const { signOut, user, session } = useClerk();
+  const clerk = useClerk();
   const card = useCardState();
   const {
     userSettings: { passwordSettings },
   } = useEnvironment();
 
   const { t, locale } = useLocalizations();
-  const { otherSessions } = useMultipleSessions({ user });
+  const { redirectUrlComplete } = useTaskResetPasswordContext();
+  const { otherSessions } = useMultipleSessions({ user: clerk.user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const updatePasswordWithReverification = useReverification(
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
@@ -32,10 +34,10 @@ const TaskResetPasswordInternal = () => {
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
+      return clerk?.signOut(navigateAfterSignOut);
     }
 
-    return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
+    return clerk?.signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: clerk.session?.id });
   };
 
   const passwordField = useFormControl('newPassword', '', {
@@ -72,24 +74,45 @@ const TaskResetPasswordInternal = () => {
   };
 
   const resetPassword = useCallback(async () => {
-    if (!user) {
+    if (!clerk.user) {
       return;
     }
     passwordField.clearFeedback();
     confirmField.clearFeedback();
     try {
-      await updatePasswordWithReverification(user, [
+      await updatePasswordWithReverification(clerk.user, [
         {
           newPassword: passwordField.value,
           signOutOfOtherSessions: sessionsField.checked,
         },
       ]);
+
+      // Handle the next task if it exists or redirect to the complete url
+      const task = clerk.session?.currentTask;
+      if (task && task.key !== 'reset-password') {
+        await clerk?.navigate(
+          clerk.buildTasksUrl({
+            redirectUrl: redirectUrlComplete,
+          }),
+        );
+        return;
+      }
+
+      await clerk?.navigate(redirectUrlComplete);
     } catch (e) {
       return handleError(e, [passwordField, confirmField], card.setError);
     }
-  }, [user, passwordField, confirmField, updatePasswordWithReverification, sessionsField.checked, card]);
+  }, [
+    clerk,
+    passwordField,
+    confirmField,
+    updatePasswordWithReverification,
+    sessionsField.checked,
+    redirectUrlComplete,
+    card.setError,
+  ]);
 
-  const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
+  const identifier = clerk.user?.primaryEmailAddress?.emailAddress ?? clerk.user?.username;
 
   return (
     <Flow.Root flow='taskResetPassword'>
@@ -118,7 +141,7 @@ const TaskResetPasswordInternal = () => {
                     data-testid='hidden-identifier'
                     id='identifier-field'
                     name='identifier'
-                    value={session?.publicUserData.identifier || ''}
+                    value={clerk.user?.primaryEmailAddress?.emailAddress || clerk.user?.username || ''}
                     style={{ display: 'none' }}
                   />
                   <Form.ControlRow elementId={passwordField.id}>

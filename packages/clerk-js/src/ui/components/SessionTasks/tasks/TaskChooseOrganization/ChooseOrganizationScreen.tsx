@@ -107,6 +107,7 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
 const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const { user } = useUser();
   const card = useCardState();
+  const clerk = useClerk();
   const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
@@ -121,8 +122,16 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
       try {
         await setActive({
           organization,
-          navigate: async () => {
-            // TODO(after-auth) ORGS-779 - Handle next tasks
+          navigate: async ({ session }) => {
+            const task = session.currentTask;
+            if (task && task.key !== 'choose-organization') {
+              await navigate(
+                clerk.buildTasksUrl({
+                  redirectUrl: redirectUrlComplete,
+                }),
+              );
+              return;
+            }
             await navigate(redirectUrlComplete);
           },
         });

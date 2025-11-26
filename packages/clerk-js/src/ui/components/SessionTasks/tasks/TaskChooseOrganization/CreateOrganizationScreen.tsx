@@ -1,4 +1,4 @@
-import { useOrganizationList } from '@clerk/shared/react';
+import { useClerk, useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams } from '@clerk/shared/types';
 
 import { useEnvironment } from '@/ui/contexts';
@@ -22,6 +22,7 @@ type CreateOrganizationScreenProps = {
 
 export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
   const card = useCardState();
+  const clerk = useClerk();
   const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
@@ -60,8 +61,16 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       await setActive({
         organization,
-        navigate: async () => {
-          // TODO(after-auth) ORGS-779 - Handle next tasks
+        navigate: async ({ session }) => {
+          const task = session.currentTask;
+          if (task && task.key !== 'choose-organization') {
+            await navigate(
+              clerk.buildTasksUrl({
+                redirectUrl: redirectUrlComplete,
+              }),
+            );
+            return;
+          }
           await navigate(redirectUrlComplete);
         },
       });
