@@ -257,7 +257,7 @@ const _UserButton = withClerk(
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
+    const userProfileProps = Object.assign({}, props.userProfileProps, { customPages });
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
@@ -435,7 +435,7 @@ const _OrganizationSwitcher = withClerk(
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const organizationProfileProps = Object.assign(props.organizationProfileProps || {}, { customPages });
+    const organizationProfileProps = Object.assign({}, props.organizationProfileProps, { customPages });
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
