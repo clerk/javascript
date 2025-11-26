@@ -52,7 +52,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
-  GenerateSignatureParams,
+  GenerateSignature,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -2361,7 +2361,7 @@ export class Clerk implements ClerkInterface {
     });
   };
 
-  public authenticateWithSolana = async (props: AuthenticateWithSolanaParams = {}): Promise<void> => {
+  public authenticateWithSolana = async (props: AuthenticateWithSolanaParams): Promise<void> => {
     await this.authenticateWithWeb3({
       ...props,
       strategy: 'web3_solana_signature',
@@ -2386,7 +2386,7 @@ export class Clerk implements ClerkInterface {
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     const identifier = await getWeb3Identifier({ provider, walletName });
-    let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
+    let generateSignature: GenerateSignature;
     switch (provider) {
       case 'metamask':
         generateSignature = generateSignatureWithMetamask;
