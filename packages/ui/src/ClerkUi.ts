@@ -1,3 +1,4 @@
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/shared/types';
 import type { ClerkUiInstance, ComponentControls as SharedComponentControls } from '@clerk/shared/ui';
 
@@ -13,9 +14,9 @@ export class ClerkUi implements ClerkUiInstance {
     getClerk: () => Clerk,
     getEnvironment: () => EnvironmentResource | null | undefined,
     options: ClerkOptions,
-    _importModule: (module: string) => Promise<any>,
+    moduleManager: ModuleManager,
   ) {
-    this.#componentRenderer = mountComponentRenderer(getClerk, getEnvironment, options);
+    this.#componentRenderer = mountComponentRenderer(getClerk, getEnvironment, options, moduleManager);
   }
 
   ensureMounted(opts?: { preloadHint?: string }): Promise<SharedComponentControls> {

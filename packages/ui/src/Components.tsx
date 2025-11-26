@@ -1,4 +1,5 @@
 import { clerkUIErrorDOMElementNotFound } from '@clerk/shared/internal/clerk-js/errors';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_CheckoutProps,
   __internal_PlanDetailsProps,
@@ -145,6 +146,7 @@ interface ComponentsProps {
   getEnvironment: () => EnvironmentResource | null | undefined;
   options: ClerkOptions;
   onComponentsMounted: () => void;
+  moduleManager: ModuleManager;
 }
 
 interface ComponentsState {
@@ -188,6 +190,7 @@ export const mountComponentRenderer = (
   getClerk: () => Clerk,
   getEnvironment: () => EnvironmentResource | null | undefined,
   _options: ClerkOptions,
+  moduleManager: ModuleManager,
 ) => {
   const options = { ..._options };
   // Extract cssLayerName from baseTheme if present and move it to appearance level
@@ -226,6 +229,7 @@ export const mountComponentRenderer = (
               getEnvironment={getEnvironment}
               options={options}
               onComponentsMounted={deferredPromise.resolve}
+              moduleManager={moduleManager}
             />,
           );
           return deferredPromise.promise.then(() => componentsControls);
@@ -578,6 +582,7 @@ const Components = (props: ComponentsProps) => {
         clerk={props.getClerk()}
         environment={props.getEnvironment()}
         options={state.options}
+        moduleManager={props.moduleManager}
       >
         {[...nodes].map(([node, component]) => {
           return (
