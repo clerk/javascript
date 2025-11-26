@@ -121,6 +121,7 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
+import { ModuleManager } from '@/utils/moduleManager';
 
 import {
   ALLOWED_PROTOCOLS,
@@ -465,7 +466,7 @@ export class Clerk implements ClerkInterface {
             () => this,
             () => this.environment,
             this.#options,
-            (module: string) => import(module),
+            new ModuleManager(),
           ),
       );
     }
