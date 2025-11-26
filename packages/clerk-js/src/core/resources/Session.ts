@@ -28,6 +28,7 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
+import { LruMap } from '@/utils/lru-map';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -46,13 +47,12 @@ import { SessionVerification } from './SessionVerification';
  * Cache of per-tokenId locks for cross-tab coordination.
  * Each unique tokenId gets its own lock, allowing different token types
  * (e.g., different orgs, JWT templates) to be fetched in parallel.
+ * Uses LRU eviction to prevent unbounded growth.
  */
-const tokenLocks = new Map<string, ReturnType<typeof SafeLock>>();
+const tokenLocks = new LruMap<string, ReturnType<typeof SafeLock>>(50);
 
 /**
  * Gets or creates a cross-tab lock for a specific tokenId.
- * Using per-tokenId locks allows different token types to be fetched in parallel
- * while still preventing duplicate fetches for the same token across tabs.
  */
 function getTokenLock(tokenId: string) {
   let lock = tokenLocks.get(tokenId);
