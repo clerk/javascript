@@ -902,7 +902,7 @@ export const itIT: LocalizationResource = {
     form_password_validation_failed: 'Password errata.',
     form_username_invalid_character: 'Il nome utente contiene caratteri non validi.',
     form_username_invalid_length: 'Il nome utente deve avere una lunghezza compresa tra 3 e 32 caratteri.',
-    form_username_needs_non_number_char: undefined,
+    form_username_needs_non_number_char: 'Il tuo nome utente deve contenere almeno un carattere non numerico.',
     identification_deletion_failed: 'Non puoi eliminare la tua ultima identificazione.',
     not_allowed_access:
       "L'indirizzo email o il numero di telefono non è autorizzato per la registrazione. Questo può essere dovuto all'uso di '+', '=', '#' o '.' nell'indirizzo email, l'uso di un dominio collegato a un servizio email temporaneo o l'esclusione esplicita. Se ritieni che si tratti di un errore, contattaci.",

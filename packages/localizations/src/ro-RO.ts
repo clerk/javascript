@@ -907,7 +907,8 @@ export const roRO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length:
       'Numele de utilizator trebuie să aibă între {{min_length}} și {{max_length}} caractere.',
-    form_username_needs_non_number_char: undefined,
+    form_username_needs_non_number_char:
+      'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

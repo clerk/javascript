@@ -894,7 +894,7 @@ export const caES: LocalizationResource = {
     form_password_validation_failed: 'Contrasenya incorrecta',
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
-    form_username_needs_non_number_char: undefined,
+    form_username_needs_non_number_char: "El vostre nom d'usuari ha de contenir almenys un caràcter no numèric.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
     not_allowed_access:
       "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",

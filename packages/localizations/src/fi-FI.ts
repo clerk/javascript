@@ -894,7 +894,7 @@ export const fiFI: LocalizationResource = {
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
-    form_username_needs_non_number_char: undefined,
+    form_username_needs_non_number_char: 'Käyttäjänimessä tulee olla vähintään yksi ei-numeerinen merkki.',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
     not_allowed_access:
       "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
