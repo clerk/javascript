@@ -124,20 +124,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
             enforce: true,
           },
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
-          },
           defaultVendors: {
             minChunks: 1,
             test: /[\\/]node_modules[\\/]/,
