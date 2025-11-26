@@ -11,6 +11,45 @@ describe('withRetry', () => {
     vi.useRealTimers();
   });
 
+  it('throws when maxAttempts is zero', async () => {
+    const fn = vi.fn().mockResolvedValue('success');
+
+    await expect(
+      withRetry(fn, {
+        maxAttempts: 0,
+        shouldRetry: () => true,
+      }),
+    ).rejects.toThrow('withRetry: maxAttempts must be a positive integer');
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('throws when maxAttempts is negative', async () => {
+    const fn = vi.fn().mockResolvedValue('success');
+
+    await expect(
+      withRetry(fn, {
+        maxAttempts: -1,
+        shouldRetry: () => true,
+      }),
+    ).rejects.toThrow('withRetry: maxAttempts must be a positive integer');
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('throws when maxAttempts is not an integer', async () => {
+    const fn = vi.fn().mockResolvedValue('success');
+
+    await expect(
+      withRetry(fn, {
+        maxAttempts: 1.5,
+        shouldRetry: () => true,
+      }),
+    ).rejects.toThrow('withRetry: maxAttempts must be a positive integer');
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+
   it('returns result on first successful attempt', async () => {
     const fn = vi.fn().mockResolvedValue('success');
 

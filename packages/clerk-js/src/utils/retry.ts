@@ -17,6 +17,10 @@ const calculateBackoff = (attempt: number, jitter: boolean): number => {
 };
 
 export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions): Promise<T> {
+  if (!Number.isInteger(options.maxAttempts) || options.maxAttempts <= 0) {
+    throw new Error('withRetry: maxAttempts must be a positive integer');
+  }
+
   let lastError: unknown;
 
   for (let attempt = 0; attempt < options.maxAttempts; attempt++) {
