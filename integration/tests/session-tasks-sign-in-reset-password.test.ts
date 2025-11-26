@@ -7,7 +7,7 @@ import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword] })(
   'session tasks after sign-in reset password flow @nextjs',
   ({ app }) => {
-    test.describe.configure({ mode: 'serial' });
+    test.describe.configure({ mode: 'parallel' });
 
     test.afterAll(async () => {
       await app.teardown();
