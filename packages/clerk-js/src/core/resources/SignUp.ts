@@ -457,7 +457,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword(loadZxcvbn, {
+      return createValidatePassword(loadZxcvbn(), {
         ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);

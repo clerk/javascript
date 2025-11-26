@@ -72,7 +72,7 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale } from '../../utils';
+import { getBrowserLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -522,7 +522,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword(loadZxcvbn, {
+      return createValidatePassword(loadZxcvbn(), {
         ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
