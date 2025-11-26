@@ -26,7 +26,19 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
 }));
 
 describe('SignUp', () => {
+  it('can be serialized with JSON.stringify', () => {
+    const signUp = new SignUp();
+    const snapshot = JSON.stringify(signUp);
+    expect(snapshot).toBeDefined();
+  });
+
   describe('SignUpFuture', () => {
+    it('can be serialized with JSON.stringify', () => {
+      const signUp = new SignUp();
+      const snapshot = JSON.stringify(signUp.__internal_future);
+      expect(snapshot).toBeDefined();
+    });
+
     describe('create', () => {
       afterEach(() => {
         vi.clearAllMocks();

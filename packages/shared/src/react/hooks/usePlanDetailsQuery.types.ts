@@ -2,7 +2,7 @@ import type { ClerkAPIResponseError } from '../../errors/clerkApiResponseError';
 import type { BillingPlanResource } from '../../types';
 
 /**
- * @interface
+ * @internal
  */
 export type UsePlanDetailsQueryParams = {
   /**
@@ -28,7 +28,7 @@ export type UsePlanDetailsQueryParams = {
 };
 
 /**
- * @interface
+ * @internal
  */
 export type PlanDetailsQueryResult = {
   /**
