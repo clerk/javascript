@@ -1,6 +1,5 @@
 import { useClerk, useReverification } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/shared/types';
-import { useCallback } from 'react';
 
 import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { useTaskResetPasswordContext } from '@/ui/contexts/components/SessionTasks';
@@ -11,6 +10,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { useConfirmPassword } from '@/ui/hooks';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
+import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -25,6 +25,7 @@ const TaskResetPasswordInternal = () => {
   } = useEnvironment();
 
   const { t, locale } = useLocalizations();
+  const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskResetPasswordContext();
   const { otherSessions } = useMultipleSessions({ user: clerk.user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
@@ -73,7 +74,7 @@ const TaskResetPasswordInternal = () => {
     }
   };
 
-  const resetPassword = useCallback(async () => {
+  const resetPassword = async () => {
     if (!clerk.user) {
       return;
     }
@@ -90,7 +91,7 @@ const TaskResetPasswordInternal = () => {
       // Handle the next task if it exists or redirect to the complete url
       const task = clerk.session?.currentTask;
       if (task && task.key !== 'reset-password') {
-        await clerk?.navigate(
+        await navigate(
           clerk.buildTasksUrl({
             redirectUrl: redirectUrlComplete,
           }),
@@ -98,19 +99,11 @@ const TaskResetPasswordInternal = () => {
         return;
       }
 
-      await clerk?.navigate(redirectUrlComplete);
+      await navigate(redirectUrlComplete);
     } catch (e) {
       return handleError(e, [passwordField, confirmField], card.setError);
     }
-  }, [
-    clerk,
-    passwordField,
-    confirmField,
-    updatePasswordWithReverification,
-    sessionsField.checked,
-    redirectUrlComplete,
-    card.setError,
-  ]);
+  };
 
   const identifier = clerk.user?.primaryEmailAddress?.emailAddress ?? clerk.user?.username;
 
