@@ -59,45 +59,19 @@ const common = ({ mode, variant }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          zxcvbnTSCoreVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts\/core|fastest-levenshtein)[\\/]/,
-            name: 'zxcvbn-ts-core',
-            chunks: 'all',
-          },
-          zxcvbnTSCommonVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
-            name: 'zxcvbn-common',
-            chunks: 'all',
-          },
-          baseAccountSDKVendor: {
-            test: /[\\/]node_modules[\\/](@base-org\/account|@noble\/curves|abitype|ox|preact|eventemitter3|viem|zustand)[\\/]/,
-            name: 'base-account-sdk',
-            chunks: 'all',
-          },
-          coinbaseWalletSDKVendor: {
-            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
-            name: 'coinbase-wallet-sdk',
-            chunks: 'all',
-          },
-          stripeVendor: {
-            test: /[\\/]node_modules[\\/](@stripe\/stripe-js)[\\/]/,
-            name: 'stripe-vendors',
-            chunks: 'all',
-            enforce: true,
-          },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.
            */
           signUp: {
             minChunks: 1,
             name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
+            test: module => !!(module.resource && module.resource.includes('/components/SignUp')),
           },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
+            test: module => !!(module.resource && !module.resource.includes('/components')),
           },
           defaultVendors: {
             minChunks: 1,
