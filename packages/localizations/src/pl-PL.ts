@@ -900,6 +900,7 @@ export const plPL: LocalizationResource = {
     form_username_invalid_character:
       'Twoja nazwa użytkownika zawiera nieprawidłowe znaki. Prosimy o używanie wyłącznie liter, cyfr i podkreśleń.',
     form_username_invalid_length: 'Nazwa użytkownika musi zawierać od {{min_length}} do {{max_length}} znaków.',
+    form_username_needs_non_number_char: 'Nazwa użytkownika musi zawierać co najmniej jeden znak niebędący cyfrą.',
     identification_deletion_failed: 'Nie można usunąć ostatniego identyfikatora.',
     not_allowed_access:
       "Adres e-mail lub numer telefonu nie jest dozwolony do rejestracji. Może to być spowodowane użyciem '+', '=', '#' lub '.' w adresie e-mail, użyciem domeny skojarzonej z usługą poczty e-mail tymczasowej lub jawnego wykluczenia.",

@@ -896,6 +896,7 @@ export const svSE: LocalizationResource = {
     form_password_validation_failed: 'Felaktigt lösenord',
     form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
+    form_username_needs_non_number_char: 'Ditt användarnamn måste innehålla minst ett icke-numeriskt tecken.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
     not_allowed_access:
       "Adressen eller telefonnumret du använder för registrering är inte tillåtet. Detta kan bero på att du använder '+', '=', '#' eller '.' i din e-postadress, använder en domän som är kopplad till en tidsbegränsad e-posttjänst eller har ett explicit blockerat.",
