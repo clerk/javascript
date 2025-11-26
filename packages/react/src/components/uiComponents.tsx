@@ -435,7 +435,7 @@ const _OrganizationSwitcher = withClerk(
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const organizationProfileProps = Object.assign({}, props.organizationProfileProps, { customPages });
+    const organizationProfileProps = { ...props.organizationProfileProps, customPages };
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
