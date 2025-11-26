@@ -107,7 +107,6 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
 const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const { user } = useUser();
   const card = useCardState();
-  const clerk = useClerk();
   const { navigate } = useRouter();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
