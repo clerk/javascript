@@ -35,7 +35,11 @@ export function isOAuthJwt(token: string): boolean {
   }
   try {
     const { data, errors } = decodeJwt(token);
-    return !errors && !!data && OAUTH_ACCESS_TOKEN_TYPES.includes(data.header.typ as (typeof OAUTH_ACCESS_TOKEN_TYPES)[number]);
+    return (
+      !errors &&
+      !!data &&
+      OAUTH_ACCESS_TOKEN_TYPES.includes(data.header.typ as (typeof OAUTH_ACCESS_TOKEN_TYPES)[number])
+    );
   } catch {
     return false;
   }
