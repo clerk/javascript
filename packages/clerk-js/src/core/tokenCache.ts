@@ -3,6 +3,7 @@ import type { TokenResource } from '@clerk/shared/types';
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
 
+import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { Token } from './resources/internal';
 
 /**
@@ -59,10 +60,9 @@ export interface TokenCache {
    * Retrieves a cached token entry if it exists and has not expired.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @param leeway - Optional seconds before expiration to treat token as expired (default: 10s). Combined with 5s sync leeway.
    * @returns The cached TokenCacheEntry if found and valid, undefined otherwise
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheEntry | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON): TokenCacheEntry | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -82,9 +82,9 @@ export interface TokenCache {
 
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
-const LEEWAY = 10;
-// This value should have the same value as the INTERVAL_IN_MS in SessionCookiePoller
-const SYNC_LEEWAY = 5;
+// Minimum remaining TTL (in seconds) before forcing a synchronous refresh.
+// Uses the poller interval to ensure the poller has time to refresh before expiration.
+const MIN_REMAINING_TTL_IN_SECONDS = POLLER_INTERVAL_IN_MS / 1000;
 
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
@@ -176,7 +176,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     cache.clear();
   };
 
-  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = LEEWAY): TokenCacheEntry | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheEntry | undefined => {
     ensureBroadcastChannel();
 
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
@@ -188,13 +188,11 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const elapsed = nowSeconds - value.createdAt;
+    const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
-    // Include poller interval as part of the leeway to ensure the cache value
-    // will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const expiresSoon = value.expiresIn! - elapsed < (leeway || 1) + SYNC_LEEWAY;
-
-    if (expiresSoon) {
+    // Token expires within the poller interval - force synchronous refresh
+    // to avoid returning a token that may expire before the poller runs.
+    if (remainingTtl < MIN_REMAINING_TTL_IN_SECONDS) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
@@ -202,6 +200,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       return;
     }
 
+    // Return the entry - the session token poller handles background refresh.
     return value.entry;
   };
 

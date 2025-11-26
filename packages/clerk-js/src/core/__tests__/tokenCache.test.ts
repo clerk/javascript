@@ -355,7 +355,7 @@ describe('SessionTokenCache', () => {
       expect(cachedEntry).toBeUndefined();
     });
 
-    it('removes token when it expires within the leeway threshold', async () => {
+    it('removes token when less than 5 seconds remain', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const iat = nowSeconds;
       const exp = iat + 20;
@@ -366,7 +366,8 @@ describe('SessionTokenCache', () => {
         jwt: { claims: { exp, iat } },
       } as any);
 
-      SessionTokenCache.set({ createdAt: nowSeconds - 13, tokenId: 'soon_expired_token', tokenResolver });
+      // Token has 20s TTL, created 16s ago = 4s remaining (< 5s threshold)
+      SessionTokenCache.set({ createdAt: nowSeconds - 16, tokenId: 'soon_expired_token', tokenResolver });
 
       await tokenResolver;
 
@@ -532,58 +533,36 @@ describe('SessionTokenCache', () => {
     });
   });
 
-  describe('leeway precision', () => {
-    it('includes 5 second sync leeway on top of default 10 second leeway', async () => {
+  describe('minimum TTL threshold', () => {
+    it('returns token until less than 5 seconds remain', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
       const token = new Token({
-        id: 'leeway-token',
+        id: 'threshold-token',
         jwt,
         object: 'token',
       });
 
       const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'leeway-test', tokenId: 'leeway-token' };
+      const key = { audience: 'threshold-test', tokenId: 'threshold-token' };
 
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      expect(SessionTokenCache.get(key)).toMatchObject({ tokenId: 'leeway-token' });
+      expect(SessionTokenCache.get(key)).toMatchObject({ tokenId: 'threshold-token' });
 
-      vi.advanceTimersByTime(44 * 1000);
+      // At 54s elapsed, 6s remaining - should still return token
+      vi.advanceTimersByTime(54 * 1000);
       expect(SessionTokenCache.get(key)).toBeDefined();
 
+      // At 55s elapsed, 5s remaining - should still return token
       vi.advanceTimersByTime(1 * 1000);
       expect(SessionTokenCache.get(key)).toBeDefined();
 
+      // At 56s elapsed, 4s remaining - should force sync refresh
       vi.advanceTimersByTime(1 * 1000);
       expect(SessionTokenCache.get(key)).toBeUndefined();
-    });
-
-    it('enforces minimum 5 second sync leeway even when leeway is set to 0', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'zero-leeway-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { audience: 'zero-leeway-test', tokenId: 'zero-leeway-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      expect(SessionTokenCache.get(key, 0)).toMatchObject({ tokenId: 'zero-leeway-token' });
-
-      vi.advanceTimersByTime(54 * 1000);
-      expect(SessionTokenCache.get(key, 0)).toBeDefined();
-
-      vi.advanceTimersByTime(2 * 1000);
-      expect(SessionTokenCache.get(key, 0)).toBeUndefined();
     });
   });
 
