@@ -1433,7 +1433,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  authenticateWithSolana = async (params?: AuthenticateWithSolanaParams) => {
+  authenticateWithSolana = async (params: AuthenticateWithSolanaParams) => {
     const callback = () => this.clerkjs?.authenticateWithSolana(params);
     if (this.clerkjs && this.loaded) {
       return callback() as Promise<void>;
