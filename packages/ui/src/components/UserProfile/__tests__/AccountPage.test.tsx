@@ -124,7 +124,7 @@ describe('AccountPage', () => {
                 },
                 verification: {
                   status: 'verified',
-                  strategy: 'saml',
+                  strategy: 'enterprise_sso',
                   verified_at_client: 'foo',
                   attempts: 0,
                   error: {
@@ -190,7 +190,7 @@ describe('AccountPage', () => {
                 },
                 verification: {
                   status: 'verified',
-                  strategy: 'saml',
+                  strategy: 'enterprise_sso',
                   verified_at_client: 'foo',
                   attempts: 0,
                   error: {
@@ -250,7 +250,7 @@ describe('AccountPage', () => {
         },
         verification: {
           status: 'verified',
-          strategy: 'saml',
+          strategy: 'enterprise_sso',
           verified_at_client: 'foo',
           attempts: 0,
           error: {

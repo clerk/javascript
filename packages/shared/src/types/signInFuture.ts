@@ -15,7 +15,7 @@ export interface SignInFutureCreateParams {
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
    * authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'saml' | 'enterprise_sso' | PasskeyStrategy;
+  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
