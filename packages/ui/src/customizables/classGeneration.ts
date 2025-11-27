@@ -1,6 +1,5 @@
-import type { Elements, ElementState } from '@clerk/shared/types';
-
 import type { FlowMetadata } from '../elements/contexts';
+import type { Elements, ElementState } from '../internal/appearance';
 import type { ElementDescriptor, ElementId } from './elementDescriptors';
 import { CLASS_PREFIX } from './elementDescriptors';
 import type { ParsedElements } from './parseAppearance';

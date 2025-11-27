@@ -9,7 +9,6 @@ import {
   useSession,
 } from '@clerk/shared/react';
 import type {
-  Appearance,
   BillingPlanResource,
   BillingSubscriptionItemResource,
   BillingSubscriptionPlanPeriod,
@@ -19,6 +18,7 @@ import { useCallback, useMemo } from 'react';
 import { useProtect } from '@/ui/common/Gate';
 import { getClosestProfileScrollBox } from '@/ui/utils/getClosestProfileScrollBox';
 
+import type { Appearance } from '../../internal/appearance';
 import type { LocalizationKey } from '../../localization';
 import { localizationKeys } from '../../localization';
 import { useSubscriberTypeContext } from './SubscriberType';
