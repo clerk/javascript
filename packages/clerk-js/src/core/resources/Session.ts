@@ -377,11 +377,17 @@ export class Session extends BaseResource implements SessionResource {
         'session',
       );
       const cachedToken = await cachedEntry.tokenResolver;
+      const isCacheTokenDifferent =
+        this.lastActiveToken && this.lastActiveToken.getRawString() !== cachedToken.getRawString();
+
+      const token = isCacheTokenDifferent ? this.lastActiveToken : cachedToken;
+
       if (shouldDispatchTokenUpdate) {
-        eventBus.emit(events.TokenUpdate, { token: cachedToken });
+        eventBus.emit(events.TokenUpdate, { token });
       }
+
       // Return null when raw string is empty to indicate that there it's signed-out
-      return cachedToken.getRawString() || null;
+      return token?.getRawString() || cachedToken.getRawString() || null;
     }
 
     debugLogger.info(
