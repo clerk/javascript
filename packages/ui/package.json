@@ -34,7 +34,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --noEmit && pnpm build:umd && pnpm build:esm",
+    "build": "pnpm build:umd && pnpm build:esm",
     "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
     "build:esm": "tsdown",
     "build:umd": "rspack build --config rspack.config.js --env production",

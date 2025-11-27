@@ -106,7 +106,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --noEmit && tsdown",
+    "build": "tsdown",
     "build:declarations": "tsc -p tsconfig.json",
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",

@@ -1,4 +1,5 @@
 import './polyfills';
+import './types/appearance';
 
 import { setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
 

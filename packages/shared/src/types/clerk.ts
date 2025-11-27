@@ -45,6 +45,24 @@ import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
 import type { WaitlistResource } from './waitlist';
 
+/**
+ * Global appearance type registry that can be augmented by packages that depend on `@clerk/ui`.
+ * Framework packages (like `@clerk/react`, `@clerk/nextjs`) should augment this interface
+ * to provide proper appearance types without creating circular dependencies.
+ */
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface ClerkAppearanceRegistry {}
+}
+
+/**
+ * Appearance theme type that gets overridden by framework packages.
+ * Defaults to `any` in @clerk/shared.
+ * Becomes fully typed when a framework package augments ClerkAppearanceRegistry with Theme.
+ */
+// @ts-expect-error - this is a global interface augmentation
+export type ClerkAppearanceTheme = ClerkAppearanceRegistry['theme'];
+
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
 export type __experimental_CheckoutCacheState = Readonly<{
@@ -1326,7 +1344,7 @@ export type SignInProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: SignInTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Initial values that are used to prefill the sign in or up forms.
    */
@@ -1397,7 +1415,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: UserVerificationTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
@@ -1447,7 +1465,7 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    * @default true
    */
   fedCmSupport?: boolean;
-  appearance?: SignInTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type SignUpProps = RoutingOptions & {
@@ -1476,7 +1494,7 @@ export type SignUpProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: SignUpTheme;
+  appearance?: ClerkAppearanceTheme;
 
   /**
    * Additional arbitrary metadata to be stored alongside the User object
@@ -1515,7 +1533,7 @@ export type UserProfileProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: UserProfileTheme;
+  appearance?: ClerkAppearanceTheme;
   /*
    * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
    * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
@@ -1563,7 +1581,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: OrganizationProfileTheme;
+  appearance?: ClerkAppearanceTheme;
   /*
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
@@ -1615,7 +1633,7 @@ export type CreateOrganizationProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: CreateOrganizationTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -1666,9 +1684,9 @@ export type UserButtonProps = UserButtonProfileMode & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: UserButtonTheme;
+  appearance?: ClerkAppearanceTheme;
 
-  /*
+  /**
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
@@ -1681,7 +1699,7 @@ export type UserButtonProps = UserButtonProfileMode & {
 };
 
 export type UserAvatarProps = {
-  appearance?: UserAvatarTheme;
+  appearance?: ClerkAppearanceTheme;
   rounded?: boolean;
 };
 
@@ -1767,7 +1785,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvider(if one is provided)
      */
-    appearance?: OrganizationSwitcherTheme;
+    appearance?: ClerkAppearanceTheme;
     /*
      * Specify options for the underlying <OrganizationProfile /> component.
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
@@ -1798,7 +1816,7 @@ export type OrganizationListProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: OrganizationListTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Hides the screen for sending invitations after an organization is created.
    *
@@ -1834,7 +1852,7 @@ export type WaitlistProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: WaitlistTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Full URL or path where the SignIn component is mounted.
    */
@@ -1877,7 +1895,7 @@ type PricingTableBaseProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: PricingTableTheme;
+  appearance?: ClerkAppearanceTheme;
   /*
    * Specify options for the underlying <Checkout /> component.
    * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
@@ -1901,7 +1919,7 @@ export type APIKeysProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: APIKeysTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Whether to show the description field in the API key creation form.
    *
@@ -1931,7 +1949,7 @@ export type RevokeAPIKeyParams = {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_CheckoutProps = {
-  appearance?: CheckoutTheme;
+  appearance?: ClerkAppearanceTheme;
   planId?: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
@@ -1956,7 +1974,7 @@ export type __experimental_CheckoutButtonProps = {
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
-    appearance?: CheckoutTheme;
+    appearance?: ClerkAppearanceTheme;
     portalId?: string;
     portalRoot?: HTMLElement | null | undefined;
     onClose?: () => void;
@@ -1985,7 +2003,7 @@ export type __internal_PlanDetailsProps = (
       planId?: never;
     }
 ) & {
-  appearance?: PlanDetailTheme;
+  appearance?: ClerkAppearanceTheme;
   initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -2009,7 +2027,7 @@ export type __experimental_PlanDetailsButtonProps = (
 ) & {
   initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   planDetailsProps?: {
-    appearance?: PlanDetailTheme;
+    appearance?: ClerkAppearanceTheme;
     portalId?: string;
     portalRoot?: PortalRoot;
   };
@@ -2026,7 +2044,7 @@ export type __internal_SubscriptionDetailsProps = {
    * @default 'user'
    */
   for?: ForPayerType;
-  appearance?: SubscriptionDetailsTheme;
+  appearance?: ClerkAppearanceTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -2045,14 +2063,14 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   for?: ForPayerType;
   onSubscriptionCancel?: () => void;
   subscriptionDetailsProps?: {
-    appearance?: SubscriptionDetailsTheme;
+    appearance?: ClerkAppearanceTheme;
     portalId?: string;
     portalRoot?: PortalRoot;
   };
 };
 
 export type __internal_OAuthConsentProps = {
-  appearance?: OAuthConsentTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Name of the OAuth application.
    */
@@ -2148,7 +2166,7 @@ export type TaskChooseOrganizationProps = {
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
-  appearance?: TaskChooseOrganizationTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type CreateOrganizationInvitationParams = {
