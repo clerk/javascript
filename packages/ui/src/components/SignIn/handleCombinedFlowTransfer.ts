@@ -115,8 +115,8 @@ export function hasOptionalFields(
   identifierAttribute: 'emailAddress' | 'phoneNumber' | 'username',
 ) {
   const filteredFields = signUp.optionalFields.filter(field => {
-    // OAuth, Web3, and SAML fields, while optional, are not relevant once sign up has been initiated with an identifier.
-    if (field.startsWith('oauth_') || field.startsWith('web3_') || ['enterprise_sso', 'saml'].includes(field)) {
+    // OAuth, Web3, and Enterprise SSO fields, while optional, are not relevant once sign up has been initiated with an identifier.
+    if (field.startsWith('oauth_') || field.startsWith('web3_') || field === 'enterprise_sso') {
       return false;
     }
 

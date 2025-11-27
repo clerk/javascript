@@ -312,30 +312,6 @@ describe('SignInStart', () => {
     });
   });
 
-  describe('SAML', () => {
-    it('initiates a SAML flow if saml is listed as a supported first factor', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
-      });
-      fixtures.signIn.create.mockReturnValueOnce(
-        Promise.resolve({
-          status: 'needs_identifier',
-          supportedFirstFactors: [{ strategy: 'saml' }],
-        } as unknown as SignInResource),
-      );
-      const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
-      await userEvent.click(screen.getByText('Continue'));
-      expect(fixtures.signIn.create).toHaveBeenCalled();
-      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
-        strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost:3000/#/sso-callback',
-        redirectUrlComplete: '/',
-        continueSignIn: true,
-      });
-    });
-  });
-
   describe('Enterprise SSO', () => {
     it('initiates a Enterprise SSO flow if enterprise_sso is listed as the only supported first factor', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
