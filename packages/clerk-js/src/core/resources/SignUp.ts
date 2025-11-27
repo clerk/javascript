@@ -1,15 +1,5 @@
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-} from '@clerk/shared/internal/clerk-js/web3';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
@@ -54,7 +44,7 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale, getClerkQueryParam } from '../../utils';
+import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -321,10 +311,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
       legalAccepted: params?.legalAccepted,
@@ -336,10 +326,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
       legalAccepted: params?.legalAccepted,
@@ -351,10 +341,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getBaseIdentifier();
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_base_signature',
       legalAccepted: params?.legalAccepted,
@@ -366,10 +356,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getOKXWalletIdentifier();
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_okx_wallet_signature',
       legalAccepted: params?.legalAccepted,
@@ -467,7 +457,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword(loadZxcvbn, {
+      return createValidatePassword(loadZxcvbn(), {
         ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
@@ -883,20 +873,20 @@ class SignUpFuture implements SignUpFutureResource {
       let generateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);

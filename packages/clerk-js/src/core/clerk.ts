@@ -122,6 +122,7 @@ import { allSettled, handleValueOrFn, noop } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
 
 import { debugLogger, initDebugLogger } from '@/utils/debug';
+import { ModuleManager } from '@/utils/moduleManager';
 
 import {
   ALLOWED_PROTOCOLS,
@@ -131,12 +132,7 @@ import {
   createBeforeUnloadTracker,
   createPageLifecycle,
   errorThrower,
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
   getClerkQueryParam,
-  getWeb3Identifier,
   hasExternalAccountSignUpError,
   inActiveBrowserTab,
   inBrowser,
@@ -147,6 +143,7 @@ import {
   removeClerkQueryParam,
   requiresUserInput,
   stripOrigin,
+  web3,
 } from '../utils';
 import { CLERK_ENVIRONMENT_STORAGE_ENTRY, SafeLocalStorage } from '../utils/localStorage';
 import { memoizeListenerCallback } from '../utils/memoizeStateListenerCallback';
@@ -466,7 +463,7 @@ export class Clerk implements ClerkInterface {
             () => this,
             () => this.environment,
             this.#options,
-            (module: string) => import(module),
+            new ModuleManager(),
           ),
       );
     }
@@ -2230,20 +2227,20 @@ export class Clerk implements ClerkInterface {
     const { displayConfig } = this.environment;
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
-    const identifier = await getWeb3Identifier({ provider });
+    const identifier = await web3().getWeb3Identifier({ provider });
     let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
     switch (provider) {
       case 'metamask':
-        generateSignature = generateSignatureWithMetamask;
+        generateSignature = web3().generateSignatureWithMetamask;
         break;
       case 'base':
-        generateSignature = generateSignatureWithBase;
+        generateSignature = web3().generateSignatureWithBase;
         break;
       case 'coinbase_wallet':
-        generateSignature = generateSignatureWithCoinbaseWallet;
+        generateSignature = web3().generateSignatureWithCoinbaseWallet;
         break;
       default:
-        generateSignature = generateSignatureWithOKXWallet;
+        generateSignature = web3().generateSignatureWithOKXWallet;
         break;
     }
 

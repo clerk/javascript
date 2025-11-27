@@ -1,3 +1,4 @@
+import type { ModuleManager } from '../moduleManager';
 import type { Appearance, Clerk, ClerkOptions, EnvironmentResource } from '../types';
 
 export type UIVersion = string;
@@ -31,7 +32,7 @@ export interface ClerkUiConstructor {
     getClerk: () => Clerk,
     getEnvironment: () => EnvironmentResource | null | undefined,
     options: ClerkOptions,
-    importModule: (module: string) => Promise<any>,
+    moduleManager: ModuleManager,
   ): ClerkUiInstance;
   version: string;
 }

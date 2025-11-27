@@ -1,4 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
@@ -12,6 +13,7 @@ import { ClerkComponents } from './components';
 const ClerkContextProvider = lazy(() => import('../contexts').then(m => ({ default: m.ClerkContextProvider })));
 const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
 const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
+const ModuleManagerProvider = lazy(() => import('../contexts').then(m => ({ default: m.ModuleManagerProvider })));
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
 const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
 const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
@@ -32,7 +34,13 @@ const OrganizationSwitcherPrefetch = lazy(() =>
   })),
 );
 
-type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
+type LazyProvidersProps = React.PropsWithChildren<{
+  clerk: any;
+  environment: any;
+  options: any;
+  moduleManager: ModuleManager;
+  children: any;
+}>;
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
@@ -40,11 +48,13 @@ export const LazyProviders = (props: LazyProvidersProps) => {
       nonce={props.options.nonce}
       cssLayerName={props.options.appearance?.cssLayerName}
     >
-      <ClerkContextProvider clerk={props.clerk}>
-        <EnvironmentProvider value={props.environment}>
-          <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
-        </EnvironmentProvider>
-      </ClerkContextProvider>
+      <ModuleManagerProvider moduleManager={props.moduleManager}>
+        <ClerkContextProvider clerk={props.clerk}>
+          <EnvironmentProvider value={props.environment}>
+            <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
+          </EnvironmentProvider>
+        </ClerkContextProvider>
+      </ModuleManagerProvider>
     </StyleCacheProvider>
   );
 };

@@ -5,4 +5,5 @@ export * from './OptionsContext';
 export * from './CoreSessionContext';
 export * from './CoreClientContext';
 export * from './AcceptedUserInvitations';
+export * from './ModuleManagerContext';
 export { ClerkContextProvider } from '@clerk/shared/react';
