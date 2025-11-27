@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useDeferredValue, useSyncExternalStore } from 'react';
 
 import type { ClientResource } from '@/types';
 
@@ -8,16 +8,14 @@ const initialSnapshot = undefined;
 export function useClientBase(): ClientResource | null | undefined {
   const clerk = useClerkInstanceContext();
 
-  const snapshot = useMemo(() => {
-    if (!clerk.loaded) {
-      return initialSnapshot;
-    }
-    return clerk.client;
-  }, [clerk.client, clerk.loaded]);
-
   const client = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
-    useCallback(() => snapshot, [snapshot]),
+    useCallback(() => {
+      if (!clerk.loaded) {
+        return initialSnapshot;
+      }
+      return clerk.client;
+    }, [clerk.client, initialSnapshot, clerk.loaded]),
     useCallback(() => initialSnapshot, []),
   );
 

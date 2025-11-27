@@ -15,16 +15,14 @@ export function useOrganizationBase(): OrganizationResource | null | undefined {
     return initialStateContext.organization;
   }, [initialStateContext]);
 
-  const snapshot = useMemo(() => {
-    if (!clerk.loaded) {
-      return initialSnapshot;
-    }
-    return clerk.organization;
-  }, [clerk.organization, initialSnapshot, clerk.loaded]);
-
   const organization = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
-    useCallback(() => snapshot, [snapshot]),
+    useCallback(() => {
+      if (!clerk.loaded) {
+        return initialSnapshot;
+      }
+      return clerk.organization;
+    }, [clerk.organization, initialSnapshot, clerk.loaded]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );
 

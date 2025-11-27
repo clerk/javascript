@@ -15,16 +15,14 @@ export function useSessionBase(): SignedInSessionResource | null | undefined {
     return initialStateContext.session as SignedInSessionResource;
   }, [initialStateContext]);
 
-  const snapshot = useMemo(() => {
-    if (!clerk.loaded) {
-      return initialSnapshot;
-    }
-    return clerk.session;
-  }, [clerk.session, initialSnapshot, clerk.loaded]);
-
   const session = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
-    useCallback(() => snapshot, [snapshot]),
+    useCallback(() => {
+      if (!clerk.loaded) {
+        return initialSnapshot;
+      }
+      return clerk.session;
+    }, [clerk.session, initialSnapshot, clerk.loaded]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );
 

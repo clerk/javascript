@@ -15,16 +15,19 @@ export function useUserBase(): UserResource | null | undefined {
     return initialStateContext.user;
   }, [initialStateContext]);
 
-  const snapshot = useMemo(() => {
-    if (!clerk.loaded) {
-      return initialSnapshot;
-    }
-    return clerk.user;
-  }, [clerk.user, initialSnapshot, clerk.loaded]);
-
   const user = useSyncExternalStore(
-    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
-    useCallback(() => snapshot, [snapshot]),
+    useCallback(
+      callback => {
+        return clerk.addListener(callback, { skipInitialEmit: true });
+      },
+      [clerk],
+    ),
+    useCallback(() => {
+      if (!clerk.loaded) {
+        return initialSnapshot;
+      }
+      return clerk.user;
+    }, [clerk.user, initialSnapshot, clerk.loaded]),
     useCallback(() => initialSnapshot, [initialSnapshot]),
   );
 
