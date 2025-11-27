@@ -3,7 +3,7 @@
 import type { DeepPartial } from '@clerk/shared/types';
 import type { BaseTheme, Elements, Theme } from '@clerk/ui/internal';
 
-import type { InternalTheme } from '../../ui/src/foundations';
+import type { InternalTheme } from '../foundations';
 
 interface CreateClerkThemeParams extends DeepPartial<Theme>, Pick<BaseTheme, 'cssLayerName'> {
   /**

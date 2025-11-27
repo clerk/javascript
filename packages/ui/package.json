@@ -27,6 +27,12 @@
       "import": "./dist/internal/index.js",
       "default": "./dist/internal/index.js"
     },
+    "./themes": {
+      "types": "./dist/themes/index.d.ts",
+      "import": "./dist/themes/index.js",
+      "default": "./dist/themes/index.js"
+    },
+    "./themes/shadcn.css": "./dist/themes/shadcn.css",
     "./package.json": "./package.json"
   },
   "types": "dist/index.d.ts",

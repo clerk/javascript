@@ -872,7 +872,7 @@ export type Theme = {
    * Supports both object-based themes and string-based themes:
    *
    * @example
-   * import { dark } from "@clerk/themes";
+   * import { dark } from "@clerk/ui/themes";
    * appearance={{ theme: dark }}
    *
    * @example
@@ -887,7 +887,7 @@ export type Theme = {
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * @example
-   * import { dark } from "@clerk/themes";
+   * import { dark } from "@clerk/ui/themes";
    * appearance={{ baseTheme: dark }}
    */
   baseTheme?: BaseTheme | BaseTheme[];
