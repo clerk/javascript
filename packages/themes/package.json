@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
+    "@clerk/ui": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
