@@ -3,27 +3,6 @@ import type { ClerkGlobalHookError } from '@/errors/globalHookError';
 import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
 import type {
-  APIKeysTheme,
-  Appearance,
-  CheckoutTheme,
-  CreateOrganizationTheme,
-  OAuthConsentTheme,
-  OrganizationListTheme,
-  OrganizationProfileTheme,
-  OrganizationSwitcherTheme,
-  PlanDetailTheme,
-  PricingTableTheme,
-  SignInTheme,
-  SignUpTheme,
-  SubscriptionDetailsTheme,
-  TaskChooseOrganizationTheme,
-  UserAvatarTheme,
-  UserButtonTheme,
-  UserProfileTheme,
-  UserVerificationTheme,
-  WaitlistTheme,
-} from './appearance';
-import type {
   BillingCheckoutResource,
   BillingNamespace,
   BillingPlanResource,
@@ -1041,7 +1020,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
     /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
-    appearance?: Appearance;
+    // TODO @nikos
+    appearance?: any;
     /**
      * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
@@ -2298,6 +2278,12 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/guides/secure/best-practices/csp-headers#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
    */
   nonce?: string;
+  /**
+   * @internal
+   * This is a structural-only type for the `ui` object that can be passed
+   * to Clerk.load() and ClerkProvider
+   */
+  ui?: { version: string; url?: string };
 } & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {
