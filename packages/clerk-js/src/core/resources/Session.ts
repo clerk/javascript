@@ -369,20 +369,27 @@ export class Session extends BaseResource implements SessionResource {
 
     const tokenId = this.#getCacheId(template, organizationId);
 
-    const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId });
+    const cacheResult = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
-    if (cachedEntry) {
+    if (cacheResult) {
+      // SWR: If token is expiring soon, trigger background refresh (fire-and-forget)
+      if (cacheResult.needsRefresh) {
+        debugLogger.debug('Token expiring soon, triggering background refresh', { tokenId }, 'session');
+        void this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
+      }
+
       debugLogger.debug(
-        'Using cached token (no fetch needed)',
+        'Using cached token',
         {
+          needsRefresh: cacheResult.needsRefresh,
           tokenId,
         },
         'session',
       );
-      const cachedToken = await cachedEntry.tokenResolver;
+      const cachedToken = await cacheResult.entry.tokenResolver;
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
@@ -390,6 +397,15 @@ export class Session extends BaseResource implements SessionResource {
       return cachedToken.getRawString() || null;
     }
 
+    return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate);
+  }
+
+  #fetchToken(
+    template: string | undefined,
+    organizationId: string | undefined | null,
+    tokenId: string,
+    shouldDispatchTokenUpdate: boolean,
+  ): Promise<string | null> {
     debugLogger.info(
       'Fetching new token from API',
       {
@@ -405,7 +421,7 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
-    const tokenResolver = Token.create(path, params, skipCache);
+    const tokenResolver = Token.create(path, params, false);
 
     // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
     SessionTokenCache.set({ tokenId, tokenResolver });
@@ -423,6 +439,18 @@ export class Session extends BaseResource implements SessionResource {
 
       // Return null when raw string is empty to indicate that there it's signed-out
       return token.getRawString() || null;
+    });
+  }
+
+  #refreshTokenInBackground(
+    template: string | undefined,
+    organizationId: string | undefined | null,
+    tokenId: string,
+    shouldDispatchTokenUpdate: boolean,
+  ): void {
+    // Fire-and-forget background refresh - errors are silently ignored
+    this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate).catch(() => {
+      debugLogger.warn('Background token refresh failed', { tokenId }, 'session');
     });
   }
 

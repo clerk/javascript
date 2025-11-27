@@ -40,7 +40,18 @@ interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
+  /** Indicates a background refresh is in progress to prevent duplicate requests */
+  isRefreshing?: boolean;
   timeoutId?: ReturnType<typeof setTimeout>;
+}
+
+/**
+ * Result from cache lookup containing the entry and refresh status.
+ */
+export interface TokenCacheGetResult {
+  entry: TokenCacheEntry;
+  /** Indicates the token is valid but expiring soon and should be refreshed in the background */
+  needsRefresh: boolean;
 }
 
 export interface TokenCache {
@@ -58,11 +69,13 @@ export interface TokenCache {
 
   /**
    * Retrieves a cached token entry if it exists and has not expired.
+   * Implements stale-while-revalidate: returns valid tokens immediately and signals when background refresh is needed.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @returns The cached TokenCacheEntry if found and valid, undefined otherwise
+   * @param leeway - Seconds before expiration to trigger background refresh (default: 10s). Minimum is the poller interval.
+   * @returns Result with entry and refresh flag, or undefined if token doesn't exist or is expired
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON): TokenCacheEntry | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheGetResult | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -82,6 +95,7 @@ export interface TokenCache {
 
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
+const DEFAULT_LEEWAY = 10;
 // Minimum remaining TTL (in seconds) before forcing a synchronous refresh.
 // Uses the poller interval to ensure the poller has time to refresh before expiration.
 const MIN_REMAINING_TTL_IN_SECONDS = POLLER_INTERVAL_IN_MS / 1000;
@@ -176,7 +190,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     cache.clear();
   };
 
-  const get = (cacheKeyJSON: TokenCacheKeyJSON): TokenCacheEntry | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = DEFAULT_LEEWAY): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
@@ -190,9 +204,8 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     const elapsed = nowSeconds - value.createdAt;
     const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
-    // Token expires within the poller interval - force synchronous refresh
-    // to avoid returning a token that may expire before the poller runs.
-    if (remainingTtl < MIN_REMAINING_TTL_IN_SECONDS) {
+    // Token is actually expired - remove it and don't return
+    if (remainingTtl <= 0) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
@@ -200,8 +213,19 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       return;
     }
 
-    // Return the entry - the session token poller handles background refresh.
-    return value.entry;
+    // Use the larger of: caller's requested leeway or minimum needed for poller.
+    const effectiveLeeway = Math.max(leeway, MIN_REMAINING_TTL_IN_SECONDS);
+
+    // Token is valid but expiring soon - signal for background refresh
+    // Only signal once per token to prevent duplicate refresh requests
+    const needsRefresh = remainingTtl < effectiveLeeway && !value.isRefreshing;
+
+    if (needsRefresh) {
+      value.isRefreshing = true;
+    }
+
+    // SWR: Return the valid token immediately, caller handles background refresh if needed
+    return { entry: value.entry, needsRefresh };
   };
 
   /**
@@ -250,9 +274,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
 
     try {
-      const existingEntry = get({ tokenId: data.tokenId });
-      if (existingEntry) {
-        const existingToken = await existingEntry.tokenResolver;
+      const result = get({ tokenId: data.tokenId });
+      if (result) {
+        const existingToken = await result.entry.tokenResolver;
         const existingIat = existingToken.jwt?.claims?.iat;
         if (existingIat && existingIat >= iat) {
           debugLogger.debug(
