@@ -15,7 +15,7 @@ import {
   trTR,
   ukUA,
 } from '@clerk/localizations';
-import { dark } from '@clerk/themes';
+import { dark } from '@clerk/ui/themes';
 import { describe, expectTypeOf, it } from 'vitest';
 
 import type { ClerkProvider } from '../ClerkProvider';

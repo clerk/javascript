@@ -26,9 +26,21 @@ export default defineConfig(({ watch }) => {
   return [
     {
       ...common,
-      entry: ['./src/index.ts', './src/entry.ts', './src/internal/index.ts'],
+      entry: ['./src/index.ts', './src/entry.ts', './src/internal/index.ts', './src/themes/index.ts'],
       outDir: './dist',
       unbundle: true,
+      onSuccess: async () => {
+        // Copy CSS files from src/themes to dist/themes
+        const { cp, mkdir } = await import('fs/promises');
+        const { join } = await import('path');
+        await mkdir('./dist/themes', { recursive: true });
+        try {
+          await cp(join('./src/themes/shadcn.css'), join('./dist/themes/shadcn.css'));
+          console.log('✓ Copied shadcn.css');
+        } catch (error) {
+          console.warn('⚠ Warning: Failed to copy CSS files:', error);
+        }
+      },
     },
   ];
 });
