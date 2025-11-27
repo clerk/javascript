@@ -5,7 +5,6 @@ import type {
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
-  Appearance,
   Clerk,
   ClerkOptions,
   CreateOrganizationProps,
@@ -17,6 +16,8 @@ import type {
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/shared/types';
+
+import type { Appearance } from './internal/appearance';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense } from 'react';
 
