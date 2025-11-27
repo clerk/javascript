@@ -9,6 +9,7 @@ export * from './components';
 export * from './contexts';
 
 export * from './hooks';
+export { getToken } from '@clerk/shared/getToken';
 export type {
   BrowserClerk,
   BrowserClerkConstructor,
