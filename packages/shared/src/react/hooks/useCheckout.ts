@@ -122,6 +122,7 @@ export const useCheckout = (options?: UseCheckoutParams): __experimental_UseChec
   const { for: forOrganization, planId, planPeriod } = options || contextOptions;
 
   const clerk = useClerk();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
   const { organization } = useOrganizationContext();
   const { isLoaded, user } = useUser();
 
