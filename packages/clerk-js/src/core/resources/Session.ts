@@ -136,13 +136,10 @@ export class Session extends BaseResource implements SessionResource {
     }
 
     const tokenId = this.#getCacheId();
-    const existing = SessionTokenCache.get({ tokenId });
-    if (!existing) {
-      SessionTokenCache.set({
-        tokenId,
-        tokenResolver: Promise.resolve(token),
-      });
-    }
+    SessionTokenCache.set({
+      tokenId,
+      tokenResolver: Promise.resolve(token),
+    });
   };
 
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
@@ -383,26 +380,26 @@ export class Session extends BaseResource implements SessionResource {
         'session',
       );
       const cachedToken = await cachedEntry.tokenResolver;
-      const cachedTokenIat = cachedToken.jwt?.claims?.iat || 0;
-      const lastActiveAtTokenIat = this.lastActiveToken?.jwt?.claims?.iat || 0;
-      const isLastActiveTokenTheSameAsCached = this.lastActiveToken?.id === cachedToken.id;
-      const isLastActiveIssuedAfterCached =
-        this.lastActiveToken && isLastActiveTokenTheSameAsCached && lastActiveAtTokenIat >= cachedTokenIat;
+      // const cachedTokenIat = cachedToken.jwt?.claims?.iat || 0;
+      // const lastActiveAtTokenIat = this.lastActiveToken?.jwt?.claims?.iat || 0;
+      // const isLastActiveTokenTheSameAsCached = this.lastActiveToken?.id === cachedToken.id;
+      // const isLastActiveIssuedAfterCached =
+      //   this.lastActiveToken && isLastActiveTokenTheSameAsCached && lastActiveAtTokenIat >= cachedTokenIat;
 
-      // If the last active token is the same as the cached token and is issued after the cached token, update the cache with the last active token
-      if (isLastActiveIssuedAfterCached && this.lastActiveToken) {
-        SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(this.lastActiveToken) });
-      }
+      // // If the last active token is the same as the cached token and is issued after the cached token, update the cache with the last active token
+      // if (isLastActiveIssuedAfterCached && this.lastActiveToken) {
+      //   SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(this.lastActiveToken) });
+      // }
 
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, {
-          token: isLastActiveIssuedAfterCached ? this.lastActiveToken : cachedToken,
+          token: cachedToken,
         });
       }
 
-      if (isLastActiveIssuedAfterCached && this.lastActiveToken) {
-        return this.lastActiveToken.getRawString() || null;
-      }
+      // if (isLastActiveIssuedAfterCached && this.lastActiveToken) {
+      //   return this.lastActiveToken.getRawString() || null;
+      // }
 
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
