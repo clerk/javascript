@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.109.0",
+  "version": "5.111.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -42,7 +42,6 @@
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
-    "dev:channel": "rspack serve --config rspack.config.js --env variant=\"clerk.channel.browser\"",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
@@ -82,8 +81,7 @@
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.14.1",
-    "swr": "2.3.4"
+    "regenerator-runtime": "0.14.1"
   },
   "devDependencies": {
     "@clerk/testing": "workspace:^",

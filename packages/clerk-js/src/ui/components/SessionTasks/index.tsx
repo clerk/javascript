@@ -1,6 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
 import { Flow } from '@/ui/customizables';
@@ -87,6 +86,7 @@ type SessionTasksProps = {
 export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
+
   const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   // If there are no pending tasks, navigate away from the tasks flow.
@@ -120,17 +120,8 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
     );
   }
 
-  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
-    const currentTask = session.currentTask;
-    if (!currentTask) {
-      return navigate(redirectUrlComplete);
-    }
-
-    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
-  };
-
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );

@@ -132,7 +132,7 @@ describe('useApiKeys', () => {
     if (isRQ) {
       await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
     } else {
-      expect(getAllSpy).toHaveBeenCalledTimes(1);
+      expect(getAllSpy).toHaveBeenCalledTimes(2);
     }
   });
 
@@ -170,7 +170,7 @@ describe('useApiKeys', () => {
     if (isRQ) {
       await waitFor(() => expect(getAllSpy.mock.calls.length).toBeGreaterThanOrEqual(2));
     } else {
-      expect(getAllSpy).toHaveBeenCalledTimes(1);
+      expect(getAllSpy).toHaveBeenCalledTimes(2);
     }
   });
 

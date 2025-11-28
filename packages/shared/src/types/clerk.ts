@@ -322,6 +322,23 @@ export interface Clerk {
   __internal_closeReverification: () => void;
 
   /**
+   * Attempts to enable a environment setting from a development instance, prompting if disabled.
+   */
+  __internal_attemptToEnableEnvironmentSetting: (
+    options: __internal_AttemptToEnableEnvironmentSettingParams,
+  ) => __internal_AttemptToEnableEnvironmentSettingResult;
+
+  /**
+   * Opens the Clerk Enable Organizations prompt for development instance
+   */
+  __internal_openEnableOrganizationsPrompt: (props: __internal_EnableOrganizationsPromptProps) => void;
+
+  /**
+   * Closes the Clerk Enable Organizations modal.
+   */
+  __internal_closeEnableOrganizationsPrompt: () => void;
+
+  /**
    * Opens the Google One Tap component.
    *
    * @param props - Optional props that will be passed to the GoogleOneTap component.
@@ -727,7 +744,7 @@ export interface Clerk {
   /**
    * Returns the configured url where tasks are mounted.
    */
-  buildTasksUrl(): string;
+  buildTasksUrl(opts?: TasksRedirectOptions): string;
 
   /**
    * Returns the configured afterSignInUrl of the instance.
@@ -1430,25 +1447,33 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
 
-export type __internal_ComponentNavigationContext = {
-  /**
-   * The `navigate` reference within the component router context
-   */
-  navigate: (
-    to: string,
-    options?: {
-      searchParams?: URLSearchParams;
-    },
-  ) => Promise<unknown>;
-  /**
-   * This path represents the root route for a specific component type and is used
-   * for internal routing and navigation.
-   *
-   * @example
-   * indexPath: '/sign-in'  // When <SignIn path='/sign-in' />
-   * indexPath: '/sign-up'  // When <SignUp path='/sign-up' />
-   */
-  indexPath: string;
+export type __internal_EnableOrganizationsPromptProps = {
+  onSuccess?: () => void;
+  onClose?: () => void;
+} & {
+  caller:
+    | 'OrganizationSwitcher'
+    | 'OrganizationProfile'
+    | 'OrganizationList'
+    | 'useOrganizationList'
+    | 'useOrganization';
+};
+
+export type __internal_AttemptToEnableEnvironmentSettingParams = {
+  for: 'organizations';
+  caller:
+    | 'OrganizationSwitcher'
+    | 'OrganizationProfile'
+    | 'OrganizationList'
+    | 'CreateOrganization'
+    | 'TaskChooseOrganization'
+    | 'useOrganizationList'
+    | 'useOrganization';
+  onClose?: () => void;
+};
+
+export type __internal_AttemptToEnableEnvironmentSettingResult = {
+  isEnabled: boolean;
 };
 
 type GoogleOneTapRedirectUrlProps = SignInForceRedirectUrl & SignUpForceRedirectUrl;

@@ -1287,6 +1287,14 @@ export type __internal_LocalizationResource = {
       action__invitationAccept: LocalizationValue;
     };
   };
+  taskResetPassword: {
+    title: LocalizationValue;
+    signOut: {
+      actionLink: LocalizationValue;
+      actionText: LocalizationValue<'identifier'>;
+    };
+    formButtonPrimary: LocalizationValue;
+  };
 };
 
 type WithParamName<T> = T &
@@ -1308,6 +1316,7 @@ type UnstableErrors = WithParamName<{
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;
+  form_username_needs_non_number_char: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
   form_param_format_invalid: LocalizationValue;
   form_param_format_invalid__email_address: LocalizationValue;

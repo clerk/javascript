@@ -1,5 +1,35 @@
 # @clerk/tanstack-react-start
 
+## 0.27.5
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44), [`337430b`](https://github.com/clerk/javascript/commit/337430bc44ba846e40bff66d72618963d51ee20d)]:
+  - @clerk/shared@3.36.0
+  - @clerk/clerk-react@5.57.0
+  - @clerk/backend@2.24.0
+  - @clerk/types@4.101.3
+
+## 0.27.4
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/backend@2.23.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
+## 0.27.3
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
 ## 0.27.2
 
 ### Patch Changes
@@ -141,7 +171,6 @@
 - Added support for [TanStack Start v1 RC](https://tanstack.com/blog/announcing-tanstack-start-v1)! Includes a new `clerkMiddleware()` global middleware replacing the custom server handler. ([#6859](https://github.com/clerk/javascript/pull/6859)) by [@wobsoriano](https://github.com/wobsoriano)
 
   Usage:
-
   1. Create a `src/start.ts` file and add `clerkMiddleware()` to the list of request middlewares:
 
   ```ts
@@ -627,7 +656,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`
@@ -1446,7 +1474,6 @@
 ### Minor Changes
 
 - Re-export missing error helpers functions from `@clerk/tanstack-start/errors` ([#4741](https://github.com/clerk/javascript/pull/4741)) by [@octoper](https://github.com/octoper)
-
   - `isClerkAPIResponseError`
   - `isEmailLinkError`
   - `isKnownError`

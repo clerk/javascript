@@ -869,6 +869,14 @@ export const msMY: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
     captcha_invalid:
@@ -906,6 +914,8 @@ export const msMY: LocalizationResource = {
       'Nama pengguna anda mengandungi aksara yang tidak sah. Sila gunakan hanya huruf, nombor, dan garis bawah.',
     form_username_invalid_length:
       'Nama pengguna anda mestilah antara {{min_length}} dan {{max_length}} aksara panjang.',
+    form_username_needs_non_number_char:
+      'Nama pengguna anda mesti mengandungi sekurang-kurangnya satu aksara bukan nombor.',
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',

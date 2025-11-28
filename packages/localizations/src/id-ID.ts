@@ -867,6 +867,14 @@ export const idID: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
     captcha_invalid:
@@ -901,6 +909,7 @@ export const idID: LocalizationResource = {
     form_password_validation_failed: 'Kata Sandi Salah',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Nama pengguna Anda harus berisi setidaknya satu karakter non-numerik.',
     identification_deletion_failed: 'Anda tidak dapat menghapus identifikasi terakhir Anda.',
     not_allowed_access:
       "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",

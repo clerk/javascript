@@ -12,9 +12,9 @@ export const PRESERVED_QUERYSTRING_PARAMS = [
 ];
 
 export const CLERK_MODAL_STATE = '__clerk_modal_state';
-export const CLERK_SYNCED = '__clerk_synced';
-export const CLERK_SUFFIXED_COOKIES = 'suffixed_cookies';
 export const CLERK_SATELLITE_URL = '__clerk_satellite_url';
+export const CLERK_SUFFIXED_COOKIES = 'suffixed_cookies';
+export const CLERK_SYNCED = '__clerk_synced';
 export const ERROR_CODES = {
   FORM_IDENTIFIER_NOT_FOUND: 'form_identifier_not_found',
   FORM_PASSWORD_INCORRECT: 'form_password_incorrect',
@@ -27,6 +27,7 @@ export const ERROR_CODES = {
   SAML_USER_ATTRIBUTE_MISSING: 'saml_user_attribute_missing',
   USER_LOCKED: 'user_locked',
   EXTERNAL_ACCOUNT_NOT_FOUND: 'external_account_not_found',
+  SESSION_EXISTS: 'session_exists',
   SIGN_UP_MODE_RESTRICTED: 'sign_up_mode_restricted',
   SIGN_UP_MODE_RESTRICTED_WAITLIST: 'sign_up_restricted_waitlist',
   ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING: 'enterprise_sso_user_attribute_missing',

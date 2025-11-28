@@ -1,7 +1,8 @@
-import { useClerk, useReverification, useSession } from '@clerk/shared/react';
+import { useClerk, useReverification } from '@clerk/shared/react';
 import type { UserResource } from '@clerk/shared/types';
 
 import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
+import { useSessionTasksContext, useTaskResetPasswordContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -13,40 +14,31 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { withTaskGuard } from './withTaskGuard';
+import { withTaskGuard } from '../shared';
 
 const TaskResetPasswordInternal = () => {
-  const { signOut, user } = useClerk();
-  const { session } = useSession();
+  const clerk = useClerk();
   const card = useCardState();
   const {
     userSettings: { passwordSettings },
-    authConfig: { reverification },
   } = useEnvironment();
 
   const { t, locale } = useLocalizations();
-  const { otherSessions } = useMultipleSessions({ user });
+  const { redirectUrlComplete } = useTaskResetPasswordContext();
+  const { otherSessions } = useMultipleSessions({ user: clerk.user });
   const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
   const updatePasswordWithReverification = useReverification(
     (user: UserResource, opts: Parameters<UserResource['updatePassword']>) => user.updatePassword(...opts),
   );
-
-  const currentPasswordRequired = user && user.passwordEnabled && !reverification;
+  const { navigateOnSetActive } = useSessionTasksContext();
 
   const handleSignOut = () => {
     if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
+      return clerk?.signOut(navigateAfterSignOut);
     }
 
-    return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
+    return clerk?.signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: clerk.session?.id });
   };
-
-  // TODO: remove this field
-  const currentPasswordField = useFormControl('currentPassword', '', {
-    type: 'password',
-    label: localizationKeys('formFieldLabel__currentPassword'),
-    isRequired: true,
-  });
 
   const passwordField = useFormControl('newPassword', '', {
     type: 'password',
@@ -81,26 +73,37 @@ const TaskResetPasswordInternal = () => {
     }
   };
 
-  const resetPassword = async () => {
-    if (!user) {
-      return;
-    }
-    passwordField.clearFeedback();
-    confirmField.clearFeedback();
-    try {
-      await updatePasswordWithReverification(user, [
-        {
-          currentPassword: currentPasswordRequired ? currentPasswordField.value : undefined,
-          newPassword: passwordField.value,
-          signOutOfOtherSessions: sessionsField.checked,
-        },
-      ]);
-    } catch (e) {
-      return handleError(e, [currentPasswordField, passwordField, confirmField], card.setError);
-    }
+  const resetPassword = () => {
+    return card.runAsync(async () => {
+      if (!clerk.user) {
+        return;
+      }
+
+      passwordField.clearFeedback();
+      confirmField.clearFeedback();
+
+      try {
+        await updatePasswordWithReverification(clerk.user, [
+          {
+            newPassword: passwordField.value,
+            signOutOfOtherSessions: sessionsField.checked,
+          },
+        ]);
+
+        // Update session to have the latest list of tasks (eg: if reset-password gets resolved)
+        await clerk.setActive({
+          session: clerk.session,
+          navigate: async ({ session }) => {
+            await navigateOnSetActive?.({ session, redirectUrlComplete });
+          },
+        });
+      } catch (e) {
+        return handleError(e, [passwordField, confirmField], card.setError);
+      }
+    });
   };
 
-  const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
+  const identifier = clerk.user?.primaryEmailAddress?.emailAddress ?? clerk.user?.username;
 
   return (
     <Flow.Root flow='taskResetPassword'>
@@ -108,7 +111,7 @@ const TaskResetPasswordInternal = () => {
         <Card.Root>
           <Card.Content>
             <Header.Root showLogo>
-              <Header.Title localizationKey={localizationKeys('signIn.resetPassword.title')} />
+              <Header.Title localizationKey={localizationKeys('taskResetPassword.title')} />
             </Header.Root>
             <Card.Alert>{card.error}</Card.Alert>
             <Col
@@ -129,19 +132,9 @@ const TaskResetPasswordInternal = () => {
                     data-testid='hidden-identifier'
                     id='identifier-field'
                     name='identifier'
-                    value={session?.publicUserData.identifier || ''}
+                    value={clerk.user?.primaryEmailAddress?.emailAddress || clerk.user?.username || ''}
                     style={{ display: 'none' }}
                   />
-                  {currentPasswordRequired && (
-                    <Form.ControlRow elementId={currentPasswordField.id}>
-                      <Form.PasswordInput
-                        {...currentPasswordField.props}
-                        minLength={6}
-                        isRequired
-                        autoFocus
-                      />
-                    </Form.ControlRow>
-                  )}
                   <Form.ControlRow elementId={passwordField.id}>
                     <Form.PasswordInput
                       {...passwordField.props}
@@ -166,8 +159,9 @@ const TaskResetPasswordInternal = () => {
                 </Col>
                 <Col gap={3}>
                   <Form.SubmitButton
+                    isLoading={card.isLoading}
                     isDisabled={!canSubmit}
-                    localizationKey={localizationKeys('signIn.resetPassword.formButtonPrimary')}
+                    localizationKey={localizationKeys('taskResetPassword.formButtonPrimary')}
                   />
                 </Col>
               </Form.Root>
@@ -184,7 +178,7 @@ const TaskResetPasswordInternal = () => {
               {identifier && (
                 <Card.ActionText
                   truncate
-                  localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
+                  localizationKey={localizationKeys('taskResetPassword.signOut.actionText', {
                     identifier,
                   })}
                 />
@@ -194,7 +188,7 @@ const TaskResetPasswordInternal = () => {
                 onClick={() => {
                   void handleSignOut();
                 }}
-                localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
+                localizationKey={localizationKeys('taskResetPassword.signOut.actionLink')}
               />
             </Card.Action>
           </Card.Footer>
@@ -205,5 +199,5 @@ const TaskResetPasswordInternal = () => {
 };
 
 export const TaskResetPassword = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskResetPasswordInternal)),
+  withTaskGuard(withCardStateProvider(TaskResetPasswordInternal), 'reset-password'),
 );

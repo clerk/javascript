@@ -1,5 +1,35 @@
 # Change Log
 
+## 4.13.20
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44), [`337430b`](https://github.com/clerk/javascript/commit/337430bc44ba846e40bff66d72618963d51ee20d)]:
+  - @clerk/shared@3.36.0
+  - @clerk/clerk-react@5.57.0
+  - @clerk/backend@2.24.0
+  - @clerk/types@4.101.3
+
+## 4.13.19
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/backend@2.23.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
+## 4.13.18
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
 ## 4.13.17
 
 ### Patch Changes
@@ -494,7 +524,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`
@@ -1861,14 +1890,12 @@
 - Support new redirect urls as environment variables or options to rootAuthLoader ([#3442](https://github.com/clerk/javascript/pull/3442)) by [@panteliselef](https://github.com/panteliselef)
 
   As options
-
   - signInForceRedirectUrl
   - signUpForceRedirectUrl
   - signInFallbackRedirectUrl
   - signUpFallbackRedirectUrl
 
   As environment variables
-
   - CLERK_SIGN_IN_FORCE_REDIRECT_URL
   - CLERK_SIGN_UP_FORCE_REDIRECT_URL
   - CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
@@ -2044,7 +2071,6 @@
   - use `publishableKey` instead of `frontendApi`
   - use `ClerkProviderOptionsWrapper` type instead of `IsomorphicClerkOptions`
 - c08f804cf: Drop deprecations. Migration steps:
-
   - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
   - use `secretKey` instead of `apiKey`
   - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
@@ -2705,7 +2731,6 @@
   ```
 
 - Changes in exports of `@clerk/backend`: ([#2363](https://github.com/clerk/javascript/pull/2363)) by [@dimkl](https://github.com/dimkl)
-
   - Expose the following helpers and enums from `@clerk/backend/internal`:
     ```typescript
     import {
@@ -2733,7 +2758,6 @@
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
 
 - Changes in exports of `@clerk/backend`: ([#2365](https://github.com/clerk/javascript/pull/2365)) by [@dimkl](https://github.com/dimkl)
-
   - Drop the following internal exports from the top-level api:
     ```typescript
     // Before
@@ -2943,7 +2967,6 @@
 ### Major Changes
 
 - Drop deprecations. Migration steps: ([#2109](https://github.com/clerk/javascript/pull/2109)) by [@dimkl](https://github.com/dimkl)
-
   - drop `orgs` jwt claim from session token
   - change type of `auth` param of `withServerAuth()` callback to `AuthObject` from `ServerSideAuth` in `gatsby-clerk-plugin`
     - use `auth.sessionClaims` instead of `auth.claims`
@@ -2963,7 +2986,6 @@
 ### Major Changes
 
 - Drop deprecations. Migration steps: ([#2022](https://github.com/clerk/javascript/pull/2022)) by [@dimkl](https://github.com/dimkl)
-
   - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
   - use `secretKey` instead of `apiKey`
   - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable
@@ -3024,7 +3046,6 @@
 ### Patch Changes
 
 - Warn about environment variables deprecations: ([#1859](https://github.com/clerk/javascript/pull/1859)) by [@dimkl](https://github.com/dimkl)
-
   - `CLERK_API_KEY`
   - `CLERK_FRONTEND_API`
   - `NEXT_PUBLIC_CLERK_FRONTEND_API`
@@ -3100,12 +3121,10 @@
   Thus `@clerk/remix` was updated to support Remix `^2.0.0` and later. If you want/need to continue using Remix `^1.0.0`, keep using the previous major `@clerk/remix` version.
 
   **Breaking changes:**
-
   - Renamed `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
   - Removed `ClerkCatchBoundary`
 
   **Migration guide:**
-
   - Rename `V2_ClerkErrorBoundary` to `ClerkErrorBoundary`
 
     ```diff
@@ -3313,7 +3332,6 @@
 ### Patch Changes
 
 - Allow `clerkJSVersion` to be passed when loading interstitial. Support for ([#1354](https://github.com/clerk/javascript/pull/1354)) by [@panteliselef](https://github.com/panteliselef)
-
   - Nextjs
   - Remix
   - Node
@@ -3332,7 +3350,6 @@
   (when the user provides a list).
 
   Resolves:
-
   - [#978](https://github.com/clerk/javascript/pull/978)
   - [#1004](https://github.com/clerk/javascript/pull/1004)
 
@@ -3349,7 +3366,6 @@
 - ESM/CJS support for `@clerk/clerk-react` by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Changes that should affect users and OS contributors:
-
   - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
   - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
   - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb

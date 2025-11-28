@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { eventMethodCalled } from '../../telemetry/events';
-import type { EnvironmentResource } from '../../types';
+import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import {
@@ -10,30 +10,11 @@ import {
   useOrganizationContext,
   useUserContext,
 } from '../contexts';
-import { STABLE_KEYS } from '../stable-keys';
+import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
 const HOOK_NAME = 'useSubscription';
-
-/**
- * @internal
- */
-function KeepPreviousDataFn<Data>(previousData: Data): Data {
-  return previousData;
-}
-
-export const subscriptionQuery = <T extends Record<string, unknown>, U extends Record<string, unknown>>(params: {
-  trackedKeys: T;
-  untrackedKeys?: U;
-}) => {
-  const stableKey = STABLE_KEYS.SUBSCRIPTION_KEY;
-  const { trackedKeys, untrackedKeys } = params;
-  return {
-    queryKey: [stableKey, trackedKeys, untrackedKeys] as const,
-    invalidationKey: [stableKey, trackedKeys] as const,
-    stableKey,
-  };
-};
 
 /**
  * This is the new implementation of useSubscription using React Query.
@@ -48,39 +29,31 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
-  // @ts-expect-error `__unstable__environment` is not typed
-  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  const billingEnabled = useBillingHookEnabled(params);
 
   clerk.telemetry?.record(eventMethodCalled(HOOK_NAME));
 
-  const isOrganization = params?.for === 'organization';
-  const billingEnabled = isOrganization
-    ? environment?.commerceSettings.billing.organization.enabled
-    : environment?.commerceSettings.billing.user.enabled;
   const keepPreviousData = params?.keepPreviousData ?? false;
 
   const [queryClient] = useClerkQueryClient();
 
-  const { queryKey, invalidationKey } = useMemo(() => {
-    return subscriptionQuery({
-      trackedKeys: {
-        userId: user?.id,
-        args: { orgId: isOrganization ? organization?.id : undefined },
-      },
-    });
-  }, [user?.id, isOrganization, organization?.id]);
+  const { queryKey, invalidationKey } = useSubscriptionCacheKeys({
+    userId: user?.id,
+    orgId: organization?.id,
+    for: params?.for,
+  });
 
-  const queriesEnabled = Boolean(user?.id && billingEnabled) && (params?.enabled ?? true);
+  const queriesEnabled = Boolean(user?.id && billingEnabled);
 
   const query = useClerkQuery({
     queryKey,
     queryFn: ({ queryKey }) => {
-      const obj = queryKey[1] as { args: { orgId?: string } };
+      const obj = queryKey[3];
       return clerk.billing.getSubscription(obj.args);
     },
     staleTime: 1_000 * 60,
     enabled: queriesEnabled,
-    placeholderData: keepPreviousData && queriesEnabled ? KeepPreviousDataFn : undefined,
+    placeholderData: defineKeepPreviousDataFn(keepPreviousData && queriesEnabled),
   });
 
   const revalidate = useCallback(

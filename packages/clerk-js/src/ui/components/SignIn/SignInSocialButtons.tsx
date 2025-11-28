@@ -1,8 +1,11 @@
+import type { ClerkAPIError } from '@clerk/shared/error';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import type { PhoneCodeChannel } from '@clerk/shared/types';
 import React from 'react';
 
-import { handleError } from '@/ui/utils/errorHandler';
+import { ERROR_CODES } from '@/core/constants';
+import { handleError as _handleError } from '@/ui/utils/errorHandler';
 import { originPrefersPopup } from '@/ui/utils/originPrefersPopup';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
@@ -30,6 +33,25 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
   const shouldUsePopup = ctx.oauthFlow === 'popup' || (ctx.oauthFlow === 'auto' && originPrefersPopup());
   const { onAlternativePhoneCodeProviderClick, ...rest } = props;
 
+  const handleError = (err: any) => {
+    if (isClerkAPIResponseError(err)) {
+      const sessionAlreadyExistsError: ClerkAPIError | undefined = err.errors.find(
+        (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
+      );
+
+      if (sessionAlreadyExistsError) {
+        return clerk.setActive({
+          session: clerk.client.lastActiveSessionId,
+          navigate: async ({ session }) => {
+            await ctx.navigateOnSetActive({ session, redirectUrl: ctx.afterSignInUrl });
+          },
+        });
+      }
+    }
+
+    return _handleError(err, [], card.setError);
+  };
+
   return (
     <SocialButtons
       {...rest}
@@ -50,12 +72,12 @@ export const SignInSocialButtons = React.memo((props: SignInSocialButtonsProps) 
 
           return signIn
             .authenticateWithPopup({ strategy, redirectUrl, redirectUrlComplete, popup, oidcPrompt: ctx.oidcPrompt })
-            .catch(err => handleError(err, [], card.setError));
+            .catch(err => handleError(err));
         }
 
         return signIn
           .authenticateWithRedirect({ strategy, redirectUrl, redirectUrlComplete, oidcPrompt: ctx.oidcPrompt })
-          .catch(err => handleError(err, [], card.setError));
+          .catch(err => handleError(err));
       }}
       web3Callback={strategy => {
         return clerk

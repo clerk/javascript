@@ -1,5 +1,46 @@
 # Change Log
 
+## 2.3.0
+
+### Minor Changes
+
+- Options passed to `clerkMiddleware` are now properly forwarded to `clerkClient`, ensuring consistent configuration when manually providing options from router context. ([#7292](https://github.com/clerk/javascript/pull/7292)) by [@spegoraro](https://github.com/spegoraro)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-react@5.57.0
+
+## 2.2.5
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44), [`337430b`](https://github.com/clerk/javascript/commit/337430bc44ba846e40bff66d72618963d51ee20d)]:
+  - @clerk/shared@3.36.0
+  - @clerk/clerk-react@5.57.0
+  - @clerk/backend@2.24.0
+  - @clerk/types@4.101.3
+
+## 2.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/backend@2.23.2
+  - @clerk/clerk-react@5.56.2
+  - @clerk/types@4.101.2
+
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/clerk-react@5.56.1
+  - @clerk/types@4.101.1
+
 ## 2.2.2
 
 ### Patch Changes
@@ -213,7 +254,6 @@
   ```
 
   **After (Recommended):**
-
   1. Enable the `v8_middleware` future flag:
 
   ```ts
@@ -565,7 +605,6 @@
 ### Minor Changes
 
 - Export experimental hooks and components for PaymentElement ([#6180](https://github.com/clerk/javascript/pull/6180)) by [@panteliselef](https://github.com/panteliselef)
-
   - `__experimental_usePaymentElement`
   - `__experimental_PaymentElementProvider`
   - `__experimental_PaymentElement`

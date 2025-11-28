@@ -863,6 +863,14 @@ export const isIS: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -897,6 +905,8 @@ export const isIS: LocalizationResource = {
     form_password_validation_failed: 'Rangt lykilorð',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char:
+      'Notandanafnið þitt verður að innihalda að minnsta kosti einn staf sem er ekki tala.',
     identification_deletion_failed: 'Þú getur ekki eytt síðasta auðkenni þínu.',
     not_allowed_access:
       "Netfang eða símanúmer þitt er ekki leyft til að skrá sig. Þetta gæti verið vegna þess að þú ert að nota '+', '=', '#' eða '.' í netfangi þínu, að nota domen sem tengist tímabundnum tölvupóstur, eða að þú ert búinn til að nota það. Ef þú reynir að skrá sig og færð villu, vinsamlegast hafið samband við stuðning.",

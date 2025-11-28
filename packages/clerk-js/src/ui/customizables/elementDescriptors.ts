@@ -506,6 +506,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'subscriptionDetailsCardBody',
   'subscriptionDetailsCardFooter',
   'subscriptionDetailsCardActions',
+  'subscriptionDetailsActionButton',
+  'subscriptionDetailsCancelButton',
   'subscriptionDetailsDetailRow',
   'subscriptionDetailsDetailRowLabel',
   'subscriptionDetailsDetailRowValue',
