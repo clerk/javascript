@@ -385,7 +385,7 @@ export class Session extends BaseResource implements SessionResource {
 
       // If the last active token is the same as the cached token and is issued after the cached token, update the cache with the last active token
       if (isLastActiveIssuedAfterCached && this.lastActiveToken) {
-        SessionTokenCache.set({ tokenId, tokenResolver: new Promise(() => this.lastActiveToken) });
+        SessionTokenCache.set({ tokenId, tokenResolver: Promise.resolve(this.lastActiveToken) });
       }
 
       if (shouldDispatchTokenUpdate) {
