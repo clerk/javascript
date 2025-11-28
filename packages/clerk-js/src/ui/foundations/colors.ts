@@ -88,17 +88,19 @@ const colorMutedForeground = clerkCssVar(
 const colors = Object.freeze({
   avatarBorder: neutralAlphaScale.neutralAlpha200,
   avatarBackground: neutralAlphaScale.neutralAlpha400,
-  colorModalBackdrop:
-    colorUtils.makeTransparent(clerkCssVar('color-modal-backdrop', defaultColorNeutral), 0.27) ||
-    neutralAlphaScale.neutralAlpha700,
+  colorModalBackdrop: clerkCssVar(
+    'color-modal-backdrop',
+    colorUtils.makeTransparent(defaultColorNeutral, 0.27) || neutralAlphaScale.neutralAlpha700,
+  ),
   colorBackground: clerkCssVar('color-background', 'white'),
   colorInput: clerkCssVar('color-input', 'white'),
   colorForeground,
   colorMutedForeground,
   colorMuted: undefined,
-  colorRing:
-    colorUtils.makeTransparent(clerkCssVar('color-ring', defaultColorNeutral), 0.85) ||
-    neutralAlphaScale.neutralAlpha200,
+  colorRing: clerkCssVar(
+    'color-ring',
+    colorUtils.makeTransparent(defaultColorNeutral, 0.85) || neutralAlphaScale.neutralAlpha200,
+  ),
   colorInputForeground: clerkCssVar('color-input-foreground', '#131316'),
   colorPrimaryForeground: clerkCssVar('color-primary-foreground', 'white'),
   colorShimmer: clerkCssVar('color-shimmer', 'rgba(255, 255, 255, 0.36)'),
