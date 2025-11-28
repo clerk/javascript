@@ -878,6 +878,7 @@ export const zhTW: LocalizationResource = {
     form_password_validation_failed: '密碼驗證失敗',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '您的使用者名稱必須包含至少一個非數字字元。',
     identification_deletion_failed: '您無法刪除最後一個驗證方式。',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
