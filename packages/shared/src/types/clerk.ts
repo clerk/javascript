@@ -64,7 +64,7 @@ import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
 import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
-import type { WaitlistResource } from './waitlist';
+import type { JoinWaitlistParams, WaitlistResource } from './waitlist';
 
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
@@ -2204,10 +2204,6 @@ export interface ClerkAuthenticateWithWeb3Params {
   legalAccepted?: boolean;
   secondFactorUrl?: string;
 }
-
-export type JoinWaitlistParams = {
-  emailAddress: string;
-};
 
 export interface AuthenticateWithMetamaskParams {
   customNavigate?: (to: string) => Promise<unknown>;
