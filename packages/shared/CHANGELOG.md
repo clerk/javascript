@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.37.0
+
+### Minor Changes
+
+- Hide billing types through @internal tag ([#7315](https://github.com/clerk/javascript/pull/7315)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Introduce `reset-password` session task ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Add localization key for username form error ([#7320](https://github.com/clerk/javascript/pull/7320)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Refactor clearing cache in RQ hooks when a use signs out. ([#7330](https://github.com/clerk/javascript/pull/7330)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.36.0
 
 ### Minor Changes
