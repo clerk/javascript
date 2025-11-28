@@ -380,7 +380,6 @@ export class Session extends BaseResource implements SessionResource {
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
-
       // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
     }
