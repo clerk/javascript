@@ -3,6 +3,7 @@ import type { TokenResource } from '@clerk/shared/types';
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
 
+import { POLLER_INTERVAL_IN_MS } from './auth/SessionCookiePoller';
 import { Token } from './resources/internal';
 
 /**
@@ -39,7 +40,18 @@ interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
+  /** Indicates a background refresh is in progress to prevent duplicate requests */
+  isRefreshing?: boolean;
   timeoutId?: ReturnType<typeof setTimeout>;
+}
+
+/**
+ * Result from cache lookup containing the entry and refresh status.
+ */
+export interface TokenCacheGetResult {
+  entry: TokenCacheEntry;
+  /** Indicates the token is valid but expiring soon and should be refreshed in the background */
+  needsRefresh: boolean;
 }
 
 export interface TokenCache {
@@ -57,12 +69,13 @@ export interface TokenCache {
 
   /**
    * Retrieves a cached token entry if it exists and has not expired.
+   * Implements stale-while-revalidate: returns valid tokens immediately and signals when background refresh is needed.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @param leeway - Optional seconds before expiration to treat token as expired (default: 10s). Combined with 5s sync leeway.
-   * @returns The cached TokenCacheEntry if found and valid, undefined otherwise
+   * @param leeway - Seconds before expiration to trigger background refresh (default: 10s). Minimum is the poller interval.
+   * @returns Result with entry and refresh flag, or undefined if token doesn't exist or is expired
    */
-  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheEntry | undefined;
+  get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheGetResult | undefined;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -82,9 +95,10 @@ export interface TokenCache {
 
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
-const LEEWAY = 10;
-// This value should have the same value as the INTERVAL_IN_MS in SessionCookiePoller
-const SYNC_LEEWAY = 5;
+const DEFAULT_LEEWAY = 10;
+// Minimum remaining TTL (in seconds) before forcing a synchronous refresh.
+// Uses the poller interval to ensure the poller has time to refresh before expiration.
+const MIN_REMAINING_TTL_IN_SECONDS = POLLER_INTERVAL_IN_MS / 1000;
 
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
@@ -176,7 +190,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     cache.clear();
   };
 
-  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = LEEWAY): TokenCacheEntry | undefined => {
+  const get = (cacheKeyJSON: TokenCacheKeyJSON, leeway = DEFAULT_LEEWAY): TokenCacheGetResult | undefined => {
     ensureBroadcastChannel();
 
     const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
@@ -188,13 +202,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const nowSeconds = Math.floor(Date.now() / 1000);
     const elapsed = nowSeconds - value.createdAt;
+    const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
-    // Include poller interval as part of the leeway to ensure the cache value
-    // will be valid for more than the SYNC_LEEWAY or the leeway in the next poll.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const expiresSoon = value.expiresIn! - elapsed < (leeway || 1) + SYNC_LEEWAY;
-
-    if (expiresSoon) {
+    // Token is actually expired - remove it and don't return
+    if (remainingTtl <= 0) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
@@ -202,7 +213,19 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       return;
     }
 
-    return value.entry;
+    // Use the larger of: caller's requested leeway or minimum needed for poller.
+    const effectiveLeeway = Math.max(leeway, MIN_REMAINING_TTL_IN_SECONDS);
+
+    // Token is valid but expiring soon - signal for background refresh
+    // Only signal once per token to prevent duplicate refresh requests
+    const needsRefresh = remainingTtl < effectiveLeeway && !value.isRefreshing;
+
+    if (needsRefresh) {
+      value.isRefreshing = true;
+    }
+
+    // SWR: Return the valid token immediately, caller handles background refresh if needed
+    return { entry: value.entry, needsRefresh };
   };
 
   /**
@@ -251,9 +274,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
 
     try {
-      const existingEntry = get({ tokenId: data.tokenId });
-      if (existingEntry) {
-        const existingToken = await existingEntry.tokenResolver;
+      const result = get({ tokenId: data.tokenId });
+      if (result) {
+        const existingToken = await result.entry.tokenResolver;
         const existingIat = existingToken.jwt?.claims?.iat;
         if (existingIat && existingIat >= iat) {
           debugLogger.debug(
