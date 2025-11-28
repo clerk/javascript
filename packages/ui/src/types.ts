@@ -12,7 +12,6 @@ import type {
   OrganizationProfileProps,
   OrganizationSwitcherProps,
   PricingTableProps,
-  SessionResource,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignInProps,
@@ -20,6 +19,7 @@ import type {
   SignUpForceRedirectUrl,
   SignUpProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -143,12 +143,14 @@ export type CheckoutCtx = __internal_CheckoutProps & {
 
 export type SessionTasksCtx = {
   redirectUrlComplete: string;
-  currentTaskContainer?: React.RefObject<HTMLDivElement> | null;
-  navigateOnSetActive: (opts: { session: SessionResource; redirectUrl: string }) => Promise<unknown>;
 };
 
 export type TaskChooseOrganizationCtx = TaskChooseOrganizationProps & {
   componentName: 'TaskChooseOrganization';
+};
+
+export type TaskResetPasswordCtx = TaskResetPasswordProps & {
+  componentName: 'TaskResetPassword';
 };
 
 export type OAuthConsentCtx = __internal_OAuthConsentProps & {
@@ -182,5 +184,6 @@ export type AvailableComponentCtx =
   | OAuthConsentCtx
   | SubscriptionDetailsCtx
   | PlanDetailsCtx
-  | TaskChooseOrganizationCtx;
+  | TaskChooseOrganizationCtx
+  | TaskResetPasswordCtx;
 export type AvailableComponentName = AvailableComponentCtx['componentName'];
