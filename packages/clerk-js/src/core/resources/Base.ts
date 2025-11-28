@@ -146,12 +146,18 @@ export abstract class BaseResource {
       assertProductionKeysOnDev(status, errors);
 
       const apiResponseOptions: ConstructorParameters<typeof ClerkAPIResponseError>[1] = { data: errors, status };
-      if (status === 429 && headers) {
+      if ((status === 429 || status == 503) && headers) {
         const retryAfter = headers.get('retry-after');
         if (retryAfter) {
           const value = parseInt(retryAfter, 10);
           if (!isNaN(value)) {
             apiResponseOptions.retryAfter = value;
+          }
+
+          const date = new Date(retryAfter);
+          if (!isNaN(date.getTime())) {
+            const value = date.getTime() - Date.now();
+            apiResponseOptions.retryAfter = value > 0 ? value : 0;
           }
         }
       }

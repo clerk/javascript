@@ -250,11 +250,17 @@ function getRetryAfter(headers?: Headers): number | undefined {
   }
 
   const value = parseInt(retryAfter, 10);
-  if (isNaN(value)) {
-    return;
+  if (!isNaN(value)) {
+    return value;
   }
 
-  return value;
+  const date = new Date(retryAfter);
+  if (!isNaN(date.getTime())) {
+    const value = date.getTime() - Date.now();
+    return value > 0 ? value : 0;
+  }
+
+  return;
 }
 
 function parseErrors(data: unknown): ClerkAPIError[] {

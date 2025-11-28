@@ -169,6 +169,25 @@ describe('api.client', () => {
     expect(errResponse.retryAfter).toBe(123);
   });
 
+  it('executes a failed backend API request and includes Retry-After header RFC1123 date', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json(
+            { errors: [] },
+            { status: 503, headers: { 'retry-after': new Date(new Date().getTime() + 60000).toUTCString() } },
+          );
+        }),
+      ),
+    );
+
+    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+
+    expect(errResponse.status).toBe(503);
+    expect(errResponse.retryAfter).not.toBeNaN();
+  });
+
   it('executes a failed backend API request and ignores invalid Retry-After header', async () => {
     server.use(
       http.get(
