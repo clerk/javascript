@@ -25,7 +25,9 @@ export const withTaskGuard = <P extends AvailableComponentProps>(
     const ctx = useSessionTasksContext();
     return withRedirect(
       Component,
-      clerk => !clerk.session?.currentTask || clerk.session.currentTask.key !== taskKey,
+      clerk =>
+        !clerk.session?.currentTask ||
+        (clerk.session.currentTask.key !== taskKey && !clerk.__internal_setActiveInProgress),
       ({ clerk }) =>
         !clerk.session ? clerk.buildSignInUrl() : (ctx.redirectUrlComplete ?? clerk.buildAfterSignInUrl()),
       warnings.cannotRenderComponentWhenTaskDoesNotExist,
