@@ -1,6 +1,6 @@
-import type { ColorScale } from '@clerk/shared/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { ColorScale } from '../../../internal/appearance';
 import { cssSupports } from '../../cssSupports';
 import {
   colorOptionToThemedAlphaScale,

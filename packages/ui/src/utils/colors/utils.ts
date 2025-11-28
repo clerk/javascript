@@ -1,5 +1,4 @@
-import type { ColorScale } from '@clerk/shared/types';
-
+import type { ColorScale } from '../../internal/appearance';
 import { cssSupports } from '../cssSupports';
 import type { ColorShade } from './constants';
 import { ALL_SHADES, ALPHA_PERCENTAGES, LIGHTNESS_CONFIG, LIGHTNESS_MIX_DATA, RELATIVE_SHADE_STEPS } from './constants';

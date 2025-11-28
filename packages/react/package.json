@@ -100,7 +100,7 @@
   },
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
-    "@clerk/themes": "workspace:*",
+    "@clerk/ui": "workspace:*",
     "@types/semver": "^7.7.1"
   },
   "peerDependencies": {

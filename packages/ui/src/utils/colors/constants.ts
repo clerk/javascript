@@ -2,7 +2,7 @@
  * Shared constants for color utilities
  */
 
-import type { ColorScale } from '@clerk/shared/types';
+import type { ColorScale } from '../../internal/appearance';
 
 // Types
 export type ColorShade = 25 | 50 | 100 | 150 | 200 | 300 | 400 | 500 | 600 | 700 | 750 | 800 | 850 | 900 | 950;

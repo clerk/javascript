@@ -66,6 +66,7 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
+    "@clerk/ui": "workspace:^",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue.ts/tsx-auto-props": "^0.6.0",

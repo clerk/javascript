@@ -1,4 +1,4 @@
-import type { Appearance, BaseTheme } from '@clerk/shared/types';
+import type { Appearance, BaseTheme } from '../internal/appearance';
 
 /**
  * Extracts cssLayerName from theme/baseTheme and moves it to appearance level.

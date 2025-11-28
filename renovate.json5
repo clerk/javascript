@@ -1159,65 +1159,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "themes-dev-minor",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "themes-dev-major",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "themes-prod-minor",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "themes-prod-major",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "upgrade-dev-minor",
       matchFileNames: [
         "packages/upgrade/package.json",

@@ -5,6 +5,7 @@ import {
 } from '@clerk/shared/loadClerkJsScript';
 import type { ClerkOptions } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Ui } from '@clerk/ui/internal';
 
 import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
@@ -34,7 +35,7 @@ function createNavigationHandler(
  */
 const createClerkInstance = runOnce(createClerkInstanceInternal);
 
-async function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
+async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroClerkCreateInstanceParams<TUi>) {
   let clerkJSInstance = window.Clerk;
   let clerkUiCtor: Promise<ClerkUiConstructor> | undefined;
 
@@ -63,16 +64,18 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
     $clerk.set(clerkJSInstance);
   }
 
-  initOptions = {
+  const clerkOptions = {
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
     // Pass the clerk-ui constructor promise to clerk.load()
     clerkUiCtor,
-  };
+  } as unknown as ClerkOptions;
+
+  initOptions = clerkOptions;
 
   return clerkJSInstance
-    .load(initOptions)
+    .load(clerkOptions)
     .then(() => {
       $csrState.setKey('isLoaded', true);
       // Notify subscribers that $clerkStore has been loaded.
@@ -94,16 +97,17 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
     .catch(() => {});
 }
 
-function updateClerkOptions(options: AstroClerkUpdateOptions) {
+function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOptions<TUi>) {
   const clerk = $clerk.get();
   if (!clerk) {
     throw new Error('Missing clerk instance');
   }
-  // `__unstable__updateProps` is not exposed as public API from `@clerk/types`
-  void (clerk as any).__unstable__updateProps({
+  const updateOptions = {
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },
-  });
+  } as unknown as { options: ClerkOptions; appearance?: any };
+  // `__unstable__updateProps` is not exposed as public API from `@clerk/types`
+  void (clerk as any).__unstable__updateProps(updateOptions);
 }
 
 export { createClerkInstance, updateClerkOptions };

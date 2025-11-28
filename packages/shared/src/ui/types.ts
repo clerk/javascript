@@ -1,5 +1,8 @@
 import type { ModuleManager } from '../moduleManager';
-import type { Appearance, Clerk, ClerkOptions, EnvironmentResource } from '../types';
+import type { Clerk, ClerkOptions, EnvironmentResource } from '../types';
+
+// TODO @nikos
+type Appearance = any;
 
 export type UIVersion = string;
 

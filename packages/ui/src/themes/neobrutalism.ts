@@ -1,4 +1,4 @@
-import { experimental_createTheme } from '../createTheme';
+import { experimental_createTheme } from './createTheme';
 
 const buttonStyle = {
   boxShadow: '3px 3px 0px #000',

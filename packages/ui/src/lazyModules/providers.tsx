@@ -1,10 +1,10 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
-import type { Appearance } from '@clerk/shared/types';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
+import type { Appearance } from '../internal/appearance';
 import type { ThemableCssProp } from '../styledSystem';
 import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';

@@ -1,4 +1,5 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 // Override Clerk React error thrower to show that errors come from @clerk/nextjs
 import { setClerkJsLoadingErrorPackageName, setErrorThrowerOptions } from '@clerk/react/internal';
 import { useRouter } from 'next/router';
@@ -16,7 +17,7 @@ import { RouterTelemetry } from '../utils/router-telemetry';
 setErrorThrowerOptions({ packageName: PACKAGE_NAME });
 setClerkJsLoadingErrorPackageName(PACKAGE_NAME);
 
-export function ClerkProvider({ children, ...props }: NextClerkProviderProps): JSX.Element {
+export function ClerkProvider<TUi extends Ui = Ui>({ children, ...props }: NextClerkProviderProps<TUi>): JSX.Element {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true } = props;
   const { push, replace } = useRouter();
   ReactClerkProvider.displayName = 'ReactClerkProvider';

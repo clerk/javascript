@@ -1,5 +1,6 @@
-import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale, HslaColorString } from '@clerk/shared/types';
+import type { HslaColorString } from '@clerk/shared/types';
 
+import type { ColorScale, CssColorOrAlphaScale, CssColorOrScale } from '../../internal/appearance';
 import { cssSupports } from '../cssSupports';
 import { ALL_SHADES, ALPHA_VALUES, COLOR_SCALE, DARK_SHADES, LIGHT_SHADES, LIGHTNESS_CONFIG } from './constants';
 import { colors as legacyColors } from './legacy';

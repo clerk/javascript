@@ -12,7 +12,7 @@ const reactVite = applicationConfig()
   .addScript('serve', 'pnpm preview')
   .addDependency('@clerk/react', linkPackage('react', 'integration'))
   .addDependency('@clerk/shared', linkPackage('shared', 'integration'))
-  .addDependency('@clerk/themes', linkPackage('themes', 'integration'));
+  .addDependency('@clerk/ui', linkPackage('ui', 'integration'));
 
 export const customFlows = {
   reactVite,

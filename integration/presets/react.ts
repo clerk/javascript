@@ -12,7 +12,7 @@ const cra = applicationConfig()
   .addScript('serve', 'pnpm start')
   .addDependency('@clerk/react', linkPackage('react', 'integration'))
   .addDependency('@clerk/shared', linkPackage('shared', 'integration'))
-  .addDependency('@clerk/themes', linkPackage('themes', 'integration'));
+  .addDependency('@clerk/ui', linkPackage('ui', 'integration'));
 
 const vite = cra
   .clone()

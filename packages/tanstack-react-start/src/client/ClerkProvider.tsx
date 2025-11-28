@@ -1,4 +1,5 @@
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import { ScriptOnce } from '@tanstack/react-router';
 import { getGlobalStartContext } from '@tanstack/react-start';
 import { useEffect } from 'react';
@@ -18,7 +19,10 @@ const SDK_METADATA = {
 
 const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> | undefined } = { current: undefined };
 
-export function ClerkProvider({ children, ...providerProps }: TanstackStartClerkProviderProps): JSX.Element {
+export function ClerkProvider<TUi extends Ui = Ui>({
+  children,
+  ...providerProps
+}: TanstackStartClerkProviderProps<TUi>): JSX.Element {
   const awaitableNavigate = useAwaitableNavigate();
   // @ts-expect-error: Untyped internal Clerk initial state
   const clerkInitialState = getGlobalStartContext()?.clerkInitialState ?? {};
