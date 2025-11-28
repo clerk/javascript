@@ -97,7 +97,8 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
     // Tasks can only exist on pending sessions, but we check both conditions
     // here to be defensive and ensure proper redirection
     const task = clerk.session?.currentTask;
-    if (!task || clerk.session?.status === 'active') {
+    if (!task || clerk.session?.status === 'active' || clerk.__internal_setActiveInProgress) {
+      console.log('navigating to redirectUrlComplete', redirectUrlComplete);
       void navigate(redirectUrlComplete);
       return;
     }
