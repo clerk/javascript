@@ -61,13 +61,62 @@ function isClerkProperlyLoaded(): boolean {
 }
 
 /**
+ * Checks if an existing script has a request error using Performance API.
+ *
+ * @param scriptUrl - The URL of the script to check.
+ * @returns True if the script has failed to load due to a network/HTTP error.
+ */
+function hasScriptRequestError(scriptUrl: string): boolean {
+  if (typeof window === 'undefined' || !window.performance) {
+    return false;
+  }
+
+  const entries = performance.getEntriesByName(scriptUrl, 'resource') as PerformanceResourceTiming[];
+
+  if (entries.length === 0) {
+    return false;
+  }
+
+  const scriptEntry = entries[entries.length - 1];
+
+  // transferSize === 0 with responseEnd === 0 indicates network failure
+  // transferSize === 0 with responseEnd > 0 might be a 4xx/5xx error or blocked request
+  if (scriptEntry.transferSize === 0 && scriptEntry.decodedBodySize === 0) {
+    // If there was no response at all, it's definitely an error
+    if (scriptEntry.responseEnd === 0) {
+      return true;
+    }
+    // If we got a response but no content, likely an HTTP error (4xx/5xx)
+    if (scriptEntry.responseEnd > 0 && scriptEntry.responseStart > 0) {
+      return true;
+    }
+
+    if ('responseStatus' in scriptEntry) {
+      const status = (scriptEntry as any).responseStatus;
+      if (status >= 400) {
+        return true;
+      }
+      if (scriptEntry.responseStatus === 0) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
  * Waits for Clerk to be properly loaded with a timeout mechanism.
  * Uses polling to check if Clerk becomes available within the specified timeout.
  *
  * @param timeoutMs - Maximum time to wait in milliseconds.
+ * @param existingScript - The existing script element to wait for. Optional, for existing scripts.
  * @returns Promise that resolves with null if Clerk loads successfully, or rejects with an error if timeout is reached.
  */
-function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement | null> {
+function waitForClerkWithTimeout(
+  timeoutMs: number,
+  existingScript?: HTMLScriptElement,
+): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
     let resolved = false;
 
@@ -75,6 +124,12 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
       clearTimeout(timeoutId);
       clearInterval(pollInterval);
     };
+
+    // Bail out early if the script fails to load, instead of waiting for the entire timeout
+    existingScript?.addEventListener('error', () => {
+      cleanup(timeoutId, pollInterval);
+      reject(new ClerkRuntimeError(FAILED_TO_LOAD_ERROR, { code: ERROR_CODE }));
+    });
 
     const checkAndResolve = () => {
       if (resolved) {
@@ -118,11 +173,13 @@ function waitForClerkWithTimeout(timeoutMs: number): Promise<HTMLScriptElement |
 }
 
 /**
- * Hotloads the Clerk JS script with robust failure detection.
+ * Hotloads the Clerk JS script with robust failure detection and retry logic.
  *
- * Uses a timeout-based approach to ensure absolute certainty about load success/failure.
- * If the script fails to load within the timeout period, or loads but doesn't create
- * a proper Clerk instance, the promise rejects with an error.
+ * For existing scripts:
+ * - If no request error detected: waits for timeout, then retries with loadScript if timeout expires
+ * - If request error detected: immediately retries with loadScript.
+ *
+ * For new scripts: uses loadScript which has built-in retry logic via the retry utility.
  *
  * @param opts - The options used to build the Clerk JS script URL and load the script.
  *               Must include a `publishableKey` if no existing script is found.
@@ -145,20 +202,30 @@ const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLS
     return null;
   }
 
-  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
-
-  if (existingScript) {
-    return waitForClerkWithTimeout(timeout);
-  }
-
   if (!opts?.publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
     return null;
   }
 
+  const scriptUrl = clerkJsScriptUrl(opts);
+  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
+
+  if (existingScript) {
+    if (hasScriptRequestError(scriptUrl)) {
+      existingScript.remove();
+    } else {
+      try {
+        await waitForClerkWithTimeout(timeout, existingScript);
+        return null;
+      } catch {
+        existingScript.remove();
+      }
+    }
+  }
+
   const loadPromise = waitForClerkWithTimeout(timeout);
 
-  loadScript(clerkJsScriptUrl(opts), {
+  loadScript(scriptUrl, {
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
