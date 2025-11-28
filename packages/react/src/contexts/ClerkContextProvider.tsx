@@ -11,7 +11,7 @@ import React from 'react';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { IsomorphicClerkOptions } from '../types';
-import { AuthContext } from './AuthContext';
+import { AuthStateProvider, InitialAuthStateProvider } from './AuthContext';
 import { IsomorphicClerkContext } from './IsomorphicClerkContext';
 
 type ClerkContextProvider = {
@@ -37,7 +37,6 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
     return clerk.addListener(e => setState({ ...e }));
   }, []);
 
-  const derivedState = deriveState(clerk.loaded, state, initialState);
   const clerkCtx = React.useMemo(
     () => ({ value: clerk }),
     [
@@ -47,37 +46,8 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
   );
   const clientCtx = React.useMemo(() => ({ value: state.client }), [state.client]);
 
-  const {
-    sessionId,
-    sessionStatus,
-    sessionClaims,
-    session,
-    userId,
-    user,
-    orgId,
-    actor,
-    organization,
-    orgRole,
-    orgSlug,
-    orgPermissions,
-    factorVerificationAge,
-  } = derivedState;
-
-  const authCtx = React.useMemo(() => {
-    const value = {
-      sessionId,
-      sessionStatus,
-      sessionClaims,
-      userId,
-      actor,
-      orgId,
-      orgRole,
-      orgSlug,
-      orgPermissions,
-      factorVerificationAge,
-    };
-    return { value };
-  }, [sessionId, sessionStatus, userId, actor, orgId, orgRole, orgSlug, factorVerificationAge, sessionClaims?.__raw]);
+  const resolvedState = deriveState(clerk.loaded, state, initialState);
+  const { sessionId, session, userId, user, orgId, organization } = resolvedState;
 
   const sessionCtx = React.useMemo(() => ({ value: session }), [sessionId, session]);
   const userCtx = React.useMemo(() => ({ value: user }), [userId, user]);
@@ -94,16 +64,18 @@ export function ClerkContextProvider(props: ClerkContextProvider) {
       <ClientContext.Provider value={clientCtx}>
         <SessionContext.Provider value={sessionCtx}>
           <OrganizationProvider {...organizationCtx.value}>
-            <AuthContext.Provider value={authCtx}>
-              <UserContext.Provider value={userCtx}>
-                <CheckoutProvider
-                  // @ts-expect-error - value is not used
-                  value={undefined}
-                >
-                  {children}
-                </CheckoutProvider>
-              </UserContext.Provider>
-            </AuthContext.Provider>
+            <InitialAuthStateProvider initialState={initialState}>
+              <AuthStateProvider state={state}>
+                <UserContext.Provider value={userCtx}>
+                  <CheckoutProvider
+                    // @ts-expect-error - value is not used
+                    value={undefined}
+                  >
+                    {children}
+                  </CheckoutProvider>
+                </UserContext.Provider>
+              </AuthStateProvider>
+            </InitialAuthStateProvider>
           </OrganizationProvider>
         </SessionContext.Provider>
       </ClientContext.Provider>

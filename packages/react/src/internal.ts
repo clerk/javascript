@@ -10,3 +10,5 @@ export {
   buildClerkUiScriptAttributes,
   setClerkJsLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
+
+export { InitialAuthStateProvider } from './contexts/AuthContext';
