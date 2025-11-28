@@ -1,4 +1,5 @@
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import * as localStorageModule from '../../utils/localStorage';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -278,6 +279,43 @@ describe('Clerk singleton', () => {
         authCreateSpy.mockRestore();
         errorSpy.mockRestore();
       }
+    });
+
+    it('retries when environment fetch fails and no cached snapshot exists', async () => {
+      vi.useFakeTimers();
+
+      const mockAuthService = createMockAuthService();
+      const authCreateSpy = vi
+        .spyOn(AuthCookieService, 'create')
+        .mockResolvedValue(mockAuthService as unknown as AuthCookieService);
+
+      const localStorageSpy = vi
+        .spyOn(localStorageModule.SafeLocalStorage, 'getItem')
+        .mockReturnValue(null);
+
+      mockEnvironmentFetch
+        .mockReset()
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValue({});
+
+      const componentControls = createMockComponentControls();
+      const mountSpy = vi.fn<NonNullable<typeof Clerk.mountComponentRenderer>>().mockReturnValue(componentControls);
+      Clerk.mountComponentRenderer = mountSpy;
+      mockClientFetch.mockClear();
+
+      const sut = new Clerk(productionPublishableKey);
+
+      try {
+        const loadPromise = sut.load();
+        await vi.runAllTimersAsync();
+        await loadPromise;
+      } finally {
+        authCreateSpy.mockRestore();
+        localStorageSpy.mockRestore();
+      }
+
+      expect(mockEnvironmentFetch).toHaveBeenCalledTimes(2);
+      expect(mockClientFetch).toHaveBeenCalledTimes(2);
     });
   });
 

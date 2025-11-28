@@ -2741,6 +2741,8 @@ export class Clerk implements ClerkInterface {
 
           if (environmentSnapshot) {
             this.updateEnvironment(new Environment(environmentSnapshot));
+          } else {
+            throw new ClerkRuntimeError('Failed to fetch environment', { code: 'network_error' });
           }
         });
 
@@ -2786,7 +2788,11 @@ export class Clerk implements ClerkInterface {
         }
       };
 
-      const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+      const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+
+      if (envResult.status === 'rejected') {
+        throw envResult.reason;
+      }
 
       if (clientResult.status === 'rejected') {
         const e = clientResult.reason;
