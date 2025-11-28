@@ -404,8 +404,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  buildTasksUrl = (opts?: TasksRedirectOptions): string | void => {
-    const callback = () => this.clerkjs?.buildTasksUrl(opts) || '';
+  buildTasksUrl = (): string | void => {
+    const callback = () => this.clerkjs?.buildTasksUrl() || '';
     if (this.clerkjs && this.loaded) {
       return callback();
     } else {
