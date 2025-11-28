@@ -1,50 +1,78 @@
-import type { Web3Provider } from '@clerk/shared/types';
+import type { GenerateSignature, Web3Provider } from '@clerk/shared/types';
+import type { SolanaWalletAdapterWallet } from '@solana/wallet-standard';
 
 import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
+import { errorThrower } from '@/utils/errorThrower';
+import { getInjectedWeb3SolanaProviders } from '@/utils/injectedWeb3SolanaProviders';
 
 import { toHex } from './hex';
-import { getInjectedWeb3Providers } from './injectedWeb3Providers';
+import { getInjectedWeb3EthProviders } from './injectedWeb3EthProviders';
 
 type GetWeb3IdentifierParams = {
   provider: Web3Provider;
+  walletName?: string;
 };
 
+// '@solana/wallet-standard'
+const StandardConnect = `standard:connect`;
+const SolanaSignMessage = `solana:signMessage`;
+
 export async function getWeb3Identifier(params: GetWeb3IdentifierParams): Promise<string> {
-  const { provider } = params;
-  const ethereum = await getEthereumProvider(provider);
+  const { provider, walletName } = params;
+  const walletProvider = await getWeb3Wallet(provider, walletName);
 
   // TODO - core-3: Improve error handling for the case when the provider is not found
-  if (!ethereum) {
+  if (!walletProvider) {
     // If a plugin for the requested provider is not found,
     // the flow will fail as it has been the expected behavior so far.
     return '';
   }
 
-  const identifiers = await ethereum.request({ method: 'eth_requestAccounts' });
+  if (provider === 'solana') {
+    const identifiers = await walletProvider.features[StandardConnect].connect();
+    return (identifiers && identifiers.accounts[0].address) || '';
+  }
+
+  // Ethereum providers
+  const identifiers = await walletProvider.request({ method: 'eth_requestAccounts' });
   // @ts-ignore -- Provider SDKs may return unknown shape; use first address if present
   return (identifiers && identifiers[0]) || '';
 }
 
-type GenerateWeb3SignatureParams = GenerateSignatureParams & {
-  provider: Web3Provider;
-};
-
-export async function generateWeb3Signature(params: GenerateWeb3SignatureParams): Promise<string> {
-  const { identifier, nonce, provider } = params;
-  const ethereum = await getEthereumProvider(provider);
+export const generateWeb3Signature: GenerateSignature = async (params): Promise<string> => {
+  const { identifier, nonce, provider, walletName = '' } = params;
+  const wallet = await getWeb3Wallet(provider, walletName);
 
   // TODO - core-3: Improve error handling for the case when the provider is not found
-  if (!ethereum) {
+  if (!wallet) {
     // If a plugin for the requested provider is not found,
     // the flow will fail as it has been the expected behavior so far.
     return '';
   }
 
-  return await ethereum.request({
+  if (provider === 'solana') {
+    const bs58 = await import('bs58').then(mod => mod.default);
+    const walletAccount = (wallet as SolanaWalletAdapterWallet).accounts.find(a => a.address === identifier);
+    if (!walletAccount) {
+      console.warn(`Wallet account with address ${identifier} not found`);
+      return '';
+    }
+    const signedMessages = await (wallet as SolanaWalletAdapterWallet).features[SolanaSignMessage]?.signMessage({
+      account: walletAccount,
+      message: new TextEncoder().encode(nonce),
+    });
+    if (!signedMessages || signedMessages.length === 0) {
+      console.warn('No signed messages returned from wallet');
+      return '';
+    }
+    return bs58.encode(signedMessages[0].signature);
+  }
+
+  return await wallet.request({
     method: 'personal_sign',
     params: [`0x${toHex(nonce)}`, identifier],
   });
-}
+};
 
 export async function getMetamaskIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'metamask' });
@@ -60,6 +88,10 @@ export async function getOKXWalletIdentifier(): Promise<string> {
 
 export async function getBaseIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'base' });
+}
+
+export async function getSolanaIdentifier(walletName: string): Promise<string> {
+  return await getWeb3Identifier({ provider: 'solana', walletName });
 }
 
 type GenerateSignatureParams = {
@@ -83,7 +115,11 @@ export async function generateSignatureWithBase(params: GenerateSignatureParams)
   return await generateWeb3Signature({ ...params, provider: 'base' });
 }
 
-async function getEthereumProvider(provider: Web3Provider) {
+export async function generateSignatureWithSolana(params: GenerateSignatureParams): Promise<string> {
+  return await generateWeb3Signature({ ...params, provider: 'solana' });
+}
+
+async function getWeb3Wallet(provider: Web3Provider, walletName?: string) {
   if (provider === 'coinbase_wallet') {
     if (__BUILD_DISABLE_RHC__) {
       clerkUnsupportedEnvironmentWarning('Coinbase Wallet');
@@ -120,5 +156,13 @@ async function getEthereumProvider(provider: Web3Provider) {
     }
   }
 
-  return getInjectedWeb3Providers().get(provider);
+  if (provider === 'solana') {
+    if (!walletName || walletName.length === 0) {
+      errorThrower.throw('Wallet name must be provided to get Solana wallet provider');
+      return;
+    }
+    return await getInjectedWeb3SolanaProviders().get(walletName);
+  }
+
+  return getInjectedWeb3EthProviders().get(provider);
 }

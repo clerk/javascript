@@ -97,6 +97,10 @@ export const useThirdPartyProvider = <
         return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_okx_wallet_signature' });
       }
 
+      if (provider === 'solana') {
+        return ref.send({ type: 'AUTHENTICATE.WEB3', strategy: 'web3_solana_signature' });
+      }
+
       return ref.send({ type: 'AUTHENTICATE.OAUTH', strategy: `oauth_${provider}` });
     },
     [provider, isProviderEnabled, isSaml, isEnterpriseSSO, ref],

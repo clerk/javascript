@@ -37,6 +37,7 @@ import type {
   AuthenticateWithGoogleOneTapParams,
   AuthenticateWithMetamaskParams,
   AuthenticateWithOKXWalletParams,
+  AuthenticateWithSolanaParams,
   BillingNamespace,
   Clerk as ClerkInterface,
   ClerkAPIError,
@@ -51,7 +52,7 @@ import type {
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
-  GenerateSignatureParams,
+  GenerateSignature,
   GoogleOneTapProps,
   HandleEmailLinkVerificationParams,
   HandleOAuthCallbackParams,
@@ -119,6 +120,7 @@ import {
   generateSignatureWithCoinbaseWallet,
   generateSignatureWithMetamask,
   generateSignatureWithOKXWallet,
+  generateSignatureWithSolana,
   getClerkQueryParam,
   getWeb3Identifier,
   hasExternalAccountSignUpError,
@@ -2359,6 +2361,13 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public authenticateWithSolana = async (props: AuthenticateWithSolanaParams): Promise<void> => {
+    await this.authenticateWithWeb3({
+      ...props,
+      strategy: 'web3_solana_signature',
+    });
+  };
+
   public authenticateWithWeb3 = async ({
     redirectUrl,
     signUpContinueUrl,
@@ -2367,6 +2376,7 @@ export class Clerk implements ClerkInterface {
     strategy,
     legalAccepted,
     secondFactorUrl,
+    walletName,
   }: ClerkAuthenticateWithWeb3Params): Promise<void> => {
     if (!this.client || !this.environment) {
       return;
@@ -2375,8 +2385,8 @@ export class Clerk implements ClerkInterface {
     const { displayConfig } = this.environment;
 
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
-    const identifier = await getWeb3Identifier({ provider });
-    let generateSignature: (params: GenerateSignatureParams) => Promise<string>;
+    const identifier = await getWeb3Identifier({ provider, walletName });
+    let generateSignature: GenerateSignature;
     switch (provider) {
       case 'metamask':
         generateSignature = generateSignatureWithMetamask;
@@ -2386,6 +2396,9 @@ export class Clerk implements ClerkInterface {
         break;
       case 'coinbase_wallet':
         generateSignature = generateSignatureWithCoinbaseWallet;
+        break;
+      case 'solana':
+        generateSignature = generateSignatureWithSolana;
         break;
       default:
         generateSignature = generateSignatureWithOKXWallet;
@@ -2416,6 +2429,7 @@ export class Clerk implements ClerkInterface {
         identifier,
         generateSignature,
         strategy,
+        walletName,
       });
     } catch (err) {
       if (isError(err, ERROR_CODES.FORM_IDENTIFIER_NOT_FOUND)) {
@@ -2425,6 +2439,7 @@ export class Clerk implements ClerkInterface {
           unsafeMetadata,
           strategy,
           legalAccepted,
+          walletName,
         });
 
         if (
