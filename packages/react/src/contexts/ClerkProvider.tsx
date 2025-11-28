@@ -1,11 +1,12 @@
 import { isPublishableKey } from '@clerk/shared/keys';
+import { ClerkContextProvider } from '@clerk/shared/react';
 import React from 'react';
 
 import { errorThrower } from '../errors/errorThrower';
 import { multipleClerkProvidersError } from '../errors/messages';
-import type { ClerkProviderProps } from '../types';
+import { IsomorphicClerk } from '../isomorphicClerk';
+import type { ClerkProviderProps, IsomorphicClerkOptions } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
-import { ClerkContextProvider } from './ClerkContextProvider';
 
 function ClerkProviderBase(props: ClerkProviderProps) {
   const { initialState, children, __internal_bypassMissingPublishableKey, ...restIsomorphicClerkOptions } = props;
@@ -19,10 +20,14 @@ function ClerkProviderBase(props: ClerkProviderProps) {
     }
   }
 
+  const { isomorphicClerk, clerkStatus } = useLoadedIsomorphicClerk(restIsomorphicClerkOptions);
+
   return (
     <ClerkContextProvider
       initialState={initialState}
-      isomorphicClerkOptions={restIsomorphicClerkOptions}
+      // @ts-expect-error - Fixme!
+      clerk={isomorphicClerk}
+      clerkStatus={clerkStatus}
     >
       {children}
     </ClerkContextProvider>
@@ -34,3 +39,28 @@ const ClerkProvider = withMaxAllowedInstancesGuard(ClerkProviderBase, 'ClerkProv
 ClerkProvider.displayName = 'ClerkProvider';
 
 export { ClerkProvider };
+
+const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
+  const isomorphicClerkRef = React.useRef(IsomorphicClerk.getOrCreateInstance(options));
+  const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
+
+  React.useEffect(() => {
+    void isomorphicClerkRef.current.__unstable__updateProps({ appearance: options.appearance });
+  }, [options.appearance]);
+
+  React.useEffect(() => {
+    void isomorphicClerkRef.current.__unstable__updateProps({ options });
+  }, [options.localization]);
+
+  React.useEffect(() => {
+    isomorphicClerkRef.current.on('status', setClerkStatus);
+    return () => {
+      if (isomorphicClerkRef.current) {
+        isomorphicClerkRef.current.off('status', setClerkStatus);
+      }
+      IsomorphicClerk.clearInstance();
+    };
+  }, []);
+
+  return { isomorphicClerk: isomorphicClerkRef.current, clerkStatus };
+};

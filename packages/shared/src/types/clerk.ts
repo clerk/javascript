@@ -138,6 +138,7 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
+export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
 export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
@@ -660,7 +661,7 @@ export interface Clerk {
    * @param callback - Callback function receiving the most updated Clerk resources after a change.
    * @returns - Unsubscribe callback
    */
-  addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+  addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
