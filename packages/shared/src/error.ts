@@ -3,6 +3,7 @@ export { errorToJSON, parseError, parseErrors } from './errors/parseError';
 export { ClerkAPIError } from './errors/clerkApiError';
 export { ClerkAPIResponseError } from './errors/clerkApiResponseError';
 export { ClerkError } from './errors/clerkError';
+export { MissingExpiredTokenError } from './errors/missingExpiredTokenError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';
 
