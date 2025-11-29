@@ -1,7 +1,14 @@
 import { isValidBrowserOnline } from '@clerk/shared/browser';
 import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { isProductionFromPublishableKey } from '@clerk/shared/keys';
-import type { ClerkAPIErrorJSON, ClerkResourceJSON, ClerkResourceReloadParams, DeletedObjectJSON } from '@clerk/types';
+import type {
+  ClerkAPIErrorJSON,
+  ClerkResourceJSON,
+  ClerkResourceReloadParams,
+  DeletedObjectJSON,
+} from '@clerk/shared/types';
+
+import { debugLogger } from '@/utils/debug';
 
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
@@ -93,7 +100,14 @@ export abstract class BaseResource {
           code: 'network_error',
         });
       } else if (!isValidBrowserOnline()) {
-        console.warn(e);
+        debugLogger.warn(
+          'Network request failed while offline, returning null',
+          {
+            method: requestInit.method,
+            path: requestInit.path,
+          },
+          'baseResource',
+        );
         return null;
       } else {
         throw e;

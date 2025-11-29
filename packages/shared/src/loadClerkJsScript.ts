@@ -1,9 +1,8 @@
-import type { ClerkOptions, SDKMetadata, Without } from '@clerk/types';
-
 import { buildErrorThrower, ClerkRuntimeError } from './error';
 import { createDevOrStagingUrlCache, parsePublishableKey } from './keys';
 import { loadScript } from './loadScript';
 import { isValidProxyUrl, proxyUrlToAbsoluteURL } from './proxy';
+import type { ClerkOptions, SDKMetadata, Without } from './types';
 import { addClerkPrefix } from './url';
 import { versionSelector } from './versionSelector';
 

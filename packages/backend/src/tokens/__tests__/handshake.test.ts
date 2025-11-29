@@ -427,7 +427,7 @@ describe('HandshakeService', () => {
 
       // Verify all required parameters are present
       expect(url.searchParams.get('redirect_url')).toBeDefined();
-      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-04-10');
+      expect(url.searchParams.get('__clerk_api_version')).toBe('2025-11-10');
       expect(url.searchParams.get(constants.QueryParameters.SuffixedCookies)).toMatch(/^(true|false)$/);
       expect(url.searchParams.get(constants.QueryParameters.HandshakeReason)).toBe('test-reason');
     });
@@ -598,6 +598,341 @@ describe('HandshakeService', () => {
 
         // Ensure URL is valid
         expect(() => new URL(location)).not.toThrow();
+      });
+    });
+  });
+
+  describe('Query Parameter Cleanup', () => {
+    beforeEach(async () => {
+      const { verifyToken } = vi.mocked(await import('../verify.js'));
+      verifyToken.mockResolvedValue({
+        data: {
+          __raw: 'mock-token',
+          sid: 'session-id',
+          sub: 'user_123',
+          iss: 'https://clerk.example.com',
+          iat: Math.floor(Date.now() / 1000),
+          exp: Math.floor(Date.now() / 1000) + 3600,
+          nbf: Math.floor(Date.now() / 1000),
+          azp: 'https://example.com',
+        },
+        errors: undefined,
+      });
+    });
+
+    describe('Development Mode', () => {
+      beforeEach(() => {
+        mockAuthenticateContext.instanceType = 'development';
+      });
+
+      it('should remove __clerk_handshake_nonce from query params', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123&foo=bar');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        expect(location).toBeTruthy();
+
+        const url = new URL(location!);
+        expect(url.searchParams.has('__clerk_handshake_nonce')).toBe(false);
+        expect(url.searchParams.get('foo')).toBe('bar');
+      });
+
+      it('should remove __clerk_handshake token from query params', async () => {
+        const { verifyHandshakeToken } = vi.mocked(await import('../handshake.js'));
+        verifyHandshakeToken.mockResolvedValue({
+          handshake: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+        });
+
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake=token123&foo=bar');
+        mockAuthenticateContext.handshakeNonce = undefined;
+        mockAuthenticateContext.handshakeToken = 'token123';
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        expect(location).toBeTruthy();
+
+        const url = new URL(location!);
+        expect(url.searchParams.has('__clerk_handshake')).toBe(false);
+        expect(url.searchParams.get('foo')).toBe('bar');
+      });
+
+      it('should remove __clerk_help from query params', async () => {
+        mockAuthenticateContext.clerkUrl = new URL(
+          'https://example.com/page?__clerk_handshake_nonce=abc123&__clerk_help=1',
+        );
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+        expect(url.searchParams.has('__clerk_help')).toBe(false);
+      });
+
+      it('should remove __clerk_db_jwt (dev browser) from query params', async () => {
+        mockAuthenticateContext.clerkUrl = new URL(
+          'https://example.com/page?__clerk_handshake_nonce=abc123&__clerk_db_jwt=dev_token',
+        );
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+        expect(url.searchParams.has('__clerk_db_jwt')).toBe(false);
+      });
+
+      it('should remove all handshake query params at once', async () => {
+        mockAuthenticateContext.clerkUrl = new URL(
+          'https://example.com/page?__clerk_handshake_nonce=abc123&__clerk_handshake=token&__clerk_help=1&__clerk_db_jwt=dev&foo=bar&baz=qux',
+        );
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+
+        expect(url.searchParams.has('__clerk_handshake_nonce')).toBe(false);
+        expect(url.searchParams.has('__clerk_handshake')).toBe(false);
+        expect(url.searchParams.has('__clerk_help')).toBe(false);
+        expect(url.searchParams.has('__clerk_db_jwt')).toBe(false);
+
+        expect(url.searchParams.get('foo')).toBe('bar');
+        expect(url.searchParams.get('baz')).toBe('qux');
+      });
+
+      it('should handle URL with only handshake params (clean URL result)', async () => {
+        mockAuthenticateContext.clerkUrl = new URL(
+          'https://example.com/page?__clerk_handshake_nonce=abc123&__clerk_help=1',
+        );
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+
+        expect(url.search).toBe('');
+        expect(url.href).toBe('https://example.com/page');
+      });
+
+      it('should handle URL with no query params (nonce in cookie)', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+
+        expect(url.href).toBe('https://example.com/page');
+        expect(url.search).toBe('');
+      });
+
+      it('should preserve URL-encoded query params', async () => {
+        mockAuthenticateContext.clerkUrl = new URL(
+          'https://example.com/page?__clerk_handshake_nonce=abc123&q=hello%20world&redirect=%2Fsome%2Fpath%3Ffoo%3Dbar',
+        );
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+
+        expect(url.searchParams.has('__clerk_handshake_nonce')).toBe(false);
+        expect(url.searchParams.get('q')).toBe('hello world');
+        expect(url.searchParams.get('redirect')).toBe('/some/path?foo=bar');
+      });
+
+      it('should preserve hash fragments when cleaning query params', async () => {
+        mockAuthenticateContext.clerkUrl = new URL(
+          'https://example.com/page?__clerk_handshake_nonce=abc123&foo=bar#section-2',
+        );
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        const url = new URL(location!);
+
+        expect(url.searchParams.has('__clerk_handshake_nonce')).toBe(false);
+        expect(url.searchParams.get('foo')).toBe('bar');
+        expect(url.hash).toBe('#section-2');
+      });
+
+      it('should set Cache-Control header to no-store', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        expect(result.headers.get(constants.Headers.CacheControl)).toBe('no-store');
+      });
+    });
+
+    describe('Production Mode', () => {
+      beforeEach(() => {
+        mockAuthenticateContext.instanceType = 'production';
+      });
+
+      it('should NOT add Location header in production mode', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123&foo=bar');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        expect(result.headers.has(constants.Headers.Location)).toBe(false);
+        expect(result.status).toBe('signed-in');
+      });
+
+      it('should NOT set Cache-Control header in production mode', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        expect(result.headers.has(constants.Headers.CacheControl)).toBe(false);
+      });
+
+      it('should still set session cookies in production', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: ['__session=eyJhbGc...; HttpOnly; Secure; SameSite=Lax'],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const setCookieHeaders = result.headers.getSetCookie?.() || [];
+        expect(setCookieHeaders.length).toBeGreaterThan(0);
+        expect(setCookieHeaders.some(h => h.startsWith('__session='))).toBe(true);
+      });
+    });
+
+    describe('Error Cases', () => {
+      beforeEach(() => {
+        mockAuthenticateContext.instanceType = 'development';
+      });
+
+      it('should handle BAPI errors gracefully', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockRejectedValue(new Error('BAPI error')),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        expect(result.status).toBe('signed-out');
+      });
+
+      it('should clean up query params even when handshake payload is empty', async () => {
+        mockAuthenticateContext.clerkUrl = new URL('https://example.com/page?__clerk_handshake_nonce=abc123&foo=bar');
+        mockAuthenticateContext.handshakeNonce = 'abc123';
+        mockAuthenticateContext.apiClient = {
+          clients: {
+            getHandshakePayload: vi.fn().mockResolvedValue({
+              directives: [],
+            }),
+          },
+        } as any;
+
+        const result = await handshakeService.resolveHandshake();
+
+        const location = result.headers.get(constants.Headers.Location);
+        expect(location).toBeTruthy();
+
+        const url = new URL(location!);
+        expect(url.searchParams.has('__clerk_handshake_nonce')).toBe(false);
+        expect(url.searchParams.get('foo')).toBe('bar');
       });
     });
   });

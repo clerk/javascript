@@ -17,6 +17,11 @@ export const skSK: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopírovať a zavrieť',
+      formHint: 'Z bezpečnostných dôvodov vám to neskôr nebudeme môcť znova zobraziť.',
+      formTitle: 'Skopírujte teraz svoj API kľúč "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const skSK: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Zariadenie používateľa',
   badge__you: 'Vy',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const skSK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const skSK: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const skSK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Zadajte heslo',
   formFieldInputPlaceholder__phoneNumber: 'Zadajte telefónne číslo',
   formFieldInputPlaceholder__username: 'Zadajte užívateľské meno',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API kľúč',
+  formFieldLabel__apiKeyDescription: 'Popis',
+  formFieldLabel__apiKeyExpiration: 'Expirácia',
+  formFieldLabel__apiKeyName: 'Názov tajného kľúča',
   formFieldLabel__automaticInvitations: 'Povoliť automatické pozvánky pre túto doménu',
   formFieldLabel__backupCode: 'Záložný kód',
   formFieldLabel__confirmDeletion: 'Potvrdenie',
@@ -283,7 +290,7 @@ export const skSK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const skSK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const skSK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvoriť organizáciu',
     action__invitationAccept: 'Pripojiť sa',
     action__manageOrganization: 'Spravovať organizáciu',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požiadať o pripojenie',
     notSelected: 'Nie je vybraná žiadna organizácia',
     personalWorkspace: 'Osobný pracovný priestor',
@@ -605,6 +614,12 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Skontrolujte svoj email',
     },
+    emailCodeMfa: {
+      formTitle: 'Skontrolujte svoj email',
+      resendButton: 'Nedostali ste kód? Znova odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Pre pokračovanie otvorte overovací odkaz na zariadení a prehliadači použitom na prihlásenie.',
@@ -640,6 +655,16 @@ export const skSK: LocalizationResource = {
         titleNewTab: 'Prihlásené v inom okne',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použite overovací odkaz odoslaný na váš e-mail',
+      resendButton: 'Nedostali ste odkaz? Znovu odoslať',
+      subtitle: 'pre pokračovanie do {{applicationName}}',
+      title: 'Skontrolujte svoj e-mail',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Overovací kód pre obnovenie hesla',
       resendButton: 'Znovu poslať kód',
@@ -653,6 +678,8 @@ export const skSK: LocalizationResource = {
       label__alternativeMethods: 'Alebo sa prihláste pomocou inej metódy.',
       title: 'Zabudli ste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Prihlasujete sa z nového zariadenia. Žiadame o overenie, aby sme udržali váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nemožno pokračovať v prihlásení. Nie je k dispozícii žiadna dostupná autentifikačná metóda.',
       subtitle: 'Došlo k chybe',
@@ -761,6 +788,10 @@ export const skSK: LocalizationResource = {
         title: 'Email úspešne overený',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Súhlasím s {{ privacyPolicyLink || link("podmienkami o ochrane osobných údajov") }}',
@@ -835,6 +866,14 @@ export const skSK: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -870,6 +909,7 @@ export const skSK: LocalizationResource = {
       'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',
     form_username_invalid_length:
       'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
+    form_username_needs_non_number_char: 'Vaše používateľské meno musí obsahovať aspoň jeden nečíselný znak.',
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
     organization_domain_blocked: undefined,
@@ -938,7 +978,9 @@ export const skSK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Pridať účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovať účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásiť sa',
     action__signOutAll: 'Odhlásiť sa zo všetkých účtov',
   },
@@ -970,7 +1012,7 @@ export const skSK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -979,7 +1021,7 @@ export const skSK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

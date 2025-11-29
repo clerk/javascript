@@ -70,6 +70,7 @@ describe('PlanDetails', () => {
   it('displays spinner when loading with planId', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getPlan.mockImplementation(() => new Promise(() => {}));
@@ -118,6 +119,7 @@ describe('PlanDetails', () => {
   it('fetches and renders plan details when planId is provided', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
+      f.withBilling();
     });
 
     fixtures.clerk.billing.getPlan.mockResolvedValue(mockPlan);
@@ -221,18 +223,8 @@ describe('PlanDetails', () => {
         currencySymbol: '$',
         currency: 'USD',
       },
-      annualFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
-      annualMonthlyFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
+      annualFee: null,
+      annualMonthlyFee: null,
     };
 
     const { wrapper } = await createFixtures(f => {
@@ -265,18 +257,8 @@ describe('PlanDetails', () => {
         currencySymbol: '$',
         currency: 'USD',
       },
-      annualFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
-      annualMonthlyFee: {
-        amount: 0,
-        amountFormatted: '0.00',
-        currencySymbol: '$',
-        currency: 'USD',
-      },
+      annualFee: null,
+      annualMonthlyFee: null,
       isDefault: true,
     };
 

@@ -17,19 +17,24 @@ export const koKR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '복사하고 닫기',
+      formHint: '보안상의 이유로 나중에 다시 볼 수 없습니다.',
+      formTitle: '지금 "{{name}}" API 키를 복사하세요',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
     formButtonPrimary__add: undefined,
-    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__expiresOn: '{{ date }}에 만료',
     formFieldCaption__expiration__never: undefined,
-    formFieldOption__expiration__180d: undefined,
-    formFieldOption__expiration__1d: undefined,
-    formFieldOption__expiration__1y: undefined,
-    formFieldOption__expiration__30d: undefined,
-    formFieldOption__expiration__60d: undefined,
-    formFieldOption__expiration__7d: undefined,
-    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__180d: '180일',
+    formFieldOption__expiration__1d: '1일',
+    formFieldOption__expiration__1y: '1년',
+    formFieldOption__expiration__30d: '30일',
+    formFieldOption__expiration__60d: '60일',
+    formFieldOption__expiration__7d: '7일',
+    formFieldOption__expiration__90d: '90일',
     formFieldOption__expiration__never: undefined,
     formHint: undefined,
     formTitle: undefined,
@@ -68,8 +73,8 @@ export const koKR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: '사용자 장치',
   badge__you: '당신',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const koKR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const koKR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -207,12 +212,12 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '계정 삭제',
-  formFieldInputPlaceholder__emailAddress: undefined,
-  formFieldInputPlaceholder__emailAddress_username: undefined,
+  formFieldInputPlaceholder__emailAddress: '이메일 주소를 입력하세요',
+  formFieldInputPlaceholder__emailAddress_username: '이메일 주소 또는 사용자명을 입력하세요',
   formFieldInputPlaceholder__emailAddresses:
     '하나 이상의 이메일 주소를 공백 또는 쉼표로 구분하여 입력하거나 붙여넣습니다',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
+  formFieldInputPlaceholder__firstName: '이름',
+  formFieldInputPlaceholder__lastName: '성',
   formFieldInputPlaceholder__organizationDomain: undefined,
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
   formFieldInputPlaceholder__organizationName: undefined,
@@ -220,9 +225,11 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API 키',
+  formFieldLabel__apiKeyDescription: '설명',
+  formFieldLabel__apiKeyExpiration: '만료',
+  formFieldLabel__apiKeyName: '시크릿 키 이름',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: '백업 코드',
   formFieldLabel__confirmDeletion: '확인',
@@ -283,7 +290,7 @@ export const koKR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const koKR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -485,9 +492,11 @@ export const koKR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '조직 만들기',
     action__invitationAccept: 'Join',
     action__manageOrganization: '조직 관리',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: '선택한 조직 없음',
     personalWorkspace: '개인 워크스페이스',
@@ -599,6 +608,12 @@ export const koKR: LocalizationResource = {
       subtitle: '{{applicationName}}로 계속하려면',
       title: '이메일을 확인하세요',
     },
+    emailCodeMfa: {
+      formTitle: '이메일을 확인하세요',
+      resendButton: '코드를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}로 계속하려면',
+      title: '이메일을 확인하세요',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -634,6 +649,16 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',
+      resendButton: '링크를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}(으)로 계속',
+      title: '이메일을 확인하세요',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: '비밀번호 재설정 코드',
       resendButton: '코드 재전송',
@@ -647,6 +672,7 @@ export const koKR: LocalizationResource = {
       label__alternativeMethods: '또는 다른 방법으로 로그인',
       title: '비밀번호를 잊으셨나요?',
     },
+    newDeviceVerificationNotice: '새로운 기기에서 로그인하고 있습니다. 계정 보안을 위해 확인을 요청하고 있습니다.',
     noAvailableMethods: {
       message: '로그인을 계속할 수 없습니다. 사용 가능한 인증 방법이 없습니다.',
       subtitle: '오류가 발생했습니다',
@@ -704,7 +730,7 @@ export const koKR: LocalizationResource = {
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       subtitleCombined: undefined,
       title: '{{applicationName}}에 로그인',
-      titleCombined: undefined,
+      titleCombined: '{{applicationName}}로 계속',
     },
     totpMfa: {
       formTitle: '인증 코드',
@@ -753,6 +779,10 @@ export const koKR: LocalizationResource = {
         subtitleNewTab: '계속하려면 이전 탭으로 돌아가기',
         title: '이메일 인증 성공',
       },
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
     },
     legalConsent: {
       checkbox: {
@@ -824,6 +854,14 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -856,6 +894,7 @@ export const koKR: LocalizationResource = {
     form_password_validation_failed: '잘못된 비밀번호',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '사용자 이름에는 숫자가 아닌 문자가 하나 이상 포함되어야 합니다.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "이메일 주소 또는 전화번호는 가입에 사용할 수 없습니다. 이는 '+', '=', '#' 또는 '.'이 이메일 주소에 사용되었거나 임시 이메일 서비스에 연결된 도메인이 사용되었거나 명시적 제외가 있는 경우입니다. 이 오류가 발생한 경우 지원에 문의하세요.",
@@ -925,7 +964,9 @@ export const koKR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '계정 추가',
+    action__closeUserMenu: '사용자 메뉴 닫기',
     action__manageAccount: '계정 관리',
+    action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
   },
@@ -956,7 +997,7 @@ export const koKR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -965,7 +1006,7 @@ export const koKR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

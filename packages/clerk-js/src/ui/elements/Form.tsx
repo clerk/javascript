@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { FieldId } from '@clerk/types';
+import type { FieldId } from '@clerk/shared/types';
 import type { PropsWithChildren } from 'react';
 import React, { forwardRef, useState } from 'react';
 
@@ -318,6 +318,7 @@ export const Form = {
   Checkbox,
   SubmitButton: FormSubmit,
   ResetButton: FormReset,
+  CommonInputWrapper,
 };
 
 export { useFormState };

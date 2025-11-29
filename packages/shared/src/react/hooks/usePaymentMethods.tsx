@@ -1,6 +1,6 @@
-import type { BillingPaymentMethodResource, GetPaymentMethodsParams } from '@clerk/types';
-
+import type { BillingPaymentMethodResource, GetPaymentMethodsParams } from '../../types';
 import { useOrganizationContext, useUserContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
@@ -8,7 +8,7 @@ import { createBillingPaginatedHook } from './createBillingPaginatedHook';
  */
 export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentMethodResource, GetPaymentMethodsParams>({
   hookName: 'usePaymentMethods',
-  resourceType: 'commerce-payment-methods',
+  resourceType: STABLE_KEYS.PAYMENT_METHODS_KEY,
   useFetcher: resource => {
     const { organization } = useOrganizationContext();
     const user = useUserContext();
@@ -19,3 +19,8 @@ export const usePaymentMethods = createBillingPaginatedHook<BillingPaymentMethod
     return user?.getPaymentMethods;
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePaymentMethodsReturn = ReturnType<typeof usePaymentMethods>;

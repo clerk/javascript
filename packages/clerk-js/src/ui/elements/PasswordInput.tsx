@@ -1,4 +1,4 @@
-import type { ClerkAPIError } from '@clerk/types';
+import type { ClerkAPIError } from '@clerk/shared/types';
 import type { ChangeEvent } from 'react';
 import React, { forwardRef, useRef, useState } from 'react';
 
@@ -31,6 +31,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     setWarning,
     setError,
     setHasPassedComplexity,
+    tabIndex,
     ...rest
   } = props;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +87,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
     >
       <Input
         {...rest}
+        tabIndex={tabIndex}
         onChange={onChange}
         onBlur={e => {
           rest.onBlur?.(e);
@@ -108,7 +110,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
         aria-label={`${hidden ? 'Show' : 'Hide'} password`}
         variant='ghost'
         size='xs'
-        tabIndex={-1}
+        tabIndex={tabIndex}
         onClick={() => setHidden(s => !s)}
         sx={theme => ({
           position: 'absolute',

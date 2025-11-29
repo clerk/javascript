@@ -1,6 +1,6 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/types';
+import type { OAuthProvider, OAuthStrategy, PhoneCodeChannel, Web3Provider, Web3Strategy } from '@clerk/shared/types';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 
@@ -20,6 +20,7 @@ import {
   useAppearance,
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
+import { useTotalEnabledAuthMethods } from '../hooks/useTotalEnabledAuthMethods';
 import { mqu, type PropsOfComponent } from '../styledSystem';
 import { sleep } from '../utils/sleep';
 import { LastAuthenticationStrategyBadge } from './Badge';
@@ -28,7 +29,7 @@ import { distributeStrategiesIntoRows } from './utils';
 
 const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
-const MAX_STRATEGIES_PER_ROW = 6;
+const MAX_STRATEGIES_PER_ROW = 5;
 
 export type SocialButtonsProps = React.PropsWithChildren<{
   enableOAuthProviders: boolean;
@@ -41,6 +42,7 @@ type SocialButtonsRootProps = SocialButtonsProps & {
   web3Callback: (strategy: Web3Strategy) => Promise<unknown>;
   alternativePhoneCodeCallback: (channel: PhoneCodeChannel) => void;
   idleAfterDelay?: boolean;
+  showLastAuthenticationStrategy?: boolean;
 };
 
 const isWeb3Strategy = (val: string): val is Web3Strategy => {
@@ -60,9 +62,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     enableWeb3Providers = true,
     enableAlternativePhoneCodeProviders = true,
     idleAfterDelay = true,
+    showLastAuthenticationStrategy = false,
   } = props;
   const { web3Strategies, authenticatableOauthStrategies, strategyToDisplayData, alternativePhoneCodeChannels } =
     useEnabledThirdPartyProviders();
+  const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const card = useCardState();
   const clerk = useClerk();
   const { socialButtonsVariant } = useAppearance().parsedLayout;
@@ -79,13 +83,28 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
     return null;
   }
 
-  const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy as TStrategy | null;
+  const clientLastAuth = showLastAuthenticationStrategy ? clerk.client?.lastAuthenticationStrategy : null;
+
+  const isValidStrategy = (strategy: unknown): strategy is TStrategy => {
+    return strategies.includes(strategy as TStrategy);
+  };
+
+  // Convert SAML strategies to OAuth strategies for consistency when matching last used strategy.
+  const convertedClientLastAuth = clientLastAuth?.startsWith('saml_')
+    ? clientLastAuth.replace('saml_', 'oauth_')
+    : clientLastAuth;
+
+  const lastAuthenticationStrategy =
+    convertedClientLastAuth && isValidStrategy(convertedClientLastAuth) ? convertedClientLastAuth : null;
+
   const { strategyRows, lastAuthenticationStrategyPresent } = distributeStrategiesIntoRows<TStrategy>(
     [...strategies],
     MAX_STRATEGIES_PER_ROW,
     lastAuthenticationStrategy,
   );
   const strategyRowOneLength = strategyRows.at(lastAuthenticationStrategyPresent ? 1 : 0)?.length ?? 0;
+  const remainingStrategiesLength = lastAuthenticationStrategyPresent ? strategies.length - 1 : strategies.length;
+  const shouldForceSingleColumnOnMobile = !lastAuthenticationStrategyPresent && strategies.length === 2;
 
   const preferBlockButtons =
     socialButtonsVariant === 'blockButton'
@@ -136,34 +155,38 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           sx={t => ({
             justifyContent: 'center',
             [mqu.sm]: {
-              gridTemplateColumns: 'repeat(1, 1fr)',
+              // Force single-column on mobile when 2 strategies are present (without last auth) to prevent
+              // label overflow. When last auth is present, only 1 strategy remains here, so overflow isn't a concern.
+              gridTemplateColumns: shouldForceSingleColumnOnMobile ? 'repeat(1, minmax(0, 1fr))' : undefined,
             },
             gridTemplateColumns:
               strategies.length < 1
-                ? `repeat(1, 1fr)`
+                ? `repeat(1, minmax(0, 1fr))`
                 : `repeat(${row.length}, ${
                     rowIndex === 0
-                      ? `1fr`
+                      ? `minmax(0, 1fr)`
                       : // Calculate the width of each button based on the width of the buttons within the first row.
                         // t.sizes.$2 is used here to represent the gap defined on the Grid component.
-                        `calc((100% - (${strategyRowOneLength} - 1) * ${t.sizes.$2}) / ${strategyRowOneLength})`
+                        `minmax(0, calc((100% - (${strategyRowOneLength} - 1) * ${t.sizes.$2}) / ${strategyRowOneLength}))`
                   })`,
           })}
         >
           {row.map(strategy => {
-            const label =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? `Continue with ${strategyToDisplayData[strategy].name}`
-                : strategyToDisplayData[strategy].name;
+            const shouldShowPreText =
+              remainingStrategiesLength === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
+              (strategy === lastAuthenticationStrategy && row.length === 1);
 
-            const localizedText =
-              strategies.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD
-                ? localizationKeys('socialButtonsBlockButton', {
-                    provider: strategyToDisplayData[strategy].name,
-                  })
-                : localizationKeys('socialButtonsBlockButtonManyInView', {
-                    provider: strategyToDisplayData[strategy].name,
-                  });
+            const label = shouldShowPreText
+              ? `Continue with ${strategyToDisplayData[strategy].name}`
+              : strategyToDisplayData[strategy].name;
+
+            const localizedText = shouldShowPreText
+              ? localizationKeys('socialButtonsBlockButton', {
+                  provider: strategyToDisplayData[strategy].name,
+                })
+              : localizationKeys('socialButtonsBlockButtonManyInView', {
+                  provider: strategyToDisplayData[strategy].name,
+                });
 
             const imageOrInitial = strategyToDisplayData[strategy].iconUrl ? (
               <Image
@@ -194,7 +217,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 label={label}
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
-                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy}
+                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1}
               />
             );
           })}

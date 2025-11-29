@@ -76,6 +76,7 @@ export type UserService = {
   createFakeOrganization: (userId: string) => Promise<FakeOrganization>;
   getUser: (opts: { id?: string; email?: string }) => Promise<User | undefined>;
   createFakeAPIKey: (userId: string) => Promise<FakeAPIKey>;
+  passwordUntrusted: (userId: string) => Promise<void>;
 };
 
 /**
@@ -200,17 +201,18 @@ export const createUserService = (clerkClient: ClerkClient) => {
 
       const apiKey = await clerkClient.apiKeys.create({
         subject: userId,
-        name: `Integration Test - ${userId}`,
+        name: `Integration Test - ${faker.string.uuid()}`,
         secondsUntilExpiration: TWENTY_MINUTES,
       });
 
-      const { secret } = await clerkClient.apiKeys.getSecret(apiKey.id);
-
       return {
         apiKey,
-        secret,
+        secret: apiKey.secret ?? '',
         revoke: () => clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' }),
       } satisfies FakeAPIKey;
+    },
+    passwordUntrusted: async (userId: string) => {
+      await clerkClient.users.__experimental_passwordUntrusted(userId);
     },
   };
 

@@ -17,6 +17,11 @@ export const heIL: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'העתק וסגור',
+      formHint: 'מסיבות אבטחה, לא נוכל לאפשר לך לצפות בזה שוב מאוחר יותר.',
+      formTitle: 'העתק את מפתח ה-API "{{name}}" שלך כעת',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const heIL: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'מכשיר משתמש',
   badge__you: 'אתה',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const heIL: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const heIL: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const heIL: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'מפתח API',
+  formFieldLabel__apiKeyDescription: 'תיאור',
+  formFieldLabel__apiKeyExpiration: 'תאריך תפוגה',
+  formFieldLabel__apiKeyName: 'שם מפתח סודי',
   formFieldLabel__automaticInvitations: 'הפעל הזמנות אוטומטיות לדומיין הזה',
   formFieldLabel__backupCode: 'קוד גיבוי',
   formFieldLabel__confirmDeletion: 'אישור',
@@ -282,7 +289,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +298,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -483,9 +490,11 @@ export const heIL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'צור ארגון',
     action__invitationAccept: 'הצטרף',
     action__manageOrganization: 'נהל ארגון',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'בקשה להצטרפות',
     notSelected: 'לא נבחר ארגון',
     personalWorkspace: 'אזור אישי',
@@ -597,6 +606,12 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשיך אל {{applicationName}}',
       title: 'בדוק את הדוא"ל שלך',
     },
+    emailCodeMfa: {
+      formTitle: 'בדוק את הדוא"ל שלך',
+      resendButton: 'לא קיבלת קוד? שלח שוב',
+      subtitle: 'להמשיך אל {{applicationName}}',
+      title: 'בדוק את הדוא"ל שלך',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'להמשך, פתח את קוד האימות מהמכשיר והדפדפן ממנו אתה מתכוון לבצע כניסה',
@@ -632,6 +647,16 @@ export const heIL: LocalizationResource = {
         titleNewTab: 'נכנס בכרטיסייה אחרת',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'השתמש בקישור האימות שנשלח לדוא״ל שלך',
+      resendButton: 'לא קיבלת את הקישור? שלח שוב',
+      subtitle: 'כדי להמשיך ל-{{applicationName}}',
+      title: 'בדוק את הדוא״ל שלך',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'אפס קוד הסיסמה',
       resendButton: 'שלח קוד שוב',
@@ -645,6 +670,7 @@ export const heIL: LocalizationResource = {
       label__alternativeMethods: 'או, התחבר באמצעות שיטה אחרת.',
       title: 'שכחת סיסמה?',
     },
+    newDeviceVerificationNotice: 'אתה נכנס מכשיר חדש. אנו מבקשים אימות כדי לשמור על החשבון שלך מאובטח.',
     noAvailableMethods: {
       message: 'לא ניתן להמשיך בהתחברות. אין גורם אימות זמין.',
       subtitle: 'אירעה שגיאה',
@@ -752,6 +778,10 @@ export const heIL: LocalizationResource = {
         title: 'אימות דוא"ל הצליח',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -822,6 +852,14 @@ export const heIL: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
@@ -853,6 +891,7 @@ export const heIL: LocalizationResource = {
     form_password_validation_failed: 'סיסמה שגויה',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'שם המשתמש שלך חייב להכיל לפחות תו אחד שאינו מספרי.',
     identification_deletion_failed: 'לא ניתן למחוק את הזיהוי האחרון שלך.',
     not_allowed_access:
       "האימייל או מספר הטלפון אינו מותר להרשמה. זה עשוי להיות בגלל השימוש ב-'+', '=', '#' או '.' בכתובת האימייל שלך, השימוש בתחום המחובר לשירות אימייל זמני או הפרסט בכתובת האימייל שלך. אם מחזרים שגיאה, נא ליצור קשר עם תמיכה.",
@@ -922,7 +961,9 @@ export const heIL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'הוסף חשבון',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'נהל חשבון',
+    action__openUserMenu: undefined,
     action__signOut: 'התנתק',
     action__signOutAll: 'התנתק מכל החשבונות',
   },
@@ -952,7 +993,7 @@ export const heIL: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -961,7 +1002,7 @@ export const heIL: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -1017,7 +1058,7 @@ export const heIL: LocalizationResource = {
       title: 'הוסף חשבון מחובר',
     },
     deletePage: {
-      actionDescription: 'הקלד "מחק חשבון" למטה כדי להמשיך.',
+      actionDescription: 'הקלד "מחיקת חשבון" למטה כדי להמשיך.',
       confirm: 'מחק חשבון',
       messageLine1:
         'האם אתה בטוח שברצונך למחוק את החשבון שלך? חלק מהנתונים המשויכים עשויים להישמר. כדי לבקש מחיקת נתונים מלאה, אנא צור קשר עם התמיכה.',
@@ -1259,16 +1300,16 @@ export const heIL: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'התחבר',
+      actionText: 'כבר יש לך גישה?',
+      formButton: 'הצטרף לרשימת ההמתנה',
+      subtitle: 'הזן את כתובת הדוא"ל שלך ואנו נודיע לך כשהמקום שלך יהיה מוכן',
+      title: 'הצטרף לרשימת ההמתנה',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'תועבר בקרוב...',
+      subtitle: 'אנו ניצור איתך קשר כשהמקום שלך יהיה מוכן',
+      title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
   },
 } as const;

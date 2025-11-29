@@ -17,6 +17,11 @@ export const viVN: LocalizationResource = {
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Sao chép và đóng',
+      formHint: 'Vì lý do bảo mật, chúng tôi sẽ không cho phép bạn xem lại sau này.',
+      formTitle: 'Sao chép khóa API "{{name}}" của bạn ngay bây giờ',
+    },
     createdAndExpirationStatus__expiresOn:
       "Tạo {{ createdDate | shortDate('vi-VN') }} • Hết hạn {{ expiresDate | longDate('vi-VN') }}",
     createdAndExpirationStatus__never: "Tạo {{ createdDate | shortDate('vi-VN') }} • Không hết hạn",
@@ -69,8 +74,8 @@ export const viVN: LocalizationResource = {
   badge__upcomingPlan: 'Sắp tới',
   badge__userDevice: 'Thiết bị người dùng',
   badge__you: 'Bạn',
-  commerce: {
-    addPaymentMethod: 'Thêm phương thức thanh toán',
+  billing: {
+    addPaymentMethod__label: 'Thêm phương thức thanh toán',
     alwaysFree: 'Miễn phí mãi mãi',
     annually: 'Hàng năm',
     availableFeatures: 'Tính năng có sẵn',
@@ -125,8 +130,7 @@ export const viVN: LocalizationResource = {
     monthly: 'Hàng tháng',
     pastDue: 'Quá hạn',
     pay: 'Thanh toán {{amount}}',
-    paymentMethods: 'Phương thức thanh toán',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Thanh toán hàng năm',
         monthly: 'Thanh toán hàng tháng',
@@ -140,6 +144,7 @@ export const viVN: LocalizationResource = {
         testCardInfo: 'Thông tin thử nghiệm',
       },
     },
+    paymentMethods__label: 'Phương thức thanh toán',
     popular: 'Phổ biến',
     pricingTable: {
       billingCycle: 'Chu kỳ thanh toán',
@@ -224,6 +229,8 @@ export const viVN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Nhập mật khẩu của bạn',
   formFieldInputPlaceholder__phoneNumber: 'Nhập số điện thoại của bạn',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Khóa API',
   formFieldLabel__apiKeyDescription: 'Mô tả',
   formFieldLabel__apiKeyExpiration: 'Hết hạn',
   formFieldLabel__apiKeyName: 'Tên khoá bí mật',
@@ -287,7 +294,7 @@ export const viVN: LocalizationResource = {
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Làm mặc định',
         actionLabel__remove: 'Xóa',
         add: 'Thêm phương thức thanh toán mới',
@@ -296,11 +303,11 @@ export const viVN: LocalizationResource = {
         formButtonPrimary__add: 'Thêm phương thức thanh toán',
         formButtonPrimary__pay: 'Thanh toán {{amount}}',
         payWithTestCardButton: 'Thanh toán với thẻ thử nghiệm',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
-          successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
+          successMessage: '{{paymentMethod}} đã bị xóa khỏi tài khoản của bạn.',
           title: 'Xóa phương thức thanh toán',
         },
         title: 'Phương thức thanh toán',
@@ -493,9 +500,11 @@ export const viVN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Tạo tổ chức',
     action__invitationAccept: 'Tham gia',
     action__manageOrganization: 'Quản lý',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Yêu cầu tham gia',
     notSelected: 'Không có tổ chức được chọn',
     personalWorkspace: 'Tài khoản cá nhân',
@@ -610,6 +619,12 @@ export const viVN: LocalizationResource = {
       subtitle: 'để tiếp tục đến {{applicationName}}',
       title: 'Kiểm tra email',
     },
+    emailCodeMfa: {
+      formTitle: 'Kiểm tra email',
+      resendButton: 'Không nhận được mã? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Để tiếp tục, mở liên kết xác minh trên thiết bị và trình duyệt từ đó bạn đã khởi động đăng nhập',
@@ -645,6 +660,16 @@ export const viVN: LocalizationResource = {
         titleNewTab: 'Đăng nhập trên tab khác',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Sử dụng liên kết xác minh được gửi đến email của bạn',
+      resendButton: 'Không nhận được liên kết? Gửi lại',
+      subtitle: 'để tiếp tục đến {{applicationName}}',
+      title: 'Kiểm tra email của bạn',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Mã xác minh mật khẩu',
       resendButton: 'Không nhận được mã? Gửi lại',
@@ -658,6 +683,8 @@ export const viVN: LocalizationResource = {
       label__alternativeMethods: 'Hoặc, đăng nhập với phương thức khác',
       title: 'Quên mật khẩu?',
     },
+    newDeviceVerificationNotice:
+      'Bạn đang đăng nhập từ thiết bị mới. Chúng tôi yêu cầu xác minh để giữ tài khoản của bạn an toàn.',
     noAvailableMethods: {
       message: 'Không thể tiếp tục đăng nhập. Không có yếu tố xác thực phù hợp được cấu hình',
       subtitle: 'Đã xảy ra lỗi',
@@ -766,6 +793,10 @@ export const viVN: LocalizationResource = {
         title: 'Xác minh email thành công',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Tôi đồng ý với {{ privacyPolicyLink || link("Chính sách bảo mật") }}',
@@ -838,6 +869,14 @@ export const viVN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
     captcha_invalid: undefined,
@@ -870,6 +909,7 @@ export const viVN: LocalizationResource = {
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Tên người dùng của bạn phải có giữa {{min_length}} và {{max_length}} ký tự.',
+    form_username_needs_non_number_char: 'Tên người dùng của bạn phải chứa ít nhất một ký tự không phải là số.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -938,7 +978,9 @@ export const viVN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Thêm tài khoản',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Quản lý tài khoản',
+    action__openUserMenu: undefined,
     action__signOut: 'Đăng xuất',
     action__signOutAll: 'Đăng xuất tất cả tài khoản',
   },
@@ -970,7 +1012,7 @@ export const viVN: LocalizationResource = {
         tableHeader__date: 'Ngày',
         tableHeader__status: 'Trạng thái',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Làm mặc định',
         actionLabel__remove: 'Xóa',
         add: 'Thêm phương thức thanh toán mới',
@@ -979,11 +1021,11 @@ export const viVN: LocalizationResource = {
         formButtonPrimary__add: 'Thêm phương thức thanh toán',
         formButtonPrimary__pay: 'Thanh toán {{amount}}',
         payWithTestCardButton: 'Thanh toán với thẻ thử',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} sẽ bị xóa khỏi tài khoản này.',
           messageLine2:
             'Bạn sẽ không còn thể sử dụng nguồn thanh toán này và bất kỳ đăng ký lặp lại nào phụ thuộc vào nó sẽ không còn hoạt động.',
-          successMessage: '{{paymentSource}} đã bị xóa khỏi tài khoản của bạn.',
+          successMessage: '{{paymentMethod}} đã bị xóa khỏi tài khoản của bạn.',
           title: 'Xóa phương thức thanh toán',
         },
         title: 'Phương thức thanh toán',

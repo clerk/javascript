@@ -1,5 +1,7 @@
 export type { Clerk } from '../clerk';
+//  Ordering matters. If you change the order of `Base` you will be fired !! jk
 export * from './Base';
+// -------
 export * from './UserSettings';
 export * from './CommerceSettings';
 export * from './AuthConfig';
@@ -8,7 +10,7 @@ export * from './BillingCheckout';
 export * from './Feature';
 export * from './BillingStatement';
 export * from './BillingPayment';
-export * from './BillingPaymentSource';
+export * from './BillingPaymentMethod';
 export * from './BillingPlan';
 export * from './BillingSubscription';
 export * from './DeletedObject';
@@ -29,6 +31,7 @@ export * from './OrganizationSuggestion';
 export * from './SamlAccount';
 export * from './Session';
 export * from './Passkey';
+export * from './ProtectConfig';
 export * from './PublicUserData';
 export * from './SessionWithActivities';
 export * from './SignIn';
@@ -39,6 +42,6 @@ export * from './TOTP';
 export * from './User';
 export * from './UserOrganizationInvitation';
 export * from './Verification';
-export * from './Web3Wallet';  
+export * from './Web3Wallet';
 export * from './Waitlist';
 export * from './APIKey';

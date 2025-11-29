@@ -1,4 +1,4 @@
-import type { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';
@@ -276,6 +276,41 @@ describe('SessionTokenCache', () => {
 
       // Critical: postMessage should NOT be called when handling a broadcast
       expect(mockBroadcastChannel.postMessage).not.toHaveBeenCalled();
+    });
+
+    it('always broadcasts regardless of cache state', async () => {
+      mockBroadcastChannel.postMessage.mockClear();
+
+      const tokenId = 'sess_2GbDB4enNdCa5vS1zpC3Xzg9tK9';
+      const tokenResolver = Promise.resolve(
+        new Token({
+          id: tokenId,
+          jwt: mockJwt,
+          object: 'token',
+        }) as TokenResource,
+      );
+
+      SessionTokenCache.set({ tokenId, tokenResolver });
+      await tokenResolver;
+
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
+      const firstCall = mockBroadcastChannel.postMessage.mock.calls[0][0];
+      expect(firstCall.tokenId).toBe(tokenId);
+
+      mockBroadcastChannel.postMessage.mockClear();
+
+      const tokenResolver2 = Promise.resolve(
+        new Token({
+          id: tokenId,
+          jwt: mockJwt,
+          object: 'token',
+        }) as TokenResource,
+      );
+
+      SessionTokenCache.set({ tokenId, tokenResolver: tokenResolver2 });
+      await tokenResolver2;
+
+      expect(mockBroadcastChannel.postMessage).toHaveBeenCalledTimes(1);
     });
   });
 

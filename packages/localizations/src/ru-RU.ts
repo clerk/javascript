@@ -17,6 +17,11 @@ export const ruRU: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копировать и закрыть',
+      formHint: 'По соображениям безопасности мы не позволим вам просмотреть его позже.',
+      formTitle: 'Скопируйте ваш API-ключ "{{name}}" сейчас',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const ruRU: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пользовательское устройство',
   badge__you: 'Вы',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const ruRU: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const ruRU: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -222,9 +227,11 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Введите ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Введите ваш номер телефона',
   formFieldInputPlaceholder__username: 'Имя пользователя',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Срок действия',
+  formFieldLabel__apiKeyName: 'Название секретного ключа',
   formFieldLabel__automaticInvitations: 'Включить автоматические приглашения для этого домена',
   formFieldLabel__backupCode: 'Код восстановления',
   formFieldLabel__confirmDeletion: 'Подтверждение',
@@ -286,7 +293,7 @@ export const ruRU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -295,7 +302,7 @@ export const ruRU: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -495,9 +502,11 @@ export const ruRU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
     action__manageOrganization: 'Настройки',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
     personalWorkspace: 'Личный профиль',
@@ -611,6 +620,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Проверьте Вашу почту',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверьте Вашу почту',
+      resendButton: 'Не получили код? Отправить снова.',
+      subtitle: 'для продолжения работы в "{{applicationName}}"',
+      title: 'Проверьте Вашу почту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -647,6 +662,16 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
+      resendButton: 'Не получили ссылку? Отправить повторно',
+      subtitle: 'чтобы продолжить в {{applicationName}}',
+      title: 'Проверьте свою электронную почту',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код восстановления пароля',
       resendButton: 'Отправить код еще раз',
@@ -660,6 +685,8 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы входите с нового устройства. Мы просим подтверждение для обеспечения безопасности вашего аккаунта.',
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',
@@ -769,6 +796,10 @@ export const ruRU: LocalizationResource = {
         title: 'Почта верифицирована',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Я согласен с {{ privacyPolicyLink || link("Политика конфиденциальности") }}',
@@ -842,6 +873,14 @@ export const ruRU: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
     captcha_invalid:
@@ -875,6 +914,7 @@ export const ruRU: LocalizationResource = {
     form_password_validation_failed: 'Неверный пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Имя пользователя должно содержать хотя бы один нецифровой символ.',
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
     not_allowed_access:
       "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
@@ -946,7 +986,9 @@ export const ruRU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавить учетную запись',
+    action__closeUserMenu: 'Закрыть меню пользователя',
     action__manageAccount: 'Управление учетной записью',
+    action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
   },
@@ -978,7 +1020,7 @@ export const ruRU: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Сделать основной',
         actionLabel__remove: 'Удалить',
         add: 'Добавить новый способ оплаты',
@@ -987,11 +1029,11 @@ export const ruRU: LocalizationResource = {
         formButtonPrimary__add: 'Добавить способ оплаты',
         formButtonPrimary__pay: 'Оплатить {{amount}}',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} будет удален из этой учетной записи.',
           messageLine2:
             'Вы больше не сможете использовать этот способ оплаты, и любые зависимые функции больше не будут работать.',
-          successMessage: '{{paymentSource}} был удален из вашей учетной записи.',
+          successMessage: '{{paymentMethod}} был удален из вашей учетной записи.',
           title: 'Удалить способ оплаты',
         },
         title: 'Доступные опции',

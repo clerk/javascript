@@ -1,5 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import useSWR from 'swr';
+import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -23,29 +22,19 @@ import { Statement } from './Statement';
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
     data: statement,
     isLoading,
     error,
-  } = useSWR(
-    params.statementId
-      ? {
-          type: 'statement',
-          id: params.statementId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getStatement({
-        id: params.statementId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
-      }),
-  );
+  } = __internal_useStatementQuery({
+    statementId: params.statementId,
+    for: requesterType,
+    enabled: Boolean(params.statementId),
+  });
 
   if (isLoading) {
     return (
@@ -106,7 +95,7 @@ export const StatementPage = () => {
                     <Statement.SectionContentItem key={item.id}>
                       <Statement.SectionContentDetailsHeader
                         title={item.subscriptionItem.plan.name}
-                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('commerce.month')) : t(localizationKeys('commerce.year'))}`}
+                        description={`${item.subscriptionItem.amount?.currencySymbol}${item.subscriptionItem.amount?.amountFormatted} / ${item.subscriptionItem.planPeriod === 'month' ? t(localizationKeys('billing.month')) : t(localizationKeys('billing.year'))}`}
                         secondaryTitle={`${item.amount.currencySymbol}${item.amount.amountFormatted}`}
                       />
                       <Statement.SectionContentDetailsList>
@@ -139,7 +128,7 @@ export const StatementPage = () => {
                                 gap: t.space.$1,
                               })}
                             >
-                              <Span localizationKey={localizationKeys('commerce.viewPayment')} />
+                              <Span localizationKey={localizationKeys('billing.viewPayment')} />
                               <Icon
                                 icon={ArrowRightIcon}
                                 size='sm'

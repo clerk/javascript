@@ -1,5 +1,5 @@
 import type { useOrganization } from '@clerk/shared/react';
-import type { GetMembersParams } from '@clerk/types';
+import type { GetMembersParams } from '@clerk/shared/types';
 import { useEffect, useRef } from 'react';
 
 import { Animated } from '@/ui/elements/Animated';

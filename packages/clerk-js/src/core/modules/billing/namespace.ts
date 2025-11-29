@@ -15,7 +15,7 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
@@ -28,8 +28,8 @@ import {
 } from '../../resources/internal';
 
 export class Billing implements BillingNamespace {
-  static readonly #pathRoot = '/commerce';
-  static path(subPath: string, param?: { orgId?: string }): string {
+  static readonly #pathRoot = '/billing';
+  static path(subPath: string, param?: { orgId?: string | null }): string {
     const { orgId } = param || {};
     const prefix = orgId ? `/organizations/${orgId}` : '/me';
     return `${prefix}${Billing.#pathRoot}${subPath}`;
@@ -39,7 +39,7 @@ export class Billing implements BillingNamespace {
     const { for: forParam, ...safeParams } = params || {};
     const searchParams = { ...safeParams, payer_type: forParam === 'organization' ? 'org' : 'user' };
     return await BaseResource._fetch({
-      path: `/commerce/plans`,
+      path: `${Billing.#pathRoot}/plans`,
       method: 'GET',
       search: convertPageToOffsetSearchParams(searchParams),
     }).then(res => {
@@ -55,7 +55,7 @@ export class Billing implements BillingNamespace {
   // Inconsistent API
   getPlan = async (params: { id: string }): Promise<BillingPlanResource> => {
     const plan = (await BaseResource._fetch({
-      path: `/commerce/plans/${params.id}`,
+      path: `${Billing.#pathRoot}/plans/${params.id}`,
       method: 'GET',
     })) as unknown as BillingPlanJSON;
     return new BillingPlan(plan);
@@ -63,7 +63,7 @@ export class Billing implements BillingNamespace {
 
   getSubscription = async (params: GetSubscriptionParams): Promise<BillingSubscriptionResource> => {
     return await BaseResource._fetch({
-      path: params.orgId ? `/organizations/${params.orgId}/commerce/subscription` : `/me/commerce/subscription`,
+      path: Billing.path(`/subscription`, { orgId: params.orgId }),
       method: 'GET',
     }).then(res => new BillingSubscription(res?.response as BillingSubscriptionJSON));
   };
@@ -72,7 +72,7 @@ export class Billing implements BillingNamespace {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/statements` : `/me/commerce/statements`,
+      path: Billing.path(`/statements`, { orgId }),
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
@@ -89,9 +89,7 @@ export class Billing implements BillingNamespace {
   getStatement = async (params: { id: string; orgId?: string }): Promise<BillingStatementResource> => {
     const statement = (
       await BaseResource._fetch({
-        path: params.orgId
-          ? `/organizations/${params.orgId}/commerce/statements/${params.id}`
-          : `/me/commerce/statements/${params.id}`,
+        path: Billing.path(`/statements/${params.id}`, { orgId: params.orgId }),
         method: 'GET',
       })
     )?.response as unknown as BillingStatementJSON;
@@ -104,7 +102,7 @@ export class Billing implements BillingNamespace {
     const { orgId, ...rest } = params;
 
     return await BaseResource._fetch({
-      path: orgId ? `/organizations/${orgId}/commerce/payment_attempts` : `/me/commerce/payment_attempts`,
+      path: Billing.path(`/payment_attempts`, { orgId }),
       method: 'GET',
       search: convertPageToOffsetSearchParams(rest),
     }).then(res => {
@@ -119,9 +117,7 @@ export class Billing implements BillingNamespace {
 
   getPaymentAttempt = async (params: { id: string; orgId?: string }): Promise<BillingPaymentResource> => {
     const paymentAttempt = (await BaseResource._fetch({
-      path: params.orgId
-        ? `/organizations/${params.orgId}/commerce/payment_attempts/${params.id}`
-        : `/me/commerce/payment_attempts/${params.id}`,
+      path: Billing.path(`/payment_attempts/${params.id}`, { orgId: params.orgId }),
       method: 'GET',
     })) as unknown as BillingPaymentJSON;
     return new BillingPayment(paymentAttempt);
@@ -131,7 +127,7 @@ export class Billing implements BillingNamespace {
     const { orgId, ...rest } = params;
     const json = (
       await BaseResource._fetch<BillingCheckoutJSON>({
-        path: orgId ? `/organizations/${orgId}/commerce/checkouts` : `/me/commerce/checkouts`,
+        path: Billing.path(`/checkouts`, { orgId }),
         method: 'POST',
         body: rest as any,
       })

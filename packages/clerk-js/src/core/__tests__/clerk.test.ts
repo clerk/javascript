@@ -6,7 +6,7 @@ import type {
   SignInJSON,
   SignUpJSON,
   TokenResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
@@ -2505,6 +2505,197 @@ describe('Clerk singleton', () => {
       // Verify hooks were called
       await waitFor(() => {
         expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
+
+  describe('__internal_attemptToEnableEnvironmentSetting', () => {
+    afterEach(() => {
+      mockEnvironmentFetch.mockReset();
+      mockClientFetch.mockReset();
+    });
+
+    describe('for organizations', () => {
+      it('does not open prompt if organizations is enabled in development', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: true,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      it('does not open prompt if organizations is enabled in production', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => true,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: true,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      it('opens prompt if organizations is disabled in development', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        const sut = new Clerk(developmentPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).toHaveBeenCalled();
+      });
+
+      it('does not open prompt if organizations is disabled in production', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      // Handles case where environment gets enabled via BAPI, but it gets cached and the user is redirected to the choose-organization task
+      // The enable org prompt should not appear in the task screen since orgs have already been enabled
+      it('does not open prompt if organizations is disabled in development and session has choose-organization task', async () => {
+        const mockSession = {
+          id: '1',
+          remove: vi.fn(),
+          status: 'pending',
+          user: {},
+          touch: vi.fn(() => Promise.resolve()),
+          getToken: vi.fn(),
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+          tasks: [{ key: 'choose-organization' }],
+          currentTask: { key: 'choose-organization' },
+          reload: vi.fn(() =>
+            Promise.resolve({
+              id: '1',
+              status: 'pending',
+              user: {},
+              tasks: [{ key: 'choose-organization' }],
+              currentTask: {
+                key: 'choose-organization',
+              },
+            }),
+          ),
+        };
+
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+          }),
+        );
+
+        const sut = new Clerk(developmentPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        // Contains the organization task, so the prompt should not be opened
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
     });
   });

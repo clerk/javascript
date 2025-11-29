@@ -10,7 +10,6 @@ const FILES_WITHOUT_HEADINGS = [
   'use-organization-params.mdx',
   'paginated-resources.mdx',
   'pages-or-infinite-options.mdx',
-  'pages-or-infinite-options.mdx',
   'paginated-hook-config.mdx',
   'use-organization-list-return.mdx',
   'use-organization-list-params.mdx',
@@ -19,6 +18,21 @@ const FILES_WITHOUT_HEADINGS = [
   'verify-token-options.mdx',
   'public-organization-data-json.mdx',
   'organization-membership-public-user-data.mdx',
+  'use-checkout-return.mdx',
+  'use-checkout-options.mdx',
+  'use-payment-element-return.mdx',
+  'use-payment-methods-return.mdx',
+  'use-payment-attempts-return.mdx',
+  'use-plans-return.mdx',
+  'use-statements-return.mdx',
+  'hook-params.mdx',
+  'use-subscription-params.mdx',
+  'subscription-result.mdx',
+  'needs-reverification-parameters.mdx',
+  'use-reverification-options.mdx',
+  'use-reverification-params.mdx',
+  'payment-element-provider-props.mdx',
+  'payment-element-props.mdx',
 ];
 
 /**
@@ -29,6 +43,9 @@ const LINK_REPLACEMENTS = [
   ['set-active-params', '/docs/reference/javascript/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/javascript/types/clerk-paginated-response'],
   ['paginated-resources', '#paginated-resources'],
+  ['use-checkout-options', '#use-checkout-options'],
+  ['needs-reverification-parameters', '#needs-reverification-parameters'],
+  ['create-organization-params', '#create-organization-params'],
   ['session-resource', '/docs/reference/javascript/session'],
   ['signed-in-session-resource', '/docs/reference/javascript/session'],
   ['sign-in-resource', '/docs/reference/javascript/sign-in'],
@@ -57,14 +74,22 @@ const LINK_REPLACEMENTS = [
   ['verify-token-options', '#verify-token-options'],
   ['localization-resource', '/docs/guides/customizing-clerk/localization'],
   ['confirm-checkout-params', '/docs/reference/javascript/types/billing-checkout-resource#parameters'],
-  ['billing-payment-source-resource', '/docs/reference/javascript/types/billing-payment-source-resource'],
+  ['billing-payment-method-resource', '/docs/reference/javascript/types/billing-payment-method-resource'],
   ['billing-payer-resource', '/docs/reference/javascript/types/billing-payer-resource'],
   ['billing-plan-resource', '/docs/reference/javascript/types/billing-plan-resource'],
   ['billing-checkout-totals', '/docs/reference/javascript/types/billing-checkout-totals'],
+  ['billing-checkout-resource', '/docs/reference/javascript/types/billing-checkout-resource'],
   ['billing-money-amount', '/docs/reference/javascript/types/billing-money-amount'],
   ['billing-subscription-item-resource', '/docs/reference/javascript/types/billing-subscription-item-resource'],
   ['feature-resource', '/docs/reference/javascript/types/feature-resource'],
   ['billing-statement-group', '/docs/reference/javascript/types/billing-statement-group'],
+  ['billing-statement-resource', '/docs/reference/javascript/types/billing-statement-resource'],
+  ['billing-subscription-resource', '/docs/reference/javascript/types/billing-subscription-resource'],
+  ['clerk-api-response-error', '/docs/reference/javascript/types/clerk-api-response-error'],
+  ['billing-statement-totals', '/docs/reference/javascript/types/billing-statement-totals'],
+  ['billing-payment-resource', '/docs/reference/javascript/types/billing-payment-resource'],
+  ['deleted-object-resource', '/docs/reference/javascript/types/deleted-object-resource'],
+  ['use-checkout-return', '/docs/reference/hooks/use-checkout#returns'],
 ];
 
 /**
@@ -94,20 +119,50 @@ function getRelativeLinkReplacements() {
 function getCatchAllReplacements() {
   return [
     {
-      pattern: /\(setActiveParams\)/g,
-      replace: '([setActiveParams](/docs/reference/javascript/types/set-active-params))',
-    },
-    {
-      pattern: /`LoadedClerk`/g,
-      replace: '[Clerk](/docs/reference/javascript/clerk)',
+      pattern: /(?<![\[\w`])`Appearance`\\<`Theme`\\>/g,
+      replace: '[`Appearance<Theme>`](/docs/guides/customizing-clerk/appearance-prop/overview)',
     },
     {
       pattern: /\(CreateOrganizationParams\)/g,
       replace: '([CreateOrganizationParams](#create-organization-params))',
     },
     {
-      pattern: /\| `SignInResource` \|/,
-      replace: '| [SignInResource](/docs/reference/javascript/sign-in) |',
+      pattern: /`LoadedClerk`/g,
+      replace: '[Clerk](/docs/reference/javascript/clerk)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?LocalizationResource`?(?![\]\w`])/g,
+      replace: '[`LocalizationResource`](/docs/guides/customizing-clerk/localization)',
+    },
+    {
+      // SessionResource appears in plain text, with an array next to it, with backticks, etc.
+      // e.g. `SessionResource[]`
+      pattern: /(?<![`[\]])\bSessionResource(\[\])?\b(?![\]\)`])/g,
+      replace: '[`SessionResource`](/docs/reference/javascript/session)$1',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SessionStatusClaim`?(?![\]\w`])/g,
+      replace: '[`SessionStatusClaim`](/docs/reference/javascript/types/session-status)',
+    },
+    {
+      pattern: /(?<![`[\]])\bSetActiveParams\b(?![\]\(])/g,
+      replace: '[SetActiveParams](/docs/reference/javascript/types/set-active-params)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignInResource`?(?![\]\w`])/g,
+      replace: '[`SignInResource`](/docs/reference/javascript/sign-in)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignedInSessionResource`?(?![\]\w`])/g,
+      replace: '[`SignedInSessionResource`](/docs/reference/javascript/session)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?SignUpResource`?(?![\]\w`])/g,
+      replace: '[`SignUpResource`](/docs/reference/javascript/sign-up)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?OrganizationResource`?(?![\]\w`])/g,
+      replace: '[`OrganizationResource`](/docs/reference/javascript/organization)',
     },
     {
       pattern: /`OrganizationPrivateMetadata`/g,
@@ -137,6 +192,10 @@ function getCatchAllReplacements() {
       pattern: /`OrganizationMembershipPublicMetadata`/g,
       replace:
         '[`OrganizationMembershipPublicMetadata`](/docs/reference/javascript/types/metadata#organization-membership-public-metadata)',
+    },
+    {
+      pattern: /(?<![\[\w`])`?UserResource`?(?![\]\w`])/g,
+      replace: '[`UserResource`](/docs/reference/javascript/user)',
     },
     {
       /**

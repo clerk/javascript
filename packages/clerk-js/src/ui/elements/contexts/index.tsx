@@ -1,5 +1,5 @@
 import { createContextAndHook } from '@clerk/shared/react';
-import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/types';
+import type { ClerkAPIError, ClerkRuntimeError } from '@clerk/shared/types';
 import { FloatingTree, useFloatingParentNodeId } from '@floating-ui/react';
 import React from 'react';
 
@@ -101,10 +101,13 @@ export type FlowMetadata = {
     | 'oauthConsent'
     | 'subscriptionDetails'
     | 'tasks'
-    | 'taskChooseOrganization';
+    | 'taskChooseOrganization'
+    | 'enableOrganizations'
+    | 'taskResetPassword';
   part?:
     | 'start'
     | 'emailCode'
+    | 'emailCode2Fa'
     | 'phoneCode'
     | 'phoneCode2Fa'
     | 'totp2Fa'

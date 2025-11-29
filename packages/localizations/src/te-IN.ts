@@ -17,6 +17,11 @@ export const teIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'కాపీ చేసి మూసివేయి',
+      formHint: 'భద్రత కారణాల కోసం, మేము మీకు తర్వాత దాన్ని మళ్లీ చూడడానికి అనుమతించము.',
+      formTitle: 'ఇప్పుడే మీ "{{name}}" API కీని కాపీ చేయండి',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const teIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'వినియోగదారు పరికరం',
   badge__you: 'మీరు',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const teIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const teIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const teIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__phoneNumber: 'మీ ఫోన్ నంబర్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API కీ',
+  formFieldLabel__apiKeyDescription: 'వివరణ',
+  formFieldLabel__apiKeyExpiration: 'కాలం ముగిసింది',
+  formFieldLabel__apiKeyName: 'రహస్య కీ పేరు',
   formFieldLabel__automaticInvitations: 'ఈ డొమైన్ కోసం స్వయంచాలక ఆహ్వానాలను ప్రారంభించండి',
   formFieldLabel__backupCode: 'బ్యాకప్ కోడ్',
   formFieldLabel__confirmDeletion: 'నిర్ధారణ',
@@ -282,7 +289,7 @@ export const teIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
         actionLabel__remove: 'తొలగించండి',
         add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
@@ -291,11 +298,11 @@ export const teIN: LocalizationResource = {
         formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
         formButtonPrimary__pay: '{{amount}} చెల్లించండి',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
           messageLine2:
             'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          successMessage: '{{paymentMethod}} మీ ఖాతా నుండి తొలగించబడింది.',
           title: 'చెల్లింపు మూలాన్ని తొలగించండి',
         },
         title: 'అందుబాటులో ఉన్న ఎంపికలు',
@@ -490,9 +497,11 @@ export const teIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'సంస్థను సృష్టించండి',
     action__invitationAccept: 'చేరండి',
     action__manageOrganization: 'నిర్వహించండి',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
     notSelected: 'సంస్థ ఎంచుకోబడలేదు',
     personalWorkspace: 'వ్యక్తిగత ఖాతా',
@@ -607,6 +616,12 @@ export const teIN: LocalizationResource = {
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
+    emailCodeMfa: {
+      formTitle: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
+      subtitle: '{{applicationName}}కి కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'కొనసాగించడానికి, మీరు సైన్-ఇన్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
@@ -642,6 +657,16 @@ export const teIN: LocalizationResource = {
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'మీ ఇమెయిల్‌కు పంపబడిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
+      resendButton: 'లింక్ రాలేదా? మళ్లీ పంపండి',
+      subtitle: '{{applicationName}} కు కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'పాస్‌వర్డ్ రీసెట్ కోడ్',
       resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
@@ -655,6 +680,8 @@ export const teIN: LocalizationResource = {
       label__alternativeMethods: 'లేదా, మరొక పద్ధతితో సైన్ ఇన్ చేయండి',
       title: 'పాస్‌వర్డ్ మర్చిపోయారా?',
     },
+    newDeviceVerificationNotice:
+      'మీరు కొత్త పరికరం నుండి సైన్ ఇన్ చేస్తున్నారు. మీ ఖాతాను సురక్షితంగా ఉంచడానికి మేము ధృవీకరణను అభ్యర్థిస్తున్నాము.',
     noAvailableMethods: {
       message: 'సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.',
       subtitle: 'లోపం సంభవించింది',
@@ -764,6 +791,10 @@ export const teIN: LocalizationResource = {
         title: 'విజయవంతంగా ఇమెయిల్ ధృవీకరించబడింది',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'నేను {{ privacyPolicyLink || link("గోప్యతా విధానం") }}కి అంగీకరిస్తున్నాను',
@@ -837,6 +868,14 @@ export const teIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
     captcha_invalid:
@@ -872,6 +911,7 @@ export const teIN: LocalizationResource = {
     form_username_invalid_character:
       'మీ వినియోగదారు పేరులో చెల్లని అక్షరాలు ఉన్నాయి. దయచేసి అక్షరాలు, సంఖ్యలు మరియు అండర్‌స్కోర్‌లను మాత్రమే ఉపయోగించండి.',
     form_username_invalid_length: 'మీ వినియోగదారు పేరు {{min_length}} మరియు {{max_length}} అక్షరాల మధ్య ఉండాలి.',
+    form_username_needs_non_number_char: 'మీ వినియోగదారు పేరులో కనీసం ఒక సంఖ్యేతర అక్షరం ఉండాలి.',
     identification_deletion_failed: 'మీరు మీ చివరి గుర్తింపును తొలగించలేరు.',
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
@@ -943,7 +983,9 @@ export const teIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'ఖాతాను జోడించండి',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'ఖాతాను నిర్వహించండి',
+    action__openUserMenu: undefined,
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
   },
@@ -975,7 +1017,7 @@ export const teIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'డిఫాల్ట్‌గా చేయండి',
         actionLabel__remove: 'తొలగించండి',
         add: 'కొత్త చెల్లింపు మూలాన్ని జోడించండి',
@@ -984,11 +1026,11 @@ export const teIN: LocalizationResource = {
         formButtonPrimary__add: 'చెల్లింపు పద్ధతిని జోడించండి',
         formButtonPrimary__pay: '{{amount}} చెల్లించండి',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} ఈ ఖాతా నుండి తొలగించబడుతుంది.',
           messageLine2:
             'మీరు ఇకపై ఈ చెల్లింపు మూలాన్ని ఉపయోగించలేరు మరియు దానిపై ఆధారపడిన పునరావృత సబ్‌స్క్రిప్షన్‌లు ఇకపై పనిచేయవు.',
-          successMessage: '{{paymentSource}} మీ ఖాతా నుండి తొలగించబడింది.',
+          successMessage: '{{paymentMethod}} మీ ఖాతా నుండి తొలగించబడింది.',
           title: 'చెల్లింపు మూలాన్ని తొలగించండి',
         },
         title: 'అందుబాటులో ఉన్న ఎంపికలు',

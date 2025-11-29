@@ -17,6 +17,11 @@ export const mnMN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Хуулах ба хаах',
+      formHint: 'Аюулгүй байдлын шалтгаанаар бид танд дараа нь үүнийг дахин харах боломж олгохгүй.',
+      formTitle: 'Одоо "{{name}}" API түлхүүрээ хуулаарай',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const mnMN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Хэрэглэгчийн төхөөрөмж',
   badge__you: 'Чи',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const mnMN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const mnMN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const mnMN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Нууц үг',
   formFieldInputPlaceholder__phoneNumber: 'Утасны дугаар',
   formFieldInputPlaceholder__username: 'Хэрэглэгчийн нэр',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API түлхүүр',
+  formFieldLabel__apiKeyDescription: 'Тодорхойлолт',
+  formFieldLabel__apiKeyExpiration: 'Хугацаа дуусах',
+  formFieldLabel__apiKeyName: 'Нууц түлхүүрийн нэр',
   formFieldLabel__automaticInvitations: 'Энэ домэйны автомат урилгыг идэвхжүүлэх',
   formFieldLabel__backupCode: 'Нөөц код',
   formFieldLabel__confirmDeletion: 'Баталгаажуулалт',
@@ -283,7 +290,7 @@ export const mnMN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const mnMN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const mnMN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Байгууллага үүсгэх',
     action__invitationAccept: 'Нэгдэх',
     action__manageOrganization: 'Удирдах',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Нэгдэх хүсэлт',
     notSelected: 'Байгууллага сонгогдоогүй байна',
     personalWorkspace: 'Хувийн бүртгэл',
@@ -604,6 +613,12 @@ export const mnMN: LocalizationResource = {
       subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
       title: 'Имэйлээ шалгана уу',
     },
+    emailCodeMfa: {
+      formTitle: 'Имэйлээ шалгана уу',
+      resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
+      subtitle: '{{applicationName}} руу үргэлжлүүлэхийн тулд',
+      title: 'Имэйлээ шалгана уу',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +654,16 @@ export const mnMN: LocalizationResource = {
         titleNewTab: 'Өөр таб дээр нэвтэрсэн',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Имэйлдээ илгээсэн баталгаажуулах холбоосыг ашиглана уу',
+      resendButton: 'Холбоос хүлээн авсангүй? Дахин илгээх',
+      subtitle: '{{applicationName}} руу үргэлжлүүлэх',
+      title: 'Имэйлээ шалгана уу',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Нууц үг шинэчлэх код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',
@@ -652,6 +677,8 @@ export const mnMN: LocalizationResource = {
       label__alternativeMethods: 'Эсвэл өөр аргаар нэвтэрнэ үү',
       title: 'Нууц үгээ мартсан?',
     },
+    newDeviceVerificationNotice:
+      'Та шинэ төхөөрөмжөөс нэвтэрч байна. Бид таны дансыг аюулгүй байлгахын тулд баталгаажуулалт хүсч байна.',
     noAvailableMethods: {
       message: 'Нэвтрэхийг үргэлжлүүлэх боломжгүй. Баталгаажуулах хүчин зүйл алга.',
       subtitle: 'Алдаа гарлаа',
@@ -760,6 +787,10 @@ export const mnMN: LocalizationResource = {
         title: 'Имэйлийг амжилттай баталгаажууллаа',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -830,6 +861,14 @@ export const mnMN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -863,6 +902,7 @@ export const mnMN: LocalizationResource = {
     form_password_validation_failed: 'Нууц үг буруу',
     form_username_invalid_character: 'Хэрэглэгчийн нэр буруу тэмдэгт агуулж байна.',
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
+    form_username_needs_non_number_char: 'Таны хэрэглэгчийн нэр дор хаяж нэг тоон бус тэмдэгт агуулсан байх ёстой.',
     identification_deletion_failed: 'Та өөрийн сүүлчийн таниулбараа устгах боломжгүй.',
     not_allowed_access:
       "Имэйл хаяг эсвэл утасны дугаарыг бүртгүүлэхийг хориглоно. Энэ нь '+', '=', '#' эсвэл '.'-г ашигласантай холбоотой байж болно. түр зуурын цахим шуудангийн үйлчилгээтэй холбогдсон домэйн ашиглах, эсвэл шууд хаагдсан байх. Хэрэв та үүнийг алдаа гэж үзэж байгаа бол дэмжлэгтэй холбогдоно уу.",
@@ -932,7 +972,9 @@ export const mnMN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Бүртгэл нэмэх',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Бүртгэлийг удирдах',
+    action__openUserMenu: undefined,
     action__signOut: 'Гарах',
     action__signOutAll: 'Бүх бүртгэлээс гарна уу',
   },
@@ -964,7 +1006,7 @@ export const mnMN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +1015,7 @@ export const mnMN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

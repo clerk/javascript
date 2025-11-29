@@ -1,4 +1,3 @@
-import { logErrorInDevMode } from '@clerk/shared/utils';
 import type {
   APIKeysProps,
   CreateOrganizationProps,
@@ -15,7 +14,8 @@ import type {
   UserProfileProps,
   WaitlistProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { logErrorInDevMode } from '@clerk/shared/utils';
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { createContext, createElement, useContext } from 'react';
 
@@ -79,7 +79,7 @@ type UserButtonPropsWithoutCustomPages = Without<
   UserButtonProps,
   'userProfileProps' | '__experimental_asStandalone'
 > & {
-  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance'>;
+  userProfileProps?: Pick<UserProfileProps, 'additionalOAuthScopes' | 'appearance' | 'apiKeysProps'>;
   /**
    * Adding `asProvider` will defer rendering until the `<Outlet />` component is mounted.
    *
@@ -257,7 +257,7 @@ const _UserButton = withClerk(
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
+    const userProfileProps = { ...props.userProfileProps, customPages };
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
@@ -435,7 +435,7 @@ const _OrganizationSwitcher = withClerk(
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const organizationProfileProps = Object.assign(props.organizationProfileProps || {}, { customPages });
+    const organizationProfileProps = { ...props.organizationProfileProps, customPages };
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
@@ -628,8 +628,8 @@ export const APIKeys = withClerk(
         {clerk.loaded && (
           <ClerkHostRenderer
             component={component}
-            mount={clerk.mountApiKeys}
-            unmount={clerk.unmountApiKeys}
+            mount={clerk.mountAPIKeys}
+            unmount={clerk.unmountAPIKeys}
             updateProps={(clerk as any).__unstable__updateProps}
             props={props}
             rootProps={rendererRootProps}

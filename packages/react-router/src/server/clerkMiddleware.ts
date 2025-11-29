@@ -34,13 +34,39 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
   return async (args, next) => {
     const clerkRequest = createClerkRequest(patchRequest(args.request));
     const loadedOptions = loadOptions(args, options);
-    const { audience, authorizedParties } = loadedOptions;
-    const { signInUrl, signUpUrl, afterSignInUrl, afterSignUpUrl } = loadedOptions;
-    const { organizationSyncOptions } = loadedOptions;
-    const requestState = await clerkClient(args).authenticateRequest(clerkRequest, {
-      organizationSyncOptions,
+
+    // Pick only the properties needed by authenticateRequest.
+    // Used when manually providing options to the middleware.
+    const {
+      apiUrl,
+      secretKey,
+      jwtKey,
+      proxyUrl,
+      isSatellite,
+      domain,
+      publishableKey,
+      machineSecretKey,
       audience,
       authorizedParties,
+      signInUrl,
+      signUpUrl,
+      afterSignInUrl,
+      afterSignUpUrl,
+      organizationSyncOptions,
+    } = loadedOptions;
+
+    const requestState = await clerkClient(args, options).authenticateRequest(clerkRequest, {
+      apiUrl,
+      secretKey,
+      jwtKey,
+      proxyUrl,
+      isSatellite,
+      domain,
+      publishableKey,
+      machineSecretKey,
+      audience,
+      authorizedParties,
+      organizationSyncOptions,
       signInUrl,
       signUpUrl,
       afterSignInUrl,

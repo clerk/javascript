@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import type { TelemetryEventRaw } from '../../types';
 
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_COMPONENT_OPENED = 'COMPONENT_OPENED';

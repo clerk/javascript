@@ -11,7 +11,7 @@ import type {
   StartEmailLinkFlowParams,
   StartEnterpriseSSOLinkFlowParams,
   VerificationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource, IdentificationLink, Verification } from './internal';
 

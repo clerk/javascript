@@ -17,6 +17,11 @@ export const beBY: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Скапіраваць і закрыць',
+      formHint: 'З мэтаў бяспекі мы не дазволім вам праглядзець яго пазней.',
+      formTitle: 'Скапіруйце ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const beBY: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Карыстальніцкая прылада',
   badge__you: 'Вы',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const beBY: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const beBY: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -221,9 +226,11 @@ export const beBY: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Увядзіце ваш пароль',
   formFieldInputPlaceholder__phoneNumber: 'Увядзіце ваш нумар тэлефона',
   formFieldInputPlaceholder__username: 'Увядзіце імя карыстальніка',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Апісанне',
+  formFieldLabel__apiKeyExpiration: 'Тэрмін дзеяння',
+  formFieldLabel__apiKeyName: 'Назва сакрэтнага ключа',
   formFieldLabel__automaticInvitations: 'Уключыць аўтаматычныя запрашэнні для гэтага дамена',
   formFieldLabel__backupCode: 'Код аднаўлення',
   formFieldLabel__confirmDeletion: 'Пацверджанне',
@@ -284,7 +291,7 @@ export const beBY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -293,7 +300,7 @@ export const beBY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -492,9 +499,11 @@ export const beBY: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Стварыць арганізацыю',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Кіраванне арганізацыяй',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Арганізацыя не выбрана',
     personalWorkspace: 'Асабістае працоўнае прастора',
@@ -607,6 +616,12 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Праверце вашу пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Праверце вашу пошту',
+      resendButton: 'Не атрымалі код? Адпраўце яшчэ раз',
+      subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
+      title: 'Праверце вашу пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -643,6 +658,16 @@ export const beBY: LocalizationResource = {
         titleNewTab: 'Залогіньцеся на іншай укладцы',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Выкарыстоўвайце спасылку для пацвярджэння, адпраўленую на вашу электронную пошту',
+      resendButton: 'Не атрымалі спасылку? Адправіць зноў',
+      subtitle: 'каб працягнуць да {{applicationName}}',
+      title: 'Праверце сваю электронную пошту',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код аднаўлення пароля',
       resendButton: 'Адправіць код яшчэ раз',
@@ -656,6 +681,8 @@ export const beBY: LocalizationResource = {
       label__alternativeMethods: 'Або ўвайдзіце іншым спосабам',
       title: 'Забыўся пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы ўваходзіце з новай прылады. Мы просім пацверджанне для забеспячэння бяспекі вашага акаўнта.',
     noAvailableMethods: {
       message: 'Немагчыма ўвайсці. Няма даступных фактараў аўтэнтыфікацыі.',
       subtitle: 'Адбылася памылка',
@@ -763,6 +790,10 @@ export const beBY: LocalizationResource = {
         title: 'Пошта верыфікавана',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Я згаджаюся з палітыкай канфідэнцыяльнасці',
@@ -835,6 +866,14 @@ export const beBY: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
     captcha_invalid:
@@ -868,6 +907,7 @@ export const beBY: LocalizationResource = {
     form_password_validation_failed: 'Неверагодны пароль',
     form_username_invalid_character: 'Імя карыстальніка змяшчае недапушчальныя сімвалы.',
     form_username_invalid_length: 'Імя карыстальніка павінна быць ад 3 да 50 сімвалаў.',
+    form_username_needs_non_number_char: 'Імя карыстальніка павінна ўтрымліваць прынамсі адзін нелічбавы сімвал.',
     identification_deletion_failed: 'Вы не можаце выдаліць вашу апошнюю ідэнтыфікацыю.',
     not_allowed_access:
       "Адрас электроннай пошты ці нумар тэлефона не дазволены для рэгістрацыі. Гэта можа быць звязана з выкарыстаннем знакаў '+', '=', '#' або '.' у вашым адрасе электроннай пошты, з дапамогай дамена, падлучанага да часовай службы электроннай пошты, або відавочна заблакіраваны. Калі вы лічыце, што гэта памылка, звярніцеся ў службу падтрымкі.",
@@ -938,7 +978,9 @@ export const beBY: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Дадаць уліковы запіс',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Кіраванне ўліковым запісам',
+    action__openUserMenu: undefined,
     action__signOut: 'Выйсці',
     action__signOutAll: 'Выйсці з усіх уліковых запісаў',
   },
@@ -970,7 +1012,7 @@ export const beBY: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -979,7 +1021,7 @@ export const beBY: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

@@ -6,7 +6,7 @@ import type {
   OrganizationSuggestionResource,
   OrganizationSuggestionStatus,
   UserOrganizationInvitationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { vi } from 'vitest';
 
 export type FakeOrganizationParams = {

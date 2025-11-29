@@ -17,6 +17,11 @@ export const esES: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar y cerrar',
+      formHint: 'Por razones de seguridad, no podrás verlo de nuevo más tarde.',
+      formTitle: 'Copia tu clave API "{{name}}" ahora',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const esES: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Dispositivo de usuario',
   badge__you: 'Usted',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const esES: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const esES: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const esES: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Ingrese su contraseña',
   formFieldInputPlaceholder__phoneNumber: 'Ingrese su número telefónico',
   formFieldInputPlaceholder__username: 'Ingrese su nombre de usuario',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Clave API',
+  formFieldLabel__apiKeyDescription: 'Descripción',
+  formFieldLabel__apiKeyExpiration: 'Expiración',
+  formFieldLabel__apiKeyName: 'Nombre de clave secreta',
   formFieldLabel__automaticInvitations: 'Activar invitaciones automáticas para este dominio',
   formFieldLabel__backupCode: 'Código de respaldo',
   formFieldLabel__confirmDeletion: 'Confirmación',
@@ -283,7 +290,7 @@ export const esES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const esES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const esES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crear Organización',
     action__invitationAccept: 'Unirse',
     action__manageOrganization: 'Administrar Organización',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar unirse',
     notSelected: 'Ninguna organización seleccionada',
     personalWorkspace: 'Espacio de trabajo personal',
@@ -605,6 +614,12 @@ export const esES: LocalizationResource = {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Revise su correo electrónico',
     },
+    emailCodeMfa: {
+      formTitle: 'Revise su correo electrónico',
+      resendButton: '¿No recibió un código? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revise su correo electrónico',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'El cliente no coincide con el solicitado. Por favor, intente de nuevo.',
@@ -640,6 +655,16 @@ export const esES: LocalizationResource = {
         titleNewTab: 'Inició sesión en otra pestaña',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utiliza el enlace de verificación enviado a tu correo electrónico',
+      resendButton: '¿No recibiste el enlace? Reenviar',
+      subtitle: 'para continuar a {{applicationName}}',
+      title: 'Revisa tu correo electrónico',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de restablecimiento de contraseña',
       resendButton: '¿No recibiste un código? Reenviar',
@@ -653,6 +678,8 @@ export const esES: LocalizationResource = {
       label__alternativeMethods: 'O, inicia sesión con otro método',
       title: '¿Olvidaste tu contraseña?',
     },
+    newDeviceVerificationNotice:
+      'Estás iniciando sesión desde un dispositivo nuevo. Estamos pidiendo verificación para mantener tu cuenta segura.',
     noAvailableMethods: {
       message: 'No se puede continuar con el inicio de sesión. No hay ningún factor de autenticación disponible.',
       subtitle: 'Ocurrió un error',
@@ -760,6 +787,10 @@ export const esES: LocalizationResource = {
         title: 'Correo electrónico verificado con éxito',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'He leído y acepto la Política de Privacidad',
@@ -831,6 +862,14 @@ export const esES: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:
@@ -864,6 +903,7 @@ export const esES: LocalizationResource = {
     form_password_validation_failed: 'La validación de la contraseña falló.',
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'El nombre de usuario debe tener entre 3 y 20 caracteres.',
+    form_username_needs_non_number_char: 'Tu nombre de usuario debe contener al menos un carácter no numérico.',
     identification_deletion_failed: 'No puedes eliminar tu última identificación.',
     not_allowed_access:
       "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",
@@ -935,7 +975,9 @@ export const esES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Añadir cuenta',
+    action__closeUserMenu: 'Cerrar menú de usuario',
     action__manageAccount: 'Administrar cuenta',
+    action__openUserMenu: 'Abrir menú de usuario',
     action__signOut: 'Cerrar sesión',
     action__signOutAll: 'Salir de todas las cuentas',
   },
@@ -967,7 +1009,7 @@ export const esES: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -976,7 +1018,7 @@ export const esES: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

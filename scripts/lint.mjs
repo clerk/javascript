@@ -17,7 +17,7 @@ const [github, integration, scripts] = await Promise.allSettled([
 
 let packages;
 try {
-  await $`pnpm turbo lint`;
+  await $`pnpm turbo lint -- --quiet`;
 } catch (error) {
   packages = error;
 }

@@ -1,4 +1,4 @@
-import type { RoutingOptions } from '@clerk/types';
+import type { RoutingOptions } from '@clerk/shared/types';
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 

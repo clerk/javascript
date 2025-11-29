@@ -1,4 +1,4 @@
-import type { CustomPage } from '@clerk/types';
+import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {

@@ -1,6 +1,5 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { BillingSubscriptionItemResource } from '@clerk/types';
-import useSWR from 'swr';
+import { __internal_usePaymentAttemptQuery } from '@clerk/shared/react/index';
+import type { BillingSubscriptionItemResource } from '@clerk/shared/types';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -29,29 +28,19 @@ import { useRouter } from '../../router';
 export const PaymentAttemptPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
     data: paymentAttempt,
     isLoading,
     error,
-  } = useSWR(
-    params.paymentAttemptId
-      ? {
-          type: 'payment-attempt',
-          id: params.paymentAttemptId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getPaymentAttempt({
-        id: params.paymentAttemptId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
-      }),
-  );
+  } = __internal_usePaymentAttemptQuery({
+    paymentAttemptId: params.paymentAttemptId,
+    for: requesterType,
+    enabled: Boolean(params.paymentAttemptId),
+  });
 
   const subscriptionItem = paymentAttempt?.subscriptionItem;
 
@@ -175,7 +164,7 @@ export const PaymentAttemptPage = () => {
           >
             <Text
               variant='h3'
-              localizationKey={localizationKeys('commerce.totalDue')}
+              localizationKey={localizationKeys('billing.totalDue')}
               elementDescriptor={descriptors.paymentAttemptFooterLabel}
             />
             <Span
@@ -215,7 +204,10 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
   }
 
   const fee =
-    subscriptionItem.planPeriod === 'month' ? subscriptionItem.plan.fee : subscriptionItem.plan.annualMonthlyFee;
+    subscriptionItem.planPeriod === 'month'
+      ? subscriptionItem.plan.fee
+      : // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        subscriptionItem.plan.annualMonthlyFee!;
 
   return (
     <Box
@@ -236,14 +228,14 @@ function PaymentAttemptBody({ subscriptionItem }: { subscriptionItem: BillingSub
           borderTop
           variant='tertiary'
         >
-          <LineItems.Title title={localizationKeys('commerce.subtotal')} />
+          <LineItems.Title title={localizationKeys('billing.subtotal')} />
           <LineItems.Description
             text={`${subscriptionItem.amount?.currencySymbol}${subscriptionItem.amount?.amountFormatted}`}
           />
         </LineItems.Group>
         {subscriptionItem.credit && subscriptionItem.credit.amount.amount > 0 && (
           <LineItems.Group variant='tertiary'>
-            <LineItems.Title title={localizationKeys('commerce.credit')} />
+            <LineItems.Title title={localizationKeys('billing.credit')} />
             <LineItems.Description
               text={`- ${subscriptionItem.credit.amount.currencySymbol}${subscriptionItem.credit.amount.amountFormatted}`}
             />

@@ -3,14 +3,15 @@ import type {
   APIKeysProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   UserButtonProps,
   WaitlistProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
-  ApiKeysContext,
+  APIKeysContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
@@ -27,7 +28,11 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
-import { TaskChooseOrganizationContext } from './components/SessionTasks';
+import {
+  SessionTasksContext,
+  TaskChooseOrganizationContext,
+  TaskResetPasswordContext,
+} from './components/SessionTasks';
 
 export function ComponentContextProvider({
   componentName,
@@ -95,7 +100,12 @@ export function ComponentContextProvider({
       );
     case 'PricingTable':
       return (
-        <SubscriberTypeContext.Provider value={(props as PricingTableProps).forOrganizations ? 'organization' : 'user'}>
+        <SubscriberTypeContext.Provider
+          value={
+            // Backward compatibility: support legacy `forOrganizations: true`
+            (props as any).forOrganizations ? 'organization' : (props as PricingTableProps).for || 'user'
+          }
+        >
           <PricingTableContext.Provider value={{ componentName, ...(props as PricingTableProps) }}>
             {children}
           </PricingTableContext.Provider>
@@ -103,9 +113,9 @@ export function ComponentContextProvider({
       );
     case 'APIKeys':
       return (
-        <ApiKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
+        <APIKeysContext.Provider value={{ componentName, ...(props as APIKeysProps) }}>
           {children}
-        </ApiKeysContext.Provider>
+        </APIKeysContext.Provider>
       );
     case 'OAuthConsent':
       return (
@@ -118,8 +128,20 @@ export function ComponentContextProvider({
         <TaskChooseOrganizationContext.Provider
           value={{ componentName: 'TaskChooseOrganization', ...(props as TaskChooseOrganizationProps) }}
         >
-          {children}
+          <SessionTasksContext.Provider value={{ ...(props as TaskChooseOrganizationProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
         </TaskChooseOrganizationContext.Provider>
+      );
+    case 'TaskResetPassword':
+      return (
+        <TaskResetPasswordContext.Provider
+          value={{ componentName: 'TaskResetPassword', ...(props as TaskResetPasswordProps) }}
+        >
+          <SessionTasksContext.Provider value={{ ...(props as TaskResetPasswordProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
+        </TaskResetPasswordContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

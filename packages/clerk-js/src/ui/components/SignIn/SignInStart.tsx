@@ -1,13 +1,13 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { useClerk } from '@clerk/shared/react';
-import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import type {
   ClerkAPIError,
   PhoneCodeChannel,
   PhoneCodeChannelData,
   SignInCreateParams,
   SignInResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { isWebAuthnAutofillSupported, isWebAuthnSupported } from '@clerk/shared/webauthn';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -37,6 +37,7 @@ import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
 import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
+import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey } from './shared';
@@ -87,6 +88,7 @@ function SignInStartInternal(): JSX.Element {
   const ctx = useSignInContext();
   const { afterSignInUrl, signUpUrl, waitlistUrl, isCombinedFlow, navigateOnSetActive } = ctx;
   const supportEmail = useSupportEmail();
+  const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const identifierAttributes = useMemo<SignInStartIdentifier[]>(
     () => groupIdentifiers(userSettings.enabledFirstFactorIdentifiers),
     [userSettings.enabledFirstFactorIdentifiers],
@@ -432,6 +434,9 @@ function SignInStartInternal(): JSX.Element {
         e.code === ERROR_CODES.FORM_PASSWORD_PWNED,
     );
 
+    const sessionAlreadyExistsError: ClerkAPIError = e.errors.find(
+      (e: ClerkAPIError) => e.code === ERROR_CODES.SESSION_EXISTS,
+    );
     const alreadySignedInError: ClerkAPIError = e.errors.find(
       (e: ClerkAPIError) => e.code === 'identifier_already_signed_in',
     );
@@ -442,6 +447,13 @@ function SignInStartInternal(): JSX.Element {
 
     if (instantPasswordError) {
       await signInWithFields(identifierField);
+    } else if (sessionAlreadyExistsError) {
+      await clerk.setActive({
+        session: clerk.client.lastActiveSessionId,
+        navigate: async ({ session }) => {
+          await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+        },
+      });
     } else if (alreadySignedInError) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const sid = alreadySignedInError.meta!.sessionId!;
@@ -524,9 +536,10 @@ function SignInStartInternal(): JSX.Element {
   const { action, validLastAuthenticationStrategies, ...identifierFieldProps } = identifierField.props;
 
   const lastAuthenticationStrategy = clerk.client?.lastAuthenticationStrategy;
-  const isIdentifierLastAuthenticationStrategy = lastAuthenticationStrategy
-    ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
-    : false;
+  const isIdentifierLastAuthenticationStrategy =
+    lastAuthenticationStrategy && totalEnabledAuthMethods > 1
+      ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
+      : false;
 
   return (
     <Flow.Part part='start'>

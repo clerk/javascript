@@ -1,6 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
 import { eventComponentMounted } from '@clerk/shared/telemetry';
-import type { SessionResource } from '@clerk/types';
 import { useEffect, useRef } from 'react';
 
 import { Flow } from '@/ui/customizables';
@@ -12,10 +11,12 @@ import { INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '../../../core/sessionTasks';
 import {
   SessionTasksContext,
   TaskChooseOrganizationContext,
+  TaskResetPasswordContext,
   useSessionTasksContext,
 } from '../../contexts/components/SessionTasks';
 import { Route, Switch, useRouter } from '../../router';
 import { TaskChooseOrganization } from './tasks/TaskChooseOrganization';
+import { TaskResetPassword } from './tasks/TaskResetPassword';
 
 const SessionTasksStart = () => {
   const clerk = useClerk();
@@ -60,6 +61,13 @@ function SessionTasksRoutes(): JSX.Element {
             <TaskChooseOrganization />
           </TaskChooseOrganizationContext.Provider>
         </Route>
+        <Route path={INTERNAL_SESSION_TASK_ROUTE_BY_KEY['reset-password']}>
+          <TaskResetPasswordContext.Provider
+            value={{ componentName: 'TaskResetPassword', redirectUrlComplete: ctx.redirectUrlComplete }}
+          >
+            <TaskResetPassword />
+          </TaskResetPasswordContext.Provider>
+        </Route>
         <Route index>
           <SessionTasksStart />
         </Route>
@@ -78,6 +86,7 @@ type SessionTasksProps = {
 export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: SessionTasksProps) => {
   const clerk = useClerk();
   const { navigate } = useRouter();
+
   const currentTaskContainer = useRef<HTMLDivElement>(null);
 
   // If there are no pending tasks, navigate away from the tasks flow.
@@ -111,17 +120,8 @@ export const SessionTasks = withCardStateProvider(({ redirectUrlComplete }: Sess
     );
   }
 
-  const navigateOnSetActive = async ({ session }: { session: SessionResource }) => {
-    const currentTask = session.currentTask;
-    if (!currentTask) {
-      return navigate(redirectUrlComplete);
-    }
-
-    return navigate(`./${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
-  };
-
   return (
-    <SessionTasksContext.Provider value={{ redirectUrlComplete, currentTaskContainer, navigateOnSetActive }}>
+    <SessionTasksContext.Provider value={{ redirectUrlComplete }}>
       <SessionTasksRoutes />
     </SessionTasksContext.Provider>
   );

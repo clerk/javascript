@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import type { SignUpProps } from '@clerk/types';
+import type { SignUpProps } from '@clerk/shared/types';
 
 const clerk = useClerk();
 

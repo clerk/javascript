@@ -1,4 +1,4 @@
-import type { SignInFactor, SignInStrategy } from '@clerk/types';
+import type { SignInFactor, SignInStrategy } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import {

@@ -1,7 +1,7 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
 import { retry } from '@clerk/shared/retry';
+import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/shared/types';
 import { camelToSnake } from '@clerk/shared/underscore';
-import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/types';
 
 import { debugLogger } from '@/utils/debug';
 

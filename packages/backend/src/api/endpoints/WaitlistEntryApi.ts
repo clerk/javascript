@@ -37,7 +37,7 @@ export class WaitlistEntryAPI extends AbstractAPI {
    * @param params Optional parameters (e.g., `query`, `status`, `orderBy`).
    */
   public async list(params: WaitlistEntryListParams = {}) {
-    return this.request<PaginatedResourceResponse<WaitlistEntry>>({
+    return this.request<PaginatedResourceResponse<WaitlistEntry[]>>({
       method: 'GET',
       path: basePath,
       queryParams: params,

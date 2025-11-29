@@ -1,4 +1,4 @@
-import type { UseSessionListReturn } from '@clerk/types';
+import type { UseSessionListReturn } from '@clerk/shared/types';
 import { computed } from 'vue';
 
 import type { ToComputedRefs } from '../utils';

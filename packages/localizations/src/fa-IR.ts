@@ -17,6 +17,11 @@ export const faIR: LocalizationResource = {
   apiKeys: {
     action__add: 'افزودن کلید جدید',
     action__search: 'جستجوی کلیدها',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'کپی و بستن',
+      formHint: 'به دلایل امنیتی، ما بعداً به شما اجازه مشاهده دوباره آن را نخواهیم داد.',
+      formTitle: 'اکنون کلید API "{{name}}" خود را کپی کنید',
+    },
     createdAndExpirationStatus__expiresOn:
       "ایجاد شده {{ createdDate | shortDate('en-US') }} • منقضی می‌شود {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "ایجاد شده {{ createdDate | shortDate('en-US') }} • هرگز منقضی نمی‌شود",
@@ -69,8 +74,8 @@ export const faIR: LocalizationResource = {
   badge__upcomingPlan: 'به زودی',
   badge__userDevice: 'دستگاه کاربر',
   badge__you: 'شما',
-  commerce: {
-    addPaymentMethod: 'افزودن روش پرداخت',
+  billing: {
+    addPaymentMethod__label: 'افزودن روش پرداخت',
     alwaysFree: 'همیشه رایگان',
     annually: 'سالانه',
     availableFeatures: 'ویژگی ها',
@@ -126,8 +131,7 @@ export const faIR: LocalizationResource = {
     monthly: 'ماهانه',
     pastDue: 'سررسید گذشته',
     pay: 'پرداخت {{amount}}',
-    paymentMethods: 'روش های پرداخت',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'پرداخت سالانه',
         monthly: 'پرداخت ماهانه',
@@ -141,6 +145,7 @@ export const faIR: LocalizationResource = {
         testCardInfo: 'تست اطلاعات کارت',
       },
     },
+    paymentMethods__label: 'روش های پرداخت',
     popular: 'محبوب',
     pricingTable: {
       billingCycle: 'چرخه صورتحساب',
@@ -225,6 +230,8 @@ export const faIR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'رمز عبور خود را وارد کنید',
   formFieldInputPlaceholder__phoneNumber: 'شماره تلفن خود را وارد کنید',
   formFieldInputPlaceholder__username: 'نام کاربری خود را وارد کنید',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'کلید API',
   formFieldLabel__apiKeyDescription: 'توضیحات کلید API',
   formFieldLabel__apiKeyExpiration: 'انقضای کلید API',
   formFieldLabel__apiKeyName: 'نام کلید API',
@@ -288,7 +295,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -297,11 +304,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',
@@ -494,9 +501,11 @@ export const faIR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'ایجاد سازمان',
     action__invitationAccept: 'بپیوندید',
     action__manageOrganization: 'مدیریت',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'درخواست عضویت',
     notSelected: 'هیچ سازمانی انتخاب نشده است',
     personalWorkspace: 'حساب شخصی',
@@ -611,6 +620,12 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه به {{applicationName}}',
       title: 'ایمیل خود را بررسی کنید',
     },
+    emailCodeMfa: {
+      formTitle: 'ایمیل خود را بررسی کنید',
+      resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -647,6 +662,16 @@ export const faIR: LocalizationResource = {
         titleNewTab: 'در برگه دیگر وارد سیستم شده‌اید',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'از لینک تأیید ارسال شده به ایمیل خود استفاده کنید',
+      resendButton: 'لینک را دریافت نکردید؟ ارسال مجدد',
+      subtitle: 'برای ادامه به {{applicationName}}',
+      title: 'ایمیل خود را بررسی کنید',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'کد رمز عبور را بازنشانی کنید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',
@@ -660,6 +685,8 @@ export const faIR: LocalizationResource = {
       label__alternativeMethods: 'یا با روش دیگری وارد شوید',
       title: 'رمز عبور را فراموش کرده‌اید؟',
     },
+    newDeviceVerificationNotice:
+      'شما از یک دستگاه جدید وارد می‌شوید. برای حفظ امنیت حساب کاربری شما، درخواست تأیید می‌کنیم.',
     noAvailableMethods: {
       message: 'نمی‌توان وارد سیستم شد. هیچ عامل احراز هویتی در دسترس نیست.',
       subtitle: 'خطایی رخ داد',
@@ -768,6 +795,10 @@ export const faIR: LocalizationResource = {
         title: 'ایمیل با موفقیت تأیید شد',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'من با {{ privacyPolicyLink || link("Privacy Policy") }} موافقم.',
@@ -841,6 +872,14 @@ export const faIR: LocalizationResource = {
       actionText: 'می‌خواهید خارج شوید؟',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
@@ -873,6 +912,7 @@ export const faIR: LocalizationResource = {
     form_password_validation_failed: 'اعتبارسنجی رمز عبور ناموفق بود.',
     form_username_invalid_character: 'نام کاربری شامل کاراکترهای نامعتبر است.',
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',
+    form_username_needs_non_number_char: 'نام کاربری شما باید حداقل شامل یک کاراکتر غیر عددی باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
     not_allowed_access: 'دسترسی مجاز نیست.',
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',
@@ -941,7 +981,9 @@ export const faIR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'افزودن حساب',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'مدیریت حساب',
+    action__openUserMenu: undefined,
     action__signOut: 'خروج',
     action__signOutAll: 'خروج از همه حساب‌ها',
   },
@@ -973,7 +1015,7 @@ export const faIR: LocalizationResource = {
         tableHeader__date: 'تاریخ',
         tableHeader__status: 'وضعیت',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'پیش فرض کنید',
         actionLabel__remove: 'حذف',
         add: 'افزودن روش پرداخت جدید',
@@ -982,11 +1024,11 @@ export const faIR: LocalizationResource = {
         formButtonPrimary__add: 'افزودن روش پرداخت',
         formButtonPrimary__pay: '{{amount}} پرداخت',
         payWithTestCardButton: 'پرداخت با کارت تست',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} از این حساب حذف خواهد شد.',
           messageLine2:
             'شما دیگر نمی‌توانید از این منبع پرداخت استفاده کنید و هرگونه اشتراک دوره‌ای وابسته به آن دیگر کار نخواهد کرد.',
-          successMessage: '{{paymentSource}} از حساب شما حذف شده است.',
+          successMessage: '{{paymentMethod}} از حساب شما حذف شده است.',
           title: 'حذف روش پرداخت',
         },
         title: 'روش های پرداخت',

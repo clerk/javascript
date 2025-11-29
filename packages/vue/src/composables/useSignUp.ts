@@ -1,5 +1,5 @@
 import { eventMethodCalled } from '@clerk/shared/telemetry';
-import type { UseSignUpReturn } from '@clerk/types';
+import type { UseSignUpReturn } from '@clerk/shared/types';
 import { computed, watch } from 'vue';
 
 import type { ToComputedRefs } from '../utils';

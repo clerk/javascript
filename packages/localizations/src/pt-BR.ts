@@ -17,6 +17,11 @@ export const ptBR: LocalizationResource = {
   apiKeys: {
     action__add: 'Adicionar nova chave',
     action__search: 'Pesquisar chaves',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que você visualize novamente mais tarde.',
+      formTitle: 'Copie sua chave API "{{name}}" agora',
+    },
     createdAndExpirationStatus__expiresOn:
       "Criada {{ createdDate | shortDate('pt-BR') }} • Expira {{ expiresDate | longDate('pt-BR') }}",
     createdAndExpirationStatus__never: "Criada {{ createdDate | shortDate('pt-BR') }} • Nunca expira",
@@ -69,8 +74,8 @@ export const ptBR: LocalizationResource = {
   badge__upcomingPlan: 'Próximo plano',
   badge__userDevice: 'Dispositivo do usuário',
   badge__you: 'Você',
-  commerce: {
-    addPaymentMethod: 'Adicionar método de pagamento',
+  billing: {
+    addPaymentMethod__label: 'Adicionar método de pagamento',
     alwaysFree: 'Gratuito',
     annually: 'Anualmente',
     availableFeatures: 'Recursos disponíveis',
@@ -127,8 +132,7 @@ export const ptBR: LocalizationResource = {
     monthly: 'Mensal',
     pastDue: 'Atrasado',
     pay: 'Pagar {{amount}}',
-    paymentMethods: 'Métodos de pagamento',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Pagamento anual',
         monthly: 'Pagamento mensal',
@@ -142,6 +146,7 @@ export const ptBR: LocalizationResource = {
         testCardInfo: 'Informações do cartão de teste',
       },
     },
+    paymentMethods__label: 'Métodos de pagamento',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclo de faturamento',
@@ -226,6 +231,8 @@ export const ptBR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Digite sua senha',
   formFieldInputPlaceholder__phoneNumber: 'Digite seu número de telefone',
   formFieldInputPlaceholder__username: 'Digite seu nome de usuário',
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Chave API',
   formFieldLabel__apiKeyDescription: 'Descrição',
   formFieldLabel__apiKeyExpiration: 'Expiração',
   formFieldLabel__apiKeyName: 'Nome da chave de API',
@@ -289,7 +296,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -298,11 +305,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',
@@ -496,9 +503,11 @@ export const ptBR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Gerenciar organização',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar participação',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
@@ -612,6 +621,12 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifique seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Para continuar, abra o link de verificação no mesmo dispositivo e navegador em que iniciou o login',
@@ -647,6 +662,16 @@ export const ptBR: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use o link de verificação enviado para o seu e-mail',
+      resendButton: 'Não recebeu o link? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique seu e-mail',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Código de redefinição de senha',
       resendButton: 'Não recebeu um código? Reenviar',
@@ -660,6 +685,8 @@ export const ptBR: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu a senha?',
     },
+    newDeviceVerificationNotice:
+      'Você está entrando de um novo dispositivo. Estamos solicitando verificação para manter sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Aconteceu um erro',
@@ -769,6 +796,10 @@ export const ptBR: LocalizationResource = {
         title: 'E-mail verificado com sucesso',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Eu concordo com a {{privacyPolicyLink || link("Política de Privacidade")}}',
@@ -842,6 +873,14 @@ export const ptBR: LocalizationResource = {
       actionText: 'Conectado como {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Resetar Senha',
+    signOut: {
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
+    },
+    title: 'Resetar senha',
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
     captcha_invalid:
@@ -874,6 +913,7 @@ export const ptBR: LocalizationResource = {
     form_password_validation_failed: 'Senha incorreta',
     form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
+    form_username_needs_non_number_char: 'Nome de usuário deve conter pelo menos um caractere não número.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
@@ -947,7 +987,9 @@ export const ptBR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
+    action__closeUserMenu: 'Fechar menu do usuário',
     action__manageAccount: 'Gerenciar conta',
+    action__openUserMenu: 'Abrir menu do usuário',
     action__signOut: 'Sair',
     action__signOutAll: 'Sair de todas as contas',
   },
@@ -979,7 +1021,7 @@ export const ptBR: LocalizationResource = {
         tableHeader__date: 'Data',
         tableHeader__status: 'Status',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Tornar padrão',
         actionLabel__remove: 'Remover',
         add: 'Adicionar novo método de pagamento',
@@ -988,11 +1030,11 @@ export const ptBR: LocalizationResource = {
         formButtonPrimary__add: 'Adicionar Método de Pagamento',
         formButtonPrimary__pay: 'Pagar {{amount}}',
         payWithTestCardButton: 'Pagar com cartão de teste',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} será removido desta conta.',
           messageLine2:
             'Você não poderá mais usar esta forma de pagamento e quaisquer assinaturas recorrentes dependentes dela deixarão de funcionar.',
-          successMessage: '{{paymentSource}} foi removido da sua conta.',
+          successMessage: '{{paymentMethod}} foi removido da sua conta.',
           title: 'Remover método de pagamento',
         },
         title: 'Métodos de pagamento',

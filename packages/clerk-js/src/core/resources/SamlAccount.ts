@@ -7,7 +7,7 @@ import type {
   SamlAccountResource,
   SamlIdpSlug,
   VerificationResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
 import { BaseResource } from './Base';
@@ -24,6 +24,7 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
   verification: VerificationResource | null = null;
   samlConnection: SamlAccountConnectionResource | null = null;
   lastAuthenticatedAt: Date | null = null;
+  enterpriseConnectionId: string | null = null;
 
   public constructor(data: Partial<SamlAccountJSON | SamlAccountJSONSnapshot>, pathRoot: string);
   public constructor(data: SamlAccountJSON | SamlAccountJSONSnapshot, pathRoot: string) {
@@ -44,6 +45,7 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
     this.emailAddress = data.email_address;
     this.firstName = data.first_name;
     this.lastName = data.last_name;
+    this.enterpriseConnectionId = data.enterprise_connection_id;
 
     if (data.verification) {
       this.verification = new Verification(data.verification);
@@ -70,6 +72,7 @@ export class SamlAccount extends BaseResource implements SamlAccountResource {
       last_name: this.lastName,
       verification: this.verification?.__internal_toSnapshot() || null,
       saml_connection: this.samlConnection?.__internal_toSnapshot(),
+      enterprise_connection_id: this.enterpriseConnectionId,
       last_authenticated_at: this.lastAuthenticatedAt ? this.lastAuthenticatedAt.getTime() : null,
     };
   }

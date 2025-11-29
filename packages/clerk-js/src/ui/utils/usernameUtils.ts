@@ -1,4 +1,4 @@
-import type { ClerkAPIError, UsernameSettingsData } from '@clerk/types';
+import type { ClerkAPIError, UsernameSettingsData } from '@clerk/shared/types';
 
 import { type LocalizationKey, localizationKeys } from '../localization';
 
@@ -9,6 +9,7 @@ type LocalizationConfigProps = {
 };
 
 const INVALID_LENGTH = 'form_username_invalid_length';
+const NEEDS_NON_NUMBER_CHAR = 'form_username_needs_non_number_char';
 
 export const createUsernameError = (
   errors: ClerkAPIError[],
@@ -29,6 +30,10 @@ export const createUsernameError = (
         max_length: usernameSettings.max_length,
       }),
     );
+  }
+
+  if (clerkApiError?.code === NEEDS_NON_NUMBER_CHAR) {
+    return t(localizationKeys(`unstable__errors.${NEEDS_NON_NUMBER_CHAR}`));
   }
 
   return clerkApiError;

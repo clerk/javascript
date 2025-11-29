@@ -17,6 +17,11 @@ export const daDK: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiér og luk',
+      formHint: 'Af sikkerhedsmæssige årsager kan vi ikke tillade dig at se det igen senere.',
+      formTitle: 'Kopiér din API-nøgle "{{name}}" nu',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const daDK: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brugerenhed',
   badge__you: 'Dig',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const daDK: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const daDK: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const daDK: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Indtast adgangskode',
   formFieldInputPlaceholder__phoneNumber: 'Indtast telefonnummer',
   formFieldInputPlaceholder__username: 'Indtast brugernavn',
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-nøgle',
+  formFieldLabel__apiKeyDescription: 'Beskrivelse',
+  formFieldLabel__apiKeyExpiration: 'Udløb',
+  formFieldLabel__apiKeyName: 'Navn på hemmelig nøgle',
   formFieldLabel__automaticInvitations: 'Aktiver automatiske invitationer for dette domæne',
   formFieldLabel__backupCode: 'Sikkerhedskode',
   formFieldLabel__confirmDeletion: 'Bekræftelse',
@@ -283,7 +290,7 @@ export const daDK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const daDK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const daDK: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opret organisation',
     action__invitationAccept: 'Deltag',
     action__manageOrganization: 'Administrer organisation',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Anmod om at deltage',
     notSelected: 'Ingen organisation valgt',
     personalWorkspace: 'Personligt arbejdsområde',
@@ -603,6 +612,12 @@ export const daDK: LocalizationResource = {
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Tjek din email',
     },
+    emailCodeMfa: {
+      formTitle: 'Tjek din email',
+      resendButton: 'Modtog du ikke en kode? Send igen',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      title: 'Tjek din email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Klient uoverensstemmelse. Prøv igen.',
@@ -638,6 +653,16 @@ export const daDK: LocalizationResource = {
         titleNewTab: 'Logget ind på anden fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Brug bekræftelseslinket, der er sendt til din e-mail',
+      resendButton: 'Har du ikke modtaget linket? Send igen',
+      subtitle: 'for at fortsætte til {{applicationName}}',
+      title: 'Tjek din e-mail',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nulstil adgangskode',
       resendButton: 'Modtog du ikke en kode? Send igen',
@@ -651,6 +676,8 @@ export const daDK: LocalizationResource = {
       label__alternativeMethods: 'Eller, log ind med en anden metode',
       title: 'Glemt Adgangskode?',
     },
+    newDeviceVerificationNotice:
+      'Du logger ind fra en ny enhed. Vi beder om verifikation for at holde din konto sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsætte med login. Der er ingen tilgængelige godkendelsesfaktorer.',
       subtitle: 'En fejl opstod',
@@ -758,6 +785,10 @@ export const daDK: LocalizationResource = {
         title: 'E-mail er bekræftet',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -828,6 +859,14 @@ export const daDK: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -860,6 +899,7 @@ export const daDK: LocalizationResource = {
     form_password_validation_failed: 'Forkert adgangskode.',
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
+    form_username_needs_non_number_char: 'Dit brugernavn skal indeholde mindst ét ikke-numerisk tegn.',
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
     not_allowed_access:
       "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",
@@ -929,7 +969,9 @@ export const daDK: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tilføj konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Log ud',
     action__signOutAll: 'Log ud af alle konti',
   },
@@ -961,7 +1003,7 @@ export const daDK: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -970,7 +1012,7 @@ export const daDK: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

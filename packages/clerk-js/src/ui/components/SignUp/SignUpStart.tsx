@@ -1,9 +1,9 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
-import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/types';
+import type { PhoneCodeChannel, PhoneCodeChannelData, SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
-import { isClerkAPIResponseError } from '@/index.headless';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
@@ -164,6 +164,7 @@ function SignUpStartInternal(): JSX.Element {
           redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
+          continuePath: 'continue',
           handleComplete: () => {
             removeClerkQueryParam('__clerk_ticket');
             removeClerkQueryParam('__clerk_invitation_token');

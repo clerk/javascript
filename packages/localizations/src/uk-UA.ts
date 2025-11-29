@@ -17,6 +17,11 @@ export const ukUA: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копіювати та закрити',
+      formHint: 'З міркувань безпеки ми не дозволимо вам переглянути його пізніше.',
+      formTitle: 'Скопіюйте ваш API-ключ "{{name}}" зараз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const ukUA: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Пристрій користувача',
   badge__you: 'Ви',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const ukUA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const ukUA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const ukUA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Термін дії',
+  formFieldLabel__apiKeyName: 'Назва секретного ключа',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: 'Код відновлення',
   formFieldLabel__confirmDeletion: 'Підтвердження',
@@ -283,7 +290,7 @@ export const ukUA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const ukUA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -487,9 +494,11 @@ export const ukUA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Створити організацію',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Управління організацією',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Організація не обрана',
     personalWorkspace: 'Особистий робочий простір',
@@ -602,6 +611,12 @@ export const ukUA: LocalizationResource = {
       subtitle: 'продовжити до {{applicationName}}',
       title: 'Перевірте свою електронну пошту',
     },
+    emailCodeMfa: {
+      formTitle: 'Перевірте свою електронну пошту',
+      resendButton: 'Не отримали код? Повторно відправити',
+      subtitle: 'продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -637,6 +652,16 @@ export const ukUA: LocalizationResource = {
         titleNewTab: 'Ви ввійшли на іншій вкладці',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Використовуйте посилання для підтвердження, надіслане на вашу електронну пошту',
+      resendButton: 'Не отримали посилання? Надіслати знову',
+      subtitle: 'щоб продовжити до {{applicationName}}',
+      title: 'Перевірте свою електронну пошту',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Код відновлення пароля',
       resendButton: 'Надіслати код ще раз',
@@ -650,6 +675,8 @@ export const ukUA: LocalizationResource = {
       label__alternativeMethods: 'Або, увійти іншим способом',
       title: 'Забули пароль?',
     },
+    newDeviceVerificationNotice:
+      'Ви входите з нового пристрою. Ми просимо підтвердження для забезпечення безпеки вашого облікового запису.',
     noAvailableMethods: {
       message: 'Не вдається виконати вхід. Немає доступного фактору автентифікації.',
       subtitle: 'Виникла помилка',
@@ -757,6 +784,10 @@ export const ukUA: LocalizationResource = {
         title: 'Успішно перевірено email',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -827,6 +858,14 @@ export const ukUA: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -859,6 +898,7 @@ export const ukUA: LocalizationResource = {
     form_password_validation_failed: 'Невірний пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: "Ім'я користувача повинно містити принаймні один нецифровий символ.",
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "Адреса електронної пошти або номер телефону не дозволено для реєстрації. Це може бути пов'язано з використанням '+', '=', '#' або '.' в адресі електронної пошти, використанням домену, пов'язаного з тимчасовою електронною поштою, або явного виключення.",
@@ -928,7 +968,9 @@ export const ukUA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Додати акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управління акаунтом',
+    action__openUserMenu: undefined,
     action__signOut: 'Вийти',
     action__signOutAll: 'Вийти з усіх акаунтів',
   },
@@ -960,7 +1002,7 @@ export const ukUA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -969,7 +1011,7 @@ export const ukUA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

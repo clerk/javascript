@@ -1,4 +1,4 @@
-import type { BillingPaymentMethodResource } from '@clerk/types';
+import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 
 import { Badge, descriptors, Flex, Icon, localizationKeys, Text } from '../../customizables';
 import { CreditCard, GenericPayment } from '../../icons';
@@ -21,7 +21,6 @@ export const PaymentMethodRow = ({ paymentMethod }: { paymentMethod: BillingPaym
         truncate
         elementDescriptor={descriptors.paymentMethodRowType}
       >
-        {/* TODO(@COMMERCE): Localize this */}
         {paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType}
       </Text>
       <Text

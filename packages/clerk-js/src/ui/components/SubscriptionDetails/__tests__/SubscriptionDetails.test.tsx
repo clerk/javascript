@@ -10,10 +10,12 @@ const { createFixtures } = bindCreateFixtures('SubscriptionDetails');
 
 describe('SubscriptionDetails', () => {
   it('Displays spinner when init loading', async () => {
-    const { wrapper } = await createFixtures(f => {
+    const { wrapper, fixtures } = await createFixtures(f => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getSubscription.mockResolvedValue(null);
 
     const { baseElement } = render(
       <Drawer.Root
@@ -36,6 +38,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -85,14 +91,13 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month',
           status: 'active',
         },
       ],
     });
 
-    const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
+    const { getByRole, getByText, queryByText, getAllByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -125,10 +130,6 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Ends on')).toBeNull();
     });
 
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    expect(menuButton).toBeVisible();
-    await userEvent.click(menuButton);
-
     await waitFor(() => {
       expect(getByText('Switch to annual $100 / year')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
@@ -140,6 +141,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -189,14 +194,13 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
       ],
     });
 
-    const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
+    const { getByRole, getByText, queryByText, getAllByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -229,10 +233,6 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Ends on')).toBeNull();
     });
 
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    expect(menuButton).toBeVisible();
-    await userEvent.click(menuButton);
-
     await waitFor(() => {
       expect(getByText('Switch to monthly $10 / month')).toBeVisible();
       expect(getByText('Cancel subscription')).toBeVisible();
@@ -244,6 +244,10 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -264,18 +268,8 @@ describe('SubscriptionDetails', () => {
               currencySymbol: '$',
               currency: 'USD',
             },
-            annualFee: {
-              amount: 0,
-              amountFormatted: '0.00',
-              currencySymbol: '$',
-              currency: 'USD',
-            },
-            annualMonthlyFee: {
-              amount: 0,
-              amountFormatted: '0.00',
-              currencySymbol: '$',
-              currency: 'USD',
-            },
+            annualFee: null,
+            annualMonthlyFee: null,
             description: 'Free Plan description',
             hasBaseFee: false,
             isRecurring: true,
@@ -285,14 +279,13 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
       ],
     });
 
-    const { getByRole, getByText, queryByText, queryByRole } = render(
+    const { getByRole, getByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -318,7 +311,9 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Monthly')).toBeNull();
       expect(queryByText('Next payment on')).toBeNull();
       expect(queryByText('Next payment amount')).toBeNull();
-      expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
+
+      expect(queryByText('Cancel subscription')).toBeNull();
+      expect(queryByText(/Switch to/i)).toBeNull();
     });
   });
 
@@ -327,6 +322,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const planAnnual = {
       id: 'plan_annual',
@@ -414,7 +414,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2022-01-01'),
           canceledAt: new Date('2021-04-01'),
-          paymentMethodId: 'src_annual',
           planPeriod: 'annual' as const,
           status: 'active' as const,
         },
@@ -425,14 +424,13 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2022-02-01'),
           periodEnd: new Date('2022-03-01'),
           canceledAt: null,
-          paymentMethodId: 'src_monthly',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
       ],
     });
 
-    const { getByRole, getByText, getAllByText, queryByText, getAllByRole, userEvent } = render(
+    const { getByRole, getByText, getAllByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -465,20 +463,13 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Begins on')).toBeVisible();
     });
 
-    const [menuButton, upcomingMenuButton] = getAllByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
     await waitFor(() => {
+      // Active (canceled) annual subscription buttons
       expect(getByText('Switch to monthly $13 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
-      expect(queryByText('Cancel subscription')).toBeNull();
-    });
-
-    await userEvent.click(upcomingMenuButton);
-
-    await waitFor(() => {
+      // Upcoming monthly subscription buttons
       expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
-      expect(getByText('Cancel subscription')).toBeVisible();
+      expect(getAllByText('Cancel subscription').length).toBe(1);
     });
   });
 
@@ -487,6 +478,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const planMonthly = {
       id: 'plan_monthly',
@@ -568,7 +564,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: new Date('2021-01-03'),
-          paymentMethodId: 'src_free_active',
           planPeriod: 'month' as const,
           status: 'active' as const,
         },
@@ -578,7 +573,6 @@ describe('SubscriptionDetails', () => {
           createdAt: new Date('2021-01-03'),
           periodStart: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_free_upcoming',
           planPeriod: 'month' as const,
           status: 'upcoming' as const,
         },
@@ -626,6 +620,11 @@ describe('SubscriptionDetails', () => {
     });
 
     const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -675,7 +674,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month' as const,
           status: 'active' as const,
           cancel: cancelSubscriptionMock,
@@ -683,7 +681,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, getAllByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -699,12 +697,9 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Active')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the cancel option to appear and click it
-    await userEvent.click(getByText('Cancel subscription'));
+    // Get the inline Cancel subscription button (first one, before confirmation dialog opens)
+    const cancelButtons = getAllByText('Cancel subscription');
+    await userEvent.click(cancelButtons[0]);
 
     await waitFor(() => {
       expect(getByText('Cancel Monthly Plan Subscription?')).toBeVisible();
@@ -716,7 +711,10 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Keep subscription')).toBeVisible();
     });
 
-    await userEvent.click(getByText('Cancel subscription'));
+    // Click the Cancel subscription button in the confirmation dialog
+    // Use getAllByText and select the last one (confirmation dialog button)
+    const allCancelButtons = getAllByText('Cancel subscription');
+    await userEvent.click(allCancelButtons[allCancelButtons.length - 1]);
 
     // Assert that the cancelSubscription method was called
     await waitFor(() => {
@@ -729,6 +727,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const plan = {
       id: 'plan_annual',
@@ -774,7 +777,6 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: new Date('2021-04-01'),
-      paymentMethodId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
       cancel: vi.fn(),
@@ -800,7 +802,7 @@ describe('SubscriptionDetails', () => {
       subscriptionItems: [subscription],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -814,11 +816,6 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Annual Plan')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the Resubscribe option and click it
     await userEvent.click(getByText('Resubscribe'));
 
     // Assert resubscribe was called
@@ -832,6 +829,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const plan = {
       id: 'plan_annual',
@@ -875,7 +877,6 @@ describe('SubscriptionDetails', () => {
       periodStart: new Date('2021-01-01'),
       periodEnd: new Date('2022-01-01'),
       canceledAt: null,
-      paymentMethodId: 'src_annual',
       planPeriod: 'annual' as const,
       status: 'active' as const,
       cancel: vi.fn(),
@@ -901,7 +902,7 @@ describe('SubscriptionDetails', () => {
       subscriptionItems: [subscription],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -915,11 +916,6 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Annual Plan')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the Switch to monthly option and click it
     await userEvent.click(getByText(/Switch to monthly/i));
 
     // Assert switchToMonthly was called
@@ -938,6 +934,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const plan = {
       id: 'plan_monthly',
@@ -993,7 +994,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month' as const,
           status: 'past_due' as const,
           pastDueAt: new Date('2021-01-15'),
@@ -1028,6 +1028,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     fixtures.clerk.billing.getSubscription.mockResolvedValue({
       activeAt: new Date('2021-01-01'),
@@ -1077,7 +1082,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,
@@ -1085,7 +1089,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, getAllByText, queryByText, userEvent } = render(
+    const { getByRole, getByText, getAllByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -1122,11 +1126,7 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Next payment amount')).toBeNull();
     });
 
-    // Test the menu shows free trial specific options
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    expect(menuButton).toBeVisible();
-    await userEvent.click(menuButton);
-
+    // Test the inline button shows free trial specific option
     await waitFor(() => {
       expect(getByText('Cancel free trial')).toBeVisible();
     });
@@ -1137,6 +1137,11 @@ describe('SubscriptionDetails', () => {
       f.withUser({ email_addresses: ['test@clerk.com'] });
       f.withBilling();
     });
+
+    fixtures.clerk.billing.getPlans.mockResolvedValue([]);
+    fixtures.clerk.billing.getStatements.mockResolvedValue([]);
+    fixtures.clerk.billing.getPaymentAttempts.mockResolvedValue([]);
+    fixtures.clerk.user.getPaymentMethods.mockResolvedValue([]);
 
     const cancelSubscriptionMock = vi.fn().mockResolvedValue({});
 
@@ -1188,7 +1193,6 @@ describe('SubscriptionDetails', () => {
           periodStart: new Date('2021-01-01'),
           periodEnd: new Date('2021-02-01'),
           canceledAt: null,
-          paymentMethodId: 'src_123',
           planPeriod: 'month',
           status: 'active',
           isFreeTrial: true,
@@ -1197,7 +1201,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, getAllByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -1213,12 +1217,9 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Free trial')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the cancel option to appear and click it
-    await userEvent.click(getByText('Cancel free trial'));
+    // Get the inline Cancel free trial button (first one, before confirmation dialog opens)
+    const cancelTrialButtons = getAllByText('Cancel free trial');
+    await userEvent.click(cancelTrialButtons[0]);
 
     await waitFor(() => {
       // Should show free trial specific cancellation dialog
@@ -1231,8 +1232,10 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Keep free trial')).toBeVisible();
     });
 
-    // Click the cancel button in the dialog
-    await userEvent.click(getByText('Cancel free trial'));
+    // Click the Cancel free trial button in the confirmation dialog
+    // Use getAllByText and select the last one (confirmation dialog button)
+    const allCancelTrialButtons = getAllByText('Cancel free trial');
+    await userEvent.click(allCancelTrialButtons[allCancelTrialButtons.length - 1]);
 
     // Assert that the cancelSubscription method was called
     await waitFor(() => {

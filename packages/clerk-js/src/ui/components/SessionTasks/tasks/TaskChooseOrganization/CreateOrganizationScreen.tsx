@@ -1,15 +1,14 @@
 import { useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams } from '@clerk/types';
+import type { CreateOrganizationParams } from '@clerk/shared/types';
 
 import { useEnvironment } from '@/ui/contexts';
-import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
+import { useSessionTasksContext, useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
-import { useRouter } from '@/ui/router';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -22,7 +21,7 @@ type CreateOrganizationScreenProps = {
 
 export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
   const card = useCardState();
-  const { navigate } = useRouter();
+  const { navigateOnSetActive } = useSessionTasksContext();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { createOrganization, isLoaded, setActive } = useOrganizationList({
     userMemberships: organizationListParams.userMemberships,
@@ -60,9 +59,8 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       await setActive({
         organization,
-        navigate: async () => {
-          // TODO(after-auth) ORGS-779 - Handle next tasks
-          await navigate(redirectUrlComplete);
+        navigate: async ({ session }) => {
+          await navigateOnSetActive?.({ session, redirectUrlComplete });
         },
       });
     } catch (err) {

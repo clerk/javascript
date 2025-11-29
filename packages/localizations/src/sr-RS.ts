@@ -17,6 +17,11 @@ export const srRS: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копирај и затвори',
+      formHint: 'Из безбедносних разлога, нећемо вам дозволити да га поново погледате касније.',
+      formTitle: 'Копирајте свој API кључ "{{name}}" сада',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const srRS: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Korisnički uređaj',
   badge__you: 'Vi',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const srRS: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const srRS: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const srRS: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API кључ',
+  formFieldLabel__apiKeyDescription: 'Опис',
+  formFieldLabel__apiKeyExpiration: 'Истиче',
+  formFieldLabel__apiKeyName: 'Назив тајног кључа',
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovaj domen',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -282,7 +289,7 @@ export const srRS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -291,7 +298,7 @@ export const srRS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -487,9 +494,11 @@ export const srRS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
     notSelected: 'Organizacija nije izabrana',
     personalWorkspace: 'Lični nalog',
@@ -602,6 +611,12 @@ export const srRS: LocalizationResource = {
       subtitle: 'da nastaviš na {{applicationName}}',
       title: 'Proveri svoj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Proveri svoj e-mail',
+      resendButton: 'Nisi primio kod? Pošalji ponovo',
+      subtitle: 'da nastaviš na {{applicationName}}',
+      title: 'Proveri svoj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -637,6 +652,16 @@ export const srRS: LocalizationResource = {
         titleNewTab: 'Prijavljen na drugom tabu',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Користите везу за верификацију послату на вашу е-пошту',
+      resendButton: 'Нисте примили везу? Пошаљи поново',
+      subtitle: 'да наставите на {{applicationName}}',
+      title: 'Проверите своју е-пошту',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kod za resetovanje lozinke',
       resendButton: 'Nisi primio kod? Pošalji ponovo',
@@ -650,6 +675,8 @@ export const srRS: LocalizationResource = {
       label__alternativeMethods: 'Ili, prijavi se drugom metodom',
       title: 'Zaboravljena lozinka?',
     },
+    newDeviceVerificationNotice:
+      'Prijavljuješ se sa novog uređaja. Tražimo verifikaciju kako bismo zadržali tvoj nalog sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti sa prijavom. Nema dostupnih metoda autentifikacije.',
       subtitle: 'Došlo je do greške',
@@ -758,6 +785,10 @@ export const srRS: LocalizationResource = {
         title: 'Uspešno verifikovan e-mail',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -828,6 +859,14 @@ export const srRS: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -862,6 +901,7 @@ export const srRS: LocalizationResource = {
     form_password_validation_failed: 'Neispravna lozinka',
     form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
+    form_username_needs_non_number_char: 'Ваше корисничко име мора садржати најмање један небројни знак.',
     identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
     not_allowed_access:
       "Adresa e-maila ili broja telefona nije dozvoljena za registraciju. Ovo može biti zbog korišćenja '+', '=', '#' ili '.' u adresi e-maila, korišćenja domena koji je povezan sa vremenskom e-mail uslugom ili eksplicitnom isključenju.",
@@ -931,7 +971,9 @@ export const srRS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj nalog',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Upravljaj nalogom',
+    action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih naloga',
   },
@@ -963,7 +1005,7 @@ export const srRS: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +1014,7 @@ export const srRS: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

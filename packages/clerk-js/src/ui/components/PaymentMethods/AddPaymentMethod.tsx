@@ -103,8 +103,8 @@ const AddPaymentMethodRoot = ({ children, checkout, ...rest }: PropsWithChildren
         paymentDescription={t(
           localizationKeys(
             checkout?.planPeriod === 'month'
-              ? 'commerce.paymentSource.applePayDescription.monthly'
-              : 'commerce.paymentSource.applePayDescription.annual',
+              ? 'billing.paymentMethod.applePayDescription.monthly'
+              : 'billing.paymentMethod.applePayDescription.annual',
           ),
         )}
       >
@@ -238,7 +238,7 @@ const AddPaymentMethodForm = ({ children }: PropsWithChildren) => {
           isDisabled={!isFormReady}
           submitLabel={
             submitLabel ??
-            localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.formButtonPrimary__add`)
+            localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.formButtonPrimary__add`)
           }
           onReset={cancelAction}
           hideReset={!cancelAction}

@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/shared/react';
-import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/types';
+import type { EnterpriseAccountResource, OAuthProvider } from '@clerk/shared/types';
 
 import { ProfileSection } from '@/ui/elements/Section';
 

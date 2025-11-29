@@ -17,6 +17,11 @@ export const nbNO: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopier og lukk',
+      formHint: 'Av sikkerhetshensyn kan vi ikke tillate deg å se det igjen senere.',
+      formTitle: 'Kopier API-nøkkelen "{{name}}" din nå',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const nbNO: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Brukerens enhet',
   badge__you: 'Du',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const nbNO: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const nbNO: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-nøkkel',
+  formFieldLabel__apiKeyDescription: 'Beskrivelse',
+  formFieldLabel__apiKeyExpiration: 'Utløper',
+  formFieldLabel__apiKeyName: 'Navn på hemmelig nøkkel',
   formFieldLabel__automaticInvitations: 'Skru på automatiske invitasjoner for dette domenet',
   formFieldLabel__backupCode: 'Sikkerhetskode',
   formFieldLabel__confirmDeletion: 'Bekreftelse',
@@ -265,7 +272,7 @@ export const nbNO: LocalizationResource = {
     subtitle: 'for å fortsette til {{applicationName}}',
     suggestionsAcceptedLabel: 'Venter på godkjenning',
     title: 'Velg en bruker',
-    titleWithoutPersonal: 'Velg en organiasjon',
+    titleWithoutPersonal: 'Velg en organisasjon',
   },
   organizationProfile: {
     apiKeysPage: {
@@ -283,7 +290,7 @@ export const nbNO: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const nbNO: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const nbNO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opprett organisasjon',
     action__invitationAccept: 'Bli med',
     action__manageOrganization: 'Administrer organisasjon',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Spør om å bli med',
     notSelected: 'Ingen organisasjon valgt',
     personalWorkspace: 'Personlig arbeidsområde',
@@ -603,6 +612,12 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Sjekk e-posten din',
     },
+    emailCodeMfa: {
+      formTitle: 'Sjekk e-posten din',
+      resendButton: 'Ikke mottatt kode? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk e-posten din',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -638,6 +653,16 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',
+      resendButton: 'Har du ikke mottatt lenken? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk din e-post',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Tilbakestill passord-kode',
       resendButton: 'Send kode på nytt',
@@ -651,6 +676,8 @@ export const nbNO: LocalizationResource = {
       label__alternativeMethods: 'Eller logg inn med en annen metode.',
       title: 'Glemt passord?',
     },
+    newDeviceVerificationNotice:
+      'Du logger inn fra en ny enhet. Vi ber om verifisering for å holde kontoen din sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsette med innloggingen. Det er ingen tilgjengelige autentiseringsfaktorer.',
       subtitle: 'En feil oppstod',
@@ -759,6 +786,10 @@ export const nbNO: LocalizationResource = {
         title: 'E-posten ble verifisert',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -829,6 +860,14 @@ export const nbNO: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -862,6 +901,7 @@ export const nbNO: LocalizationResource = {
     form_password_validation_failed: 'Feil passord',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Brukernavnet ditt må inneholde minst ett ikke-numerisk tegn.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "E-postadressen eller telefonnummeret ditt er ikke tillatt for registrering. Dette kan være på grunn av bruk av '+', '=', '#' eller '.' i e-postadressen din, bruk av et domenn som er tilknyttet en midlertidig e-posttjeneste, eller eksplisitt blokkering. Hvis du mener dette er en feil, vennligst kontakt støtte.",
@@ -931,7 +971,9 @@ export const nbNO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Legg til konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
   },
@@ -963,7 +1005,7 @@ export const nbNO: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -972,7 +1014,7 @@ export const nbNO: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

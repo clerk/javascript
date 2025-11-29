@@ -17,6 +17,11 @@ export const hiIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'कॉपी करें और बंद करें',
+      formHint: 'सुरक्षा कारणों से, हम आपको बाद में इसे फिर से देखने की अनुमति नहीं देंगे।',
+      formTitle: 'अभी अपना "{{name}}" API कुंजी कॉपी करें',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const hiIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'उपयोगकर्ता उपकरण',
   badge__you: 'आप',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const hiIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const hiIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -219,9 +224,11 @@ export const hiIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'अपना पासवर्ड दर्ज करें',
   formFieldInputPlaceholder__phoneNumber: 'अपना फोन नंबर दर्ज करें',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API कुंजी',
+  formFieldLabel__apiKeyDescription: 'विवरण',
+  formFieldLabel__apiKeyExpiration: 'समाप्ति',
+  formFieldLabel__apiKeyName: 'गुप्त कुंजी का नाम',
   formFieldLabel__automaticInvitations: 'इस डोमेन के लिए स्वचालित आमंत्रण सक्षम करें',
   formFieldLabel__backupCode: 'बैकअप कोड',
   formFieldLabel__confirmDeletion: 'पुष्टिकरण',
@@ -283,7 +290,7 @@ export const hiIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'डिफ़ॉल्ट बनाएं',
         actionLabel__remove: 'हटाएं',
         add: 'नया भुगतान स्रोत जोड़ें',
@@ -292,11 +299,11 @@ export const hiIN: LocalizationResource = {
         formButtonPrimary__add: 'भुगतान विधि जोड़ें',
         formButtonPrimary__pay: '{{amount}} का भुगतान करें',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} को इस खाते से हटा दिया जाएगा।',
           messageLine2:
             'आप अब इस भुगतान स्रोत का उपयोग नहीं कर पाएंगे और इस पर निर्भर कोई भी आवर्ती सदस्यता अब काम नहीं करेगी।',
-          successMessage: '{{paymentSource}} को आपके खाते से हटा दिया गया है।',
+          successMessage: '{{paymentMethod}} को आपके खाते से हटा दिया गया है।',
           title: 'भुगतान स्रोत हटाएं',
         },
         title: 'उपलब्ध विकल्प',
@@ -488,9 +495,11 @@ export const hiIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'संगठन बनाएँ',
     action__invitationAccept: 'शामिल हों',
     action__manageOrganization: 'प्रबंधित करें',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
     notSelected: 'कोई संगठन चयनित नहीं',
     personalWorkspace: 'व्यक्तिगत खाता',
@@ -605,6 +614,12 @@ export const hiIN: LocalizationResource = {
       subtitle: '{{applicationName}} पर जारी रखने के लिए',
       title: 'अपना ईमेल जांचें',
     },
+    emailCodeMfa: {
+      formTitle: 'अपना ईमेल जांचें',
+      resendButton: 'कोड नहीं मिला? फिर से भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'जारी रखने के लिए, सत्यापन लिंक को उस डिवाइस और ब्राउज़र पर खोलें जिससे आपने साइन-अप शुरू किया था',
@@ -640,6 +655,16 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',
+      resendButton: 'लिंक नहीं मिला? पुनः भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'पासवर्ड रीसेट कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',
@@ -653,6 +678,8 @@ export const hiIN: LocalizationResource = {
       label__alternativeMethods: 'या, दूसरी विधि से साइन इन करें',
       title: 'पासवर्ड भूल गए?',
     },
+    newDeviceVerificationNotice:
+      'आप एक नए डिवाइस से साइन इन कर रहे हैं। हम आपके खाते को सुरक्षित रखने के लिए सत्यापन मांग रहे हैं।',
     noAvailableMethods: {
       message: 'साइन इन जारी नहीं रख सकते। कोई उपलब्ध प्रमाणीकरण कारक नहीं है।',
       subtitle: 'एक त्रुटि हुई',
@@ -762,6 +789,10 @@ export const hiIN: LocalizationResource = {
         title: 'सफलतापूर्वक ईमेल सत्यापित किया गया',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'मैं {{ privacyPolicyLink || link("गोपनीयता नीति") }} से सहमत हूं',
@@ -835,6 +866,14 @@ export const hiIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
     captcha_invalid:
@@ -870,6 +909,7 @@ export const hiIN: LocalizationResource = {
     form_username_invalid_character:
       'आपके उपयोगकर्ता नाम में अमान्य वर्ण हैं। कृपया केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें।',
     form_username_invalid_length: 'आपका उपयोगकर्ता नाम {{min_length}} और {{max_length}} अक्षरों के बीच होना चाहिए।',
+    form_username_needs_non_number_char: 'आपके उपयोगकर्ता नाम में कम से कम एक गैर-संख्यात्मक वर्ण होना चाहिए।',
     identification_deletion_failed: 'आप अपनी अंतिम पहचान को हटा नहीं सकते।',
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',
@@ -942,7 +982,9 @@ export const hiIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'खाता जोड़ें',
+    action__closeUserMenu: 'उपयोगकर्ता मेनू बंद करें',
     action__manageAccount: 'खाता प्रबंधित करें',
+    action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
   },
@@ -974,7 +1016,7 @@ export const hiIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -983,7 +1025,7 @@ export const hiIN: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

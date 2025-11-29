@@ -8,11 +8,12 @@ import type {
   BillingPaymentMethodResource,
   BillingSubscriptionPlanPeriod,
   ConfirmCheckoutParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { unixEpochToDate } from '@/utils/date';
 
 import { billingTotalsFromJSON } from '../../utils';
+import { Billing } from '../modules/billing/namespace';
 import { BillingPayer } from './BillingPayer';
 import { BaseResource, BillingPaymentMethod, BillingPlan } from './internal';
 
@@ -27,8 +28,9 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
   status!: 'needs_confirmation' | 'completed';
   totals!: BillingCheckoutTotals;
   isImmediatePlanChange!: boolean;
-  freeTrialEndsAt!: Date | null;
+  freeTrialEndsAt?: Date;
   payer!: BillingPayerResource;
+  needsPaymentMethod!: boolean;
 
   constructor(data: BillingCheckoutJSON) {
     super();
@@ -50,8 +52,11 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     this.status = data.status;
     this.totals = billingTotalsFromJSON(data.totals);
     this.isImmediatePlanChange = data.is_immediate_plan_change;
-    this.freeTrialEndsAt = data.free_trial_ends_at ? unixEpochToDate(data.free_trial_ends_at) : null;
+    if (data.free_trial_ends_at) {
+      this.freeTrialEndsAt = unixEpochToDate(data.free_trial_ends_at);
+    }
     this.payer = new BillingPayer(data.payer);
+    this.needsPaymentMethod = data.needs_payment_method;
     return this;
   }
 
@@ -62,9 +67,7 @@ export class BillingCheckout extends BaseResource implements BillingCheckoutReso
     return retry(
       () =>
         this._basePatch({
-          path: this.payer.organizationId
-            ? `/organizations/${this.payer.organizationId}/commerce/checkouts/${this.id}/confirm`
-            : `/me/commerce/checkouts/${this.id}/confirm`,
+          path: Billing.path(`/checkouts/${this.id}/confirm`, { orgId: this.payer.organizationId }),
           body: params as any,
         }),
       {

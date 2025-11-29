@@ -17,6 +17,11 @@ export const roRO: LocalizationResource = {
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiază și închide',
+      formHint: 'Din motive de securitate, nu vă vom permite să îl vizualizați din nou mai târziu.',
+      formTitle: 'Copiați acum cheia API "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Creată {{ createdDate | shortDate('ro-RO') }} • Expiră {{ expiresDate | longDate('ro-RO') }}",
     createdAndExpirationStatus__never: "Creată {{ createdDate | shortDate('ro-RO') }} • Nu expiră niciodată",
@@ -69,8 +74,8 @@ export const roRO: LocalizationResource = {
   badge__upcomingPlan: 'Urmează',
   badge__userDevice: 'Dispozitiv utilizator',
   badge__you: 'Tu',
-  commerce: {
-    addPaymentMethod: 'Adaugă metodă de plată',
+  billing: {
+    addPaymentMethod__label: 'Adaugă metodă de plată',
     alwaysFree: 'Întotdeauna gratuit',
     annually: 'Anual',
     availableFeatures: 'Funcții disponibile',
@@ -127,8 +132,7 @@ export const roRO: LocalizationResource = {
     monthly: 'Lunar',
     pastDue: 'Restanță',
     pay: 'Plătește {{amount}}',
-    paymentMethods: 'Metode de plată',
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: 'Plată anuală',
         monthly: 'Plată lunară',
@@ -142,6 +146,7 @@ export const roRO: LocalizationResource = {
         testCardInfo: 'Informații card de test',
       },
     },
+    paymentMethods__label: 'Metode de plată',
     popular: 'Popular',
     pricingTable: {
       billingCycle: 'Ciclu de facturare',
@@ -226,6 +231,8 @@ export const roRO: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Introdu parola',
   formFieldInputPlaceholder__phoneNumber: 'Introdu numărul de telefon',
   formFieldInputPlaceholder__username: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Cheie API',
   formFieldLabel__apiKeyDescription: 'Descriere',
   formFieldLabel__apiKeyExpiration: 'Expirare',
   formFieldLabel__apiKeyName: 'Numele cheii secrete',
@@ -289,7 +296,7 @@ export const roRO: LocalizationResource = {
         tableHeader__date: 'Dată',
         tableHeader__status: 'Stare',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Setează ca implicită',
         actionLabel__remove: 'Elimină',
         add: 'Adaugă metodă de plată nouă',
@@ -298,11 +305,11 @@ export const roRO: LocalizationResource = {
         formButtonPrimary__add: 'Adaugă metoda de plată',
         formButtonPrimary__pay: 'Plătește {{amount}}',
         payWithTestCardButton: 'Plătește cu card de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} va fi eliminat(ă) din acest cont.',
           messageLine2:
             'Nu vei mai putea folosi această metodă de plată, iar abonamentele recurente dependente de ea nu vor mai funcționa.',
-          successMessage: '{{paymentSource}} a fost eliminată din contul tău.',
+          successMessage: '{{paymentMethod}} a fost eliminată din contul tău.',
           title: 'Elimină metoda de plată',
         },
         title: 'Metode de plată',
@@ -496,9 +503,11 @@ export const roRO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Creează organizație',
     action__invitationAccept: 'Alătură-te',
     action__manageOrganization: 'Gestionează',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicită alăturarea',
     notSelected: 'Nicio organizație selectată',
     personalWorkspace: 'Cont personal',
@@ -613,6 +622,12 @@ export const roRO: LocalizationResource = {
       subtitle: 'pentru a continua la {{applicationName}}',
       title: 'Verifică-ți emailul',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifică-ți emailul',
+      resendButton: 'Nu ai primit un cod? Retrimite',
+      subtitle: 'pentru a continua la {{applicationName}}',
+      title: 'Verifică-ți emailul',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -649,6 +664,16 @@ export const roRO: LocalizationResource = {
         titleNewTab: 'Autentificat în altă filă',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Folosiți linkul de verificare trimis la adresa dvs. de e-mail',
+      resendButton: 'Nu ați primit linkul? Retrimiteți',
+      subtitle: 'pentru a continua către {{applicationName}}',
+      title: 'Verificați-vă e-mailul',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Cod pentru resetarea parolei',
       resendButton: 'Nu ai primit un cod? Retrimite',
@@ -662,6 +687,8 @@ export const roRO: LocalizationResource = {
       label__alternativeMethods: 'Sau autentifică-te cu altă metodă',
       title: 'Ai uitat parola?',
     },
+    newDeviceVerificationNotice:
+      'Te conectezi de pe un dispozitiv nou. Solicităm verificarea pentru a menține contul tău sigur.',
     noAvailableMethods: {
       message: 'Nu se poate continua autentificarea. Nu există niciun factor de autentificare disponibil.',
       subtitle: 'A apărut o eroare',
@@ -771,6 +798,10 @@ export const roRO: LocalizationResource = {
         title: 'Email verificat cu succes',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Sunt de acord cu {{ privacyPolicyLink || link("Politica de confidențialitate") }}',
@@ -843,6 +874,14 @@ export const roRO: LocalizationResource = {
       actionText: 'Autentificat ca {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
     captcha_invalid: undefined,
@@ -876,6 +915,8 @@ export const roRO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length:
       'Numele de utilizator trebuie să aibă între {{min_length}} și {{max_length}} caractere.',
+    form_username_needs_non_number_char:
+      'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -946,7 +987,9 @@ export const roRO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adaugă cont',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestionează contul',
+    action__openUserMenu: undefined,
     action__signOut: 'Deconectează-te',
     action__signOutAll: 'Deconectează toate conturile',
   },
@@ -978,7 +1021,7 @@ export const roRO: LocalizationResource = {
         tableHeader__date: 'Dată',
         tableHeader__status: 'Stare',
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'Setează ca implicită',
         actionLabel__remove: 'Elimină',
         add: 'Adaugă metodă de plată nouă',
@@ -987,11 +1030,11 @@ export const roRO: LocalizationResource = {
         formButtonPrimary__add: 'Adaugă metoda de plată',
         formButtonPrimary__pay: 'Plătește {{amount}}',
         payWithTestCardButton: 'Plătește cu card de test',
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} va fi eliminat(ă) din acest cont.',
           messageLine2:
             'Nu vei mai putea utiliza această sursă de plată, iar orice abonamente recurente care depind de ea nu vor mai funcționa.',
-          successMessage: '{{paymentSource}} a fost eliminată din contul tău.',
+          successMessage: '{{paymentMethod}} a fost eliminată din contul tău.',
           title: 'Elimină metoda de plată',
         },
         title: 'Metode de plată',

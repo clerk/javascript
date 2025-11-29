@@ -17,6 +17,11 @@ export const fiFI: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopioi ja sulje',
+      formHint: 'Tietoturvasyistä emme voi sallia sen tarkastelua myöhemmin.',
+      formTitle: 'Kopioi API-avaimesi "{{name}}" nyt',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const fiFI: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Käyttäjän laite',
   badge__you: 'Sinä',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const fiFI: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const fiFI: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-avain',
+  formFieldLabel__apiKeyDescription: 'Kuvaus',
+  formFieldLabel__apiKeyExpiration: 'Vanheneminen',
+  formFieldLabel__apiKeyName: 'Salaisen avaimen nimi',
   formFieldLabel__automaticInvitations: 'Ota automaattiset kutsut käyttöön tälle verkkotunnukselle',
   formFieldLabel__backupCode: 'Varakoodi',
   formFieldLabel__confirmDeletion: 'Vahvistus',
@@ -283,7 +290,7 @@ export const fiFI: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const fiFI: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -489,9 +496,11 @@ export const fiFI: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Luo organisaatio',
     action__invitationAccept: 'Liity',
     action__manageOrganization: 'Hallitse',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Pyydä liittymistä',
     notSelected: 'Ei valittua organisaatiota',
     personalWorkspace: 'Henkilökohtainen tili',
@@ -604,6 +613,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',
     },
+    emailCodeMfa: {
+      formTitle: 'Tarkista sähköpostisi',
+      resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
@@ -639,6 +654,16 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
+      resendButton: 'Etkö saanut linkkiä? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Nollaa salasana',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
@@ -652,6 +677,8 @@ export const fiFI: LocalizationResource = {
       label__alternativeMethods: 'tai kirjaudu sisään toisella tavalla',
       title: 'Unohditko salasanasi?',
     },
+    newDeviceVerificationNotice:
+      'Kirjaudut sisään uudesta laitteesta. Pyydämme vahvistusta tilisi turvallisuuden varmistamiseksi.',
     noAvailableMethods: {
       message: 'Kirjautuminen ei onnistu. Käytettävissä ei ole yhtään todennusmenetelmää.',
       subtitle: 'Tapahtui virhe',
@@ -760,6 +787,10 @@ export const fiFI: LocalizationResource = {
         title: 'Rekisteröitynyt toiseen välilehteen',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Hyväksyn {{ privacyPolicyLink || link("tietosuojaselosteen") }}',
@@ -831,6 +862,14 @@ export const fiFI: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -863,6 +902,7 @@ export const fiFI: LocalizationResource = {
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Käyttäjänimessä tulee olla vähintään yksi ei-numeerinen merkki.',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
     not_allowed_access:
       "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
@@ -932,7 +972,9 @@ export const fiFI: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lisää tili',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hallitse tiliä',
+    action__openUserMenu: undefined,
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },
@@ -964,7 +1006,7 @@ export const fiFI: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -973,7 +1015,7 @@ export const fiFI: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

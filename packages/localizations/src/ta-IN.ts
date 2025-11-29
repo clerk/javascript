@@ -17,6 +17,11 @@ export const taIN: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'நகலெடுத்து மூடு',
+      formHint: 'பாதுகாப்பு காரணங்களுக்காக, நாங்கள் பின்னர் அதை மீண்டும் பார்க்க அனுமதிக்க மாட்டோம்.',
+      formTitle: 'இப்போது உங்கள் "{{name}}" API விசையை நகலெடுக்கவும்',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const taIN: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'பயனர் சாதனம்',
   badge__you: 'நீங்கள்',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const taIN: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const taIN: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const taIN: LocalizationResource = {
   formFieldInputPlaceholder__password: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   formFieldInputPlaceholder__phoneNumber: 'உங்கள் தொலைபேசி எண்ணை உள்ளிடவும்',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API விசை',
+  formFieldLabel__apiKeyDescription: 'விளக்கம்',
+  formFieldLabel__apiKeyExpiration: 'காலாவதி',
+  formFieldLabel__apiKeyName: 'இரகசிய விசையின் பெயர்',
   formFieldLabel__automaticInvitations: 'இந்த டொமைனுக்கு தானியங்கி அழைப்புகளை இயக்கவும்',
   formFieldLabel__backupCode: 'காப்புக் குறியீடு',
   formFieldLabel__confirmDeletion: 'உறுதிப்படுத்தல்',
@@ -283,7 +290,7 @@ export const taIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'இயல்புநிலையாக்கு',
         actionLabel__remove: 'நீக்கு',
         add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
@@ -292,11 +299,11 @@ export const taIN: LocalizationResource = {
         formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
         formButtonPrimary__pay: '{{amount}} செலுத்து',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
           messageLine2:
             'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
-          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
+          successMessage: '{{paymentMethod}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
           title: 'கட்டண மூலத்தை நீக்கு',
         },
         title: 'கிடைக்கும் விருப்பங்கள்',
@@ -491,9 +498,11 @@ export const taIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'நிறுவனத்தை உருவாக்கு',
     action__invitationAccept: 'சேரவும்',
     action__manageOrganization: 'நிர்வகி',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'சேர கோரிக்கை',
     notSelected: 'நிறுவனம் எதுவும் தேர்ந்தெடுக்கப்படவில்லை',
     personalWorkspace: 'தனிப்பட்ட கணக்கு',
@@ -608,6 +617,12 @@ export const taIN: LocalizationResource = {
       subtitle: '{{applicationName}} க்கு தொடர',
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
+    emailCodeMfa: {
+      formTitle: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+      resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'தொடர, நீங்கள் உள்நுழைவைத் தொடங்கிய சாதனத்திலும் உலாவியிலும் சரிபார்ப்பு இணைப்பைத் திறக்கவும்',
@@ -643,6 +658,16 @@ export const taIN: LocalizationResource = {
         titleNewTab: 'மற்ற தாவலில் உள்நுழைந்தது',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'உங்கள் மின்னஞ்சலுக்கு அனுப்பப்பட்ட சரிபார்ப்பு இணைப்பைப் பயன்படுத்தவும்',
+      resendButton: 'இணைப்பு கிடைக்கவில்லையா? மீண்டும் அனுப்பவும்',
+      subtitle: '{{applicationName}} க்கு தொடர',
+      title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'கடவுச்சொல் மீட்டமைப்பு குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -656,6 +681,8 @@ export const taIN: LocalizationResource = {
       label__alternativeMethods: 'அல்லது, வேறு முறையில் உள்நுழையவும்',
       title: 'கடவுச்சொல் மறந்துவிட்டதா?',
     },
+    newDeviceVerificationNotice:
+      'நீங்கள் ஒரு புதிய சாதனத்திலிருந்து உள்நுழைகிறீர்கள். உங்கள் கணக்கை பாதுகாப்பாக வைத்திருக்க நாங்கள் சரிபார்ப்பு கோருகிறோம்.',
     noAvailableMethods: {
       message: 'உள்நுழைவைத் தொடர முடியாது. எந்த அங்கீகார காரணியும் கிடைக்கவில்லை.',
       subtitle: 'பிழை ஏற்பட்டது',
@@ -764,6 +791,10 @@ export const taIN: LocalizationResource = {
         title: 'மின்னஞ்சல் வெற்றிகரமாக சரிபார்க்கப்பட்டது',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'நான் {{ privacyPolicyLink || link("தனியுரிமைக் கொள்கை") }} ஐ ஒப்புக்கொள்கிறேன்',
@@ -837,6 +868,14 @@ export const taIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
     captcha_invalid:
@@ -874,6 +913,7 @@ export const taIN: LocalizationResource = {
       'உங்கள் பயனர்பெயரில் தவறான எழுத்துக்கள் உள்ளன. எழுத்துக்கள், எண்கள் மற்றும் அடிக்கோடுகளை மட்டும் பயன்படுத்தவும்.',
     form_username_invalid_length:
       'உங்கள் பயனர்பெயர் {{min_length}} மற்றும் {{max_length}} எழுத்துகளுக்கு இடையில் இருக்க வேண்டும்.',
+    form_username_needs_non_number_char: 'உங்கள் பயனர் பெயரில் குறைந்தது ஒரு எண்ணல்லாத எழுத்து இருக்க வேண்டும்.',
     identification_deletion_failed: 'உங்கள் கடைசி அடையாளத்தை நீங்கள் நீக்க முடியாது.',
     not_allowed_access:
       'இந்த பக்கத்தை அணுக உங்களுக்கு அனுமதி இல்லை. இது பிழை என்று நீங்கள் நம்பினால், ஆதரவைத் தொடர்பு கொள்ளவும்.',
@@ -947,7 +987,9 @@ export const taIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'கணக்கைச் சேர்',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'கணக்கை நிர்வகி',
+    action__openUserMenu: undefined,
     action__signOut: 'வெளியேறு',
     action__signOutAll: 'அனைத்து கணக்குகளிலிருந்தும் வெளியேறு',
   },
@@ -979,7 +1021,7 @@ export const taIN: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: 'இயல்புநிலையாக்கு',
         actionLabel__remove: 'நீக்கு',
         add: 'புதிய கட்டண மூலத்தைச் சேர்க்கவும்',
@@ -988,11 +1030,11 @@ export const taIN: LocalizationResource = {
         formButtonPrimary__add: 'கட்டண முறையைச் சேர்',
         formButtonPrimary__pay: '{{amount}} செலுத்து',
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: '{{identifier}} இந்த கணக்கிலிருந்து நீக்கப்படும்.',
           messageLine2:
             'இந்த கட்டண மூலத்தை இனி பயன்படுத்த முடியாது மற்றும் அதைச் சார்ந்த எந்த தொடர் சந்தாக்களும் இனி செயல்படாது.',
-          successMessage: '{{paymentSource}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
+          successMessage: '{{paymentMethod}} உங்கள் கணக்கிலிருந்து நீக்கப்பட்டது.',
           title: 'கட்டண மூலத்தை நீக்கு',
         },
         title: 'கிடைக்கும் விருப்பங்கள்',

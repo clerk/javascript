@@ -42,15 +42,6 @@ const withEmailCodes = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
-const withBroadcastChannel = withEmailCodes
-  .clone()
-  .setId('withBroadcastChannel')
-  .setEnvVariable(
-    'public',
-    'CLERK_JS_URL',
-    constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.channel.browser.js',
-  );
-
 const sessionsProd1 = base
   .clone()
   .setId('sessionsProd1')
@@ -160,6 +151,13 @@ const withSessionTasks = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
+const withSessionTasksResetPassword = base
+  .clone()
+  .setId('withSessionTasksResetPassword')
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password').pk);
+
 const withBillingJwtV2 = base
   .clone()
   .setId('withBillingJwtV2')
@@ -185,6 +183,12 @@ const withAPIKeys = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-api-keys').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-api-keys').pk);
 
+const withProtectService = base
+  .clone()
+  .setId('withProtectService')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service').pk);
+
 export const envs = {
   base,
   sessionsProd1,
@@ -195,7 +199,6 @@ export const envs = {
   withAPCore2ClerkV4,
   withBilling,
   withBillingJwtV2,
-  withBroadcastChannel,
   withCustomRoles,
   withDynamicKeys,
   withEmailCodes,
@@ -207,9 +210,11 @@ export const envs = {
   withRestrictedMode,
   withReverification,
   withSessionTasks,
+  withSessionTasksResetPassword,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,
   withWaitlistdMode,
   withWhatsappPhoneCode,
+  withProtectService,
 } as const;

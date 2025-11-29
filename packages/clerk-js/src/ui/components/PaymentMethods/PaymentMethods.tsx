@@ -1,5 +1,5 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import type { BillingPaymentMethodResource } from '@clerk/types';
+import { useClerk, useOrganizationContext } from '@clerk/shared/react';
+import type { BillingPaymentMethodResource } from '@clerk/shared/types';
 import { Fragment, useMemo, useRef } from 'react';
 
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -38,10 +38,10 @@ const AddScreen = withCardStateProvider(({ onSuccess }: { onSuccess: () => void 
       cancelAction={close}
     >
       <AddPaymentMethod.FormHeader
-        text={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
+        text={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.add`)}
       />
       <AddPaymentMethod.FormSubtitle
-        text={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.addSubtitle`)}
+        text={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.addSubtitle`)}
       />
       <DevOnly>
         <TestPaymentMethod />
@@ -60,11 +60,12 @@ const RemoveScreen = ({
   const { close } = useActionContext();
   const card = useCardState();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const ref = useRef(
     `${paymentMethod.paymentType === 'card' ? paymentMethod.cardType : paymentMethod.paymentType} ${paymentMethod.paymentType === 'card' ? `⋯ ${paymentMethod.last4}` : '-'}`,
   );
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   if (!ref.current) {
     return null;
@@ -72,7 +73,7 @@ const RemoveScreen = ({
 
   const removePaymentMethod = async () => {
     await paymentMethod
-      .remove({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+      .remove({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
       .then(revalidate)
       .catch((error: Error) => {
         handleError(error, [], card.setError);
@@ -81,20 +82,18 @@ const RemoveScreen = ({
 
   return (
     <RemoveResourceForm
-      title={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.removeResource.title`)}
+      title={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.title`)}
       messageLine1={localizationKeys(
-        `${localizationRoot}.billingPage.paymentSourcesSection.removeResource.messageLine1`,
+        `${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.messageLine1`,
         {
           identifier: ref.current,
         },
       )}
-      messageLine2={localizationKeys(
-        `${localizationRoot}.billingPage.paymentSourcesSection.removeResource.messageLine2`,
-      )}
+      messageLine2={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.messageLine2`)}
       successMessage={localizationKeys(
-        `${localizationRoot}.billingPage.paymentSourcesSection.removeResource.successMessage`,
+        `${localizationRoot}.billingPage.paymentMethodsSection.removeMethod.successMessage`,
         {
-          paymentSource: ref.current,
+          paymentMethod: ref.current,
         },
       )}
       deleteResource={removePaymentMethod}
@@ -127,7 +126,7 @@ export const PaymentMethods = withCardStateProvider(() => {
 
   return (
     <ProfileSection.Root
-      title={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.title`)}
+      title={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.title`)}
       centered={false}
       id='paymentMethods'
       sx={t => ({
@@ -171,7 +170,7 @@ export const PaymentMethods = withCardStateProvider(() => {
                   <Action.Trigger value='add'>
                     <ProfileSection.ArrowButton
                       id='paymentMethods'
-                      localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.add`)}
+                      localizationKey={localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.add`)}
                     />
                   </Action.Trigger>
                   <Action.Open value='add'>
@@ -198,13 +197,14 @@ const PaymentMethodMenu = ({
 }) => {
   const { open } = useActionContext();
   const card = useCardState();
-  const { organization } = useOrganization();
   const subscriberType = useSubscriberTypeContext();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
+  // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
+  const organizationCtx = useOrganizationContext();
 
   const actions = [
     {
-      label: localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.actionLabel__remove`),
+      label: localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.actionLabel__remove`),
       isDestructive: true,
       onClick: () => open(`remove-${paymentMethod.id}`),
       isDisabled: !paymentMethod.isRemovable,
@@ -213,11 +213,11 @@ const PaymentMethodMenu = ({
 
   if (!paymentMethod.isDefault) {
     actions.unshift({
-      label: localizationKeys(`${localizationRoot}.billingPage.paymentSourcesSection.actionLabel__default`),
+      label: localizationKeys(`${localizationRoot}.billingPage.paymentMethodsSection.actionLabel__default`),
       isDestructive: false,
       onClick: () => {
         paymentMethod
-          .makeDefault({ orgId: subscriberType === 'organization' ? organization?.id : undefined })
+          .makeDefault({ orgId: subscriberType === 'organization' ? organizationCtx?.organization?.id : undefined })
           .then(revalidate)
           .catch((error: Error) => {
             handleError(error, [], card.setError);

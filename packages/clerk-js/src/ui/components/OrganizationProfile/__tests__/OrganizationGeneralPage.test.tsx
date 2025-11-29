@@ -1,4 +1,8 @@
-import type { ClerkPaginatedResponse, OrganizationDomainResource, OrganizationMembershipResource } from '@clerk/types';
+import type {
+  ClerkPaginatedResponse,
+  OrganizationDomainResource,
+  OrganizationMembershipResource,
+} from '@clerk/shared/types';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -246,6 +250,7 @@ describe('OrganizationSettings', () => {
     it('open the profile section', async () => {
       const { wrapper } = await createFixtures(f => {
         f.withOrganizations();
+        f.withOrganizationSlug(true);
         f.withUser({
           email_addresses: ['test@clerk.com'],
           organization_memberships: [{ name: 'Org1', slug: 'Org1' }],

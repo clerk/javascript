@@ -1,7 +1,7 @@
-import type { ClerkAPIResponseError } from './apiResponseError';
+import type { ClerkAPIResponseError } from './clerkApiResponseError';
+import type { ClerkRuntimeError } from './clerkRuntimeError';
 import type { EmailLinkError } from './emailLinkError';
 import type { MetamaskError } from './metamaskError';
-import type { ClerkRuntimeError } from './runtimeError';
 
 /**
  * Checks if the provided error object is an unauthorized error.

@@ -17,6 +17,11 @@ export const arSA: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'نسخ وإغلاق',
+      formHint: 'لأسباب أمنية، لن نسمح لك بعرضه مرة أخرى لاحقاً.',
+      formTitle: 'انسخ مفتاح API الخاص بك "{{name}}" الآن',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const arSA: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'جهاز المستخدم',
   badge__you: 'أنت',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const arSA: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const arSA: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__password: undefined,
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'مفتاح API',
+  formFieldLabel__apiKeyDescription: 'الوصف',
+  formFieldLabel__apiKeyExpiration: 'الانتهاء',
+  formFieldLabel__apiKeyName: 'اسم المفتاح السري',
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
@@ -283,7 +290,7 @@ export const arSA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const arSA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -486,9 +493,11 @@ export const arSA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'أنشاء منظمة',
     action__invitationAccept: 'أنضمام',
     action__manageOrganization: 'أدارة المنظمة',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'طلب أنضمام',
     notSelected: 'لم يتم أختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
@@ -601,6 +610,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'التحقق من البريد الإلكتروني',
     },
+    emailCodeMfa: {
+      formTitle: 'التحقق من البريد الإلكتروني',
+      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'التحقق من البريد الإلكتروني',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'للمتابعة, قم بفتح رابط التحقق عبر نفس الجهاز والمتصفح الذي انشأت محاولة تسجيل الدخول منه',
@@ -636,6 +651,16 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',
+      resendButton: 'لم تستلم الرابط؟ إعادة الإرسال',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'تحقق من بريدك الإلكتروني',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'رمز تحقق لإعادة تعيين كلمة المرور',
       resendButton: 'لم يصلك أي رمز؟ حاول مرة أخرى.',
@@ -649,6 +674,7 @@ export const arSA: LocalizationResource = {
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
+    newDeviceVerificationNotice: 'أنت تسجل الدخول من جهاز جديد. نحن نطلب التحقق للحفاظ على أمان حسابك.',
     noAvailableMethods: {
       message: 'لا يمكن متابعة تسجيل الدخول. لا يوجد وسيلة مصادقة متاحة.',
       subtitle: 'حدث خطأ',
@@ -758,6 +784,10 @@ export const arSA: LocalizationResource = {
         title: 'تم التحقق بنجاح من البريد الإلكتروني',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: undefined,
@@ -828,6 +858,14 @@ export const arSA: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -860,6 +898,7 @@ export const arSA: LocalizationResource = {
     form_password_validation_failed: 'كلمة مرور خاطئة',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'يجب أن يحتوي اسم المستخدم على حرف واحد على الأقل غير رقمي.',
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access:
       'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',
@@ -929,7 +968,9 @@ export const arSA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'إضافة حساب',
+    action__closeUserMenu: 'إغلاق قائمة المستخدم',
     action__manageAccount: 'إدارة الحساب',
+    action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },
@@ -961,7 +1002,7 @@ export const arSA: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -970,7 +1011,7 @@ export const arSA: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

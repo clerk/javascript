@@ -120,6 +120,7 @@ export default tseslint.config([
       'packages/backend/src/runtime/**/*',
       'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
+      'packages/shared/tsdown.config.mjs',
     ],
   },
   {
@@ -366,8 +367,8 @@ export default tseslint.config([
     },
   },
   {
-    name: 'packages/clerk-js - vitest',
-    files: ['packages/clerk-js/src/**/*.test.{ts,tsx}'],
+    name: 'packages - vitest',
+    files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
       'jest/unbound-method': 'off',
       '@typescript-eslint/unbound-method': 'off',

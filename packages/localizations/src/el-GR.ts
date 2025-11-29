@@ -17,6 +17,11 @@ export const elGR: LocalizationResource = {
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Αντιγραφή και κλείσιμο',
+      formHint: 'Για λόγους ασφαλείας, δεν θα σας επιτρέψουμε να το δείτε ξανά αργότερα.',
+      formTitle: 'Αντιγράψτε το κλειδί API "{{name}}" σας τώρα',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -68,8 +73,8 @@ export const elGR: LocalizationResource = {
   badge__upcomingPlan: undefined,
   badge__userDevice: 'Συσκευή χρήστη',
   badge__you: 'Εσείς',
-  commerce: {
-    addPaymentMethod: undefined,
+  billing: {
+    addPaymentMethod__label: undefined,
     alwaysFree: undefined,
     annually: undefined,
     availableFeatures: undefined,
@@ -121,8 +126,7 @@ export const elGR: LocalizationResource = {
     monthly: undefined,
     pastDue: undefined,
     pay: undefined,
-    paymentMethods: undefined,
-    paymentSource: {
+    paymentMethod: {
       applePayDescription: {
         annual: undefined,
         monthly: undefined,
@@ -136,6 +140,7 @@ export const elGR: LocalizationResource = {
         testCardInfo: undefined,
       },
     },
+    paymentMethods__label: undefined,
     popular: undefined,
     pricingTable: {
       billingCycle: undefined,
@@ -220,9 +225,11 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__password: 'Εισάγετε τον κωδικό σας',
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
   formFieldInputPlaceholder__username: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Κλειδί API',
+  formFieldLabel__apiKeyDescription: 'Περιγραφή',
+  formFieldLabel__apiKeyExpiration: 'Λήξη',
+  formFieldLabel__apiKeyName: 'Όνομα μυστικού κλειδιού',
   formFieldLabel__automaticInvitations: 'Ενεργοποίηση αυτόματων προσκλήσεων για αυτόν τον τομέα',
   formFieldLabel__backupCode: 'Αντίγραφο ασφαλείας κωδικού',
   formFieldLabel__confirmDeletion: 'Επιβεβαίωση',
@@ -283,7 +290,7 @@ export const elGR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -292,7 +299,7 @@ export const elGR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,
@@ -488,9 +495,11 @@ export const elGR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Δημιουργία Οργανισμού',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Διαχείριση Οργανισμού',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Δεν έχει επιλεγεί οργανισμός',
     personalWorkspace: 'Προσωπικός Χώρος Εργασίας',
@@ -604,6 +613,12 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Ελέγξτε το email σας',
     },
+    emailCodeMfa: {
+      formTitle: 'Ελέγξτε το email σας',
+      resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +654,16 @@ export const elGR: LocalizationResource = {
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
+      resendButton: 'Δεν λάβατε τον σύνδεσμο; Επανάληψη αποστολής',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     forgotPassword: {
       formTitle: 'Επαναφορά κωδικού πρόσβασης',
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
@@ -652,6 +677,8 @@ export const elGR: LocalizationResource = {
       label__alternativeMethods: 'Ή, συνδεθείτε με μια άλλη μέθοδο.',
       title: 'Ξεχάσατε τον κωδικό πρόσβασης;',
     },
+    newDeviceVerificationNotice:
+      'Συνδέεστε από μια νέα συσκευή. Ζητάμε επαλήθευση για να διατηρήσουμε τον λογαριασμό σας ασφαλή.',
     noAvailableMethods: {
       message: 'Δεν είναι δυνατή η σύνδεση. Δεν υπάρχει διαθέσιμος παράγοντας αυθεντικοποίησης.',
       subtitle: 'Προέκυψε σφάλμα',
@@ -761,6 +788,10 @@ export const elGR: LocalizationResource = {
         title: 'Επιτυχής επαλήθευση email',
       },
     },
+    enterpriseConnections: {
+      subtitle: undefined,
+      title: undefined,
+    },
     legalConsent: {
       checkbox: {
         label__onlyPrivacyPolicy: 'Συμφωνώ με την {{ privacyPolicyLink || link("Πολιτική Απορρήτου") }}',
@@ -832,6 +863,14 @@ export const elGR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -865,6 +904,7 @@ export const elGR: LocalizationResource = {
     form_password_validation_failed: 'Λανθασμένος κωδικός',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Το όνομα χρήστη πρέπει να περιέχει τουλάχιστον έναν μη αριθμητικό χαρακτήρα.',
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
     not_allowed_access:
       "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
@@ -937,7 +977,9 @@ export const elGR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Προσθήκη λογαριασμού',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Διαχείριση λογαριασμού',
+    action__openUserMenu: undefined,
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },
@@ -969,7 +1011,7 @@ export const elGR: LocalizationResource = {
         tableHeader__date: undefined,
         tableHeader__status: undefined,
       },
-      paymentSourcesSection: {
+      paymentMethodsSection: {
         actionLabel__default: undefined,
         actionLabel__remove: undefined,
         add: undefined,
@@ -978,7 +1020,7 @@ export const elGR: LocalizationResource = {
         formButtonPrimary__add: undefined,
         formButtonPrimary__pay: undefined,
         payWithTestCardButton: undefined,
-        removeResource: {
+        removeMethod: {
           messageLine1: undefined,
           messageLine2: undefined,
           successMessage: undefined,

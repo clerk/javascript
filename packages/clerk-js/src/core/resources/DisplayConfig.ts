@@ -7,7 +7,7 @@ import type {
   DisplayThemeJSON,
   OAuthStrategy,
   PreferredSignInStrategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource } from './internal';
 
