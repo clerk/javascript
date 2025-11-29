@@ -28,6 +28,7 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
+import { LruMap } from '@/utils/lru-map';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -35,11 +36,32 @@ import {
 } from '@/utils/passkeys';
 import { TokenId } from '@/utils/tokenId';
 
+import { SafeLock } from '../auth/safeLock';
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
+
+/**
+ * Cache of per-tokenId locks for cross-tab coordination.
+ * Each unique tokenId gets its own lock, allowing different token types
+ * (e.g., different orgs, JWT templates) to be fetched in parallel.
+ * Uses LRU eviction to prevent unbounded growth.
+ */
+const tokenLocks = new LruMap<string, ReturnType<typeof SafeLock>>(50);
+
+/**
+ * Gets or creates a cross-tab lock for a specific tokenId.
+ */
+function getTokenLock(tokenId: string) {
+  let lock = tokenLocks.get(tokenId);
+  if (!lock) {
+    lock = SafeLock(`clerk.lock.getToken.${tokenId}`);
+    tokenLocks.set(tokenId, lock);
+  }
+  return lock;
+}
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -363,19 +385,13 @@ export class Session extends BaseResource implements SessionResource {
 
     const tokenId = this.#getCacheId(template, organizationId);
 
+    // Fast path: check cache without lock for immediate hits
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
-      debugLogger.debug(
-        'Using cached token (no fetch needed)',
-        {
-          tokenId,
-        },
-        'session',
-      );
       const cachedToken = await cachedEntry.tokenResolver;
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
@@ -384,39 +400,63 @@ export class Session extends BaseResource implements SessionResource {
       return cachedToken.getRawString() || null;
     }
 
-    debugLogger.info(
-      'Fetching new token from API',
-      {
-        organizationId,
-        template,
-        tokenId,
-      },
-      'session',
-    );
+    // Cache miss: acquire cross-tab lock before fetching to prevent duplicate API calls
+    // when multiple tabs try to refresh the token simultaneously.
+    // Using per-tokenId locks allows different token types to be fetched in parallel.
+    const tokenLock = getTokenLock(tokenId);
+    return tokenLock.acquireLockAndRun(async () => {
+      // Double-check cache after acquiring lock - another tab may have populated it
+      const cachedEntryAfterLock = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
 
-    const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
-
-    // TODO: update template endpoint to accept organizationId
-    const params: Record<string, string | null> = template ? {} : { organizationId };
-
-    const tokenResolver = Token.create(path, params, skipCache);
-
-    // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
-    SessionTokenCache.set({ tokenId, tokenResolver });
-
-    return tokenResolver.then(token => {
-      if (shouldDispatchTokenUpdate) {
-        eventBus.emit(events.TokenUpdate, { token });
-
-        if (token.jwt) {
-          this.lastActiveToken = token;
-          // Emits the updated session with the new token to the state listeners
-          eventBus.emit(events.SessionTokenResolved, null);
+      if (cachedEntryAfterLock) {
+        debugLogger.debug(
+          'Using cached token after lock (populated by another tab)',
+          {
+            tokenId,
+          },
+          'session',
+        );
+        const cachedToken = await cachedEntryAfterLock.tokenResolver;
+        if (shouldDispatchTokenUpdate) {
+          eventBus.emit(events.TokenUpdate, { token: cachedToken });
         }
+        return cachedToken.getRawString() || null;
       }
 
-      // Return null when raw string is empty to indicate that there it's signed-out
-      return token.getRawString() || null;
+      debugLogger.info(
+        'Fetching new token from API',
+        {
+          organizationId,
+          template,
+          tokenId,
+        },
+        'session',
+      );
+
+      const path = template ? `${this.path()}/tokens/${template}` : `${this.path()}/tokens`;
+
+      // TODO: update template endpoint to accept organizationId
+      const params: Record<string, string | null> = template ? {} : { organizationId };
+
+      const tokenResolver = Token.create(path, params, skipCache);
+
+      // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
+      SessionTokenCache.set({ tokenId, tokenResolver });
+
+      return tokenResolver.then(token => {
+        if (shouldDispatchTokenUpdate) {
+          eventBus.emit(events.TokenUpdate, { token });
+
+          if (token.jwt) {
+            this.lastActiveToken = token;
+            // Emits the updated session with the new token to the state listeners
+            eventBus.emit(events.SessionTokenResolved, null);
+          }
+        }
+
+        // Return null when raw string is empty to indicate that there it's signed-out
+        return token.getRawString() || null;
+      });
     });
   }
 
