@@ -126,15 +126,36 @@ export const createUserService = (clerkClient: ClerkClient) => {
       };
     },
     createBapiUser: async fakeUser => {
-      return await clerkClient.users.createUser({
-        emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
-        password: fakeUser.password,
-        firstName: fakeUser.firstName,
-        lastName: fakeUser.lastName,
-        phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
-        username: fakeUser.username,
-        skipPasswordRequirement: fakeUser.password === undefined,
-      });
+      try {
+        return await clerkClient.users.createUser({
+          emailAddress: fakeUser.email !== undefined ? [fakeUser.email] : undefined,
+          firstName: fakeUser.firstName,
+          lastName: fakeUser.lastName,
+          password: fakeUser.password,
+          phoneNumber: fakeUser.phoneNumber !== undefined ? [fakeUser.phoneNumber] : undefined,
+          skipPasswordRequirement: fakeUser.password === undefined,
+          username: fakeUser.username,
+        });
+      } catch (error: unknown) {
+        if (typeof error === 'object' && error !== null && 'status' in error && error.status === 429) {
+          const clerkError = error as {
+            status: number;
+            retryAfter?: number;
+            clerkTraceId?: string;
+            errors?: Array<{ message: string }>;
+          };
+          const details = [
+            `Retry-After: ${clerkError.retryAfter ?? 'not provided'} seconds`,
+            clerkError.clerkTraceId ? `Trace ID: ${clerkError.clerkTraceId}` : null,
+            clerkError.errors?.length > 0 ? `API Errors: ${clerkError.errors.map(e => e.message).join(', ')}` : null,
+          ]
+            .filter(Boolean)
+            .join(' | ');
+
+          throw new Error(`Rate limit exceeded (HTTP 429) during createBapiUser. ${details}`, { cause: error });
+        }
+        throw error;
+      }
     },
     getOrCreateUser: async fakeUser => {
       const existingUser = await self.getUser({ email: fakeUser.email });
@@ -187,13 +208,13 @@ export const createUserService = (clerkClient: ClerkClient) => {
     createFakeOrganization: async userId => {
       const name = faker.animal.dog();
       const organization = await clerkClient.organizations.createOrganization({
-        name: faker.animal.dog(),
         createdBy: userId,
+        name,
       });
       return {
+        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
         name,
         organization,
-        delete: () => clerkClient.organizations.deleteOrganization(organization.id),
       } satisfies FakeOrganization;
     },
     createFakeAPIKey: async (userId: string) => {
