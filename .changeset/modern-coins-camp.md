@@ -5,4 +5,4 @@
 "@clerk/shared": minor
 ---
 
-Export TaskResetPassword components
+Introduce new `<TaskResetPassword/>` session task component
