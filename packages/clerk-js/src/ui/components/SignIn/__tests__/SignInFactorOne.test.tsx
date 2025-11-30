@@ -1077,11 +1077,9 @@ describe('SignInFactorOne', () => {
           status: 422,
         }),
       );
-      const { userEvent, debug } = render(<SignInFactorOne />, { wrapper });
+      const { userEvent } = render(<SignInFactorOne />, { wrapper });
       await userEvent.type(screen.getByLabelText('Password'), '123456');
       await userEvent.click(screen.getByText('Continue'));
-
-      console.log(debug());
 
       await screen.findByText('Password compromised');
       await userEvent.click(screen.getByText('Email code to hello@clerk.com'));
