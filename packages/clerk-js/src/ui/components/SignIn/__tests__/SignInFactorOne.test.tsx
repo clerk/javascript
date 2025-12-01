@@ -369,9 +369,9 @@ describe('SignInFactorOne', () => {
         const errJSON = {
           code: 'form_password_untrusted',
           long_message:
-            "Your appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
           message:
-            "Your appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
           meta: { param_name: 'password' },
         };
 
@@ -387,7 +387,7 @@ describe('SignInFactorOne', () => {
 
         await screen.findByText('Password compromised');
         await screen.findByText(
-          "Your appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
         );
 
         await screen.findByText('Email code to hello@clerk.com');
@@ -410,9 +410,9 @@ describe('SignInFactorOne', () => {
         const errJSON = {
           code: 'form_password_untrusted',
           long_message:
-            "Your appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
           message:
-            "Your appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
           meta: { param_name: 'password' },
         };
 
