@@ -377,6 +377,7 @@ export class Session extends BaseResource implements SessionResource {
     const tokenId = this.#getCacheId(template, organizationId);
 
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
+    // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cachedEntry) {
@@ -422,6 +423,7 @@ export class Session extends BaseResource implements SessionResource {
       const params: Record<string, string | null> = template ? {} : { organizationId };
 
       const tokenResolver = Token.create(path, params, skipCache);
+      // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
       SessionTokenCache.set({ tokenId, tokenResolver });
 
       return tokenResolver.then(token => {
