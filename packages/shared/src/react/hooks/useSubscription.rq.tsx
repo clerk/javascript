@@ -11,6 +11,7 @@ import {
   useUserContext,
 } from '../contexts';
 import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useSubscriptionCacheKeys } from './useSubscription.shared';
 import type { SubscriptionResult, UseSubscriptionParams } from './useSubscription.types';
 
@@ -37,13 +38,18 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
 
   const [queryClient] = useClerkQueryClient();
 
-  const { queryKey, invalidationKey } = useSubscriptionCacheKeys({
+  const { queryKey, invalidationKey, stableKey, authenticated } = useSubscriptionCacheKeys({
     userId: user?.id,
     orgId: organization?.id,
     for: params?.for,
   });
 
   const queriesEnabled = Boolean(user?.id && billingEnabled);
+  useClearQueriesOnSignOut({
+    isSignedOut: user === null,
+    authenticated,
+    stableKeys: stableKey,
+  });
 
   const query = useClerkQuery({
     queryKey,

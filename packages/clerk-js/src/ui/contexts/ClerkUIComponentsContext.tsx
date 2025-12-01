@@ -3,6 +3,7 @@ import type {
   APIKeysProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   UserButtonProps,
   WaitlistProps,
 } from '@clerk/shared/types';
@@ -27,7 +28,11 @@ import {
   UserVerificationContext,
   WaitlistContext,
 } from './components';
-import { TaskChooseOrganizationContext } from './components/SessionTasks';
+import {
+  SessionTasksContext,
+  TaskChooseOrganizationContext,
+  TaskResetPasswordContext,
+} from './components/SessionTasks';
 
 export function ComponentContextProvider({
   componentName,
@@ -123,8 +128,20 @@ export function ComponentContextProvider({
         <TaskChooseOrganizationContext.Provider
           value={{ componentName: 'TaskChooseOrganization', ...(props as TaskChooseOrganizationProps) }}
         >
-          {children}
+          <SessionTasksContext.Provider value={{ ...(props as TaskChooseOrganizationProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
         </TaskChooseOrganizationContext.Provider>
+      );
+    case 'TaskResetPassword':
+      return (
+        <TaskResetPasswordContext.Provider
+          value={{ componentName: 'TaskResetPassword', ...(props as TaskResetPasswordProps) }}
+        >
+          <SessionTasksContext.Provider value={{ ...(props as TaskResetPasswordProps) }}>
+            {children}
+          </SessionTasksContext.Provider>
+        </TaskResetPasswordContext.Provider>
       );
     default:
       throw new Error(`Unknown component context: ${componentName}`);

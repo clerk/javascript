@@ -8,15 +8,31 @@ export const createSessionTaskComponentPageObject = (testArgs: { page: EnhancedP
 
   const self = {
     ...common(testArgs),
-    resolveForceOrganizationSelectionTask: async (fakeOrganization: { name: string; slug: string }) => {
+    resolveForceOrganizationSelectionTask: async (fakeOrganization: { name: string; slug?: string }) => {
       const createOrganizationButton = page.getByRole('button', { name: /continue/i });
 
       await expect(createOrganizationButton).toBeVisible();
 
       await page.locator('input[name=name]').fill(fakeOrganization.name);
-      await page.locator('input[name=slug]').fill(fakeOrganization.slug);
+      if (fakeOrganization.slug) {
+        await page.locator('input[name=slug]').fill(fakeOrganization.slug);
+      }
 
       await createOrganizationButton.click();
+    },
+    resolveResetPasswordTask: async ({
+      newPassword,
+      confirmPassword,
+    }: {
+      newPassword: string;
+      confirmPassword: string;
+    }) => {
+      await page.locator('input[name=newPassword]').fill(newPassword);
+      await page.locator('input[name=confirmPassword]').fill(confirmPassword);
+
+      const resetPasswordButton = page.getByRole('button', { name: /reset password/i });
+      await expect(resetPasswordButton).toBeVisible();
+      await resetPasswordButton.click();
     },
   };
 

@@ -1044,6 +1044,7 @@ export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
+export type TaskResetPasswordTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**

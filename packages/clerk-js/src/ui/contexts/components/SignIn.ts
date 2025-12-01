@@ -37,7 +37,7 @@ export const SignInContext = createContext<SignInCtx | null>(null);
 
 export const useSignInContext = (): SignInContextType => {
   const context = useContext(SignInContext);
-  const { navigate, basePath } = useRouter();
+  const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
@@ -129,7 +129,9 @@ export const useSignInContext = (): SignInContextType => {
     const taskEndpoint = getTaskEndpoint(currentTask);
     const taskNavigationPath = isCombinedFlow ? '/create' + taskEndpoint : taskEndpoint;
 
-    return navigate(`/${basePath + taskNavigationPath}`);
+    // Base path is required for virtual routing with start path
+    // eg: to navigate from /sign-in/factor-one to /sign-in/tasks/choose-organization
+    return navigate(`/${basePath + startPath + taskNavigationPath}`);
   };
 
   const taskUrl = clerk.session?.currentTask

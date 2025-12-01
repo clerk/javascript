@@ -102,7 +102,8 @@ export type FlowMetadata = {
     | 'subscriptionDetails'
     | 'tasks'
     | 'taskChooseOrganization'
-    | 'enableOrganizations';
+    | 'enableOrganizations'
+    | 'taskResetPassword';
   part?:
     | 'start'
     | 'emailCode'

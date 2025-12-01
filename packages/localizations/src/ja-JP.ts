@@ -873,6 +873,14 @@ export const jaJP: LocalizationResource = {
       actionText: '{{identifier}} としてサインイン中',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} はすでにこの組織のメンバーです。',
     captcha_invalid: undefined,

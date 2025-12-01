@@ -2,6 +2,7 @@ import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
 import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { useStatementQueryCacheKeys } from './useStatementQuery.shared';
 import type { StatementQueryResult, UseStatementQueryParams } from './useStatementQuery.types';
 
@@ -17,7 +18,7 @@ function useStatementQuery(params: UseStatementQueryParams = {}): StatementQuery
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;
 
-  const { queryKey } = useStatementQueryCacheKeys({
+  const { queryKey, stableKey, authenticated } = useStatementQueryCacheKeys({
     statementId,
     userId,
     orgId: organizationId,
@@ -27,6 +28,12 @@ function useStatementQuery(params: UseStatementQueryParams = {}): StatementQuery
   const billingEnabled = useBillingHookEnabled(params);
 
   const queryEnabled = Boolean(statementId) && billingEnabled;
+
+  useClearQueriesOnSignOut({
+    isSignedOut: user === null,
+    authenticated,
+    stableKeys: stableKey,
+  });
 
   const query = useClerkQuery({
     queryKey,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ClerkPaginatedResponse } from '../../types';
 import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
@@ -6,9 +6,9 @@ import { useClerkQueryClient } from '../clerk-rq/use-clerk-query-client';
 import { useClerkInfiniteQuery } from '../clerk-rq/useInfiniteQuery';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import type { CacheSetter, ValueOrSetter } from '../types';
+import { useClearQueriesOnSignOut, withInfiniteKey } from './useClearQueriesOnSignOut';
 import type { UsePagesOrInfiniteSignature } from './usePageOrInfinite.types';
 import { useWithSafeValues } from './usePagesOrInfinite.shared';
-import { usePreviousValue } from './usePreviousValue';
 
 export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
   const { fetcher, config, keys } = params;
@@ -98,32 +98,18 @@ export const usePagesOrInfinite: UsePagesOrInfiniteSignature = params => {
     enabled: queriesEnabled && triggerInfinite,
   });
 
-  // Track previous isSignedIn state to detect sign-out transitions
-  const previousIsSignedIn = usePreviousValue(isSignedIn);
-
-  // Detect sign-out and clear queries
-  useEffect(() => {
-    const isNowSignedOut = isSignedIn === false;
-
-    if (previousIsSignedIn && isNowSignedOut) {
-      queryClient.removeQueries({
-        predicate: query => {
-          const [stablePrefix, authenticated] = query.queryKey;
-          return (
-            authenticated === true &&
-            typeof stablePrefix === 'string' &&
-            (stablePrefix === keys.queryKey[0] || stablePrefix === keys.queryKey[0] + '-inf')
-          );
-        },
-      });
-
+  useClearQueriesOnSignOut({
+    isSignedOut: isSignedIn === false,
+    authenticated: keys.authenticated,
+    stableKeys: withInfiniteKey(keys.stableKey),
+    onCleanup: () => {
       // Reset paginated page to initial
       setPaginatedPage(initialPageRef.current);
 
       // Force re-render to reflect cache changes
       void Promise.resolve().then(() => forceUpdate(n => n + 1));
-    }
-  }, [isSignedIn, queryClient, previousIsSignedIn, forceUpdate]);
+    },
+  });
 
   // Compute data, count and page from the same data source to ensure consistency
   const computedValues = useMemo(() => {

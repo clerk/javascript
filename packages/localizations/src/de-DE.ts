@@ -876,6 +876,14 @@ export const deDE: LocalizationResource = {
       actionText: 'Angemeldet als {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
     captcha_invalid:

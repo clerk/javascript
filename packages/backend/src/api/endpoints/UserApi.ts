@@ -447,4 +447,15 @@ export class UserAPI extends AbstractAPI {
       path: joinPaths(basePath, userId, 'totp'),
     });
   }
+
+  public async __experimental_passwordUntrusted(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'password_untrusted'),
+      bodyParams: {
+        revokeAllSessions: false,
+      },
+    });
+  }
 }

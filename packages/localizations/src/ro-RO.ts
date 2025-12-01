@@ -874,6 +874,14 @@ export const roRO: LocalizationResource = {
       actionText: 'Autentificat ca {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
     captcha_invalid: undefined,
