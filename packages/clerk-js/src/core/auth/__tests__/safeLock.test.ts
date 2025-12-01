@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SafeLockReturn } from '../safeLock';
 
 describe('SafeLock', () => {
-  let SafeLock: typeof import('../safeLock').SafeLock;
+  let SafeLock: (key: string) => SafeLockReturn;
   let addEventListenerSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(async () => {
@@ -37,8 +37,8 @@ describe('SafeLock', () => {
 
   describe('Web Locks API path', () => {
     it('uses Web Locks API when available in secure context', async () => {
-      // Skip if Web Locks not available (like in jsdom without polyfill)
-      if (!('locks' in navigator) || !navigator.locks) {
+      // Skip if Web Locks not available or not in secure context
+      if (!('locks' in navigator) || !navigator.locks || !isSecureContext) {
         return;
       }
 
@@ -114,6 +114,62 @@ describe('SafeLock', () => {
       expect(results).toContain('tab1-result');
       expect(results).toContain('tab2-result');
       expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('error handling', () => {
+    it('propagates callback errors without double-invocation', async () => {
+      const originalLocks = navigator.locks;
+      const callbackError = new Error('Callback failed');
+      const callback = vi.fn().mockRejectedValue(callbackError);
+
+      const mockRequest = vi.fn().mockImplementation(async (_name, _options, cb) => {
+        return await cb();
+      });
+
+      Object.defineProperty(navigator, 'locks', {
+        value: { request: mockRequest },
+        configurable: true,
+      });
+
+      try {
+        const lock = SafeLock('test-error-propagation');
+        await expect(lock.acquireLockAndRun(callback)).rejects.toThrow('Callback failed');
+        expect(callback).toHaveBeenCalledTimes(1);
+      } finally {
+        Object.defineProperty(navigator, 'locks', {
+          value: originalLocks,
+          configurable: true,
+        });
+      }
+    });
+
+    it('invokes callback in degraded mode on AbortError (timeout)', async () => {
+      const originalLocks = navigator.locks;
+      const callback = vi.fn().mockResolvedValue('success');
+
+      const abortError = new Error('Lock request aborted');
+      abortError.name = 'AbortError';
+
+      const mockRequest = vi.fn().mockRejectedValue(abortError);
+
+      Object.defineProperty(navigator, 'locks', {
+        value: { request: mockRequest },
+        configurable: true,
+      });
+
+      try {
+        const lock = SafeLock('test-abort-fallback');
+        const result = await lock.acquireLockAndRun(callback);
+
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect(result).toBe('success');
+      } finally {
+        Object.defineProperty(navigator, 'locks', {
+          value: originalLocks,
+          configurable: true,
+        });
+      }
     });
   });
 

@@ -48,9 +48,13 @@ export function SafeLock(key: string): SafeLockReturn {
           clearTimeout(lockTimeout);
           return await cb();
         });
-      } catch {
-        debugLogger.warn('Lock acquisition timed out, proceeding without lock (degraded mode)', { key }, 'safeLock');
-        return await cb();
+      } catch (error) {
+        clearTimeout(lockTimeout);
+        if (error instanceof Error && error.name === 'AbortError') {
+          debugLogger.warn('Lock acquisition timed out, proceeding without lock (degraded mode)', { key }, 'safeLock');
+          return await cb();
+        }
+        throw error;
       }
     }
 
