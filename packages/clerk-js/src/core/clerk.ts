@@ -2732,7 +2732,12 @@ export class Clerk implements ClerkInterface {
       const initEnvironmentPromise = Environment.getInstance()
         .fetch({ touch: shouldTouchEnv })
         .then(res => this.updateEnvironment(res))
-        .catch(() => {
+        .catch(err => {
+          // Let 4xx errors (like dev_browser_unauthenticated) bubble up to be handled by retry logic
+          if (is4xxError(err)) {
+            throw err;
+          }
+
           ++initializationDegradedCounter;
           const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
             CLERK_ENVIRONMENT_STORAGE_ENTRY,
