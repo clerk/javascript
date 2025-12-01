@@ -901,6 +901,7 @@ export const srRS: LocalizationResource = {
       'Ova lozinka je pronađena kao deo kompromitovanih podataka i ne može se koristiti, molimo resetuj svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Tvoja lozinka je premašila maksimalni dozvoljeni broj bajtova, molimo skrati je ili ukloni neke specijalne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Neispravna lozinka',
     form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',

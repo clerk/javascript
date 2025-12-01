@@ -891,6 +891,7 @@ export const heIL: LocalizationResource = {
       'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, אנא בצע איתחול לסיסמה שלך.',
     form_password_size_in_bytes_exceeded:
       'הסיסמה שלך חורגת ממספר הבייטים המרבי המותר, נסה לקצר אותה או להסיר כמה תווים מיוחדים.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'סיסמה שגויה',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

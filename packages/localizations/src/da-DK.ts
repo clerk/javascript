@@ -899,6 +899,7 @@ export const daDK: LocalizationResource = {
     form_password_pwned__sign_in: 'Din adgangskode er blevet kompromitteret, vælg en ny.',
     form_password_size_in_bytes_exceeded:
       'Din adgangskode har overskredet det maksimalt tilladte antal bytes, forkort den eller fjern nogle specialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Forkert adgangskode.',
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',

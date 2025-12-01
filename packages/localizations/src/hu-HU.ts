@@ -902,6 +902,7 @@ export const huHU: LocalizationResource = {
       'Úgy látjuk, hogy ez a jelszó kiszivárgott, ezért ezt nem használhatod, kérlek állítsd át a jelszavad.',
     form_password_size_in_bytes_exceeded:
       'A jelszavad több bájtot tartalmaz mint a megadott maximum, kérlek rövidítsd vagy törölj ki néhány speciális karaktert.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Helytelen jelszó',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

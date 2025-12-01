@@ -18,10 +18,12 @@ import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
+export type PasswordErrorCode = 'untrusted' | 'pwned';
+
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onUntrustedPassword?: (errorCode: string) => void;
+  onPasswordError?: (errorCode: PasswordErrorCode) => void;
 };
 
 const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
@@ -50,7 +52,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick, onUntrustedPassword } = props;
+  const { onShowAlternativeMethodsClick, onPasswordError } = props;
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
   const card = useCardState();
   const { setActive } = useClerk();
@@ -92,16 +94,16 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
-        if (onUntrustedPassword) {
+        if (onPasswordError) {
           if (isPasswordPwnedError(err)) {
             card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
-            onUntrustedPassword('form_password_pwned__sign_in');
+            onPasswordError('pwned');
             return;
           }
 
           if (isPasswordUntrustedError(err)) {
             card.setError({ ...err.errors[0], code: 'form_password_untrusted__sign_in' });
-            onUntrustedPassword('form_password_untrusted__sign_in');
+            onPasswordError('untrusted');
             return;
           }
         }

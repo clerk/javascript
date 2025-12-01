@@ -905,6 +905,7 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo resetirajte svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Vaša lozinka je premašila maksimalni dopušteni broj bajtova, molimo skratite je ili uklonite neke posebne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Netočna lozinka',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

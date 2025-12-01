@@ -907,6 +907,7 @@ export const skSK: LocalizationResource = {
       'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo prekročilo maximálny povolený počet bytov, prosím skráťte ho alebo odstráňte niektoré špeciálne znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávne heslo',
     form_username_invalid_character:
       'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',

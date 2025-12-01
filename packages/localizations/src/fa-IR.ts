@@ -912,6 +912,7 @@ export const faIR: LocalizationResource = {
     form_password_pwned__sign_in:
       'این رمز عبور به عنوان بخشی از یک نقض امنیتی یافت شده و قابل استفاده نیست، لطفاً رمز عبور خود را مجدداً تنظیم کنید.',
     form_password_size_in_bytes_exceeded: 'رمز عبور خیلی طولانی است.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'اعتبارسنجی رمز عبور ناموفق بود.',
     form_username_invalid_character: 'نام کاربری شامل کاراکترهای نامعتبر است.',
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',

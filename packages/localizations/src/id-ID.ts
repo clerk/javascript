@@ -909,6 +909,7 @@ export const idID: LocalizationResource = {
       'Kata sandi ini telah ditemukan sebagai bagian dari kebocoran data dan tidak dapat digunakan, silakan reset kata sandi Anda.',
     form_password_size_in_bytes_exceeded:
       'Kata sandi Anda telah melebihi jumlah byte maksimum yang diizinkan, silakan persingkat atau hapus beberapa karakter khusus.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Kata Sandi Salah',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

@@ -900,6 +900,8 @@ export const enUS: LocalizationResource = {
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in:
+      "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',

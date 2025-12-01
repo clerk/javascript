@@ -20,6 +20,7 @@ import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
 import { SignInFactorOneEnterpriseConnections } from './SignInFactorOneEnterpriseConnections';
 import { SignInFactorOneForgotPasswordCard } from './SignInFactorOneForgotPasswordCard';
 import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
+import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
@@ -44,17 +45,17 @@ const factorKey = (factor: SignInFactor | null | undefined) => {
 
 function determineAlternativeMethodsMode(
   showForgotPasswordStrategies: boolean,
-  untrustedPasswordErrorCode: string | null,
+  passwordErrorCode: PasswordErrorCode | null,
 ): AlternativeMethodsMode {
   if (!showForgotPasswordStrategies) {
     return 'default';
   }
 
-  if (untrustedPasswordErrorCode === 'form_password_pwned__sign_in') {
+  if (passwordErrorCode === 'pwned') {
     return 'pwned';
   }
 
-  if (untrustedPasswordErrorCode === 'form_password_untrusted__sign_in') {
+  if (passwordErrorCode === 'untrusted') {
     return 'passwordUntrusted';
   }
 
@@ -104,7 +105,7 @@ function SignInFactorOneInternal(): JSX.Element {
 
   const [showForgotPasswordStrategies, setShowForgotPasswordStrategies] = React.useState(false);
 
-  const [untrustedPasswordErrorCode, setUntrustedPasswordErrorCode] = React.useState<string | null>(null);
+  const [passwordErrorCode, setPasswordErrorCode] = React.useState<PasswordErrorCode | null>(null);
 
   React.useEffect(() => {
     if (__internal_setActiveInProgress) {
@@ -159,11 +160,11 @@ function SignInFactorOneInternal(): JSX.Element {
     const toggle = showAllStrategies ? toggleAllStrategies : toggleForgotPasswordStrategies;
     const backHandler = () => {
       card.setError(undefined);
-      setUntrustedPasswordErrorCode(null);
+      setPasswordErrorCode(null);
       toggle?.();
     };
 
-    const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, untrustedPasswordErrorCode);
+    const mode = determineAlternativeMethodsMode(showForgotPasswordStrategies, passwordErrorCode);
 
     return (
       <AlternativeMethods
@@ -195,8 +196,8 @@ function SignInFactorOneInternal(): JSX.Element {
         <SignInFactorOnePasswordCard
           onForgotPasswordMethodClick={resetPasswordFactor ? toggleForgotPasswordStrategies : toggleAllStrategies}
           onShowAlternativeMethodsClick={toggleAllStrategies}
-          onUntrustedPassword={errorCode => {
-            setUntrustedPasswordErrorCode(errorCode);
+          onPasswordError={errorCode => {
+            setPasswordErrorCode(errorCode);
             toggleForgotPasswordStrategies();
           }}
         />

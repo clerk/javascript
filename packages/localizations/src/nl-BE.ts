@@ -901,6 +901,7 @@ export const nlBE: LocalizationResource = {
     form_password_pwned__sign_in: 'Als je dit wachtwoord elders gebruikt, moet je het wijzigen.',
     form_password_size_in_bytes_exceeded:
       'Je wachtwoord heeft het maximum aantal bytes overschreden, vermijd speciale tekens.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Wachtwoord is incorrect.',
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
