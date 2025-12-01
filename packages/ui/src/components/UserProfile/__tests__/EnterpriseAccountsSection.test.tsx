@@ -1,4 +1,3 @@
-import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -50,7 +49,7 @@ const withInactiveEnterpriseConnection = createFixtures.config(f => {
         },
         verification: {
           status: 'verified',
-          strategy: 'saml',
+          strategy: 'enterprise_sso',
           verified_at_client: 'foo',
           attempts: 0,
           error: {
@@ -201,7 +200,7 @@ const withSamlEnterpriseConnection = createFixtures.config(f => {
         },
         verification: {
           status: 'verified',
-          strategy: 'saml',
+          strategy: 'enterprise_sso',
           verified_at_client: 'foo',
           attempts: 0,
           error: {

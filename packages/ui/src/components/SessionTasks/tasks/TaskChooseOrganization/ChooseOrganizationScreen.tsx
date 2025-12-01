@@ -7,6 +7,7 @@ import type {
 } from '@clerk/shared/types';
 import React, { useState } from 'react';
 
+import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
 import {
   OrganizationPreviewButton,
   OrganizationPreviewListItem,
@@ -18,13 +19,12 @@ import {
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
 import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
-import { Action, Actions } from '@/ui/elements/Actions';
+import { Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
-import { Add } from '@/ui/icons';
 import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 
@@ -258,16 +258,9 @@ const CreateOrganizationButton = ({
 }: {
   onCreateOrganizationClick: React.MouseEventHandler;
 }) => {
-  const { user } = useUser();
-
-  if (!user?.createOrganizationEnabled) {
-    return null;
-  }
-
   return (
-    <Action
+    <CreateOrganizationAction
       elementDescriptor={descriptors.taskChooseOrganizationCreateOrganizationActionButton}
-      icon={Add}
       label={localizationKeys('taskChooseOrganization.chooseOrganization.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({

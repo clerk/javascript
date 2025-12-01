@@ -27,7 +27,7 @@ export const completeSignUpFlow = ({
   if (signUp.status === 'complete') {
     return handleComplete && handleComplete();
   } else if (signUp.status === 'missing_requirements') {
-    if (signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso')) {
+    if (signUp.missingFields.some(mf => mf === 'enterprise_sso')) {
       return signUp.authenticateWithRedirect({
         strategy: 'enterprise_sso',
         redirectUrl,

@@ -1,4 +1,4 @@
-import type { EnterpriseSSOStrategy, OAuthStrategy, SamlStrategy } from './strategies';
+import type { EnterpriseSSOStrategy, OAuthStrategy } from './strategies';
 
 export type AfterSignOutUrl = {
   /**
@@ -50,9 +50,9 @@ export type AuthenticateWithRedirectParams = {
 
   /**
    * One of the supported OAuth providers you can use to authenticate with, eg 'oauth_google'.
-   * Alternatively `saml` or `enterprise_sso`, to authenticate with Enterprise SSO.
+   * Alternatively `enterprise_sso`, to authenticate with Enterprise SSO.
    */
-  strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
+  strategy: OAuthStrategy | EnterpriseSSOStrategy;
 
   /**
    * Identifier to use for targeting a Enterprise Connection at sign-in

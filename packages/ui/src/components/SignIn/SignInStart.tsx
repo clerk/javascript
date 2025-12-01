@@ -338,10 +338,7 @@ function SignInStartInternal(): JSX.Element {
        * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
        */
       const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (
-        !passwordField ||
-        signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')
-      ) {
+      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
         return signInResource;
       }
       return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
@@ -380,7 +377,7 @@ function SignInStartInternal(): JSX.Element {
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate an enterprise sso flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'saml' || ff.strategy === 'enterprise_sso')) {
+          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
             await authenticateWithEnterpriseSSO();
           }
           break;
