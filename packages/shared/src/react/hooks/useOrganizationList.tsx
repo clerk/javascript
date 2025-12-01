@@ -1,4 +1,3 @@
-import { useAttemptToEnableOrganizations } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   CreateOrganizationParams,
@@ -15,6 +14,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContex
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**

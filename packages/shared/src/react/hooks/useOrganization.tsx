@@ -1,4 +1,4 @@
-import { getCurrentOrganizationMembership, useAttemptToEnableOrganizations } from '../../organization';
+import { getCurrentOrganizationMembership } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   GetDomainsParams,
@@ -20,6 +20,7 @@ import {
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
