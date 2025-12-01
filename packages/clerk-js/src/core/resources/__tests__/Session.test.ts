@@ -428,12 +428,6 @@ describe('Session', () => {
     });
 
     it('uses cache populated by another source during lock wait (simulates cross-tab)', async () => {
-      // This test simulates the cross-tab scenario where:
-      // 1. Tab 2 tries to get a token (cache miss)
-      // 2. While waiting for the lock, Tab 1 broadcasts a fresh token via BroadcastChannel
-      // 3. Tab 2 acquires the lock and double-checks the cache
-      // 4. Tab 2 should use the cached token instead of making an API call
-
       BaseResource.clerk = clerkMock();
 
       const session = new Session({
@@ -450,14 +444,12 @@ describe('Session', () => {
       const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
       requestSpy.mockClear();
 
-      // First call populates the cache
       const token1 = await session.getToken();
       expect(requestSpy).toHaveBeenCalledTimes(1);
       expect(token1).toEqual(mockJwt);
 
       requestSpy.mockClear();
 
-      // Second call should hit the cache (simulating what Tab 2 would see after broadcast)
       const token2 = await session.getToken();
       expect(requestSpy).toHaveBeenCalledTimes(0);
       expect(token2).toEqual(mockJwt);
@@ -478,13 +470,11 @@ describe('Session', () => {
         updated_at: new Date().getTime(),
       } as SessionJSON);
 
-      // Cache is hydrated from lastActiveToken
       expect(SessionTokenCache.size()).toBe(1);
 
       const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
       requestSpy.mockClear();
 
-      // With skipCache, should bypass cache and make API call
       const token = await session.getToken({ skipCache: true });
 
       expect(requestSpy).toHaveBeenCalledTimes(1);

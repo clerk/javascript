@@ -4,9 +4,7 @@ const INTERVAL_IN_MS = 5 * 1_000;
 
 /**
  * Polls for session token refresh at regular intervals.
- *
- * Note: Cross-tab coordination is handled within Session.getToken() itself,
- * so this poller simply triggers the refresh callback without additional locking.
+ * Cross-tab coordination is handled within Session.getToken().
  */
 export class SessionCookiePoller {
   private workerTimers = createWorkerTimers();

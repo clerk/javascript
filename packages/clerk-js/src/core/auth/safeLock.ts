@@ -4,10 +4,6 @@ import { debugLogger } from '@/utils/debug';
 
 const LOCK_TIMEOUT_MS = 4999;
 
-/**
- * Module-level tracking of active locks for cleanup on page unload.
- * This ensures we only register one beforeunload listener regardless of how many locks are created.
- */
 const activeLocks = new Map<string, Lock>();
 let cleanupListenerRegistered = false;
 
@@ -17,9 +13,6 @@ function registerCleanupListener() {
   }
   cleanupListenerRegistered = true;
 
-  // Release all held locks when the tab is closing to prevent deadlocks.
-  // Note: beforeunload handlers should be synchronous; async operations may not complete.
-  // We fire-and-forget the release - best effort cleanup.
   window.addEventListener('beforeunload', () => {
     activeLocks.forEach((lock, key) => {
       void lock.releaseLock(key);
@@ -42,15 +35,9 @@ export interface SafeLockReturn {
 export function SafeLock(key: string): SafeLockReturn {
   const lock = new Lock();
 
-  // Track this lock for cleanup on page unload
   activeLocks.set(key, lock);
   registerCleanupListener();
 
-  /**
-   * Acquires the cross-tab lock and executes the callback while holding it.
-   * If lock acquisition fails or times out, executes the callback anyway (degraded mode)
-   * to ensure the operation completes rather than failing.
-   */
   const acquireLockAndRun = async <T>(cb: () => Promise<T>): Promise<T> => {
     if ('locks' in navigator && isSecureContext) {
       const controller = new AbortController();
@@ -62,14 +49,11 @@ export function SafeLock(key: string): SafeLockReturn {
           return await cb();
         });
       } catch {
-        // Lock request was aborted (timeout) or failed
-        // Execute callback anyway in degraded mode to ensure operation completes
         debugLogger.warn('Lock acquisition timed out, proceeding without lock (degraded mode)', { key }, 'safeLock');
         return await cb();
       }
     }
 
-    // Fallback for non-secure contexts using localStorage-based locking
     if (await lock.acquireLock(key, LOCK_TIMEOUT_MS + 1)) {
       try {
         return await cb();
@@ -78,7 +62,6 @@ export function SafeLock(key: string): SafeLockReturn {
       }
     }
 
-    // Lock acquisition timed out - execute callback anyway in degraded mode
     debugLogger.warn('Lock acquisition timed out, proceeding without lock (degraded mode)', { key }, 'safeLock');
     return await cb();
   };
