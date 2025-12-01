@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { __experimental_PaymentElement, __experimental_PaymentElementProvider } from '../billing/payment-element';
-import { ClerkInstanceContext, OptionsContext, OrganizationProvider, UserContext } from '../contexts';
+import { ClerkInstanceContext, OptionsContext } from '../contexts';
 
 // Mock the Stripe components
 vi.mock('../stripe-react', () => ({
@@ -186,11 +186,6 @@ describe('PaymentElement Localization', () => {
     },
   };
 
-  const mockUser = {
-    id: 'user_123',
-    initializePaymentMethod: mockInitializePaymentMethod,
-  };
-
   const renderWithLocale = (locale: string) => {
     // Mock the __internal_getOption to return the expected localization
     mockGetOption.mockImplementation(key => {
@@ -206,15 +201,11 @@ describe('PaymentElement Localization', () => {
 
     return render(
       <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
-        <UserContext.Provider value={{ value: mockUser as any }}>
-          <OrganizationProvider organization={null}>
-            <OptionsContext.Provider value={options}>
-              <__experimental_PaymentElementProvider checkout={mockCheckout}>
-                <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-              </__experimental_PaymentElementProvider>
-            </OptionsContext.Provider>
-          </OrganizationProvider>
-        </UserContext.Provider>
+        <OptionsContext.Provider value={options}>
+          <__experimental_PaymentElementProvider checkout={mockCheckout}>
+            <__experimental_PaymentElement fallback={<div>Loading...</div>} />
+          </__experimental_PaymentElementProvider>
+        </OptionsContext.Provider>
       </ClerkInstanceContext.Provider>,
     );
   };
@@ -239,15 +230,11 @@ describe('PaymentElement Localization', () => {
 
     render(
       <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
-        <UserContext.Provider value={{ value: mockUser as any }}>
-          <OrganizationProvider organization={null}>
-            <OptionsContext.Provider value={options}>
-              <__experimental_PaymentElementProvider checkout={mockCheckout}>
-                <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-              </__experimental_PaymentElementProvider>
-            </OptionsContext.Provider>
-          </OrganizationProvider>
-        </UserContext.Provider>
+        <OptionsContext.Provider value={options}>
+          <__experimental_PaymentElementProvider checkout={mockCheckout}>
+            <__experimental_PaymentElement fallback={<div>Loading...</div>} />
+          </__experimental_PaymentElementProvider>
+        </OptionsContext.Provider>
       </ClerkInstanceContext.Provider>,
     );
 
@@ -281,15 +268,11 @@ describe('PaymentElement Localization', () => {
 
       const { unmount } = render(
         <ClerkInstanceContext.Provider value={{ value: mockClerk as any }}>
-          <UserContext.Provider value={{ value: mockUser as any }}>
-            <OrganizationProvider organization={null}>
-              <OptionsContext.Provider value={options}>
-                <__experimental_PaymentElementProvider checkout={mockCheckout}>
-                  <__experimental_PaymentElement fallback={<div>Loading...</div>} />
-                </__experimental_PaymentElementProvider>
-              </OptionsContext.Provider>
-            </OrganizationProvider>
-          </UserContext.Provider>
+          <OptionsContext.Provider value={options}>
+            <__experimental_PaymentElementProvider checkout={mockCheckout}>
+              <__experimental_PaymentElement fallback={<div>Loading...</div>} />
+            </__experimental_PaymentElementProvider>
+          </OptionsContext.Provider>
         </ClerkInstanceContext.Provider>,
       );
 

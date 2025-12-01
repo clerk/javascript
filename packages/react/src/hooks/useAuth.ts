@@ -9,8 +9,8 @@ import type {
   UseAuthReturn,
 } from '@clerk/shared/types';
 import { useCallback } from 'react';
-import { useAuthState } from 'src/contexts/AuthContext';
 
+import { useAuthState } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
