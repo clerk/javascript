@@ -5,6 +5,33 @@ import { debugLogger } from '@/utils/debug';
 const LOCK_TIMEOUT_MS = 4999;
 
 /**
+ * Module-level tracking of active locks for cleanup on page unload.
+ * This ensures we only register one beforeunload listener regardless of how many locks are created.
+ */
+const activeLocks = new Map<string, Lock>();
+let cleanupListenerRegistered = false;
+
+function registerCleanupListener() {
+  if (cleanupListenerRegistered) {
+    return;
+  }
+  cleanupListenerRegistered = true;
+
+  // Release all held locks when the tab is closing to prevent deadlocks.
+  // Note: beforeunload handlers should be synchronous; async operations may not complete.
+  // We fire-and-forget the release - best effort cleanup.
+  window.addEventListener('beforeunload', () => {
+    activeLocks.forEach((lock, key) => {
+      void lock.releaseLock(key);
+    });
+  });
+}
+
+export interface SafeLockReturn {
+  acquireLockAndRun: <T>(cb: () => Promise<T>) => Promise<T>;
+}
+
+/**
  * Creates a cross-tab lock for coordinating exclusive operations across browser tabs.
  *
  * Uses Web Locks API in secure contexts (HTTPS), falling back to browser-tabs-lock
@@ -12,14 +39,12 @@ const LOCK_TIMEOUT_MS = 4999;
  *
  * @param key - Unique identifier for the lock (same key = same lock across all tabs)
  */
-export function SafeLock(key: string) {
+export function SafeLock(key: string): SafeLockReturn {
   const lock = new Lock();
 
-  // Release any held locks when the tab is closing to prevent deadlocks
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  window.addEventListener('beforeunload', async () => {
-    await lock.releaseLock(key);
-  });
+  // Track this lock for cleanup on page unload
+  activeLocks.set(key, lock);
+  registerCleanupListener();
 
   /**
    * Acquires the cross-tab lock and executes the callback while holding it.

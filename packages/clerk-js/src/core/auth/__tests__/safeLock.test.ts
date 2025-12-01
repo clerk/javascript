@@ -1,9 +1,22 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { SafeLockReturn } from '../safeLock';
-import { SafeLock } from '../safeLock';
 
 describe('SafeLock', () => {
+  let SafeLock: typeof import('../safeLock').SafeLock;
+  let addEventListenerSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(async () => {
+    vi.resetModules();
+    const module = await import('../safeLock');
+    SafeLock = module.SafeLock;
+    addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+  });
+
+  afterEach(() => {
+    addEventListenerSpy.mockRestore();
+  });
+
   describe('interface contract', () => {
     it('returns SafeLockReturn interface with acquireLockAndRun method', () => {
       const lock = SafeLock('test-interface');
@@ -101,6 +114,37 @@ describe('SafeLock', () => {
       expect(results).toContain('tab1-result');
       expect(results).toContain('tab2-result');
       expect(sharedLock.acquireLockAndRun).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('beforeunload listener consolidation', () => {
+    it('registers only one beforeunload listener regardless of lock count', () => {
+      const beforeUnloadCalls = addEventListenerSpy.mock.calls.filter(call => call[0] === 'beforeunload');
+      expect(beforeUnloadCalls).toHaveLength(0);
+
+      SafeLock('lock-1');
+      SafeLock('lock-2');
+      SafeLock('lock-3');
+
+      const afterCalls = addEventListenerSpy.mock.calls.filter(call => call[0] === 'beforeunload');
+      expect(afterCalls).toHaveLength(1);
+    });
+
+    it('fresh module import starts with clean state', async () => {
+      // First module instance
+      SafeLock('lock-a');
+      expect(addEventListenerSpy.mock.calls.filter(call => call[0] === 'beforeunload')).toHaveLength(1);
+
+      // Reset and get fresh module
+      vi.resetModules();
+      addEventListenerSpy.mockRestore();
+      addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+      const freshModule = await import('../safeLock');
+
+      // Fresh module should register its own listener
+      freshModule.SafeLock('lock-b');
+      expect(addEventListenerSpy.mock.calls.filter(call => call[0] === 'beforeunload')).toHaveLength(1);
     });
   });
 });
