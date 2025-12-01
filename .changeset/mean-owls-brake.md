@@ -9,7 +9,6 @@
 "@clerk/nuxt": major
 "@clerk/tanstack-react-start": major
 "@clerk/testing": major
-"@clerk/themes": major
 "@clerk/upgrade": major
 "@clerk/vue": major
 ---
