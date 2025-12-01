@@ -1,6 +1,6 @@
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
-import { getTaskEndpoint, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { SessionResource } from '@clerk/shared/types';

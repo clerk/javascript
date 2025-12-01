@@ -97,7 +97,7 @@ const TaskResetPasswordInternal = () => {
             await navigateOnSetActive?.({ session, redirectUrlComplete });
           },
         });
-      } catch (e) {
+      } catch (e: any) {
         return handleError(e, [passwordField, confirmField], card.setError);
       }
     });

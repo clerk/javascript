@@ -1,7 +1,7 @@
+import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import type { SessionResource } from '@clerk/shared/types';
 import { createContext, useContext } from 'react';
 
-import { getTaskEndpoint } from '@/core/sessionTasks';
 import { useRouter } from '@/ui/router';
 
 import type { SessionTasksCtx, TaskChooseOrganizationCtx, TaskResetPasswordCtx } from '../../types';
