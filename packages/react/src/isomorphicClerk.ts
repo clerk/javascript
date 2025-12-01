@@ -1223,7 +1223,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  __experimental_mountTaskResetPassword = (node: HTMLDivElement, props?: TaskResetPasswordProps): void => {
+  mountTaskResetPassword = (node: HTMLDivElement, props?: TaskResetPasswordProps): void => {
     if (this.clerkjs && this.loaded) {
       this.clerkjs.mountTaskResetPassword(node, props);
     } else {
