@@ -3,8 +3,8 @@ import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
-  ClientResource,
   ClerkOptions,
+  ClientResource,
   InitialState,
   IsomorphicClerkOptions,
   MultiDomainAndOrProxy,
@@ -17,7 +17,6 @@ import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
-
 declare global {
   interface Window {
     __unstable_ClerkUiCtor?: ClerkUiConstructor;
