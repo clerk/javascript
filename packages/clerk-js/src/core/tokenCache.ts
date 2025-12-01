@@ -68,12 +68,13 @@ export interface TokenCache {
   close(): void;
 
   /**
-   * Retrieves a cached token entry if it exists and has not expired.
+   * Retrieves a cached token entry if it exists and is safe to use.
    * Implements stale-while-revalidate: returns valid tokens immediately and signals when background refresh is needed.
+   * Forces synchronous refresh if token has less than one poller interval remaining.
    *
    * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   * @param leeway - Seconds before expiration to trigger background refresh (default: 10s). Minimum is the poller interval.
-   * @returns Result with entry and refresh flag, or undefined if token doesn't exist or is expired
+   * @param leeway - Seconds before expiration to trigger background refresh (default: 10s). Minimum is 15s.
+   * @returns Result with entry and refresh flag, or undefined if token is missing/expired/too close to expiration
    */
   get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheGetResult | undefined;
 
@@ -96,9 +97,12 @@ export interface TokenCache {
 const KEY_PREFIX = 'clerk';
 const DELIMITER = '::';
 const DEFAULT_LEEWAY = 10;
-// Minimum remaining TTL (in seconds) before forcing a synchronous refresh.
-// Uses the poller interval to ensure the poller has time to refresh before expiration.
-const MIN_REMAINING_TTL_IN_SECONDS = POLLER_INTERVAL_IN_MS / 1000;
+
+/**
+ * Conservative threshold accounting for timer jitter, SafeLock contention (~5s),
+ * network latency, and tolerance for missed poller ticks.
+ */
+const MIN_REMAINING_TTL_IN_SECONDS = 15;
 
 const BROADCAST = { broadcast: true };
 const NO_BROADCAST = { broadcast: false };
@@ -204,8 +208,8 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     const elapsed = nowSeconds - value.createdAt;
     const remainingTtl = (value.expiresIn ?? Infinity) - elapsed;
 
-    // Token is actually expired - remove it and don't return
-    if (remainingTtl <= 0) {
+    // Token expired or dangerously close to expiration - force synchronous refresh
+    if (remainingTtl <= POLLER_INTERVAL_IN_MS / 1000) {
       if (value.timeoutId !== undefined) {
         clearTimeout(value.timeoutId);
       }
@@ -213,7 +217,6 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       return;
     }
 
-    // Use the larger of: caller's requested leeway or minimum needed for poller.
     const effectiveLeeway = Math.max(leeway, MIN_REMAINING_TTL_IN_SECONDS);
 
     // Token is valid but expiring soon - signal for background refresh

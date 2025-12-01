@@ -652,7 +652,7 @@ describe('SessionTokenCache', () => {
       expect(result?.needsRefresh).toBe(true);
     });
 
-    it('enforces minimum 5 second leeway even when leeway is set to 0', async () => {
+    it('enforces minimum 15 second threshold even when leeway is set to 0', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
@@ -668,21 +668,166 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      // At 54s elapsed, 6s remaining - still fresh with min 5s leeway
-      vi.advanceTimersByTime(54 * 1000);
+      // 16s remaining (above 15s threshold)
+      vi.advanceTimersByTime(44 * 1000);
       let result = SessionTokenCache.get(key, 0);
       expect(result?.entry.tokenId).toBe('zero-leeway-token');
       expect(result?.needsRefresh).toBe(false);
 
-      // At 56s elapsed, 4s remaining (< 5s min leeway) - needs refresh
+      // 14s remaining (below 15s threshold)
       vi.advanceTimersByTime(2 * 1000);
       result = SessionTokenCache.get(key, 0);
       expect(result?.entry.tokenId).toBe('zero-leeway-token');
       expect(result?.needsRefresh).toBe(true);
 
-      // At 60s elapsed, 0s remaining - actually expired
-      vi.advanceTimersByTime(4 * 1000);
+      // 0s remaining (expired)
+      vi.advanceTimersByTime(14 * 1000);
       result = SessionTokenCache.get(key, 0);
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('conservative threshold behavior', () => {
+    it('returns needsRefresh=false when TTL is comfortably above 15s threshold', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'above-threshold-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'above-threshold-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // 60s remaining
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('above-threshold-token');
+      expect(result?.needsRefresh).toBe(false);
+
+      // 20s remaining
+      vi.advanceTimersByTime(40 * 1000);
+      result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('above-threshold-token');
+      expect(result?.needsRefresh).toBe(false);
+    });
+
+    it('returns needsRefresh=true when TTL drops just below 15s threshold', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'below-threshold-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'below-threshold-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // 16s remaining
+      vi.advanceTimersByTime(44 * 1000);
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('below-threshold-token');
+      expect(result?.needsRefresh).toBe(false);
+
+      // 14s remaining
+      vi.advanceTimersByTime(2 * 1000);
+      result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('below-threshold-token');
+      expect(result?.needsRefresh).toBe(true);
+    });
+
+    it('uses caller leeway when larger than 15s threshold', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'large-leeway-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'large-leeway-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // 21s remaining (leeway=20s)
+      vi.advanceTimersByTime(39 * 1000);
+      let result = SessionTokenCache.get(key, 20);
+      expect(result?.entry.tokenId).toBe('large-leeway-token');
+      expect(result?.needsRefresh).toBe(false);
+
+      // 19s remaining (leeway=20s)
+      vi.advanceTimersByTime(2 * 1000);
+      result = SessionTokenCache.get(key, 20);
+      expect(result?.entry.tokenId).toBe('large-leeway-token');
+      expect(result?.needsRefresh).toBe(true);
+    });
+
+    it('ignores caller leeway when smaller than 15s threshold', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'small-leeway-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'small-leeway-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // 16s remaining (leeway=5s, but min threshold is 15s)
+      vi.advanceTimersByTime(44 * 1000);
+      let result = SessionTokenCache.get(key, 5);
+      expect(result?.entry.tokenId).toBe('small-leeway-token');
+      expect(result?.needsRefresh).toBe(false);
+
+      // 14s remaining
+      vi.advanceTimersByTime(2 * 1000);
+      result = SessionTokenCache.get(key, 5);
+      expect(result?.entry.tokenId).toBe('small-leeway-token');
+      expect(result?.needsRefresh).toBe(true);
+    });
+
+    it('forces synchronous refresh when token has less than poller interval remaining', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'hard-cutoff-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'hard-cutoff-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // 6s remaining (just above 5s cutoff)
+      vi.advanceTimersByTime(54 * 1000);
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.tokenId).toBe('hard-cutoff-token');
+      expect(result?.needsRefresh).toBe(true);
+
+      // 4s remaining (below 5s cutoff) - forces sync refresh
+      vi.advanceTimersByTime(2 * 1000);
+      result = SessionTokenCache.get(key);
       expect(result).toBeUndefined();
     });
   });
