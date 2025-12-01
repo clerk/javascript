@@ -1,17 +1,17 @@
 import { describe, expect, test, vi } from 'vitest';
 
-import * as retryModule from '../../retry';
-import { safeImport } from '../index';
+import * as retryModule from '../retry';
+import { safeImport } from '../safeImport';
 
 describe('safeImport', () => {
   test('calls retry with correct configuration', async () => {
     const retrySpy = vi.spyOn(retryModule, 'retry');
-    const testModule = './test-module';
+    const mockImportFn = vi.fn(() => Promise.resolve({ default: 'test' }));
 
     try {
-      await safeImport(testModule);
+      await safeImport(mockImportFn);
     } catch {
-      // Ignore import errors since we're just testing the retry configuration
+      // Ignore errors since we're just testing the retry configuration
     }
 
     expect(retrySpy).toHaveBeenCalledWith(
@@ -32,7 +32,8 @@ describe('safeImport', () => {
     // Mock the retry to immediately return our mock module
     const retrySpy = vi.spyOn(retryModule, 'retry').mockResolvedValueOnce(mockModule);
 
-    const result = await safeImport('./test-module');
+    const mockImportFn = vi.fn(() => Promise.resolve(mockModule));
+    const result = await safeImport(mockImportFn);
 
     expect(result).toBe(mockModule);
     expect(retrySpy).toHaveBeenCalledTimes(1);
@@ -46,7 +47,8 @@ describe('safeImport', () => {
     // Mock retry to reject with our error
     const retrySpy = vi.spyOn(retryModule, 'retry').mockRejectedValueOnce(importError);
 
-    await expect(safeImport('./non-existent-module')).rejects.toThrow('Module not found');
+    const mockImportFn = vi.fn(() => Promise.reject(importError));
+    await expect(safeImport(mockImportFn)).rejects.toThrow('Module not found');
 
     retrySpy.mockRestore();
   });
@@ -54,8 +56,9 @@ describe('safeImport', () => {
   test('configures shouldRetry to allow up to 3 retries', async () => {
     const retrySpy = vi.spyOn(retryModule, 'retry');
 
+    const mockImportFn = vi.fn(() => Promise.resolve({ default: 'test' }));
     try {
-      await safeImport('./test-module');
+      await safeImport(mockImportFn);
     } catch {
       // Ignore errors
     }

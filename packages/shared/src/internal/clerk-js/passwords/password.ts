@@ -1,5 +1,6 @@
-import type { PasswordSettingsData, PasswordValidation, ValidatePasswordCallbacks, ZxcvbnResult } from '../../../types';
-import { noop } from '../../../utils';
+import type { PasswordSettingsData, PasswordValidation, ValidatePasswordCallbacks, ZxcvbnResult } from '@/types';
+import { noop } from '@/utils';
+
 import { createValidateComplexity } from './complexity';
 import { createValidatePasswordStrength } from './strength';
 

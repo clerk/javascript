@@ -80,16 +80,6 @@
         "default": "./dist/runtime/ui/index.js"
       }
     },
-    "./import": {
-      "import": {
-        "types": "./dist/runtime/import/index.d.mts",
-        "default": "./dist/runtime/import/index.mjs"
-      },
-      "require": {
-        "types": "./dist/runtime/import/index.d.ts",
-        "default": "./dist/runtime/import/index.js"
-      }
-    },
     "./types": {
       "import": {
         "types": "./dist/types/index.d.mts",
@@ -141,11 +131,15 @@
     "swr": "2.3.4"
   },
   "devDependencies": {
+    "@base-org/account": "catalog:module-manager",
+    "@coinbase/wallet-sdk": "catalog:module-manager",
     "@stripe/react-stripe-js": "3.1.1",
     "@stripe/stripe-js": "5.6.0",
     "@tanstack/query-core": "5.87.4",
     "@types/glob-to-regexp": "0.4.4",
     "@types/js-cookie": "3.0.6",
+    "@zxcvbn-ts/core": "catalog:module-manager",
+    "@zxcvbn-ts/language-common": "catalog:module-manager",
     "cross-fetch": "^4.1.0",
     "rolldown": "catalog:repo"
   },

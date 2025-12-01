@@ -40,6 +40,11 @@ function HookAliasPlugin() {
 
 export default defineConfig({
   plugins: [HookAliasPlugin()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     watch: false,
     typecheck: {

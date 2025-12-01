@@ -35,6 +35,7 @@ const copyStyles = (iframe: HTMLIFrameElement, selector = '[data-emotion=cl-inte
   if (!iframe.contentDocument) {
     return;
   }
+  // @ts-ignore - noop
   const allStyleText = [...document.head.querySelectorAll(selector)].map(a => a.innerHTML).join('\n');
   const styleEl = iframe.contentDocument.createElement('style');
   styleEl.innerHTML = allStyleText;

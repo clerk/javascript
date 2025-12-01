@@ -2,7 +2,11 @@ import { act, render, renderHook, screen, waitFor } from '@testing-library/react
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { BillingPlanResource } from '@/types/billing';
+
+import { usePlans } from '../usePlans';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
+import { wrapper } from './wrapper';
 
 const mockUser: any = createMockUser();
 const mockOrganization: any = createMockOrganization();
@@ -35,10 +39,6 @@ vi.mock('../../contexts', () => {
     useOrganizationContext: () => ({ organization: mockClerk.loaded ? mockOrganization : null }),
   };
 });
-
-import type { BillingPlanResource } from '../../../types/billing';
-import { usePlans } from '../usePlans';
-import { wrapper } from './wrapper';
 
 describe('usePlans', () => {
   beforeEach(() => {

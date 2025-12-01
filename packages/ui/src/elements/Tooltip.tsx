@@ -1,4 +1,4 @@
-import type { Placement } from '@floating-ui/react';
+import type { Placement, UseFloatingReturn, UseInteractionsReturn } from '@floating-ui/react';
 import {
   autoUpdate,
   flip,
@@ -27,12 +27,19 @@ interface TooltipOptions {
   onOpenChange?: (open: boolean) => void;
 }
 
+interface UseTooltipReturn extends UseFloatingReturn, UseInteractionsReturn {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  isMounted: boolean;
+  transitionStyles: React.CSSProperties;
+}
+
 export function useTooltip({
   initialOpen = false,
   placement = 'top',
   open: controlledOpen,
   onOpenChange: setControlledOpen,
-}: TooltipOptions = {}) {
+}: TooltipOptions = {}): UseTooltipReturn {
   const [uncontrolledOpen, setUncontrolledOpen] = React.useState(initialOpen);
 
   const open = controlledOpen ?? uncontrolledOpen;
@@ -103,11 +110,11 @@ export function useTooltip({
   );
 }
 
-type ContextType = ReturnType<typeof useTooltip> | null;
+type ContextType = UseTooltipReturn | null;
 
 const TooltipContext = React.createContext<ContextType>(null);
 
-export const useTooltipContext = () => {
+export const useTooltipContext = (): UseTooltipReturn => {
   const context = React.useContext(TooltipContext);
 
   if (context == null) {

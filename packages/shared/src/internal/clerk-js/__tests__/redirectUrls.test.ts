@@ -1,7 +1,8 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 
-import type { RedirectOptions } from '../../../types';
-import { snakeToCamel } from '../../../underscore';
+import type { RedirectOptions } from '@/types';
+import { snakeToCamel } from '@/underscore';
+
 import { RedirectUrls } from '../redirectUrls';
 
 const oldWindowLocation = window.location;
