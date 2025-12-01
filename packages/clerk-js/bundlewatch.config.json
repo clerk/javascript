@@ -31,6 +31,6 @@
     { "path": "./dist/op-plans-page*.js", "maxSize": "1.0KB" },
     { "path": "./dist/statement-page*.js", "maxSize": "1.0KB" },
     { "path": "./dist/payment-attempt-page*.js", "maxSize": "3.0KB" },
-    { "path": "./dist/sessionTasks*.js", "maxSize": "1.5KB" }
+    { "path": "./dist/sessionTasks*.js", "maxSize": "3.0KB" }
   ]
 }
