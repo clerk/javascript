@@ -1,5 +1,4 @@
 import { ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
-import * as localStorageModule from '../../utils/localStorage';
 import type {
   ActiveSessionResource,
   PendingSessionResource,
@@ -14,6 +13,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test,
 import { mockJwt } from '@/test/core-fixtures';
 
 import { mockNativeRuntime } from '../../test/utils';
+import * as localStorageModule from '../../utils/localStorage';
 import { AuthCookieService } from '../auth/AuthCookieService';
 import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
@@ -289,14 +289,9 @@ describe('Clerk singleton', () => {
         .spyOn(AuthCookieService, 'create')
         .mockResolvedValue(mockAuthService as unknown as AuthCookieService);
 
-      const localStorageSpy = vi
-        .spyOn(localStorageModule.SafeLocalStorage, 'getItem')
-        .mockReturnValue(null);
+      const localStorageSpy = vi.spyOn(localStorageModule.SafeLocalStorage, 'getItem').mockReturnValue(null);
 
-      mockEnvironmentFetch
-        .mockReset()
-        .mockRejectedValueOnce(new Error('Network error'))
-        .mockResolvedValue({});
+      mockEnvironmentFetch.mockReset().mockRejectedValueOnce(new Error('Network error')).mockResolvedValue({});
 
       const componentControls = createMockComponentControls();
       const mountSpy = vi.fn<NonNullable<typeof Clerk.mountComponentRenderer>>().mockReturnValue(componentControls);
