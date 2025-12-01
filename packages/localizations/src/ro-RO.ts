@@ -874,6 +874,14 @@ export const roRO: LocalizationResource = {
       actionText: 'Autentificat ca {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
     captcha_invalid: undefined,
@@ -907,6 +915,8 @@ export const roRO: LocalizationResource = {
     form_username_invalid_character: undefined,
     form_username_invalid_length:
       'Numele de utilizator trebuie să aibă între {{min_length}} și {{max_length}} caractere.',
+    form_username_needs_non_number_char:
+      'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

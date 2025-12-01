@@ -854,6 +854,14 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -886,6 +894,7 @@ export const koKR: LocalizationResource = {
     form_password_validation_failed: '잘못된 비밀번호',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '사용자 이름에는 숫자가 아닌 문자가 하나 이상 포함되어야 합니다.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "이메일 주소 또는 전화번호는 가입에 사용할 수 없습니다. 이는 '+', '=', '#' 또는 '.'이 이메일 주소에 사용되었거나 임시 이메일 서비스에 연결된 도메인이 사용되었거나 명시적 제외가 있는 경우입니다. 이 오류가 발생한 경우 지원에 문의하세요.",

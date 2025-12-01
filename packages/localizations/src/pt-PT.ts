@@ -859,6 +859,14 @@ export const ptPT: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
     captcha_invalid:
@@ -893,6 +901,7 @@ export const ptPT: LocalizationResource = {
     form_password_validation_failed: 'Falha na validação da palavra-passe.',
     form_username_invalid_character: 'O nome de utilizador contém caracteres inválidos.',
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
+    form_username_needs_non_number_char: 'O seu nome de utilizador deve conter pelo menos um caractere não numérico.',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",

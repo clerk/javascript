@@ -862,6 +862,14 @@ export const thTH: LocalizationResource = {
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
     captcha_invalid: undefined,
@@ -894,6 +902,7 @@ export const thTH: LocalizationResource = {
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
+    form_username_needs_non_number_char: 'ชื่อผู้ใช้ของคุณต้องมีอักขระที่ไม่ใช่ตัวเลขอย่างน้อยหนึ่งตัว',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

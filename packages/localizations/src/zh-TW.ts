@@ -849,6 +849,14 @@ export const zhTW: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
@@ -878,6 +886,7 @@ export const zhTW: LocalizationResource = {
     form_password_validation_failed: '密碼驗證失敗',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '您的使用者名稱必須包含至少一個非數字字元。',
     identification_deletion_failed: '您無法刪除最後一個驗證方式。',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

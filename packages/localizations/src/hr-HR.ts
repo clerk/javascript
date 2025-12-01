@@ -863,6 +863,14 @@ export const hrHR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     captcha_invalid:
@@ -897,6 +905,7 @@ export const hrHR: LocalizationResource = {
     form_password_validation_failed: 'Netočna lozinka',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Vaše korisničko ime mora sadržavati najmanje jedan nebrojčani znak.',
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",

@@ -868,6 +868,14 @@ export const esCR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
     captcha_invalid:
@@ -902,6 +910,7 @@ export const esCR: LocalizationResource = {
     form_password_validation_failed: 'Contraseña incorrecta',
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
+    form_username_needs_non_number_char: 'Tu nombre de usuario debe contener al menos un carácter no numérico.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
     not_allowed_access: 'No tienes permiso para acceder a esta página.',
     organization_domain_blocked: 'Este correo electrónico del dominio está bloqueado, intenta con otro.',

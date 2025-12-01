@@ -860,6 +860,14 @@ export const enUS: LocalizationResource = {
       actionText: 'Signed in as {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Reset Password',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    title: 'Reset password',
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,
@@ -892,6 +900,7 @@ export const enUS: LocalizationResource = {
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
+    form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

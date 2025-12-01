@@ -863,6 +863,14 @@ export const enGB: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organisation.',
     captcha_invalid:
@@ -898,6 +906,7 @@ export const enGB: LocalizationResource = {
     form_username_invalid_character:
       'Your username contains invalid characters. Please use only letters, numbers, and underscores.',
     form_username_invalid_length: 'Your username must be between 3 and 20 characters long.',
+    form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access: undefined,
     organization_domain_blocked: 'This is a blocked email provider domain. Please use a different one.',

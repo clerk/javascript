@@ -862,6 +862,14 @@ export const bgBG: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
     captcha_invalid: undefined,
@@ -892,6 +900,7 @@ export const bgBG: LocalizationResource = {
     form_password_validation_failed: 'Невалидна парола.',
     form_username_invalid_character: 'Потребителското име съдържа невалидни символи.',
     form_username_invalid_length: 'Потребителското име трябва да бъде между 3 и 256 символа.',
+    form_username_needs_non_number_char: 'Потребителското име трябва да съдържа поне един нечислов символ.',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
     not_allowed_access:
       'Имейл адресът или телефонният номер не са разрешени за регистрация. Това може да се дължи на използването на „+“, „=“, „#“ или „.“ във вашия имейл адрес, като използвате домейн, свързан с временна имейл услуга, или сте изрично блокирани. Ако смятате, че това е грешка, моля, свържете се с поддръжката.',
