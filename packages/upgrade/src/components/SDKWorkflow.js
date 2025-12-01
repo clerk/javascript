@@ -9,6 +9,12 @@ import { Command } from './Command.js';
 import { Header } from './Header.js';
 import { UpgradeSDK } from './UpgradeSDK.js';
 
+const CODEMODS = {
+  ASYNC_REQUEST: 'transform-async-request',
+  CLERK_REACT_V6: 'transform-clerk-react-v6',
+  REMOVE_DEPRECATED_PROPS: 'transform-remove-deprecated-props',
+};
+
 function versionNeedsUpgrade(sdk, version) {
   if (sdk === 'clerk-react' && version === 5) {
     return true;
@@ -58,171 +64,273 @@ export function SDKWorkflow(props) {
   }
 
   if (sdk === 'nextjs') {
-    // Right now, we only have one codemod for the `@clerk/nextjs` async request transformation
     return (
-      <>
-        <Header />
-        <Text>
-          Clerk SDK used: <Text color='green'>@clerk/{sdk}</Text>
-        </Text>
-        <Text>
-          Migrating from version: <Text color='green'>{version}</Text>
-        </Text>
-        {runCodemod ? (
-          <Text>
-            Executing codemod: <Text color='green'>yes</Text>
-          </Text>
-        ) : null}
-        <Newline />
-        {version === 5 && (
-          <>
-            <UpgradeSDK
-              callback={setUpgradeComplete}
-              sdk={sdk}
-            />
-            {upgradeComplete ? (
-              <Codemod
-                callback={setDone}
-                sdk={sdk}
-                transform='transform-async-request'
-              />
-            ) : null}
-          </>
-        )}
-        {version === 6 && (
-          <>
-            <UpgradeSDK
-              callback={setUpgradeComplete}
-              sdk={sdk}
-            />
-            {upgradeComplete ? (
-              <Codemod
-                callback={setDone}
-                sdk={sdk}
-                transform='transform-clerk-react-v6'
-              />
-            ) : null}
-          </>
-        )}
-        {version === 7 && (
-          <>
-            {runCodemod ? (
-              <Codemod
-                sdk={sdk}
-                callback={setDone}
-                transform='transform-clerk-react-v6'
-              />
-            ) : (
-              <>
-                <Text>
-                  Looks like you are already on the latest version of <Text bold>@clerk/{sdk}</Text>. Would you like to
-                  run the associated codemod?
-                </Text>
-                <Select
-                  options={[
-                    { label: 'yes', value: 'yes' },
-                    { label: 'no', value: 'no' },
-                  ]}
-                  onChange={value => {
-                    if (value === 'yes') {
-                      setRunCodemod(true);
-                    } else {
-                      setDone(true);
-                    }
-                  }}
-                />
-              </>
-            )}
-          </>
-        )}
-        {done && (
-          <>
-            <StatusMessage variant='success'>
-              Done upgrading <Text bold>@clerk/nextjs</Text>
-            </StatusMessage>
-            <Command
-              cmd={
-                'grep -rE "import.*\\\\{.*useAuth.*\\\\}.*from.*[\'\\\\\\"]@clerk/nextjs[\'\\\\\\"]" . --exclude-dir={node_modules,dist}'
-              }
-              message={<Spinner label={'Checking for `useAuth` usage in your project...'} />}
-              onError={() => null}
-              onSuccess={() => (
-                <StatusMessage variant='warning'>
-                  <Text>
-                    We have detected that your application might be using the <Text bold>useAuth</Text> hook from{' '}
-                    <Text bold>@clerk/nextjs</Text>.
-                  </Text>
-                  <Newline />
-                  <Text>
-                    If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
-                    prop to your application's root <Text bold>ClerkProvider</Text>.
-                  </Text>
-                  <Newline />
-                  <Text>
-                    You can find more information about this change in the Clerk documentation at{' '}
-                    <Link url='https://clerk.com/docs/references/nextjs/rendering-modes'>
-                      https://clerk.com/docs/references/nextjs/rendering-modes
-                    </Link>
-                    .
-                  </Text>
-                </StatusMessage>
-              )}
-            />
-          </>
-        )}
-      </>
+      <NextjsWorkflow
+        done={done}
+        runCodemod={runCodemod}
+        sdk={sdk}
+        setDone={setDone}
+        setRunCodemod={setRunCodemod}
+        setUpgradeComplete={setUpgradeComplete}
+        upgradeComplete={upgradeComplete}
+        version={version}
+      />
     );
   }
 
   if (['clerk-react', 'clerk-expo', 'react-router', 'tanstack-react-start'].includes(sdk)) {
-    const replacePackage = sdk === 'clerk-react' || sdk === 'clerk-expo';
     return (
-      <>
-        <Header />
-        <Text>
-          Clerk SDK used: <Text color='green'>@clerk/{sdk}</Text>
-        </Text>
-        <Text>
-          Migrating from version: <Text color='green'>{version}</Text>
-        </Text>
-        {runCodemod ? (
-          <Text>
-            Executing codemod: <Text color='green'>yes</Text>
-          </Text>
-        ) : null}
-        <Newline />
-        {versionNeedsUpgrade(sdk, version) && (
-          <>
-            <UpgradeSDK
-              callback={setUpgradeComplete}
-              sdk={sdk}
-              replacePackage={replacePackage}
-            />
-            {upgradeComplete ? (
-              <Codemod
-                callback={setDone}
-                sdk={sdk}
-                transform='transform-clerk-react-v6'
-              />
-            ) : null}
-          </>
-        )}
-        {done && (
-          <>
-            <StatusMessage variant='success'>
-              {replacePackage ? (
-                <>
-                  Done upgrading to <Text bold>@clerk/{sdk.replace('clerk-', '')}</Text>
-                </>
-              ) : (
-                <>
-                  Done upgrading <Text bold>@clerk/{sdk}</Text>
-                </>
-              )}
-            </StatusMessage>
-          </>
-        )}
-      </>
+      <ReactSdkWorkflow
+        done={done}
+        runCodemod={runCodemod}
+        sdk={sdk}
+        setDone={setDone}
+        setRunCodemod={setRunCodemod}
+        setUpgradeComplete={setUpgradeComplete}
+        upgradeComplete={upgradeComplete}
+        version={version}
+      />
     );
   }
+}
+
+function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgradeComplete, upgradeComplete, version }) {
+  const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
+
+  return (
+    <>
+      <Header />
+      <Text>
+        Clerk SDK used: <Text color='green'>@clerk/{sdk}</Text>
+      </Text>
+      <Text>
+        Migrating from version: <Text color='green'>{version}</Text>
+      </Text>
+      {runCodemod ? (
+        <Text>
+          Executing codemod: <Text color='green'>yes</Text>
+        </Text>
+      ) : null}
+      <Newline />
+      {version === 5 && (
+        <>
+          <UpgradeSDK
+            callback={setUpgradeComplete}
+            sdk={sdk}
+          />
+          {upgradeComplete ? (
+            <Codemod
+              callback={setV6CodemodComplete}
+              sdk={sdk}
+              transform={CODEMODS.ASYNC_REQUEST}
+            />
+          ) : null}
+          {v6CodemodComplete ? (
+            <Codemod
+              callback={setDone}
+              sdk={sdk}
+              transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+            />
+          ) : null}
+        </>
+      )}
+      {version === 6 && (
+        <>
+          <UpgradeSDK
+            callback={setUpgradeComplete}
+            sdk={sdk}
+          />
+          {upgradeComplete ? (
+            <Codemod
+              callback={setV6CodemodComplete}
+              sdk={sdk}
+              transform={CODEMODS.CLERK_REACT_V6}
+            />
+          ) : null}
+          {v6CodemodComplete ? (
+            <Codemod
+              callback={setDone}
+              sdk={sdk}
+              transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+            />
+          ) : null}
+        </>
+      )}
+      {version === 7 && (
+        <>
+          {runCodemod ? (
+            <>
+              <Codemod
+                callback={setV6CodemodComplete}
+                sdk={sdk}
+                transform={CODEMODS.CLERK_REACT_V6}
+              />
+              {v6CodemodComplete ? (
+                <Codemod
+                  callback={setDone}
+                  sdk={sdk}
+                  transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+                />
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Text>
+                Looks like you are already on the latest version of <Text bold>@clerk/{sdk}</Text>. Would you like to
+                run the associated codemods?
+              </Text>
+              <Select
+                onChange={value => {
+                  if (value === 'yes') {
+                    setRunCodemod(true);
+                  } else {
+                    setDone(true);
+                  }
+                }}
+                options={[
+                  { label: 'yes', value: 'yes' },
+                  { label: 'no', value: 'no' },
+                ]}
+              />
+            </>
+          )}
+        </>
+      )}
+      {done && (
+        <>
+          <StatusMessage variant='success'>
+            Done upgrading <Text bold>@clerk/nextjs</Text>
+          </StatusMessage>
+          <Command
+            cmd={
+              'grep -rE "import.*\\\\{.*useAuth.*\\\\}.*from.*[\'\\\\\\"]@clerk/nextjs[\'\\\\\\"]" . --exclude-dir={node_modules,dist}'
+            }
+            message={<Spinner label={'Checking for `useAuth` usage in your project...'} />}
+            onError={() => null}
+            onSuccess={() => (
+              <StatusMessage variant='warning'>
+                <Text>
+                  We have detected that your application might be using the <Text bold>useAuth</Text> hook from{' '}
+                  <Text bold>@clerk/nextjs</Text>.
+                </Text>
+                <Newline />
+                <Text>
+                  If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
+                  prop to your application's root <Text bold>ClerkProvider</Text>.
+                </Text>
+                <Newline />
+                <Text>
+                  You can find more information about this change in the Clerk documentation at{' '}
+                  <Link url='https://clerk.com/docs/references/nextjs/rendering-modes'>
+                    https://clerk.com/docs/references/nextjs/rendering-modes
+                  </Link>
+                  .
+                </Text>
+              </StatusMessage>
+            )}
+          />
+        </>
+      )}
+    </>
+  );
+}
+
+function ReactSdkWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgradeComplete, upgradeComplete, version }) {
+  const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
+  const replacePackage = sdk === 'clerk-react' || sdk === 'clerk-expo';
+  const needsUpgrade = versionNeedsUpgrade(sdk, version);
+
+  return (
+    <>
+      <Header />
+      <Text>
+        Clerk SDK used: <Text color='green'>@clerk/{sdk}</Text>
+      </Text>
+      <Text>
+        Migrating from version: <Text color='green'>{version}</Text>
+      </Text>
+      {runCodemod ? (
+        <Text>
+          Executing codemod: <Text color='green'>yes</Text>
+        </Text>
+      ) : null}
+      <Newline />
+      {needsUpgrade && (
+        <>
+          <UpgradeSDK
+            callback={setUpgradeComplete}
+            replacePackage={replacePackage}
+            sdk={sdk}
+          />
+          {upgradeComplete ? (
+            <Codemod
+              callback={setV6CodemodComplete}
+              sdk={sdk}
+              transform={CODEMODS.CLERK_REACT_V6}
+            />
+          ) : null}
+          {v6CodemodComplete ? (
+            <Codemod
+              callback={setDone}
+              sdk={sdk}
+              transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+            />
+          ) : null}
+        </>
+      )}
+      {!needsUpgrade && (
+        <>
+          {runCodemod ? (
+            <>
+              <Codemod
+                callback={setV6CodemodComplete}
+                sdk={sdk}
+                transform={CODEMODS.CLERK_REACT_V6}
+              />
+              {v6CodemodComplete ? (
+                <Codemod
+                  callback={setDone}
+                  sdk={sdk}
+                  transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+                />
+              ) : null}
+            </>
+          ) : (
+            <>
+              <Text>
+                Looks like you are already on the latest version of <Text bold>@clerk/{sdk}</Text>. Would you like to
+                run the associated codemods?
+              </Text>
+              <Select
+                onChange={value => {
+                  if (value === 'yes') {
+                    setRunCodemod(true);
+                  } else {
+                    setDone(true);
+                  }
+                }}
+                options={[
+                  { label: 'yes', value: 'yes' },
+                  { label: 'no', value: 'no' },
+                ]}
+              />
+            </>
+          )}
+        </>
+      )}
+      {done && (
+        <StatusMessage variant='success'>
+          {replacePackage ? (
+            <>
+              Done upgrading to <Text bold>@clerk/{sdk.replace('clerk-', '')}</Text>
+            </>
+          ) : (
+            <>
+              Done upgrading <Text bold>@clerk/{sdk}</Text>
+            </>
+          )}
+        </StatusMessage>
+      )}
+    </>
+  );
 }
