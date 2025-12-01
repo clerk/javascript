@@ -862,6 +862,14 @@ export const thTH: LocalizationResource = {
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
     captcha_invalid: undefined,

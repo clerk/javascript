@@ -860,6 +860,14 @@ export const enUS: LocalizationResource = {
       actionText: 'Signed in as {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Reset Password',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    title: 'Reset password',
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
     captcha_invalid: undefined,
