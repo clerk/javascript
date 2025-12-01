@@ -684,6 +684,9 @@ export const zhCN: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '验证码',
       resendButton: '重新发送验证码',

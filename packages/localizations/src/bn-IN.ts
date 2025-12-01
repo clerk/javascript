@@ -699,6 +699,9 @@ export const bnIN: LocalizationResource = {
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',

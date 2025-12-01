@@ -697,6 +697,9 @@ export const fiFI: LocalizationResource = {
     passwordPwned: {
       title: 'Salasana kompromisoitu',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
       resendButton: 'Etkö saanut koodia? Lähetä uudelleen',

@@ -688,6 +688,9 @@ export const kkKZ: LocalizationResource = {
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Растау коды',
       resendButton: 'Код алмадыңыз ба? Қайта жіберу',

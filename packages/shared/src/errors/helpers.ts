@@ -121,7 +121,7 @@ export function isPasswordPwnedError(err: any) {
 }
 
 /**
- * Checks if the provided error is a clerk api response error indicating a password was pwned.
+ * Checks if the provided error is a clerk api response error indicating a password was untrusted.
  *
  * @internal
  */

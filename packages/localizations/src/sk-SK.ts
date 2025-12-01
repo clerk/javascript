@@ -698,6 +698,9 @@ export const skSK: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Overovací kód',
       resendButton: 'Znova odoslať kód',

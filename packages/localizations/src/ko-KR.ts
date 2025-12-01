@@ -690,6 +690,9 @@ export const koKR: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '인증 코드',
       resendButton: '코드 다시 보내기',

@@ -697,6 +697,9 @@ export const thTH: LocalizationResource = {
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',

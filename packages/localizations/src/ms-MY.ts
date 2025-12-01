@@ -701,6 +701,9 @@ export const msMY: LocalizationResource = {
     passwordPwned: {
       title: 'Kata laluan dikompromi',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kod pengesahan',
       resendButton: 'Tidak menerima kod? Hantar semula',

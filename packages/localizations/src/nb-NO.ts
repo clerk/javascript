@@ -695,6 +695,9 @@ export const nbNO: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifiseringskode',
       resendButton: 'Send kode på nytt',

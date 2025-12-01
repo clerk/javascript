@@ -696,6 +696,9 @@ export const huHU: LocalizationResource = {
     passwordPwned: {
       title: 'Jelszó kompromitálódott',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Visszaigazoló kód',
       resendButton: 'Nem kaptad meg a kódot? Újraküldés',

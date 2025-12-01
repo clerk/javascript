@@ -707,6 +707,9 @@ export const roRO: LocalizationResource = {
     passwordPwned: {
       title: 'Parola este compromisă',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Cod de verificare',
       resendButton: 'Nu ai primit un cod? Retrimite',

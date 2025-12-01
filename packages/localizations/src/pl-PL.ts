@@ -698,6 +698,9 @@ export const plPL: LocalizationResource = {
     passwordPwned: {
       title: 'Hasło skompromitowane',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kod weryfikacyjny',
       resendButton: 'Wyślij kod ponownie',

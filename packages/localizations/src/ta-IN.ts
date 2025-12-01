@@ -701,6 +701,9 @@ export const taIN: LocalizationResource = {
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',

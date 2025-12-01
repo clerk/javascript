@@ -700,6 +700,9 @@ export const esUY: LocalizationResource = {
     passwordPwned: {
       title: 'Contraseña comprometida',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: '¿No recibiste un código? Reenviar',

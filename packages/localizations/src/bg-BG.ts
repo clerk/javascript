@@ -696,6 +696,9 @@ export const bgBG: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Код за потвърждение',
       resendButton: 'Не сте получили код? Изпрати отново',

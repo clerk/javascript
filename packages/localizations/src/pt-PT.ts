@@ -694,6 +694,9 @@ export const ptPT: LocalizationResource = {
     passwordPwned: {
       title: 'Este password foi comprometido em uma violação de dados. Escolha outro por motivos de segurança.',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificação',
       resendButton: 'Reenviar código',

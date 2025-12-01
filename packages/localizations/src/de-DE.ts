@@ -709,6 +709,9 @@ export const deDE: LocalizationResource = {
     passwordPwned: {
       title: 'Passwort kompromittiert',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Bestätigungscode',
       resendButton: 'Code erneut senden',

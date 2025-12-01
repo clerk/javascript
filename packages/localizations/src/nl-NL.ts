@@ -696,6 +696,9 @@ export const nlNL: LocalizationResource = {
     passwordPwned: {
       title: 'Dit wachtwoord is gelekt bij een datalek. Kies een ander wachtwoord om veiligheidsredenen.',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verificatiecode',
       resendButton: 'Verstuur code opnieuw',

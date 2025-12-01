@@ -705,6 +705,9 @@ export const faIR: LocalizationResource = {
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'کد تأیید',
       resendButton: 'کدی دریافت نکردید؟ ارسال دوباره',

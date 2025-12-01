@@ -684,6 +684,9 @@ export const zhTW: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '驗證碼',
       resendButton: '重新傳送驗證碼',

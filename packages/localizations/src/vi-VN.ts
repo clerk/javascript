@@ -703,6 +703,9 @@ export const viVN: LocalizationResource = {
     passwordPwned: {
       title: 'Mật khẩu bị rò rỉ',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Mã xác minh',
       resendButton: 'Không nhận được mã? Gửi lại',

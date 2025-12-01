@@ -704,6 +704,9 @@ export const csCZ: LocalizationResource = {
     passwordPwned: {
       title: 'Heslo kompromitováno',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Ověřovací kód',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',

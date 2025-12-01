@@ -697,6 +697,9 @@ export const hrHR: LocalizationResource = {
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
       resendButton: 'Niste primili kod? Pošalji ponovno',

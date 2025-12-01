@@ -697,6 +697,9 @@ export const mnMN: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Баталгаажуулах код',
       resendButton: 'Код хүлээж аваагүй юу? Дахин илгээх',

@@ -693,6 +693,9 @@ export const arSA: LocalizationResource = {
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'رمز التحقق',
       resendButton: 'لم يصلك الرمز؟ حاول مرة أخرى',

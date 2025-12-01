@@ -696,6 +696,9 @@ export const caES: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Codi de verificació',
       resendButton: 'No has rebut el codi? Reenvia',

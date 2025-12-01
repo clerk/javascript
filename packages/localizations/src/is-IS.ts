@@ -698,6 +698,9 @@ export const isIS: LocalizationResource = {
     passwordPwned: {
       title: 'Lykilorð brotið',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
       resendButton: 'Fékkstu ekki kóða? Senda aftur',

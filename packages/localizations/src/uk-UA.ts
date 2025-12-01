@@ -694,6 +694,9 @@ export const ukUA: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Код підтвердження',
       resendButton: 'Не отримали код? повторно відправити',

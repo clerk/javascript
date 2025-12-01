@@ -688,6 +688,9 @@ export const heIL: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'קוד אימות',
       resendButton: 'שלח את הקוד שוב',

@@ -710,6 +710,9 @@ export const frFR: LocalizationResource = {
     passwordPwned: {
       title: 'Mot de passe compromis',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Code de vérification',
       resendButton: "Vous n'avez pas reçu de code ? Renvoyer",

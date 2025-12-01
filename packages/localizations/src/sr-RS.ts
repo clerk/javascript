@@ -695,6 +695,9 @@ export const srRS: LocalizationResource = {
     passwordPwned: {
       title: 'Lozinka kompromitovana',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifikacioni kod',
       resendButton: 'Nisi primio kod? Pošalji ponovo',

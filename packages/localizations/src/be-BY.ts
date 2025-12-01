@@ -700,6 +700,9 @@ export const beBY: LocalizationResource = {
     passwordPwned: {
       title: 'Пароль быў узламаны',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Код верыфікацыі',
       resendButton: 'Пераадправіць код',

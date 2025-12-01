@@ -697,6 +697,9 @@ export const elGR: LocalizationResource = {
     passwordPwned: {
       title: 'Παραβιασμένος κωδικός',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
       resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',

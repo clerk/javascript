@@ -702,6 +702,9 @@ export const esMX: LocalizationResource = {
     passwordPwned: {
       title: 'Contraseña en peligro',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: 'Reenviar código',

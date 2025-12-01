@@ -699,6 +699,9 @@ export const idID: LocalizationResource = {
     passwordPwned: {
       title: 'Kata sandi terkompromi',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Kode verifikasi',
       resendButton: 'Tidak menerima kode? Kirim ulang',

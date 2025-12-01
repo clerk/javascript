@@ -698,6 +698,9 @@ export const hiIN: LocalizationResource = {
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
       resendButton: 'कोड नहीं मिला? फिर से भेजें',

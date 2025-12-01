@@ -705,6 +705,9 @@ export const ruRU: LocalizationResource = {
     passwordPwned: {
       title: 'Пароль скомпрометирован',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Верификационный код',
       resendButton: 'Не получили код? Отправить снова.',
