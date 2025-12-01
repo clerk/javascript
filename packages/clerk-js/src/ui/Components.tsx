@@ -484,6 +484,7 @@ const Components = (props: ComponentsProps) => {
         base: '/user',
         path: userProfileModal?.__experimental_startPath || urlStateParam?.path,
       })}
+      getContainer={userProfileModal?.getContainer}
       componentName={'UserProfileModal'}
       modalContainerSx={{ alignItems: 'center' }}
       modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}

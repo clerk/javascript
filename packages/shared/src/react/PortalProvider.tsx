@@ -64,13 +64,14 @@ export const PortalProvider = ({ children, getContainer }: PortalProviderProps) 
  * First checks React context (for same-tree components),
  * then falls back to PortalRootManager (for cross-tree like modals).
  */
-export const usePortalRoot = (): HTMLElement | null => {
+export const usePortalRoot = (): (() => HTMLElement | null) => {
   // Try to get from context first (for components in the same React tree)
   const contextValue = usePortalContextWithoutGuarantee();
-  if (contextValue && 'getContainer' in contextValue) {
-    return contextValue.getContainer();
+
+  if (contextValue && 'getContainer' in contextValue && contextValue.getContainer) {
+    return contextValue.getContainer;
   }
 
   // Fall back to manager (for components in different React trees, like modals)
-  return portalRootManager.getCurrent();
+  return portalRootManager.getCurrent.bind(portalRootManager);
 };

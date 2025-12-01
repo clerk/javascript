@@ -20,7 +20,7 @@ export const withClerk = <P extends { clerk: LoadedClerk; component?: string }>(
     useAssertWrappedByClerkProvider(displayName || 'withClerk');
 
     const clerk = useIsomorphicClerkContext();
-    const portalRoot = usePortalRoot();
+    const getContainer = usePortalRoot();
 
     if (!clerk.loaded && !options?.renderWhileLoading) {
       return null;
@@ -28,7 +28,7 @@ export const withClerk = <P extends { clerk: LoadedClerk; component?: string }>(
 
     return (
       <Component
-        portalRoot={portalRoot}
+        getContainer={getContainer}
         {...(props as P)}
         component={displayName}
         clerk={clerk}

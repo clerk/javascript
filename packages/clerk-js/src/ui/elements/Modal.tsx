@@ -1,4 +1,4 @@
-import { createContextAndHook, useSafeLayoutEffect, usePortalRoot } from '@clerk/shared/react';
+import { createContextAndHook, usePortalRoot, useSafeLayoutEffect } from '@clerk/shared/react';
 import React, { useRef } from 'react';
 
 import { descriptors, Flex } from '../customizables';
@@ -53,7 +53,7 @@ export const Modal = withFloatingTree((props: ModalProps) => {
     };
   }, []);
 
-  const effectivePortalRoot = portalRoot ?? portalRootFromContext ?? undefined;
+  const effectivePortalRoot = portalRoot ?? portalRootFromContext?.() ?? undefined;
 
   return (
     <Popover
