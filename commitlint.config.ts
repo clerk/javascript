@@ -10,11 +10,12 @@ const getPackageNames = () => {
       const fullPath = join(packagesDir, entry);
       return statSync(fullPath).isDirectory();
     })
-    .map(dir => {
+    .flatMap(dir => {
       const packageJsonPath = join(packagesDir, dir, 'package.json');
       try {
         const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
-        return packageJson.name.split('/').pop();
+        const name = packageJson.name.split('/').pop() as string;
+        return [name, name.replace('clerk-', '')];
       } catch {
         // Ignore directories without a package.json
         return null;
@@ -27,7 +28,7 @@ const getPackageNames = () => {
 const Configuration = {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    'subject-case': [2, 'always', ['sentence-case']],
+    'subject-case': [2, 'always', ['lower-case', 'sentence-case']],
     'body-max-line-length': [1, 'always', '150'],
     'scope-empty': [2, 'never'],
     'scope-enum': [2, 'always', [...getPackageNames(), 'repo', 'release', 'e2e', '*']],

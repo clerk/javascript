@@ -1,19 +1,7 @@
-import type { ZxcvbnResult } from '@clerk/shared/types';
+import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 
-export type zxcvbnFN = (password: string, userInputs?: (string | number)[]) => ZxcvbnResult;
+import { ModuleManager } from './moduleManager';
 
 export const loadZxcvbn = () => {
-  return Promise.all([import('@zxcvbn-ts/core'), import('@zxcvbn-ts/language-common')]).then(
-    ([coreModule, languageCommonModule]) => {
-      const { zxcvbnOptions, zxcvbn } = coreModule;
-      const { dictionary, adjacencyGraphs } = languageCommonModule;
-      zxcvbnOptions.setOptions({
-        dictionary: {
-          ...dictionary,
-        },
-        graphs: adjacencyGraphs,
-      });
-      return zxcvbn;
-    },
-  );
+  return createLoadZxcvbn(new ModuleManager()).loadZxcvbn;
 };

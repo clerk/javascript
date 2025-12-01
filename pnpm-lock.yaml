@@ -5,6 +5,19 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
+  module-manager:
+    '@base-org/account':
+      specifier: 2.0.1
+      version: 2.0.1
+    '@coinbase/wallet-sdk':
+      specifier: 4.3.0
+      version: 4.3.0
+    '@zxcvbn-ts/core':
+      specifier: 3.0.4
+      version: 3.0.4
+    '@zxcvbn-ts/language-common':
+      specifier: 3.0.4
+      version: 3.0.4
   react:
     '@types/react':
       specifier: 18.3.26
@@ -423,13 +436,13 @@ importers:
   packages/clerk-js:
     dependencies:
       '@base-org/account':
-        specifier: 2.0.1
+        specifier: catalog:module-manager
         version: 2.0.1(@types/react@18.3.26)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
       '@clerk/shared':
         specifier: workspace:^
         version: link:../shared
       '@coinbase/wallet-sdk':
-        specifier: 4.3.0
+        specifier: catalog:module-manager
         version: 4.3.0
       '@stripe/stripe-js':
         specifier: 5.6.0
@@ -441,10 +454,10 @@ importers:
         specifier: 5.87.4
         version: 5.87.4
       '@zxcvbn-ts/core':
-        specifier: 3.0.4
+        specifier: catalog:module-manager
         version: 3.0.4
       '@zxcvbn-ts/language-common':
-        specifier: 3.0.4
+        specifier: catalog:module-manager
         version: 3.0.4
       alien-signals:
         specifier: 2.0.6
@@ -789,6 +802,12 @@ importers:
         specifier: 2.3.4
         version: 2.3.4(react@18.3.1)
     devDependencies:
+      '@base-org/account':
+        specifier: catalog:module-manager
+        version: 2.0.1(@types/react@18.3.26)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.6.0(react@18.3.1))(zod@3.25.76)
+      '@coinbase/wallet-sdk':
+        specifier: catalog:module-manager
+        version: 4.3.0
       '@stripe/react-stripe-js':
         specifier: 3.1.1
         version: 3.1.1(@stripe/stripe-js@5.6.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -804,6 +823,12 @@ importers:
       '@types/js-cookie':
         specifier: 3.0.6
         version: 3.0.6
+      '@zxcvbn-ts/core':
+        specifier: catalog:module-manager
+        version: 3.0.4
+      '@zxcvbn-ts/language-common':
+        specifier: catalog:module-manager
+        version: 3.0.4
       cross-fetch:
         specifier: ^4.1.0
         version: 4.1.0
@@ -894,12 +919,6 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.8.2
         version: 0.8.4
-      '@zxcvbn-ts/core':
-        specifier: 3.0.4
-        version: 3.0.4
-      '@zxcvbn-ts/language-common':
-        specifier: 3.0.4
-        version: 3.0.4
       copy-to-clipboard:
         specifier: 3.3.3
         version: 3.3.3
@@ -925,6 +944,9 @@ importers:
         specifier: 2.3.4
         version: 2.3.4(react@18.3.1)
     devDependencies:
+      '@floating-ui/react-dom':
+        specifier: ^2.1.6
+        version: 2.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rspack/cli':
         specifier: ^1.6.0
         version: 1.6.1(@rspack/core@1.6.1(@swc/helpers@0.5.17))(@types/express@4.17.25)(webpack@5.102.1)
@@ -934,12 +956,6 @@ importers:
       '@rspack/plugin-react-refresh':
         specifier: ^1.5.2
         version: 1.5.2(react-refresh@0.17.0)
-      '@stripe/react-stripe-js':
-        specifier: 3.1.1
-        version: 3.1.1(@stripe/stripe-js@5.6.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@stripe/stripe-js':
-        specifier: 5.6.0
-        version: 5.6.0
       '@svgr/webpack':
         specifier: ^6.5.1
         version: 6.5.1
@@ -2365,7 +2381,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}

@@ -7,16 +7,6 @@ import {
 } from '@clerk/shared/internal/clerk-js/passkeys';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-} from '@clerk/shared/internal/clerk-js/web3';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
@@ -42,7 +32,6 @@ import type {
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
-  SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureBackupCodeVerifyParams,
@@ -82,7 +71,7 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale } from '../../utils';
+import { getBrowserLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -221,12 +210,6 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'reset_password_email_code':
         config = { emailAddressId: params.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
         break;
-      case 'saml':
-        config = {
-          redirectUrl: params.redirectUrl,
-          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
-        } as SamlConfig;
-        break;
       case 'enterprise_sso':
         config = {
           redirectUrl: params.redirectUrl,
@@ -346,7 +329,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (strategy === 'saml' || strategy === 'enterprise_sso') {
+    if (strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
         redirectUrl,
@@ -426,37 +409,37 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       strategy: 'web3_metamask_signature',
     });
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
     });
   };
 
   public authenticateWithBase = async (): Promise<SignInResource> => {
-    const identifier = await getBaseIdentifier();
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       strategy: 'web3_base_signature',
     });
   };
 
   public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
-    const identifier = await getOKXWalletIdentifier();
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       strategy: 'web3_okx_wallet_signature',
     });
   };
@@ -532,7 +515,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
     if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword(loadZxcvbn, {
+      return createValidatePassword(loadZxcvbn(), {
         ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
@@ -978,20 +961,20 @@ class SignInFuture implements SignInFutureResource {
       let generateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);

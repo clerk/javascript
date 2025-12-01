@@ -19,5 +19,5 @@ export * from '@clerk/shared/internal/clerk-js/querystring';
 export * from '@clerk/shared/internal/clerk-js/runtime';
 export * from './tokenId';
 export * from '@clerk/shared/internal/clerk-js/url';
-export * from '@clerk/shared/internal/clerk-js/web3';
+export * from './web3';
 export * from '@clerk/shared/internal/clerk-js/windowNavigate';

@@ -95,7 +95,7 @@ describe('ProfileSection', () => {
               },
               verification: {
                 status: 'verified',
-                strategy: 'saml',
+                strategy: 'enterprise_sso',
                 verified_at_client: 'foo',
                 attempts: 0,
                 error: {
@@ -170,7 +170,7 @@ describe('ProfileSection', () => {
               },
               verification: {
                 status: 'verified',
-                strategy: 'saml',
+                strategy: 'enterprise_sso',
                 verified_at_client: 'foo',
                 attempts: 0,
                 error: {

@@ -1,16 +1,18 @@
+import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import type { UsePasswordCbs, UsePasswordConfig } from '@clerk/shared/internal/clerk-js/passwords/password';
 import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
 import type { PasswordValidation } from '@clerk/shared/types';
 import { noop } from '@clerk/shared/utils';
 import { useCallback, useMemo } from 'react';
 
+import { useModuleManager } from '../contexts/ModuleManagerContext';
 import { localizationKeys, useLocalizations } from '../localization';
 import type { FormControlState } from '../utils/useFormControl';
-import { loadZxcvbn } from '../utils/zxcvbn';
 import { generateErrorTextUtil } from './usePasswordComplexity';
 
 export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCbs) => {
   const { t, locale } = useLocalizations();
+  const moduleManager = useModuleManager();
   const {
     onValidationError = noop,
     onValidationSuccess = noop,
@@ -64,11 +66,13 @@ export const usePassword = (config: UsePasswordConfig, callbacks?: UsePasswordCb
   );
 
   const validatePassword = useMemo(() => {
+    const { loadZxcvbn } = createLoadZxcvbn(moduleManager);
+
     return createValidatePassword(loadZxcvbn, config, {
       onValidation: onValidate,
       onValidationComplexity,
     });
-  }, [onValidate, config]);
+  }, [onValidate, config, moduleManager]);
 
   return {
     validatePassword,

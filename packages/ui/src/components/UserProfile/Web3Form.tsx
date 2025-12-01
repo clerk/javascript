@@ -1,4 +1,4 @@
-import { generateWeb3Signature, getWeb3Identifier } from '@clerk/shared/internal/clerk-js/web3';
+import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
 
@@ -6,6 +6,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { getFieldError, handleError } from '@/ui/utils/errorHandler';
 
+import { useModuleManager } from '../../contexts';
 import { descriptors, Image, localizationKeys, Text } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 
@@ -13,7 +14,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
   const card = useCardState();
   const { user } = useUser();
   const { strategies, strategyToDisplayData } = useEnabledThirdPartyProviders();
-
+  const moduleManager = useModuleManager();
   const enabledStrategies = strategies.filter(s => s.startsWith('web3')) as Web3Strategy[];
   const connectedStrategies = user?.verifiedWeb3Wallets.map(w => w.verification.strategy) as Web3Strategy[];
   const unconnectedStrategies = enabledStrategies.filter(strategy => {
@@ -24,12 +25,14 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
   );
 
   const connect = async (strategy: Web3Strategy) => {
+    const web3 = createWeb3(moduleManager);
+
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
     card.setError(undefined);
 
     try {
       card.setLoading(strategy);
-      const identifier = await getWeb3Identifier({ provider });
+      const identifier = await web3.getWeb3Identifier({ provider });
 
       if (!user) {
         throw new Error('user is not defined');
@@ -38,7 +41,7 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
       let web3Wallet = await createWeb3Wallet(identifier);
       web3Wallet = await web3Wallet?.prepareVerification({ strategy });
       const message = web3Wallet?.verification.message as string;
-      const signature = await generateWeb3Signature({ identifier, nonce: message, provider });
+      const signature = await web3.generateWeb3Signature({ identifier, nonce: message, provider });
       await web3Wallet?.attemptVerification({ signature });
       card.setIdle();
     } catch (err: any) {
@@ -67,7 +70,9 @@ export const AddWeb3WalletActionMenu = withCardStateProvider(({ onClick }: { onC
           <ProfileSection.ActionMenuItem
             key={strategy}
             id={strategyToDisplayData[strategy].id}
-            onClick={() => connect(strategy)}
+            onClick={() => {
+              void connect(strategy);
+            }}
             isLoading={card.loadingMetadata === strategy}
             isDisabled={card.isLoading}
             localizationKey={localizationKeys('userProfile.web3WalletPage.web3WalletButtonsBlockButton', {
