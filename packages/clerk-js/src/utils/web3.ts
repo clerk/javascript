@@ -2,6 +2,7 @@ import type { GenerateSignature, Web3Provider } from '@clerk/shared/types';
 import type { SolanaWalletAdapterWallet } from '@solana/wallet-standard';
 
 import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
+import { ClerkRuntimeError } from '@/index.headless';
 import { errorThrower } from '@/utils/errorThrower';
 import { getInjectedWeb3SolanaProviders } from '@/utils/injectedWeb3SolanaProviders';
 
@@ -51,21 +52,32 @@ export const generateWeb3Signature: GenerateSignature = async (params): Promise<
   }
 
   if (provider === 'solana') {
-    const bs58 = await import('bs58').then(mod => mod.default);
-    const walletAccount = (wallet as SolanaWalletAdapterWallet).accounts.find(a => a.address === identifier);
-    if (!walletAccount) {
-      console.warn(`Wallet account with address ${identifier} not found`);
-      return '';
+    try {
+      const walletAccount = (wallet as SolanaWalletAdapterWallet).accounts.find(a => a.address === identifier);
+      if (!walletAccount) {
+        console.warn(`Wallet account with address ${identifier} not found`);
+        return '';
+      }
+      const signedMessages = await (wallet as SolanaWalletAdapterWallet).features[SolanaSignMessage]?.signMessage({
+        account: walletAccount,
+        message: new TextEncoder().encode(nonce),
+      });
+      if (!signedMessages || signedMessages.length === 0) {
+        console.warn('No signed messages returned from wallet');
+        return '';
+      }
+      return Array.from(signedMessages[0].signature).toString();
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('User rejected the request.')) {
+        throw new ClerkRuntimeError('Web3 signature request was rejected by the user.', {
+          code: 'web3_signature_request_rejected',
+        });
+      }
+      throw new ClerkRuntimeError('An error occurred while generating the Solana signature.', {
+        code: 'web3_solana_signature_error',
+        cause: err,
+      });
     }
-    const signedMessages = await (wallet as SolanaWalletAdapterWallet).features[SolanaSignMessage]?.signMessage({
-      account: walletAccount,
-      message: new TextEncoder().encode(nonce),
-    });
-    if (!signedMessages || signedMessages.length === 0) {
-      console.warn('No signed messages returned from wallet');
-      return '';
-    }
-    return bs58.encode(signedMessages[0].signature);
   }
 
   return await wallet.request({
@@ -90,7 +102,10 @@ export async function getBaseIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'base' });
 }
 
-export async function getSolanaIdentifier(walletName: string): Promise<string> {
+export async function getSolanaIdentifier(walletName?: string): Promise<string> {
+  if (!walletName) {
+    throw new Error('walletName is required for solana web3 authentication');
+  }
   return await getWeb3Identifier({ provider: 'solana', walletName });
 }
 
