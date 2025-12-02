@@ -301,7 +301,7 @@ testAgainstRunningApps({
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
-    // Set up request interception to capture the subject parameter
+    // Capture the subject parameter
     let capturedSubject: string | null = null;
     await u.page.route('**/api_keys*', async route => {
       const url = new URL(route.request().url());
@@ -309,7 +309,6 @@ testAgainstRunningApps({
       await route.continue();
     });
 
-    // Navigate to UserProfile API keys page
     await u.po.page.goToRelative('/user');
     await u.po.userProfile.waitForMounted();
     await u.po.userProfile.switchToAPIKeysTab();
