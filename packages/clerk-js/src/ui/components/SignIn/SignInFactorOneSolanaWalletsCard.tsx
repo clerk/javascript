@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '@/ui/common/withRedirect';
-import { descriptors, Flex, Flow } from '@/ui/customizables';
+import { descriptors, Flex, Flow, localizationKeys } from '@/ui/customizables';
 import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -27,8 +27,8 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title>Continue with Solana Wallet</Header.Title>
-            <Header.Subtitle>Select a wallet below to sign in</Header.Subtitle>
+            <Header.Title localizationKey={localizationKeys('signIn.web3Solana.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signIn.web3Solana.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex
@@ -49,7 +49,6 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
                   .catch(err => web3CallbackErrorHandler(err, card.setError));
               }}
             />
-
             <BackLink
               boxElementDescriptor={descriptors.backRow}
               linkElementDescriptor={descriptors.backLink}
