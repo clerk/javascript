@@ -690,6 +690,9 @@ export const koKR: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '인증 코드',
       resendButton: '코드 다시 보내기',
@@ -891,6 +894,7 @@ export const koKR: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       '비밀번호가 허용되는 최대 바이트 수를 초과했습니다. 비밀번호를 줄이거나 일부 특수 문자를 제거해 주세요.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '잘못된 비밀번호',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

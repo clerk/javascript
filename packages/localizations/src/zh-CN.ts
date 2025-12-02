@@ -684,6 +684,9 @@ export const zhCN: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '验证码',
       resendButton: '重新发送验证码',
@@ -882,6 +885,7 @@ export const zhCN: LocalizationResource = {
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密码超过了允许的最大字节数，请缩短它或去掉一些特殊字符。',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '密码错误',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

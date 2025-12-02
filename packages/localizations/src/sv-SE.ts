@@ -698,6 +698,9 @@ export const svSE: LocalizationResource = {
     passwordPwned: {
       title: 'Lösenord är för osäkert',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Verifieringskod',
       resendButton: 'Skicka koden igen',
@@ -901,6 +904,7 @@ export const svSE: LocalizationResource = {
     form_password_pwned__sign_in: 'Lösenordet har läckt, vänligen logga in för att ändra det.',
     form_password_size_in_bytes_exceeded:
       'Ditt lösenord har överskridit det maximala antalet tillåtna bytes, vänligen förkorta det eller ta bort några specialtecken.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Felaktigt lösenord',
     form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',

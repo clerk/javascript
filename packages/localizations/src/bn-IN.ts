@@ -699,6 +699,9 @@ export const bnIN: LocalizationResource = {
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
       resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
@@ -906,6 +909,7 @@ export const bnIN: LocalizationResource = {
       'এই পাসওয়ার্ডটি একটি ডেটা লঙ্ঘনের অংশ হিসাবে পাওয়া গেছে এবং ব্যবহার করা যাবে না, দয়া করে আপনার পাসওয়ার্ড রিসেট করুন।',
     form_password_size_in_bytes_exceeded:
       'আপনার পাসওয়ার্ড অনুমোদিত সর্বাধিক বাইট সংখ্যা অতিক্রম করেছে, দয়া করে এটি ছোট করুন বা কিছু বিশেষ অক্ষর সরান।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'ভুল পাসওয়ার্ড',
     form_username_invalid_character:
       'আপনার ব্যবহারকারীর নামে অবৈধ অক্ষর রয়েছে। দয়া করে শুধুমাত্র অক্ষর, সংখ্যা এবং আন্ডারস্কোর ব্যবহার করুন।',
