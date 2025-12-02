@@ -28,8 +28,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
-      await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
-      await u.po.signIn.getUseAnotherMethodLink().click();
+      await expect(
+        u.page.getByText(
+          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+        ),
+      ).toBeVisible();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
       await u.page.getByRole('textbox', { name: 'code' }).click();
@@ -78,10 +81,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
-      await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
-
-      await u.po.signIn.getUseAnotherMethodLink().click();
-
+      await expect(
+        u.page.getByText(
+          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+        ),
+      ).toBeVisible();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
       await u.page.getByRole('textbox', { name: 'code' }).click();
