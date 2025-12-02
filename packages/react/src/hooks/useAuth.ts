@@ -8,12 +8,12 @@ import type {
   SignOut,
   UseAuthReturn,
 } from '@clerk/shared/types';
-import { useCallback } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-import { useAuthContext } from '../contexts/AuthContext';
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
 import { errorThrower } from '../errors/errorThrower';
 import { invalidStateError } from '../errors/messages';
+import { authStore } from '../stores/authStore';
 import { useAssertWrappedByClerkProvider } from './useAssertWrappedByClerkProvider';
 import { createGetToken, createSignOut } from './utils';
 
@@ -95,17 +95,12 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
 export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuthReturn => {
   useAssertWrappedByClerkProvider('useAuth');
 
-  const { treatPendingAsSignedOut, ...rest } = initialAuthStateOrOptions ?? {};
-  const initialAuthState = rest as any;
-
-  const authContextFromHook = useAuthContext();
-  let authContext = authContextFromHook;
-
-  if (authContext.sessionId === undefined && authContext.userId === undefined) {
-    authContext = initialAuthState != null ? initialAuthState : {};
-  }
+  const { treatPendingAsSignedOut } = initialAuthStateOrOptions ?? {};
 
   const isomorphicClerk = useIsomorphicClerkContext();
+
+  const authContext = useSyncExternalStore(authStore.subscribe, authStore.getSnapshot, authStore.getServerSnapshot);
+
   const getToken: GetToken = useCallback(createGetToken(isomorphicClerk), [isomorphicClerk]);
   const signOut: SignOut = useCallback(createSignOut(isomorphicClerk), [isomorphicClerk]);
 
