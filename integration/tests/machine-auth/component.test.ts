@@ -30,7 +30,7 @@ const mockAPIKeysEnvironmentSettings = async (
 testAgainstRunningApps({
   withEnv: [appConfigs.envs.withAPIKeys],
   withPattern: ['withMachine.next.appRouter'],
-})('api keys component @xmachine', ({ app }) => {
+})('api keys component @machine', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;
