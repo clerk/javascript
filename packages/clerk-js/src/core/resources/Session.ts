@@ -28,6 +28,7 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
+import { LruMap } from '@/utils/lru-map';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -46,8 +47,11 @@ import { SessionVerification } from './SessionVerification';
  * Cache of per-tokenId locks for cross-tab coordination.
  * Each unique tokenId gets its own lock, allowing different token types
  * (e.g., different orgs, JWT templates) to be fetched in parallel.
+ *
+ * LruMap is used to limit the maximum number of lock instances to prevent
+ * unbounded memory growth in long-lived browser sessions.
  */
-const tokenLocks = new Map<string, ReturnType<typeof SafeLock>>();
+const tokenLocks = new LruMap<string, ReturnType<typeof SafeLock>>(50);
 
 /**
  * Gets or creates a cross-tab lock for a specific tokenId.
@@ -387,7 +391,6 @@ export class Session extends BaseResource implements SessionResource {
 
     // Fast path: check cache without lock for immediate hits
     const cachedEntry = skipCache ? undefined : SessionTokenCache.get({ tokenId }, leewayInSeconds);
-
     // Dispatch tokenUpdate only for __session tokens with the session's active organization ID, and not JWT templates
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
@@ -396,7 +399,6 @@ export class Session extends BaseResource implements SessionResource {
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
-      // Return null when raw string is empty to indicate that there it's signed-out
       return cachedToken.getRawString() || null;
     }
 
@@ -454,7 +456,7 @@ export class Session extends BaseResource implements SessionResource {
           }
         }
 
-        // Return null when raw string is empty to indicate that there it's signed-out
+        // Return null when raw string is empty to indicate that it's signed-out
         return token.getRawString() || null;
       });
     });

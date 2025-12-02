@@ -426,6 +426,60 @@ describe('Session', () => {
 
       expect(requestSpy).toHaveBeenCalledTimes(2);
     });
+
+    it('uses cache populated by another source during lock wait (simulates cross-tab)', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      const token1 = await session.getToken();
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+      expect(token1).toEqual(mockJwt);
+
+      requestSpy.mockClear();
+
+      const token2 = await session.getToken();
+      expect(requestSpy).toHaveBeenCalledTimes(0);
+      expect(token2).toEqual(mockJwt);
+    });
+
+    it('makes API call when skipCache is true even if cache is populated', async () => {
+      BaseResource.clerk = clerkMock();
+
+      const session = new Session({
+        status: 'active',
+        id: 'session_1',
+        object: 'session',
+        user: createUser({}),
+        last_active_organization_id: null,
+        last_active_token: { object: 'token', jwt: mockJwt },
+        actor: null,
+        created_at: new Date().getTime(),
+        updated_at: new Date().getTime(),
+      } as SessionJSON);
+
+      expect(SessionTokenCache.size()).toBe(1);
+
+      const requestSpy = BaseResource.clerk.getFapiClient().request as Mock<any>;
+      requestSpy.mockClear();
+
+      const token = await session.getToken({ skipCache: true });
+
+      expect(requestSpy).toHaveBeenCalledTimes(1);
+      expect(token).toEqual(mockJwt);
+    });
   });
 
   describe('touch()', () => {
