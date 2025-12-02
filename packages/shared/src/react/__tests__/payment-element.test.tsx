@@ -53,12 +53,6 @@ vi.mock('../hooks/useUser', () => ({
   }),
 }));
 
-vi.mock('../hooks/useOrganization', () => ({
-  useOrganization: () => ({
-    organization: null,
-  }),
-}));
-
 const mockInitializePaymentMethod = vi.fn().mockResolvedValue({
   externalGatewayId: 'acct_123',
   externalClientSecret: 'seti_123',

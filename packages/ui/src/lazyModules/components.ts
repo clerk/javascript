@@ -17,7 +17,7 @@ const componentImportPaths = {
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
-  KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/KeylessPrompt'),
+  KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/devPrompts/KeylessPrompt'),
   PricingTable: () => import(/* webpackChunkName: "pricingTable" */ '../components/PricingTable'),
   Checkout: () => import(/* webpackChunkName: "checkout" */ '../components/Checkout'),
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
@@ -27,6 +27,8 @@ const componentImportPaths = {
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
   OAuthConsent: () => import(/* webpackChunkName: "oauthConsent" */ '../components/OAuthConsent/OAuthConsent'),
+  EnableOrganizationsPrompt: () =>
+    import(/* webpackChunkName: "enableOrganizationsPrompt" */ '../components/devPrompts/EnableOrganizationsPrompt'),
 } as const;
 
 export const SignIn = lazy(() => componentImportPaths.SignIn().then(module => ({ default: module.SignIn })));
@@ -42,6 +44,10 @@ export const UserVerification = lazy(() =>
 
 export const UserVerificationModal = lazy(() =>
   componentImportPaths.UserVerification().then(module => ({ default: module.UserVerificationModal })),
+);
+
+export const EnableOrganizationsPrompt = lazy(() =>
+  componentImportPaths.EnableOrganizationsPrompt().then(module => ({ default: module.EnableOrganizationsPrompt })),
 );
 
 export const SignUp = lazy(() => componentImportPaths.SignUp().then(module => ({ default: module.SignUp })));
@@ -144,6 +150,7 @@ export const ClerkComponents = {
   UserButton,
   UserProfile,
   UserVerification,
+  EnableOrganizationsPrompt,
   OrganizationSwitcher,
   OrganizationList,
   OrganizationProfile,
