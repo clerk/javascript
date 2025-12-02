@@ -3,6 +3,7 @@ import { deriveState } from '@clerk/shared/deriveState';
 import { loadClerkJsScript, type LoadClerkJsScriptOptions, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   Clerk,
+  ClerkOptions,
   ClientResource,
   InitialState,
   IsomorphicClerkOptions,
@@ -11,20 +12,21 @@ import type {
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Appearance, Ui } from '@clerk/ui/internal';
 import type { Plugin } from 'vue';
 import { computed, ref, shallowRef, triggerRef } from 'vue';
 
 import { ClerkInjectionKey } from './keys';
-
 declare global {
   interface Window {
     __unstable_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
 
-export type PluginOptions = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl'> &
+export type PluginOptions<TUi extends Ui = Ui> = Without<IsomorphicClerkOptions, 'domain' | 'proxyUrl' | 'appearance'> &
   MultiDomainAndOrProxy & {
     initialState?: InitialState;
+    appearance?: Appearance<TUi>;
   };
 
 const SDK_METADATA = {
@@ -52,7 +54,7 @@ const SDK_METADATA = {
  * ```
  */
 export const clerkPlugin: Plugin<[PluginOptions]> = {
-  install(app, pluginOptions) {
+  install<TUi extends Ui = Ui>(app: any, pluginOptions: PluginOptions<TUi>) {
     const { initialState } = pluginOptions || {};
 
     const loaded = shallowRef(false);
@@ -93,7 +95,8 @@ export const clerkPlugin: Plugin<[PluginOptions]> = {
           }
 
           clerk.value = window.Clerk;
-          await window.Clerk.load({ ...options, clerkUiCtor: clerkUiCtorPromise });
+          const loadOptions = { ...options, clerkUiCtor: clerkUiCtorPromise } as unknown as ClerkOptions;
+          await window.Clerk.load(loadOptions);
           loaded.value = true;
 
           if (clerk.value) {

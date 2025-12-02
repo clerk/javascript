@@ -873,6 +873,14 @@ export const ptBR: LocalizationResource = {
       actionText: 'Conectado como {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Resetar Senha',
+    signOut: {
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
+    },
+    title: 'Resetar senha',
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
     captcha_invalid:

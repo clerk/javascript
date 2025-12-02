@@ -13,34 +13,45 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/ui.mjs",
-      "default": "./dist/ui.mjs"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./entry": {
-      "types": "./dist/types/entry.d.ts",
-      "import": "./dist/entry.mjs",
-      "default": "./dist/entry.mjs"
+      "types": "./dist/entry.d.ts",
+      "import": "./dist/entry.js",
+      "default": "./dist/entry.js"
     },
+    "./internal": {
+      "types": "./dist/internal/index.d.ts",
+      "import": "./dist/internal/index.js",
+      "default": "./dist/internal/index.js"
+    },
+    "./themes": {
+      "types": "./dist/themes/index.d.ts",
+      "import": "./dist/themes/index.js",
+      "default": "./dist/themes/index.js"
+    },
+    "./themes/shadcn.css": "./dist/themes/shadcn.css",
     "./package.json": "./package.json"
   },
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "pnpm build:bundle && pnpm build:declarations",
+    "build": "pnpm build:umd && pnpm build:esm",
     "build:analyze": "rspack build --config rspack.config.js --env production --analyze",
-    "build:bundle": "rspack build --config rspack.config.js --env production",
-    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:esm": "tsdown",
+    "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
-    "dev": "rspack serve --config rspack.config.js",
+    "dev": "tsdown --watch src",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4001}",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
-    "lint:attw": "attw --pack . --profile esm-only --ignore-rules internal-resolution-error",
+    "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
     "lint:disabled": "eslint src",
     "lint:publint": "publint",
     "showerrors": "tsc",
@@ -69,10 +80,12 @@
     "@rspack/cli": "^1.6.0",
     "@rspack/core": "^1.6.0",
     "@rspack/plugin-react-refresh": "^1.5.2",
+    "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "cross-fetch": "^4.1.0",
+    "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
   },
   "engines": {

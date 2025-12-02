@@ -1,8 +1,7 @@
-import type { Theme } from '@clerk/shared/types';
-
 import { createShadowSet, generateShadow } from '../foundations/shadows';
 import { BORDER_RADIUS_SCALE_RATIOS, spaceScaleKeys } from '../foundations/sizes';
 import { FONT_SIZE_SCALE_RATIOS, type FontSizeKey, type fontWeights } from '../foundations/typography';
+import type { Theme } from '../internal/appearance';
 import { colors } from '../utils/colors';
 import { colorOptionToThemedAlphaScale, colorOptionToThemedLightnessScale } from '../utils/colors/scales';
 import { createAlphaColorMixString } from '../utils/colors/utils';

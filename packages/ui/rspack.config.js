@@ -15,14 +15,10 @@ const isDevelopment = mode => !isProduction(mode);
 
 const variants = {
   uiBrowser: 'ui.browser',
-  ui: 'ui',
-  entry: 'entry',
 };
 
 const variantToSourceFile = {
   [variants.uiBrowser]: './src/index.browser.ts',
-  [variants.ui]: './src/index.ts',
-  [variants.entry]: './src/entry.ts',
 };
 
 /**
@@ -140,43 +136,9 @@ const commonForProdBrowser = () => {
 };
 
 /**
- * Common production configuration for bundled module builds (no chunks)
- * @returns {import('@rspack/core').Configuration}
- */
-const commonForProdBundled = () => {
-  return {
-    devtool: false,
-    output: {
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: '',
-    },
-    module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets: 'last 2 years' })],
-    },
-    optimization: {
-      minimize: true,
-      minimizer: [
-        new rspack.SwcJsMinimizerRspackPlugin({
-          minimizerOptions: {
-            compress: {
-              unused: true,
-              dead_code: true,
-              passes: 2,
-            },
-            mangle: {
-              safari10: true,
-            },
-          },
-        }),
-      ],
-    },
-  };
-};
-
-/**
- * Production configuration - builds multiple variants
+ * Production configuration - builds UMD browser variant only
  * @param {'development'|'production'} mode
- * @returns {(import('@rspack/core').Configuration)[]}
+ * @returns {import('@rspack/core').Configuration}
  */
 const prodConfig = mode => {
   // Browser bundle with chunks (UMD)
@@ -186,52 +148,7 @@ const prodConfig = mode => {
     commonForProdBrowser(),
   );
 
-  // ESM module bundle (no chunks)
-  const uiEsm = merge(entryForVariant(variants.ui), common({ mode, variant: variants.ui }), commonForProdBundled(), {
-    experiments: {
-      outputModule: true,
-    },
-    output: {
-      filename: '[name].mjs',
-      libraryTarget: 'module',
-    },
-    plugins: [
-      // Bundle everything into a single file for ESM
-      new rspack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
-    ],
-    optimization: {
-      splitChunks: false,
-    },
-  });
-
-  // Entry ESM module bundle (no chunks)
-  const entryEsm = merge(
-    entryForVariant(variants.entry),
-    common({ mode, variant: variants.entry }),
-    commonForProdBundled(),
-    {
-      experiments: {
-        outputModule: true,
-      },
-      output: {
-        filename: '[name].mjs',
-        libraryTarget: 'module',
-      },
-      plugins: [
-        // Bundle everything into a single file for ESM
-        new rspack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
-      optimization: {
-        splitChunks: false,
-      },
-    },
-  );
-
-  return [uiBrowser, uiEsm, entryEsm];
+  return uiBrowser;
 };
 
 /**
