@@ -697,6 +697,9 @@ export const thTH: LocalizationResource = {
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
       resendButton: 'ไม่ได้รับรหัส? ส่งใหม่',
@@ -899,6 +902,7 @@ export const thTH: LocalizationResource = {
     form_password_pwned__sign_in:
       'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของรหัสผ่านที่เคยถูกโจรกรรมข้อมูลและไม่สามารถใช้ได้ โปรดรีเซ็ตรหัสผ่านของคุณ',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',

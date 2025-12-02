@@ -38,6 +38,11 @@ export function SafeLock(key: string): SafeLockReturn {
   activeLocks.set(key, lock);
   registerCleanupListener();
 
+  /**
+   * Acquires the cross-tab lock and executes the callback while holding it.
+   * If lock acquisition fails or times out, executes the callback anyway (degraded mode)
+   * to ensure the operation completes rather than failing.
+   */
   const acquireLockAndRun = async <T>(cb: () => Promise<T>): Promise<T> => {
     if ('locks' in navigator && isSecureContext) {
       const controller = new AbortController();
@@ -51,6 +56,7 @@ export function SafeLock(key: string): SafeLockReturn {
       } catch (error) {
         clearTimeout(lockTimeout);
         if (error instanceof Error && error.name === 'AbortError') {
+          // Lock request was aborted (timeout) - execute callback anyway in degraded mode
           debugLogger.warn('Lock acquisition timed out, proceeding without lock (degraded mode)', { key }, 'safeLock');
           return await cb();
         }
@@ -58,6 +64,7 @@ export function SafeLock(key: string): SafeLockReturn {
       }
     }
 
+    // Fallback for non-secure contexts using localStorage-based locking
     if (await lock.acquireLock(key, LOCK_TIMEOUT_MS + 1)) {
       try {
         return await cb();
@@ -66,6 +73,7 @@ export function SafeLock(key: string): SafeLockReturn {
       }
     }
 
+    // Lock acquisition timed out - execute callback anyway in degraded mode
     debugLogger.warn('Lock acquisition timed out, proceeding without lock (degraded mode)', { key }, 'safeLock');
     return await cb();
   };

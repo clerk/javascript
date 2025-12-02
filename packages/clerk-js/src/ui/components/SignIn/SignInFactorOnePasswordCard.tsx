@@ -1,4 +1,4 @@
-import { isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
+import { isPasswordPwnedError, isPasswordUntrustedError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
@@ -18,10 +18,12 @@ import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
+export type PasswordErrorCode = 'untrusted' | 'pwned';
+
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
   onShowAlternativeMethodsClick: React.MouseEventHandler | undefined;
-  onPasswordPwned?: () => void;
+  onPasswordError?: (errorCode: PasswordErrorCode) => void;
 };
 
 const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
@@ -50,7 +52,7 @@ const usePasswordControl = (props: SignInFactorOnePasswordProps) => {
 };
 
 export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps) => {
-  const { onShowAlternativeMethodsClick, onPasswordPwned } = props;
+  const { onShowAlternativeMethodsClick, onPasswordError } = props;
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
   const card = useCardState();
   const { setActive } = useClerk();
@@ -64,20 +66,20 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
   const clerk = useClerk();
 
   const goBack = () => {
-    return navigate('../');
+    void navigate('../');
   };
 
-  const handlePasswordSubmit: React.FormEventHandler = async e => {
+  const handlePasswordSubmit: React.FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
-    return signIn
+    void signIn
       .attemptFirstFactor({ strategy: 'password', password: passwordControl.value })
       .then(res => {
         switch (res.status) {
           case 'complete':
             return setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              navigate: ({ session }) => {
+                void navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
               },
             });
           case 'needs_second_factor':
@@ -92,10 +94,18 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           return clerk.__internal_navigateWithError('..', err.errors[0]);
         }
 
-        if (isPasswordPwnedError(err) && onPasswordPwned) {
-          card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
-          onPasswordPwned();
-          return;
+        if (onPasswordError) {
+          if (isPasswordPwnedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_pwned__sign_in' });
+            onPasswordError('pwned');
+            return;
+          }
+
+          if (isPasswordUntrustedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_untrusted__sign_in' });
+            onPasswordError('untrusted');
+            return;
+          }
         }
 
         handleError(err, [passwordControl], card.setError);

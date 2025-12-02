@@ -37,7 +37,7 @@ describe('SafeLock', () => {
 
   describe('Web Locks API path', () => {
     it('uses Web Locks API when available in secure context', async () => {
-      // Skip if Web Locks not available or not in secure context
+      // Skip if Web Locks not available or not in secure context (e.g. jsdom without polyfill)
       if (!('locks' in navigator) || !navigator.locks || !isSecureContext) {
         return;
       }
