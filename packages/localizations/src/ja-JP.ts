@@ -901,8 +901,7 @@ export const jaJP: LocalizationResource = {
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
-    form_password_pwned__sign_in:
-      'このパスワードは侵害の一部として見つかったため使用できません。パスワードをリセットしてください。',
+    form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
     form_password_untrusted__sign_in: undefined,
