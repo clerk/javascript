@@ -375,25 +375,21 @@ export class Session extends BaseResource implements SessionResource {
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cacheResult) {
-      // SWR: If token is expiring soon, trigger background refresh (fire-and-forget)
+      // Capture reference before potential cache update from background refresh
+      const tokenResolver = cacheResult.entry.tokenResolver;
+
       if (cacheResult.needsRefresh) {
-        debugLogger.debug('Token expiring soon, triggering background refresh', { tokenId }, 'session');
+        debugLogger.debug('Serving cached token while refreshing in background', { tokenId }, 'session');
         void this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
+      } else {
+        debugLogger.debug('Using cached token', { tokenId }, 'session');
       }
 
-      debugLogger.debug(
-        'Using cached token',
-        {
-          needsRefresh: cacheResult.needsRefresh,
-          tokenId,
-        },
-        'session',
-      );
-      const cachedToken = await cacheResult.entry.tokenResolver;
+      const cachedToken = await tokenResolver;
       if (shouldDispatchTokenUpdate) {
         eventBus.emit(events.TokenUpdate, { token: cachedToken });
       }
-      // Return null when raw string is empty to indicate that there it's signed-out
+      // Return null when raw string is empty to indicate signed-out state
       return cachedToken.getRawString() || null;
     }
 
