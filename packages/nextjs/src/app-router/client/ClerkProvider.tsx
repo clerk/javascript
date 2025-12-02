@@ -1,5 +1,6 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import { InitialStateProvider } from '@clerk/shared/react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ const LazyCreateKeylessApplication = dynamic(() =>
   import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
 );
 
-const NextClientClerkProvider = (props: NextClerkProviderProps) => {
+const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
   const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
@@ -103,7 +104,9 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKeyless?: boolean }) => {
+export const ClientClerkProvider = <TUi extends Ui = Ui>(
+  props: NextClerkProviderProps<TUi> & { disableKeyless?: boolean },
+) => {
   const { children, disableKeyless = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 

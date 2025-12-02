@@ -1,26 +1,18 @@
-import { isPublishableKey } from '@clerk/shared/keys';
 import { ClerkContextProvider } from '@clerk/shared/react';
+import type { Ui } from '@clerk/ui/internal';
 import React from 'react';
 
-import { errorThrower } from '../errors/errorThrower';
 import { multipleClerkProvidersError } from '../errors/messages';
 import { IsomorphicClerk } from '../isomorphicClerk';
 import type { ClerkProviderProps, IsomorphicClerkOptions } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
 
-function ClerkProviderBase(props: ClerkProviderProps) {
-  const { initialState, children, __internal_bypassMissingPublishableKey, ...restIsomorphicClerkOptions } = props;
-  const { publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
+function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
+  const { initialState, children, ...restIsomorphicClerkOptions } = props;
 
-  if (!userInitialisedClerk && !__internal_bypassMissingPublishableKey) {
-    if (!publishableKey) {
-      errorThrower.throwMissingPublishableKeyError();
-    } else if (publishableKey && !isPublishableKey(publishableKey)) {
-      errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
-    }
-  }
-
-  const { isomorphicClerk, clerkStatus } = useLoadedIsomorphicClerk(restIsomorphicClerkOptions);
+  const { isomorphicClerk, clerkStatus } = useLoadedIsomorphicClerk(
+    restIsomorphicClerkOptions as unknown as IsomorphicClerkOptions,
+  );
 
   return (
     <ClerkContextProvider

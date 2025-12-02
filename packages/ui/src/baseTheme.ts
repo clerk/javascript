@@ -1,6 +1,5 @@
-import type { Appearance, Elements } from '@clerk/shared/types';
-
 import type { InternalTheme } from './foundations';
+import type { Appearance, Elements } from './internal/appearance';
 
 const BORDER_SHADOW_LENGTH = '0px 0px 0px 1px';
 const BUTTON_SOLID_SHADOW = (color: string) =>

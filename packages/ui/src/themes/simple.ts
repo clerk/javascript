@@ -1,4 +1,4 @@
-import { experimental_createTheme } from '../createTheme';
+import { experimental_createTheme } from './createTheme';
 
 export const experimental__simple = experimental_createTheme({
   name: 'simple',

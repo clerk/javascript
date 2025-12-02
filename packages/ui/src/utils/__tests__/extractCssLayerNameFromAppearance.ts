@@ -1,6 +1,6 @@
-import type { Appearance, BaseTheme } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
+import type { Appearance, BaseTheme } from '../../internal/appearance';
 import { extractCssLayerNameFromAppearance } from '../extractCssLayerNameFromAppearance';
 
 describe('extractCssLayerNameFromAppearance', () => {

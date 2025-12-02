@@ -1,3 +1,4 @@
+import type { Ui } from '@clerk/react/internal';
 import type { InitialState, Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
 import React from 'react';
@@ -25,8 +26,8 @@ const getNonceHeaders = React.cache(async function getNonceHeaders() {
       getScriptNonceFromHeader(headersList.get('Content-Security-Policy') || '') || '';
 });
 
-export async function ClerkProvider(
-  props: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
+export async function ClerkProvider<TUi extends Ui = Ui>(
+  props: Without<NextClerkProviderProps<TUi>, '__unstable_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
 

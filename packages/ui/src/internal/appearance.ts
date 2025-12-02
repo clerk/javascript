@@ -1,22 +1,22 @@
-import type * as CSS from 'csstype';
-
 import type {
   AlertId,
+  BuiltInColors,
   CardActionId,
+  EnterpriseProvider,
   FieldId,
   MenuId,
+  OAuthProvider,
   OrganizationPreviewId,
+  PhoneCodeChannel,
   ProfilePageId,
   ProfileSectionId,
+  SamlIdpSlug,
   SelectId,
+  TransparentColor,
   UserPreviewId,
-} from './elementIds';
-import type { EnterpriseProvider } from './enterpriseAccount';
-import type { OAuthProvider } from './oauth';
-import type { PhoneCodeChannel } from './phoneCodeChannel';
-import type { SamlIdpSlug } from './saml';
-import type { BuiltInColors, TransparentColor } from './theme';
-import type { Web3Provider } from './web3';
+  Web3Provider,
+} from '@clerk/shared/types';
+import type * as CSS from 'csstype';
 
 type CSSProperties = CSS.PropertiesFallback<number | string>;
 type CSSPropertiesWithMultiValues = { [K in keyof CSSProperties]: CSSProperties[K] };
@@ -872,7 +872,7 @@ export type Theme = {
    * Supports both object-based themes and string-based themes:
    *
    * @example
-   * import { dark } from "@clerk/themes";
+   * import { dark } from "@clerk/ui/themes";
    * appearance={{ theme: dark }}
    *
    * @example
@@ -887,7 +887,7 @@ export type Theme = {
    * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * @example
-   * import { dark } from "@clerk/themes";
+   * import { dark } from "@clerk/ui/themes";
    * appearance={{ baseTheme: dark }}
    */
   baseTheme?: BaseTheme | BaseTheme[];
