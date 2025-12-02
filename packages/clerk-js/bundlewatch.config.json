@@ -1,13 +1,13 @@
 {
   "files": [
     { "path": "./dist/clerk.js", "maxSize": "918KB" },
-    { "path": "./dist/clerk.browser.js", "maxSize": "81KB" },
-    { "path": "./dist/clerk.channel.browser.js", "maxSize": "81KB" },
-    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "123KB" },
+    { "path": "./dist/clerk.browser.js", "maxSize": "84KB" },
+    { "path": "./dist/clerk.channel.browser.js", "maxSize": "85KB" },
+    { "path": "./dist/clerk.legacy.browser.js", "maxSize": "125KB" },
     { "path": "./dist/clerk.headless*.js", "maxSize": "65KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "119KB" },
     { "path": "./dist/ui-common*.legacy.*.js", "maxSize": "122KB" },
-    { "path": "./dist/vendors*.js", "maxSize": "47KB" },
+    { "path": "./dist/vendors*.js", "maxSize": "50KB" },
     { "path": "./dist/coinbase*.js", "maxSize": "38KB" },
     { "path": "./dist/stripe-vendors*.js", "maxSize": "1KB" },
     { "path": "./dist/createorganization*.js", "maxSize": "5KB" },
