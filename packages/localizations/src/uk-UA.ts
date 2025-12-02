@@ -694,6 +694,9 @@ export const ukUA: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Код підтвердження',
       resendButton: 'Не отримали код? повторно відправити',
@@ -895,6 +898,7 @@ export const ukUA: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перевищує максимально допустиму кількість байтів, скоротіть його або видаліть деякі спеціальні символи.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невірний пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

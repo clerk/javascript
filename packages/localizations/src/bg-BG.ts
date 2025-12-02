@@ -696,6 +696,9 @@ export const bgBG: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Код за потвърждение',
       resendButton: 'Не сте получили код? Изпрати отново',
@@ -897,6 +900,7 @@ export const bgBG: LocalizationResource = {
     form_password_pwned: 'Тази парола е компрометирана в изтекли данни. Моля, изберете друга.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: 'Паролата ви е твърде дълга. Моля, съкратете я.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невалидна парола.',
     form_username_invalid_character: 'Потребителското име съдържа невалидни символи.',
     form_username_invalid_length: 'Потребителското име трябва да бъде между 3 и 256 символа.',

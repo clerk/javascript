@@ -695,6 +695,9 @@ export const jaJP: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: '検証コード',
       resendButton: 'コードを再送信',
@@ -898,9 +901,11 @@ export const jaJP: LocalizationResource = {
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
-    form_password_pwned__sign_in: undefined,
+    form_password_pwned__sign_in:
+      'このパスワードは侵害の一部として見つかったため使用できません。パスワードをリセットしてください。',
     form_password_size_in_bytes_exceeded:
       'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'パスワードが間違っています',
     form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
