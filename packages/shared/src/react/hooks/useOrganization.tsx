@@ -20,6 +20,7 @@ import {
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -280,6 +281,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization');
 
   const { organization } = useOrganizationContext();
   const session = useSessionContext();

@@ -30,6 +30,7 @@ export type LoadClerkJsScriptOptions = {
 export type LoadClerkUiScriptOptions = {
   publishableKey: string;
   clerkUiUrl?: string;
+  clerkUiVersion?: string;
   proxyUrl?: string;
   domain?: string;
   nonce?: string;
@@ -162,15 +163,15 @@ export const clerkJsScriptUrl = (opts: LoadClerkJsScriptOptions) => {
 };
 
 export const clerkUiScriptUrl = (opts: LoadClerkUiScriptOptions) => {
-  const { clerkUiUrl, proxyUrl, domain, publishableKey } = opts;
+  const { clerkUiUrl, clerkUiVersion, proxyUrl, domain, publishableKey } = opts;
 
   if (clerkUiUrl) {
     return clerkUiUrl;
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  // TODO: add version selector for clerk/ui similar to clerk-js
-  return `https://${scriptHost}/npm/@clerk/ui@latest/dist/ui.browser.js`;
+  const version = versionSelector(clerkUiVersion);
+  return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 
 export const buildClerkJsScriptAttributes = (options: LoadClerkJsScriptOptions) => {

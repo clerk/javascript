@@ -1,8 +1,9 @@
-import type { Appearance, CaptchaAppearanceOptions, DeepPartial, Elements, Layout, Theme } from '@clerk/shared/types';
+import type { DeepPartial } from '@clerk/shared/types';
 import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
 import { baseTheme, getBaseTheme } from '../baseTheme';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
+import type { Appearance, CaptchaAppearanceOptions, Elements, Layout, Theme } from '../internal/appearance';
 import type { InternalTheme } from '../styledSystem';
 import {
   createColorScales,
@@ -27,7 +28,7 @@ type PublicAppearanceTopLevelKey = keyof Omit<
 export type AppearanceCascade = {
   globalAppearance?: Appearance;
   appearance?: Appearance;
-  appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab';
+  appearanceKey: PublicAppearanceTopLevelKey | 'impersonationFab' | 'enableOrganizationsPrompt';
 };
 
 export type ParsedAppearance = {

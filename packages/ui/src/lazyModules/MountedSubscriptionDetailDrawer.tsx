@@ -1,7 +1,8 @@
 import { useUser } from '@clerk/shared/react';
-import type { __internal_SubscriptionDetailsProps, Appearance } from '@clerk/shared/types';
+import type { __internal_SubscriptionDetailsProps } from '@clerk/shared/types';
 
 import { SubscriptionDetails } from '../components/SubscriptionDetails';
+import type { Appearance } from '../internal/appearance';
 import { LazyDrawerRenderer } from './providers';
 
 export function MountedSubscriptionDetailDrawer({
