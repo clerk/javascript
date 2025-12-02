@@ -25,6 +25,11 @@ interface TokenCacheEntry extends TokenCacheKeyJSON {
    */
   createdAt?: Seconds;
   /**
+   * The resolved token value for synchronous reads.
+   * Populated after tokenResolver resolves. Check this first to avoid microtask overhead.
+   */
+  resolvedToken?: TokenResource;
+  /**
    * Promise that resolves to the TokenResource.
    * May be pending and should be awaited before accessing token data.
    */
@@ -77,6 +82,14 @@ export interface TokenCache {
    * @returns Result with entry and refresh flag, or undefined if token is missing/expired/too close to expiration
    */
   get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheGetResult | undefined;
+
+  /**
+   * Resets the isRefreshing flag on an existing cache entry without replacing it.
+   * Used when a background refresh fails to allow future refresh attempts.
+   *
+   * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
+   */
+  markRefreshComplete(cacheKeyJSON: TokenCacheKeyJSON): void;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -358,6 +371,9 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     entry.tokenResolver
       .then(newToken => {
+        // Store resolved token for synchronous reads
+        entry.resolvedToken = newToken;
+
         const claims = newToken.jwt?.claims;
         if (!claims || typeof claims.exp !== 'number' || typeof claims.iat !== 'number') {
           return deleteKey();
@@ -431,11 +447,19 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
   };
 
+  const markRefreshComplete = (cacheKeyJSON: TokenCacheKeyJSON): void => {
+    const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
+    const value = cache.get(cacheKey.toKey());
+    if (value) {
+      value.isRefreshing = false;
+    }
+  };
+
   const size = () => {
     return cache.size;
   };
 
-  return { clear, close, get, set, size };
+  return { clear, close, get, markRefreshComplete, set, size };
 };
 
 export const SessionTokenCache = MemoryTokenCache();

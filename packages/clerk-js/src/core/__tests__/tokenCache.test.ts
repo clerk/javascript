@@ -576,20 +576,20 @@ describe('SessionTokenCache', () => {
       SessionTokenCache.set({ ...key, tokenResolver });
       await tokenResolver;
 
-      // At 49s elapsed, 11s remaining - fresh, no refresh needed
-      vi.advanceTimersByTime(49 * 1000);
+      // At 44s elapsed, 16s remaining - fresh, no refresh needed (> 15s MIN_REMAINING_TTL)
+      vi.advanceTimersByTime(44 * 1000);
       let result = SessionTokenCache.get(key);
       expect(result?.entry.tokenId).toBe('expiring-token');
       expect(result?.needsRefresh).toBe(false);
 
-      // At 51s elapsed, 9s remaining (< 10s leeway) - SWR: return token with needsRefresh=true
+      // At 46s elapsed, 14s remaining (< 15s MIN_REMAINING_TTL) - SWR: return token with needsRefresh=true
       vi.advanceTimersByTime(2 * 1000);
       result = SessionTokenCache.get(key);
       expect(result?.entry.tokenId).toBe('expiring-token');
       expect(result?.needsRefresh).toBe(true);
 
       // At 60s elapsed, 0s remaining - token actually expired, return undefined
-      vi.advanceTimersByTime(9 * 1000);
+      vi.advanceTimersByTime(14 * 1000);
       result = SessionTokenCache.get(key);
       expect(result).toBeUndefined();
     });
@@ -1007,6 +1007,105 @@ describe('SessionTokenCache', () => {
     });
   });
 
+  describe('markRefreshComplete', () => {
+    it('resets isRefreshing flag on existing cache entry', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'refresh-test-token',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'refresh-test-token' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+      await tokenResolver;
+
+      // Advance to within leeway to trigger needsRefresh
+      vi.advanceTimersByTime(51 * 1000); // 9s remaining
+
+      // First get should return needsRefresh=true and set isRefreshing
+      let result = SessionTokenCache.get(key);
+      expect(result?.needsRefresh).toBe(true);
+
+      // Second get should return needsRefresh=false (already refreshing)
+      result = SessionTokenCache.get(key);
+      expect(result?.needsRefresh).toBe(false);
+
+      // Call markRefreshComplete to reset the flag
+      SessionTokenCache.markRefreshComplete(key);
+
+      // Now get should return needsRefresh=true again
+      result = SessionTokenCache.get(key);
+      expect(result?.needsRefresh).toBe(true);
+    });
+
+    it('does nothing if cache entry does not exist', () => {
+      // Should not throw
+      expect(() => {
+        SessionTokenCache.markRefreshComplete({ tokenId: 'non-existent-token' });
+      }).not.toThrow();
+    });
+  });
+
+  describe('resolvedToken', () => {
+    it('is populated after tokenResolver resolves', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'resolved-token-test',
+        jwt,
+        object: 'token',
+      });
+
+      const tokenResolver = Promise.resolve<TokenResource>(token);
+      const key = { tokenId: 'resolved-token-test' };
+
+      SessionTokenCache.set({ ...key, tokenResolver });
+
+      // Before promise resolves, resolvedToken should be undefined
+      let result = SessionTokenCache.get(key);
+      expect(result?.entry.resolvedToken).toBeUndefined();
+
+      // Wait for promise to resolve
+      await tokenResolver;
+
+      // After promise resolves, resolvedToken should be populated
+      result = SessionTokenCache.get(key);
+      expect(result?.entry.resolvedToken).toBeDefined();
+      expect(result?.entry.resolvedToken?.getRawString()).toBeTruthy();
+    });
+
+    it('can be provided when setting a pre-resolved token', async () => {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const jwt = createJwtWithTtl(nowSeconds, 60);
+
+      const token = new Token({
+        id: 'pre-resolved-token',
+        jwt,
+        object: 'token',
+      });
+
+      const key = { tokenId: 'pre-resolved-token' };
+
+      // Set with both tokenResolver and resolvedToken
+      SessionTokenCache.set({
+        ...key,
+        resolvedToken: token,
+        tokenResolver: Promise.resolve(token),
+      });
+
+      // resolvedToken should be immediately available
+      const result = SessionTokenCache.get(key);
+      expect(result?.entry.resolvedToken).toBeDefined();
+      expect(result?.entry.resolvedToken).toBe(token);
+    });
+  });
+
   describe('multi-session isolation', () => {
     it('stores tokens from different session IDs separately without interference', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
@@ -1058,15 +1157,15 @@ describe('SessionTokenCache', () => {
       // (not session2's token) - tokens are isolated by tokenId
       const retrievedSession1Token = SessionTokenCache.get({ tokenId: session1Id });
       expect(retrievedSession1Token).toBeDefined();
-      const resolvedSession1Token = await retrievedSession1Token!.tokenResolver;
+      const resolvedSession1Token = await retrievedSession1Token!.entry.tokenResolver;
       expect(resolvedSession1Token.jwt?.claims?.iat).toBe(nowSeconds);
-      expect(retrievedSession1Token!.tokenId).toBe(session1Id);
+      expect(retrievedSession1Token!.entry.tokenId).toBe(session1Id);
 
       // Verify session2's token is separate
       const retrievedSession2Token = SessionTokenCache.get({ tokenId: session2Id });
       expect(retrievedSession2Token).toBeDefined();
-      expect(retrievedSession2Token!.tokenId).toBe(session2Id);
-      expect(retrievedSession2Token!.tokenId).not.toBe(session1Id);
+      expect(retrievedSession2Token!.entry.tokenId).toBe(session2Id);
+      expect(retrievedSession2Token!.entry.tokenId).not.toBe(session1Id);
     });
 
     it('accepts broadcast messages from the same session ID', async () => {
@@ -1092,7 +1191,7 @@ describe('SessionTokenCache', () => {
 
       const cachedToken = SessionTokenCache.get({ tokenId: sessionId });
       expect(cachedToken).toBeDefined();
-      const resolvedToken = await cachedToken!.tokenResolver;
+      const resolvedToken = await cachedToken!.entry.tokenResolver;
       expect(resolvedToken.jwt?.claims?.iat).toBe(nowSeconds - 10);
 
       const newerJwt = createJwtWithTtl(nowSeconds, 60);
@@ -1112,7 +1211,7 @@ describe('SessionTokenCache', () => {
       await vi.waitFor(async () => {
         const updatedCached = SessionTokenCache.get({ tokenId: sessionId });
         expect(updatedCached).toBeDefined();
-        const updatedToken = await updatedCached!.tokenResolver;
+        const updatedToken = await updatedCached!.entry.tokenResolver;
         expect(updatedToken.jwt?.claims?.iat).toBe(nowSeconds);
       });
 
