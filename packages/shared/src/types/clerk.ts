@@ -2001,6 +2001,10 @@ export type APIKeysProps = {
    * @default false
    */
   showDescription?: boolean;
+  /**
+   * @internal
+   */
+  subject?: string;
 };
 
 export type GetAPIKeysParams = ClerkPaginationParams<{

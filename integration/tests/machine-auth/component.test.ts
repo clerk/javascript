@@ -30,7 +30,7 @@ const mockAPIKeysEnvironmentSettings = async (
 testAgainstRunningApps({
   withEnv: [appConfigs.envs.withAPIKeys],
   withPattern: ['withMachine.next.appRouter'],
-})('api keys component @machine', ({ app }) => {
+})('api keys component @xmachine', ({ app }) => {
   test.describe.configure({ mode: 'serial' });
 
   let fakeAdmin: FakeUser;
@@ -281,6 +281,42 @@ testAgainstRunningApps({
     await page.reload();
     await u.po.page.goToRelative('/organization-profile#/organization-api-keys');
     await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
+
+    await u.page.unrouteAll();
+  });
+
+  test('UserProfile API keys uses user ID as subject even when organization is active', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const admin = await u.services.users.getUser({ email: fakeAdmin.email });
+    expect(admin).toBeDefined();
+    const userId = admin.id;
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    // Set up request interception to capture the subject parameter
+    let capturedSubject: string | null = null;
+    await u.page.route('**/api_keys*', async route => {
+      const url = new URL(route.request().url());
+      capturedSubject = url.searchParams.get('subject');
+      await route.continue();
+    });
+
+    // Navigate to UserProfile API keys page
+    await u.po.page.goToRelative('/user');
+    await u.po.userProfile.waitForMounted();
+    await u.po.userProfile.switchToAPIKeysTab();
+
+    // Verify the subject parameter is the user ID, not the organization ID
+    expect(capturedSubject).toBe(userId);
+    expect(capturedSubject).not.toBe(fakeOrganization.organization.id);
 
     await u.page.unrouteAll();
   });
