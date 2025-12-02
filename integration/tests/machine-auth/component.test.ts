@@ -285,6 +285,43 @@ testAgainstRunningApps({
     await u.page.unrouteAll();
   });
 
+  test('UserProfile API keys uses user ID as subject even when organization is active', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const admin = await u.services.users.getUser({ email: fakeAdmin.email });
+    expect(admin).toBeDefined();
+    const userId = admin.id;
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    let capturedSubject: string | null = null;
+    const apiKeyRequestPromise = u.page.waitForRequest(request => {
+      if (request.url().includes('api_keys')) {
+        const url = new URL(request.url());
+        capturedSubject = url.searchParams.get('subject');
+        return true;
+      }
+      return false;
+    });
+
+    await u.po.page.goToRelative('/user');
+    await u.po.userProfile.waitForMounted();
+    await u.po.userProfile.switchToAPIKeysTab();
+
+    await apiKeyRequestPromise;
+
+    // Verify the subject parameter is the user ID, not the organization ID
+    expect(capturedSubject).toBe(userId);
+    expect(capturedSubject).not.toBe(fakeOrganization.organization.id);
+  });
+
   test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
