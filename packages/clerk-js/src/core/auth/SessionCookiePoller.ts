@@ -1,5 +1,7 @@
 import { createWorkerTimers } from '@clerk/shared/workerTimers';
 
+import { debugLogger } from '@/utils/debug';
+
 const INTERVAL_IN_MS = 5 * 1_000;
 
 /**
@@ -21,8 +23,13 @@ export class SessionCookiePoller {
 
     const run = async () => {
       this.initiated = true;
-      await cb();
-      this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+      try {
+        await cb();
+      } catch (error) {
+        debugLogger.error('SessionCookiePoller callback failed', { error }, 'auth');
+      } finally {
+        this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+      }
     };
 
     void run();
