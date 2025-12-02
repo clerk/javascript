@@ -242,9 +242,7 @@ const _APIKeys = () => {
   // Do not use `useOrganization` to avoid triggering the in-app enable organizations prompt in development instance
   const organizationCtx = useOrganizationContext();
 
-  // Use subject from context if provided (set by UserProfile/OrganizationProfile),
-  // otherwise fall back to organization ID if active, or user ID
-  const subject = ctx.subject ?? organizationCtx?.organization?.id ?? user?.id ?? '';
+  const subject = organizationCtx?.organization?.id ?? user?.id ?? '';
 
   return (
     <Flow.Root

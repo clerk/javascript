@@ -107,9 +107,7 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
     keys: createCacheKeys({
       stablePrefix: STABLE_KEYS.API_KEYS_KEY,
       authenticated: Boolean(clerk.user),
-      tracked: {
-        subject: safeValues.subject,
-      },
+      tracked: {},
       untracked: {
         args: hookParams,
       },

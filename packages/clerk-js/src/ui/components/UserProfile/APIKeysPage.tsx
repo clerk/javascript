@@ -28,7 +28,7 @@ export const APIKeysPage = () => {
           textVariant='h2'
         />
       </Header.Root>
-      <APIKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps, subject: user.id }}>
+      <APIKeysContext.Provider value={{ componentName: 'APIKeys', ...apiKeysProps }}>
         <APIKeysPageInternal
           subject={user.id}
           revokeModalRoot={contentRef}
