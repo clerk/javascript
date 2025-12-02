@@ -1,4 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
+import { lazy, Suspense } from 'react';
 
 import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '@/ui/common/withRedirect';
 import { descriptors, Flex, Flow } from '@/ui/customizables';
@@ -6,8 +7,11 @@ import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
-import { Web3WalletButtons } from '@/ui/elements/Web3WalletButtons';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
+
+const Web3WalletButtons = lazy(() =>
+  import('@/ui/elements/Web3WalletButtons').then(m => ({ default: m.Web3WalletButtons })),
+);
 
 import { useSignUpContext } from '../../contexts';
 import { useRouter } from '../../router';
@@ -35,22 +39,24 @@ const SignUpStartSolanaWalletsCardInner = () => {
             direction='col'
             gap={4}
           >
-            <Web3WalletButtons
-              web3AuthCallback={({ walletName }) => {
-                return clerk
-                  .authenticateWithWeb3({
-                    customNavigate: router.navigate,
-                    redirectUrl: ctx.afterSignUpUrl || '/',
-                    signUpContinueUrl: '../continue',
-                    strategy: 'web3_solana_signature',
-                    unsafeMetadata: ctx.unsafeMetadata,
-                    // TODO: Add support to pass legalAccepted status
-                    // legalAccepted: ,
-                    walletName,
-                  })
-                  .catch(err => web3CallbackErrorHandler(err, card.setError));
-              }}
-            />
+            <Suspense fallback={null}>
+              <Web3WalletButtons
+                web3AuthCallback={({ walletName }) => {
+                  return clerk
+                    .authenticateWithWeb3({
+                      customNavigate: router.navigate,
+                      redirectUrl: ctx.afterSignUpUrl || '/',
+                      signUpContinueUrl: '../continue',
+                      strategy: 'web3_solana_signature',
+                      unsafeMetadata: ctx.unsafeMetadata,
+                      // TODO: Add support to pass legalAccepted status
+                      // legalAccepted: ,
+                      walletName,
+                    })
+                    .catch(err => web3CallbackErrorHandler(err, card.setError));
+                }}
+              />
+            </Suspense>
             <BackLink
               boxElementDescriptor={descriptors.backRow}
               linkElementDescriptor={descriptors.backLink}
