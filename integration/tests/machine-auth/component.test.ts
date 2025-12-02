@@ -301,23 +301,25 @@ testAgainstRunningApps({
     await u.po.organizationSwitcher.waitForMounted();
     await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
 
-    // Capture the subject parameter
     let capturedSubject: string | null = null;
-    await u.page.route('**/api_keys*', async route => {
-      const url = new URL(route.request().url());
-      capturedSubject = url.searchParams.get('subject');
-      await route.continue();
+    const apiKeyRequestPromise = u.page.waitForRequest(request => {
+      if (request.url().includes('api_keys')) {
+        const url = new URL(request.url());
+        capturedSubject = url.searchParams.get('subject');
+        return true;
+      }
+      return false;
     });
 
     await u.po.page.goToRelative('/user');
     await u.po.userProfile.waitForMounted();
     await u.po.userProfile.switchToAPIKeysTab();
 
+    await apiKeyRequestPromise;
+
     // Verify the subject parameter is the user ID, not the organization ID
     expect(capturedSubject).toBe(userId);
     expect(capturedSubject).not.toBe(fakeOrganization.organization.id);
-
-    await u.page.unrouteAll();
   });
 
   test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {
