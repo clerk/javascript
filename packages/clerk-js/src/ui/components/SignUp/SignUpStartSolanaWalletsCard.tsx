@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/shared/react';
 
 import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '@/ui/common/withRedirect';
-import { descriptors, Flex, Flow } from '@/ui/customizables';
+import { descriptors, Flex, Flow, localizationKeys } from '@/ui/customizables';
 import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -27,8 +27,8 @@ const SignUpStartSolanaWalletsCardInner = () => {
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
-            <Header.Title>Sign up with Solana Wallet</Header.Title>
-            <Header.Subtitle>Select a wallet below to sign up</Header.Subtitle>
+            <Header.Title localizationKey={localizationKeys('signUp.web3Solana.title')} />
+            <Header.Subtitle localizationKey={localizationKeys('signUp.web3Solana.subtitle')} />
           </Header.Root>
           <Card.Alert>{card.error}</Card.Alert>
           <Flex

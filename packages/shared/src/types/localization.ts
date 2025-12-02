@@ -369,6 +369,11 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
+    web3Solana: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      noAvailableWallets: LocalizationValue;
+    };
   };
   signIn: {
     start: {
@@ -544,6 +549,10 @@ export type __internal_LocalizationResource = {
       action__signOutAll: LocalizationValue;
     };
     enterpriseConnections: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
+    web3Solana: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
     };
@@ -1298,6 +1307,11 @@ export type __internal_LocalizationResource = {
       actionText: LocalizationValue<'identifier'>;
     };
     formButtonPrimary: LocalizationValue;
+  };
+  web3WalletButtons: {
+    connect: LocalizationValue<'walletName'>;
+    continue: LocalizationValue<'walletName'>;
+    noneAvailable: LocalizationValue<'solanaWalletsLink'>;
   };
 };
 

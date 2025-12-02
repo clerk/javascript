@@ -5,9 +5,22 @@ import type { Ref } from 'react';
 import React, { forwardRef, isValidElement, useMemo } from 'react';
 
 import { ProviderInitialIcon } from '@/ui/common';
-import { Button, descriptors, Flex, Grid, Icon, Image, Link, SimpleButton, Spinner, Text } from '@/ui/customizables';
+import {
+  Button,
+  descriptors,
+  Flex,
+  Grid,
+  Icon,
+  Image,
+  localizationKeys,
+  SimpleButton,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
+import { LinkRenderer } from '@/ui/elements/LinkRenderer';
 import { distributeStrategiesIntoRows } from '@/ui/elements/utils';
 import { mqu, type PropsOfComponent } from '@/ui/styledSystem';
 import { sleep } from '@/ui/utils/sleep';
@@ -23,6 +36,7 @@ const MAX_STRATEGIES_PER_ROW = 5;
 const Web3WalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
   const card = useCardState();
   const { wallets } = useWallet();
+  const { t } = useLocalizations();
 
   // Filter to only show installed wallets
   const installedWallets = React.useMemo(
@@ -61,27 +75,19 @@ const Web3WalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) =>
   if (installedWallets.length === 0) {
     return (
       <Card.Alert>
-        No Solana wallets detected. Please install a Solana supported wallet extension like{' '}
-        <Link
-          href='https://phantom.app/'
-          target='_blank'
-          rel='noopener noreferrer'
-          colorScheme='danger'
+        <LinkRenderer
+          text={t(
+            localizationKeys('web3WalletButtons.noneAvailable', {
+              solanaWalletsLink: 'https://solana.com/solana-wallets',
+            }),
+          )}
           isExternal
-        >
-          Phantom
-        </Link>{' '}
-        or{' '}
-        <Link
-          href='https://www.backpack.app/'
-          target='_blank'
-          rel='noopener noreferrer'
-          isExternal
-          colorScheme='danger'
-        >
-          Backpack
-        </Link>
-        .
+          sx={t => ({
+            textDecoration: 'underline',
+            textUnderlineOffset: t.space.$1,
+            color: 'inherit',
+          })}
+        />
       </Card.Alert>
     );
   }
@@ -120,14 +126,16 @@ const Web3WalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) =>
         >
           {row.map(w => {
             const shouldShowPreText = installedWallets.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD;
-            const label = shouldShowPreText ? `Continue with ${w.name}` : w.name;
+            const label = shouldShowPreText
+              ? localizationKeys('web3WalletButtons.continue', { walletName: w.name })
+              : w.name;
 
             const imageOrInitial = w.icon ? (
               <Image
                 isDisabled={card.isLoading}
                 isLoading={card.loadingMetadata === w.name}
                 src={w.icon}
-                alt={`Sign in with ${w.name}`}
+                alt={t(localizationKeys('web3WalletButtons.connect', { walletName: w.name }))}
                 sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
               />
             ) : (
@@ -145,7 +153,7 @@ const Web3WalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) =>
                 onClick={startWeb3AuthFlow(w.name)}
                 isLoading={card.loadingMetadata === w.name}
                 isDisabled={card.isLoading}
-                label={label}
+                label={t(label)}
                 icon={imageOrInitial}
               />
             );
