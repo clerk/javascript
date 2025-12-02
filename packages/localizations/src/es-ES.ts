@@ -697,6 +697,9 @@ export const esES: LocalizationResource = {
     passwordPwned: {
       title: 'Tu contraseña ha sido comprometida',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: 'Reenviar código',
@@ -900,6 +903,7 @@ export const esES: LocalizationResource = {
     form_password_pwned__sign_in: 'La contraseña ya está en uso en otro servicio.',
     form_password_size_in_bytes_exceeded:
       'Tu contraseña ha excedido el número máximo de bytes permitidos, por favor acórtala o elimina algunos caracteres especiales.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'La validación de la contraseña falló.',
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'El nombre de usuario debe tener entre 3 y 20 caracteres.',

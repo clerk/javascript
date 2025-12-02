@@ -702,6 +702,9 @@ export const esMX: LocalizationResource = {
     passwordPwned: {
       title: 'Contraseña en peligro',
     },
+    passwordUntrusted: {
+      title: undefined,
+    },
     phoneCode: {
       formTitle: 'Código de verificación',
       resendButton: 'Reenviar código',
@@ -908,6 +911,7 @@ export const esMX: LocalizationResource = {
       'Esta contraseña se encontró como parte de una brecha y no se puede utilizar, por favor restablece tu contraseña.',
     form_password_size_in_bytes_exceeded:
       'La contraseña excede el número máximo de bytes permitidos. Por favor, elimine algunos caracteres especiales o reduzca la longitud de la contraseña.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contraseña incorrecta',
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
