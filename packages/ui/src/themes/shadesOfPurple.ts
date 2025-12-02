@@ -1,4 +1,4 @@
-import { experimental_createTheme } from '../createTheme';
+import { experimental_createTheme } from './createTheme';
 import { dark } from './dark';
 
 export const shadesOfPurple = experimental_createTheme({

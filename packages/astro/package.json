@@ -94,6 +94,7 @@
     "nanostores": "1.0.1"
   },
   "devDependencies": {
+    "@clerk/ui": "workspace:^",
     "astro": "^5.15.3"
   },
   "peerDependencies": {

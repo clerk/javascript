@@ -1,4 +1,5 @@
 import type { ClerkProviderProps } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import type { InitialState, Without } from '@clerk/shared/types';
 import type React from 'react';
 
@@ -23,7 +24,10 @@ export type ClerkState = {
   };
 };
 
-export type TanstackStartClerkProviderProps = Without<ClerkProviderProps, 'publishableKey' | 'initialState'> & {
+export type TanstackStartClerkProviderProps<TUi extends Ui = Ui> = Without<
+  ClerkProviderProps<TUi>,
+  'publishableKey' | 'initialState'
+> & {
   publishableKey?: string;
   children: React.ReactNode;
 };

@@ -43,7 +43,7 @@ function ClerkScript(props: ClerkScriptProps) {
 }
 
 export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] }) {
-  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl } = useClerkNextOptions();
+  const { publishableKey, clerkJSUrl, clerkJSVersion, clerkJSVariant, nonce, clerkUiUrl, ui } = useClerkNextOptions();
   const { domain, proxyUrl } = useClerk();
 
   if (!publishableKey) {
@@ -58,7 +58,8 @@ export function ClerkScripts({ router }: { router: ClerkScriptProps['router'] })
     nonce,
     domain,
     proxyUrl,
-    clerkUiUrl,
+    clerkUiVersion: ui?.version,
+    clerkUiUrl: ui?.url || clerkUiUrl,
   };
 
   return (

@@ -15,7 +15,7 @@ test.describe('appearance prop', () => {
         'src/App.tsx',
         ({ tsx }) => tsx`
             import { SignIn, SignUp } from '@clerk/react';
-            import { dark, neobrutalism, shadesOfPurple } from '@clerk/themes';
+            import { dark, neobrutalism, shadesOfPurple } from '@clerk/ui/themes';
             const themes = { shadesOfPurple, neobrutalism, dark };
 
             export default function App() {

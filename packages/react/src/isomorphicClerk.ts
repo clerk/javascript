@@ -509,6 +509,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
     await loadClerkUiScript({
       ...this.options,
+      clerkUiVersion: this.options.ui?.version,
+      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
       publishableKey: this.#publishableKey,
       proxyUrl: this.proxyUrl,
       domain: this.domain,

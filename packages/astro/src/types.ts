@@ -7,10 +7,13 @@ import type {
   Without,
 } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Appearance, Ui } from '@clerk/ui/internal';
 
-type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
+type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
+  appearance?: Appearance<TUi>;
+};
 
-type AstroClerkIntegrationParams = Without<
+type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   ClerkOptions,
   | 'isSatellite'
   | 'sdkMetadata'
@@ -21,8 +24,10 @@ type AstroClerkIntegrationParams = Without<
   | 'routerPush'
   | 'polling'
   | 'touchSession'
+  | 'appearance'
 > &
   MultiDomainAndOrProxyPrimitives & {
+    appearance?: Appearance<TUi>;
     clerkJSUrl?: string;
     clerkJSVariant?: 'headless' | '';
     clerkJSVersion?: string;
@@ -32,7 +37,9 @@ type AstroClerkIntegrationParams = Without<
     clerkUiUrl?: string;
   };
 
-type AstroClerkCreateInstanceParams = AstroClerkIntegrationParams & { publishableKey: string };
+type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {
+  publishableKey: string;
+};
 
 // Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
