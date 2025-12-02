@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { hash } from '../models/helpers';
 import { appConfigs } from '../presets';
@@ -30,6 +30,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
 
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });
+
+      await expect(u.page.getByText(/password compromised/i)).toBeVisible();
+
+      await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
@@ -73,6 +77,10 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
+      await u.page.getByRole('textbox', { name: 'code' }).fill('424242');
+
+      await expect(u.page.getByText(/password compromised/i)).toBeVisible();
+      await u.po.signIn.getAltMethodsEmailCodeButton().click();
       await u.page.getByRole('textbox', { name: 'code' }).fill('424242');
 
       await u.po.expect.toBeSignedIn();
