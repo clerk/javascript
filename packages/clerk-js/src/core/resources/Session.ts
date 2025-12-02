@@ -356,7 +356,7 @@ export class Session extends BaseResource implements SessionResource {
       return null;
     }
 
-    const { leewayInSeconds, template, skipCache = false } = options || {};
+    const { leewayInSeconds, refreshIfStale = false, skipCache = false, template } = options || {};
 
     // If no organization ID is provided, default to the selected organization in memory
     // Note: this explicitly allows passing `null` or `""`, which should select the personal workspace.
@@ -375,12 +375,13 @@ export class Session extends BaseResource implements SessionResource {
     const shouldDispatchTokenUpdate = !template && organizationId === this.lastActiveOrganizationId;
 
     if (cacheResult) {
-      if (cacheResult.needsRefresh) {
-        debugLogger.debug('Serving cached token while refreshing in background', { tokenId }, 'session');
-        void this.#refreshTokenInBackground(template, organizationId, tokenId, shouldDispatchTokenUpdate);
-      } else {
-        debugLogger.debug('Using cached token', { tokenId }, 'session');
+      // If caller requests refresh when stale (e.g., poller), fetch fresh token instead of returning cached
+      if (cacheResult.needsRefresh && refreshIfStale) {
+        debugLogger.debug('Token is stale, refreshing as requested', { tokenId }, 'session');
+        return this.#fetchToken(template, organizationId, tokenId, shouldDispatchTokenUpdate);
       }
+
+      debugLogger.debug('Using cached token', { tokenId }, 'session');
 
       // Prefer synchronous read to avoid microtask overhead when token is already resolved
       const cachedToken = cacheResult.entry.resolvedToken ?? (await cacheResult.entry.tokenResolver);
@@ -435,31 +436,6 @@ export class Session extends BaseResource implements SessionResource {
       // Return null when raw string is empty to indicate signed-out state
       return token.getRawString() || null;
     });
-  }
-
-  #refreshTokenInBackground(
-    template: string | undefined,
-    organizationId: string | undefined | null,
-    tokenId: string,
-    shouldDispatchTokenUpdate: boolean,
-  ): void {
-    // Background refresh must NOT update cache until success to preserve SWR behavior.
-    // If we updated cache immediately, concurrent getToken calls would await the pending
-    // promise instead of returning the stale token.
-    debugLogger.info('Starting background token refresh', { organizationId, template, tokenId }, 'session');
-
-    this.#createTokenResolver(template, organizationId)
-      .then(token => {
-        // Cache only after success with resolvedToken for immediate synchronous reads
-        SessionTokenCache.set({ resolvedToken: token, tokenId, tokenResolver: Promise.resolve(token) });
-        this.#dispatchTokenEvents(token, shouldDispatchTokenUpdate);
-        debugLogger.debug('Background token refresh completed', { tokenId }, 'session');
-      })
-      .catch(() => {
-        // Reset isRefreshing flag so future calls can retry. Old valid token remains in cache.
-        SessionTokenCache.markRefreshComplete({ tokenId });
-        debugLogger.warn('Background token refresh failed', { tokenId }, 'session');
-      });
   }
 
   get currentTask() {

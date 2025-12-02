@@ -162,7 +162,8 @@ export class AuthCookieService {
     }
 
     try {
-      const token = await this.clerk.session.getToken();
+      // Use refreshIfStale to fetch fresh token when cached token is within leeway period
+      const token = await this.clerk.session.getToken({ refreshIfStale: true });
       if (updateCookieImmediately) {
         this.updateSessionCookie(token);
       }

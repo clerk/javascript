@@ -45,8 +45,6 @@ interface TokenCacheValue {
   createdAt: Seconds;
   entry: TokenCacheEntry;
   expiresIn?: Seconds;
-  /** Indicates a background refresh is in progress to prevent duplicate requests */
-  isRefreshing?: boolean;
   timeoutId?: ReturnType<typeof setTimeout>;
 }
 
@@ -82,14 +80,6 @@ export interface TokenCache {
    * @returns Result with entry and refresh flag, or undefined if token is missing/expired/too close to expiration
    */
   get(cacheKeyJSON: TokenCacheKeyJSON, leeway?: number): TokenCacheGetResult | undefined;
-
-  /**
-   * Resets the isRefreshing flag on an existing cache entry without replacing it.
-   * Used when a background refresh fails to allow future refresh attempts.
-   *
-   * @param cacheKeyJSON - Object containing tokenId and optional audience to identify the cached entry
-   */
-  markRefreshComplete(cacheKeyJSON: TokenCacheKeyJSON): void;
 
   /**
    * Stores a token entry in the cache and broadcasts to other tabs when the token resolves.
@@ -232,15 +222,10 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
 
     const effectiveLeeway = Math.max(leeway, MIN_REMAINING_TTL_IN_SECONDS);
 
-    // Token is valid but expiring soon - signal for background refresh
-    // Only signal once per token to prevent duplicate refresh requests
-    const needsRefresh = remainingTtl < effectiveLeeway && !value.isRefreshing;
+    // Token is valid but expiring soon - signal that refresh is needed
+    const needsRefresh = remainingTtl < effectiveLeeway;
 
-    if (needsRefresh) {
-      value.isRefreshing = true;
-    }
-
-    // SWR: Return the valid token immediately, caller handles background refresh if needed
+    // Return the valid token immediately, caller decides whether to refresh
     return { entry: value.entry, needsRefresh };
   };
 
@@ -447,19 +432,11 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     }
   };
 
-  const markRefreshComplete = (cacheKeyJSON: TokenCacheKeyJSON): void => {
-    const cacheKey = new TokenCacheKey(prefix, cacheKeyJSON);
-    const value = cache.get(cacheKey.toKey());
-    if (value) {
-      value.isRefreshing = false;
-    }
-  };
-
   const size = () => {
     return cache.size;
   };
 
-  return { clear, close, get, markRefreshComplete, set, size };
+  return { clear, close, get, set, size };
 };
 
 export const SessionTokenCache = MemoryTokenCache();

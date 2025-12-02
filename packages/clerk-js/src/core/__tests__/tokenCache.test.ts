@@ -594,7 +594,7 @@ describe('SessionTokenCache', () => {
       expect(result).toBeUndefined();
     });
 
-    it('returns needsRefresh=true only once per token (prevents duplicate refreshes)', async () => {
+    it('returns needsRefresh=true consistently while token is within leeway', async () => {
       const nowSeconds = Math.floor(Date.now() / 1000);
       const jwt = createJwtWithTtl(nowSeconds, 60);
 
@@ -617,10 +617,10 @@ describe('SessionTokenCache', () => {
       let result = SessionTokenCache.get(key);
       expect(result?.needsRefresh).toBe(true);
 
-      // Second call: needsRefresh=false (already marked for refresh)
+      // Second call: needsRefresh=true (consistently signals refresh needed)
       result = SessionTokenCache.get(key);
       expect(result?.entry.tokenId).toBe('dedupe-token');
-      expect(result?.needsRefresh).toBe(false);
+      expect(result?.needsRefresh).toBe(true);
     });
 
     it('honors larger custom leeway values', async () => {
@@ -1003,50 +1003,6 @@ describe('SessionTokenCache', () => {
 
       expect(() => {
         broadcastListener(event);
-      }).not.toThrow();
-    });
-  });
-
-  describe('markRefreshComplete', () => {
-    it('resets isRefreshing flag on existing cache entry', async () => {
-      const nowSeconds = Math.floor(Date.now() / 1000);
-      const jwt = createJwtWithTtl(nowSeconds, 60);
-
-      const token = new Token({
-        id: 'refresh-test-token',
-        jwt,
-        object: 'token',
-      });
-
-      const tokenResolver = Promise.resolve<TokenResource>(token);
-      const key = { tokenId: 'refresh-test-token' };
-
-      SessionTokenCache.set({ ...key, tokenResolver });
-      await tokenResolver;
-
-      // Advance to within leeway to trigger needsRefresh
-      vi.advanceTimersByTime(51 * 1000); // 9s remaining
-
-      // First get should return needsRefresh=true and set isRefreshing
-      let result = SessionTokenCache.get(key);
-      expect(result?.needsRefresh).toBe(true);
-
-      // Second get should return needsRefresh=false (already refreshing)
-      result = SessionTokenCache.get(key);
-      expect(result?.needsRefresh).toBe(false);
-
-      // Call markRefreshComplete to reset the flag
-      SessionTokenCache.markRefreshComplete(key);
-
-      // Now get should return needsRefresh=true again
-      result = SessionTokenCache.get(key);
-      expect(result?.needsRefresh).toBe(true);
-    });
-
-    it('does nothing if cache entry does not exist', () => {
-      // Should not throw
-      expect(() => {
-        SessionTokenCache.markRefreshComplete({ tokenId: 'non-existent-token' });
       }).not.toThrow();
     });
   });

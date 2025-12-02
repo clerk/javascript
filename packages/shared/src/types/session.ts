@@ -339,10 +339,16 @@ export interface SessionTask {
 }
 
 export type GetTokenOptions = {
-  template?: string;
-  organizationId?: string;
   leewayInSeconds?: number;
+  organizationId?: string;
+  /**
+   * @internal
+   * When true, forces a fresh token fetch if the cached token is within the refresh leeway period.
+   * Used by the token poller to proactively refresh tokens before they expire.
+   */
+  refreshIfStale?: boolean;
   skipCache?: boolean;
+  template?: string;
 };
 /**
  * @inline
