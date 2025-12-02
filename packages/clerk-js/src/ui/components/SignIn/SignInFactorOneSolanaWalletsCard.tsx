@@ -7,7 +7,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Web3WalletButtons } from '@/ui/elements/Web3WalletButtons';
-import { handleError } from '@/ui/utils/errorHandler';
+import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 import { useSignInContext } from '../../contexts';
 import { useRouter } from '../../router';
@@ -17,23 +17,6 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
   const card = useCardState();
   const router = useRouter();
   const ctx = useSignInContext();
-
-  const onSelect = async ({ walletName }: { walletName: string }) => {
-    card.setLoading(walletName);
-    try {
-      await clerk.authenticateWithWeb3({
-        strategy: 'web3_solana_signature',
-        redirectUrl: ctx.afterSignInUrl || '/',
-        signUpContinueUrl: ctx.isCombinedFlow ? '../create/continue' : ctx.signUpContinueUrl,
-        customNavigate: router.navigate,
-        secondFactorUrl: 'factor-two',
-        walletName,
-      });
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-      card.setIdle();
-    }
-  };
 
   const onBackLinkClick = () => {
     void router.navigate('../');
@@ -52,7 +35,20 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
             direction='col'
             gap={4}
           >
-            <Web3WalletButtons onSelect={onSelect} />
+            <Web3WalletButtons
+              web3AuthCallback={({ walletName }) => {
+                return clerk
+                  .authenticateWithWeb3({
+                    customNavigate: router.navigate,
+                    redirectUrl: ctx.afterSignInUrl || '/',
+                    secondFactorUrl: 'factor-two',
+                    signUpContinueUrl: ctx.isCombinedFlow ? '../create/continue' : ctx.signUpContinueUrl,
+                    strategy: 'web3_solana_signature',
+                    walletName,
+                  })
+                  .catch(err => web3CallbackErrorHandler(err, card.setError));
+              }}
+            />
 
             <BackLink
               boxElementDescriptor={descriptors.backRow}
