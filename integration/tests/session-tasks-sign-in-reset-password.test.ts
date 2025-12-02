@@ -28,12 +28,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
+      await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
+      await u.po.signIn.getUseAnotherMethodLink().click();
+      await u.po.signIn.getAltMethodsEmailCodeButton().click();
+
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });
-
-      await expect(u.page.getByText(/password compromised/i)).toBeVisible();
-
-      await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
@@ -66,7 +66,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.services.users.passwordUntrusted(createdUser.id);
       const fakeOrganization = u.services.organizations.createFakeOrganization();
       await u.services.organizations.createBapiOrganization({
-        ...fakeOrganization,
+        name: fakeOrganization.name,
+        slug: fakeOrganization.slug + Date.now().toString(),
         createdBy: createdUser.id,
       });
 
@@ -77,13 +78,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
-      await u.page.getByRole('textbox', { name: 'code' }).fill('424242');
+      await expect(u.page.getByTestId('form-feedback-error')).toBeVisible();
 
-      await expect(u.page.getByText(/password compromised/i)).toBeVisible();
+      await u.po.signIn.getUseAnotherMethodLink().click();
+
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
-      await u.page.getByRole('textbox', { name: 'code' }).fill('424242');
 
-      await u.po.expect.toBeSignedIn();
+      await u.page.getByRole('textbox', { name: 'code' }).click();
+      await u.page.keyboard.type('424242', { delay: 100 });
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
