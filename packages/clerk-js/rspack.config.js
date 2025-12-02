@@ -150,19 +150,22 @@ const common = ({ mode, variant, disableRHC = false }) => {
           },
           defaultVendors: {
             minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
+            test: module => {
+              if (!(module instanceof rspack.NormalModule) || !module.resource) {
+                return false;
+              }
+              // Exclude Solana packages and their known transitive dependencies
+              if (
+                /[\\/]node_modules[\\/](@solana|@solana-mobile|@wallet-standard|bn\.js|borsh|buffer|superstruct|bs58|jayson|rpc-websockets|qrcode)[\\/]/.test(
+                  module.resource,
+                )
+              ) {
+                return false;
+              }
+              return /[\\/]node_modules[\\/]/.test(module.resource);
+            },
             name: 'vendors',
             priority: -10,
-            /**
-             * Only apply to initial chunks. Dependencies used exclusively by async chunks
-             * (like Solana packages and their transitive deps) will be bundled with those
-             * async chunks instead of being forced into the shared vendors bundle.
-             *
-             * This ensures that lazy-loaded features (like Web3 wallet support) don't
-             * bloat the initial bundle, and their dependencies are automatically
-             * code-split without needing explicit configuration.
-             */
-            chunks: 'initial',
           },
           react: {
             chunks: 'all',

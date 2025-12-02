@@ -10,7 +10,9 @@ import { Header } from '@/ui/elements/Header';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 const Web3WalletButtons = lazy(() =>
-  import('@/ui/elements/Web3WalletButtons').then(m => ({ default: m.Web3WalletButtons })),
+  import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3WalletButtons').then(m => ({
+    default: m.Web3WalletButtons,
+  })),
 );
 
 import { useSignInContext } from '../../contexts';
