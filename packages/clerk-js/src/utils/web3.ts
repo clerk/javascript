@@ -62,11 +62,7 @@ export const generateWeb3Signature: GenerateSignature = async (params): Promise<
         account: walletAccount,
         message: new TextEncoder().encode(nonce),
       });
-      if (!signedMessages || signedMessages.length === 0) {
-        console.warn('No signed messages returned from wallet');
-        return '';
-      }
-      return Array.from(signedMessages[0].signature).toString();
+      return signedMessages?.[0]?.signature ? Array.from(signedMessages[0].signature).toString() : '';
     } catch (err) {
       if (err instanceof Error && err.message.includes('User rejected the request.')) {
         throw new ClerkRuntimeError('Web3 signature request was rejected by the user.', {

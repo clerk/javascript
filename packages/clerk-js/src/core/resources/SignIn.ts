@@ -475,7 +475,7 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier,
       generateSignature: generateSignatureWithSolana,
       strategy: 'web3_solana_signature',
-      walletName: params?.walletName,
+      walletName: params.walletName,
     });
   };
 
@@ -1006,9 +1006,6 @@ class SignInFuture implements SignInFutureResource {
           generateSignature = generateSignatureWithOKXWallet;
           break;
         case 'solana':
-          if (!params.walletName) {
-            throw new Error('walletName is required for solana web3 authentication');
-          }
           identifier = await getSolanaIdentifier(params.walletName);
           generateSignature = generateSignatureWithSolana;
           break;

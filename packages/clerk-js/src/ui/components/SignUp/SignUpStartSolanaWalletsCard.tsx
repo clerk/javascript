@@ -7,8 +7,7 @@ import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { Web3WalletButtons } from '@/ui/elements/Web3WalletButtons';
-import { handleError } from '@/ui/utils/errorHandler';
-import { sleep } from '@/ui/utils/sleep';
+import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 import { useSignUpContext } from '../../contexts';
 import { useRouter } from '../../router';
@@ -18,28 +17,6 @@ const SignUpStartSolanaWalletsCardInner = () => {
   const card = useCardState();
   const router = useRouter();
   const ctx = useSignUpContext();
-
-  const onSelect = async ({ walletName }: { walletName: string }) => {
-    card.setLoading(walletName);
-    try {
-      await clerk.authenticateWithWeb3({
-        customNavigate: router.navigate,
-        redirectUrl: ctx.afterSignUpUrl || '/',
-        signUpContinueUrl: '../continue',
-        unsafeMetadata: ctx.unsafeMetadata,
-        strategy: 'web3_solana_signature',
-        // TODO: Add support to pass legalAccepted status
-        // legalAccepted: ,
-        walletName,
-      });
-    } catch (err) {
-      await sleep(1000);
-      handleError(err as Error, [], card.setError);
-      card.setIdle();
-    }
-    await sleep(5000);
-    card.setIdle();
-  };
 
   const onBackLinkClick = () => {
     void router.navigate('../');
@@ -58,7 +35,22 @@ const SignUpStartSolanaWalletsCardInner = () => {
             direction='col'
             gap={4}
           >
-            <Web3WalletButtons onSelect={onSelect} />
+            <Web3WalletButtons
+              web3AuthCallback={({ walletName }) => {
+                return clerk
+                  .authenticateWithWeb3({
+                    customNavigate: router.navigate,
+                    redirectUrl: ctx.afterSignUpUrl || '/',
+                    signUpContinueUrl: '../continue',
+                    strategy: 'web3_solana_signature',
+                    unsafeMetadata: ctx.unsafeMetadata,
+                    // TODO: Add support to pass legalAccepted status
+                    // legalAccepted: ,
+                    walletName,
+                  })
+                  .catch(err => web3CallbackErrorHandler(err, card.setError));
+              }}
+            />
             <BackLink
               boxElementDescriptor={descriptors.backRow}
               linkElementDescriptor={descriptors.backLink}
