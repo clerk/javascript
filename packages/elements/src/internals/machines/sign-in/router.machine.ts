@@ -33,14 +33,14 @@ export type TSignInRouterMachine = typeof SignInRouterMachine;
 
 const isCurrentPath =
   (path: `/${string}`) =>
-  ({ context }: { context: SignInRouterContext }, _params?: NonReducibleUnknown) => {
-    return context.router?.match(path) ?? false;
-  };
+    ({ context }: { context: SignInRouterContext }, _params?: NonReducibleUnknown) => {
+      return context.router?.match(path) ?? false;
+    };
 
 const needsStatus =
   (status: SignInStatus) =>
-  ({ context, event }: { context: SignInRouterContext; event?: SignInRouterEvents }, _?: NonReducibleUnknown) =>
-    (event as SignInRouterNextEvent)?.resource?.status === status || context.clerk?.client.signIn.status === status;
+    ({ context, event }: { context: SignInRouterContext; event?: SignInRouterEvents }, _?: NonReducibleUnknown) =>
+      (event as SignInRouterNextEvent)?.resource?.status === status || context.clerk?.client.signIn.status === status;
 
 export const SignInRouterMachineId = 'SignInRouter';
 
@@ -131,6 +131,7 @@ export const SignInRouterMachine = setup({
         case ERROR_CODES.ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH:
         case ERROR_CODES.SAML_EMAIL_ADDRESS_DOMAIN_MISMATCH:
         case ERROR_CODES.ORGANIZATION_MEMBERSHIP_QUOTA_EXCEEDED_FOR_SSO:
+        case ERROR_CODES.SIGN_UP_RESTRICTED_WAITLIST:
           error = new ClerkElementsError(errorOrig.code, errorOrig.longMessage || '');
           break;
         default:
@@ -196,11 +197,10 @@ export const SignInRouterMachine = setup({
         type: 'REDIRECT',
         params: {
           strategy: event.strategy,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrl: `${context.router?.mode === ROUTING.virtual
+            ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+            : context.router?.basePath
+            }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignInUrl({
             params: context.router?.searchParams(),
           }),
@@ -213,11 +213,10 @@ export const SignInRouterMachine = setup({
         params: {
           strategy: 'saml',
           identifier: context.formRef.getSnapshot().context.fields.get('identifier')?.value,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrl: `${context.router?.mode === ROUTING.virtual
+            ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+            : context.router?.basePath
+            }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignInUrl({
             params: context.router?.searchParams(),
           }),
@@ -230,11 +229,10 @@ export const SignInRouterMachine = setup({
         params: {
           strategy: 'enterprise_sso',
           identifier: context.formRef.getSnapshot().context.fields.get('identifier')?.value,
-          redirectUrl: `${
-            context.router?.mode === ROUTING.virtual
-              ? context.clerk.__unstable__environment?.displayConfig.signInUrl
-              : context.router?.basePath
-          }${SSO_CALLBACK_PATH_ROUTE}`,
+          redirectUrl: `${context.router?.mode === ROUTING.virtual
+            ? context.clerk.__unstable__environment?.displayConfig.signInUrl
+            : context.router?.basePath
+            }${SSO_CALLBACK_PATH_ROUTE}`,
           redirectUrlComplete: context.clerk.buildAfterSignInUrl({
             params: context.router?.searchParams(),
           }),
@@ -371,7 +369,6 @@ export const SignInRouterMachine = setup({
     },
     Start: {
       tags: ['step:start'],
-      exit: 'clearFormErrors',
       invoke: {
         id: 'start',
         src: 'startMachine',
@@ -402,21 +399,21 @@ export const SignInRouterMachine = setup({
         NEXT: [
           {
             guard: 'isComplete',
-            actions: 'setActive',
+            actions: ['setActive', 'clearFormErrors'],
           },
           {
             guard: 'statusNeedsFirstFactor',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: ["clearFormErrors", { type: "navigateInternal", params: { path: "/continue" } }],
             target: 'FirstFactor',
           },
           {
             guard: 'statusNeedsSecondFactor',
-            actions: { type: 'navigateInternal', params: { path: '/continue' } },
+            actions: ["clearFormErrors", { type: "navigateInternal", params: { path: "/continue" } }],
             target: 'SecondFactor',
           },
           {
             guard: 'statusNeedsNewPassword',
-            actions: { type: 'navigateInternal', params: { path: '/reset-password' } },
+            actions: ["clearFormErrors", { type: "navigateInternal", params: { path: "/reset-password" } }],
             target: 'ResetPassword',
           },
         ],
