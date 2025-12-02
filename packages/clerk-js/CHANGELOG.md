@@ -1,5 +1,37 @@
 # Change Log
 
+## 5.112.0
+
+### Minor Changes
+
+- Introduce `reset-password` session task ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+- Introduce a new variant for the alternative methods screen to handle untrusted password error on sign-in ([#7331](https://github.com/clerk/javascript/pull/7331)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Prevent enable organization prompt from appearing if there is a session with a pending `choose-organization` task. ([#7307](https://github.com/clerk/javascript/pull/7307)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  This resolves an issue where, after organizations are enabled via the Dashboard, cached environment resources may cause the prompt to show again when the user is redirected to complete the `choose-organization` task.
+
+- Fix issue where `SignIn` and `SignUp` instances were unable to be serialized with `JSON.stringify` due to a circular reference. ([#7321](https://github.com/clerk/javascript/pull/7321)) by [@dstaley](https://github.com/dstaley)
+
+- Conditionally apply `tabIndex={-1}` usage when shown to ensure buttons are keyboard accessible. ([#7306](https://github.com/clerk/javascript/pull/7306)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes line-height discrepancy between browsers. ([#7112](https://github.com/clerk/javascript/pull/7112)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add localization key for username form error ([#7320](https://github.com/clerk/javascript/pull/7320)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Ensure client trust messaging is only displayed if no 2FA options are available ([#7313](https://github.com/clerk/javascript/pull/7313)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updates line-height calculations to follow font-sizing to fix differences across browsers. ([#7112](https://github.com/clerk/javascript/pull/7112)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Reverts the changes introduced in [PR #7105](https://github.com/clerk/javascript/pull/7105), as it was causing JWTs returned from client piggybacking not to be inserted into the cache even though their claims had actually changed. ([#7329](https://github.com/clerk/javascript/pull/7329)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`40a841d`](https://github.com/clerk/javascript/commit/40a841d56cd8983dce21376c832f1085c43a9518), [`f364924`](https://github.com/clerk/javascript/commit/f364924708f20f0bc7b8b291ea2ae01ce09e2e9f), [`f115e56`](https://github.com/clerk/javascript/commit/f115e56d14b5c49f52b6aca01b434dbe4f6193cf), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`3f99742`](https://github.com/clerk/javascript/commit/3f997427e400248502b0977e1b69e109574dfe7d), [`02798f5`](https://github.com/clerk/javascript/commit/02798f571065d8142cf1dade57b42b3e8ce0f818), [`07a30ce`](https://github.com/clerk/javascript/commit/07a30ce52b7d2ba85ce3533879700b9ec129152e), [`ce8b914`](https://github.com/clerk/javascript/commit/ce8b9149bff27866cdb686f1ab0b56cef8d8c697)]:
+  - @clerk/shared@3.37.0
+  - @clerk/localizations@3.29.0
+
 ## 5.111.0
 
 ### Minor Changes
