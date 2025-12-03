@@ -2194,6 +2194,14 @@ export type TaskChooseOrganizationProps = {
   appearance?: ClerkAppearanceTheme;
 };
 
+export type TaskResetPasswordProps = {
+  /**
+   * Full URL or path to navigate to after successfully resolving all tasks
+   */
+  redirectUrlComplete: string;
+  appearance?: ClerkAppearanceTheme;
+};
+
 export type CreateOrganizationInvitationParams = {
   emailAddress: string;
   role: OrganizationCustomRoleKey;

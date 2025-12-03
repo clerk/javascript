@@ -1,6 +1,6 @@
 import { SIGN_UP_INITIAL_VALUE_KEYS } from '@clerk/shared/internal/clerk-js/constants';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
-import { getTaskEndpoint, INTERNAL_SESSION_TASK_ROUTE_BY_KEY } from '@clerk/shared/internal/clerk-js/sessionTasks';
+import { getTaskEndpoint } from '@clerk/shared/internal/clerk-js/sessionTasks';
 import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import type { SessionResource } from '@clerk/shared/types';
@@ -35,7 +35,7 @@ export const SignUpContext = createContext<SignUpCtx | null>(null);
 
 export const useSignUpContext = (): SignUpContextType => {
   const context = useContext(SignUpContext);
-  const { navigate, basePath } = useRouter();
+  const { navigate, basePath, startPath } = useRouter();
   const { displayConfig, userSettings } = useEnvironment();
   const { queryParams, queryString } = useRouter();
   const signUpMode = userSettings.signUp.mode;
@@ -120,7 +120,11 @@ export const useSignUpContext = (): SignUpContextType => {
       return navigate(redirectUrl);
     }
 
-    return navigate(`/${basePath}/tasks/${INTERNAL_SESSION_TASK_ROUTE_BY_KEY[currentTask.key]}`);
+    const taskEndpoint = getTaskEndpoint(currentTask);
+
+    // Base path is required for virtual routing with start path
+    // eg: to navigate from /sign-in/factor-one to /sign-in/tasks/choose-organization
+    return navigate(`/${basePath + startPath + taskEndpoint}`);
   };
 
   const taskUrl = clerk.session?.currentTask

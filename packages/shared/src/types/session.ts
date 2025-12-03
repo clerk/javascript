@@ -335,7 +335,7 @@ export interface SessionTask {
   /**
    * A unique identifier for the task
    */
-  key: 'choose-organization';
+  key: 'choose-organization' | 'reset-password';
 }
 
 export type GetTokenOptions = {
