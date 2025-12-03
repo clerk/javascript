@@ -695,6 +695,9 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Zadajte svoje heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

@@ -24,7 +24,7 @@ export {
   isMetamaskError,
   isNetworkError,
   isPasswordPwnedError,
-  isPasswordUntrustedError,
+  isPasswordCompromisedError,
   isReverificationCancelledError,
   isUnauthorizedError,
   isUserLockedError,

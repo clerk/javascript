@@ -121,12 +121,12 @@ export function isPasswordPwnedError(err: any) {
 }
 
 /**
- * Checks if the provided error is a clerk api response error indicating a password was untrusted.
+ * Checks if the provided error is a clerk api response error indicating a password was compromised.
  *
  * @internal
  */
-export function isPasswordUntrustedError(err: any) {
-  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_untrusted';
+export function isPasswordCompromisedError(err: any) {
+  return isClerkAPIResponseError(err) && err.errors?.[0]?.code === 'form_password_compromised';
 }
 
 /**

@@ -700,6 +700,9 @@ export const viVN: LocalizationResource = {
       subtitle: 'Nhập mật khẩu được liên kết với tài khoản của bạn',
       title: 'Nhập mật khẩu',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mật khẩu bị rò rỉ',
     },

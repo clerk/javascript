@@ -694,6 +694,9 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รหัสผ่านที่เชื่อมโยงกับบัญชีของคุณ',
       title: 'ใส่รหัสผ่านของคุณ',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
     },

@@ -695,6 +695,9 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn lykilorðið sem tengist reikningnum þínum',
       title: 'Sláðu inn lykilorðið þitt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lykilorð brotið',
     },

@@ -692,6 +692,9 @@ export const jaJP: LocalizationResource = {
       subtitle: '{{applicationName}}へのアクセスを続ける',
       title: 'パスワードを入力',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

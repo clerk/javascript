@@ -693,6 +693,9 @@ export const huHU: LocalizationResource = {
       subtitle: 'Írd be a fiókhoz tartozó jelszavad',
       title: 'Írd be a jelszavad',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Jelszó kompromitálódott',
     },

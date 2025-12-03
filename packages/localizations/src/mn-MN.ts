@@ -694,6 +694,9 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Бүртгэлтэй холбоотой нууц үгээ оруулна уу',
       title: 'Нууц үгээ оруулна уу',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

@@ -19,7 +19,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       const user = u.services.users.createFakeUser();
       const createdUser = await u.services.users.createBapiUser(user);
 
-      await u.services.users.passwordUntrusted(createdUser.id);
+      await u.services.users.passwordCompromised(createdUser.id);
 
       // Performs sign-in
       await u.po.signIn.goTo();
@@ -66,7 +66,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       const user = u.services.users.createFakeUser();
       const createdUser = await u.services.users.createBapiUser(user);
 
-      await u.services.users.passwordUntrusted(createdUser.id);
+      await u.services.users.passwordCompromised(createdUser.id);
       const fakeOrganization = u.services.organizations.createFakeOrganization();
       await u.services.organizations.createBapiOrganization({
         name: fakeOrganization.name,

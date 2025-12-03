@@ -696,6 +696,9 @@ export const idID: LocalizationResource = {
       subtitle: 'Masukkan kata sandi yang terkait dengan akun Anda',
       title: 'Masukkan kata sandi Anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata sandi terkompromi',
     },

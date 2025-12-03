@@ -698,6 +698,9 @@ export const esCR: LocalizationResource = {
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Introduzca su contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Contraseña en peligro',
     },

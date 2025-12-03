@@ -702,6 +702,9 @@ export const ruRU: LocalizationResource = {
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Введите пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль скомпрометирован',
     },
