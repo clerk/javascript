@@ -681,6 +681,9 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       title: '輸入您的密碼',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

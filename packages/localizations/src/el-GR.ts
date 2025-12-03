@@ -694,6 +694,9 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Εισαγωγή κωδικού πρόσβασης',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Παραβιασμένος κωδικός',
     },

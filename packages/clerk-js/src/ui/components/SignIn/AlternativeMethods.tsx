@@ -18,7 +18,7 @@ import { SignInSocialButtons } from './SignInSocialButtons';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { withHavingTrouble } from './withHavingTrouble';
 
-export type AlternativeMethodsMode = 'forgot' | 'pwned' | 'passwordUntrusted' | 'default';
+export type AlternativeMethodsMode = 'forgot' | 'pwned' | 'passwordCompromised' | 'default';
 
 export type AlternativeMethodsProps = {
   onBackLinkClick: React.MouseEventHandler | undefined;
@@ -55,7 +55,7 @@ const AlternativeMethodsList = (props: AlternativeMethodListProps) => {
         <Card.Content>
           <Header.Root showLogo>
             <Header.Title localizationKey={cardTitleKey} />
-            {!isReset && mode !== 'passwordUntrusted' && (
+            {!isReset && mode !== 'passwordCompromised' && (
               <Header.Subtitle localizationKey={localizationKeys('signIn.alternativeMethods.subtitle')} />
             )}
           </Header.Root>
@@ -185,8 +185,8 @@ function determineFlowPart(mode: AlternativeMethodsMode) {
       return 'forgotPasswordMethods';
     case 'pwned':
       return 'passwordPwnedMethods';
-    case 'passwordUntrusted':
-      return 'passwordUntrustedMethods';
+    case 'passwordCompromised':
+      return 'passwordCompromisedMethods';
     default:
       return 'alternativeMethods';
   }
@@ -198,8 +198,8 @@ function determineTitle(mode: AlternativeMethodsMode): LocalizationKey {
       return localizationKeys('signIn.forgotPasswordAlternativeMethods.title');
     case 'pwned':
       return localizationKeys('signIn.passwordPwned.title');
-    case 'passwordUntrusted':
-      return localizationKeys('signIn.passwordPwned.title');
+    case 'passwordCompromised':
+      return localizationKeys('signIn.passwordCompromised.title');
     default:
       return localizationKeys('signIn.alternativeMethods.title');
   }
@@ -210,7 +210,7 @@ function determineIsReset(mode: AlternativeMethodsMode): boolean {
     case 'forgot':
     case 'pwned':
       return true;
-    case 'passwordUntrusted':
+    case 'passwordCompromised':
       return false;
     default:
       return false;

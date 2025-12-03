@@ -693,6 +693,9 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Въведете паролата, свързана с вашия акаунт',
       title: 'Въведете вашата парола',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

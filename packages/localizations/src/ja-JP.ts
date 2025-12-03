@@ -703,6 +703,9 @@ export const jaJP: LocalizationResource = {
       subtitle: 'アカウントに関連付けられたパスワードを入力してください',
       title: 'パスワードを入力',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'パスワードが漏えいしました',
     },

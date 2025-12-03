@@ -698,6 +698,9 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் கணக்குடன் தொடர்புடைய கடவுச்சொல்லை உள்ளிடவும்',
       title: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
     },

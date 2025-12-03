@@ -693,6 +693,9 @@ export const caES: LocalizationResource = {
       subtitle: 'Introdueix la contrasenya associada al teu compte',
       title: 'Introdueix la teva contrasenya',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

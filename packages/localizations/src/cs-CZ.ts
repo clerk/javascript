@@ -701,6 +701,9 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte heslo spojené s vaším účtem',
       title: 'Zadejte své heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Heslo kompromitováno',
     },

@@ -694,6 +694,9 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite lozinku povezanu s vašim računom',
       title: 'Unesite svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
     },
