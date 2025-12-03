@@ -206,7 +206,7 @@ describe('M2MToken', () => {
     });
   });
 
-  describe('verifyToken', () => {
+  describe('verify', () => {
     it('verifies a m2m token using machine secret', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
@@ -223,7 +223,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2m.verifyToken({
+      const response = await apiClient.m2m.verify({
         token: m2mSecret,
       });
 
@@ -249,7 +249,7 @@ describe('M2MToken', () => {
         ),
       );
 
-      const response = await apiClient.m2m.verifyToken({
+      const response = await apiClient.m2m.verify({
         token: m2mSecret,
       });
 
@@ -274,7 +274,7 @@ describe('M2MToken', () => {
       );
 
       const errResponse = await apiClient.m2m
-        .verifyToken({
+        .verify({
           token: m2mSecret,
         })
         .catch(err => err);
