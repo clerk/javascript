@@ -696,10 +696,13 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার অ্যাকাউন্টের সাথে যুক্ত পাসওয়ার্ড লিখুন',
       title: 'আপনার পাসওয়ার্ড লিখুন',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

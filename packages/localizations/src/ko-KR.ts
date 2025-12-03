@@ -687,10 +687,13 @@ export const koKR: LocalizationResource = {
       subtitle: '계정에 등록된 비밀번호를 입력해 주세요',
       title: '비밀번호를 입력하세요',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

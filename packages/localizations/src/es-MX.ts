@@ -699,10 +699,13 @@ export const esMX: LocalizationResource = {
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Introduzca su contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Contraseña en peligro',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

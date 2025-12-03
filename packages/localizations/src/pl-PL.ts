@@ -695,10 +695,13 @@ export const plPL: LocalizationResource = {
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Wprowadź swoje hasło',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Hasło skompromitowane',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

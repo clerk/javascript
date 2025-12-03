@@ -691,10 +691,13 @@ export const ukUA: LocalizationResource = {
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Введіть пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

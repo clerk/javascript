@@ -55,7 +55,7 @@ function determineAlternativeMethodsMode(
     return 'pwned';
   }
 
-  if (passwordErrorCode === 'untrusted') {
+  if (passwordErrorCode === 'compromised') {
     return 'passwordCompromised';
   }
 

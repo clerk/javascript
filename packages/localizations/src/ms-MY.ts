@@ -698,10 +698,13 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan yang berkaitan dengan akaun anda',
       title: 'Masukkan kata laluan anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata laluan dikompromi',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

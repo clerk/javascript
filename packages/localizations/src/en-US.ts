@@ -691,11 +691,14 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the password associated with your account',
       title: 'Enter your password',
     },
+    passwordCompromised: {
+      title: 'Password compromised',
+    },
     passwordPwned: {
       title: 'Password compromised',
     },
-    passwordCompromised: {
-      title: 'Password compromised',
+    passwordUntrusted: {
+      title: 'Password untrusted',
     },
     phoneCode: {
       formTitle: 'Verification code',

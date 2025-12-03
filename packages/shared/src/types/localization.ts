@@ -400,6 +400,10 @@ export type __internal_LocalizationResource = {
     passwordPwned: {
       title: LocalizationValue;
     };
+    /** @deprecated Use `passwordCompromised` instead */
+    passwordUntrusted: {
+      title: LocalizationValue;
+    };
     passwordCompromised: {
       title: LocalizationValue;
     };
@@ -1315,7 +1319,7 @@ type UnstableErrors = WithParamName<{
   web3_missing_identifier: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
-  /** @deprecated Use form_password_compromised__sign_in instead */
+  /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;

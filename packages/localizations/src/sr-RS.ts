@@ -692,10 +692,13 @@ export const srRS: LocalizationResource = {
       subtitle: 'Unesi lozinku koja je povezana sa tvojim nalogom',
       title: 'Unesi svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka kompromitovana',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

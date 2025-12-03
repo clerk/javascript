@@ -702,10 +702,13 @@ export const faIR: LocalizationResource = {
       subtitle: 'رمز عبور مرتبط با حساب کاربری خود را وارد کنید',
       title: 'رمز عبور خود را وارد کنید',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

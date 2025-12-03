@@ -685,10 +685,13 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Есептік жазбаңыздың құпия сөзін енгізіңіз',
       title: 'Құпия сөзді енгізіңіз',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

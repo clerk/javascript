@@ -693,10 +693,13 @@ export const nlBE: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Vul je wachtwoord in',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Dit wachtwoord is gelekt bij een datalek. Kies een ander wachtwoord om veiligheidsredenen.',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

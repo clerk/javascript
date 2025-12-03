@@ -697,10 +697,13 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá la contraseña asociada a tu cuenta',
       title: 'Ingresá tu contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Contraseña comprometida',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

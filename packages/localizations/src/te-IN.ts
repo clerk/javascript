@@ -697,10 +697,13 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ ఖాతాతో సంబంధం ఉన్న పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {

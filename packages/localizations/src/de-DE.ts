@@ -706,10 +706,13 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Geben Sie Ihr Passwort ein',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Passwort kompromittiert',
     },
-    passwordCompromised: {
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
