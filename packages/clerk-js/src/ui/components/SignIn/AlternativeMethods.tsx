@@ -186,7 +186,7 @@ function determineFlowPart(mode: AlternativeMethodsMode) {
     case 'pwned':
       return 'passwordPwnedMethods';
     case 'passwordCompromised':
-      return 'passwordUntrustedMethods';
+      return 'passwordCompromisedMethods';
     default:
       return 'alternativeMethods';
   }
