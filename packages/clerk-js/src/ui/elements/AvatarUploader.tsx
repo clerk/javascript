@@ -27,7 +27,6 @@ const SUPPORTED_MIME_TYPES = Object.freeze(['image/png', 'image/jpeg', 'image/gi
 
 const validType = (f: File | DataTransferItem) => SUPPORTED_MIME_TYPES.includes(f.type);
 const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
-const validFile = (f: File) => validType(f) && validSize(f);
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
   const [showUpload, setShowUpload] = React.useState(false);
@@ -64,9 +63,21 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   };
 
   const upload = async (f: File | undefined) => {
-    if (f && validFile(f)) {
-      await handleFileDrop(f);
+    if (!f) {
+      return;
     }
+
+    if (!validType(f)) {
+      card.setError('File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.');
+      return;
+    }
+
+    if (!validSize(f)) {
+      card.setError('File size exceeds the maximum limit of 10MB. Please choose a smaller file.');
+      return;
+    }
+
+    await handleFileDrop(f);
   };
 
   const previewElement = objectUrl
