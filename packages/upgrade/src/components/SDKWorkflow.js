@@ -130,7 +130,16 @@ export function SDKWorkflow(props) {
   }
 }
 
-function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgradeComplete, upgradeComplete, version }) {
+function NextjsWorkflow({
+  done,
+  runCodemod,
+  sdk,
+  setDone,
+  setRunCodemod,
+  setUpgradeComplete,
+  upgradeComplete,
+  version,
+}) {
   const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
   const [glob, setGlob] = useState();
 
@@ -267,8 +276,8 @@ function NextjsUseAuthWarning() {
       </Text>
       <Newline />
       <Text>
-        If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
-        prop to your application's root <Text bold>ClerkProvider</Text>.
+        If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text> prop to
+        your application's root <Text bold>ClerkProvider</Text>.
       </Text>
       <Newline />
       <Text>
@@ -282,7 +291,16 @@ function NextjsUseAuthWarning() {
   );
 }
 
-function ReactSdkWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgradeComplete, upgradeComplete, version }) {
+function ReactSdkWorkflow({
+  done,
+  runCodemod,
+  sdk,
+  setDone,
+  setRunCodemod,
+  setUpgradeComplete,
+  upgradeComplete,
+  version,
+}) {
   const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
   const [glob, setGlob] = useState();
   const replacePackage = sdk === 'clerk-react' || sdk === 'clerk-expo';

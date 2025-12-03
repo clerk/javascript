@@ -11,4 +11,3 @@ describe('transform-remove-deprecated-props', () => {
     expect(result).toEqual(output.trim());
   });
 });
-

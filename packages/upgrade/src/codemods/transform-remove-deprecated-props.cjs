@@ -497,4 +497,3 @@ function renameEntityName(entity, oldName, newName) {
 
   return false;
 }
-
