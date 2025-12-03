@@ -906,6 +906,7 @@ export const daDK: LocalizationResource = {
     form_password_validation_failed: 'Forkert adgangskode.',
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
+    form_username_needs_non_number_char: 'Dit brugernavn skal indeholde mindst ét ikke-numerisk tegn.',
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
     not_allowed_access:
       "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",

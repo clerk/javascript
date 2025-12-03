@@ -912,6 +912,7 @@ export const jaJP: LocalizationResource = {
     form_password_validation_failed: 'パスワードが間違っています',
     form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
     form_username_invalid_length: 'ユーザー名の長さが無効です。',
+    form_username_needs_non_number_char: 'ユーザー名には少なくとも1つの数字以外の文字が含まれている必要があります。',
     identification_deletion_failed: '最後の識別情報は削除できません。',
     not_allowed_access:
       "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
