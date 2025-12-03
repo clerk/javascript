@@ -49,17 +49,53 @@ function versionNeedsUpgrade(sdk, version) {
 export function SDKWorkflow(props) {
   const { sdk } = props;
 
+  const detectedVersion = getClerkSdkVersion(sdk);
+
   const [done, setDone] = useState(false);
   const [runCodemod, setRunCodemod] = useState(false);
   const [upgradeComplete, setUpgradeComplete] = useState(false);
 
-  const [version] = useState(getClerkSdkVersion(sdk));
+  const [version, setVersion] = useState(detectedVersion);
+  const [versionConfirmed, setVersionConfirmed] = useState(Boolean(detectedVersion));
 
   if (!['nextjs', 'clerk-react', 'clerk-expo', 'react-router', 'tanstack-react-start'].includes(sdk)) {
     return (
       <StatusMessage variant='error'>
         The SDK upgrade functionality is not available for <Text bold>@clerk/{sdk}</Text> at the moment.
       </StatusMessage>
+    );
+  }
+
+  // If we cannot automatically determine the installed version, let the user
+  // pick the major version they are on so we can still run the appropriate
+  // upgrade / codemods instead of silently doing nothing.
+  if (!versionConfirmed) {
+    return (
+      <>
+        <Header />
+        <Text>
+          We couldn&apos;t automatically detect which major version of <Text bold>@clerk/{sdk}</Text> you&apos;re using.
+        </Text>
+        <Newline />
+        <StatusMessage variant='warning'>
+          Please select the major version below. If you&apos;re not sure, picking v7 (Core 3) will run the latest
+          codemods and is generally safe to re-run.
+        </StatusMessage>
+        <Newline />
+        <Text>Please select your current @clerk/{sdk} major version:</Text>
+        <Select
+          options={[
+            { label: 'v5 (upgrade to v6)', value: 5 },
+            { label: 'v6 (upgrade to v7 / Core 3)', value: 6 },
+            { label: 'v7 (already on Core 3, just run codemods)', value: 7 },
+          ]}
+          onChange={value => {
+            const numeric = typeof value === 'number' ? value : Number(value);
+            setVersion(Number.isNaN(numeric) ? 7 : numeric);
+            setVersionConfirmed(true);
+          }}
+        />
+      </>
     );
   }
 
@@ -96,6 +132,7 @@ export function SDKWorkflow(props) {
 
 function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgradeComplete, upgradeComplete, version }) {
   const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
+  const [glob, setGlob] = useState();
 
   return (
     <>
@@ -123,6 +160,7 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
               callback={setV6CodemodComplete}
               sdk={sdk}
               transform={CODEMODS.ASYNC_REQUEST}
+              onGlobResolved={setGlob}
             />
           ) : null}
           {v6CodemodComplete ? (
@@ -130,6 +168,7 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
               callback={setDone}
               sdk={sdk}
               transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+              glob={glob}
             />
           ) : null}
         </>
@@ -145,6 +184,7 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
               callback={setV6CodemodComplete}
               sdk={sdk}
               transform={CODEMODS.CLERK_REACT_V6}
+              onGlobResolved={setGlob}
             />
           ) : null}
           {v6CodemodComplete ? (
@@ -152,6 +192,7 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
               callback={setDone}
               sdk={sdk}
               transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+              glob={glob}
             />
           ) : null}
         </>
@@ -164,12 +205,14 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
                 callback={setV6CodemodComplete}
                 sdk={sdk}
                 transform={CODEMODS.CLERK_REACT_V6}
+                onGlobResolved={setGlob}
               />
               {v6CodemodComplete ? (
                 <Codemod
                   callback={setDone}
                   sdk={sdk}
                   transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+                  glob={glob}
                 />
               ) : null}
             </>
@@ -207,27 +250,7 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
             }
             message={<Spinner label={'Checking for `useAuth` usage in your project...'} />}
             onError={() => null}
-            onSuccess={() => (
-              <StatusMessage variant='warning'>
-                <Text>
-                  We have detected that your application might be using the <Text bold>useAuth</Text> hook from{' '}
-                  <Text bold>@clerk/nextjs</Text>.
-                </Text>
-                <Newline />
-                <Text>
-                  If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
-                  prop to your application's root <Text bold>ClerkProvider</Text>.
-                </Text>
-                <Newline />
-                <Text>
-                  You can find more information about this change in the Clerk documentation at{' '}
-                  <Link url='https://clerk.com/docs/references/nextjs/rendering-modes'>
-                    https://clerk.com/docs/references/nextjs/rendering-modes
-                  </Link>
-                  .
-                </Text>
-              </StatusMessage>
-            )}
+            onSuccess={NextjsUseAuthWarning}
           />
         </>
       )}
@@ -235,8 +258,33 @@ function NextjsWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgr
   );
 }
 
+function NextjsUseAuthWarning() {
+  return (
+    <StatusMessage variant='warning'>
+      <Text>
+        We have detected that your application might be using the <Text bold>useAuth</Text> hook from{' '}
+        <Text bold>@clerk/nextjs</Text>.
+      </Text>
+      <Newline />
+      <Text>
+        If usages of this hook are server-side rendered, you might need to add the <Text bold>dynamic</Text>{' '}
+        prop to your application's root <Text bold>ClerkProvider</Text>.
+      </Text>
+      <Newline />
+      <Text>
+        You can find more information about this change in the Clerk documentation at{' '}
+        <Link url='https://clerk.com/docs/references/nextjs/rendering-modes'>
+          https://clerk.com/docs/references/nextjs/rendering-modes
+        </Link>
+        .
+      </Text>
+    </StatusMessage>
+  );
+}
+
 function ReactSdkWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUpgradeComplete, upgradeComplete, version }) {
   const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
+  const [glob, setGlob] = useState();
   const replacePackage = sdk === 'clerk-react' || sdk === 'clerk-expo';
   const needsUpgrade = versionNeedsUpgrade(sdk, version);
 
@@ -267,6 +315,7 @@ function ReactSdkWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUp
               callback={setV6CodemodComplete}
               sdk={sdk}
               transform={CODEMODS.CLERK_REACT_V6}
+              onGlobResolved={setGlob}
             />
           ) : null}
           {v6CodemodComplete ? (
@@ -274,6 +323,7 @@ function ReactSdkWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUp
               callback={setDone}
               sdk={sdk}
               transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+              glob={glob}
             />
           ) : null}
         </>
@@ -286,12 +336,14 @@ function ReactSdkWorkflow({ done, runCodemod, sdk, setDone, setRunCodemod, setUp
                 callback={setV6CodemodComplete}
                 sdk={sdk}
                 transform={CODEMODS.CLERK_REACT_V6}
+                onGlobResolved={setGlob}
               />
               {v6CodemodComplete ? (
                 <Codemod
                   callback={setDone}
                   sdk={sdk}
                   transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+                  glob={glob}
                 />
               ) : null}
             </>

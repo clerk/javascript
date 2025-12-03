@@ -28,7 +28,7 @@ export function Command({ cmd, message, onError, onSuccess }) {
       .catch(err => {
         setError(err);
       });
-  }, []);
+  }, [cmd]);
 
   return (
     <>

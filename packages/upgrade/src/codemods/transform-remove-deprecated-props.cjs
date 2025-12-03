@@ -243,8 +243,6 @@ function renameObjectProperties(root, j, oldName, newName) {
       return;
     }
 
-    const parent = path.parentPath && path.parentPath.node;
-    const isPattern = parent && parent.type === 'ObjectPattern';
     const originalLocalName = getLocalIdentifierName(path.node);
 
     if (path.node.shorthand) {
@@ -377,7 +375,7 @@ function transformSetActiveBeforeEmit(root, j) {
 
   root
     .find(j.CallExpression)
-    .filter(path => isSetActiveCall(path.node.callee, j))
+    .filter(path => isSetActiveCall(path.node.callee))
     .forEach(path => {
       const [args0] = path.node.arguments;
       if (!args0 || args0.type !== 'ObjectExpression') {
@@ -391,7 +389,7 @@ function transformSetActiveBeforeEmit(root, j) {
       if (!beforeEmitProp || beforeEmitProp.type !== 'ObjectProperty') {
         return;
       }
-      const originalValue = getPropertyValueExpression(beforeEmitProp.value, j);
+      const originalValue = getPropertyValueExpression(beforeEmitProp.value);
       if (!originalValue) {
         args0.properties.splice(beforeEmitIndex, 1);
         changed = true;
@@ -406,7 +404,7 @@ function transformSetActiveBeforeEmit(root, j) {
   return changed;
 }
 
-function isSetActiveCall(callee, j) {
+function isSetActiveCall(callee) {
   if (!callee) {
     return false;
   }
@@ -424,7 +422,7 @@ function isPropertyNamed(prop, name) {
   return prop && prop.type === 'ObjectProperty' && isPropertyKeyNamed(prop.key, name);
 }
 
-function getPropertyValueExpression(valueNode, j) {
+function getPropertyValueExpression(valueNode) {
   if (!valueNode) {
     return null;
   }

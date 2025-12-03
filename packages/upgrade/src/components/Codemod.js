@@ -9,17 +9,28 @@ import { runCodemod } from '../codemods/index.js';
  *
  * @param {Object} props
  * @param {Function} props.callback - The callback function to be called after the codemod is run.
- * @param {string} props.glob - The directory to scan for files in the project.
+ * @param {string|string[]} [props.glob] - Optional glob(s) to scan for files. When provided, the
+ *   codemod will use this glob directly instead of prompting.
+ * @param {Function} [props.onGlobResolved] - Optional callback invoked with the resolved glob array
+ *   when the user provides it via the prompt.
  * @param {string} props.sdk - The SDK name to be used in the codemod.
  * @param {string} props.transform - The transformation to be applied by the codemod.
  *
  * @returns {JSX.Element} The rendered Codemod component.
  */
 export function Codemod(props) {
-  const { callback, sdk, transform } = props;
+  const { callback, sdk, transform, glob: initialGlob, onGlobResolved } = props;
   const [error, setError] = useState();
-  const [glob, setGlob] = useState(props.glob);
+  const [glob, setGlob] = useState(initialGlob);
   const [result, setResult] = useState();
+
+  // If a glob is later provided via props (e.g. from a previous codemod run),
+  // adopt it so we can run without re-prompting.
+  useEffect(() => {
+    if (initialGlob && !glob) {
+      setGlob(initialGlob);
+    }
+  }, [initialGlob, glob]);
 
   useEffect(() => {
     if (!glob) {
@@ -51,7 +62,11 @@ export function Codemod(props) {
             <TextInput
               defaultValue='**/*.(js|jsx|ts|tsx|mjs|cjs)'
               onSubmit={val => {
-                setGlob(val.split(/[ ,]/));
+                const parsed = val.split(/[ ,]/).filter(Boolean);
+                setGlob(parsed);
+                if (onGlobResolved) {
+                  onGlobResolved(parsed);
+                }
               }}
             />
           )}
