@@ -2,6 +2,7 @@ export { assertContextExists, createContextAndHook } from './createContextAndHoo
 export { useAPIKeys as __experimental_useAPIKeys } from './useAPIKeys';
 export { useOrganization } from './useOrganization';
 export { useOrganizationList } from './useOrganizationList';
+export { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 export { useSafeLayoutEffect } from './useSafeLayoutEffect';
 export { useSession } from './useSession';
 export { useSessionList } from './useSessionList';

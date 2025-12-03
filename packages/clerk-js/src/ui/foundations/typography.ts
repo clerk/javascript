@@ -9,10 +9,10 @@ const fontWeights = Object.freeze({
 
 const lineHeights = Object.freeze({
   normal: 'normal',
-  extraSmall: '1.33333',
-  small: '1.38462',
-  medium: '1.41176',
-  large: '1.45455',
+  extraSmall: 'calc(16 / 12)', // = 1.33333
+  small: 'calc(18 / 13)', // = 1.38462
+  medium: 'calc(24 / 17)', // = 1.41176
+  large: 'calc(16 / 11)', // = 1.45455
 } as const);
 
 const letterSpacings = Object.freeze({
@@ -20,11 +20,11 @@ const letterSpacings = Object.freeze({
 } as const);
 
 export const FONT_SIZE_SCALE_RATIOS = Object.freeze({
-  xs: '11 / 13', // 0.846154
-  sm: '12 / 13', // 0.923077
-  md: '1', // 1.0
-  lg: '17 / 13', // 1.307692
-  xl: '24 / 13', // 1.846154
+  xs: '11 / 13', // = 0.846154
+  sm: '12 / 13', // = 0.923077
+  md: '1', // = 1.0
+  lg: '17 / 13', // = 1.307692
+  xl: '24 / 13', // = 1.846154
 } as const);
 
 export type FontSizeKey = keyof typeof FONT_SIZE_SCALE_RATIOS;

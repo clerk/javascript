@@ -694,8 +694,14 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Εισαγωγή κωδικού πρόσβασης',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Παραβιασμένος κωδικός',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
@@ -901,6 +907,7 @@ export const elGR: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ο κωδικός πρόσβασής σας έχει υπερβεί το μέγιστο αριθμό bytes που επιτρέπεται. Παρακαλούμε, συντομεύστε τον ή αφαιρέστε μερικούς ειδικούς χαρακτήρες.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Λανθασμένος κωδικός',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

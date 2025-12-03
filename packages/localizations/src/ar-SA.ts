@@ -690,8 +690,14 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'ادخل كلمة المرور',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'رمز التحقق',
@@ -895,6 +901,7 @@ export const arSA: LocalizationResource = {
     form_password_pwned__sign_in: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'كلمة مرور خاطئة',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

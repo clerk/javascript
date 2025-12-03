@@ -694,8 +694,14 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Şifrenizi girin',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Şifre ele geçirildi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Doğrulama kodu',
@@ -900,6 +906,7 @@ export const trTR: LocalizationResource = {
       'Bu şifre bir veri ihlalinde tespit edildi ve oturum açmak için kullanılamaz. Lütfen başka bir şifre seçin.',
     form_password_size_in_bytes_exceeded:
       'Şifreniz izin verilen maksimum byte sayısını aştı, lütfen kısaltın veya bazı özel karakterleri çıkarın.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Şifre doğrulaması başarısız.',
     form_username_invalid_character: 'Kullanıcı adı geçersiz karakterler içeriyor.',
     form_username_invalid_length: 'Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.',

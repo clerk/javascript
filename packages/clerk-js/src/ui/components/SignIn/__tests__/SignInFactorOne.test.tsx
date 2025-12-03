@@ -352,6 +352,84 @@ describe('SignInFactorOne', () => {
           ),
         ).not.toBeInTheDocument();
       });
+
+      it('using an compromised password should show the compromised password screen', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_compromised',
+          long_message:
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          message:
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+
+        await screen.findByText('Password compromised');
+        await screen.findByText(
+          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+        );
+
+        await screen.findByText('Email code to hello@clerk.com');
+      });
+
+      it('Prompts the user to use a different method if the password is compromised', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword();
+          f.withPreferredSignInStrategy({ strategy: 'password' });
+          f.withSocialProvider({ provider: 'google', authenticatable: true });
+          f.startSignInWithEmailAddress({
+            supportEmailCode: true,
+            supportPassword: true,
+            supportResetPassword: true,
+          });
+        });
+        fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
+
+        const errJSON = {
+          code: 'form_password_compromised',
+          long_message:
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          message:
+            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          meta: { param_name: 'password' },
+        };
+
+        fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Error', {
+            data: [errJSON],
+            status: 422,
+          }),
+        );
+        const { userEvent } = render(<SignInFactorOne />, { wrapper });
+        await userEvent.type(screen.getByLabelText('Password'), '123456');
+        await userEvent.click(screen.getByText('Continue'));
+
+        await screen.findByText('Password compromised');
+        await userEvent.click(screen.getByText('Email code to hello@clerk.com'));
+        await screen.findByText('Check your email');
+      });
     });
 
     describe('Forgot Password', () => {

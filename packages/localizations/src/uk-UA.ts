@@ -691,7 +691,13 @@ export const ukUA: LocalizationResource = {
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Введіть пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -895,6 +901,7 @@ export const ukUA: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перевищує максимально допустиму кількість байтів, скоротіть його або видаліть деякі спеціальні символи.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невірний пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

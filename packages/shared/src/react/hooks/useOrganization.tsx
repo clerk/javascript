@@ -1,4 +1,4 @@
-import { getCurrentOrganizationMembership, useAttemptToEnableOrganizations } from '../../organization';
+import { getCurrentOrganizationMembership } from '../../organization';
 import { eventMethodCalled } from '../../telemetry/events/method-called';
 import type {
   GetDomainsParams,
@@ -20,6 +20,7 @@ import {
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -30,7 +31,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/verified-domains#enrollment-mode).</li>
+   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/verified-domains#enable-verified-domains).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
    */

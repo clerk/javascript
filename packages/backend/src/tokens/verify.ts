@@ -199,7 +199,7 @@ async function verifyM2MToken(
 ): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2m.verifyToken({ token });
+    const verifiedToken = await client.m2m.verify({ token });
     return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
@@ -212,7 +212,7 @@ async function verifyOAuthToken(
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.idPOAuthAccessToken.verifyAccessToken(accessToken);
+    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
@@ -225,7 +225,7 @@ async function verifyAPIKey(
 ): Promise<MachineTokenReturnType<APIKey, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.apiKeys.verifySecret(secret);
+    const verifiedToken = await client.apiKeys.verify(secret);
     return { data: verifiedToken, tokenType: TokenType.ApiKey, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.ApiKey, err, 'API key not found');

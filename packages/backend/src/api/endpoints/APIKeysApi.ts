@@ -2,6 +2,7 @@ import type { ClerkPaginationRequest } from '@clerk/shared/types';
 
 import type { PaginatedResourceResponse } from '../../api/resources/Deserializer';
 import { joinPaths } from '../../util/path';
+import { deprecated } from '../../util/shared';
 import type { APIKey } from '../resources/APIKey';
 import { AbstractAPI } from './AbstractApi';
 
@@ -88,11 +89,19 @@ export class APIKeysAPI extends AbstractAPI {
     });
   }
 
-  async verifySecret(secret: string) {
+  async verify(secret: string) {
     return this.request<APIKey>({
       method: 'POST',
       path: joinPaths(basePath, 'verify'),
       bodyParams: { secret },
     });
+  }
+
+  /**
+   * @deprecated Use `verify()` instead. This method will be removed in the next major release.
+   */
+  async verifySecret(secret: string) {
+    deprecated('apiKeys.verifySecret()', 'Use `apiKeys.verify()` instead.');
+    return this.verify(secret);
   }
 }

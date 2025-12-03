@@ -704,8 +704,14 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu parola asociată contului tău',
       title: 'Introdu parola',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Parola este compromisă',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Cod de verificare',
@@ -911,6 +917,7 @@ export const roRO: LocalizationResource = {
     form_password_pwned__sign_in:
       'Această parolă a fost găsită într-o breșă de securitate și nu poate fi folosită. Te rugăm resetează parola.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length:

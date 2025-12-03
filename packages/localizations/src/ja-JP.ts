@@ -703,8 +703,14 @@ export const jaJP: LocalizationResource = {
       subtitle: 'アカウントに関連付けられたパスワードを入力してください',
       title: 'パスワードを入力',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'パスワードが漏えいしました',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: '検証コード',
@@ -910,6 +916,7 @@ export const jaJP: LocalizationResource = {
     form_password_pwned__sign_in:
       'このパスワードは侵害の一部として見つかったため使用できません。パスワードをリセットしてください。',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'ユーザー名は{{min_length}}文字以上{{max_length}}文字以下である必要があります。',
