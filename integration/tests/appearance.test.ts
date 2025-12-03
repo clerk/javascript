@@ -26,8 +26,8 @@ test.describe('appearance prop', () => {
                 return (
                   <div key={name}>
                     <h2>{name}</h2>
-                    <SignIn appearance={{ baseTheme: theme }} />
-                    <SignUp appearance={{ baseTheme: theme }} />
+                    <SignIn appearance={{ theme }} />
+                    <SignUp appearance={{ theme }} />
                   </div>
                 );
               });

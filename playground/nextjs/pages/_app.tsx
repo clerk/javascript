@@ -63,7 +63,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* @ts-ignore */}
       <ClerkProvider
         appearance={{
-          baseTheme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
+          theme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
           variables: {
             colorPrimary: primaryColor,
           },
