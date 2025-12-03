@@ -158,6 +158,27 @@ describe('createClerkRequest', () => {
       const req2 = new Request('http://localhost:3000////path');
       expect(createClerkRequest(req2).clerkUrl.toString()).toBe('http://localhost:3000////path');
     });
+
+    it('should handle malformed x-forwarded-host header gracefully', () => {
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          'x-forwarded-host': 'z2cgvm.xfh"></script><script>alert(document.domain);</script>',
+          'x-forwarded-proto': 'https',
+        },
+      });
+      // Should fall back to original URL instead of throwing
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
+    });
+
+    it('should handle malformed host header gracefully', () => {
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          host: 'z2cgvm.xfh"></script><script>alert(document.domain);</script>',
+        },
+      });
+      // Should fall back to original URL instead of throwing
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
+    });
   });
 
   describe('toJSON', () => {

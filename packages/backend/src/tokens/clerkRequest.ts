@@ -59,7 +59,13 @@ class ClerkRequest extends Request {
     if (origin === initialUrl.origin) {
       return createClerkUrl(initialUrl);
     }
-    return createClerkUrl(initialUrl.pathname + initialUrl.search, origin);
+    try {
+      return createClerkUrl(initialUrl.pathname + initialUrl.search, origin);
+    } catch {
+      // If the origin contains invalid characters (e.g., from malicious headers),
+      // fall back to using the original request URL to prevent the application from crashing
+      return createClerkUrl(initialUrl);
+    }
   }
 
   private getFirstValueFromHeader(value?: string | null) {
