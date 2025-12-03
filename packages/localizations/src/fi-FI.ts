@@ -694,6 +694,9 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä tilisi salasana',
       title: 'Syötä salasanasi',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Salasana kompromisoitu',
     },

@@ -690,6 +690,9 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'ادخل كلمة المرور',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
     },

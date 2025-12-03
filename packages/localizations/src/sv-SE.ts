@@ -695,6 +695,9 @@ export const svSE: LocalizationResource = {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Ange ditt lösenord',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lösenord är för osäkert',
     },

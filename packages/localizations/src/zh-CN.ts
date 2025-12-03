@@ -681,6 +681,9 @@ export const zhCN: LocalizationResource = {
       subtitle: '继续使用 {{applicationName}}',
       title: '输入您的密码',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: undefined,
     },

@@ -353,7 +353,7 @@ describe('SignInFactorOne', () => {
         ).not.toBeInTheDocument();
       });
 
-      it('using an untrusted password should show the untrusted password screen', async () => {
+      it('using an compromised password should show the compromised password screen', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -367,7 +367,7 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
 
         const errJSON = {
-          code: 'form_password_untrusted',
+          code: 'form_password_compromised',
           long_message:
             "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
           message:
@@ -393,7 +393,7 @@ describe('SignInFactorOne', () => {
         await screen.findByText('Email code to hello@clerk.com');
       });
 
-      it('Prompts the user to use a different method if the password is untrusted', async () => {
+      it('Prompts the user to use a different method if the password is compromised', async () => {
         const { wrapper, fixtures } = await createFixtures(f => {
           f.withEmailAddress();
           f.withPassword();
@@ -408,7 +408,7 @@ describe('SignInFactorOne', () => {
         fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
 
         const errJSON = {
-          code: 'form_password_untrusted',
+          code: 'form_password_compromised',
           long_message:
             "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
           message:

@@ -694,6 +694,9 @@ export const esES: LocalizationResource = {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Introduzca su contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Tu contraseña ha sido comprometida',
     },

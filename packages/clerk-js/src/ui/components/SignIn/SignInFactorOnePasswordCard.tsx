@@ -1,4 +1,4 @@
-import { isPasswordPwnedError, isPasswordUntrustedError, isUserLockedError } from '@clerk/shared/error';
+import { isPasswordCompromisedError, isPasswordPwnedError, isUserLockedError } from '@clerk/shared/error';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 
@@ -18,7 +18,7 @@ import { useRouter } from '../../router/RouteContext';
 import { HavingTrouble } from './HavingTrouble';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 
-export type PasswordErrorCode = 'untrusted' | 'pwned';
+export type PasswordErrorCode = 'compromised' | 'pwned';
 
 type SignInFactorOnePasswordProps = {
   onForgotPasswordMethodClick: React.MouseEventHandler | undefined;
@@ -101,9 +101,9 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             return;
           }
 
-          if (isPasswordUntrustedError(err)) {
-            card.setError({ ...err.errors[0], code: 'form_password_untrusted__sign_in' });
-            onPasswordError('untrusted');
+          if (isPasswordCompromisedError(err)) {
+            card.setError({ ...err.errors[0], code: 'form_password_compromised__sign_in' });
+            onPasswordError('compromised');
             return;
           }
         }
