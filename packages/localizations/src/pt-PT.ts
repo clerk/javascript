@@ -691,8 +691,14 @@ export const ptPT: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira a sua palavra-passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Este password foi comprometido em uma violação de dados. Escolha outro por motivos de segurança.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -898,9 +904,11 @@ export const ptPT: LocalizationResource = {
       'Esta palavra-passe foi encontrada como parte de uma violação e não pode ser utilizada para login. Por favor, escolha outra.',
     form_password_size_in_bytes_exceeded:
       'A sua palavra-passe excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Falha na validação da palavra-passe.',
     form_username_invalid_character: 'O nome de utilizador contém caracteres inválidos.',
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
+    form_username_needs_non_number_char: 'O seu nome de utilizador deve conter pelo menos um caractere não numérico.',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",

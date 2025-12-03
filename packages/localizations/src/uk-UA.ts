@@ -691,7 +691,13 @@ export const ukUA: LocalizationResource = {
       subtitle: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Введіть пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -895,9 +901,11 @@ export const ukUA: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перевищує максимально допустиму кількість байтів, скоротіть його або видаліть деякі спеціальні символи.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невірний пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: "Ім'я користувача повинно містити принаймні один нецифровий символ.",
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "Адреса електронної пошти або номер телефону не дозволено для реєстрації. Це може бути пов'язано з використанням '+', '=', '#' або '.' в адресі електронної пошти, використанням домену, пов'язаного з тимчасовою електронною поштою, або явного виключення.",

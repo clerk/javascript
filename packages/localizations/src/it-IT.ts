@@ -700,8 +700,14 @@ export const itIT: LocalizationResource = {
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Inserisci la tua password',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'La tua password è stata trovata in un data breach.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Codice di verifica',
@@ -907,9 +913,11 @@ export const itIT: LocalizationResource = {
       'Questa password è stata trovata in una violazione dei dati. Non può essere utilizzata. Reimposta la tua password.',
     form_password_size_in_bytes_exceeded:
       'La tua password ha superato il numero massimo di byte consentiti, per favore accorciala o rimuovi alcuni caratteri speciali.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Password errata.',
     form_username_invalid_character: 'Il nome utente contiene caratteri non validi.',
     form_username_invalid_length: 'Il nome utente deve avere una lunghezza compresa tra 3 e 32 caratteri.',
+    form_username_needs_non_number_char: 'Il tuo nome utente deve contenere almeno un carattere non numerico.',
     identification_deletion_failed: 'Non puoi eliminare la tua ultima identificazione.',
     not_allowed_access:
       "L'indirizzo email o il numero di telefono non è autorizzato per la registrazione. Questo può essere dovuto all'uso di '+', '=', '#' o '.' nell'indirizzo email, l'uso di un dominio collegato a un servizio email temporaneo o l'esclusione esplicita. Se ritieni che si tratti di un errore, contattaci.",

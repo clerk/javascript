@@ -697,8 +697,14 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ ఖాతాతో సంబంధం ఉన్న పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
@@ -907,10 +913,12 @@ export const teIN: LocalizationResource = {
       'ఈ పాస్‌వర్డ్ డేటా ఉల్లంఘన భాగంగా కనుగొనబడింది మరియు ఉపయోగించడానికి వీలుపడదు, దయచేసి మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి.',
     form_password_size_in_bytes_exceeded:
       'మీ పాస్‌వర్డ్ అనుమతించిన గరిష్ట బైట్ల సంఖ్యను మించింది, దయచేసి దాన్ని చిన్నదిగా చేయండి లేదా కొన్ని ప్రత్యేక అక్షరాలను తొలగించండి.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'తప్పు పాస్‌వర్డ్',
     form_username_invalid_character:
       'మీ వినియోగదారు పేరులో చెల్లని అక్షరాలు ఉన్నాయి. దయచేసి అక్షరాలు, సంఖ్యలు మరియు అండర్‌స్కోర్‌లను మాత్రమే ఉపయోగించండి.',
     form_username_invalid_length: 'మీ వినియోగదారు పేరు {{min_length}} మరియు {{max_length}} అక్షరాల మధ్య ఉండాలి.',
+    form_username_needs_non_number_char: 'మీ వినియోగదారు పేరులో కనీసం ఒక సంఖ్యేతర అక్షరం ఉండాలి.',
     identification_deletion_failed: 'మీరు మీ చివరి గుర్తింపును తొలగించలేరు.',
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',

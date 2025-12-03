@@ -685,8 +685,14 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Есептік жазбаңыздың құпия сөзін енгізіңіз',
       title: 'Құпия сөзді енгізіңіз',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Растау коды',
@@ -888,10 +894,12 @@ export const kkKZ: LocalizationResource = {
     form_password_pwned__sign_in: 'Бұл құпия сөз қауіпсіз емес. Құпия сөзді өзгертуге болады.',
     form_password_size_in_bytes_exceeded:
       'Құпия сөзде тым көп байт бар. Оны қысқартыңыз немесе арнайы таңбаларды алып тастаңыз.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Құпия сөз қате',
     form_username_invalid_character:
       'Пайдаланушы атында жарамсыз таңбалар бар. Тек әріптер, сандар және астыңғы сызықшаларды қолданыңыз.',
     form_username_invalid_length: 'Пайдаланушы аты {{min_length}} пен {{max_length}} арасында болуы керек.',
+    form_username_needs_non_number_char: 'Пайдаланушы атыңызда кемінде бір санды емес таңба болуы керек.',
     identification_deletion_failed: 'Соңғы идентификацияны жою мүмкін емес.',
     not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
