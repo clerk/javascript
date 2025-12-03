@@ -18,7 +18,6 @@ Align experimental/unstable prefixes to use consistent naming:
 
 **Breaking Changes:**
 
-**Internal APIs (renamed from `__unstable_*` to `__internal_*`):**
 - `__unstable__environment` → `__internal__environment`
 - `__unstable__updateProps` → `__internal__updateProps`
 - `__unstable__setEnvironment` → `__internal__setEnvironment`
@@ -28,16 +27,9 @@ Align experimental/unstable prefixes to use consistent naming:
 - `__unstable__onAfterResponse` → `__internal__onAfterResponse`
 - `__unstable_ClerkUiCtor` → `__internal_ClerkUiCtor`
 - `__unstable_invokeMiddlewareOnAuthStateChange` → `__internal_invokeMiddlewareOnAuthStateChange`
-
-**Experimental APIs (renamed from `experimental__*`/`experimental_*` to `__experimental_*`):**
 - `experimental_createTheme` → `__experimental_createTheme`
 - `experimental__simple` → `__experimental_simple`
-
-**Removed APIs:**
 - `__unstable_manageBillingUrl` (removed)
 - `__unstable_manageBillingLabel` (removed)
 - `__unstable_manageBillingMembersLimit` (removed)
 - `experimental__forceOauthFirst` (removed)
-
-Note: All `__experimental_*` APIs already used the correct format and remain unchanged.
-
