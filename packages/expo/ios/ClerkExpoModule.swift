@@ -14,6 +14,8 @@ public protocol ClerkViewFactoryProtocol {
   func createAuthViewController(mode: String, dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
   func createUserProfileViewController(dismissable: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) -> UIViewController?
   func configure(publishableKey: String) async throws
+  func getSession() async -> [String: Any]?
+  func signOut() async throws
 }
 
 public class ClerkExpoModule: Module {
@@ -85,6 +87,22 @@ public class ClerkExpoModule: Module {
           }
         }
       }
+    }
+
+    // Get current session from native Clerk SDK
+    AsyncFunction("getSession") { () -> [String: Any]? in
+      guard let factory = clerkViewFactory else {
+        return nil
+      }
+      return await factory.getSession()
+    }
+
+    // Sign out from native Clerk SDK
+    AsyncFunction("signOut") { () in
+      guard let factory = clerkViewFactory else {
+        throw NSError(domain: "ClerkExpo", code: 1, userInfo: [NSLocalizedDescriptionKey: "Clerk not initialized"])
+      }
+      try await factory.signOut()
     }
   }
 }

@@ -59,6 +59,25 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
     )
     return wrapper
   }
+
+  @MainActor
+  public func getSession() async -> [String: Any]? {
+    guard let session = Clerk.shared.session else {
+      print("📭 [ClerkViewFactory] No active session")
+      return nil
+    }
+    print("✅ [ClerkViewFactory] Found active session: \(session.id)")
+    return [
+      "sessionId": session.id,
+      "status": String(describing: session.status)
+    ]
+  }
+
+  public func signOut() async throws {
+    print("🔓 [ClerkViewFactory] Signing out...")
+    try await Clerk.shared.signOut()
+    print("✅ [ClerkViewFactory] Signed out successfully")
+  }
 }
 
 // MARK: - Auth View Controller Wrapper
