@@ -701,7 +701,7 @@ export const taIN: LocalizationResource = {
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

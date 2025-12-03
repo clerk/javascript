@@ -699,7 +699,7 @@ export const idID: LocalizationResource = {
     passwordPwned: {
       title: 'Kata sandi terkompromi',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

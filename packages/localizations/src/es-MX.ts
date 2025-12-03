@@ -702,7 +702,7 @@ export const esMX: LocalizationResource = {
     passwordPwned: {
       title: 'Contraseña en peligro',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

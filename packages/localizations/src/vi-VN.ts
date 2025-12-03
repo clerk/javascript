@@ -703,7 +703,7 @@ export const viVN: LocalizationResource = {
     passwordPwned: {
       title: 'Mật khẩu bị rò rỉ',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

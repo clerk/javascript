@@ -56,7 +56,7 @@ function determineAlternativeMethodsMode(
   }
 
   if (passwordErrorCode === 'untrusted') {
-    return 'passwordUntrusted';
+    return 'passwordCompromised';
   }
 
   return 'forgot';

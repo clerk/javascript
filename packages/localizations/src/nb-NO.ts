@@ -695,7 +695,7 @@ export const nbNO: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

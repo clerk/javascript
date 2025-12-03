@@ -698,7 +698,7 @@ export const hiIN: LocalizationResource = {
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

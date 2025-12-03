@@ -697,7 +697,7 @@ export const trTR: LocalizationResource = {
     passwordPwned: {
       title: 'Şifre ele geçirildi',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

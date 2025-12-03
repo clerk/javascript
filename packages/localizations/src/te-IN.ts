@@ -700,7 +700,7 @@ export const teIN: LocalizationResource = {
     passwordPwned: {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

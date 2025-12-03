@@ -694,7 +694,7 @@ export const enUS: LocalizationResource = {
     passwordPwned: {
       title: 'Password compromised',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: 'Password compromised',
     },
     phoneCode: {

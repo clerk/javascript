@@ -706,7 +706,7 @@ export const jaJP: LocalizationResource = {
     passwordPwned: {
       title: 'パスワードが漏えいしました',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

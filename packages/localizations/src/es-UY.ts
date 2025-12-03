@@ -700,7 +700,7 @@ export const esUY: LocalizationResource = {
     passwordPwned: {
       title: 'Contraseña comprometida',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

@@ -688,7 +688,7 @@ export const heIL: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

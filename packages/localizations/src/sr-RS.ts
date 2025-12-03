@@ -695,7 +695,7 @@ export const srRS: LocalizationResource = {
     passwordPwned: {
       title: 'Lozinka kompromitovana',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

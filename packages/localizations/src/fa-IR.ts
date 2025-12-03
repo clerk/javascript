@@ -705,7 +705,7 @@ export const faIR: LocalizationResource = {
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

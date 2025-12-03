@@ -698,7 +698,7 @@ export const svSE: LocalizationResource = {
     passwordPwned: {
       title: 'Lösenord är för osäkert',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

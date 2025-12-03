@@ -709,7 +709,7 @@ export const deDE: LocalizationResource = {
     passwordPwned: {
       title: 'Passwort kompromittiert',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

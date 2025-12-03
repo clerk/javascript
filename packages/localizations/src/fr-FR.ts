@@ -710,7 +710,7 @@ export const frFR: LocalizationResource = {
     passwordPwned: {
       title: 'Mot de passe compromis',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

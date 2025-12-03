@@ -703,7 +703,7 @@ export const itIT: LocalizationResource = {
     passwordPwned: {
       title: 'La tua password è stata trovata in un data breach.',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

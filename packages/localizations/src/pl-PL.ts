@@ -698,7 +698,7 @@ export const plPL: LocalizationResource = {
     passwordPwned: {
       title: 'Hasło skompromitowane',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

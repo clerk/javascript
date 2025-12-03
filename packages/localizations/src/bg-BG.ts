@@ -696,7 +696,7 @@ export const bgBG: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

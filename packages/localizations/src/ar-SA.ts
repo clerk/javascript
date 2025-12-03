@@ -693,7 +693,7 @@ export const arSA: LocalizationResource = {
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

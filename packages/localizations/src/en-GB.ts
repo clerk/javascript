@@ -697,7 +697,7 @@ export const enGB: LocalizationResource = {
     passwordPwned: {
       title: 'Password compromised',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

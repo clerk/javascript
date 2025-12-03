@@ -699,7 +699,7 @@ export const bnIN: LocalizationResource = {
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

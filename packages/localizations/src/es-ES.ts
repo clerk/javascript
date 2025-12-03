@@ -697,7 +697,7 @@ export const esES: LocalizationResource = {
     passwordPwned: {
       title: 'Tu contraseña ha sido comprometida',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

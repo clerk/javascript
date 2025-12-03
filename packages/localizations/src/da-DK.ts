@@ -695,7 +695,7 @@ export const daDK: LocalizationResource = {
     passwordPwned: {
       title: 'Sikkerhedsadvarsel',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

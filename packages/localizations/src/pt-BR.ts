@@ -705,7 +705,7 @@ export const ptBR: LocalizationResource = {
     passwordPwned: {
       title: 'Senha comprometida',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

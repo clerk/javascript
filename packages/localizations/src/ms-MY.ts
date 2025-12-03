@@ -701,7 +701,7 @@ export const msMY: LocalizationResource = {
     passwordPwned: {
       title: 'Kata laluan dikompromi',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

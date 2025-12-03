@@ -701,7 +701,7 @@ export const esCR: LocalizationResource = {
     passwordPwned: {
       title: 'Contraseña en peligro',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

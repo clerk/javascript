@@ -704,7 +704,7 @@ export const csCZ: LocalizationResource = {
     passwordPwned: {
       title: 'Heslo kompromitováno',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

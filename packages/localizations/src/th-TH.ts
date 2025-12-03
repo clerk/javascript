@@ -697,7 +697,7 @@ export const thTH: LocalizationResource = {
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

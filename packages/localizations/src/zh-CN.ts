@@ -684,7 +684,7 @@ export const zhCN: LocalizationResource = {
     passwordPwned: {
       title: undefined,
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

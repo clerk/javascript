@@ -688,7 +688,7 @@ export const kkKZ: LocalizationResource = {
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

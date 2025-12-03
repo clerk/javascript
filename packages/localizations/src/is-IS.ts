@@ -698,7 +698,7 @@ export const isIS: LocalizationResource = {
     passwordPwned: {
       title: 'Lykilorð brotið',
     },
-    passwordUntrusted: {
+    passwordCompromised: {
       title: undefined,
     },
     phoneCode: {

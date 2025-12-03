@@ -400,7 +400,7 @@ export type __internal_LocalizationResource = {
     passwordPwned: {
       title: LocalizationValue;
     };
-    passwordUntrusted: {
+    passwordCompromised: {
       title: LocalizationValue;
     };
     passkey: {
@@ -1315,7 +1315,9 @@ type UnstableErrors = WithParamName<{
   web3_missing_identifier: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
+  /** @deprecated Use form_password_compromised__sign_in instead */
   form_password_untrusted__sign_in: LocalizationValue;
+  form_password_compromised__sign_in: LocalizationValue;
   form_username_invalid_length: LocalizationValue<'min_length' | 'max_length'>;
   form_username_needs_non_number_char: LocalizationValue;
   form_username_invalid_character: LocalizationValue;
