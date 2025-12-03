@@ -1,8 +1,17 @@
 import { requireNativeModule, Platform } from 'expo-modules-core';
-import { TouchableOpacity, View, Text, StyleSheet, ViewProps } from 'react-native';
+import { useEffect, useState } from 'react';
+import { TouchableOpacity, View, Text, StyleSheet, ViewProps, Image } from 'react-native';
 
 // Get the native module for modal presentation
 const ClerkExpo = Platform.OS === 'ios' ? requireNativeModule('ClerkExpo') : null;
+
+interface NativeUser {
+  id: string;
+  firstName?: string;
+  lastName?: string;
+  imageUrl?: string;
+  primaryEmailAddress?: string;
+}
 
 export interface UserButtonProps extends ViewProps {
   /**
@@ -15,6 +24,7 @@ export interface UserButtonProps extends ViewProps {
  * Native iOS UserButton component powered by clerk-ios SwiftUI
  *
  * Displays a button that opens the UserProfileView when tapped.
+ * Shows the user's profile image, or their initials if no image is available.
  *
  * Uses the official clerk-ios package from:
  * https://github.com/clerk/clerk-ios
@@ -33,6 +43,27 @@ export interface UserButtonProps extends ViewProps {
  * ```
  */
 export function UserButton({ onPress, style, ...props }: UserButtonProps) {
+  const [user, setUser] = useState<NativeUser | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (Platform.OS !== 'ios' || !ClerkExpo?.getSession) {
+        return;
+      }
+
+      try {
+        const session = await ClerkExpo.getSession();
+        if (session?.user) {
+          setUser(session.user);
+        }
+      } catch (err) {
+        console.error('[UserButton] Error fetching user:', err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   const handlePress = async () => {
     onPress?.();
 
@@ -48,6 +79,16 @@ export function UserButton({ onPress, style, ...props }: UserButtonProps) {
     } catch (err) {
       console.error('[UserButton] Error presenting profile:', err);
     }
+  };
+
+  // Get initials from user name
+  const getInitials = () => {
+    if (user?.firstName) {
+      const first = user.firstName.charAt(0).toUpperCase();
+      const last = user.lastName?.charAt(0).toUpperCase() || '';
+      return first + last;
+    }
+    return 'U';
   };
 
   if (Platform.OS !== 'ios') {
@@ -67,9 +108,16 @@ export function UserButton({ onPress, style, ...props }: UserButtonProps) {
       style={[styles.button, style]}
       {...props}
     >
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>U</Text>
-      </View>
+      {user?.imageUrl ? (
+        <Image
+          source={{ uri: user.imageUrl }}
+          style={styles.avatarImage}
+        />
+      ) : (
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{getInitials()}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -86,6 +134,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#6366f1',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 18,
   },
   avatarText: {
     color: 'white',

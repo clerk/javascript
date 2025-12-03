@@ -67,10 +67,41 @@ public class ClerkViewFactory: ClerkViewFactoryProtocol {
       return nil
     }
     print("✅ [ClerkViewFactory] Found active session: \(session.id)")
-    return [
+
+    var result: [String: Any] = [
       "sessionId": session.id,
       "status": String(describing: session.status)
     ]
+
+    // Include user details if available
+    // Try to get user from session first, then fallback to Clerk.shared.user
+    let user = session.user ?? Clerk.shared.user
+    NSLog("🔍 [ClerkViewFactory] Clerk.shared.user: \(Clerk.shared.user?.id ?? "nil")")
+    NSLog("🔍 [ClerkViewFactory] session.user: \(session.user?.id ?? "nil")")
+
+    if let user = user {
+      var userDict: [String: Any] = [
+        "id": user.id,
+        "imageUrl": user.imageUrl
+      ]
+      if let firstName = user.firstName {
+        userDict["firstName"] = firstName
+      }
+      if let lastName = user.lastName {
+        userDict["lastName"] = lastName
+      }
+      if let primaryEmail = user.emailAddresses.first(where: { $0.id == user.primaryEmailAddressId }) {
+        userDict["primaryEmailAddress"] = primaryEmail.emailAddress
+      } else if let firstEmail = user.emailAddresses.first {
+        userDict["primaryEmailAddress"] = firstEmail.emailAddress
+      }
+      result["user"] = userDict
+      NSLog("✅ [ClerkViewFactory] User found: \(user.firstName ?? "N/A") \(user.lastName ?? "")")
+    } else {
+      NSLog("⚠️ [ClerkViewFactory] No user available - all sources returned nil")
+    }
+
+    return result
   }
 
   public func signOut() async throws {
