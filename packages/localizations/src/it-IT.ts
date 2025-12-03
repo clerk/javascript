@@ -700,8 +700,14 @@ export const itIT: LocalizationResource = {
       subtitle: 'per continuare su {{applicationName}}',
       title: 'Inserisci la tua password',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'La tua password è stata trovata in un data breach.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Codice di verifica',
@@ -907,6 +913,7 @@ export const itIT: LocalizationResource = {
       'Questa password è stata trovata in una violazione dei dati. Non può essere utilizzata. Reimposta la tua password.',
     form_password_size_in_bytes_exceeded:
       'La tua password ha superato il numero massimo di byte consentiti, per favore accorciala o rimuovi alcuni caratteri speciali.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Password errata.',
     form_username_invalid_character: 'Il nome utente contiene caratteri non validi.',
     form_username_invalid_length: 'Il nome utente deve avere una lunghezza compresa tra 3 e 32 caratteri.',

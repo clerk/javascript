@@ -695,8 +695,14 @@ export const hiIN: LocalizationResource = {
       subtitle: 'अपने खाते से जुड़ा पासवर्ड दर्ज करें',
       title: 'अपना पासवर्ड दर्ज करें',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
@@ -905,6 +911,7 @@ export const hiIN: LocalizationResource = {
       'यह पासवर्ड डेटा उल्लंघन के हिस्से के रूप में पाया गया है और इसका उपयोग नहीं किया जा सकता, कृपया अपना पासवर्ड रीसेट करें।',
     form_password_size_in_bytes_exceeded:
       'आपके पासवर्ड ने अनुमत बाइट्स की अधिकतम संख्या से अधिक हो गया है, कृपया इसे छोटा करें या कुछ विशेष वर्णों को हटा दें।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'गलत पासवर्ड',
     form_username_invalid_character:
       'आपके उपयोगकर्ता नाम में अमान्य वर्ण हैं। कृपया केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें।',
