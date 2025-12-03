@@ -1,7 +1,7 @@
 import type { Clerk } from '../../core/clerk';
 
 export const retrieveCaptchaInfo = (clerk: Clerk) => {
-  const _environment = clerk.__internal__environment;
+  const _environment = clerk.__internal_environment;
   const captchaProvider = _environment ? _environment.displayConfig.captchaProvider : 'turnstile';
 
   // Access nonce via internal options - casting to any since nonce is in IsomorphicClerkOptions but not ClerkOptions

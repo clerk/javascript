@@ -11,7 +11,7 @@ const props = defineProps<PricingTableProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountPricingTable"
     :unmount="clerk?.unmountPricingTable"
-    :update-props="(clerk as any)?.__internal__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="props"
   />
 </template>

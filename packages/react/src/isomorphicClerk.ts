@@ -745,9 +745,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __internal__environment(): any {
+  get __internal_environment(): any {
     if (this.clerkjs) {
-      return (this.clerkjs as any).__internal__environment;
+      return (this.clerkjs as any).__internal_environment;
       // TODO: add ssr condition
     } else {
       return undefined;
@@ -780,20 +780,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       : this.#stateProxy.checkoutSignal(...args);
   };
 
-  __internal__setEnvironment(...args: any): void {
-    if (this.clerkjs && '__internal__setEnvironment' in this.clerkjs) {
-      (this.clerkjs as any).__internal__setEnvironment(args);
+  __internal_setEnvironment(...args: any): void {
+    if (this.clerkjs && '__internal_setEnvironment' in this.clerkjs) {
+      (this.clerkjs as any).__internal_setEnvironment(args);
     } else {
       return undefined;
     }
   }
 
   // TODO @userland-errors:
-  __internal__updateProps = async (props: any): Promise<void> => {
+  __internal_updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
-    if (clerkjs && '__internal__updateProps' in clerkjs) {
-      return (clerkjs as any).__internal__updateProps(props);
+    if (clerkjs && '__internal_updateProps' in clerkjs) {
+      return (clerkjs as any).__internal_updateProps(props);
     }
   };
 

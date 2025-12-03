@@ -94,8 +94,8 @@ export function createClerkClient({
     listener?.add();
   }
 
-  clerk.__internal__onAfterResponse(responseHandler(jwt, { isProd }));
-  clerk.__internal__onBeforeRequest(requestHandler(jwt, { isProd }));
+  clerk.__internal_onAfterResponse(responseHandler(jwt, { isProd }));
+  clerk.__internal_onBeforeRequest(requestHandler(jwt, { isProd }));
 
   return clerk;
 }

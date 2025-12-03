@@ -27,8 +27,8 @@ type PaymentElementError = {
 
 const useInternalEnvironment = () => {
   const clerk = useClerk();
-  // @ts-expect-error `__internal__environment` is not typed
-  return clerk.__internal__environment as unknown as EnvironmentResource | null | undefined;
+  // @ts-expect-error `__internal_environment` is not typed
+  return clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
 };
 
 const useLocalization = () => {

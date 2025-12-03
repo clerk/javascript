@@ -44,8 +44,8 @@ describe('usePlans', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockClerk.loaded = true;
-    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = true;
-    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = true;
     defaultQueryClient.client.clear();
   });
 

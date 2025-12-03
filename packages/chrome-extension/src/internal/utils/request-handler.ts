@@ -3,7 +3,7 @@ import type { Clerk } from '@clerk/clerk-js';
 import { AUTH_HEADER } from '../constants';
 import type { JWTHandler } from './jwt-handler';
 
-type Handler = Parameters<Clerk['__internal__onBeforeRequest']>[0];
+type Handler = Parameters<Clerk['__internal_onBeforeRequest']>[0];
 type Req = Parameters<Handler>[0];
 
 /** Append the JWT to the FAPI request */

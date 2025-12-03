@@ -32,7 +32,7 @@ export function createMockClerk(overrides: any = {}) {
     telemetry: { record: vi.fn() },
     on: vi.fn(),
     off: vi.fn(),
-    __internal__environment: {
+    __internal_environment: {
       commerceSettings: {
         billing: {
           user: { enabled: true },

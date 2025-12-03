@@ -26,7 +26,13 @@ export default defineConfig(({ watch }) => {
   return [
     {
       ...common,
-      entry: ['./src/index.ts', './src/entry.ts', './src/internal/index.ts', './src/themes/index.ts', './src/themes/experimental.ts'],
+      entry: [
+        './src/index.ts',
+        './src/entry.ts',
+        './src/internal/index.ts',
+        './src/themes/index.ts',
+        './src/themes/experimental.ts',
+      ],
       outDir: './dist',
       unbundle: true,
       onSuccess: async () => {

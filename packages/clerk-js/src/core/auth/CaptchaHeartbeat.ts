@@ -35,7 +35,7 @@ export class CaptchaHeartbeat {
   }
 
   private isEnabled() {
-    return !!this.clerk.__internal__environment?.displayConfig?.captchaHeartbeat;
+    return !!this.clerk.__internal_environment?.displayConfig?.captchaHeartbeat;
   }
 
   private clientBypass() {
@@ -43,6 +43,6 @@ export class CaptchaHeartbeat {
   }
 
   private intervalInMs() {
-    return this.clerk.__internal__environment?.displayConfig?.captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
+    return this.clerk.__internal_environment?.displayConfig?.captchaHeartbeatIntervalMs ?? 10 * 60 * 1000;
   }
 }

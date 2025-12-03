@@ -15,6 +15,6 @@ const __BUILD_VARIANT_CHANNEL__: boolean;
 const __BUILD_VARIANT_CHIPS__: boolean;
 
 interface Window {
-  __internal__onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
-  __internal__onAfterSetActive: () => Promise<void> | void;
+  __internal_onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
+  __internal_onAfterSetActive: () => Promise<void> | void;
 }

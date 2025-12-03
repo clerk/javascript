@@ -37,24 +37,24 @@ describe('isomorphicClerk', () => {
   it('updates props asynchronously after clerkjs has loaded', async () => {
     const propsHistory: any[] = [];
     const dummyClerkJS = {
-      __internal__updateProps: (props: any) => propsHistory.push(props),
+      __internal_updateProps: (props: any) => propsHistory.push(props),
     };
 
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     (isomorphicClerk as any).clerkjs = dummyClerkJS as any;
 
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'dark' } });
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'light' } });
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'purple' } });
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'yellow' } });
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'red' } });
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'blue' } });
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'green' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'dark' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'light' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'purple' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'yellow' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'red' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'blue' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'green' } });
     expect(propsHistory).toEqual([]);
 
     vi.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
     isomorphicClerk.emitLoaded();
-    void isomorphicClerk.__internal__updateProps({ appearance: { baseTheme: 'white' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'white' } });
     await vi.runAllTimersAsync();
 
     expect(propsHistory).toEqual([

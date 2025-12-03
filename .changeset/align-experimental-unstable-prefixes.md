@@ -20,17 +20,13 @@ Align experimental/unstable prefixes to use consistent naming:
 **Breaking Changes:**
 
 ### @clerk/clerk-js
-- `__unstable__environment` → `__internal__environment`
-- `__unstable__updateProps` → `__internal__updateProps`
-- `__unstable__setEnvironment` → `__internal__setEnvironment`
-- `__unstable__onBeforeRequest` → `__internal__onBeforeRequest`
-- `__unstable__onAfterResponse` → `__internal__onAfterResponse`
-- `__unstable__onBeforeSetActive` → `__internal__onBeforeSetActive` (window global)
-- `__unstable__onAfterSetActive` → `__internal__onAfterSetActive` (window global)
-
-### @clerk/react
-- `__internal__environment` (exposed via IsomorphicClerk, underlying API changed in @clerk/clerk-js)
-- `__internal_ClerkUiCtor` (exposed, underlying API changed in @clerk/ui)
+- `__unstable__environment` → `__internal_environment`
+- `__unstable__updateProps` → `__internal_updateProps`
+- `__unstable__setEnvironment` → `__internal_setEnvironment`
+- `__unstable__onBeforeRequest` → `__internal_onBeforeRequest`
+- `__unstable__onAfterResponse` → `__internal_onAfterResponse`
+- `__unstable__onBeforeSetActive` → `__internal_onBeforeSetActive` (window global)
+- `__unstable__onAfterSetActive` → `__internal_onAfterSetActive` (window global)
 
 ### @clerk/nextjs
 - `__unstable_invokeMiddlewareOnAuthStateChange` → `__internal_invokeMiddlewareOnAuthStateChange`
@@ -38,6 +34,9 @@ Align experimental/unstable prefixes to use consistent naming:
 ### @clerk/ui
 - `experimental_createTheme` / `__experimental_createTheme` → `createTheme` (now exported from `@clerk/ui/themes/experimental`)
 - `experimental__simple` / `__experimental_simple` → `simple` (now exported from `@clerk/ui/themes/experimental`)
+
+### @clerk/chrome-extension
+- `__unstable__createClerkClient` → `createClerkClient` (exported from `@clerk/chrome-extension/background`)
 
 ### Removed (multiple packages)
 - `__unstable_manageBillingUrl` (removed)

@@ -52,13 +52,13 @@ describe('useSubscription', () => {
     orgBillingEnabled = true;
     mockUser = createMockUser();
     mockOrganization = createMockOrganization();
-    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = userBillingEnabled;
-    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = userBillingEnabled;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
     defaultQueryClient.client.clear();
   });
 
   it('does not fetch when billing disabled for user', () => {
-    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
 
     const { result } = renderHook(() => useSubscription(), { wrapper });
 

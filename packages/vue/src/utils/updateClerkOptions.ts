@@ -31,6 +31,6 @@ export function updateClerkOptions<TUi extends Ui = Ui>(options: ClerkUpdateOpti
     appearance: options.appearance,
   } as unknown as { options: any; appearance?: any };
 
-  // @ts-expect-error - `__internal__updateProps` is not exposed as public API from `@clerk/types`
-  void window.Clerk.__internal__updateProps(updateOptions);
+  // @ts-expect-error - `__internal_updateProps` is not exposed as public API from `@clerk/types`
+  void window.Clerk.__internal_updateProps(updateOptions);
 }

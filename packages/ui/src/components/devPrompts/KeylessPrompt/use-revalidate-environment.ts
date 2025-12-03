@@ -21,7 +21,7 @@ function useRevalidateEnvironment() {
       'focus',
 
       async () => {
-        const environment = (clerk as Clerk).__internal__environment;
+        const environment = (clerk as Clerk).__internal_environment;
 
         if (!environment) {
           return;

@@ -95,7 +95,7 @@ export const SignIn = withClerk(({ clerk, ...props }: WithClerkProp<SignInProps>
     <Portal
       mount={clerk?.mountSignIn}
       unmount={clerk?.unmountSignIn}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );
@@ -106,7 +106,7 @@ export const SignUp = withClerk(({ clerk, ...props }: WithClerkProp<SignUpProps>
     <Portal
       mount={clerk?.mountSignUp}
       unmount={clerk?.unmountSignUp}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );
@@ -117,7 +117,7 @@ export const UserButton = withClerk(({ clerk, ...props }: WithClerkProp<UserButt
     <Portal
       mount={clerk?.mountUserButton}
       unmount={clerk?.unmountUserButton}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );
@@ -128,7 +128,7 @@ export const UserProfile = withClerk(({ clerk, ...props }: WithClerkProp<UserPro
     <Portal
       mount={clerk?.mountUserProfile}
       unmount={clerk?.unmountUserProfile}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );
@@ -139,7 +139,7 @@ export const OrganizationProfile = withClerk(({ clerk, ...props }: WithClerkProp
     <Portal
       mount={clerk?.mountOrganizationProfile}
       unmount={clerk?.unmountOrganizationProfile}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );
@@ -150,7 +150,7 @@ export const OrganizationSwitcher = withClerk(({ clerk, ...props }: WithClerkPro
     <Portal
       mount={clerk?.mountOrganizationSwitcher}
       unmount={clerk?.unmountOrganizationSwitcher}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );
@@ -161,7 +161,7 @@ export const OrganizationList = withClerk(({ clerk, ...props }: WithClerkProp<Or
     <Portal
       mount={clerk?.mountOrganizationList}
       unmount={clerk?.unmountOrganizationList}
-      updateProps={(clerk as any)?.__internal__updateProps}
+      updateProps={(clerk as any)?.__internal_updateProps}
       props={props}
     />
   );

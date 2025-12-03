@@ -106,8 +106,8 @@ function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOption
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },
   } as unknown as { options: ClerkOptions; appearance?: any };
-  // `__internal__updateProps` is not exposed as public API from `@clerk/types`
-  void (clerk as any).__internal__updateProps(updateOptions);
+  // `__internal_updateProps` is not exposed as public API from `@clerk/types`
+  void (clerk as any).__internal_updateProps(updateOptions);
 }
 
 export { createClerkInstance, updateClerkOptions };

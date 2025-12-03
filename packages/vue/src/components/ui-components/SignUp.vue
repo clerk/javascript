@@ -13,6 +13,6 @@ const props = defineProps<SignUpProps>();
     :mount="clerk?.mountSignUp"
     :unmount="clerk?.unmountSignUp"
     :props="props"
-    :update-props="(clerk as any)?.__internal__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
   />
 </template>
