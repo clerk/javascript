@@ -388,7 +388,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     const identifier = await getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithSolana,
+      generateSignature: p => generateSignatureWithSolana({ ...p, walletName: params.walletName }),
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_solana_signature',
       legalAccepted: params?.legalAccepted,

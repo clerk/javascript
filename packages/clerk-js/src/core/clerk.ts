@@ -2294,7 +2294,13 @@ export class Clerk implements ClerkInterface {
         generateSignature = generateSignatureWithCoinbaseWallet;
         break;
       case 'solana':
-        generateSignature = generateSignatureWithSolana;
+        if (!walletName) {
+          throw new ClerkRuntimeError('Wallet name is required for Solana authentication.', {
+            code: 'web3_solana_wallet_name_required',
+          });
+        }
+        // Solana requires walletName; bind it into the helper
+        generateSignature = params => generateSignatureWithSolana({ ...params, walletName });
         break;
       default:
         generateSignature = generateSignatureWithOKXWallet;
