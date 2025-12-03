@@ -473,7 +473,7 @@ export class SignIn extends BaseResource implements SignInResource {
     const identifier = await getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithSolana,
+      generateSignature: p => generateSignatureWithSolana({ ...p, walletName: params.walletName }),
       strategy: 'web3_solana_signature',
       walletName: params.walletName,
     });
@@ -1010,8 +1010,13 @@ class SignInFuture implements SignInFutureResource {
           generateSignature = generateSignatureWithOKXWallet;
           break;
         case 'solana':
+          if (!params.walletName) {
+            throw new ClerkRuntimeError('Wallet name is required for Solana authentication.', {
+              code: 'web3_solana_wallet_name_required',
+            });
+          }
           identifier = await getSolanaIdentifier(params.walletName);
-          generateSignature = generateSignatureWithSolana;
+          generateSignature = p => generateSignatureWithSolana({ ...p, walletName: params.walletName as string });
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);

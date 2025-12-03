@@ -98,16 +98,17 @@ export async function getBaseIdentifier(): Promise<string> {
   return await getWeb3Identifier({ provider: 'base' });
 }
 
-export async function getSolanaIdentifier(walletName?: string): Promise<string> {
-  if (!walletName) {
-    throw new Error('walletName is required for solana web3 authentication');
-  }
+export async function getSolanaIdentifier(walletName: string): Promise<string> {
   return await getWeb3Identifier({ provider: 'solana', walletName });
 }
 
 type GenerateSignatureParams = {
   identifier: string;
   nonce: string;
+};
+
+type GenerateSolanaSignatureParams = GenerateSignatureParams & {
+  walletName: string;
 };
 
 export async function generateSignatureWithMetamask(params: GenerateSignatureParams): Promise<string> {
@@ -126,7 +127,7 @@ export async function generateSignatureWithBase(params: GenerateSignatureParams)
   return await generateWeb3Signature({ ...params, provider: 'base' });
 }
 
-export async function generateSignatureWithSolana(params: GenerateSignatureParams): Promise<string> {
+export async function generateSignatureWithSolana(params: GenerateSolanaSignatureParams): Promise<string> {
   return await generateWeb3Signature({ ...params, provider: 'solana' });
 }
 
