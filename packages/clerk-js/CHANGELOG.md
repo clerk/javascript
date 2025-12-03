@@ -1,5 +1,11 @@
 # Change Log
 
+## 5.112.1
+
+### Patch Changes
+
+- Fix line height calculations. ([#7350](https://github.com/clerk/javascript/pull/7350)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 5.112.0
 
 ### Minor Changes
