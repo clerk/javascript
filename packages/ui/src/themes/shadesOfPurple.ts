@@ -1,7 +1,7 @@
-import { __experimental_createTheme } from './createTheme';
+import { createTheme } from './createTheme';
 import { dark } from './dark';
 
-export const shadesOfPurple = __experimental_createTheme({
+export const shadesOfPurple = createTheme({
   name: 'shadesOfPurple',
   baseTheme: dark,
   variables: {
