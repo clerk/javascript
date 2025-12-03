@@ -1,6 +1,6 @@
-import { experimental_createTheme } from './createTheme';
+import { __experimental_createTheme } from './createTheme';
 
-export const experimental__simple = experimental_createTheme({
+export const __experimental_simple = __experimental_createTheme({
   name: 'simple',
   //@ts-expect-error not public api
   simpleStyles: true,

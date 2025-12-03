@@ -556,13 +556,13 @@ export class Clerk implements ClerkInterface {
     }
 
     const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
+      typeof window !== 'undefined' && typeof window.__internal__onBeforeSetActive === 'function'
+        ? window.__internal__onBeforeSetActive
         : noop;
 
     const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
+      typeof window !== 'undefined' && typeof window.__internal__onAfterSetActive === 'function'
+        ? window.__internal__onAfterSetActive
         : noop;
 
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -2499,13 +2499,13 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  get __unstable__environment(): EnvironmentResource | null | undefined {
+  get __internal__environment(): EnvironmentResource | null | undefined {
     return this.environment;
   }
 
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
-  __unstable__setEnvironment = async (env: EnvironmentJSON) => {
+  __internal__setEnvironment = async (env: EnvironmentJSON) => {
     this.environment = new Environment(env);
 
     // TODO @nikos update
@@ -2514,16 +2514,16 @@ export class Clerk implements ClerkInterface {
     // }
   };
 
-  __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
+  __internal__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onBeforeRequest(callback);
   };
 
-  __unstable__onAfterResponse = (callback: FapiRequestCallback<any>): void => {
+  __internal__onAfterResponse = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onAfterResponse(callback);
   };
 
   // TODO @userland-errors:
-  __unstable__updateProps = (_props: any) => {
+  __internal__updateProps = (_props: any) => {
     // We need to re-init the options here in order to keep the options passed to ClerkProvider
     // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:
     // 1. User renders <ClerkProvider propA={undefined} propB={1} />

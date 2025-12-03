@@ -11,7 +11,7 @@ const props = defineProps<OrganizationListProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountOrganizationList"
     :unmount="clerk?.unmountOrganizationList"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal__updateProps"
     :props="props"
   />
 </template>

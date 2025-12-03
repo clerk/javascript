@@ -45,11 +45,11 @@ async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroC
     clerkUiCtor = options?.clerkUiCtor
       ? Promise.resolve(options.clerkUiCtor)
       : loadClerkUiScript(options).then(() => {
-          if (!window.__unstable_ClerkUiCtor) {
+          if (!window.__internal_ClerkUiCtor) {
             throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
           }
           // After the check, TypeScript knows it's defined
-          return window.__unstable_ClerkUiCtor;
+          return window.__internal_ClerkUiCtor;
         });
 
     await clerkPromise;
@@ -106,8 +106,8 @@ function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOption
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },
   } as unknown as { options: ClerkOptions; appearance?: any };
-  // `__unstable__updateProps` is not exposed as public API from `@clerk/types`
-  void (clerk as any).__unstable__updateProps(updateOptions);
+  // `__internal__updateProps` is not exposed as public API from `@clerk/types`
+  void (clerk as any).__internal__updateProps(updateOptions);
 }
 
 export { createClerkInstance, updateClerkOptions };

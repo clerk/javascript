@@ -7,13 +7,11 @@ import { Col, Flex, localizationKeys, Text } from '../../customizables';
 import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { MembersActionsRow } from './MembersActions';
-import { MembershipWidget } from './MembershipWidget';
 import { RequestToJoinList } from './RequestToJoinList';
 
 export const OrganizationMembersTabRequests = () => {
   const { organizationSettings } = useEnvironment();
-  //@ts-expect-error
-  const { __unstable_manageBillingUrl, navigateToGeneralPageRoot } = useOrganizationProfileContext();
+  const { navigateToGeneralPageRoot } = useOrganizationProfileContext();
 
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
@@ -24,8 +22,6 @@ export const OrganizationMembersTabRequests = () => {
         width: '100%',
       }}
     >
-      {__unstable_manageBillingUrl && <MembershipWidget />}
-
       {isDomainsEnabled && (
         <Protect permission='org:sys_domains:manage'>
           <Flex

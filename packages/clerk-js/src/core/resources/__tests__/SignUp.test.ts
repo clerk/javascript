@@ -271,7 +271,7 @@ describe('SignUp', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
-          __unstable__environment: {
+          __internal__environment: {
             reload: vi.fn().mockResolvedValue({}),
           },
         } as any;

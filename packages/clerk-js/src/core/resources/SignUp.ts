@@ -406,7 +406,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await SignUp.clerk.__unstable__environment!.reload();
+        await SignUp.clerk.__internal__environment!.reload();
         return authenticateFn();
       }
       throw e;
@@ -456,9 +456,9 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
+    if (SignUp.clerk.__internal__environment?.userSettings.passwordSettings) {
       return createValidatePassword(loadZxcvbn(), {
-        ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
+        ...SignUp.clerk.__internal__environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -533,7 +533,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+    const captchaOauthBypass = SignUp.clerk.__internal__environment!.displayConfig.captchaOauthBypass;
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
@@ -844,7 +844,7 @@ class SignUpFuture implements SignUpFutureResource {
       await authenticateFn().catch(async e => {
         if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await SignUp.clerk.__unstable__environment!.reload();
+          await SignUp.clerk.__internal__environment!.reload();
           return authenticateFn();
         }
         throw e;

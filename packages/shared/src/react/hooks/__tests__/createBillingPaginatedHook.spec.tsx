@@ -56,8 +56,8 @@ describe('createBillingPaginatedHook', () => {
       }),
     );
     mockClerk.loaded = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = true;
     mockUser = createMockUser();
     mockOrganization = createMockOrganization();
     defaultQueryClient.client.clear();
@@ -88,7 +88,7 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('does not fetch when billing disabled (user)', () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = false;
 
     const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4 }), { wrapper });
 
@@ -145,8 +145,8 @@ describe('createBillingPaginatedHook', () => {
 
   it('unauthenticated hook: does not fetch when billing disabled for both user and organization', () => {
     mockUser = null;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = false;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useDummyUnauth({ initialPage: 1, pageSize: 4 }), { wrapper });
 
@@ -158,8 +158,8 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('allows fetching for user when organization billing disabled', async () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal__environment.commerceSettings.billing.user.enabled = true;
 
     const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4 }), { wrapper });
 
@@ -208,7 +208,7 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('does not fetch in organization mode when organization billing disabled', async () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useDummyAuth({ initialPage: 1, pageSize: 4, for: 'organization' } as any), {
       wrapper,
@@ -221,7 +221,7 @@ describe('createBillingPaginatedHook', () => {
   });
 
   it('unauthenticated hook: does not fetch in organization mode when organization billing disabled', async () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = false;
+    mockClerk.__internal__environment.commerceSettings.billing.organization.enabled = false;
 
     const { result } = renderHook(() => useDummyUnauth({ initialPage: 1, pageSize: 4, for: 'organization' } as any), {
       wrapper,

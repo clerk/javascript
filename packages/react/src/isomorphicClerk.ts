@@ -85,7 +85,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __unstable_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUiCtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -521,11 +521,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       nonce: this.options.nonce,
     });
 
-    if (!global.__unstable_ClerkUiCtor) {
+    if (!global.__internal_ClerkUiCtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
 
-    return global.__unstable_ClerkUiCtor;
+    return global.__internal_ClerkUiCtor;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -745,9 +745,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __unstable__environment(): any {
+  get __internal__environment(): any {
     if (this.clerkjs) {
-      return (this.clerkjs as any).__unstable__environment;
+      return (this.clerkjs as any).__internal__environment;
       // TODO: add ssr condition
     } else {
       return undefined;
@@ -780,20 +780,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       : this.#stateProxy.checkoutSignal(...args);
   };
 
-  __unstable__setEnvironment(...args: any): void {
-    if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
-      (this.clerkjs as any).__unstable__setEnvironment(args);
+  __internal__setEnvironment(...args: any): void {
+    if (this.clerkjs && '__internal__setEnvironment' in this.clerkjs) {
+      (this.clerkjs as any).__internal__setEnvironment(args);
     } else {
       return undefined;
     }
   }
 
   // TODO @userland-errors:
-  __unstable__updateProps = async (props: any): Promise<void> => {
+  __internal__updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
-    if (clerkjs && '__unstable__updateProps' in clerkjs) {
-      return (clerkjs as any).__unstable__updateProps(props);
+    if (clerkjs && '__internal__updateProps' in clerkjs) {
+      return (clerkjs as any).__internal__updateProps(props);
     }
   };
 

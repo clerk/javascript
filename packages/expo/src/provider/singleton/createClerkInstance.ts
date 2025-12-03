@@ -116,7 +116,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
           __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
+            const environment = __internal_clerk?.__internal__environment as EnvironmentResource;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
@@ -152,7 +152,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       }
 
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
+      __internal_clerk.__internal__onBeforeRequest(async (requestInit: FapiRequestInit) => {
         // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
         requestInit.credentials = 'omit';
 
@@ -172,7 +172,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
+      __internal_clerk.__internal__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveToken(KEY, authHeader);

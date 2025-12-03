@@ -35,7 +35,7 @@ describe('Nonce support', () => {
     it('should extract nonce from clerk options when available', async () => {
       // Mock clerk instance with internal options
       const mockClerk = {
-        __unstable__environment: {
+        __internal__environment: {
           displayConfig: {
             captchaProvider: 'turnstile',
             captchaPublicKey: 'test-site-key',
@@ -63,7 +63,7 @@ describe('Nonce support', () => {
 
     it('should return undefined nonce when not available in clerk options', async () => {
       const mockClerk = {
-        __unstable__environment: {
+        __internal__environment: {
           displayConfig: {
             captchaProvider: 'turnstile',
             captchaPublicKey: 'test-site-key',
@@ -88,7 +88,7 @@ describe('Nonce support', () => {
 
     it('should handle clerk instance without __internal_getOption method', async () => {
       const mockClerk = {
-        __unstable__environment: {
+        __internal__environment: {
           displayConfig: {
             captchaProvider: 'turnstile',
             captchaPublicKey: 'test-site-key',
@@ -152,7 +152,7 @@ describe('Nonce support', () => {
     beforeEach(() => {
       // Mock clerk instance
       mockClerk = {
-        __unstable__environment: {
+        __internal__environment: {
           displayConfig: {
             captchaProvider: 'turnstile',
             captchaPublicKey: 'test-site-key',

@@ -26,7 +26,7 @@ vi.mock('../hooks/useClerk', () => ({
   useClerk: () => ({
     __internal_loadStripeJs: vi.fn().mockResolvedValue(() => Promise.resolve({})),
     __internal_getOption: mockGetOption,
-    __unstable__environment: {
+    __internal__environment: {
       commerceSettings: {
         billing: {
           stripePublishableKey: 'pk_test_123',
@@ -167,7 +167,7 @@ describe('PaymentElement Localization', () => {
   const mockClerk = {
     __internal_loadStripeJs: vi.fn().mockResolvedValue(() => Promise.resolve({})),
     __internal_getOption: mockGetOption,
-    __unstable__environment: {
+    __internal__environment: {
       commerceSettings: {
         billing: {
           stripePublishableKey: 'pk_test_123',

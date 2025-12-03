@@ -18,7 +18,7 @@ interface CreateClerkThemeParams extends DeepPartial<Theme>, Pick<BaseTheme, 'cs
   elements?: Elements | ((params: { theme: InternalTheme }) => Elements);
 }
 
-export const experimental_createTheme = (themeParams: CreateClerkThemeParams) => {
+export const __experimental_createTheme = (themeParams: CreateClerkThemeParams) => {
   // Placeholder method that might hande more transformations in the future
   return {
     ...themeParams,

@@ -27,7 +27,7 @@ provide(UserProfileInjectionKey, {
     :mount="clerk?.mountUserProfile"
     :unmount="clerk?.unmountUserProfile"
     :props="finalProps"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal__updateProps"
   />
   <CustomPortalsRenderer :custom-pages-portals="customPagesPortals" />
   <slot />

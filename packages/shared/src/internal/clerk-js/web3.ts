@@ -117,7 +117,7 @@ export function createWeb3(moduleManager: ModuleManager) {
           appName:
             (typeof window !== 'undefined' &&
               // @ts-expect-error missing types
-              (window.Clerk as any)?.__unstable__environment?.displayConfig?.applicationName) ||
+              (window.Clerk as any)?.__internal__environment?.displayConfig?.applicationName) ||
             (typeof document !== 'undefined' && document.title) ||
             'Web3 Application',
         });

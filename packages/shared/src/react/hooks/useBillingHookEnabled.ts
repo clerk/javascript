@@ -9,8 +9,8 @@ export function useBillingHookEnabled(params?: { for?: ForPayerType; enabled?: b
 
   const enabledFromParam = params?.enabled ?? true;
 
-  // @ts-expect-error `__unstable__environment` is not typed
-  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  // @ts-expect-error `__internal__environment` is not typed
+  const environment = clerk.__internal__environment as unknown as EnvironmentResource | null | undefined;
 
   const user = useUserContext();
   const { organization } = useOrganizationContext();

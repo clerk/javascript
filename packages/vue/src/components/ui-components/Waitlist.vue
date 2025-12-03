@@ -11,7 +11,7 @@ const props = defineProps<WaitlistProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountWaitlist"
     :unmount="clerk?.unmountWaitlist"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal__updateProps"
     :props="props"
   />
 </template>

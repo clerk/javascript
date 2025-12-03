@@ -1,6 +1,6 @@
-import { experimental_createTheme } from './createTheme';
+import { __experimental_createTheme } from './createTheme';
 
-export const dark = experimental_createTheme({
+export const dark = __experimental_createTheme({
   name: 'dark',
   variables: {
     colorBackground: '#212126',
