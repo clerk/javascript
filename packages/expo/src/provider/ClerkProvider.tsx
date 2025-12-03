@@ -3,6 +3,8 @@ import '../polyfills';
 import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
 import type { Without } from '@clerk/types';
 import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
+import { useEffect } from 'react';
 
 import type { TokenCache } from '../cache/types';
 import { isNative, isWeb } from '../utils/runtime';
@@ -51,6 +53,25 @@ export function ClerkProvider(props: ClerkProviderProps): JSX.Element {
     ...rest
   } = props;
   const pk = publishableKey || process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || '';
+
+  // Configure Clerk iOS SDK
+  useEffect(() => {
+    if (Platform.OS === 'ios' && pk) {
+      const configureClerk = async () => {
+        try {
+          const { requireNativeModule } = require('expo-modules-core');
+          const ClerkExpo = requireNativeModule('ClerkExpo');
+          if (ClerkExpo?.configure) {
+            await ClerkExpo.configure(pk);
+            console.log('[ClerkProvider] Configured Clerk iOS SDK');
+          }
+        } catch (error) {
+          console.error('[ClerkProvider] Failed to configure Clerk iOS:', error);
+        }
+      };
+      configureClerk();
+    }
+  }, [pk]);
 
   if (isWeb()) {
     // This is needed in order for useOAuth to work correctly on web.
