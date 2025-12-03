@@ -101,7 +101,9 @@ export type FlowMetadata = {
     | 'oauthConsent'
     | 'subscriptionDetails'
     | 'tasks'
-    | 'taskChooseOrganization';
+    | 'taskChooseOrganization'
+    | 'enableOrganizations'
+    | 'taskResetPassword';
   part?:
     | 'start'
     | 'emailCode'

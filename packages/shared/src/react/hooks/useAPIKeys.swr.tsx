@@ -96,7 +96,9 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
   const isEnabled = (safeValues.enabled ?? true) && clerk.loaded;
 
   const result = usePagesOrInfinite({
-    fetcher: clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
+    fetcher: clerk.apiKeys?.getAll
+      ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll({ ...params, subject: safeValues.subject })
+      : undefined,
     config: {
       keepPreviousData: safeValues.keepPreviousData,
       infinite: safeValues.infinite,

@@ -1035,6 +1035,7 @@ export type OrganizationListTheme = Theme;
 export type OrganizationProfileTheme = Theme;
 export type CreateOrganizationTheme = Theme;
 export type UserVerificationTheme = Theme;
+export type EnableOrganizationsTheme = Theme;
 export type WaitlistTheme = Theme;
 export type PricingTableTheme = Theme;
 export type CheckoutTheme = Theme;
@@ -1043,6 +1044,7 @@ export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type OAuthConsentTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
+export type TaskResetPasswordTheme = Theme;
 
 type GlobalAppearanceOptions = {
   /**
@@ -1123,4 +1125,8 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<TaskChooseOrganization />` component
      */
     taskChooseOrganization?: T;
+    /**
+     * Theme overrides that only apply to the `<EnableOrganizations/>` component
+     */
+    enableOrganizations?: T;
   };
