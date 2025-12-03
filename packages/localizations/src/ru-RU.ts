@@ -702,8 +702,14 @@ export const ruRU: LocalizationResource = {
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Введите пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль скомпрометирован',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -911,6 +917,7 @@ export const ruRU: LocalizationResource = {
       'Этот пароль был найден в утечке данных и не может быть использован. Пожалуйста, сбросьте пароль.',
     form_password_size_in_bytes_exceeded:
       'Ваш пароль превышает максимально допустимое количество байтов, сократите его или удалите некоторые специальные символы.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Неверный пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

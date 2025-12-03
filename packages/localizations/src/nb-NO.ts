@@ -692,7 +692,13 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Skriv inn passordet ditt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -898,6 +904,7 @@ export const nbNO: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Passordet ditt har overskredet maksimalt antall byte tillatt. Vennligst forkort det eller fjern noen spesialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Feil passord',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

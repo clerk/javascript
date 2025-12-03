@@ -707,8 +707,14 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Tapez votre mot de passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mot de passe compromis',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -915,6 +921,7 @@ export const frFR: LocalizationResource = {
     form_password_pwned__sign_in: 'Mot de passe compromis. Veuillez le réinitialiser.',
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Mot de passe incorrect',
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",

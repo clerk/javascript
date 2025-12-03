@@ -698,8 +698,14 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் கணக்குடன் தொடர்புடைய கடவுச்சொல்லை உள்ளிடவும்',
       title: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
@@ -908,6 +914,7 @@ export const taIN: LocalizationResource = {
       'இந்த கடவுச்சொல் தரவு மீறலின் ஒரு பகுதியாக காணப்பட்டது மற்றும் பயன்படுத்த முடியாது, தயவுசெய்து உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்.',
     form_password_size_in_bytes_exceeded:
       'உங்கள் கடவுச்சொல் அனுமதிக்கப்பட்ட அதிகபட்ச பைட்டுகளை மீறிவிட்டது, தயவுசெய்து அதை குறைக்கவும் அல்லது சில சிறப்பு எழுத்துக்களை நீக்கவும்.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'தவறான கடவுச்சொல்',
     form_username_invalid_character:
       'உங்கள் பயனர்பெயரில் தவறான எழுத்துக்கள் உள்ளன. எழுத்துக்கள், எண்கள் மற்றும் அடிக்கோடுகளை மட்டும் பயன்படுத்தவும்.',

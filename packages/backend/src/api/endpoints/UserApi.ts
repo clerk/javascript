@@ -448,11 +448,11 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async __experimental_passwordUntrusted(userId: string) {
+  public async __experimental_passwordCompromised(userId: string) {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'password_untrusted'),
+      path: joinPaths(basePath, userId, 'password_compromised'),
       bodyParams: {
         revokeAllSessions: false,
       },

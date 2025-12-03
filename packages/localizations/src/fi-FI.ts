@@ -694,8 +694,14 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä tilisi salasana',
       title: 'Syötä salasanasi',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Salasana kompromisoitu',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
@@ -899,6 +905,7 @@ export const fiFI: LocalizationResource = {
     form_password_pwned__sign_in: 'Salasana on ollut osallisena tietovuodossa. Vaihdathan salasanasi.',
     form_password_size_in_bytes_exceeded:
       'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
