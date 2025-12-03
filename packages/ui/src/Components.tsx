@@ -202,7 +202,7 @@ export const mountComponentRenderer = (
   moduleManager: ModuleManager,
 ) => {
   const options = { ..._options };
-  // Extract cssLayerName from baseTheme if present and move it to appearance level
+  // Extract cssLayerName from theme if present and move it to appearance level
   if (options.appearance) {
     options.appearance = extractCssLayerNameFromAppearance(options.appearance);
   }

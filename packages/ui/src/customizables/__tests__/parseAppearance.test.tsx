@@ -17,9 +17,9 @@ const themeA = {
     colorBackground: themeAColor,
     colorInput: themeAColor,
     colorInputForeground: themeAColor,
-    colorText: themeAColor,
+    colorForeground: themeAColor,
     colorPrimaryForeground: themeAColor,
-    colorTextSecondary: themeAColor,
+    colorMutedForeground: themeAColor,
     borderRadius: '1rem',
     fontFamily: 'Comic Sans',
     fontFamilyButtons: 'Comic Sans',
@@ -39,9 +39,9 @@ const themeB = {
     colorBackground: themeBColor,
     colorInput: themeBColor,
     colorInputForeground: themeBColor,
-    colorText: themeBColor,
+    colorForeground: themeBColor,
     colorPrimaryForeground: themeBColor,
-    colorTextSecondary: themeBColor,
+    colorMutedForeground: themeBColor,
     borderRadius: '2rem',
     fontFamily: 'Arial',
     fontFamilyButtons: 'Arial',
@@ -338,7 +338,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
   });
 
-  it('removes the baseTheme when simpleStyles is passed to globalAppearance', () => {
+  it('removes the base theme when simpleStyles is passed to globalAppearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -359,7 +359,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
   });
 
-  it('removes the baseTheme when simpleStyles is passed to appearance', () => {
+  it('removes the base theme when simpleStyles is passed to appearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -479,7 +479,7 @@ describe('AppearanceProvider theme flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should include clerk theme styles (baseTheme will be included)
+    // Should include clerk theme styles (base theme will be included)
     expect(result.current.parsedElements.length).toBeGreaterThan(0);
   });
 
@@ -500,42 +500,7 @@ describe('AppearanceProvider theme flows', () => {
     expect(result.current.parsedElements.length).toBe(2);
   });
 
-  it('theme property takes precedence over deprecated baseTheme', () => {
-    const wrapper = ({ children }) => (
-      <AppearanceProvider
-        appearanceKey='signIn'
-        appearance={{
-          theme: 'simple',
-          baseTheme: 'clerk', // This should be ignored
-        }}
-      >
-        {children}
-      </AppearanceProvider>
-    );
-
-    const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should include both simple theme and base theme (2 elements total)
-    expect(result.current.parsedElements.length).toBe(2);
-  });
-
-  it('maintains backward compatibility with baseTheme property', () => {
-    const wrapper = ({ children }) => (
-      <AppearanceProvider
-        appearanceKey='signIn'
-        appearance={{
-          baseTheme: 'simple',
-        }}
-      >
-        {children}
-      </AppearanceProvider>
-    );
-
-    const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should work the same as theme: 'simple' (2 elements total)
-    expect(result.current.parsedElements.length).toBe(2);
-  });
-
-  it('supports object-based themes with new theme property', () => {
+  it('supports object-based themes with theme property', () => {
     const customTheme = {
       elements: {
         card: { backgroundColor: 'red' },
@@ -559,7 +524,7 @@ describe('AppearanceProvider theme flows', () => {
     expect(result.current.parsedElements.some(el => el.card?.backgroundColor === 'red')).toBe(true);
   });
 
-  it('supports array-based themes with new theme property', () => {
+  it('supports array-based themes with theme property', () => {
     const themeA = {
       elements: { card: { backgroundColor: 'red' } },
     };
