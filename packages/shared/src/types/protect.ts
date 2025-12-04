@@ -22,7 +22,7 @@ import type { Autocomplete } from './utils';
  * <Protect feature="a_feature_key" />
  *
  * // Require a specific Plan
- * <Protect plan=a_plan_key" />
+ * <Protect plan="a_plan_key" />
  * ```
  */
 export type ProtectProps =
