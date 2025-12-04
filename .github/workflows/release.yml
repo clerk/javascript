@@ -55,8 +55,8 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: 'ci(repo): Version packages'
-          title: 'ci(repo): Version packages'
+          commit: "ci(repo): Version packages"
+          title: "ci(repo): Version packages"
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
@@ -83,9 +83,9 @@ jobs:
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'sdk-infra-workers',
-                workflow_id: 'update-clerkjs.yml',
+                workflow_id: 'update-pkg-versions.yml',
                 ref: 'main',
-                inputs: { version: clerkjsVersion }
+                inputs: { clerkjsVersion }
               })
 
               github.rest.actions.createWorkflowDispatch({
@@ -145,5 +145,5 @@ jobs:
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
-          turbo-team: ''
-          turbo-token: ''
+          turbo-team: ""
+          turbo-token: ""

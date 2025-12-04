@@ -1,5 +1,4 @@
-import { useClerk, useOrganization } from '@clerk/shared/react';
-import useSWR from 'swr';
+import { __internal_useStatementQuery } from '@clerk/shared/react/index';
 
 import { Alert } from '@/ui/elements/Alert';
 import { Header } from '@/ui/elements/Header';
@@ -23,29 +22,19 @@ import { Statement } from './Statement';
 export const StatementPage = () => {
   const { params, navigate } = useRouter();
   const subscriberType = useSubscriberTypeContext();
-  const { organization } = useOrganization();
   const localizationRoot = useSubscriberTypeLocalizationRoot();
   const { t, translateError } = useLocalizations();
-  const clerk = useClerk();
+  const requesterType = subscriberType === 'organization' ? 'organization' : 'user';
 
   const {
     data: statement,
     isLoading,
     error,
-  } = useSWR(
-    params.statementId
-      ? {
-          type: 'statement',
-          id: params.statementId,
-          orgId: subscriberType === 'organization' ? organization?.id : undefined,
-        }
-      : null,
-    () =>
-      clerk.billing.getStatement({
-        id: params.statementId,
-        orgId: subscriberType === 'organization' ? organization?.id : undefined,
-      }),
-  );
+  } = __internal_useStatementQuery({
+    statementId: params.statementId,
+    for: requesterType,
+    enabled: Boolean(params.statementId),
+  });
 
   if (isLoading) {
     return (

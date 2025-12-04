@@ -1,18 +1,17 @@
-/* eslint-disable @typescript-eslint/consistent-type-imports */
 import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
-import React, { type PropsWithChildren, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import React, { type PropsWithChildren, type ReactNode, useCallback, useMemo, useState } from 'react';
 
-import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../types';
-import { createContextAndHook } from './hooks/createContextAndHook';
-import type { useCheckout } from './hooks/useCheckout';
-import { useClerk } from './hooks/useClerk';
-import { useOrganization } from './hooks/useOrganization';
-import { useUser } from './hooks/useUser';
-import { Elements, PaymentElement as StripePaymentElement, useElements, useStripe } from './stripe-react';
-
-type LoadStripeFn = typeof import('@stripe/stripe-js').loadStripe;
+import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../../types';
+import { createContextAndHook } from '../hooks/createContextAndHook';
+import type { useCheckout } from '../hooks/useCheckout';
+import { useClerk } from '../hooks/useClerk';
+import { Elements, PaymentElement as StripePaymentElement, useElements, useStripe } from '../stripe-react';
+import {
+  __internal_useInitializePaymentMethod as useInitializePaymentMethod,
+  type UseInitializePaymentMethodResult,
+} from './useInitializePaymentMethod';
+import { __internal_useStripeClerkLibs as useStripeClerkLibs } from './useStripeClerkLibs';
+import { __internal_useStripeLoader as useStripeLoader, type UseStripeLoaderResult } from './useStripeLoader';
 
 type PaymentElementError = {
   gateway: 'stripe';
@@ -24,36 +23,6 @@ type PaymentElementError = {
     message?: string;
     type: string;
   };
-};
-
-const [StripeLibsContext, useStripeLibsContext] = createContextAndHook<{
-  loadStripe: LoadStripeFn;
-} | null>('StripeLibsContext');
-
-const StripeLibsProvider = ({ children }: PropsWithChildren) => {
-  const clerk = useClerk();
-  const { data: stripeClerkLibs } = useSWR(
-    'clerk-stripe-sdk',
-    async () => {
-      const loadStripe = (await clerk.__internal_loadStripeJs()) as LoadStripeFn;
-      return { loadStripe };
-    },
-    {
-      keepPreviousData: true,
-      revalidateOnFocus: false,
-      dedupingInterval: Infinity,
-    },
-  );
-
-  return (
-    <StripeLibsContext.Provider
-      value={{
-        value: stripeClerkLibs || null,
-      }}
-    >
-      {children}
-    </StripeLibsContext.Provider>
-  );
 };
 
 const useInternalEnvironment = () => {
@@ -80,54 +49,22 @@ const useLocalization = () => {
 };
 
 const usePaymentSourceUtils = (forResource: ForPayerType = 'user') => {
-  const { organization } = useOrganization();
-  const { user } = useUser();
-  const resource = forResource === 'organization' ? organization : user;
-  const stripeClerkLibs = useStripeLibsContext();
-
-  const { data: initializedPaymentMethod, trigger: initializePaymentMethod } = useSWRMutation(
-    {
-      key: 'billing-payment-method-initialize',
-      resourceId: resource?.id,
-    },
-    () => {
-      return resource?.initializePaymentMethod({
-        gateway: 'stripe',
-      });
-    },
-  );
-
+  const stripeClerkLibs = useStripeClerkLibs();
   const environment = useInternalEnvironment();
 
-  useEffect(() => {
-    if (!resource?.id) {
-      return;
-    }
-    initializePaymentMethod().catch(() => {
-      // ignore errors
-    });
-  }, [resource?.id]);
+  const { initializedPaymentMethod, initializePaymentMethod }: UseInitializePaymentMethodResult =
+    useInitializePaymentMethod({ for: forResource });
 
-  const externalGatewayId = initializedPaymentMethod?.externalGatewayId;
+  const stripePublishableKey = environment?.commerceSettings.billing.stripePublishableKey ?? undefined;
+
+  const stripe: UseStripeLoaderResult = useStripeLoader({
+    stripeClerkLibs,
+    externalGatewayId: initializedPaymentMethod?.externalGatewayId,
+    stripePublishableKey,
+  });
+
   const externalClientSecret = initializedPaymentMethod?.externalClientSecret;
   const paymentMethodOrder = initializedPaymentMethod?.paymentMethodOrder;
-  const stripePublishableKey = environment?.commerceSettings.billing.stripePublishableKey;
-
-  const { data: stripe } = useSWR(
-    stripeClerkLibs && externalGatewayId && stripePublishableKey
-      ? { key: 'stripe-sdk', externalGatewayId, stripePublishableKey }
-      : null,
-    ({ stripePublishableKey, externalGatewayId }) => {
-      return stripeClerkLibs?.loadStripe(stripePublishableKey, {
-        stripeAccount: externalGatewayId,
-      });
-    },
-    {
-      keepPreviousData: true,
-      revalidateOnFocus: false,
-      dedupingInterval: 1_000 * 60, // 1 minute
-    },
-  );
 
   return {
     stripe,
@@ -225,11 +162,9 @@ const PropsProvider = ({ children, ...props }: PropsWithChildren<PaymentElementP
 
 const PaymentElementProvider = ({ children, ...props }: PropsWithChildren<PaymentElementProviderProps>) => {
   return (
-    <StripeLibsProvider>
-      <PropsProvider {...props}>
-        <PaymentElementInternalRoot>{children}</PaymentElementInternalRoot>
-      </PropsProvider>
-    </StripeLibsProvider>
+    <PropsProvider {...props}>
+      <PaymentElementInternalRoot>{children}</PaymentElementInternalRoot>
+    </PropsProvider>
   );
 };
 

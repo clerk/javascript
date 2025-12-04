@@ -131,15 +131,9 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: TokenResource | null) => {
-    if (!token) {
-      return;
-    }
-
-    const tokenId = this.#getCacheId();
-    const existing = SessionTokenCache.get({ tokenId });
-    if (!existing) {
+    if (token) {
       SessionTokenCache.set({
-        tokenId,
+        tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
       });
     }
@@ -405,7 +399,7 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
-    const tokenResolver = Token.create(path, params);
+    const tokenResolver = Token.create(path, params, skipCache);
 
     // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
     SessionTokenCache.set({ tokenId, tokenResolver });

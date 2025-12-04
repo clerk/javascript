@@ -1,5 +1,41 @@
 # Change Log
 
+## 2.6.6
+
+### Patch Changes
+
+- Updated dependencies [[`40a841d`](https://github.com/clerk/javascript/commit/40a841d56cd8983dce21376c832f1085c43a9518), [`f364924`](https://github.com/clerk/javascript/commit/f364924708f20f0bc7b8b291ea2ae01ce09e2e9f), [`f115e56`](https://github.com/clerk/javascript/commit/f115e56d14b5c49f52b6aca01b434dbe4f6193cf), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`3f99742`](https://github.com/clerk/javascript/commit/3f997427e400248502b0977e1b69e109574dfe7d), [`02798f5`](https://github.com/clerk/javascript/commit/02798f571065d8142cf1dade57b42b3e8ce0f818), [`07a30ce`](https://github.com/clerk/javascript/commit/07a30ce52b7d2ba85ce3533879700b9ec129152e), [`d7c336d`](https://github.com/clerk/javascript/commit/d7c336d98b95b56446940c6b7e394933df832403), [`ce8b914`](https://github.com/clerk/javascript/commit/ce8b9149bff27866cdb686f1ab0b56cef8d8c697), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`a3e14b1`](https://github.com/clerk/javascript/commit/a3e14b176ade8c39b382873051eebfde42fc029e)]:
+  - @clerk/shared@3.37.0
+  - @clerk/backend@2.25.0
+  - @clerk/types@4.101.4
+
+## 2.6.5
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44), [`337430b`](https://github.com/clerk/javascript/commit/337430bc44ba846e40bff66d72618963d51ee20d)]:
+  - @clerk/shared@3.36.0
+  - @clerk/backend@2.24.0
+  - @clerk/types@4.101.3
+
+## 2.6.4
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/backend@2.23.2
+  - @clerk/types@4.101.2
+
+## 2.6.3
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/backend@2.23.1
+  - @clerk/types@4.101.1
+
 ## 2.6.2
 
 ### Patch Changes
@@ -1843,11 +1879,9 @@
 - 629881cba: Re-export everything from `@clerk/backend` in `@clerk/fastify` to support common backend types and functionality without adding `@clerk/backend` as dependency.
 
   New exports:
-
   - `verifyToken()`
 
   New exported types:
-
   - `ClerkOptions`
   - `ClerkClient`
   - `OrganizationMembershipRole`
@@ -2160,11 +2194,9 @@
 - Re-export everything from `@clerk/backend` in `@clerk/fastify` to support common backend types and functionality without adding `@clerk/backend` as dependency. ([#2968](https://github.com/clerk/javascript/pull/2968)) by [@dimkl](https://github.com/dimkl)
 
   New exports:
-
   - `verifyToken()`
 
   New exported types:
-
   - `ClerkOptions`
   - `ClerkClient`
   - `OrganizationMembershipRole`
@@ -2382,7 +2414,6 @@
 ### Major Changes
 
 - Changes in exports of `@clerk/backend`: ([#2363](https://github.com/clerk/javascript/pull/2363)) by [@dimkl](https://github.com/dimkl)
-
   - Expose the following helpers and enums from `@clerk/backend/internal`:
     ```typescript
     import {
@@ -2410,7 +2441,6 @@
     Dropping those exports results in also dropping the exports from `gatsby-plugin-clerk`, `@clerk/clerk-sdk-node`, `@clerk/backend`, `@clerk/fastify`, `@clerk/nextjs`, `@clerk/remix` packages.
 
 - Changes in exports of `@clerk/backend`: ([#2365](https://github.com/clerk/javascript/pull/2365)) by [@dimkl](https://github.com/dimkl)
-
   - Drop the following internal exports from the top-level api:
     ```typescript
     // Before
@@ -2577,7 +2607,6 @@
 - Internal update default apiUrl domain from clerk.dev to clerk.com ([#1878](https://github.com/clerk/javascript/pull/1878)) by [@dimkl](https://github.com/dimkl)
 
 - Drop deprecations. Migration steps: ([#1976](https://github.com/clerk/javascript/pull/1976)) by [@dimkl](https://github.com/dimkl)
-
   - use `CLERK_SECRET_KEY` instead of `CLERK_API_KEY` env variable
   - use `secretKey` instead of `apiKey`
   - use `CLERK_PUBLISHABLE_KEY` instead of `CLERK_FRONTEND_API` env variable

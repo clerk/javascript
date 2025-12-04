@@ -1,3 +1,4 @@
+import type { ClerkError } from '../errors/clerkError';
 import type { SetActiveNavigate } from './clerk';
 import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignUpField, SignUpIdentificationField, SignUpStatus } from './signUpCommon';
@@ -398,12 +399,12 @@ export interface SignUpFutureResource {
    * > Once the sign-up process is complete, call the `signUp.finalize()` method to set the newly created session as
    * > the active session.
    */
-  create: (params: SignUpFutureCreateParams) => Promise<{ error: unknown }>;
+  create: (params: SignUpFutureCreateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Updates the current `SignUp`.
    */
-  update: (params: SignUpFutureUpdateParams) => Promise<{ error: unknown }>;
+  update: (params: SignUpFutureUpdateParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    *
@@ -412,47 +413,47 @@ export interface SignUpFutureResource {
     /**
      * Used to send an email code to verify an email address.
      */
-    sendEmailCode: () => Promise<{ error: unknown }>;
+    sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via email.
      */
-    verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to send a phone code to verify a phone number.
      */
-    sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: unknown }>;
+    sendPhoneCode: (params: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
      * Used to verify a code sent via phone.
      */
-    verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: unknown }>;
+    verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
 
   /**
    * Used to sign up using an email address and password.
    */
-  password: (params: SignUpFuturePasswordParams) => Promise<{ error: unknown }>;
+  password: (params: SignUpFuturePasswordParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to create an account using an OAuth connection.
    */
-  sso: (params: SignUpFutureSSOParams) => Promise<{ error: unknown }>;
+  sso: (params: SignUpFutureSSOParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to perform a ticket-based sign-up.
    */
-  ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: unknown }>;
+  ticket: (params?: SignUpFutureTicketParams) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to perform a Web3-based sign-up.
    */
-  web3: (params: SignUpFutureWeb3Params) => Promise<{ error: unknown }>;
+  web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
    * Used to convert a sign-up with `status === 'complete'` into an active session. Will cause anything observing the
    * session state (such as the `useUser()` hook) to update automatically.
    */
-  finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: unknown }>;
+  finalize: (params?: SignUpFutureFinalizeParams) => Promise<{ error: ClerkError | null }>;
 }

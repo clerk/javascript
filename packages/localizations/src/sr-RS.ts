@@ -692,8 +692,14 @@ export const srRS: LocalizationResource = {
       subtitle: 'Unesi lozinku koja je povezana sa tvojim nalogom',
       title: 'Unesi svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka kompromitovana',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifikacioni kod',
@@ -859,6 +865,14 @@ export const srRS: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -890,9 +904,11 @@ export const srRS: LocalizationResource = {
       'Ova lozinka je pronađena kao deo kompromitovanih podataka i ne može se koristiti, molimo resetuj svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Tvoja lozinka je premašila maksimalni dozvoljeni broj bajtova, molimo skrati je ili ukloni neke specijalne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Neispravna lozinka',
     form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
+    form_username_needs_non_number_char: 'Ваше корисничко име мора садржати најмање један небројни знак.',
     identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
     not_allowed_access:
       "Adresa e-maila ili broja telefona nije dozvoljena za registraciju. Ovo može biti zbog korišćenja '+', '=', '#' ili '.' u adresi e-maila, korišćenja domena koji je povezan sa vremenskom e-mail uslugom ili eksplicitnom isključenju.",

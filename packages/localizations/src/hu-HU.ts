@@ -693,8 +693,14 @@ export const huHU: LocalizationResource = {
       subtitle: 'Írd be a fiókhoz tartozó jelszavad',
       title: 'Írd be a jelszavad',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Jelszó kompromitálódott',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Visszaigazoló kód',
@@ -860,6 +866,14 @@ export const huHU: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -891,9 +905,11 @@ export const huHU: LocalizationResource = {
       'Úgy látjuk, hogy ez a jelszó kiszivárgott, ezért ezt nem használhatod, kérlek állítsd át a jelszavad.',
     form_password_size_in_bytes_exceeded:
       'A jelszavad több bájtot tartalmaz mint a megadott maximum, kérlek rövidítsd vagy törölj ki néhány speciális karaktert.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Helytelen jelszó',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'A felhasználónévnek legalább egy nem numerikus karaktert kell tartalmaznia.',
     identification_deletion_failed: 'Nem törölheted ki az utolsó azonosítód.',
     not_allowed_access:
       "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",

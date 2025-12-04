@@ -101,7 +101,9 @@ export type FlowMetadata = {
     | 'oauthConsent'
     | 'subscriptionDetails'
     | 'tasks'
-    | 'taskChooseOrganization';
+    | 'taskChooseOrganization'
+    | 'enableOrganizations'
+    | 'taskResetPassword';
   part?:
     | 'start'
     | 'emailCode'
@@ -118,6 +120,7 @@ export type FlowMetadata = {
     | 'alternativeMethods'
     | 'forgotPasswordMethods'
     | 'passwordPwnedMethods'
+    | 'passwordCompromisedMethods'
     | 'havingTrouble'
     | 'ssoCallback'
     | 'popupCallback'

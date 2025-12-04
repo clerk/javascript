@@ -17,8 +17,10 @@ import {
   useOrganizationContext,
   useSessionContext,
 } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -29,7 +31,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enrollment-mode).</li>
+   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enable-verified-domains).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
    */
@@ -279,6 +281,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization');
 
   const { organization } = useOrganizationContext();
   const session = useSessionContext();
@@ -368,7 +371,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: domainSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'domains',
+      stablePrefix: STABLE_KEYS.DOMAINS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,
@@ -390,7 +393,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: membershipRequestSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'membershipRequests',
+      stablePrefix: STABLE_KEYS.MEMBERSHIP_REQUESTS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,
@@ -412,7 +415,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: membersSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'members',
+      stablePrefix: STABLE_KEYS.MEMBERSHIPS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,
@@ -434,7 +437,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
       pageSize: invitationsSafeValues.pageSize,
     },
     keys: createCacheKeys({
-      stablePrefix: 'invitations',
+      stablePrefix: STABLE_KEYS.INVITATIONS_KEY,
       authenticated: Boolean(organization),
       tracked: {
         organizationId: organization?.id,

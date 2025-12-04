@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.4.41
+
+### Patch Changes
+
+- Add `providerIcon__vercel` inversion for dark mode in `dark` and `shadcn` themes ([#7337](https://github.com/clerk/javascript/pull/7337)) by [@Railly](https://github.com/Railly)
+
+- Updated dependencies [[`40a841d`](https://github.com/clerk/javascript/commit/40a841d56cd8983dce21376c832f1085c43a9518), [`f364924`](https://github.com/clerk/javascript/commit/f364924708f20f0bc7b8b291ea2ae01ce09e2e9f), [`f115e56`](https://github.com/clerk/javascript/commit/f115e56d14b5c49f52b6aca01b434dbe4f6193cf), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`3f99742`](https://github.com/clerk/javascript/commit/3f997427e400248502b0977e1b69e109574dfe7d), [`02798f5`](https://github.com/clerk/javascript/commit/02798f571065d8142cf1dade57b42b3e8ce0f818), [`07a30ce`](https://github.com/clerk/javascript/commit/07a30ce52b7d2ba85ce3533879700b9ec129152e), [`ce8b914`](https://github.com/clerk/javascript/commit/ce8b9149bff27866cdb686f1ab0b56cef8d8c697)]:
+  - @clerk/shared@3.37.0
+
+## 2.4.40
+
+### Patch Changes
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44)]:
+  - @clerk/shared@3.36.0
+
+## 2.4.39
+
+### Patch Changes
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+
+## 2.4.38
+
+### Patch Changes
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+
 ## 2.4.37
 
 ### Patch Changes
@@ -69,7 +99,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -361,7 +390,6 @@
   Deprecated variables will continue to work but will be removed in the next major version.
 
   ## New variables
-
   - `colorRing` - The color of the ring when an interactive element is focused.
   - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
   - `colorShadow` - The base shadow color used in the components.
@@ -1378,7 +1406,6 @@
 ### Patch Changes
 
 - Introduces three new element appearance descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
-
   - `tableHead` let's you customize the tables head styles.
   - `paginationButton` let's you customize the pagination buttons.
   - `paginationRowText` let's you customize the pagination text.

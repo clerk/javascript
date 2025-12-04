@@ -1,13 +1,15 @@
+import type { __internal_ResourceCacheStableKey, ResourceCacheStableKey } from '../stable-keys';
+import type { QueryKeyWithArgs } from './usePageOrInfinite.types';
+
 /**
  * @internal
  */
 export function createCacheKeys<
   Params,
-  StableKey extends string,
   T extends Record<string, unknown> = Record<string, unknown>,
   U extends Record<string, unknown> | undefined = undefined,
 >(params: {
-  stablePrefix: StableKey;
+  stablePrefix: ResourceCacheStableKey | __internal_ResourceCacheStableKey;
   authenticated: boolean;
   tracked: T;
   untracked: U extends { args: Params } ? U : never;
@@ -17,5 +19,17 @@ export function createCacheKeys<
     invalidationKey: [params.stablePrefix, params.authenticated, params.tracked] as const,
     stableKey: params.stablePrefix,
     authenticated: params.authenticated,
+  };
+}
+
+/**
+ * @internal
+ */
+export function toSWRQuery<T extends { queryKey: QueryKeyWithArgs<unknown> }>(keys: T) {
+  const { queryKey } = keys;
+  return {
+    type: queryKey[0],
+    ...queryKey[2],
+    ...(queryKey[3] as { args: Record<string, unknown> }).args,
   };
 }

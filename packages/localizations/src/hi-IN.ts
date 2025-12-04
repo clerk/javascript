@@ -695,8 +695,14 @@ export const hiIN: LocalizationResource = {
       subtitle: 'अपने खाते से जुड़ा पासवर्ड दर्ज करें',
       title: 'अपना पासवर्ड दर्ज करें',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
@@ -866,6 +872,14 @@ export const hiIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
     captcha_invalid:
@@ -897,10 +911,12 @@ export const hiIN: LocalizationResource = {
       'यह पासवर्ड डेटा उल्लंघन के हिस्से के रूप में पाया गया है और इसका उपयोग नहीं किया जा सकता, कृपया अपना पासवर्ड रीसेट करें।',
     form_password_size_in_bytes_exceeded:
       'आपके पासवर्ड ने अनुमत बाइट्स की अधिकतम संख्या से अधिक हो गया है, कृपया इसे छोटा करें या कुछ विशेष वर्णों को हटा दें।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'गलत पासवर्ड',
     form_username_invalid_character:
       'आपके उपयोगकर्ता नाम में अमान्य वर्ण हैं। कृपया केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें।',
     form_username_invalid_length: 'आपका उपयोगकर्ता नाम {{min_length}} और {{max_length}} अक्षरों के बीच होना चाहिए।',
+    form_username_needs_non_number_char: 'आपके उपयोगकर्ता नाम में कम से कम एक गैर-संख्यात्मक वर्ण होना चाहिए।',
     identification_deletion_failed: 'आप अपनी अंतिम पहचान को हटा नहीं सकते।',
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',

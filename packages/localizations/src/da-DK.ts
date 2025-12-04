@@ -692,8 +692,14 @@ export const daDK: LocalizationResource = {
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Indtast din adgangskode',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Sikkerhedsadvarsel',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bekræftelseskode',
@@ -859,6 +865,14 @@ export const daDK: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
     captcha_invalid:
@@ -888,9 +902,11 @@ export const daDK: LocalizationResource = {
     form_password_pwned__sign_in: 'Din adgangskode er blevet kompromitteret, vælg en ny.',
     form_password_size_in_bytes_exceeded:
       'Din adgangskode har overskredet det maksimalt tilladte antal bytes, forkort den eller fjern nogle specialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Forkert adgangskode.',
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
+    form_username_needs_non_number_char: 'Dit brugernavn skal indeholde mindst ét ikke-numerisk tegn.',
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
     not_allowed_access:
       "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",

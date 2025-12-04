@@ -694,8 +694,14 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite lozinku povezanu s vašim računom',
       title: 'Unesite svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
@@ -863,6 +869,14 @@ export const hrHR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
     captcha_invalid:
@@ -894,9 +908,11 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo resetirajte svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Vaša lozinka je premašila maksimalni dopušteni broj bajtova, molimo skratite je ili uklonite neke posebne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Netočna lozinka',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Vaše korisničko ime mora sadržavati najmanje jedan nebrojčani znak.',
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",

@@ -52,7 +52,7 @@ type UpdateOrganizationSettingsParams = {
   adminDeleteEnabled?: boolean | null | undefined;
   domainsEnabled?: boolean | null | undefined;
   /**
-   * Specifies which [enrollment modes](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enrollment-mode) to enable for your Organization Domains.
+   * Specifies which [enrollment modes](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enable-verified-domains) to enable for your Organization Domains.
    *
    * @remarks Supported modes are 'automatic_invitation' & 'automatic_suggestion'.
    */

@@ -5,10 +5,16 @@ import type { PropsWithChildren } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Flex, Link } from '../../customizables';
-import { Portal } from '../../elements/Portal';
-import { InternalThemeProvider } from '../../styledSystem';
-import { ClerkLogoIcon } from './ClerkLogoIcon';
+import { Flex, Link } from '../../../customizables';
+import { Portal } from '../../../elements/Portal';
+import { InternalThemeProvider } from '../../../styledSystem';
+import {
+  basePromptElementStyles,
+  ClerkLogoIcon,
+  handleDashboardUrlParsing,
+  PromptContainer,
+  PromptSuccessIcon,
+} from '../shared';
 import { KeySlashIcon } from './KeySlashIcon';
 import { useRevalidateEnvironment } from './use-revalidate-environment';
 
@@ -22,30 +28,6 @@ const buttonIdentifierPrefix = `--clerk-keyless-prompt`;
 const buttonIdentifier = `${buttonIdentifierPrefix}-button`;
 const contentIdentifier = `${buttonIdentifierPrefix}-content`;
 
-const baseElementStyles = css`
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  background: none;
-  border: none;
-  line-height: 1.5;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    avenir next,
-    avenir,
-    segoe ui,
-    helvetica neue,
-    helvetica,
-    Cantarell,
-    Ubuntu,
-    roboto,
-    noto,
-    arial,
-    sans-serif;
-  text-decoration: none;
-`;
-
 /**
  * If we cannot reconstruct the url properly, then simply fallback to Clerk Dashboard
  */
@@ -55,25 +37,6 @@ function withLastActiveFallback(cb: () => string): string {
   } catch {
     return 'https://dashboard.clerk.com/last-active';
   }
-}
-
-function handleDashboardUrlParsing(url: string) {
-  // make sure this is a valid url
-  const __url = new URL(url);
-  const regex = /^https?:\/\/(.*?)\/apps\/app_(.+?)\/instances\/ins_(.+?)(?:\/.*)?$/;
-
-  const match = __url.href.match(regex);
-
-  if (!match) {
-    throw new Error('invalid value dashboard url structure');
-  }
-
-  // Extracting base domain, app ID with prefix, and instanceId with prefix
-  return {
-    baseDomain: `https://${match[1]}`,
-    appId: `app_${match[2]}`,
-    instanceId: `ins_${match[3]}`,
-  };
 }
 
 const KeylessPromptInternal = (_props: KeylessPromptProps) => {
@@ -122,7 +85,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
   }, [_props.copyKeysUrl]);
 
   const mainCTAStyles = css`
-    ${baseElementStyles};
+    ${basePromptElementStyles};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,7 +113,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
 
   return (
     <Portal>
-      <Flex
+      <PromptContainer
         data-expanded={isForcedExpanded}
         sx={t => ({
           position: 'fixed',
@@ -160,10 +123,6 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           minWidth: '13.4rem',
           paddingLeft: `${t.space.$3}`,
           borderRadius: '1.25rem',
-          fontFamily: t.fonts.$main,
-          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 100%), #1f1f1f',
-          boxShadow:
-            '0px 0px 0px 0.5px #2F3037 inset, 0px 1px 0px 0px rgba(255, 255, 255, 0.08) inset, 0px 0px 0.8px 0.8px rgba(255, 255, 255, 0.20) inset, 0px 0px 0px 0px rgba(255, 255, 255, 0.72), 0px 16px 36px -6px rgba(0, 0, 0, 0.36), 0px 6px 16px -2px rgba(0, 0, 0, 0.20);',
           transition: 'all 195ms cubic-bezier(0.2, 0.61, 0.1, 1)',
 
           '&[data-expanded="false"]:hover': {
@@ -192,7 +151,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           id={buttonIdentifier}
           onClick={() => !claimed && setIsExpanded(prev => !prev)}
           css={css`
-            ${baseElementStyles};
+            ${basePromptElementStyles};
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -206,29 +165,12 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
             })}
           >
             {success ? (
-              <svg
-                width='1rem'
-                height='1rem'
-                viewBox='0 0 16 17'
-                fill='none'
-                aria-hidden
-                xmlns='http://www.w3.org/2000/svg'
-              >
-                <g opacity='0.88'>
-                  <path
-                    d='M13.8002 8.20039C13.8002 8.96206 13.6502 9.71627 13.3587 10.42C13.0672 11.1236 12.64 11.763 12.1014 12.3016C11.5628 12.8402 10.9234 13.2674 10.2198 13.5589C9.51607 13.8504 8.76186 14.0004 8.0002 14.0004C7.23853 14.0004 6.48432 13.8504 5.78063 13.5589C5.07694 13.2674 4.43756 12.8402 3.89898 12.3016C3.3604 11.763 2.93317 11.1236 2.64169 10.42C2.35022 9.71627 2.2002 8.96206 2.2002 8.20039C2.2002 6.66214 2.81126 5.18688 3.89898 4.09917C4.98669 3.01146 6.46194 2.40039 8.0002 2.40039C9.53845 2.40039 11.0137 3.01146 12.1014 4.09917C13.1891 5.18688 13.8002 6.66214 13.8002 8.20039Z'
-                    fill='#22C543'
-                    fillOpacity='0.16'
-                  />
-                  <path
-                    d='M6.06686 8.68372L7.51686 10.1337L9.93353 6.75039M13.8002 8.20039C13.8002 8.96206 13.6502 9.71627 13.3587 10.42C13.0672 11.1236 12.64 11.763 12.1014 12.3016C11.5628 12.8402 10.9234 13.2674 10.2198 13.5589C9.51607 13.8504 8.76186 14.0004 8.0002 14.0004C7.23853 14.0004 6.48432 13.8504 5.78063 13.5589C5.07694 13.2674 4.43756 12.8402 3.89898 12.3016C3.3604 11.763 2.93317 11.1236 2.64169 10.42C2.35022 9.71627 2.2002 8.96206 2.2002 8.20039C2.2002 6.66214 2.81126 5.18688 3.89898 4.09917C4.98669 3.01146 6.46194 2.40039 8.0002 2.40039C9.53845 2.40039 11.0137 3.01146 12.1014 4.09917C13.1891 5.18688 13.8002 6.66214 13.8002 8.20039Z'
-                    stroke='#22C543'
-                    strokeWidth='1.2'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                  />
-                </g>
-              </svg>
+              <PromptSuccessIcon
+                css={css`
+                  width: 1rem;
+                  height: 1rem;
+                `}
+              />
             ) : claimed ? (
               <svg
                 width='1rem'
@@ -315,7 +257,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                 success ? 'Claim completed' : claimed ? 'Missing environment keys' : 'Clerk is in keyless mode'
               }
               css={css`
-                ${baseElementStyles};
+                ${basePromptElementStyles};
                 color: #d9d9d9;
                 font-size: 0.875rem;
                 font-weight: 500;
@@ -381,7 +323,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
           >
             <p
               css={css`
-                ${baseElementStyles};
+                ${basePromptElementStyles};
                 color: #b4b4b4;
                 font-size: 0.8125rem;
                 font-weight: 400;
@@ -532,7 +474,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
                       target='_blank'
                       rel='noopener noreferrer'
                       css={css`
-                        ${baseElementStyles};
+                        ${basePromptElementStyles};
                         color: #ffffff9e;
                         font-size: 0.75rem;
                         transition: color 120ms ease-out;
@@ -565,7 +507,7 @@ const KeylessPromptInternal = (_props: KeylessPromptProps) => {
               </Flex>
             ))}
         </Flex>
-      </Flex>
+      </PromptContainer>
       <BodyPortal>
         <a
           href={`#${buttonIdentifier}`}

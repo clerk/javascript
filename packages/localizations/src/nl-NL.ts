@@ -693,8 +693,14 @@ export const nlNL: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Vul je wachtwoord in',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Dit wachtwoord is gelekt bij een datalek. Kies een ander wachtwoord om veiligheidsredenen.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verificatiecode',
@@ -861,6 +867,14 @@ export const nlNL: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
     captcha_invalid:
@@ -890,9 +904,11 @@ export const nlNL: LocalizationResource = {
     form_password_pwned__sign_in: 'Als je dit wachtwoord elders gebruikt, moet je het wijzigen.',
     form_password_size_in_bytes_exceeded:
       'Je wachtwoord heeft het maximum aantal bytes overschreden, vermijd speciale tekens.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Wachtwoord is incorrect.',
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
+    form_username_needs_non_number_char: 'Uw gebruikersnaam moet minstens één niet-numeriek teken bevatten.',
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
     not_allowed_access:
       "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",

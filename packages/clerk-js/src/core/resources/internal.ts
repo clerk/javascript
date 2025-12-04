@@ -1,5 +1,7 @@
 export type { Clerk } from '../clerk';
+//  Ordering matters. If you change the order of `Base` you will be fired !! jk
 export * from './Base';
+// -------
 export * from './UserSettings';
 export * from './CommerceSettings';
 export * from './AuthConfig';
@@ -40,6 +42,6 @@ export * from './TOTP';
 export * from './User';
 export * from './UserOrganizationInvitation';
 export * from './Verification';
-export * from './Web3Wallet';  
+export * from './Web3Wallet';
 export * from './Waitlist';
 export * from './APIKey';

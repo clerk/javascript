@@ -696,8 +696,14 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার অ্যাকাউন্টের সাথে যুক্ত পাসওয়ার্ড লিখুন',
       title: 'আপনার পাসওয়ার্ড লিখুন',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
@@ -866,6 +872,14 @@ export const bnIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
     captcha_invalid:
@@ -898,10 +912,12 @@ export const bnIN: LocalizationResource = {
       'এই পাসওয়ার্ডটি একটি ডেটা লঙ্ঘনের অংশ হিসাবে পাওয়া গেছে এবং ব্যবহার করা যাবে না, দয়া করে আপনার পাসওয়ার্ড রিসেট করুন।',
     form_password_size_in_bytes_exceeded:
       'আপনার পাসওয়ার্ড অনুমোদিত সর্বাধিক বাইট সংখ্যা অতিক্রম করেছে, দয়া করে এটি ছোট করুন বা কিছু বিশেষ অক্ষর সরান।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'ভুল পাসওয়ার্ড',
     form_username_invalid_character:
       'আপনার ব্যবহারকারীর নামে অবৈধ অক্ষর রয়েছে। দয়া করে শুধুমাত্র অক্ষর, সংখ্যা এবং আন্ডারস্কোর ব্যবহার করুন।',
     form_username_invalid_length: 'আপনার ব্যবহারকারীর নাম {{min_length}} থেকে {{max_length}} অক্ষর দীর্ঘ হতে হবে।',
+    form_username_needs_non_number_char: 'আপনার ব্যবহারকারীর নামে কমপক্ষে একটি অ-সংখ্যাসূচক অক্ষর থাকতে হবে।',
     identification_deletion_failed: 'আপনি আপনার শেষ শনাক্তকরণ মুছতে পারবেন না।',
     not_allowed_access:
       'আপনার এই পৃষ্ঠা অ্যাক্সেস করার অনুমতি নেই। আপনি যদি মনে করেন এটি একটি ত্রুটি, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',
