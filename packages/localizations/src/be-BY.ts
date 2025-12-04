@@ -697,8 +697,14 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увядзіце пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль быў узламаны',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код верыфікацыі',
@@ -904,6 +910,7 @@ export const beBY: LocalizationResource = {
     form_password_pwned__sign_in: 'Гэты пароль быў узламаны, калі ласка, абярыце іншы.',
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перавышае максімальна дапушчальнае колькасць байтаў, скараціце яго або выдаліце некаторыя спецыяльныя сімвалы.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Неверагодны пароль',
     form_username_invalid_character: 'Імя карыстальніка змяшчае недапушчальныя сімвалы.',
     form_username_invalid_length: 'Імя карыстальніка павінна быць ад 3 да 50 сімвалаў.',

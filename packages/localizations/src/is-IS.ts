@@ -695,8 +695,14 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn lykilorðið sem tengist reikningnum þínum',
       title: 'Sláðu inn lykilorðið þitt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lykilorð brotið',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
@@ -902,6 +908,7 @@ export const isIS: LocalizationResource = {
       'Þetta lykilorð hefur fundist sem hluti af öryggisbresti og má ekki nota, vinsamlegast endurstilltu lykilorðið þitt.',
     form_password_size_in_bytes_exceeded:
       'Lykilorðið þitt hefur farið yfir hámarksfjölda bæta sem leyfðir eru, vinsamlegast styttu það eða fjarlægðu nokkra sérstafi.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Rangt lykilorð',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,

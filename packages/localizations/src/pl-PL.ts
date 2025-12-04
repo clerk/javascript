@@ -695,8 +695,14 @@ export const plPL: LocalizationResource = {
       subtitle: 'aby kontynuować w {{applicationName}}',
       title: 'Wprowadź swoje hasło',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Hasło skompromitowane',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kod weryfikacyjny',
@@ -904,6 +910,7 @@ export const plPL: LocalizationResource = {
     form_password_pwned__sign_in: 'To hasło zostało znalezione w wyniku włamania i nie można go użyć. Zresetuj hasło.',
     form_password_size_in_bytes_exceeded:
       'Twoje hasło przekroczyło maksymalną dozwoloną liczbę bajtów, skróć je lub usuń niektóre znaki specjalne.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Podane hasło jest nieprawidłowe',
     form_username_invalid_character:
       'Twoja nazwa użytkownika zawiera nieprawidłowe znaki. Prosimy o używanie wyłącznie liter, cyfr i podkreśleń.',

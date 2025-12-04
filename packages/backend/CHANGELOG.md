@@ -1,5 +1,35 @@
 # Change Log
 
+## 2.25.0
+
+### Minor Changes
+
+- Unified machine token verification methods under a consistent `verify()` API. The previous methods (`verifySecret`, `verifyToken`, `verifyAccessToken`) are now deprecated. ([#7347](https://github.com/clerk/javascript/pull/7347)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Before
+
+  ```ts
+  await clerkClient.apiKeys.verifySecret('ak_...');
+  await clerkClient.m2m.verifyToken({ token: 'mt_...' });
+  ```
+
+  After
+
+  ```ts
+  await clerkClient.apiKeys.verify('ak_...');
+  await clerkClient.m2m.verify({ token: 'mt_...' });
+  ```
+
+- Introducing `users.__experimental_passwordUntrusted` action ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+- Export `UserDeletedJSON` type from API resources ([#7309](https://github.com/clerk/javascript/pull/7309)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Updated dependencies [[`40a841d`](https://github.com/clerk/javascript/commit/40a841d56cd8983dce21376c832f1085c43a9518), [`f364924`](https://github.com/clerk/javascript/commit/f364924708f20f0bc7b8b291ea2ae01ce09e2e9f), [`f115e56`](https://github.com/clerk/javascript/commit/f115e56d14b5c49f52b6aca01b434dbe4f6193cf), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`3f99742`](https://github.com/clerk/javascript/commit/3f997427e400248502b0977e1b69e109574dfe7d), [`02798f5`](https://github.com/clerk/javascript/commit/02798f571065d8142cf1dade57b42b3e8ce0f818), [`07a30ce`](https://github.com/clerk/javascript/commit/07a30ce52b7d2ba85ce3533879700b9ec129152e), [`ce8b914`](https://github.com/clerk/javascript/commit/ce8b9149bff27866cdb686f1ab0b56cef8d8c697)]:
+  - @clerk/shared@3.37.0
+  - @clerk/types@4.101.4
+
 ## 2.24.0
 
 ### Minor Changes
