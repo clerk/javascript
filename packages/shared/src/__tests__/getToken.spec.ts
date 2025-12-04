@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { ClerkRuntimeError } from '../errors/clerkRuntimeError';
 import { getToken } from '../getToken';
 
 type StatusHandler = (status: string) => void;
@@ -153,16 +154,20 @@ describe('getToken', () => {
       expect(token).toBe(mockToken);
     });
 
-    it('should timeout and return null if Clerk never loads', async () => {
+    it('should throw ClerkRuntimeError if Clerk never loads', async () => {
       global.window = {} as any;
 
-      const tokenPromise = getToken();
+      let caughtError: unknown;
+      const tokenPromise = getToken().catch(e => {
+        caughtError = e;
+      });
 
       // Fast-forward past timeout (10 seconds)
       await vi.advanceTimersByTimeAsync(15000);
+      await tokenPromise;
 
-      const token = await tokenPromise;
-      expect(token).toBeNull();
+      expect(caughtError).toBeInstanceOf(ClerkRuntimeError);
+      expect((caughtError as ClerkRuntimeError).code).toBe('clerk_runtime_load_timeout');
     });
   });
 
@@ -210,16 +215,18 @@ describe('getToken', () => {
   });
 
   describe('in non-browser environment', () => {
-    it('should return null when window is undefined', async () => {
+    it('should throw ClerkRuntimeError when window is undefined', async () => {
       global.window = undefined as any;
 
-      const token = await getToken();
-      expect(token).toBeNull();
+      await expect(getToken()).rejects.toThrow(ClerkRuntimeError);
+      await expect(getToken()).rejects.toMatchObject({
+        code: 'clerk_runtime_not_browser',
+      });
     });
   });
 
   describe('when Clerk enters error status', () => {
-    it('should return null', async () => {
+    it('should throw ClerkRuntimeError', async () => {
       let statusHandler: StatusHandler | null = null;
 
       const mockClerk = {
@@ -244,13 +251,15 @@ describe('getToken', () => {
         (statusHandler as StatusHandler)('error');
       }
 
-      const token = await tokenPromise;
-      expect(token).toBeNull();
+      await expect(tokenPromise).rejects.toThrow(ClerkRuntimeError);
+      await expect(tokenPromise).rejects.toMatchObject({
+        code: 'clerk_runtime_init_error',
+      });
     });
   });
 
   describe('when session.getToken throws', () => {
-    it('should return null and not propagate the error', async () => {
+    it('should propagate the error', async () => {
       const mockClerk = {
         status: 'ready',
         session: {
@@ -260,8 +269,7 @@ describe('getToken', () => {
 
       global.window = { Clerk: mockClerk } as any;
 
-      const token = await getToken();
-      expect(token).toBeNull();
+      await expect(getToken()).rejects.toThrow('Token fetch failed');
     });
   });
 

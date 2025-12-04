@@ -1,42 +1,26 @@
 import { inBrowser } from './browser';
-import type { ClerkStatus, GetTokenOptions, LoadedClerk } from './types';
+import { ClerkRuntimeError } from './errors/clerkRuntimeError';
+import type { Clerk, ClerkStatus, GetTokenOptions, LoadedClerk } from './types';
 
 const POLL_INTERVAL_MS = 50;
 const MAX_POLL_RETRIES = 100; // 5 seconds of polling
 const TIMEOUT_MS = 10000; // 10 second absolute timeout
 
-type WindowClerk = LoadedClerk & {
-  status?: ClerkStatus;
-  loaded?: boolean;
-  on?: (event: 'status', handler: (status: ClerkStatus) => void, opts?: { notify?: boolean }) => void;
-  off?: (event: 'status', handler: (status: ClerkStatus) => void) => void;
-};
-
-function getWindowClerk(): WindowClerk | undefined {
+function getWindowClerk(): Clerk | undefined {
   if (inBrowser() && 'Clerk' in window) {
-    return (window as unknown as { Clerk?: WindowClerk }).Clerk;
+    return (window as unknown as { Clerk?: Clerk }).Clerk;
   }
   return undefined;
-}
-
-class ClerkNotLoadedError extends Error {
-  constructor() {
-    super('Clerk: Timeout waiting for Clerk to load. Ensure ClerkProvider is mounted.');
-    this.name = 'ClerkNotLoadedError';
-  }
-}
-
-class ClerkNotAvailableError extends Error {
-  constructor() {
-    super('Clerk: getToken can only be used in browser environments.');
-    this.name = 'ClerkNotAvailableError';
-  }
 }
 
 function waitForClerk(): Promise<LoadedClerk> {
   return new Promise((resolve, reject) => {
     if (!inBrowser()) {
-      reject(new ClerkNotAvailableError());
+      reject(
+        new ClerkRuntimeError('getToken can only be used in browser environments.', {
+          code: 'clerk_runtime_not_browser',
+        }),
+      );
       return;
     }
 
@@ -53,22 +37,25 @@ function waitForClerk(): Promise<LoadedClerk> {
     }
 
     let retries = 0;
-    let timeoutId: ReturnType<typeof setTimeout>;
     let statusHandler: ((status: ClerkStatus) => void) | undefined;
     let pollTimeoutId: ReturnType<typeof setTimeout>;
-    let currentClerk: WindowClerk | undefined = clerk;
+    let currentClerk: Clerk | undefined = clerk;
 
     const cleanup = () => {
       clearTimeout(timeoutId);
       clearTimeout(pollTimeoutId);
-      if (statusHandler && currentClerk?.off) {
+      if (statusHandler && currentClerk) {
         currentClerk.off('status', statusHandler);
       }
     };
 
-    timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       cleanup();
-      reject(new ClerkNotLoadedError());
+      reject(
+        new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
+          code: 'clerk_runtime_load_timeout',
+        }),
+      );
     }, TIMEOUT_MS);
 
     const checkAndResolve = () => {
@@ -94,14 +81,18 @@ function waitForClerk(): Promise<LoadedClerk> {
         return;
       }
 
-      if (!statusHandler && currentClerk.on) {
+      if (!statusHandler) {
         statusHandler = (status: ClerkStatus) => {
           if (status === 'ready' || status === 'degraded') {
             cleanup();
             resolve(currentClerk as LoadedClerk);
           } else if (status === 'error') {
             cleanup();
-            reject(new ClerkNotLoadedError());
+            reject(
+              new ClerkRuntimeError('Clerk failed to initialize.', {
+                code: 'clerk_runtime_init_error',
+              }),
+            );
           }
         };
 
@@ -123,10 +114,13 @@ function waitForClerk(): Promise<LoadedClerk> {
  * @param options.organizationId - Organization ID to include in the token
  * @param options.leewayInSeconds - Number of seconds of leeway for token expiration
  * @param options.skipCache - Whether to skip the token cache
- * @returns A Promise that resolves to the session token, or `null` if:
- *   - The user is not signed in
- *   - Clerk failed to load
- *   - Called in a non-browser environment
+ * @returns A Promise that resolves to the session token, or `null` if the user is not signed in
+ *
+ * @throws {ClerkRuntimeError} When called in a non-browser environment (code: `clerk_runtime_not_browser`)
+ *
+ * @throws {ClerkRuntimeError} When Clerk fails to load within timeout (code: `clerk_runtime_load_timeout`)
+ *
+ * @throws {ClerkRuntimeError} When Clerk fails to initialize (code: `clerk_runtime_init_error`)
  *
  * @example
  * ```typescript
@@ -143,18 +137,11 @@ function waitForClerk(): Promise<LoadedClerk> {
  * ```
  */
 export async function getToken(options?: GetTokenOptions): Promise<string | null> {
-  try {
-    const clerk = await waitForClerk();
+  const clerk = await waitForClerk();
 
-    if (!clerk.session) {
-      return null;
-    }
-
-    return await clerk.session.getToken(options);
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[Clerk] getToken failed:', error);
-    }
+  if (!clerk.session) {
     return null;
   }
+
+  return clerk.session.getToken(options);
 }
