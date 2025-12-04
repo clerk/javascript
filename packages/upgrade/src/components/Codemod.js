@@ -1,5 +1,5 @@
 import { Spinner, StatusMessage, TextInput } from '@inkjs/ui';
-import { Newline, Text } from 'ink';
+import { Box, Newline, Text } from 'ink';
 import React, { useEffect, useState } from 'react';
 
 import { runCodemod } from '../codemods/index.js';
@@ -111,8 +111,10 @@ function ManualInterventionSummary({ stats }) {
   }
 
   return (
-    <>
-      <Newline />
+    <Box
+      flexDirection='column'
+      marginTop={1}
+    >
       <Text
         bold
         color='yellow'
@@ -121,60 +123,56 @@ function ManualInterventionSummary({ stats }) {
       </Text>
 
       {userButtonCount > 0 && (
-        <>
-          <Newline />
+        <Box
+          flexDirection='column'
+          marginTop={1}
+        >
           <Text color='yellow'>
-            • Removed {userButtonCount} <Text bold>UserButton</Text> sign-out redirect prop(s) (
-            <Text italic>afterSignOutUrl</Text>, <Text italic>afterMultiSessionSingleSignOutUrl</Text>)
+            • Removed {userButtonCount} <Text bold>UserButton</Text> sign-out redirect prop(s)
+          </Text>
+          <Text color='gray'> To configure sign-out redirects:</Text>
+          <Text color='gray'>
+            {' '}- Global: Add <Text italic>afterSignOutUrl</Text> to <Text italic>{'<ClerkProvider>'}</Text>
           </Text>
           <Text color='gray'>
-            {'  '}These props have been removed from UserButton. To configure sign-out redirects:
+            {' '}- Per-button: Use <Text italic>{'<SignOutButton redirectUrl="...">'}</Text>
           </Text>
           <Text color='gray'>
-            {'  '}- Global default: Add <Text italic>afterSignOutUrl</Text> prop to{' '}
-            <Text italic>{'<ClerkProvider>'}</Text>
+            {' '}- Programmatic: <Text italic>{'clerk.signOut({ redirectUrl: "..." })'}</Text>
           </Text>
-          <Text color='gray'>
-            {'  '}- Per-button control: Use <Text italic>{'<SignOutButton redirectUrl="/your-path">'}</Text>
-          </Text>
-          <Text color='gray'>
-            {'  '}- Programmatic: Call <Text italic>{'clerk.signOut({ redirectUrl: "/your-path" })'}</Text>
-          </Text>
-        </>
+        </Box>
       )}
 
       {hideSlugCount > 0 && (
-        <>
-          <Newline />
+        <Box
+          flexDirection='column'
+          marginTop={1}
+        >
           <Text color='yellow'>
-            • Removed {hideSlugCount} <Text bold>hideSlug</Text> prop(s) from organization components
+            • Removed {hideSlugCount} <Text bold>hideSlug</Text> prop(s)
           </Text>
           <Text color='gray'>
-            {'  '}The <Text italic>hideSlug</Text> prop has been removed from CreateOrganization,
+            {' '}Removed from CreateOrganization, OrganizationSwitcher, and OrganizationList.
           </Text>
-          <Text color='gray'>{'  '}OrganizationSwitcher, and OrganizationList components.</Text>
-          <Text color='gray'>{'  '}Organization slugs are now managed through the Clerk Dashboard settings.</Text>
-        </>
+          <Text color='gray'> Slugs are now managed in the Clerk Dashboard.</Text>
+        </Box>
       )}
 
       {beforeEmitCount > 0 && (
-        <>
-          <Newline />
+        <Box
+          flexDirection='column'
+          marginTop={1}
+        >
           <Text color='yellow'>
-            • Transformed {beforeEmitCount} <Text bold>setActive({'{ beforeEmit }'})</Text> to{' '}
-            <Text bold>setActive({'{ navigate }'})</Text>
+            • Transformed {beforeEmitCount} <Text bold>{'setActive({ beforeEmit })'}</Text> →{' '}
+            <Text bold>{'setActive({ navigate })'}</Text>
           </Text>
-          <Text color='gray'>
-            {'  '}The callback now receives an object with <Text italic>session</Text> property:
-          </Text>
-          <Text color='gray'>{'    '}Before: beforeEmit: (session) =&gt; doSomething(session)</Text>
-          <Text color='gray'>
-            {'    '}After: navigate: ({'{ session }'}) =&gt; doSomething(session)
-          </Text>
-          <Text color='gray'>{'  '}The codemod wrapped your callback to extract session from the params object.</Text>
-          <Text color='gray'>{'  '}Consider refactoring to use destructuring directly for cleaner code.</Text>
-        </>
+          <Text color='gray'> The callback now receives an object with session property:</Text>
+          <Text color='gray'> Before: beforeEmit: (session) =&gt; ...</Text>
+          <Text color='gray'> After: navigate: (params) =&gt; ...(params.session)</Text>
+          <Text color='gray'> Consider refactoring to use destructuring for cleaner code.</Text>
+        </Box>
       )}
-    </>
+    </Box>
   );
 }
