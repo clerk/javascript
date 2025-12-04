@@ -87,27 +87,100 @@ export function Codemod(props) {
           <Text color='gray'>{result.nochange ?? 0} unmodified</Text>
           {result.timeElapsed && <Text>Time elapsed: {result.timeElapsed}</Text>}
 
-          {transform === 'transform-remove-deprecated-props' &&
-            result.clerkUpgradeStats?.userbuttonAfterSignOutPropsRemoved > 0 && (
-              <>
-                <Newline />
-                <Text color='yellow'>
-                  Found and removed {result.clerkUpgradeStats.userbuttonAfterSignOutPropsRemoved} usage(s) of
-                  <Text bold> UserButton</Text> sign-out redirect props (<Text italic>afterSignOutUrl</Text> /{' '}
-                  <Text italic>afterMultiSessionSingleSignOutUrl</Text>).
-                </Text>
-                <Text color='gray'>
-                  In Core 3, these props have been removed. Configure sign-out redirects globally via
-                  <Text italic> ClerkProvider afterSignOutUrl</Text> (or the corresponding environment variable) or use
-                  <Text italic> SignOutButton redirectUrl</Text> for one-off flows.
-                </Text>
-              </>
-            )}
+          {transform === 'transform-remove-deprecated-props' && (
+            <ManualInterventionSummary stats={result.clerkUpgradeStats} />
+          )}
 
           <Newline />
         </>
       )}
       {error && <Text color='red'>{error.message}</Text>}
+    </>
+  );
+}
+
+function ManualInterventionSummary({ stats }) {
+  if (!stats) {
+    return null;
+  }
+
+  const hasUserButtonChanges = stats.userbuttonAfterSignOutPropsRemoved > 0;
+  const hasHideSlugChanges = stats.hideSlugRemoved > 0;
+  const hasBeforeEmitChanges = stats.beforeEmitTransformed > 0;
+
+  if (!hasUserButtonChanges && !hasHideSlugChanges && !hasBeforeEmitChanges) {
+    return null;
+  }
+
+  return (
+    <>
+      <Newline />
+      <Text
+        bold
+        color='yellow'
+      >
+        ⚠️ Manual intervention may be required:
+      </Text>
+
+      {hasUserButtonChanges && (
+        <>
+          <Newline />
+          <Text color='yellow'>
+            • Removed {stats.userbuttonAfterSignOutPropsRemoved} <Text bold>UserButton</Text> sign-out redirect prop(s)
+          </Text>
+          <Text color='gray'>
+            {'  '}Configure redirects via <Text italic>ClerkProvider afterSignOutUrl</Text> or{' '}
+            <Text italic>SignOutButton redirectUrl</Text>
+          </Text>
+          <FileList files={stats.userbuttonFilesAffected} />
+        </>
+      )}
+
+      {hasHideSlugChanges && (
+        <>
+          <Newline />
+          <Text color='yellow'>
+            • Removed {stats.hideSlugRemoved} <Text bold>hideSlug</Text> prop(s)
+          </Text>
+          <Text color='gray'>{'  '}This prop has been removed. Slug visibility is now controlled differently.</Text>
+          <FileList files={stats.hideSlugFiles} />
+        </>
+      )}
+
+      {hasBeforeEmitChanges && (
+        <>
+          <Newline />
+          <Text color='yellow'>
+            • Transformed {stats.beforeEmitTransformed} <Text bold>setActive beforeEmit</Text> to{' '}
+            <Text bold>navigate</Text>
+          </Text>
+          <Text color='gray'>
+            {'  '}Callback signature changed: now receives <Text italic>params</Text> object instead of{' '}
+            <Text italic>session</Text> directly. Review the transformed code.
+          </Text>
+          <FileList files={stats.beforeEmitFiles} />
+        </>
+      )}
+    </>
+  );
+}
+
+function FileList({ files }) {
+  if (!files?.length) {
+    return null;
+  }
+
+  return (
+    <>
+      <Text color='gray'>{'  '}Files:</Text>
+      {files.map((file, index) => (
+        <Text
+          key={index}
+          color='gray'
+        >
+          {'    '}- {file}
+        </Text>
+      ))}
     </>
   );
 }

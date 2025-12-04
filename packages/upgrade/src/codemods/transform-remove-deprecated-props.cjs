@@ -15,9 +15,10 @@ const COMPONENTS_WITH_USER_BUTTON_REMOVALS = new Map([
 ]);
 const ORGANIZATION_SWITCHER_RENAMES = new Map([['afterSwitchOrganizationUrl', 'afterSelectOrganizationUrl']]);
 
-module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j }, options = {}) {
+module.exports = function transformDeprecatedProps({ source, path: filePath }, { jscodeshift: j }, options = {}) {
   const root = j(source);
   let dirty = false;
+  const stats = options.clerkUpgradeStats;
 
   const { namedImports, namespaceImports } = collectClerkImports(root, j);
 
@@ -32,20 +33,31 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j 
     if (COMPONENTS_WITH_HIDE_SLUG.has(canonicalName)) {
       if (removeJsxAttribute(j, jsxNode, 'hideSlug')) {
         dirty = true;
+        if (stats) {
+          stats.hideSlugRemoved = (stats.hideSlugRemoved || 0) + 1;
+          stats.hideSlugFiles = stats.hideSlugFiles || [];
+          if (!stats.hideSlugFiles.includes(filePath)) {
+            stats.hideSlugFiles.push(filePath);
+          }
+        }
       }
     }
 
     if (COMPONENTS_WITH_USER_BUTTON_REMOVALS.has(canonicalName)) {
+      const propsToRemove = COMPONENTS_WITH_USER_BUTTON_REMOVALS.get(canonicalName);
       let removedCount = 0;
-      for (const attrName of COMPONENTS_WITH_USER_BUTTON_REMOVALS.get(canonicalName)) {
+      for (const attrName of propsToRemove) {
         if (removeJsxAttribute(j, jsxNode, attrName)) {
           dirty = true;
           removedCount += 1;
         }
       }
-      if (removedCount > 0 && options.clerkUpgradeStats) {
-        options.clerkUpgradeStats.userbuttonAfterSignOutPropsRemoved =
-          (options.clerkUpgradeStats.userbuttonAfterSignOutPropsRemoved || 0) + removedCount;
+      if (removedCount > 0 && stats) {
+        stats.userbuttonAfterSignOutPropsRemoved = (stats.userbuttonAfterSignOutPropsRemoved || 0) + removedCount;
+        stats.userbuttonFilesAffected = stats.userbuttonFilesAffected || [];
+        if (!stats.userbuttonFilesAffected.includes(filePath)) {
+          stats.userbuttonFilesAffected.push(filePath);
+        }
       }
     }
 
@@ -104,7 +116,7 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j 
     dirty = true;
   }
 
-  if (transformSetActiveBeforeEmit(root, j)) {
+  if (transformSetActiveBeforeEmit(root, j, stats, filePath)) {
     dirty = true;
   }
 
@@ -376,7 +388,7 @@ function renameTSPropertySignatures(root, j, oldName, newName) {
   return changed;
 }
 
-function transformSetActiveBeforeEmit(root, j) {
+function transformSetActiveBeforeEmit(root, j, stats, filePath) {
   let changed = false;
 
   root
@@ -405,6 +417,14 @@ function transformSetActiveBeforeEmit(root, j) {
       const navigateProp = j.objectProperty(j.identifier('navigate'), buildNavigateArrowFunction(j, originalValue));
       args0.properties.splice(beforeEmitIndex, 1, navigateProp);
       changed = true;
+
+      if (stats) {
+        stats.beforeEmitTransformed = (stats.beforeEmitTransformed || 0) + 1;
+        stats.beforeEmitFiles = stats.beforeEmitFiles || [];
+        if (!stats.beforeEmitFiles.includes(filePath)) {
+          stats.beforeEmitFiles.push(filePath);
+        }
+      }
     });
 
   return changed;
