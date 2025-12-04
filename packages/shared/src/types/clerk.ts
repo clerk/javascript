@@ -247,6 +247,13 @@ export interface Clerk {
   user: UserResource | null | undefined;
 
   /**
+   * Last emitted resources, maintains a stable reference to the resources between emits.
+   *
+   * @internal
+   */
+  __internal_lastEmittedResources: Resources | undefined;
+
+  /**
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
    * `effect()` that can be used to subscribe to changes from Signals.
    *

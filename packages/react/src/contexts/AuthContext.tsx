@@ -3,13 +3,14 @@ import { deriveFromClientSideState, deriveFromSsrInitialState } from '@clerk/sha
 import { useClerkInstanceContext, useInitialStateContext } from '@clerk/shared/react';
 import type {
   ActClaim,
-  ClientResource,
+  InitialState,
   JwtPayload,
   OrganizationCustomPermissionKey,
   OrganizationCustomRoleKey,
+  Resources,
   SessionStatusClaim,
 } from '@clerk/shared/types';
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
 
 type AuthStateValue = {
   userId: string | null | undefined;
@@ -39,35 +40,36 @@ export const defaultDerivedInitialState = {
 
 export function useAuthState(): AuthStateValue {
   const clerk = useClerkInstanceContext();
-  const initialStateContext = useInitialStateContext();
-  // If we make initialState support a promise in the future, this is where we would use() that promise
-  const initialSnapshot = useMemo(() => {
-    if (!initialStateContext) {
+  const initialStateFromContextRaw = useInitialStateContext();
+
+  // This is never allowed to change, so we snapshot it to guarantee that
+  // eslint-disable-next-line react/hook-use-state
+  const [initialStateFromContext] = useState(initialStateFromContextRaw);
+
+  const state = useSyncExternalStore(
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
+    useCallback(() => {
+      if (!clerk.loaded || !clerk.__internal_lastEmittedResources) {
+        return initialStateFromContext;
+      }
+
+      return clerk.__internal_lastEmittedResources;
+      // We do not want to include __internal_lastEmittedResources in the dependency array as that is not reactive,
+      // in the future we should useEffectEvent for this, but it's only available in React 19.
+      // clerk only changes identity when it's status changes, so reads to __internal_lastEmittedResources will
+      // always return the latest value, which is what we want.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [clerk.loaded, initialStateFromContext]),
+    useCallback(() => initialStateFromContext, [initialStateFromContext]),
+  );
+
+  const authState = useMemo(() => {
+    if (!state) {
       return defaultDerivedInitialState;
     }
-    const fullState = deriveFromSsrInitialState(initialStateContext);
+    const fullState = isInitialState(state) ? deriveFromSsrInitialState(state) : deriveFromClientSideState(state);
     return authStateFromFull(fullState);
-  }, [initialStateContext]);
-
-  const snapshot = useMemo(() => {
-    if (!clerk.loaded) {
-      return initialSnapshot;
-    }
-    const state = {
-      client: clerk.client as ClientResource,
-      session: clerk.session,
-      user: clerk.user,
-      organization: clerk.organization,
-    };
-    const fullState = deriveFromClientSideState(state);
-    return authStateFromFull(fullState);
-  }, [clerk.client, clerk.session, clerk.user, clerk.organization, initialSnapshot, clerk.loaded]);
-
-  const authState = useSyncExternalStore(
-    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
-    useCallback(() => snapshot, [snapshot]),
-    useCallback(() => initialSnapshot, [initialSnapshot]),
-  );
+  }, [state]);
 
   return authState;
 }
@@ -85,4 +87,8 @@ function authStateFromFull(derivedState: DeriveStateReturnType) {
     orgPermissions: derivedState.orgPermissions,
     factorVerificationAge: derivedState.factorVerificationAge,
   };
+}
+
+function isInitialState(state: Resources | InitialState): state is InitialState {
+  return !('client' in state);
 }

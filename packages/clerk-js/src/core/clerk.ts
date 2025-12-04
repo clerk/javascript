@@ -2905,15 +2905,18 @@ export class Clerk implements ClerkInterface {
     });
   };
 
+  public __internal_lastEmittedResources: Resources | undefined;
   #emit = (): void => {
     if (this.client) {
+      const resources = {
+        client: this.client,
+        session: this.session,
+        user: this.user,
+        organization: this.organization,
+      };
+      this.__internal_lastEmittedResources = resources;
       for (const listener of this.#listeners) {
-        listener({
-          client: this.client,
-          session: this.session,
-          user: this.user,
-          organization: this.organization,
-        });
+        listener(resources);
       }
     }
   };

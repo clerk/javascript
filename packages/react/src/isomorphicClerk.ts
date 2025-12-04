@@ -40,6 +40,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   RedirectOptions,
+  Resources,
   SetActiveParams,
   SignInProps,
   SignInRedirectOptions,
@@ -800,6 +801,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       return (clerkjs as any).__internal_updateProps(props);
     }
   };
+
+  get __internal_lastEmittedResources(): Resources | undefined {
+    return this.clerkjs?.__internal_lastEmittedResources;
+  }
 
   /**
    * `setActive` can be used to set the active session and/or organization.
