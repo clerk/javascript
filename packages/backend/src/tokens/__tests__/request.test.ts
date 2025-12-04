@@ -904,6 +904,11 @@ describe('tokens.authenticateRequest(options)', () => {
   });
 
   test('cookieToken: returns handshake when no clientUat and redirect loop but invalid session token', async () => {
+    server.use(
+      http.get('https://api.clerk.test/v1/jwks', () => {
+        return HttpResponse.json(mockJwks);
+      }),
+    );
     // Simulate scenario where we're in a redirect loop but the session token is invalid
     const requestState = await authenticateRequest(
       mockRequestWithCookies(
