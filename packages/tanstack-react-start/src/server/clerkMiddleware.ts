@@ -1,7 +1,7 @@
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
 import { createMiddleware, json } from '@tanstack/react-start';
 

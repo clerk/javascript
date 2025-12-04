@@ -1,4 +1,4 @@
-import type { VerificationStatus } from '@clerk/types';
+import type { VerificationStatus } from '@clerk/shared/types';
 
 import type { OrganizationDomainVerificationJSON, VerificationJSON } from './JSON';
 

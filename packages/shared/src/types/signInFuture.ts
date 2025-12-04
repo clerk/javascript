@@ -15,7 +15,7 @@ export interface SignInFutureCreateParams {
    * The first factor verification strategy to use in the sign-in flow. Depends on the `identifier` value. Each
    * authentication identifier supports different verification strategies.
    */
-  strategy?: OAuthStrategy | 'saml' | 'enterprise_sso' | PasskeyStrategy;
+  strategy?: OAuthStrategy | 'enterprise_sso' | PasskeyStrategy;
   /**
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
@@ -326,6 +326,13 @@ export interface SignInFutureResource {
    * `identifier` property.
    */
   readonly userData: UserData;
+
+  /**
+   * Indicates that the sign-in has been finalized.
+   *
+   * @internal
+   */
+  readonly hasBeenFinalized: boolean;
 
   /**
    * Creates a new `SignIn` instance initialized with the provided parameters. The instance maintains the sign-in

@@ -1,4 +1,4 @@
-import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from '@clerk/types';
+import type { ClientJSONSnapshot, EnvironmentJSONSnapshot } from '@clerk/shared/types';
 
 import type { IStorage } from '../provider/singleton/types';
 import type { ResourceCache, ResourceCacheInitOptions } from './types';

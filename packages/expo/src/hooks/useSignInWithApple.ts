@@ -1,4 +1,4 @@
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { errorThrower } from '../utils/errors';
 

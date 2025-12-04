@@ -30,7 +30,7 @@ export function Scan(props) {
   // { sdkName: [{ title: 'x', matcher: /x/, slug: 'x', ... }] }
   useEffect(() => {
     setStatus(`Loading data for ${toVersion} migration`);
-    import(`../versions/${toVersion}/index.js`).then(version => {
+    void import(`../versions/${toVersion}/index.js`).then(version => {
       setMatchers(
         sdks.reduce((m, sdk) => {
           m[sdk] = version.default[sdk];
@@ -47,7 +47,7 @@ export function Scan(props) {
     setStatus('Collecting files to scan');
     const pattern = convertPathToPattern(path.resolve(dir));
 
-    globby(pattern, {
+    void globby(pattern, {
       ignore: [
         'node_modules/**',
         '**/node_modules/**',
@@ -78,7 +78,7 @@ export function Scan(props) {
     }
     const allResults = {};
 
-    Promise.all(
+    void Promise.all(
       // first we read all the files
       files.map(async (file, idx) => {
         const content = await fs.readFile(file, 'utf8');
@@ -142,8 +142,8 @@ export function Scan(props) {
       }),
     )
       .then(() => {
-        const newResults = [...results, ...Object.keys(allResults).map(k => allResults[k])];
-        setResults(newResults);
+        const aggregatedResults = Object.keys(allResults).map(k => allResults[k]);
+        setResults(prevResults => [...prevResults, ...aggregatedResults]);
 
         // Anonymously track how many instances of each breaking change item were encountered.
         // This only tracks the name of the breaking change found, and how many instances of it
@@ -151,14 +151,14 @@ export function Scan(props) {
         // It is used internally to help us understand what the most common sticking points are
         // for our users so we can appropriate prioritize support/guidance/docs around them.
         if (!disableTelemetry) {
-          fetch('https://api.segment.io/v1/batch', {
+          void fetch('https://api.segment.io/v1/batch', {
             method: 'POST',
             headers: {
               Authorization: `Basic ${Buffer.from('5TkC1SM87VX2JRJcIGBBmL7sHLRWaIvc:').toString('base64')}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              batch: newResults.map(item => {
+              batch: aggregatedResults.map(item => {
                 return {
                   type: 'track',
                   userId: 'clerk-upgrade-tool',
@@ -189,7 +189,7 @@ export function Scan(props) {
       .catch(err => {
         console.error(err);
       });
-  }, [matchers, files, noWarnings, disableTelemetry]);
+  }, [matchers, files, noWarnings, disableTelemetry, fromVersion, toVersion, uuid]);
 
   return complete ? (
     <>

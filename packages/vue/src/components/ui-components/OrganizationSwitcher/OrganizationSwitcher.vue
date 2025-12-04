@@ -32,7 +32,7 @@ provide(OrganizationProfileInjectionKey, {
   <ClerkHostRenderer
     :mount="clerk?.mountOrganizationSwitcher"
     :unmount="clerk?.unmountOrganizationSwitcher"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="finalProps"
   />
   <CustomPortalsRenderer :custom-pages-portals="customPagesPortals" />

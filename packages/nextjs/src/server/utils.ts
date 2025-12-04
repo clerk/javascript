@@ -2,7 +2,6 @@ import type { AuthObject } from '@clerk/backend';
 import type { AuthenticateRequestOptions, ClerkRequest, RequestState } from '@clerk/backend/internal';
 import { constants } from '@clerk/backend/internal';
 import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
-import { logger } from '@clerk/shared/logger';
 import { isHttpOrHttps } from '@clerk/shared/proxy';
 import { handleValueOrFn, isProductionEnvironment } from '@clerk/shared/utils';
 import { NextResponse } from 'next/server';
@@ -15,6 +14,7 @@ import {
   authSignatureInvalid,
   encryptionKeyInvalid,
   encryptionKeyInvalidDev,
+  encryptionKeyMissing,
   missingDomainAndProxy,
   missingSignInUrlInDev,
 } from './errors';
@@ -200,12 +200,7 @@ export function encryptClerkRequestData(
   }
 
   if (requestData.secretKey && !ENCRYPTION_KEY) {
-    // TODO SDK-1833: change this to an error in the next major version of `@clerk/nextjs`
-    logger.warnOnce(
-      'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/reference/nextjs/clerk-middleware#dynamic-keys',
-    );
-
-    return;
+    throw new Error(encryptionKeyMissing);
   }
 
   const maybeKeylessEncryptionKey = isProductionEnvironment()

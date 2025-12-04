@@ -1,4 +1,5 @@
-import { type ClerkError, createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
+import type { ClerkAPIError, ClerkError } from '@clerk/shared/error';
+import { createClerkGlobalHookError, isClerkAPIResponseError } from '@clerk/shared/error';
 import type { Errors, SignInErrors, SignInSignal, SignUpErrors, SignUpSignal } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 import { computed, signal } from 'alien-signals';
@@ -58,7 +59,11 @@ export function errorsToParsedErrors<T extends Record<string, unknown>>(
     return parsedErrors;
   }
 
-  const hasFieldErrors = error.errors.some(error => 'meta' in error && error.meta && 'paramName' in error.meta);
+  function isFieldError(error: ClerkAPIError): boolean {
+    return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
+  }
+
+  const hasFieldErrors = error.errors.some(isFieldError);
   if (hasFieldErrors) {
     error.errors.forEach(error => {
       if (parsedErrors.raw) {
@@ -66,7 +71,7 @@ export function errorsToParsedErrors<T extends Record<string, unknown>>(
       } else {
         parsedErrors.raw = [error];
       }
-      if ('meta' in error && error.meta && 'paramName' in error.meta) {
+      if (isFieldError(error)) {
         const name = snakeToCamel(error.meta.paramName);
         if (name in parsedErrors.fields) {
           (parsedErrors.fields as any)[name] = error;

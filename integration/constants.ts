@@ -29,6 +29,15 @@ export const constants = {
    */
   E2E_APP_CLERK_JS_DIR: process.env.E2E_APP_CLERK_JS_DIR,
   /**
+   * Controls the URL the apps will load ui.browser.js from.
+   * If this is set, clerk-ui will not be served automatically from the test runner.
+   */
+  E2E_APP_CLERK_UI: process.env.E2E_APP_CLERK_UI,
+  /**
+   * Controls the path where ui.browser.js is located on the disk.
+   */
+  E2E_APP_CLERK_UI_DIR: process.env.E2E_APP_CLERK_UI_DIR,
+  /**
    * If CLEANUP=0 is used, the .tmp_integration directory will not be deleted.
    * This is useful for debugging locally.
    */
@@ -63,7 +72,11 @@ export const constants = {
   /**
    * The version of the dependency to use, controlled programmatically.
    */
-  E2E_CLERK_VERSION: process.env.E2E_CLERK_VERSION,
+  E2E_CLERK_JS_VERSION: process.env.E2E_CLERK_JS_VERSION,
+  /**
+   * The version of the dependency to use, controlled programmatically.
+   */
+  E2E_CLERK_UI_VERSION: process.env.E2E_CLERK_UI_VERSION,
   /**
    * Key used to encrypt request data for Next.js dynamic keys.
    * @ref https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys

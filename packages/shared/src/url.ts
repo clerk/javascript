@@ -1,6 +1,9 @@
 import { CURRENT_DEV_INSTANCE_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
 import { isStaging } from './utils/instance';
 
+/**
+ *
+ */
 export function parseSearchParams(queryString = ''): URLSearchParams {
   if (queryString.startsWith('?')) {
     queryString = queryString.slice(1);
@@ -8,10 +11,16 @@ export function parseSearchParams(queryString = ''): URLSearchParams {
   return new URLSearchParams(queryString);
 }
 
+/**
+ *
+ */
 export function stripScheme(url = ''): string {
   return (url || '').replace(/^.+:\/\//, '');
 }
 
+/**
+ *
+ */
 export function addClerkPrefix(str: string | undefined) {
   if (!str) {
     return '';
@@ -62,6 +71,9 @@ export const getScriptUrl = (frontendApi: string, { clerkJSVersion }: { clerkJSV
 // * accounts.foo.bar-13.lcl.dev
 // * accounts.foo.bar-13.lclstage.dev
 // * accounts.foo.bar-13.dev.lclclerk.com
+/**
+ *
+ */
 export function isLegacyDevAccountPortalOrigin(host: string): boolean {
   return LEGACY_DEV_INSTANCE_SUFFIXES.some(legacyDevSuffix => {
     return host.startsWith('accounts.') && host.endsWith(legacyDevSuffix);
@@ -74,6 +86,9 @@ export function isLegacyDevAccountPortalOrigin(host: string): boolean {
 // * foo-bar-13.accounts.lclclerk.com
 // But false for:
 // * foo-bar-13.clerk.accounts.lclclerk.com
+/**
+ *
+ */
 export function isCurrentDevAccountPortalOrigin(host: string): boolean {
   return CURRENT_DEV_INSTANCE_SUFFIXES.some(currentDevSuffix => {
     return host.endsWith(currentDevSuffix) && !host.endsWith('.clerk' + currentDevSuffix);
@@ -84,6 +99,9 @@ export function isCurrentDevAccountPortalOrigin(host: string): boolean {
 
 const TRAILING_SLASH_RE = /\/$|\/\?|\/#/;
 
+/**
+ *
+ */
 export function hasTrailingSlash(input = '', respectQueryAndFragment?: boolean): boolean {
   if (!respectQueryAndFragment) {
     return input.endsWith('/');
@@ -91,6 +109,9 @@ export function hasTrailingSlash(input = '', respectQueryAndFragment?: boolean):
   return TRAILING_SLASH_RE.test(input);
 }
 
+/**
+ *
+ */
 export function withTrailingSlash(input = '', respectQueryAndFragment?: boolean): string {
   if (!respectQueryAndFragment) {
     return input.endsWith('/') ? input : input + '/';
@@ -112,6 +133,9 @@ export function withTrailingSlash(input = '', respectQueryAndFragment?: boolean)
   return s0 + '/' + (s.length > 0 ? `?${s.join('?')}` : '') + fragment;
 }
 
+/**
+ *
+ */
 export function withoutTrailingSlash(input = '', respectQueryAndFragment?: boolean): string {
   if (!respectQueryAndFragment) {
     return (hasTrailingSlash(input) ? input.slice(0, -1) : input) || '/';
@@ -130,18 +154,30 @@ export function withoutTrailingSlash(input = '', respectQueryAndFragment?: boole
   return (s0.slice(0, -1) || '/') + (s.length > 0 ? `?${s.join('?')}` : '') + fragment;
 }
 
+/**
+ *
+ */
 export function hasLeadingSlash(input = ''): boolean {
   return input.startsWith('/');
 }
 
+/**
+ *
+ */
 export function withoutLeadingSlash(input = ''): string {
   return (hasLeadingSlash(input) ? input.slice(1) : input) || '/';
 }
 
+/**
+ *
+ */
 export function withLeadingSlash(input = ''): string {
   return hasLeadingSlash(input) ? input : '/' + input;
 }
 
+/**
+ *
+ */
 export function cleanDoubleSlashes(input = ''): string {
   return input
     .split('://')
@@ -149,12 +185,18 @@ export function cleanDoubleSlashes(input = ''): string {
     .join('://');
 }
 
+/**
+ *
+ */
 export function isNonEmptyURL(url: string) {
   return url && url !== '/';
 }
 
 const JOIN_LEADING_SLASH_RE = /^\.?\//;
 
+/**
+ *
+ */
 export function joinURL(base: string, ...input: string[]): string {
   let url = base || '';
 

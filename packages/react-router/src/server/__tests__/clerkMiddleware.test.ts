@@ -30,8 +30,6 @@ describe('clerkMiddleware', () => {
       authorizedParties: [],
       signInUrl: '',
       signUpUrl: '',
-      afterSignInUrl: '',
-      afterSignUpUrl: '',
       secretKey: 'sk_test_...',
       publishableKey: 'pk_test_...',
     } as unknown as ReturnType<typeof loadOptions>);
@@ -77,8 +75,6 @@ describe('clerkMiddleware', () => {
       authorizedParties: [],
       signInUrl: '',
       signUpUrl: '',
-      afterSignInUrl: '',
-      afterSignUpUrl: '',
       acceptsToken: 'any',
     });
 
@@ -107,8 +103,6 @@ describe('clerkMiddleware', () => {
       authorizedParties: ['https://example.com'],
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
-      afterSignInUrl: '/dashboard',
-      afterSignUpUrl: '/welcome',
     };
 
     const middleware = clerkMiddleware(options);

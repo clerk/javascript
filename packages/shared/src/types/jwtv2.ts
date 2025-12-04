@@ -186,6 +186,7 @@ export type JwtPayload = JWTPayloadBase & CustomJwtSessionClaims & VersionedJwtP
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+ *
  * @inline
  */
 export interface ActClaim {

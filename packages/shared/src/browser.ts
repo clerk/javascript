@@ -1,6 +1,7 @@
 /**
  * Checks if the window object is defined. You can also use this to check if something is happening on the client side.
- * @returns {boolean}
+ *
+ * @returns
  */
 export function inBrowser(): boolean {
   return typeof window !== 'undefined';
@@ -40,8 +41,9 @@ const botAgentRegex = new RegExp(botAgents.join('|'), 'i');
 
 /**
  * Checks if the user agent is a bot.
+ *
  * @param userAgent - Any user agent string
- * @returns {boolean}
+ * @returns
  */
 export function userAgentIsRobot(userAgent: string): boolean {
   return !userAgent ? false : botAgentRegex.test(userAgent);
@@ -49,7 +51,8 @@ export function userAgentIsRobot(userAgent: string): boolean {
 
 /**
  * Checks if the current environment is a browser and the user agent is not a bot.
- * @returns {boolean}
+ *
+ * @returns
  */
 export function isValidBrowser(): boolean {
   const navigator = inBrowser() ? window?.navigator : null;
@@ -61,7 +64,8 @@ export function isValidBrowser(): boolean {
 
 /**
  * Checks if the current environment is a browser and if the navigator is online.
- * @returns {boolean}
+ *
+ * @returns
  */
 export function isBrowserOnline(): boolean {
   const navigator = inBrowser() ? window?.navigator : null;
@@ -80,7 +84,8 @@ export function isBrowserOnline(): boolean {
 
 /**
  * Runs `isBrowserOnline` and `isValidBrowser` to check if the current environment is a valid browser and if the navigator is online.
- * @returns {boolean}
+ *
+ * @returns
  */
 export function isValidBrowserOnline(): boolean {
   return isBrowserOnline() && isValidBrowser();

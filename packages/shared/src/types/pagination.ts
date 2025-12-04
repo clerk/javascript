@@ -1,5 +1,6 @@
 /**
  * Pagination params in request
+ *
  * @interface
  */
 export type ClerkPaginationRequest<T = object> = {
@@ -36,11 +37,13 @@ export interface ClerkPaginatedResponse<T> {
 export type ClerkPaginationParams<T = object> = {
   /**
    * A number that specifies which page to fetch. For example, if `initialPage` is set to `10`, it will skip the first 9 pages and fetch the 10th page.
+   *
    * @default 1
    */
   initialPage?: number;
   /**
    * A number that specifies the maximum number of results to return per page.
+   *
    * @default 10
    */
   pageSize?: number;

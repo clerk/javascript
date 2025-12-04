@@ -64,11 +64,6 @@ export type ClerkMiddlewareSessionAuthObject = (SignedInAuthObject | SignedOutAu
   redirectToSignUp: RedirectFun<Response>;
 };
 
-/**
- * @deprecated Use `ClerkMiddlewareSessionAuthObject` instead.
- */
-export type ClerkMiddlewareAuthObject = ClerkMiddlewareSessionAuthObject;
-
 export type ClerkMiddlewareAuth = AuthFn;
 
 type ClerkMiddlewareHandler = (

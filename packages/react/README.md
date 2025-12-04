@@ -6,7 +6,7 @@
     </picture>
   </a>
   <br />
-  <h1 align="center">@clerk/clerk-react</h1>
+  <h1 align="center">@clerk/react</h1>
 </p>
 
 <div align="center">
@@ -39,7 +39,7 @@
 
 The fastest way to get started with Clerk is by following the [React Quickstart](https://clerk.com/docs/quickstarts/react?utm_source=github&utm_medium=clerk_react).
 
-You'll learn how to create a new React application, install `@clerk/clerk-react`, set up your environment keys, add `<ClerkProvider>`, and use Clerk's prebuilt components.
+You'll learn how to create a new React application, install `@clerk/react`, set up your environment keys, add `<ClerkProvider>`, and use Clerk's prebuilt components.
 
 ## Usage
 
@@ -58,9 +58,9 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 ## Security
 
-`@clerk/clerk-react` follows good practices of security, but 100% security cannot be assured.
+`@clerk/react` follows good practices of security, but 100% security cannot be assured.
 
-`@clerk/clerk-react` is provided **"as is"** without any **warranty**. Use at your own risk.
+`@clerk/react` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 

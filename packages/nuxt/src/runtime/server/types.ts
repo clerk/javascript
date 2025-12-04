@@ -1,5 +1,5 @@
 import type { AuthenticateRequestOptions, GetAuthFnNoRequest } from '@clerk/backend/internal';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 
 export type AuthOptions = PendingSessionOptions & Pick<AuthenticateRequestOptions, 'acceptsToken'>;
 

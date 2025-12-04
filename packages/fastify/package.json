@@ -67,7 +67,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "cookies": "0.9.1",
     "fastify-plugin": "^5.0.1"
   },

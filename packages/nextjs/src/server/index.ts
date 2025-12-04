@@ -44,12 +44,7 @@ export { buildClerkProps } from './buildClerkProps';
 export { auth } from '../app-router/server/auth';
 export { currentUser } from '../app-router/server/currentUser';
 export { clerkMiddleware } from './clerkMiddleware';
-export type {
-  ClerkMiddlewareAuth,
-  ClerkMiddlewareSessionAuthObject,
-  ClerkMiddlewareAuthObject,
-  ClerkMiddlewareOptions,
-} from './clerkMiddleware';
+export type { ClerkMiddlewareAuth, ClerkMiddlewareSessionAuthObject, ClerkMiddlewareOptions } from './clerkMiddleware';
 
 /**
  * Re-export resource types from @clerk/backend

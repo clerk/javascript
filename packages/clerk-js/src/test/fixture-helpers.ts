@@ -8,7 +8,6 @@ import type {
   OrganizationEnrollmentMode,
   PhoneNumberJSON,
   PublicUserDataJSON,
-  SamlAccountJSON,
   SessionJSON,
   SignInJSON,
   SignUpJSON,
@@ -44,13 +43,12 @@ export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
 const createUserFixtureHelpers = (baseClient: ClientJSON) => {
   type WithUserParams = Omit<
     Partial<UserJSON>,
-    'email_addresses' | 'phone_numbers' | 'external_accounts' | 'saml_accounts' | 'organization_memberships'
+    'email_addresses' | 'phone_numbers' | 'external_accounts' | 'organization_memberships'
   > & {
     identifier?: string;
     email_addresses?: Array<string | Partial<EmailAddressJSON>>;
     phone_numbers?: Array<string | Partial<PhoneNumberJSON>>;
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
-    saml_accounts?: Array<Partial<SamlAccountJSON>>;
     organization_memberships?: Array<string | OrgParams>;
     tasks?: SessionJSON['tasks'];
   };

@@ -15,7 +15,7 @@ import {
   UserButton as BaseUserButton,
   UserProfile as BaseUserProfile,
   Waitlist as BaseWaitlist,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 import { Platform } from 'react-native';
 
 import { errorThrower } from '../utils/errors';

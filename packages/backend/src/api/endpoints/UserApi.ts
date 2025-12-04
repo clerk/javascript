@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/types';
+import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/shared/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';

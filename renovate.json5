@@ -276,7 +276,7 @@
       groupName: "[DEV] minor & patch dependencies",
       groupSlug: "clerk-expo-dev-minor",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -292,7 +292,7 @@
       groupName: "[DEV] major dependencies",
       groupSlug: "clerk-expo-dev-major",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -306,7 +306,7 @@
       groupName: "minor & patch dependencies",
       groupSlug: "clerk-expo-prod-minor",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -321,7 +321,7 @@
       groupName: "major dependencies",
       groupSlug: "clerk-expo-prod-major",
       matchFileNames: [
-        "packages/clerk-expo/package.json",
+        "packages/expo/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -392,9 +392,9 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "clerk-react-dev-minor",
+      groupSlug: "react-dev-minor",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -404,13 +404,13 @@
         "minor",
       ],
       automerge: true,
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "[DEV] major dependencies",
-      groupSlug: "clerk-react-dev-major",
+      groupSlug: "react-dev-major",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "devDependencies",
@@ -418,13 +418,13 @@
       matchUpdateTypes: [
         "major",
       ],
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "minor & patch dependencies",
-      groupSlug: "clerk-react-prod-minor",
+      groupSlug: "react-prod-minor",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -433,13 +433,13 @@
         "patch",
         "minor",
       ],
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "major dependencies",
-      groupSlug: "clerk-react-prod-major",
+      groupSlug: "react-prod-major",
       matchFileNames: [
-        "packages/clerk-react/package.json",
+        "packages/react/package.json",
       ],
       matchDepTypes: [
         "dependencies",
@@ -447,7 +447,7 @@
       matchUpdateTypes: [
         "major",
       ],
-      semanticCommitScope: "clerk-react",
+      semanticCommitScope: "react",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
@@ -982,65 +982,6 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "remix-dev-minor",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "remix-dev-major",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "remix-prod-minor",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "remix-prod-major",
-      matchFileNames: [
-        "packages/remix/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "remix",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "shared-dev-minor",
       matchFileNames: [
         "packages/shared/package.json",
@@ -1215,124 +1156,6 @@
         "major",
       ],
       semanticCommitScope: "testing",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "themes-dev-minor",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "themes-dev-major",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "themes-prod-minor",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "themes-prod-major",
-      matchFileNames: [
-        "packages/themes/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "themes",
-    },
-    {
-      groupName: "[DEV] minor & patch dependencies",
-      groupSlug: "types-dev-minor",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      automerge: true,
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "[DEV] major dependencies",
-      groupSlug: "types-dev-major",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "devDependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "minor & patch dependencies",
-      groupSlug: "types-prod-minor",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "patch",
-        "minor",
-      ],
-      semanticCommitScope: "types",
-    },
-    {
-      groupName: "major dependencies",
-      groupSlug: "types-prod-major",
-      matchFileNames: [
-        "packages/types/package.json",
-      ],
-      matchDepTypes: [
-        "dependencies",
-      ],
-      matchUpdateTypes: [
-        "major",
-      ],
-      semanticCommitScope: "types",
     },
     {
       groupName: "[DEV] minor & patch dependencies",

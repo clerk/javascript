@@ -26,8 +26,6 @@ import type {
   ResetPasswordPhoneCodeAttempt,
   ResetPasswordPhoneCodeFactor,
   ResetPasswordPhoneCodeFactorConfig,
-  SamlConfig,
-  SamlFactor,
   TOTPAttempt,
   TOTPFactor,
   Web3Attempt,
@@ -53,7 +51,6 @@ import type {
   PhoneCodeStrategy,
   ResetPasswordEmailCodeStrategy,
   ResetPasswordPhoneCodeStrategy,
-  SamlStrategy,
   TicketStrategy,
   TOTPStrategy,
   Web3Strategy,
@@ -83,7 +80,6 @@ export type SignInFirstFactor =
   | ResetPasswordEmailCodeFactor
   | Web3SignatureFactor
   | OauthFactor
-  | SamlFactor
   | EnterpriseSSOFactor;
 
 export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor | EmailLinkFactor;
@@ -106,7 +102,6 @@ export type PrepareFirstFactorParams =
   | ResetPasswordPhoneCodeFactorConfig
   | ResetPasswordEmailCodeFactorConfig
   | OAuthConfig
-  | SamlConfig
   | EnterpriseSSOConfig;
 
 export type AttemptFirstFactorParams =
@@ -124,7 +119,7 @@ export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupC
 
 export type SignInCreateParams = (
   | {
-      strategy: OAuthStrategy | SamlStrategy | EnterpriseSSOStrategy;
+      strategy: OAuthStrategy | EnterpriseSSOStrategy;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;
@@ -195,5 +190,4 @@ export type SignInStrategy =
   | TOTPStrategy
   | BackupCodeStrategy
   | OAuthStrategy
-  | SamlStrategy
   | EnterpriseSSOStrategy;

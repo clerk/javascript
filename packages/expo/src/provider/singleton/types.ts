@@ -4,7 +4,7 @@ import type {
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { TokenCache } from '../../cache/types';
 

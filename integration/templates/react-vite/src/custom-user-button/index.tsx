@@ -1,4 +1,4 @@
-import { UserButton } from '@clerk/clerk-react';
+import { UserButton } from '@clerk/react';
 import { useContext } from 'react';
 import { PageContext, PageContextProvider } from '../PageContext.tsx';
 

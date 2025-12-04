@@ -1,4 +1,0 @@
-{
-  "main": "../dist/token-cache/index.js",
-  "types": "../dist/token-cache/index.d.ts"
-}

@@ -80,7 +80,6 @@ export interface DisplayConfigResource extends ClerkResource {
   theme: DisplayThemeJSON;
   userProfileUrl: string;
   clerkJSVersion?: string;
-  experimental__forceOauthFirst?: boolean;
   organizationProfileUrl: string;
   createOrganizationUrl: string;
   afterLeaveOrganizationUrl: string;

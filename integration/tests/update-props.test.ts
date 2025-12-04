@@ -31,7 +31,7 @@ testAgainstRunningApps({ withPattern: ['react.vite.withEmailCodes'] })('sign in 
     await u.page.waitForFunction(async () => {
       // Emulate ClerkProvider being unmounted and mounted again
       // as updateProps is going to be called without the default options set by window.Clerk.load()
-      await (window.Clerk as any).__unstable__updateProps({ options: {} });
+      await (window.Clerk as any).__internal_updateProps({ options: {} });
     });
     await u.po.signIn.setIdentifier(fakeUser.email);
     await u.po.signIn.continue();

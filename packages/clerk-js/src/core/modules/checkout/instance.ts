@@ -1,12 +1,10 @@
-import type {
-  __experimental_CheckoutCacheState,
-  __experimental_CheckoutInstance,
-  __experimental_CheckoutOptions,
-  SetActiveNavigate,
-} from '@clerk/shared/types';
+import type { __experimental_CheckoutOptions, CheckoutSignalValue } from '@clerk/shared/types';
+
+import { CheckoutFlow, createSignals } from '@/core/resources/BillingCheckout';
 
 import type { Clerk } from '../../clerk';
-import { type CheckoutKey, createCheckoutManager } from './manager';
+
+type CheckoutKey = string & { readonly __tag: 'CheckoutKey' };
 
 /**
  * Generate cache key for checkout instance
@@ -17,71 +15,51 @@ function cacheKey(options: { userId: string; orgId?: string; planId: string; pla
 }
 
 /**
+ * Stores the state of checkout instances based on their configuration as a cache key.
+ */
+const CheckoutSignalCache = new Map<
+  CheckoutKey,
+  { resource: CheckoutFlow; signals: ReturnType<typeof createSignals> }
+>();
+
+/**
  * Create a checkout instance with the given options
  */
-function createCheckoutInstance(
-  clerk: Clerk,
-  options: __experimental_CheckoutOptions,
-): __experimental_CheckoutInstance {
+function createCheckoutInstance(clerk: Clerk, options: __experimental_CheckoutOptions): CheckoutSignalValue {
   const { for: forOrganization, planId, planPeriod } = options;
 
-  if (!clerk.isSignedIn || !clerk.user) {
+  if (clerk.user === null) {
     throw new Error('Clerk: User is not authenticated');
   }
 
-  if (forOrganization === 'organization' && !clerk.organization) {
-    throw new Error('Clerk: Use `setActive` to set the organization');
+  if (forOrganization === 'organization' && clerk.organization === null) {
+    throw new Error(
+      'Clerk: The current session does not have an active organization. Use `setActive` to set the organization',
+    );
   }
 
   const checkoutKey = cacheKey({
-    userId: clerk.user.id,
+    userId: clerk.user?.id || '',
     orgId: forOrganization === 'organization' ? clerk.organization?.id : undefined,
     planId,
     planPeriod,
   });
 
-  const manager = createCheckoutManager(checkoutKey);
+  const checkoutInstance = CheckoutSignalCache.get(checkoutKey);
+  if (checkoutInstance) {
+    return checkoutInstance.signals.computedSignal() as CheckoutSignalValue;
+  }
 
-  const start: __experimental_CheckoutInstance['start'] = async () => {
-    return manager.executeOperation('start', async () => {
-      const result = await clerk.billing?.startCheckout({
-        ...(forOrganization === 'organization' ? { orgId: clerk.organization?.id } : {}),
-        planId,
-        planPeriod,
-      });
-      return result;
-    });
-  };
+  const signals = createSignals();
 
-  const confirm: __experimental_CheckoutInstance['confirm'] = async params => {
-    return manager.executeOperation('confirm', async () => {
-      const checkout = manager.getCacheState().checkout;
-      if (!checkout) {
-        throw new Error('Clerk: Call `start` before `confirm`');
-      }
-      return checkout.confirm(params);
-    });
-  };
+  const checkout = new CheckoutFlow(signals, {
+    ...(forOrganization === 'organization' ? { orgId: clerk.organization?.id } : {}),
+    planId,
+    planPeriod,
+  });
 
-  const finalize = (params?: { navigate?: SetActiveNavigate }) => {
-    const { navigate } = params || {};
-    return clerk.setActive({ session: clerk.session?.id, navigate });
-  };
-
-  const clear = () => manager.clearCheckout();
-
-  const subscribe = (listener: (state: __experimental_CheckoutCacheState) => void) => {
-    return manager.subscribe(listener);
-  };
-
-  return {
-    start,
-    confirm,
-    finalize,
-    clear,
-    subscribe,
-    getState: manager.getCacheState,
-  };
+  CheckoutSignalCache.set(checkoutKey, { resource: checkout, signals });
+  return signals.computedSignal() as CheckoutSignalValue;
 }
 
 export { createCheckoutInstance };

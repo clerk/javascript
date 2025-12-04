@@ -1,4 +1,4 @@
-import { UserAvatar } from '@clerk/clerk-react';
+import { UserAvatar } from '@clerk/react';
 import React from 'react';
 
 export default function UserAvatarPage() {

@@ -5,4 +5,5 @@ export { logErrorInDevMode } from './logErrorInDevMode';
 export { noop } from './noop';
 export * from './runtimeEnvironment';
 export { handleValueOrFn } from './handleValueOrFn';
+export { runIfFunctionOrReturn } from './runIfFunctionOrReturn';
 export { fastDeepMergeAndReplace, fastDeepMergeAndKeep } from './fastDeepMerge';

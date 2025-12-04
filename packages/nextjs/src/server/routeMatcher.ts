@@ -1,5 +1,5 @@
 import { createPathMatcher, type WithPathPatternWildcard } from '@clerk/shared/pathMatcher';
-import type { Autocomplete } from '@clerk/types';
+import type { Autocomplete } from '@clerk/shared/types';
 import type Link from 'next/link';
 import type { NextRequest } from 'next/server';
 

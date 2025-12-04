@@ -6,5 +6,9 @@ export { useDerivedAuth } from './hooks/useAuth';
 export {
   clerkJsScriptUrl,
   buildClerkJsScriptAttributes,
+  clerkUiScriptUrl,
+  buildClerkUiScriptAttributes,
   setClerkJsLoadingErrorPackageName,
 } from '@clerk/shared/loadClerkJsScript';
+
+export type { Ui } from '@clerk/ui/internal';

@@ -1,5 +1,5 @@
 import type { AuthObject } from '@clerk/backend';
-import type { Without } from '@clerk/types';
+import type { Without } from '@clerk/shared/types';
 import { headers } from 'next/headers';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
@@ -14,7 +14,7 @@ import { ClientClerkProvider } from '../client/ClerkProvider';
 import { deleteKeylessAction } from '../keyless-actions';
 
 export async function getKeylessStatus(
-  params: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
+  params: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange'>,
 ) {
   let [shouldRunAsKeyless, runningWithClaimedKeys, locallyStoredPublishableKey] = [false, false, ''];
   if (canUseKeyless) {
@@ -33,7 +33,7 @@ export async function getKeylessStatus(
 }
 
 type KeylessProviderProps = PropsWithChildren<{
-  rest: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>;
+  rest: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange'>;
   runningWithClaimedKeys: boolean;
   generateStatePromise: () => Promise<AuthObject | null>;
   generateNonce: () => Promise<string>;

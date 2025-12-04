@@ -1,5 +1,6 @@
-import type { ClerkProviderProps } from '@clerk/clerk-react';
-import type { InitialState, Without } from '@clerk/types';
+import type { ClerkProviderProps } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
+import type { InitialState, Without } from '@clerk/shared/types';
 import type React from 'react';
 
 export type ClerkState = {
@@ -12,14 +13,13 @@ export type ClerkState = {
     __isSatellite: boolean;
     __signInUrl: string | undefined;
     __signUpUrl: string | undefined;
-    __afterSignInUrl: string | undefined;
-    __afterSignUpUrl: string | undefined;
     __signInForceRedirectUrl: string | undefined;
     __signUpForceRedirectUrl: string | undefined;
     __signInFallbackRedirectUrl: string | undefined;
     __signUpFallbackRedirectUrl: string | undefined;
     __clerk_debug: any;
     __clerkJSUrl: string | undefined;
+    __clerkUiUrl: string | undefined;
     __clerkJSVersion: string | undefined;
     __telemetryDisabled: boolean | undefined;
     __telemetryDebug: boolean | undefined;
@@ -31,7 +31,10 @@ export type WithClerkState<U = any> = {
   clerkState: { __type: 'clerkState' };
 };
 
-export type ReactRouterClerkProviderProps = Without<ClerkProviderProps, 'publishableKey' | 'initialState'> & {
+export type ReactRouterClerkProviderProps<TUi extends Ui = Ui> = Without<
+  ClerkProviderProps<TUi>,
+  'publishableKey' | 'initialState'
+> & {
   /**
    * Used to override the default VITE_CLERK_PUBLISHABLE_KEY env variable if needed.
    * This is optional for React Router (in SSR mode) as the ClerkProvider will automatically use the VITE_CLERK_PUBLISHABLE_KEY env variable if it exists.

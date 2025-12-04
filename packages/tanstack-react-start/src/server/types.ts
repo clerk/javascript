@@ -1,13 +1,12 @@
 import type { VerifyTokenOptions } from '@clerk/backend';
 import type { OrganizationSyncOptions } from '@clerk/backend/internal';
 import type {
-  LegacyRedirectProps,
   MultiDomainAndOrProxy,
   SignInFallbackRedirectUrl,
   SignInForceRedirectUrl,
   SignUpFallbackRedirectUrl,
   SignUpForceRedirectUrl,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export type ClerkMiddlewareOptions = {
   publishableKey?: string;
@@ -22,8 +21,7 @@ export type ClerkMiddlewareOptions = {
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps;
+  SignUpFallbackRedirectUrl;
 
 export type LoaderOptions = ClerkMiddlewareOptions;
 

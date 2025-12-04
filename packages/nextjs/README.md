@@ -31,7 +31,7 @@
 
 ### Prerequisites
 
-- Next.js 13.5.7 or later
+- Next.js 15.2.3 or later
 - React 18 or later
 - Node.js `>=18.17.0` or later
 - An existing Clerk application. [Create your account for free](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=clerk_nextjs).

@@ -172,7 +172,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
 /**
  * > [!WARNING]
  * >
- * > Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.12.7` or later, `@clerk/clerk-react@5.25.1` or later, and `@clerk/clerk-js@5.57.1` or later.
+ * > Depending on the SDK you're using, this feature requires `@clerk/nextjs@6.12.7` or later, `@clerk/react@5.25.1` or later, and `@clerk/clerk-js@5.57.1` or later.
  *
  * The `useReverification()` hook is used to handle a session's reverification flow. If a request requires reverification, a modal will display, prompting the user to verify their credentials. Upon successful verification, the original request will automatically retry.
  *
@@ -188,8 +188,8 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  * In the following example, `myFetcher` would be a function in your backend that fetches data from the route that requires reverification. See the [guide on how to require reverification](https://clerk.com/docs/guides/secure/reverification) for more information.
  *
  * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
- * import { useReverification } from '@clerk/clerk-react'
- * import { isReverificationCancelledError } from '@clerk/clerk-react/error'
+ * import { useReverification } from '@clerk/react'
+ * import { isReverificationCancelledError } from '@clerk/react/error'
  *
  * type MyData = {
  *   balance: number

@@ -8,13 +8,13 @@
     "ios": "expo run:ios",
     "start": "expo start",
     "web": "expo start --web",
-    "yalc:add": "pnpm yalc add @clerk/clerk-expo @clerk/clerk-js @clerk/clerk-react @clerk/types @clerk/shared @clerk/types @clerk/expo-passkeys",
+    "yalc:add": "pnpm yalc add @clerk/expo @clerk/clerk-js @clerk/react @clerk/types @clerk/shared @clerk/types @clerk/expo-passkeys",
     "expo:update": "pnpm expo install --fix"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "file:.yalc/@clerk/clerk-expo",
+    "@clerk/expo": "file:.yalc/@clerk/expo",
     "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/react": "file:.yalc/@clerk/react",
     "@clerk/expo-passkeys": "file:.yalc/@clerk/expo-passkeys",
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",

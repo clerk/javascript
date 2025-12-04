@@ -2,6 +2,9 @@ export const DEV_BROWSER_JWT_KEY = '__clerk_db_jwt';
 export const DEV_BROWSER_JWT_HEADER = 'Clerk-Db-Jwt';
 
 // Sets the dev_browser JWT in the hash or the search
+/**
+ *
+ */
 export function setDevBrowserJWTInURL(url: URL, jwt: string): URL {
   const resultURL = new URL(url);
 

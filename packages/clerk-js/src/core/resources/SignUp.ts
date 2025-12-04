@@ -1,4 +1,6 @@
 import { type ClerkError, ClerkRuntimeError, isCaptchaError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptEmailAddressVerificationParams,
@@ -42,28 +44,16 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkMissingOptionError,
@@ -321,10 +311,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_metamask_signature',
       legalAccepted: params?.legalAccepted,
@@ -336,10 +326,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_coinbase_wallet_signature',
       legalAccepted: params?.legalAccepted,
@@ -351,10 +341,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getBaseIdentifier();
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_base_signature',
       legalAccepted: params?.legalAccepted,
@@ -366,10 +356,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       legalAccepted?: boolean;
     },
   ): Promise<SignUpResource> => {
-    const identifier = await getOKXWalletIdentifier();
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_okx_wallet_signature',
       legalAccepted: params?.legalAccepted,
@@ -416,7 +406,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await SignUp.clerk.__unstable__environment!.reload();
+        await SignUp.clerk.__internal_environment!.reload();
         return authenticateFn();
       }
       throw e;
@@ -466,9 +456,9 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
-        ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
+    if (SignUp.clerk.__internal_environment?.userSettings.passwordSettings) {
+      return createValidatePassword(loadZxcvbn(), {
+        ...SignUp.clerk.__internal_environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -543,7 +533,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
@@ -580,6 +570,7 @@ class SignUpFuture implements SignUpFutureResource {
     verifyPhoneCode: this.verifyPhoneCode.bind(this),
   };
 
+  #hasBeenFinalized = false;
   readonly #resource: SignUp;
 
   constructor(resource: SignUp) {
@@ -682,6 +673,10 @@ class SignUpFuture implements SignUpFutureResource {
     }
 
     return undefined;
+  }
+
+  get hasBeenFinalized() {
+    return this.#hasBeenFinalized;
   }
 
   private async getCaptchaToken(): Promise<{
@@ -852,7 +847,7 @@ class SignUpFuture implements SignUpFutureResource {
       await authenticateFn().catch(async e => {
         if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await SignUp.clerk.__unstable__environment!.reload();
+          await SignUp.clerk.__internal_environment!.reload();
           return authenticateFn();
         }
         throw e;
@@ -881,20 +876,20 @@ class SignUpFuture implements SignUpFutureResource {
       let generateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);
@@ -950,6 +945,7 @@ class SignUpFuture implements SignUpFutureResource {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
+      this.#hasBeenFinalized = true;
       await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
   }

@@ -5,6 +5,7 @@ const path = require('path');
 const { merge } = require('webpack-merge');
 const ReactRefreshPlugin = require('@rspack/plugin-react-refresh');
 const { RsdoctorRspackPlugin } = require('@rsdoctor/rspack-plugin');
+const { svgLoader, typescriptLoaderProd, typescriptLoaderDev } = require('../../scripts/rspack-common');
 
 const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
@@ -120,20 +121,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
             chunks: 'all',
             enforce: true,
           },
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
-          },
           defaultVendors: {
             minChunks: 1,
             test: /[\\/]node_modules[\\/]/,
@@ -153,116 +140,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
     // Disable Rspack's warnings since we use bundlewatch
     ignoreWarnings: [/entrypoint size limit/, /asset size limit/, /Rspack performance recommendations/],
   };
-};
-
-/** @type { () => (import('@rspack/core').RuleSetRule) }  */
-const svgLoader = () => {
-  return {
-    test: /\.svg$/,
-    resolve: {
-      fullySpecified: false,
-    },
-    use: {
-      loader: '@svgr/webpack',
-      options: {
-        svgo: true,
-        svgoConfig: {
-          floatPrecision: 3,
-          transformPrecision: 1,
-          plugins: ['preset-default', 'removeDimensions', 'removeStyleElement'],
-        },
-      },
-    },
-  };
-};
-
-/** @type { (opts?: { targets?: string, useCoreJs?: boolean }) => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderProd = (
-  { targets = packageJSON.browserslist, useCoreJs = false } = { targets: packageJSON.browserslist, useCoreJs: false },
-) => {
-  return [
-    {
-      test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
-      use: {
-        loader: 'builtin:swc-loader',
-        options: {
-          env: {
-            targets,
-            ...(useCoreJs
-              ? {
-                  mode: 'usage',
-                  coreJs: require('core-js/package.json').version,
-                }
-              : {}),
-          },
-          jsc: {
-            parser: {
-              syntax: 'typescript',
-              tsx: true,
-            },
-            externalHelpers: true,
-            transform: {
-              react: {
-                runtime: 'automatic',
-                importSource: '@emotion/react',
-                development: false,
-                refresh: false,
-              },
-            },
-          },
-        },
-      },
-    },
-    {
-      test: /\.m?js$/,
-      exclude: /node_modules[\\/]core-js/,
-      use: {
-        loader: 'builtin:swc-loader',
-        options: {
-          env: {
-            targets,
-            ...(useCoreJs
-              ? {
-                  mode: 'usage',
-                  coreJs: '3.41.0',
-                }
-              : {}),
-          },
-          isModule: 'unknown',
-        },
-      },
-    },
-  ];
-};
-
-/** @type { () => (import('@rspack/core').RuleSetRule[]) } */
-const typescriptLoaderDev = () => {
-  return [
-    {
-      test: /\.(jsx?|tsx?)$/,
-      exclude: /node_modules/,
-      loader: 'builtin:swc-loader',
-      options: {
-        jsc: {
-          target: 'esnext',
-          parser: {
-            syntax: 'typescript',
-            tsx: true,
-          },
-          externalHelpers: true,
-          transform: {
-            react: {
-              runtime: 'automatic',
-              importSource: '@emotion/react',
-              development: true,
-              refresh: true,
-            },
-          },
-        },
-      },
-    },
-  ];
 };
 
 /**
@@ -608,7 +485,7 @@ const devConfig = ({ mode, env }) => {
       cache: true,
       experiments: {
         cache: {
-          type: 'persistent',
+          type: 'memory',
         },
       },
     };

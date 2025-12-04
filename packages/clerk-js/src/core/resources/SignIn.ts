@@ -1,5 +1,13 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
+import { createValidatePassword } from '@clerk/shared/internal/clerk-js/passwords/password';
+import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
+import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { Poller } from '@clerk/shared/poller';
 import type {
   AttemptFirstFactorParams,
@@ -24,7 +32,6 @@ import type {
   ResetPasswordEmailCodeFactorConfig,
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
-  SamlConfig,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureBackupCodeVerifyParams,
@@ -64,31 +71,14 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  generateSignatureWithBase,
-  generateSignatureWithCoinbaseWallet,
-  generateSignatureWithMetamask,
-  generateSignatureWithOKXWallet,
-  getBaseIdentifier,
-  getBrowserLocale,
-  getClerkQueryParam,
-  getCoinbaseWalletIdentifier,
-  getMetamaskIdentifier,
-  getOKXWalletIdentifier,
-  windowNavigate,
-} from '../../utils';
+import { getBrowserLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
   wrapWithPopupRoutes,
 } from '../../utils/authenticateWithPopup';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '../../utils/passkeys';
-import { createValidatePassword } from '../../utils/passwords/password';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
   clerkInvalidStrategy,
@@ -220,12 +210,6 @@ export class SignIn extends BaseResource implements SignInResource {
       case 'reset_password_email_code':
         config = { emailAddressId: params.emailAddressId } as ResetPasswordEmailCodeFactorConfig;
         break;
-      case 'saml':
-        config = {
-          redirectUrl: params.redirectUrl,
-          actionCompleteRedirectUrl: params.actionCompleteRedirectUrl,
-        } as SamlConfig;
-        break;
       case 'enterprise_sso':
         config = {
           redirectUrl: params.redirectUrl,
@@ -345,7 +329,7 @@ export class SignIn extends BaseResource implements SignInResource {
       });
     }
 
-    if (strategy === 'saml' || strategy === 'enterprise_sso') {
+    if (strategy === 'enterprise_sso') {
       await this.prepareFirstFactor({
         strategy,
         redirectUrl,
@@ -425,37 +409,37 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   public authenticateWithMetamask = async (): Promise<SignInResource> => {
-    const identifier = await getMetamaskIdentifier();
+    const identifier = await web3().getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithMetamask,
+      generateSignature: web3().generateSignatureWithMetamask,
       strategy: 'web3_metamask_signature',
     });
   };
 
   public authenticateWithCoinbaseWallet = async (): Promise<SignInResource> => {
-    const identifier = await getCoinbaseWalletIdentifier();
+    const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithCoinbaseWallet,
+      generateSignature: web3().generateSignatureWithCoinbaseWallet,
       strategy: 'web3_coinbase_wallet_signature',
     });
   };
 
   public authenticateWithBase = async (): Promise<SignInResource> => {
-    const identifier = await getBaseIdentifier();
+    const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithBase,
+      generateSignature: web3().generateSignatureWithBase,
       strategy: 'web3_base_signature',
     });
   };
 
   public authenticateWithOKXWallet = async (): Promise<SignInResource> => {
-    const identifier = await getOKXWalletIdentifier();
+    const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: generateSignatureWithOKXWallet,
+      generateSignature: web3().generateSignatureWithOKXWallet,
       strategy: 'web3_okx_wallet_signature',
     });
   };
@@ -530,9 +514,9 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignIn.clerk.__unstable__environment?.userSettings.passwordSettings) {
-      return createValidatePassword({
-        ...SignIn.clerk.__unstable__environment?.userSettings.passwordSettings,
+    if (SignIn.clerk.__internal_environment?.userSettings.passwordSettings) {
+      return createValidatePassword(loadZxcvbn(), {
+        ...SignIn.clerk.__internal_environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -631,6 +615,7 @@ class SignInFuture implements SignInFutureResource {
     verifyBackupCode: this.verifyBackupCode.bind(this),
   };
 
+  #hasBeenFinalized = false;
   readonly #resource: SignIn;
 
   constructor(resource: SignIn) {
@@ -688,6 +673,10 @@ class SignInFuture implements SignInFutureResource {
 
   get secondFactorVerification() {
     return this.#resource.secondFactorVerification;
+  }
+
+  get hasBeenFinalized() {
+    return this.#hasBeenFinalized;
   }
 
   async sendResetPasswordEmailCode(): Promise<{ error: ClerkError | null }> {
@@ -975,20 +964,20 @@ class SignInFuture implements SignInFutureResource {
       let generateSignature;
       switch (provider) {
         case 'metamask':
-          identifier = await getMetamaskIdentifier();
-          generateSignature = generateSignatureWithMetamask;
+          identifier = await web3().getMetamaskIdentifier();
+          generateSignature = web3().generateSignatureWithMetamask;
           break;
         case 'coinbase_wallet':
-          identifier = await getCoinbaseWalletIdentifier();
-          generateSignature = generateSignatureWithCoinbaseWallet;
+          identifier = await web3().getCoinbaseWalletIdentifier();
+          generateSignature = web3().generateSignatureWithCoinbaseWallet;
           break;
         case 'base':
-          identifier = await getBaseIdentifier();
-          generateSignature = generateSignatureWithBase;
+          identifier = await web3().getBaseIdentifier();
+          generateSignature = web3().generateSignatureWithBase;
           break;
         case 'okx_wallet':
-          identifier = await getOKXWalletIdentifier();
-          generateSignature = generateSignatureWithOKXWallet;
+          identifier = await web3().getOKXWalletIdentifier();
+          generateSignature = web3().generateSignatureWithOKXWallet;
           break;
         default:
           throw new Error(`Unsupported Web3 provider: ${provider}`);
@@ -1167,9 +1156,13 @@ class SignInFuture implements SignInFutureResource {
     }
 
     return runAsyncResourceTask(this.#resource, async () => {
-      // Reload the client to prevent an issue where the created session is not picked up.
-      await SignIn.clerk.client?.reload();
+      // Reload the client if the created session is not in the client's sessions. This can happen during modal SSO
+      // flows where the in-memory client does not have the created session.
+      if (SignIn.clerk.client && !SignIn.clerk.client.sessions.some(s => s.id === this.#resource.createdSessionId)) {
+        await SignIn.clerk.client.reload();
+      }
 
+      this.#hasBeenFinalized = true;
       await SignIn.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
   }

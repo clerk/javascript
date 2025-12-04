@@ -19,6 +19,7 @@ declare global {
 
 /**
  * The `OrganizationInvitation` object is the model around an organization invitation.
+ *
  * @interface
  */
 export interface UserOrganizationInvitationResource extends ClerkResource {

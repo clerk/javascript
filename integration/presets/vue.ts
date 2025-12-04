@@ -11,7 +11,7 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
-  .addDependency('@clerk/vue', constants.E2E_CLERK_VERSION || linkPackage('vue'))
+  .addDependency('@clerk/vue', constants.E2E_CLERK_JS_VERSION || linkPackage('vue'))
   .addDependency('@clerk/localizations', linkPackage('localizations'));
 
 export const vue = {

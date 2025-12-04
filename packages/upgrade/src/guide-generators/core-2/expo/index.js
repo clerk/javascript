@@ -13,7 +13,7 @@ const version = 'core-2';
 const semverVersion = 'v1';
 const name = 'expo';
 const properName = 'Expo';
-const packageName = '@clerk/clerk-expo';
+const packageName = '@clerk/expo';
 const cwd = `${version}/${name}`;
 
 async function generate() {
@@ -42,4 +42,4 @@ async function generate() {
   ]);
 }
 
-generate().then(writeToFile(cwd));
+void generate().then(writeToFile(cwd));

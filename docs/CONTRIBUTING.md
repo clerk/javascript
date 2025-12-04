@@ -44,8 +44,7 @@ All packages of the monorepo are inside [packages](../packages). For package spe
 
 - [`@clerk/backend`](../packages/backend): Functionalities regarded as "core" for Clerk to operate with. _Authentication resolution, API Resources etc._
 - [`@clerk/clerk-js`](../packages/clerk-js): Core JavaScript implementation used by Clerk in the browser.
-- [`@clerk/clerk-react`](../packages/react) Clerk package for React applications.
-- [`@clerk/types`](../packages/types): Main TypeScript typings for Clerk libraries.
+- [`@clerk/react`](../packages/react) Clerk package for React applications.
 - Browse [packages](../packages) to see more
 
 Additionally there are packages which act as shared utilities or building blocks.
@@ -186,15 +185,19 @@ To review your changes locally, you can run `pnpm run typedoc:generate` to gener
 
 Create a PR that includes your changes to any Typedoc comments. Once the PR has been merged and a release is published, a PR will [automatically](https://github.com/clerk/clerk-docs/blob/main/.github/workflows/typedoc.yml) be opened in `clerk-docs` to merge in the Typedoc changes.
 
-Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` component. For example, if you updated Typedoc comments for the `useAuth()` hook in `clerk/javascript`, you'll need to make sure that in `clerk-docs`, in the `/hooks/use-auth.mdx` file, there's a `<Typedoc />` component linked to the `./clerk-typedoc/clerk-react/use-auth.mdx` file, like:
+Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` component. For example, if you updated Typedoc comments for the `useAuth()` hook in `clerk/javascript`, you'll need to make sure that in `clerk-docs`, in the `/hooks/use-auth.mdx` file, there's a `<Typedoc />` component linked to the `./clerk-typedoc/react/use-auth.mdx` file, like:
 
 ```mdx
-<Typedoc src='clerk-react/use-auth' />
+<Typedoc src='react/use-auth' />
 ```
 
 Read more about this in the [`clerk-docs` CONTRIBUTING.md](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#typedoc-).
 
 Then, to preview how the `<Typedoc />` component renders, the `clerk-docs` PR will have a Vercel preview. Or to get local previews set up, see the [section in `clerk/clerk` about setting up local docs](https://github.com/clerk/clerk?tab=readme-ov-file#5-optional-set-up-local-docs).
+
+### Experimental and internal APIs
+
+In some cases, we might need to add new methods to our publicly exposed APIs that are meant for internal use, or as experimental releases before the APIs are stabilized. For internal methods or properties, use the `__internal_` prefix. For experimental methods or properties that are attached to existing APIs, use the `__experimental_` prefix. For new exports, it is also acceptable to export from an `/experimental` subpath. Exports from `/experimental` are not covered by regular SemVer guarantees.
 
 ## Opening a Pull Request
 

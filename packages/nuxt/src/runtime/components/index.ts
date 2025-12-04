@@ -1,14 +1,9 @@
+export { SignIn, SignUp, UserProfile, OrganizationProfile, CreateOrganization, OrganizationList } from './uiComponents';
+
 export {
-  // UI components
-  SignUp,
-  SignIn,
-  UserProfile,
   UserAvatar,
   UserButton,
   OrganizationSwitcher,
-  OrganizationProfile,
-  CreateOrganization,
-  OrganizationList,
   GoogleOneTap,
   Waitlist,
   // Control components
@@ -30,5 +25,4 @@ export {
   SignOutButton,
   SignInWithMetamaskButton,
   PricingTable,
-  APIKeys,
 } from '@clerk/vue';

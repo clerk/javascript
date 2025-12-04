@@ -6,7 +6,7 @@
     </picture>
   </a>
   <br />
-  <h1 align="center">@clerk/clerk-expo</h1>
+  <h1 align="center">@clerk/expo</h1>
 </p>
 
 <div align="center">
@@ -61,9 +61,9 @@ We're open to all community contributions! If you'd like to contribute in any wa
 
 ## Security
 
-`@clerk/clerk-expo` follows good practices of security, but 100% security cannot be assured.
+`@clerk/expo` follows good practices of security, but 100% security cannot be assured.
 
-`@clerk/clerk-expo` is provided **"as is"** without any **warranty**. Use at your own risk.
+`@clerk/expo` is provided **"as is"** without any **warranty**. Use at your own risk.
 
 _For more information and to report security issues, please refer to our [security documentation](https://github.com/clerk/javascript/blob/main/docs/SECURITY.md)._
 

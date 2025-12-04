@@ -10,7 +10,7 @@ const expoWeb = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/clerk-expo', linkPackage('expo'));
+  .addDependency('@clerk/expo', linkPackage('expo'));
 
 export const expo = {
   expoWeb,

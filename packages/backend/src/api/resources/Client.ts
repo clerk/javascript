@@ -1,4 +1,4 @@
-import type { LastAuthenticationStrategy } from '@clerk/types';
+import type { LastAuthenticationStrategy } from '@clerk/shared/types';
 
 import type { ClientJSON } from './JSON';
 import { Session } from './Session';

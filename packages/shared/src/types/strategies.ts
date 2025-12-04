@@ -18,8 +18,3 @@ export type EnterpriseSSOStrategy = 'enterprise_sso';
 
 export type OAuthStrategy = `oauth_${OAuthProvider}` | CustomOAuthStrategy;
 export type Web3Strategy = `web3_${Web3Provider}_signature`;
-
-/**
- * @deprecated Use `EnterpriseSSOStrategy` instead.
- */
-export type SamlStrategy = 'saml';

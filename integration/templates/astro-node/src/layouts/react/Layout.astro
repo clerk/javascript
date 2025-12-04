@@ -80,10 +80,7 @@ import { LanguagePicker } from '../../components/LanguagePicker';
             <LanguagePicker client:idle />
 
             <SignedIn client:load>
-              <UserButton
-                client:load
-                afterSignOutUrl='/'
-              />
+              <UserButton client:load />
             </SignedIn>
 
             <SignedOut client:load>

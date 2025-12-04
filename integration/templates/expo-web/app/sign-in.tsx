@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { SignIn } from '@clerk/clerk-expo/web';
+import { SignIn } from '@clerk/expo/web';
 
 export default function Index() {
   return (

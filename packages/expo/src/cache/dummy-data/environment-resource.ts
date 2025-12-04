@@ -1,4 +1,4 @@
-import type { EnvironmentJSONSnapshot } from '@clerk/types';
+import type { EnvironmentJSONSnapshot } from '@clerk/shared/types';
 
 export const DUMMY_CLERK_ENVIRONMENT_RESOURCE = {
   object: 'environment',

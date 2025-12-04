@@ -116,11 +116,11 @@ const useLoadedIsomorphicClerk = (options: IsomorphicClerkOptions) => {
   const [clerkStatus, setClerkStatus] = React.useState(isomorphicClerkRef.current.status);
 
   React.useEffect(() => {
-    void isomorphicClerkRef.current.__unstable__updateProps({ appearance: options.appearance });
+    void isomorphicClerkRef.current.__internal_updateProps({ appearance: options.appearance });
   }, [options.appearance]);
 
   React.useEffect(() => {
-    void isomorphicClerkRef.current.__unstable__updateProps({ options });
+    void isomorphicClerkRef.current.__internal_updateProps({ options });
   }, [options.localization]);
 
   React.useEffect(() => {

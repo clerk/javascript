@@ -1,4 +1,4 @@
-import type { AttributeMappingJSON, SamlAccountConnectionJSON, SamlConnectionJSON } from './JSON';
+import type { AttributeMappingJSON, SamlConnectionJSON } from './JSON';
 
 /**
  * The Backend `SamlConnection` object holds information about a SAML connection for an organization.
@@ -113,35 +113,6 @@ export class SamlConnection {
       data.created_at,
       data.updated_at,
       data.attribute_mapping && AttributeMapping.fromJSON(data.attribute_mapping),
-    );
-  }
-}
-
-export class SamlAccountConnection {
-  constructor(
-    readonly id: string,
-    readonly name: string,
-    readonly domain: string,
-    readonly active: boolean,
-    readonly provider: string,
-    readonly syncUserAttributes: boolean,
-    readonly allowSubdomains: boolean,
-    readonly allowIdpInitiated: boolean,
-    readonly createdAt: number,
-    readonly updatedAt: number,
-  ) {}
-  static fromJSON(data: SamlAccountConnectionJSON): SamlAccountConnection {
-    return new SamlAccountConnection(
-      data.id,
-      data.name,
-      data.domain,
-      data.active,
-      data.provider,
-      data.sync_user_attributes,
-      data.allow_subdomains,
-      data.allow_idp_initiated,
-      data.created_at,
-      data.updated_at,
     );
   }
 }

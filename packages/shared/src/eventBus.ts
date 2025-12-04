@@ -149,6 +149,7 @@ const _off: InternalOff = (eventToHandlersMap, event, handler) => {
  * Creates a strongly-typed event bus that enables publish/subscribe communication between components.
  *
  * @template Events - A record type that maps event names to their payload types
+ *
  * @returns An EventBus instance with the following methods:
  * - `on`: Subscribe to an event
  * - `onPreDispatch`: Subscribe to an event, triggered before regular subscribers

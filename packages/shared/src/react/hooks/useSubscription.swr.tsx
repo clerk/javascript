@@ -27,8 +27,8 @@ export function useSubscription(params?: UseSubscriptionParams): SubscriptionRes
   const user = useUserContext();
   const { organization } = useOrganizationContext();
 
-  // @ts-expect-error `__unstable__environment` is not typed
-  const environment = clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  // @ts-expect-error `__internal_environment` is not typed
+  const environment = clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
 
   clerk.telemetry?.record(eventMethodCalled(hookName));
 

@@ -1,5 +1,5 @@
 import { createClerkClient } from '@clerk/backend';
-import type { Clerk, SignOutOptions } from '@clerk/types';
+import type { Clerk, SignOutOptions } from '@clerk/shared/types';
 import type { Page } from '@playwright/test';
 
 import type { ClerkSignInParams, SetupClerkTestingTokenOptions } from '../common';

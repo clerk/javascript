@@ -71,3 +71,37 @@ runs:
         pnpm config set $(echo ${{ inputs.registry }} | sed -E 's/https?://')/:_authToken secretToken
         # Verify proxy is working by trying to fetch a known package
         pnpm view semver > /dev/null 2>&1 || echo "Warning: Could not fetch semver package, proxy might not be working"
+
+    - name: Print published Clerk package versions
+      shell: bash
+      run: |
+        echo "Published @clerk packages under 'integration' tag:"
+        echo "=================================================="
+        packages=(
+          "@clerk/agent-toolkit"
+          "@clerk/astro"
+          "@clerk/backend"
+          "@clerk/chrome-extension"
+          "@clerk/clerk-js"
+          "@clerk/dev-cli"
+          "@clerk/expo"
+          "@clerk/expo-passkeys"
+          "@clerk/express"
+          "@clerk/fastify"
+          "@clerk/localizations"
+          "@clerk/nextjs"
+          "@clerk/nuxt"
+          "@clerk/react"
+          "@clerk/react-router"
+          "@clerk/shared"
+          "@clerk/tanstack-react-start"
+          "@clerk/testing"
+          "@clerk/types"
+          "@clerk/ui"
+          "@clerk/upgrade"
+          "@clerk/vue"
+        )
+        for pkg in "${packages[@]}"; do
+          version=$(pnpm view "$pkg@integration" version 2>/dev/null || echo "not found")
+          printf "%-35s %s\n" "$pkg@integration:" "$version"
+        done

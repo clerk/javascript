@@ -1,5 +1,11 @@
-import { loadClerkJsScript, setClerkJsLoadingErrorPackageName } from '@clerk/shared/loadClerkJsScript';
-import type { ClerkOptions } from '@clerk/types';
+import {
+  loadClerkJsScript,
+  loadClerkUiScript,
+  setClerkJsLoadingErrorPackageName,
+} from '@clerk/shared/loadClerkJsScript';
+import type { ClerkOptions } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Ui } from '@clerk/ui/internal';
 
 import { $clerkStore } from '../stores/external';
 import { $clerk, $csrState } from '../stores/internal';
@@ -29,10 +35,24 @@ function createNavigationHandler(
  */
 const createClerkInstance = runOnce(createClerkInstanceInternal);
 
-async function createClerkInstanceInternal(options?: AstroClerkCreateInstanceParams) {
+async function createClerkInstanceInternal<TUi extends Ui = Ui>(options?: AstroClerkCreateInstanceParams<TUi>) {
   let clerkJSInstance = window.Clerk;
+  let clerkUiCtor: Promise<ClerkUiConstructor> | undefined;
+
   if (!clerkJSInstance) {
-    await loadClerkJsScript(options);
+    // Load both clerk-js and clerk-ui in parallel
+    const clerkPromise = loadClerkJsScript(options);
+    clerkUiCtor = options?.clerkUiCtor
+      ? Promise.resolve(options.clerkUiCtor)
+      : loadClerkUiScript(options).then(() => {
+          if (!window.__internal_ClerkUiCtor) {
+            throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+          }
+          // After the check, TypeScript knows it's defined
+          return window.__internal_ClerkUiCtor;
+        });
+
+    await clerkPromise;
 
     if (!window.Clerk) {
       throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
@@ -44,14 +64,18 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
     $clerk.set(clerkJSInstance);
   }
 
-  initOptions = {
+  const clerkOptions = {
     routerPush: createNavigationHandler(window.history.pushState.bind(window.history)),
     routerReplace: createNavigationHandler(window.history.replaceState.bind(window.history)),
     ...options,
-  };
+    // Pass the clerk-ui constructor promise to clerk.load()
+    clerkUiCtor,
+  } as unknown as ClerkOptions;
+
+  initOptions = clerkOptions;
 
   return clerkJSInstance
-    .load(initOptions)
+    .load(clerkOptions)
     .then(() => {
       $csrState.setKey('isLoaded', true);
       // Notify subscribers that $clerkStore has been loaded.
@@ -73,16 +97,17 @@ async function createClerkInstanceInternal(options?: AstroClerkCreateInstancePar
     .catch(() => {});
 }
 
-function updateClerkOptions(options: AstroClerkUpdateOptions) {
+function updateClerkOptions<TUi extends Ui = Ui>(options: AstroClerkUpdateOptions<TUi>) {
   const clerk = $clerk.get();
   if (!clerk) {
     throw new Error('Missing clerk instance');
   }
-  // `__unstable__updateProps` is not exposed as public API from `@clerk/types`
-  void (clerk as any).__unstable__updateProps({
+  const updateOptions = {
     options: { ...initOptions, ...options },
     appearance: { ...initOptions?.appearance, ...options.appearance },
-  });
+  } as unknown as { options: ClerkOptions; appearance?: any };
+  // `__internal_updateProps` is not exposed as public API from `@clerk/types`
+  void (clerk as any).__internal_updateProps(updateOptions);
 }
 
 export { createClerkInstance, updateClerkOptions };

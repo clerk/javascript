@@ -1,4 +1,4 @@
-import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 
 import type { BuildClerkOptions } from './types';
 

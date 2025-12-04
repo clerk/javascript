@@ -1,4 +1,4 @@
-import { SignedIn } from '@clerk/clerk-react';
+import { SignedIn } from '@clerk/react';
 
 export default function Page() {
   return (

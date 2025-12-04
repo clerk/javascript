@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
-import { SignedIn, SignedOut } from '@clerk/clerk-expo';
-import { UserButton } from '@clerk/clerk-expo/web';
+import { SignedIn, SignedOut } from '@clerk/expo';
+import { UserButton } from '@clerk/expo/web';
 
 export default function Index() {
   return (

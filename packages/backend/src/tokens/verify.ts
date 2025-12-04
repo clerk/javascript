@@ -1,6 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Simplify } from '@clerk/shared/types';
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload, Simplify } from '@clerk/shared/types';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';

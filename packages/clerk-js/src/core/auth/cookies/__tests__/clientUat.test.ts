@@ -1,15 +1,15 @@
 import { createCookieHandler } from '@clerk/shared/cookie';
 import { addYears } from '@clerk/shared/date';
+import { inCrossOriginIframe } from '@clerk/shared/internal/clerk-js/runtime';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { inCrossOriginIframe } from '../../../../utils';
 import { getCookieDomain } from '../../getCookieDomain';
 import { getSecureAttribute } from '../../getSecureAttribute';
 import { createClientUatCookie } from '../clientUat';
 
 vi.mock('@clerk/shared/cookie');
 vi.mock('@clerk/shared/date');
-vi.mock('../../../../utils');
+vi.mock('@clerk/shared/internal/clerk-js/runtime');
 vi.mock('../../getCookieDomain');
 vi.mock('../../getSecureAttribute');
 

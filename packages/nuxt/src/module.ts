@@ -1,4 +1,4 @@
-import type { Without } from '@clerk/types';
+import type { Without } from '@clerk/shared/types';
 import type { PluginOptions } from '@clerk/vue';
 import {
   addComponent,
@@ -65,6 +65,7 @@ export default defineNuxtModule<ModuleOptions>({
           signUpUrl: options.signUpUrl,
           domain: options.domain,
           clerkJSUrl: options.clerkJSUrl,
+          clerkUiUrl: options.clerkUiUrl,
           clerkJSVariant: options.clerkJSVariant,
           clerkJSVersion: options.clerkJSVersion,
           isSatellite: options.isSatellite,
@@ -110,12 +111,11 @@ export default defineNuxtModule<ModuleOptions>({
     addTypeTemplate(
       {
         filename: 'types/clerk.d.ts',
-        getContents: () => `import type { SessionAuthObject } from '@clerk/backend';
-          import type { AuthFn } from '@clerk/nuxt/server';
+        getContents: () => `import type { AuthFn } from '@clerk/nuxt/server';
 
           declare module 'h3' {
             interface H3EventContext {
-              auth: SessionAuthObject & AuthFn;
+              auth: AuthFn;
             }
           }
         `,
@@ -136,11 +136,28 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    const components: Array<keyof typeof import('@clerk/vue')> = [
-      // Authentication Components
+    // Components that use path-based routing (wrapped components)
+    const wrappedComponents = [
       'SignIn',
       'SignUp',
+      'UserProfile',
+      'OrganizationProfile',
+      'CreateOrganization',
+      'OrganizationList',
+    ] as const;
+
+    wrappedComponents.forEach(component => {
+      void addComponent({
+        name: component,
+        export: component,
+        filePath: resolver.resolve('./runtime/components'),
+      });
+    });
+
+    // Other components exported directly from @clerk/vue
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    const otherComponents: Array<keyof typeof import('@clerk/vue')> = [
+      // Authentication Components
       'GoogleOneTap',
       // Unstyled Components
       'SignInButton',
@@ -149,12 +166,8 @@ export default defineNuxtModule<ModuleOptions>({
       'SignInWithMetamaskButton',
       // User Components
       'UserButton',
-      'UserProfile',
       // Organization Components
-      'CreateOrganization',
-      'OrganizationProfile',
       'OrganizationSwitcher',
-      'OrganizationList',
       // Billing Components
       'PricingTable',
       // Control Components
@@ -169,10 +182,8 @@ export default defineNuxtModule<ModuleOptions>({
       'SignedIn',
       'SignedOut',
       'Waitlist',
-      // API Keys Components
-      'APIKeys',
     ];
-    components.forEach(component => {
+    otherComponents.forEach(component => {
       void addComponent({
         name: component,
         export: component,

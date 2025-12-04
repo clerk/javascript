@@ -1,4 +1,5 @@
-import { ClerkProvider as ReactClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import React from 'react';
 
 import {
@@ -11,7 +12,7 @@ import { ClerkReactRouterOptionsProvider } from './ReactRouterOptionsContext';
 import type { ClerkState, ReactRouterClerkProviderProps } from './types';
 import { useAwaitableNavigate } from './useAwaitableNavigate';
 
-export * from '@clerk/clerk-react';
+export * from '@clerk/react';
 
 const SDK_METADATA = {
   name: PACKAGE_NAME,
@@ -28,11 +29,11 @@ const awaitableNavigateRef: { current: ReturnType<typeof useAwaitableNavigate> |
  * Internal type that includes the initial state prop that is passed to the ClerkProvider during SSR.
  * This is a value that we pass automatically so it does not need to pollute the public API.
  */
-type ClerkProviderPropsWithState = ReactRouterClerkProviderProps & {
+type ClerkProviderPropsWithState<TUi extends Ui = Ui> = ReactRouterClerkProviderProps<TUi> & {
   clerkState?: ClerkState;
 };
 
-function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
+function ClerkProviderBase<TUi extends Ui = Ui>({ children, ...rest }: ClerkProviderPropsWithState<TUi>) {
   const awaitableNavigate = useAwaitableNavigate();
   const isSpaMode = _isSpaMode();
 
@@ -56,13 +57,12 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
     __clerk_debug,
     __signInUrl,
     __signUpUrl,
-    __afterSignInUrl,
-    __afterSignUpUrl,
     __signInForceRedirectUrl,
     __signUpForceRedirectUrl,
     __signInFallbackRedirectUrl,
     __signUpFallbackRedirectUrl,
     __clerkJSUrl,
+    __clerkUiUrl,
     __clerkJSVersion,
     __telemetryDisabled,
     __telemetryDebug,
@@ -85,13 +85,12 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
     isSatellite: __isSatellite,
     signInUrl: __signInUrl,
     signUpUrl: __signUpUrl,
-    afterSignInUrl: __afterSignInUrl,
-    afterSignUpUrl: __afterSignUpUrl,
     signInForceRedirectUrl: __signInForceRedirectUrl,
     signUpForceRedirectUrl: __signUpForceRedirectUrl,
     signInFallbackRedirectUrl: __signInFallbackRedirectUrl,
     signUpFallbackRedirectUrl: __signUpFallbackRedirectUrl,
     clerkJSUrl: __clerkJSUrl,
+    clerkUiUrl: __clerkUiUrl,
     clerkJSVersion: __clerkJSVersion,
     telemetry: {
       disabled: __telemetryDisabled,
@@ -115,16 +114,16 @@ function ClerkProviderBase({ children, ...rest }: ClerkProviderPropsWithState) {
   );
 }
 
-type ClerkReactRouterOptions = Partial<
-  Omit<ReactRouterClerkProviderProps, 'routerPush' | 'routerReplace' | 'clerkState'>
+type ClerkReactRouterOptions<TUi extends Ui = Ui> = Partial<
+  Omit<ReactRouterClerkProviderProps<TUi>, 'routerPush' | 'routerReplace' | 'clerkState'>
 >;
 
 // TODO: Remove "any" on loaderData type and use Route.ComponentProps from userland code
-type ClerkProviderProps = ClerkReactRouterOptions & {
+type ClerkProviderProps<TUi extends Ui = Ui> = ClerkReactRouterOptions<TUi> & {
   loaderData?: any;
 };
 
-export const ClerkProvider = ({ children, loaderData, ...opts }: ClerkProviderProps) => {
+export const ClerkProvider = <TUi extends Ui = Ui>({ children, loaderData, ...opts }: ClerkProviderProps<TUi>) => {
   let clerkState;
   const isSpaMode = _isSpaMode();
 

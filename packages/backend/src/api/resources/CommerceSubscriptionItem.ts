@@ -1,4 +1,4 @@
-import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/types';
+import type { BillingMoneyAmount, BillingMoneyAmountJSON } from '@clerk/shared/types';
 
 import { BillingPlan } from './CommercePlan';
 import type { BillingSubscriptionItemJSON } from './JSON';

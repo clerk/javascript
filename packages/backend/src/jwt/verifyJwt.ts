@@ -1,4 +1,4 @@
-import type { Jwt, JwtPayload } from '@clerk/types';
+import type { Jwt, JwtPayload } from '@clerk/shared/types';
 
 import { TokenVerificationError, TokenVerificationErrorAction, TokenVerificationErrorReason } from '../errors';
 import { runtime } from '../runtime';

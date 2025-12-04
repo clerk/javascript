@@ -32,6 +32,12 @@ type StateFile = Partial<{
    * The PID is used to teardown the http-server after the tests are done.
    */
   clerkJsHttpServerPid: number;
+  /**
+   * This prop describes the pid of the http server that serves the clerk-ui hotloaded lib.
+   * The http-server replaces the production clerk-ui delivery mechanism.
+   * The PID is used to teardown the http-server after the tests are done.
+   */
+  clerkUiHttpServerPid: number;
 }>;
 
 const createStateFile = () => {
@@ -83,6 +89,16 @@ const createStateFile = () => {
     return read().clerkJsHttpServerPid;
   };
 
+  const setClerkUiHttpServerPid = (pid: number) => {
+    const json = read();
+    json.clerkUiHttpServerPid = pid;
+    write(json);
+  };
+
+  const getClerkUiHttpServerPid = () => {
+    return read().clerkUiHttpServerPid;
+  };
+
   const debug = () => {
     const json = read();
     console.log('state file', JSON.stringify(json, null, 2));
@@ -94,6 +110,8 @@ const createStateFile = () => {
     getStandAloneApp,
     setClerkJsHttpServerPid,
     getClerkJsHttpServerPid,
+    setClerkUiHttpServerPid,
+    getClerkUiHttpServerPid,
     addLongRunningApp,
     getLongRunningApps,
     debug,

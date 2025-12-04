@@ -3,7 +3,7 @@ import { assembleContent, frontmatter, markdown, writeToFile } from '../../text-
 const cwd = 'core-2/overview';
 
 async function generate() {
-  return assembleContent({ data: {}, cwd }, [
+  return await assembleContent({ data: {}, cwd }, [
     frontmatter({
       title: `Upgrading to Clerk Core 2`,
       description: `Learn how to upgrade to the latest version of Clerk's SDKs`,
@@ -12,4 +12,4 @@ async function generate() {
   ]);
 }
 
-generate().then(writeToFile(cwd));
+void generate().then(writeToFile(cwd));

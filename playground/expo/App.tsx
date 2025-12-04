@@ -1,5 +1,5 @@
-import { ClerkProvider, SignedIn, SignedOut, useAuth, useSignIn, useUser } from '@clerk/clerk-expo';
-import { passkeys } from '@clerk/clerk-expo/passkeys';
+import { ClerkProvider, SignedIn, SignedOut, useAuth, useSignIn, useUser } from '@clerk/expo';
+import { passkeys } from '@clerk/expo/passkeys';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
