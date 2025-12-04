@@ -6,7 +6,7 @@ import { run } from 'jscodeshift/src/Runner.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export async function runCodemod(transform = 'transform-async-request', glob, options) {
+export async function runCodemod(transform = 'transform-async-request', glob, options = {}) {
   if (!transform) {
     throw new Error('No transform provided');
   }
@@ -34,10 +34,19 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
     ],
   });
 
-  return await run(resolvedPath, paths ?? [], {
+  const clerkUpgradeStats = options.clerkUpgradeStats ?? {};
+
+  const result = await run(resolvedPath, paths ?? [], {
     dry: false,
     ...options,
+    // expose a mutable stats bag so individual transforms can record structured information
+    clerkUpgradeStats,
     // we must silence stdout to prevent output from interfering with ink CLI
     silent: true,
   });
+
+  return {
+    ...result,
+    clerkUpgradeStats,
+  };
 }

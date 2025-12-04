@@ -15,7 +15,7 @@ const COMPONENTS_WITH_USER_BUTTON_REMOVALS = new Map([
 ]);
 const ORGANIZATION_SWITCHER_RENAMES = new Map([['afterSwitchOrganizationUrl', 'afterSelectOrganizationUrl']]);
 
-module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j }) {
+module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j }, options = {}) {
   const root = j(source);
   let dirty = false;
 
@@ -36,10 +36,16 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j 
     }
 
     if (COMPONENTS_WITH_USER_BUTTON_REMOVALS.has(canonicalName)) {
+      let removedCount = 0;
       for (const attrName of COMPONENTS_WITH_USER_BUTTON_REMOVALS.get(canonicalName)) {
         if (removeJsxAttribute(j, jsxNode, attrName)) {
           dirty = true;
+          removedCount += 1;
         }
+      }
+      if (removedCount > 0 && options.clerkUpgradeStats) {
+        options.clerkUpgradeStats.userbuttonAfterSignOutPropsRemoved =
+          (options.clerkUpgradeStats.userbuttonAfterSignOutPropsRemoved || 0) + removedCount;
       }
     }
 

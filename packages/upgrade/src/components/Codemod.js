@@ -86,6 +86,24 @@ export function Codemod(props) {
           <Text color='yellow'>{result.skip ?? 0} skipped</Text>
           <Text color='gray'>{result.nochange ?? 0} unmodified</Text>
           {result.timeElapsed && <Text>Time elapsed: {result.timeElapsed}</Text>}
+
+          {transform === 'transform-remove-deprecated-props' &&
+            result.clerkUpgradeStats?.userbuttonAfterSignOutPropsRemoved > 0 && (
+              <>
+                <Newline />
+                <Text color='yellow'>
+                  Found and removed {result.clerkUpgradeStats.userbuttonAfterSignOutPropsRemoved} usage(s) of
+                  <Text bold> UserButton</Text> sign-out redirect props (<Text italic>afterSignOutUrl</Text> /{' '}
+                  <Text italic>afterMultiSessionSingleSignOutUrl</Text>).
+                </Text>
+                <Text color='gray'>
+                  In Core 3, these props have been removed. Configure sign-out redirects globally via
+                  <Text italic> ClerkProvider afterSignOutUrl</Text> (or the corresponding environment variable) or use
+                  <Text italic> SignOutButton redirectUrl</Text> for one-off flows.
+                </Text>
+              </>
+            )}
+
           <Newline />
         </>
       )}
