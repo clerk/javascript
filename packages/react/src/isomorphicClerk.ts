@@ -32,6 +32,7 @@ import type {
   HandleOAuthCallbackParams,
   JoinWaitlistParams,
   ListenerCallback,
+  ListenerOptions,
   LoadedClerk,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -157,8 +158,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountAddListenerCalls = new Map<
     ListenerCallback,
     {
-      unsubscribe: UnsubscribeCallback;
-      nativeUnsubscribe?: UnsubscribeCallback;
+      options?: ListenerOptions;
+      handlers: {
+        unsubscribe: UnsubscribeCallback;
+        nativeUnsubscribe?: UnsubscribeCallback;
+      };
     }
   >();
   private loadedListeners: Array<() => void> = [];
@@ -581,8 +585,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.clerkjs = clerkjs;
 
     this.premountMethodCalls.forEach(cb => cb());
-    this.premountAddListenerCalls.forEach((listenerHandlers, listener) => {
-      listenerHandlers.nativeUnsubscribe = clerkjs.addListener(listener);
+    this.premountAddListenerCalls.forEach((listenerExtras, listener) => {
+      listenerExtras.handlers.nativeUnsubscribe = clerkjs.addListener(listener, listenerExtras.options);
     });
 
     this.#eventBus.internal.retrieveListeners('status')?.forEach(listener => {
@@ -1233,18 +1237,18 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  addListener = (listener: ListenerCallback): UnsubscribeCallback => {
+  addListener = (listener: ListenerCallback, options?: ListenerOptions): UnsubscribeCallback => {
     if (this.clerkjs) {
-      return this.clerkjs.addListener(listener);
+      return this.clerkjs.addListener(listener, options);
     } else {
       const unsubscribe = () => {
-        const listenerHandlers = this.premountAddListenerCalls.get(listener);
-        if (listenerHandlers) {
-          listenerHandlers.nativeUnsubscribe?.();
+        const listenerExtras = this.premountAddListenerCalls.get(listener);
+        if (listenerExtras?.handlers) {
+          listenerExtras?.handlers.nativeUnsubscribe?.();
           this.premountAddListenerCalls.delete(listener);
         }
       };
-      this.premountAddListenerCalls.set(listener, { unsubscribe, nativeUnsubscribe: undefined });
+      this.premountAddListenerCalls.set(listener, { options, handlers: { unsubscribe, nativeUnsubscribe: undefined } });
       return unsubscribe;
     }
   };
