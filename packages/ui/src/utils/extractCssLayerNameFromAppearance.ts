@@ -1,17 +1,14 @@
 import type { Appearance, BaseTheme } from '../internal/appearance';
 
 /**
- * Extracts cssLayerName from theme/baseTheme and moves it to appearance level.
- * Handles both the new 'theme' property and deprecated 'baseTheme' property.
+ * Extracts cssLayerName from theme and moves it to appearance level.
  */
 export function extractCssLayerNameFromAppearance(appearance: Appearance | undefined): Appearance | undefined {
   if (!appearance || typeof appearance !== 'object') {
     return appearance;
   }
 
-  // Use new 'theme' property if available, otherwise fall back to deprecated 'baseTheme'
-  const themeProperty = appearance.theme !== undefined ? appearance.theme : appearance.baseTheme;
-  const isUsingNewThemeProperty = appearance.theme !== undefined;
+  const themeProperty = appearance.theme;
 
   if (!themeProperty) {
     return appearance;
@@ -41,7 +38,7 @@ export function extractCssLayerNameFromAppearance(appearance: Appearance | undef
 
     const result = {
       ...appearance,
-      [isUsingNewThemeProperty ? 'theme' : 'baseTheme']: processedThemeArray,
+      theme: processedThemeArray,
     };
 
     if (finalCssLayerName) {
@@ -72,7 +69,7 @@ export function extractCssLayerNameFromAppearance(appearance: Appearance | undef
 
     const result = {
       ...appearance,
-      [isUsingNewThemeProperty ? 'theme' : 'baseTheme']: processedTheme,
+      theme: processedTheme,
     };
 
     if (finalCssLayerName) {

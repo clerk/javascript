@@ -3,7 +3,7 @@ import { dark } from './dark';
 
 export const shadesOfPurple = experimental_createTheme({
   name: 'shadesOfPurple',
-  baseTheme: dark,
+  theme: dark,
   variables: {
     colorBackground: '#3f3c77',
     colorPrimary: '#f8d80d',
