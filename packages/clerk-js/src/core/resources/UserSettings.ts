@@ -198,7 +198,10 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
     return Boolean(
       this.attributes?.email_address?.enabled ||
         this.attributes?.phone_number?.enabled ||
-        (this.attributes.password?.required && this.attributes.username?.required),
+        (this.attributes.password?.enabled &&
+          (this.attributes?.email_address?.enabled ||
+            this.attributes?.phone_number?.enabled ||
+            this.attributes?.username?.enabled)),
     );
   }
 
