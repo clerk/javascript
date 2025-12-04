@@ -544,19 +544,22 @@ export const authenticateRequest: AuthenticateRequest = (async (
     // session token, authenticate the user instead of triggering another handshake.
     if (!hasActiveClient && hasSessionToken) {
       if (authenticateContext.handshakeRedirectLoopCounter > 0) {
-        try {
-          const { data } = await verifyToken(authenticateContext.sessionTokenInCookie!, authenticateContext);
-          if (data) {
-            return signedIn({
-              tokenType: TokenType.SessionToken,
-              authenticateContext,
-              sessionClaims: data,
-              headers: new Headers(),
-              token: authenticateContext.sessionTokenInCookie!,
-            });
+        const sessionToken = authenticateContext.sessionTokenInCookie;
+        if (sessionToken) {
+          try {
+            const { data } = await verifyToken(sessionToken, authenticateContext);
+            if (data) {
+              return signedIn({
+                tokenType: TokenType.SessionToken,
+                authenticateContext,
+                sessionClaims: data,
+                headers: new Headers(),
+                token: sessionToken,
+              });
+            }
+          } catch {
+            // Token verification failed, proceed with normal handshake flow
           }
-        } catch {
-          // Token verification failed, proceed with normal handshake flow
         }
       }
       return handleMaybeHandshakeStatus(authenticateContext, AuthErrorReason.SessionTokenWithoutClientUAT, '');
