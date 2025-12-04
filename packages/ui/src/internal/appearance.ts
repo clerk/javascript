@@ -867,7 +867,7 @@ export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerN
 export type Theme = {
   /**
    * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   * For further customisation, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * Supports both object-based themes and string-based themes:
    *
@@ -884,7 +884,7 @@ export type Theme = {
   /**
    * @deprecated Use `theme` instead. This property will be removed in a future version.
    * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   * For further customisation, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * @example
    * import { dark } from "@clerk/ui/themes";
@@ -896,7 +896,7 @@ export type Theme = {
    * customizations that hard to implement with just CSS.
    * Eg: placing the logo outside the card element
    */
-  layout?: Layout;
+  options?: Layout;
   /**
    * General theme overrides. This styles will be merged with our base theme.
    * Can override global styles like colors, fonts etc.

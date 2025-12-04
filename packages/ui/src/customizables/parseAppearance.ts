@@ -22,7 +22,7 @@ export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'baseTheme' | 'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
+  'baseTheme' | 'theme' | 'elements' | 'options' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
@@ -126,7 +126,7 @@ const parseElements = (appearances: Appearance[]) => {
 };
 
 const parseLayout = (appearanceList: Appearance[]) => {
-  return { ...defaultLayout, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.layout }), {}) };
+  return { ...defaultLayout, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.options }), {}) };
 };
 
 const parseCaptcha = (appearanceList: Appearance[]) => {

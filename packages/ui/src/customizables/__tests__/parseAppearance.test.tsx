@@ -228,7 +228,7 @@ describe('AppearanceProvider layout flows', () => {
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://example.com/help',
             logoImageUrl: 'https://placehold.co/64x64.png',
             logoLinkUrl: 'https://example.com/',
@@ -262,7 +262,7 @@ describe('AppearanceProvider layout flows', () => {
       <AppearanceProvider
         appearanceKey='signIn'
         appearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://example.com/help',
             logoImageUrl: 'https://placehold.co/64x64.png',
             logoLinkUrl: 'https://example.com/',
@@ -296,7 +296,7 @@ describe('AppearanceProvider layout flows', () => {
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://example.com/help',
             logoImageUrl: 'https://placehold.co/64x64.png',
             logoLinkUrl: 'https://example.com/',
@@ -309,7 +309,7 @@ describe('AppearanceProvider layout flows', () => {
           },
         }}
         appearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://second.example.com/help',
             logoImageUrl: 'https://placehold.co/32x32@2.png',
             logoLinkUrl: 'https://second.example.com/',
