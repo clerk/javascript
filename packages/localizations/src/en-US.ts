@@ -934,6 +934,9 @@ export const enUS: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
+    web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
+    web3_solana_signature_generation_failed:
+      'An error occurred while generating the signature. Please try again to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',
