@@ -80,7 +80,7 @@ export function UpgradeSDK({ callback, sdk, replacePackage = false }) {
       .finally(() => {
         callback(true);
       });
-  }, [command, packageManager, sdk]);
+  }, [callback, command, packageManager, replacePackage, sdk]);
 
   return (
     <>
