@@ -44,7 +44,7 @@ const defaultLayout: ParsedLayout = {
   socialButtonsVariant: 'auto',
   logoImageUrl: '',
   logoLinkUrl: '',
-  showOptionalFields: true,
+  showOptionalFields: false,
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
