@@ -1,10 +1,11 @@
 import { inBrowser } from './browser';
 import { ClerkRuntimeError } from './errors/clerkRuntimeError';
+import { retry } from './retry';
 import type { Clerk, ClerkStatus, GetTokenOptions, LoadedClerk } from './types';
 
 const POLL_INTERVAL_MS = 50;
-const MAX_POLL_RETRIES = 100; // 5 seconds of polling
-const TIMEOUT_MS = 10000; // 10 second absolute timeout
+const MAX_POLL_RETRIES = 100;
+const STATUS_TIMEOUT_MS = 10000; // 10 second timeout for status changes
 
 function getWindowClerk(): Clerk | undefined {
   if (inBrowser() && 'Clerk' in window) {
@@ -13,95 +14,88 @@ function getWindowClerk(): Clerk | undefined {
   return undefined;
 }
 
-function waitForClerk(): Promise<LoadedClerk> {
+function waitForClerkStatus(clerk: Clerk): Promise<LoadedClerk> {
   return new Promise((resolve, reject) => {
-    if (!inBrowser()) {
-      reject(
-        new ClerkRuntimeError('getToken can only be used in browser environments.', {
-          code: 'clerk_runtime_not_browser',
-        }),
-      );
-      return;
-    }
+    let settled = false;
 
-    const clerk = getWindowClerk();
+    const statusHandler = (status: ClerkStatus) => {
+      if (settled) {
+        return;
+      }
 
-    if (clerk && (clerk.status === 'ready' || clerk.status === 'degraded')) {
-      resolve(clerk as LoadedClerk);
-      return;
-    }
-
-    if (clerk && clerk.loaded && !clerk.status) {
-      resolve(clerk as LoadedClerk);
-      return;
-    }
-
-    let retries = 0;
-    let statusHandler: ((status: ClerkStatus) => void) | undefined;
-    let pollTimeoutId: ReturnType<typeof setTimeout>;
-    let currentClerk: Clerk | undefined = clerk;
-
-    const cleanup = () => {
-      clearTimeout(timeoutId);
-      clearTimeout(pollTimeoutId);
-      if (statusHandler && currentClerk) {
-        currentClerk.off('status', statusHandler);
+      if (status === 'ready' || status === 'degraded') {
+        settled = true;
+        clearTimeout(timeoutId);
+        clerk.off('status', statusHandler);
+        resolve(clerk as LoadedClerk);
+      } else if (status === 'error') {
+        settled = true;
+        clearTimeout(timeoutId);
+        clerk.off('status', statusHandler);
+        reject(
+          new ClerkRuntimeError('Clerk failed to initialize.', {
+            code: 'clerk_runtime_init_error',
+          }),
+        );
       }
     };
 
     const timeoutId = setTimeout(() => {
-      cleanup();
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clerk.off('status', statusHandler);
       reject(
-        new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
+        new ClerkRuntimeError('Timeout waiting for Clerk to initialize.', {
           code: 'clerk_runtime_load_timeout',
         }),
       );
-    }, TIMEOUT_MS);
+    }, STATUS_TIMEOUT_MS);
 
-    const checkAndResolve = () => {
-      currentClerk = getWindowClerk();
-
-      if (!currentClerk) {
-        if (retries < MAX_POLL_RETRIES) {
-          retries++;
-          pollTimeoutId = setTimeout(checkAndResolve, POLL_INTERVAL_MS);
-        }
-        return;
-      }
-
-      if (currentClerk.status === 'ready' || currentClerk.status === 'degraded') {
-        cleanup();
-        resolve(currentClerk as LoadedClerk);
-        return;
-      }
-
-      if (currentClerk.loaded && !currentClerk.status) {
-        cleanup();
-        resolve(currentClerk as LoadedClerk);
-        return;
-      }
-
-      if (!statusHandler) {
-        statusHandler = (status: ClerkStatus) => {
-          if (status === 'ready' || status === 'degraded') {
-            cleanup();
-            resolve(currentClerk as LoadedClerk);
-          } else if (status === 'error') {
-            cleanup();
-            reject(
-              new ClerkRuntimeError('Clerk failed to initialize.', {
-                code: 'clerk_runtime_init_error',
-              }),
-            );
-          }
-        };
-
-        currentClerk.on('status', statusHandler, { notify: true });
-      }
-    };
-
-    checkAndResolve();
+    clerk.on('status', statusHandler, { notify: true });
   });
+}
+
+async function waitForClerk(): Promise<LoadedClerk> {
+  if (!inBrowser()) {
+    throw new ClerkRuntimeError('getToken can only be used in browser environments.', {
+      code: 'clerk_runtime_not_browser',
+    });
+  }
+
+  let clerk: Clerk;
+  try {
+    clerk = await retry(
+      () => {
+        const clerk = getWindowClerk();
+        if (!clerk) {
+          throw new Error('Clerk not found');
+        }
+        return clerk;
+      },
+      {
+        initialDelay: POLL_INTERVAL_MS,
+        factor: 1,
+        jitter: false,
+        shouldRetry: (_, iterations) => iterations < MAX_POLL_RETRIES,
+      },
+    );
+  } catch {
+    throw new ClerkRuntimeError('Timeout waiting for Clerk to load.', {
+      code: 'clerk_runtime_load_timeout',
+    });
+  }
+
+  if (clerk.status === 'ready' || clerk.status === 'degraded') {
+    return clerk as LoadedClerk;
+  }
+
+  if (clerk.loaded && !clerk.status) {
+    return clerk as LoadedClerk;
+  }
+
+  return waitForClerkStatus(clerk);
 }
 
 /**
