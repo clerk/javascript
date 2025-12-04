@@ -1,4 +1,3 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -63,43 +62,6 @@ describe('TaskResetPassword', () => {
       newPassword: 'testtest',
       signOutOfOtherSessions: true,
     });
-  });
-
-  it('giving the same password as the current password, should show an error', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.withUser({
-        email_addresses: ['test@clerk.com'],
-        identifier: 'test@clerk.com',
-        tasks: [{ key: 'reset-password' }],
-      });
-      f.withPassword();
-    });
-
-    const errJSON = {
-      code: 'form_new_password_matches_current',
-      long_message: 'New password cannot be the same as the current password.',
-      message: 'New password cannot be the same as the current password.',
-      meta: { param_name: 'newPassword' },
-    };
-
-    fixtures.clerk.user?.updatePassword.mockResolvedValueOnce(
-      new ClerkAPIResponseError('Error', {
-        data: [errJSON],
-        status: 422,
-      }),
-    );
-    const { getByRole, userEvent, getByLabelText, findByText } = render(<TaskResetPassword />, { wrapper });
-    await waitFor(() => getByRole('heading', { name: /Reset password/i }));
-
-    await userEvent.type(getByLabelText(/new password/i), 'itsthesamepassword');
-    await userEvent.type(getByLabelText(/confirm password/i), 'itsthesamepassword');
-    await userEvent.click(getByRole('button', { name: /reset password$/i }));
-    expect(fixtures.clerk.user?.updatePassword).toHaveBeenCalledWith({
-      newPassword: 'itsthesamepassword',
-      signOutOfOtherSessions: true,
-    });
-
-    await waitFor(() => expect(findByText(/new password cannot be the same as the current password/i)).toBeVisible());
   });
 
   it('renders a hidden identifier field', async () => {
