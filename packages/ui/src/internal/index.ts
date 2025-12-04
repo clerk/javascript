@@ -52,7 +52,7 @@ export type {
   ElementState,
   FontFamily,
   IdSelectors,
-  Layout,
+  Options,
   OAuthConsentTheme,
   OrganizationListTheme,
   OrganizationProfileTheme,

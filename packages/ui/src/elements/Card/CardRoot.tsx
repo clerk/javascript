@@ -15,7 +15,7 @@ export const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>((props, 
 
   return (
     <>
-      {appearance.parsedLayout.logoPlacement === 'outside' && (
+      {appearance.parsedOptions.logoPlacement === 'outside' && (
         <ApplicationLogo
           sx={t => ({
             position: 'relative',

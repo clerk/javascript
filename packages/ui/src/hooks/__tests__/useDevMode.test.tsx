@@ -35,7 +35,7 @@ describe('useDevMode', () => {
         }) as EnvironmentResource,
     );
     mockUseAppearance.mockImplementationOnce(() => ({
-      parsedLayout: {
+      parsedOptions: {
         unsafe_disableDevelopmentModeWarnings: false,
       },
     }));
@@ -57,7 +57,7 @@ describe('useDevMode', () => {
         }) as EnvironmentResource,
     );
     mockUseAppearance.mockImplementationOnce(() => ({
-      parsedLayout: {
+      parsedOptions: {
         unsafe_disableDevelopmentModeWarnings: false,
       },
     }));
@@ -79,7 +79,7 @@ describe('useDevMode', () => {
         }) as EnvironmentResource,
     );
     mockUseAppearance.mockImplementationOnce(() => ({
-      parsedLayout: {
+      parsedOptions: {
         unsafe_disableDevelopmentModeWarnings: false,
       },
     }));
@@ -101,7 +101,7 @@ describe('useDevMode', () => {
         }) as EnvironmentResource,
     );
     mockUseAppearance.mockImplementationOnce(() => ({
-      parsedLayout: {
+      parsedOptions: {
         unsafe_disableDevelopmentModeWarnings: true,
       },
     }));
