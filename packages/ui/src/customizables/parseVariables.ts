@@ -14,15 +14,7 @@ const createMutedForegroundColor = (variables: NonNullable<Theme['variables']>) 
     return colors.toHslaString(variables.colorMutedForeground);
   }
 
-  if (variables.colorTextSecondary) {
-    return colors.toHslaString(variables.colorTextSecondary);
-  }
-
-  if (variables.colorForeground) {
-    return colors.makeTransparent(variables.colorForeground, 0.35);
-  }
-
-  return colors.makeTransparent(variables.colorText, 0.35);
+  return colors.makeTransparent(variables.colorForeground, 0.35);
 };
 
 export const createColorScales = (theme: Theme) => {
@@ -57,20 +49,12 @@ export const createColorScales = (theme: Theme) => {
     primaryHover: colors.adjustForLightness(primaryScale?.primary500),
     colorPrimaryForeground: variables.colorPrimaryForeground
       ? colors.toHslaString(variables.colorPrimaryForeground)
-      : variables.colorTextOnPrimaryBackground
-        ? colors.toHslaString(variables.colorTextOnPrimaryBackground)
-        : undefined,
-    colorForeground: variables.colorForeground
-      ? colors.toHslaString(variables.colorForeground)
-      : colors.toHslaString(variables.colorText),
+      : undefined,
+    colorForeground: colors.toHslaString(variables.colorForeground),
     colorMutedForeground: createMutedForegroundColor(variables),
-    colorInputForeground: variables.colorInputForeground
-      ? colors.toHslaString(variables.colorInputForeground)
-      : colors.toHslaString(variables.colorInputText),
+    colorInputForeground: colors.toHslaString(variables.colorInputForeground),
     colorBackground: colors.toHslaString(variables.colorBackground),
-    colorInput: variables.colorInput
-      ? colors.toHslaString(variables.colorInput)
-      : colors.toHslaString(variables.colorInputBackground),
+    colorInput: colors.toHslaString(variables.colorInput),
     colorShimmer: colors.toHslaString(variables.colorShimmer),
     colorMuted: variables.colorMuted ? colors.toHslaString(variables.colorMuted) : undefined,
     colorRing: variables.colorRing ? colors.toHslaString(variables.colorRing) : undefined,
@@ -146,16 +130,15 @@ export const createRadiiUnits = (theme: Theme) => {
 };
 
 export const createSpaceScale = (theme: Theme) => {
-  const { spacing, spacingUnit } = theme.variables || {};
-  const spacingValue = spacing ?? spacingUnit;
-  if (spacingValue === undefined) {
+  const { spacing } = theme.variables || {};
+  if (spacing === undefined) {
     return;
   }
   return fromEntries(
     spaceScaleKeys.map(k => {
       const num = Number.parseFloat(k.replace('x', '.'));
       const percentage = (num / 0.5) * 0.125;
-      return [k, `calc(${spacingValue} * ${percentage})`];
+      return [k, `calc(${spacing} * ${percentage})`];
     }),
   );
 };

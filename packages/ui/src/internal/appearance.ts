@@ -667,15 +667,6 @@ export type Variables = {
    * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
    * eg: solid primary buttons.
    *
-   * @deprecated Use {@link Variables.colorPrimaryForeground} instead.
-   *
-   * @default 'white'
-   */
-  colorTextOnPrimaryBackground?: CssColor;
-  /**
-   * The color of text appearing on top of an element that with a background color of {@link Variables.colorPrimary},
-   * eg: solid primary buttons.
-   *
    * @default 'white'
    */
   colorPrimaryForeground?: CssColor;
@@ -708,14 +699,6 @@ export type Variables = {
   /**
    * The default text color.
    *
-   * @deprecated Use {@link Variables.colorForeground} instead.
-   *
-   * @default '#212126'
-   */
-  colorText?: CssColor;
-  /**
-   * The default text color.
-   *
    * @default 'inherit'
    */
   colorForeground?: CssColor;
@@ -726,16 +709,7 @@ export type Variables = {
   colorMuted?: CssColor;
   /**
    * The text color for elements of lower importance, eg: a subtitle text.
-   * This color is a lighter shade of {@link Variables.colorText}.
-   *
-   * @deprecated Use {@link Variables.colorMutedForeground} instead.
-   *
-   * @default '#747686'
-   */
-  colorTextSecondary?: CssColor;
-  /**
-   * The text color for elements of lower importance, eg: a subtitle text.
-   * This color is a lighter shade of {@link Variables.colorText}.
+   * This color is a lighter shade of {@link Variables.colorForeground}.
    *
    * @default '#747686'
    */
@@ -747,27 +721,11 @@ export type Variables = {
    */
   colorBackground?: CssColor;
   /**
-   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
-   *
-   * @deprecated Use {@link Variables.colorInputForeground} instead.
-   *
-   * @default 'black'
-   */
-  colorInputText?: CssColor;
-  /**
-   * The default text color inside input elements. To customise the input background color instead, use {@link Variables.colorInputBackground}.
+   * The default text color inside input elements. To customize the input background color instead, use {@link Variables.colorInput}.
    *
    * @default 'black'
    */
   colorInputForeground?: CssColor;
-  /**
-   * The background color for all input elements.
-   *
-   * @deprecated Use {@link Variables.colorInput} instead.
-   *
-   * @default 'white'
-   */
-  colorInputBackground?: CssColor;
   /**
    * The background color for all input elements.
    *
@@ -846,14 +804,6 @@ export type Variables = {
    */
   borderRadius?: CssLengthUnit;
   /**
-   * The base spacing unit that all margins, paddings and gaps between the elements are derived from.
-   *
-   * @deprecated Use {@link Variables.spacing} instead.
-   *
-   * @default '1rem'
-   */
-  spacingUnit?: CssLengthUnit;
-  /**
    * The base spacing that all margins, paddings and gaps between the elements are derived from.
    *
    * @default '1rem'
@@ -881,16 +831,6 @@ export type Theme = {
    * appearance={{ theme: 'simple' }}
    */
   theme?: BaseTheme | BaseTheme[];
-  /**
-   * @deprecated Use `theme` instead. This property will be removed in a future version.
-   * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
-   *
-   * @example
-   * import { dark } from "@clerk/ui/themes";
-   * appearance={{ baseTheme: dark }}
-   */
-  baseTheme?: BaseTheme | BaseTheme[];
   /**
    * Configuration options that affect the layout of the components, allowing
    * customizations that hard to implement with just CSS.
@@ -964,7 +904,7 @@ export type Layout = {
    * Controls whether the SignIn or SignUp forms will include optional fields.
    * You can make a field required or optional through the {@link https://dashboard.clerk.com|Clerk dashboard}.
    *
-   * @default true
+   * @default false
    */
   showOptionalFields?: boolean;
   /**

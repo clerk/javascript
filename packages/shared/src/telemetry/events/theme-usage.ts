@@ -37,8 +37,7 @@ function analyzeThemeUsage(appearance?: any): EventThemeUsage {
     return {};
   }
 
-  // Prioritize the new theme property over deprecated baseTheme
-  const themeProperty = appearance.theme || appearance.baseTheme;
+  const themeProperty = appearance.theme;
 
   if (!themeProperty) {
     return {};

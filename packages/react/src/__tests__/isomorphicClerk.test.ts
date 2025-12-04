@@ -43,29 +43,29 @@ describe('isomorphicClerk', () => {
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     (isomorphicClerk as any).clerkjs = dummyClerkJS as any;
 
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'dark' } });
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'light' } });
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'purple' } });
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'yellow' } });
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'red' } });
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'blue' } });
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'green' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'dark' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'light' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'purple' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'yellow' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'red' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'blue' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'green' } });
     expect(propsHistory).toEqual([]);
 
     vi.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
     isomorphicClerk.emitLoaded();
-    void isomorphicClerk.__internal_updateProps({ appearance: { baseTheme: 'white' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'white' } });
     await vi.runAllTimersAsync();
 
     expect(propsHistory).toEqual([
-      { appearance: { baseTheme: 'dark' } },
-      { appearance: { baseTheme: 'light' } },
-      { appearance: { baseTheme: 'purple' } },
-      { appearance: { baseTheme: 'yellow' } },
-      { appearance: { baseTheme: 'red' } },
-      { appearance: { baseTheme: 'blue' } },
-      { appearance: { baseTheme: 'green' } },
-      { appearance: { baseTheme: 'white' } },
+      { appearance: { theme: 'dark' } },
+      { appearance: { theme: 'light' } },
+      { appearance: { theme: 'purple' } },
+      { appearance: { theme: 'yellow' } },
+      { appearance: { theme: 'red' } },
+      { appearance: { theme: 'blue' } },
+      { appearance: { theme: 'green' } },
+      { appearance: { theme: 'white' } },
     ]);
   });
 

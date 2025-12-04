@@ -15,7 +15,7 @@ type ClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'
  * import { dark } from '@clerk/ui/themes';
  *
  * updateClerkOptions({
- *   appearance: { baseTheme: dark },
+ *   appearance: { theme: dark },
  *   localization: frFR
  * });
  */
