@@ -3,6 +3,7 @@ import { addYears } from '@clerk/shared/date';
 import { getSuffixedCookieName } from '@clerk/shared/keys';
 
 import { inCrossOriginIframe } from '../../../utils';
+import { getCookieDomain } from '../getCookieDomain';
 import { getSecureAttribute } from '../getSecureAttribute';
 
 const SESSION_COOKIE_NAME = '__session';
@@ -31,6 +32,13 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
 
   const remove = () => {
     const attributes = getCookieAttributes();
+    const domain = getCookieDomain();
+
+    // Remove cookies with domain attribute
+    sessionCookie.remove({ ...attributes, domain });
+    suffixedSessionCookie.remove({ ...attributes, domain });
+
+    // Also remove cookies without domain attribute for backward compatibility
     sessionCookie.remove(attributes);
     suffixedSessionCookie.remove(attributes);
   };
@@ -38,6 +46,11 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
   const set = (token: string) => {
     const expires = addYears(Date.now(), 1);
     const { sameSite, secure, partitioned } = getCookieAttributes();
+    const domain = getCookieDomain();
+
+    // Remove any existing cookies without a domain specified to ensure subdomain-scoped cookies are cleaned up
+    sessionCookie.remove();
+    suffixedSessionCookie.remove();
 
     // If setting Partitioned to true, remove the existing session cookies.
     // This is to avoid conflicts with the same cookie name without Partitioned attribute.
@@ -45,8 +58,8 @@ export const createSessionCookie = (cookieSuffix: string): SessionCookieHandler 
       remove();
     }
 
-    sessionCookie.set(token, { expires, sameSite, secure, partitioned });
-    suffixedSessionCookie.set(token, { expires, sameSite, secure, partitioned });
+    sessionCookie.set(token, { domain, expires, partitioned, sameSite, secure });
+    suffixedSessionCookie.set(token, { domain, expires, partitioned, sameSite, secure });
   };
 
   const get = () => suffixedSessionCookie.get() || sessionCookie.get();
