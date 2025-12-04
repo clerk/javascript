@@ -60,6 +60,7 @@ const Web3WalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) =>
       await web3AuthCallback({ walletName });
     } catch {
       await sleep(1000);
+    } finally {
       card.setIdle();
     }
   };
