@@ -10,14 +10,14 @@ import type { ThemableCssProp } from '../styledSystem';
  */
 export const withAvatarShimmer = <T extends { sx?: ThemableCssProp }>(Component: React.ComponentType<T>) => {
   return forwardRef<HTMLElement, T>((props, ref) => {
-    const { parsedLayout } = useAppearance();
+    const { parsedOptions } = useAppearance();
 
     return (
       <Component
         {...(props as T)}
         ref={ref}
         sx={[
-          parsedLayout.shimmer
+          parsedOptions.shimmer
             ? {
                 ':hover': {
                   '--cl-shimmer-hover-transform': 'skew(-45deg) translateX(600%)',

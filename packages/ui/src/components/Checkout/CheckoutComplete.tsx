@@ -166,7 +166,7 @@ export const CheckoutComplete = () => {
   const [mousePosition, setMousePosition] = useState({ x: 256, y: 256 });
 
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const { animations: layoutAnimations } = useAppearance().parsedOptions;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
   const checkoutSuccessRootRef = useRef<HTMLSpanElement>(null);

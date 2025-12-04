@@ -37,7 +37,7 @@ function SignUpStartInternal(): JSX.Element {
   const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
-  const { showOptionalFields } = useAppearance().parsedLayout;
+  const { showOptionalFields } = useAppearance().parsedOptions;
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;

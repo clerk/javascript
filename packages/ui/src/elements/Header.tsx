@@ -17,7 +17,7 @@ const Root = React.memo(
     const { sx, children, contentSx, gap = 6, showLogo = false, showDivider = false, ...rest } = props;
     const appearance = useAppearance();
 
-    const logoIsVisible = appearance.parsedLayout.logoPlacement === 'inside' && showLogo;
+    const logoIsVisible = appearance.parsedOptions.logoPlacement === 'inside' && showLogo;
     const verticalDividerIsVisible = showDivider && logoIsVisible;
 
     return (

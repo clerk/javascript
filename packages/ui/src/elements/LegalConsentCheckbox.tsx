@@ -72,10 +72,10 @@ export const LegalCheckbox = (
   },
 ) => {
   const { displayConfig } = useEnvironment();
-  const { parsedLayout } = useAppearance();
+  const { parsedOptions } = useAppearance();
 
-  const termsLink = parsedLayout.termsPageUrl || displayConfig.termsUrl;
-  const privacyPolicy = parsedLayout.privacyPageUrl || displayConfig.privacyPolicyUrl;
+  const termsLink = parsedOptions.termsPageUrl || displayConfig.termsUrl;
+  const privacyPolicy = parsedOptions.privacyPageUrl || displayConfig.privacyPolicyUrl;
 
   return (
     <Field.Root {...props}>
