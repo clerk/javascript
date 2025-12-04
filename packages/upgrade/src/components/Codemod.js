@@ -132,13 +132,16 @@ function ManualInterventionSummary({ stats }) {
           </Text>
           <Text color='gray'> To configure sign-out redirects:</Text>
           <Text color='gray'>
-            {' '}- Global: Add <Text italic>afterSignOutUrl</Text> to <Text italic>{'<ClerkProvider>'}</Text>
+            {' '}
+            - Global: Add <Text italic>afterSignOutUrl</Text> to <Text italic>{'<ClerkProvider>'}</Text>
           </Text>
           <Text color='gray'>
-            {' '}- Per-button: Use <Text italic>{'<SignOutButton redirectUrl="...">'}</Text>
+            {' '}
+            - Per-button: Use <Text italic>{'<SignOutButton redirectUrl="...">'}</Text>
           </Text>
           <Text color='gray'>
-            {' '}- Programmatic: <Text italic>{'clerk.signOut({ redirectUrl: "..." })'}</Text>
+            {' '}
+            - Programmatic: <Text italic>{'clerk.signOut({ redirectUrl: "..." })'}</Text>
           </Text>
         </Box>
       )}
@@ -151,9 +154,7 @@ function ManualInterventionSummary({ stats }) {
           <Text color='yellow'>
             • Removed {hideSlugCount} <Text bold>hideSlug</Text> prop(s)
           </Text>
-          <Text color='gray'>
-            {' '}Removed from CreateOrganization, OrganizationSwitcher, and OrganizationList.
-          </Text>
+          <Text color='gray'> Removed from CreateOrganization, OrganizationSwitcher, and OrganizationList.</Text>
           <Text color='gray'> Slugs are now managed in the Clerk Dashboard.</Text>
         </Box>
       )}
