@@ -234,6 +234,14 @@ export const authenticateRequest: AuthenticateRequest = (async (
 
     try {
       // Perform the actual token refresh.
+      const requestHeaders = new Headers(request.headers);
+      if (options.headers) {
+        const extraHeaders = new Headers(options.headers);
+        extraHeaders.forEach((value, key) => {
+          requestHeaders.append(key, value);
+        });
+      }
+
       const response = await options.apiClient.sessions.refreshSession(decodeResult.payload.sid, {
         format: 'cookie',
         suffixed_cookies: authenticateContext.usesSuffixedCookies(),
@@ -241,7 +249,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
         refresh_token: refreshToken || '',
         request_origin: authenticateContext.clerkUrl.origin,
         // The refresh endpoint expects headers as Record<string, string[]>, so we need to transform it.
-        request_headers: Object.fromEntries(Array.from(request.headers.entries()).map(([k, v]) => [k, [v]])),
+        request_headers: Object.fromEntries(Array.from(requestHeaders.entries()).map(([k, v]) => [k, [v]])),
       });
       return { data: response.cookies, error: null };
     } catch (err: any) {

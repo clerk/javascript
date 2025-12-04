@@ -59,6 +59,10 @@ export type AuthenticateRequestOptions = {
    */
   organizationSyncOptions?: OrganizationSyncOptions;
   /**
+   * Optional headers to be passed to the backend API.
+   */
+  headers?: HeadersInit;
+  /**
    * @internal
    */
   apiClient?: ApiClient;
