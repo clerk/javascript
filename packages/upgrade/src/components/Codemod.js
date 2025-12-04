@@ -119,7 +119,7 @@ function ManualInterventionSummary({ stats }) {
         bold
         color='yellow'
       >
-        ⚠️ Manual intervention may be required:
+        Manual intervention may be required:
       </Text>
 
       {userButtonCount > 0 && (
