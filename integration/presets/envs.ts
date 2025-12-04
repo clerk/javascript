@@ -165,9 +165,8 @@ const withSessionTasksResetPassword = base
 const withBillingJwtV2 = base
   .clone()
   .setId('withBillingJwtV2')
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing').pk);
 
 const withBilling = base
   .clone()

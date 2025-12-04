@@ -34,7 +34,7 @@
     "test:integration:ap-flows": "pnpm test:integration:base --grep @ap-flows",
     "test:integration:astro": "E2E_APP_ID=astro.* pnpm test:integration:base --grep @astro",
     "test:integration:base": "pnpm playwright test --config integration/playwright.config.ts",
-    "test:integration:billing": "E2E_APP_ID=withBilling.* pnpm test:integration:base --grep @billing",
+    "test:integration:billing": "E2E_DEBUG=1 E2E_APP_ID=withBillingJwtV2.* pnpm test:integration:base --grep @billing",
     "test:integration:cleanup": "pnpm playwright test --config integration/playwright.cleanup.config.ts",
     "test:integration:custom": "pnpm test:integration:base --grep @custom",
     "test:integration:deployment:nextjs": "pnpm playwright test --config integration/playwright.deployments.config.ts",

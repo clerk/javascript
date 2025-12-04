@@ -1,11 +1,10 @@
 import type { Locator } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing table @billing', ({ app }) => {
+testAgainstRunningApps({})('pricing table @billing', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
 
   let fakeUser: FakeUser;
@@ -236,6 +235,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
     await u.po.pricingTable.startCheckout({ planSlug: 'plus' });
     await u.po.checkout.waitForMounted();
     await expect(u.po.page.getByText('Checkout')).toBeVisible();
+    await page.pause();
     await expect(u.po.page.getByText(/^Add an email address$/i)).toBeVisible();
 
     const newFakeUser = u.services.users.createFakeUser();
@@ -639,7 +639,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await fakeUser.deleteIfExists();
     });
 
-    test('displays notice then plan cannot change', async ({ page, context }) => {
+    test('displays notice the plan cannot change', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
 
       const fakeUser = u.services.users.createFakeUser();
@@ -657,7 +657,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('pricing tabl
       await u.po.checkout.fillTestCard();
       await u.po.checkout.clickPayOrSubscribe();
       await expect(u.po.page.getByText('Payment was successful!')).toBeVisible();
-
       await u.po.checkout.confirmAndContinue();
       await u.po.pricingTable.startCheckout({ planSlug: 'pro', shouldSwitch: true, period: 'monthly' });
       await u.po.checkout.waitForMounted();

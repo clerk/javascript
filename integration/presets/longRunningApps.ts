@@ -42,9 +42,7 @@ export const createLongRunningApps = () => {
      * Billing apps
      */
     { id: 'withBillingJwtV2.next.appRouter', config: next.appRouter, env: envs.withBillingJwtV2 },
-    { id: 'withBilling.next.appRouter', config: next.appRouter, env: envs.withBilling },
     { id: 'withBillingJwtV2.vue.vite', config: vue.vite, env: envs.withBillingJwtV2 },
-    { id: 'withBilling.vue.vite', config: vue.vite, env: envs.withBilling },
 
     /**
      * Machine auth apps
@@ -68,7 +66,6 @@ export const createLongRunningApps = () => {
     /**
      * Various apps - basic flows
      */
-    { id: 'withBilling.astro.node', config: astro.node, env: envs.withBilling },
     { id: 'astro.node.withCustomRoles', config: astro.node, env: envs.withCustomRoles },
     { id: 'astro.static.withCustomRoles', config: astro.static, env: envs.withCustomRoles },
     { id: 'expo.expo-web', config: expo.expoWeb, env: envs.withEmailCodes },

@@ -36,8 +36,6 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
       script.defer = defer || false;
 
       script.addEventListener('load', () => {
-        console.log('this loaded ', src);
-
         script.remove();
         resolve(script);
       });
