@@ -29,7 +29,7 @@ const SignUpStartSolanaWalletsCardInner = () => {
   };
 
   return (
-    <Flow.Part part='choose-wallet'>
+    <Flow.Part part='chooseWallet'>
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
