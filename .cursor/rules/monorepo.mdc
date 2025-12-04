@@ -103,3 +103,11 @@ Release Management
 - Canary and snapshot releases for testing
 - Git tags and GitHub releases for version tracking
 - Coordinated releases to maintain compatibility between packages
+
+Commit Messages
+
+- Commit messages must follow the conventional commit format using lowercase
+- Commit messages must be in English
+- Commit messages must be concise and to the point
+- Commit messages must be prefixed with the type of change
+- Commit messages must be prefixed with the scope of the change (package name or `js` for `clekr-js`, repo, release, e2e, \*)

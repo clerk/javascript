@@ -29,7 +29,7 @@ const getNonceHeaders = React.cache(async function getNonceHeaders() {
 });
 
 export async function ClerkProvider<TUi extends Ui = Ui>(
-  props: Without<NextClerkProviderProps<TUi>, '__unstable_invokeMiddlewareOnAuthStateChange'>,
+  props: Without<NextClerkProviderProps<TUi>, '__internal_invokeMiddlewareOnAuthStateChange'>,
 ) {
   const { children, dynamic, ...rest } = props;
 

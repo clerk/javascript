@@ -1,6 +1,5 @@
 import { useClerk, useOrganization, useOrganizationList, useUser } from '@clerk/shared/react';
 import type { OrganizationResource } from '@clerk/shared/types';
-import { runIfFunctionOrReturn } from '@clerk/shared/utils';
 import React from 'react';
 
 import { Actions, SmallAction } from '@/ui/elements/Actions';
@@ -13,8 +12,7 @@ import { NotificationCountBadge, withProtect } from '../../common';
 import { useEnvironment, useOrganizationSwitcherContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys } from '../../customizables';
 import { RootBox } from '../../elements/RootBox';
-import { Billing, CogFilled } from '../../icons';
-import { useRouter } from '../../router';
+import { CogFilled } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import { OrganizationActionList } from './OtherOrganizationActions';
 
@@ -29,15 +27,8 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
     const { openOrganizationProfile, openCreateOrganization } = useClerk();
     const { organization: currentOrg } = useOrganization();
     const { isLoaded, setActive } = useOrganizationList();
-    const router = useRouter();
     const {
       hidePersonal,
-      //@ts-expect-error
-      __unstable_manageBillingUrl,
-      //@ts-expect-error
-      __unstable_manageBillingLabel,
-      //@ts-expect-error
-      __unstable_manageBillingMembersLimit,
       createOrganizationMode,
       organizationProfileMode,
       afterLeaveOrganizationUrl,
@@ -97,10 +88,6 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       return openOrganizationProfile({
         ...organizationProfileProps,
         afterLeaveOrganizationUrl,
-        //@ts-expect-error
-        __unstable_manageBillingUrl,
-        __unstable_manageBillingLabel,
-        __unstable_manageBillingMembersLimit,
       });
     };
 
@@ -120,69 +107,27 @@ export const OrganizationSwitcherPopover = React.forwardRef<HTMLDivElement, Orga
       />
     );
 
-    const billingOrganizationButton = (
-      <SmallAction
-        icon={Billing}
-        label={runIfFunctionOrReturn(__unstable_manageBillingLabel) || 'Upgrade'}
-        onClick={() => router.navigate(runIfFunctionOrReturn(__unstable_manageBillingUrl))}
-        focusRing
-      />
-    );
-
-    const selectedOrganizationPreview = (currentOrg: OrganizationResource) =>
-      __unstable_manageBillingUrl ? (
-        <>
-          <OrganizationPreview
-            elementId={'organizationSwitcherActiveOrganization'}
-            organization={currentOrg}
-            user={user}
-            mainIdentifierVariant='buttonLarge'
-            sx={t => ({
-              padding: `${t.space.$4} ${t.space.$5}`,
-            })}
-          />
-          <Actions
-            role='menu'
-            sx={t => ({
-              borderBottomWidth: t.borderWidths.$normal,
-              borderBottomStyle: t.borderStyles.$solid,
-              borderBottomColor: t.colors.$borderAlpha100,
-            })}
-          >
-            <Flex
-              justify='between'
-              sx={t => ({
-                marginLeft: t.space.$12,
-                padding: `0 ${t.space.$5} ${t.space.$4}`,
-                gap: t.space.$2,
-              })}
-            >
-              {manageOrganizationButton}
-              {billingOrganizationButton}
-            </Flex>
-          </Actions>
-        </>
-      ) : (
-        <Flex
-          justify='between'
-          align='center'
+    const selectedOrganizationPreview = (currentOrg: OrganizationResource) => (
+      <Flex
+        justify='between'
+        align='center'
+        sx={t => ({
+          width: '100%',
+          paddingRight: t.space.$5,
+        })}
+      >
+        <OrganizationPreview
+          elementId={'organizationSwitcherActiveOrganization'}
+          organization={currentOrg}
+          user={user}
+          mainIdentifierVariant='buttonLarge'
           sx={t => ({
-            width: '100%',
-            paddingRight: t.space.$5,
+            padding: `${t.space.$4} ${t.space.$5}`,
           })}
-        >
-          <OrganizationPreview
-            elementId={'organizationSwitcherActiveOrganization'}
-            organization={currentOrg}
-            user={user}
-            mainIdentifierVariant='buttonLarge'
-            sx={t => ({
-              padding: `${t.space.$4} ${t.space.$5}`,
-            })}
-          />
-          <Actions role='menu'>{manageOrganizationButton}</Actions>
-        </Flex>
-      );
+        />
+        <Actions role='menu'>{manageOrganizationButton}</Actions>
+      </Flex>
+    );
 
     return (
       <RootBox elementDescriptor={descriptors.organizationSwitcherPopoverRootBox}>

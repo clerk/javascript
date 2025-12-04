@@ -22,7 +22,7 @@ export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'baseTheme' | 'theme' | 'elements' | 'options' | 'variables' | 'captcha' | 'cssLayerName'
+  'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
@@ -44,7 +44,7 @@ const defaultOptions: ParsedOptions = {
   socialButtonsVariant: 'auto',
   logoImageUrl: '',
   logoLinkUrl: '',
-  showOptionalFields: true,
+  showOptionalFields: false,
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
@@ -105,15 +105,14 @@ const expand = (theme: Theme | undefined, cascade: any[]) => {
     return;
   }
 
-  // Use new 'theme' property if available, otherwise fall back to deprecated 'baseTheme'
-  const themeProperty = theme.theme !== undefined ? theme.theme : theme.baseTheme;
+  const themeProperty = theme.theme;
 
   if (themeProperty !== undefined) {
-    (Array.isArray(themeProperty) ? themeProperty : [themeProperty]).forEach(baseTheme => {
-      if (typeof baseTheme === 'string') {
-        expand(getBaseTheme(baseTheme), cascade);
+    (Array.isArray(themeProperty) ? themeProperty : [themeProperty]).forEach(t => {
+      if (typeof t === 'string') {
+        expand(getBaseTheme(t), cascade);
       } else {
-        expand(baseTheme as Theme, cascade);
+        expand(t as Theme, cascade);
       }
     });
   }

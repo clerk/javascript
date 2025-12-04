@@ -87,7 +87,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
-    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onBeforeRequest;
+    const windowCallback = typeof window !== 'undefined' && (window as any).__internal_onBeforeRequest;
     for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
       if ((await callback(requestInit)) === false) {
         return false;
@@ -97,7 +97,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   async function runAfterResponseCallbacks(requestInit: FapiRequestInit, response: FapiResponse<unknown>) {
-    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onAfterResponse;
+    const windowCallback = typeof window !== 'undefined' && (window as any).__internal_onAfterResponse;
     for await (const callback of [windowCallback, ...onAfterResponseCallbacks].filter(s => s)) {
       if ((await callback(requestInit, response)) === false) {
         return false;

@@ -1,5 +1,33 @@
 # Change Log
 
+## 3.29.0
+
+### Minor Changes
+
+- Introduce `reset-password` session task ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+- Introduce a new variant for the alternative methods screen to handle untrusted password error on sign-in ([#7331](https://github.com/clerk/javascript/pull/7331)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Add localization key for username form error ([#7320](https://github.com/clerk/javascript/pull/7320)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.4
+
+## 3.28.5
+
+### Patch Changes
+
+- Improve Japanese (ja-JP) translations ([#7216](https://github.com/clerk/javascript/pull/7216)) by [@kaz](https://github.com/kaz)
+
+## 3.28.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.3
+
 ## 3.28.3
 
 ### Patch Changes

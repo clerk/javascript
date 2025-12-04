@@ -56,7 +56,7 @@ describe('ClerkProvider', () => {
     it('includes variables, elements, options baseTheme', () => {
       expectTypeOf({
         ...defaultProps,
-        appearance: { elements: {}, variables: {}, options: {}, baseTheme: dark },
+        appearance: { elements: {}, variables: {}, options: {}, thene: dark },
       }).toMatchTypeOf<ClerkProviderProps>();
     });
 

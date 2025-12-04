@@ -16,6 +16,12 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 
 describe('SignIn', () => {
+  it('can be serialized with JSON.stringify', () => {
+    const signIn = new SignIn();
+    const snapshot = JSON.stringify(signIn);
+    expect(snapshot).toBeDefined();
+  });
+
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -71,6 +77,12 @@ describe('SignIn', () => {
   });
 
   describe('SignInFuture', () => {
+    it('can be serialized with JSON.stringify', () => {
+      const signIn = new SignIn();
+      const snapshot = JSON.stringify(signIn.__internal_future);
+      expect(snapshot).toBeDefined();
+    });
+
     describe('selectFirstFactor', () => {
       beforeAll(() => {
         const signInCreatedJSON = {
