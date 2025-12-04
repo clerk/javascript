@@ -893,6 +893,7 @@ export const teIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__username: 'ఈ వినియోగదారు పేరు తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_not_found: 'ఈ గుర్తింపుదారుతో ఖాతా కనుగొనబడలేదు. దయచేసి తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'నమోదు చేసిన విలువ చెల్లని ఫార్మాట్‌లో ఉంది. దయచేసి తనిఖీ చేసి దిద్దుబాటు చేయండి.',
     form_param_format_invalid__email_address: 'ఇమెయిల్ చిరునామా చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామా అయి ఉండాలి.',
     form_param_format_invalid__phone_number: 'ఫోన్ నంబర్ చెల్లుబాటు అయ్యే అంతర్జాతీయ ఫార్మాట్‌లో ఉండాలి.',

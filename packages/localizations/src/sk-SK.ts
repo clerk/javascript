@@ -891,6 +891,7 @@ export const skSK: LocalizationResource = {
     form_identifier_exists__phone_number: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     form_identifier_exists__username: 'Táto použivateľské meno je už obsadené. Skúste prosím iné.',
     form_identifier_not_found: 'Účet s týmto identifikátorom nebol nájdený. Skontrolujte údaje a skúste to znova.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Zadaná hodnota nie je v správnom formáte. Skontrolujte a opravte.',
     form_param_format_invalid__email_address: 'Emailová adresa musí byť platná.',
     form_param_format_invalid__phone_number: 'Telefónne číslo musí byť v platnom medzinárodnom formáte.',
