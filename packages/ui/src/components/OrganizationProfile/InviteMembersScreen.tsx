@@ -11,7 +11,6 @@ import { useOrganizationProfileContext } from '../../contexts';
 import { descriptors, Flex, localizationKeys, Text } from '../../customizables';
 import { useActionContext } from '../../elements/Action/ActionRoot';
 import { Email } from '../../icons';
-import { BillingWidget } from './BillingWidget';
 import { InviteMembersForm } from './InviteMembersForm';
 
 type InviteMembersScreenProps = {
@@ -26,17 +25,10 @@ export const InviteMembersScreen = withCardStateProvider((props: InviteMembersSc
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
   const { organization } = useOrganization();
-  // @ts-expect-error - __unstable_manageBillingUrl and __unstable_manageBillingMembersLimit are unstable props
-  const { __unstable_manageBillingUrl, __unstable_manageBillingMembersLimit } = useOrganizationProfileContext();
 
   if (!organization) {
     return null;
   }
-
-  const reachedOrganizationMemberLimit =
-    !!__unstable_manageBillingMembersLimit &&
-    runIfFunctionOrReturn(__unstable_manageBillingMembersLimit) <=
-      organization.pendingInvitationsCount + organization.membersCount;
 
   return (
     <Wizard {...wizard.props}>
@@ -44,12 +36,6 @@ export const InviteMembersScreen = withCardStateProvider((props: InviteMembersSc
         headerTitle={title}
         headerSubtitle={subtitle}
       >
-        {reachedOrganizationMemberLimit && __unstable_manageBillingUrl && (
-          <BillingWidget
-            __unstable_manageBillingUrl={__unstable_manageBillingUrl}
-            __unstable_manageBillingMembersLimit={__unstable_manageBillingMembersLimit}
-          />
-        )}
         <InviteMembersForm
           onSuccess={wizard.nextStep}
           onReset={onReset}

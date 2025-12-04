@@ -38,8 +38,8 @@ interface Window {
   __clerk_nav_await: Array<(value: void) => void>;
   __clerk_nav: (to: string) => Promise<void>;
 
-  __unstable__onBeforeSetActive: (intent?: 'sign-out') => void | Promise<void>;
-  __unstable__onAfterSetActive: () => void | Promise<void>;
+  __internal_onBeforeSetActive: (intent?: 'sign-out') => void | Promise<void>;
+  __internal_onAfterSetActive: () => void | Promise<void>;
 
   next?: {
     version: string;

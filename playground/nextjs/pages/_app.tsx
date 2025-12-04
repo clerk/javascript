@@ -10,7 +10,7 @@ import {
   SignOutButton,
   UserButton,
 } from '@clerk/nextjs';
-import { dark, experimental__simple, neobrutalism, shadesOfPurple } from '@clerk/themes';
+import { dark, __experimental_simple, neobrutalism, shadesOfPurple } from '@clerk/themes';
 import Link from 'next/link';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 
@@ -63,7 +63,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* @ts-ignore */}
       <ClerkProvider
         appearance={{
-          theme: styleReset ? [experimental__simple, themes[selectedTheme]] : themes[selectedTheme],
+          baseTheme: styleReset ? [__experimental_simple, themes[selectedTheme]] : themes[selectedTheme],
           variables: {
             colorPrimary: primaryColor,
           },

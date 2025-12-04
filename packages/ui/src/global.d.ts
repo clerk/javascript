@@ -20,6 +20,6 @@ declare global {
      * Unstable API for accessing UI components separately from clerk-js.
      * This is injected by the @clerk/ui browser bundle.
      */
-    __unstable_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUiCtor?: ClerkUiConstructor;
   }
 }

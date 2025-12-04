@@ -1,6 +1,6 @@
-import { experimental_createTheme } from './createTheme';
+import { createTheme } from './createTheme';
 
-export const shadcn = experimental_createTheme({
+export const shadcn = createTheme({
   name: 'shadcn',
   cssLayerName: 'components',
   variables: {
