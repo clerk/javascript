@@ -87,9 +87,7 @@ export function Codemod(props) {
           <Text color='gray'>{result.nochange ?? 0} unmodified</Text>
           {result.timeElapsed && <Text>Time elapsed: {result.timeElapsed}</Text>}
 
-          {transform === 'transform-remove-deprecated-props' && (
-            <ManualInterventionSummary stats={result.clerkUpgradeStats} />
-          )}
+          {transform === 'transform-remove-deprecated-props' && <ManualInterventionSummary stats={result.stats} />}
 
           <Newline />
         </>
@@ -104,11 +102,11 @@ function ManualInterventionSummary({ stats }) {
     return null;
   }
 
-  const hasUserButtonChanges = stats.userbuttonAfterSignOutPropsRemoved > 0;
-  const hasHideSlugChanges = stats.hideSlugRemoved > 0;
-  const hasBeforeEmitChanges = stats.beforeEmitTransformed > 0;
+  const userButtonCount = stats.userbuttonAfterSignOutPropsRemoved || 0;
+  const hideSlugCount = stats.hideSlugRemoved || 0;
+  const beforeEmitCount = stats.beforeEmitTransformed || 0;
 
-  if (!hasUserButtonChanges && !hasHideSlugChanges && !hasBeforeEmitChanges) {
+  if (!userButtonCount && !hideSlugCount && !beforeEmitCount) {
     return null;
   }
 
@@ -122,65 +120,61 @@ function ManualInterventionSummary({ stats }) {
         ⚠️ Manual intervention may be required:
       </Text>
 
-      {hasUserButtonChanges && (
+      {userButtonCount > 0 && (
         <>
           <Newline />
           <Text color='yellow'>
-            • Removed {stats.userbuttonAfterSignOutPropsRemoved} <Text bold>UserButton</Text> sign-out redirect prop(s)
+            • Removed {userButtonCount} <Text bold>UserButton</Text> sign-out redirect prop(s) (
+            <Text italic>afterSignOutUrl</Text>, <Text italic>afterMultiSessionSingleSignOutUrl</Text>)
           </Text>
           <Text color='gray'>
-            {'  '}Configure redirects via <Text italic>ClerkProvider afterSignOutUrl</Text> or{' '}
-            <Text italic>SignOutButton redirectUrl</Text>
-          </Text>
-          <FileList files={stats.userbuttonFilesAffected} />
-        </>
-      )}
-
-      {hasHideSlugChanges && (
-        <>
-          <Newline />
-          <Text color='yellow'>
-            • Removed {stats.hideSlugRemoved} <Text bold>hideSlug</Text> prop(s)
-          </Text>
-          <Text color='gray'>{'  '}This prop has been removed. Slug visibility is now controlled differently.</Text>
-          <FileList files={stats.hideSlugFiles} />
-        </>
-      )}
-
-      {hasBeforeEmitChanges && (
-        <>
-          <Newline />
-          <Text color='yellow'>
-            • Transformed {stats.beforeEmitTransformed} <Text bold>setActive beforeEmit</Text> to{' '}
-            <Text bold>navigate</Text>
+            {'  '}These props have been removed from UserButton. To configure sign-out redirects:
           </Text>
           <Text color='gray'>
-            {'  '}Callback signature changed: now receives <Text italic>params</Text> object instead of{' '}
-            <Text italic>session</Text> directly. Review the transformed code.
+            {'  '}- Global default: Add <Text italic>afterSignOutUrl</Text> prop to{' '}
+            <Text italic>{'<ClerkProvider>'}</Text>
           </Text>
-          <FileList files={stats.beforeEmitFiles} />
+          <Text color='gray'>
+            {'  '}- Per-button control: Use <Text italic>{'<SignOutButton redirectUrl="/your-path">'}</Text>
+          </Text>
+          <Text color='gray'>
+            {'  '}- Programmatic: Call <Text italic>{'clerk.signOut({ redirectUrl: "/your-path" })'}</Text>
+          </Text>
         </>
       )}
-    </>
-  );
-}
 
-function FileList({ files }) {
-  if (!files?.length) {
-    return null;
-  }
+      {hideSlugCount > 0 && (
+        <>
+          <Newline />
+          <Text color='yellow'>
+            • Removed {hideSlugCount} <Text bold>hideSlug</Text> prop(s) from organization components
+          </Text>
+          <Text color='gray'>
+            {'  '}The <Text italic>hideSlug</Text> prop has been removed from CreateOrganization,
+          </Text>
+          <Text color='gray'>{'  '}OrganizationSwitcher, and OrganizationList components.</Text>
+          <Text color='gray'>{'  '}Organization slugs are now managed through the Clerk Dashboard settings.</Text>
+        </>
+      )}
 
-  return (
-    <>
-      <Text color='gray'>{'  '}Files:</Text>
-      {files.map((file, index) => (
-        <Text
-          key={index}
-          color='gray'
-        >
-          {'    '}- {file}
-        </Text>
-      ))}
+      {beforeEmitCount > 0 && (
+        <>
+          <Newline />
+          <Text color='yellow'>
+            • Transformed {beforeEmitCount} <Text bold>setActive({'{ beforeEmit }'})</Text> to{' '}
+            <Text bold>setActive({'{ navigate }'})</Text>
+          </Text>
+          <Text color='gray'>
+            {'  '}The callback now receives an object with <Text italic>session</Text> property:
+          </Text>
+          <Text color='gray'>{'    '}Before: beforeEmit: (session) =&gt; doSomething(session)</Text>
+          <Text color='gray'>
+            {'    '}After: navigate: ({'{ session }'}) =&gt; doSomething(session)
+          </Text>
+          <Text color='gray'>{'  '}The codemod wrapped your callback to extract session from the params object.</Text>
+          <Text color='gray'>{'  '}Consider refactoring to use destructuring directly for cleaner code.</Text>
+        </>
+      )}
     </>
   );
 }
