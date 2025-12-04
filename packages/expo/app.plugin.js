@@ -223,35 +223,52 @@ const withClerkIOS = config => {
       const projectName = config.modRequest.projectName;
       const iosProjectPath = path.join(platformProjectRoot, projectName);
 
-      // Find the ClerkSignInView.swift source file from node_modules
-      // Handle both pnpm workspace and regular node_modules
+      // Find the ClerkSignInView.swift source file
+      // Check multiple possible locations in order of preference
       let sourceFile;
-      const workspacePath = path.join(
-        config.modRequest.projectRoot,
-        '..',
-        'javascript',
-        'packages',
-        'expo',
-        'ios',
-        'ClerkSignInView.swift',
-      );
-      const nodeModulesPath = path.join(
-        config.modRequest.projectRoot,
-        'node_modules',
-        '@clerk',
-        'clerk-expo',
-        'ios',
-        'ClerkSignInView.swift',
-      );
+      const possiblePaths = [
+        // Standard node_modules (npm, yarn)
+        path.join(
+          config.modRequest.projectRoot,
+          'node_modules',
+          '@clerk',
+          'clerk-expo',
+          'ios',
+          'ClerkSignInView.swift',
+        ),
+        // pnpm hoisted node_modules
+        path.join(
+          config.modRequest.projectRoot,
+          '..',
+          'node_modules',
+          '@clerk',
+          'clerk-expo',
+          'ios',
+          'ClerkSignInView.swift',
+        ),
+        // Monorepo workspace (pnpm workspace)
+        path.join(
+          config.modRequest.projectRoot,
+          '..',
+          'javascript',
+          'packages',
+          'expo',
+          'ios',
+          'ClerkSignInView.swift',
+        ),
+        // Alternative monorepo structure
+        path.join(config.modRequest.projectRoot, '..', 'packages', 'expo', 'ios', 'ClerkSignInView.swift'),
+      ];
 
-      if (fs.existsSync(workspacePath)) {
-        sourceFile = workspacePath;
-      } else if (fs.existsSync(nodeModulesPath)) {
-        sourceFile = nodeModulesPath;
+      for (const possiblePath of possiblePaths) {
+        if (fs.existsSync(possiblePath)) {
+          sourceFile = possiblePath;
+          break;
+        }
       }
 
       if (sourceFile && fs.existsSync(sourceFile)) {
-        // Copy it to the app target directory
+        // ALWAYS copy the file to ensure we have the latest version
         const targetFile = path.join(iosProjectPath, 'ClerkSignInView.swift');
         fs.copyFileSync(sourceFile, targetFile);
         console.log('✅ Copied ClerkSignInView.swift to app target');
@@ -271,12 +288,13 @@ const withClerkIOS = config => {
 
           const targetUuid = target.uuid;
 
-          // Check if file is already in the project
+          // Check if file is already in the Xcode project references
           const fileReferences = xcodeProject.hash.project.objects.PBXFileReference || {};
           const alreadyExists = Object.values(fileReferences).some(ref => ref && ref.path === fileName);
 
           if (alreadyExists) {
-            console.log('✅ ClerkSignInView.swift already in Xcode project');
+            // File is already in project, but we still copied the latest version
+            console.log('✅ ClerkSignInView.swift updated in app target');
             return config;
           }
 
@@ -374,6 +392,61 @@ const withClerkIOS = config => {
 
     return config;
   });
+
+  // Inject SPM package resolution into Podfile post_install hook
+  // This runs synchronously during pod install, ensuring packages are resolved before prebuild completes
+  config = withDangerousMod(config, [
+    'ios',
+    async config => {
+      const platformProjectRoot = config.modRequest.platformProjectRoot;
+      const projectName = config.modRequest.projectName;
+      const podfilePath = path.join(platformProjectRoot, 'Podfile');
+
+      if (fs.existsSync(podfilePath)) {
+        let podfileContents = fs.readFileSync(podfilePath, 'utf8');
+
+        // Check if we've already added our resolution code
+        if (!podfileContents.includes('# Clerk: Resolve SPM packages')) {
+          // Code to inject into existing post_install block
+          // Note: We run this AFTER react_native_post_install to ensure the workspace is fully written
+          const spmResolutionCode = `
+    # Clerk: Resolve SPM packages synchronously during pod install
+    # This ensures packages are downloaded before the user opens Xcode
+    # We wait until the end of post_install to ensure workspace is fully written
+    at_exit do
+      workspace_path = File.join(__dir__, '${projectName}.xcworkspace')
+      if File.exist?(workspace_path)
+        puts ""
+        puts "📦 [Clerk] Resolving Swift Package dependencies..."
+        puts "   This may take a minute on first run..."
+        # Use backticks to capture output and check exit status
+        output = \`xcodebuild -resolvePackageDependencies -workspace "#{workspace_path}" -scheme "${projectName}" 2>&1\`
+        if $?.success?
+          puts "✅ [Clerk] Swift Package dependencies resolved successfully"
+        else
+          puts "⚠️  [Clerk] SPM resolution output:"
+          puts output.lines.last(10).join
+        end
+        puts ""
+      end
+    end
+`;
+
+          // Insert our code at the beginning of the existing post_install block
+          if (podfileContents.includes('post_install do |installer|')) {
+            podfileContents = podfileContents.replace(
+              /post_install do \|installer\|/,
+              `post_install do |installer|${spmResolutionCode}`,
+            );
+            fs.writeFileSync(podfilePath, podfileContents);
+            console.log('✅ Added SPM resolution to Podfile post_install hook');
+          }
+        }
+      }
+
+      return config;
+    },
+  ]);
 
   return config;
 };
