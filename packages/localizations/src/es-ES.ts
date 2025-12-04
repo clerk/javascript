@@ -694,8 +694,14 @@ export const esES: LocalizationResource = {
       subtitle: 'para continuar a {{applicationName}}',
       title: 'Introduzca su contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Tu contraseña ha sido comprometida',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -900,9 +906,11 @@ export const esES: LocalizationResource = {
     form_password_pwned__sign_in: 'La contraseña ya está en uso en otro servicio.',
     form_password_size_in_bytes_exceeded:
       'Tu contraseña ha excedido el número máximo de bytes permitidos, por favor acórtala o elimina algunos caracteres especiales.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'La validación de la contraseña falló.',
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'El nombre de usuario debe tener entre 3 y 20 caracteres.',
+    form_username_needs_non_number_char: 'Tu nombre de usuario debe contener al menos un carácter no numérico.',
     identification_deletion_failed: 'No puedes eliminar tu última identificación.',
     not_allowed_access:
       "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",

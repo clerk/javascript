@@ -698,8 +698,14 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் கணக்குடன் தொடர்புடைய கடவுச்சொல்லை உள்ளிடவும்',
       title: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
@@ -908,11 +914,13 @@ export const taIN: LocalizationResource = {
       'இந்த கடவுச்சொல் தரவு மீறலின் ஒரு பகுதியாக காணப்பட்டது மற்றும் பயன்படுத்த முடியாது, தயவுசெய்து உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்.',
     form_password_size_in_bytes_exceeded:
       'உங்கள் கடவுச்சொல் அனுமதிக்கப்பட்ட அதிகபட்ச பைட்டுகளை மீறிவிட்டது, தயவுசெய்து அதை குறைக்கவும் அல்லது சில சிறப்பு எழுத்துக்களை நீக்கவும்.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'தவறான கடவுச்சொல்',
     form_username_invalid_character:
       'உங்கள் பயனர்பெயரில் தவறான எழுத்துக்கள் உள்ளன. எழுத்துக்கள், எண்கள் மற்றும் அடிக்கோடுகளை மட்டும் பயன்படுத்தவும்.',
     form_username_invalid_length:
       'உங்கள் பயனர்பெயர் {{min_length}} மற்றும் {{max_length}} எழுத்துகளுக்கு இடையில் இருக்க வேண்டும்.',
+    form_username_needs_non_number_char: 'உங்கள் பயனர் பெயரில் குறைந்தது ஒரு எண்ணல்லாத எழுத்து இருக்க வேண்டும்.',
     identification_deletion_failed: 'உங்கள் கடைசி அடையாளத்தை நீங்கள் நீக்க முடியாது.',
     not_allowed_access:
       'இந்த பக்கத்தை அணுக உங்களுக்கு அனுமதி இல்லை. இது பிழை என்று நீங்கள் நம்பினால், ஆதரவைத் தொடர்பு கொள்ளவும்.',

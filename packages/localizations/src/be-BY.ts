@@ -697,8 +697,14 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увядзіце пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль быў узламаны',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код верыфікацыі',
@@ -904,9 +910,11 @@ export const beBY: LocalizationResource = {
     form_password_pwned__sign_in: 'Гэты пароль быў узламаны, калі ласка, абярыце іншы.',
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перавышае максімальна дапушчальнае колькасць байтаў, скараціце яго або выдаліце некаторыя спецыяльныя сімвалы.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Неверагодны пароль',
     form_username_invalid_character: 'Імя карыстальніка змяшчае недапушчальныя сімвалы.',
     form_username_invalid_length: 'Імя карыстальніка павінна быць ад 3 да 50 сімвалаў.',
+    form_username_needs_non_number_char: 'Імя карыстальніка павінна ўтрымліваць прынамсі адзін нелічбавы сімвал.',
     identification_deletion_failed: 'Вы не можаце выдаліць вашу апошнюю ідэнтыфікацыю.',
     not_allowed_access:
       "Адрас электроннай пошты ці нумар тэлефона не дазволены для рэгістрацыі. Гэта можа быць звязана з выкарыстаннем знакаў '+', '=', '#' або '.' у вашым адрасе электроннай пошты, з дапамогай дамена, падлучанага да часовай службы электроннай пошты, або відавочна заблакіраваны. Калі вы лічыце, што гэта памылка, звярніцеся ў службу падтрымкі.",

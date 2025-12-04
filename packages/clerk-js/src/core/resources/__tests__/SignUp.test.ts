@@ -26,7 +26,19 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
 }));
 
 describe('SignUp', () => {
+  it('can be serialized with JSON.stringify', () => {
+    const signUp = new SignUp();
+    const snapshot = JSON.stringify(signUp);
+    expect(snapshot).toBeDefined();
+  });
+
   describe('SignUpFuture', () => {
+    it('can be serialized with JSON.stringify', () => {
+      const signUp = new SignUp();
+      const snapshot = JSON.stringify(signUp.__internal_future);
+      expect(snapshot).toBeDefined();
+    });
+
     describe('create', () => {
       afterEach(() => {
         vi.clearAllMocks();
@@ -271,7 +283,7 @@ describe('SignUp', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
-          __unstable__environment: {
+          __internal_environment: {
             reload: vi.fn().mockResolvedValue({}),
           },
         } as any;

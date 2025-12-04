@@ -15,7 +15,7 @@ type ClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'
  * import { dark } from '@clerk/ui/themes';
  *
  * updateClerkOptions({
- *   appearance: { baseTheme: dark },
+ *   appearance: { theme: dark },
  *   localization: frFR
  * });
  */
@@ -31,6 +31,6 @@ export function updateClerkOptions<TUi extends Ui = Ui>(options: ClerkUpdateOpti
     appearance: options.appearance,
   } as unknown as { options: any; appearance?: any };
 
-  // @ts-expect-error - `__unstable__updateProps` is not exposed as public API from `@clerk/types`
-  void window.Clerk.__unstable__updateProps(updateOptions);
+  // @ts-expect-error - `__internal_updateProps` is not exposed as public API from `@clerk/types`
+  void window.Clerk.__internal_updateProps(updateOptions);
 }

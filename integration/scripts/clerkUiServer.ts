@@ -10,8 +10,8 @@ export const startClerkUiHttpServer = async (): Promise<void> => {
     return;
   }
 
-  const clerkUiTempDir = getTempDir('clerk-ui/node_modules/@clerk/ui/dist/browser', 'E2E_APP_CLERK_UI_DIR');
-  const sourceDir = path.join(process.cwd(), 'packages/ui/dist/browser');
+  const clerkUiTempDir = getTempDir('clerk-ui/node_modules/@clerk/ui/dist', 'E2E_APP_CLERK_UI_DIR');
+  const sourceDir = path.join(process.cwd(), 'packages/ui/dist');
 
   const { pid } = await startHttpServer({
     name: 'clerkUi',

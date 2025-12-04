@@ -1175,7 +1175,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      *
      * @default undefined
      */
-    taskUrls?: Record<SessionTask['key'], string>;
+    taskUrls?: Partial<Record<SessionTask['key'], string>>;
   };
 
 export interface NavigateOptions {

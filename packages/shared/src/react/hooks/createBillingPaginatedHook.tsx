@@ -129,7 +129,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
         keepPreviousData: safeValues.keepPreviousData,
         infinite: safeValues.infinite,
         enabled: isEnabled,
-        ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
+        ...(options?.unauthenticated ? {} : { isSignedIn: user !== null }),
         __experimental_mode: safeValues.__experimental_mode,
         initialPage: safeValues.initialPage,
         pageSize: safeValues.pageSize,

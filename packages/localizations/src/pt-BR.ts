@@ -702,8 +702,14 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira sua senha',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Senha comprometida',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -910,9 +916,11 @@ export const ptBR: LocalizationResource = {
     form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:
       'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Senha incorreta',
     form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
+    form_username_needs_non_number_char: 'Nome de usuário deve conter pelo menos um caractere não número.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",

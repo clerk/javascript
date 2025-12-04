@@ -706,8 +706,14 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Geben Sie Ihr Passwort ein',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Passwort kompromittiert',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bestätigungscode',
@@ -915,10 +921,12 @@ export const deDE: LocalizationResource = {
       'Dieses Passwort wurde in einem Datenleck gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
     form_password_size_in_bytes_exceeded:
       'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Falsches Passwort.',
     form_username_invalid_character:
       'Der Benutzername enthält ungültige Zeichen. Bitte verwenden Sie nur alphanumerische Zeichen und Unterstriche.',
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
+    form_username_needs_non_number_char: 'Ihr Benutzername muss mindestens ein nicht-numerisches Zeichen enthalten.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
     not_allowed_access:
       "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",

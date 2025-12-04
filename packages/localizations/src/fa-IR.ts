@@ -702,8 +702,14 @@ export const faIR: LocalizationResource = {
       subtitle: 'رمز عبور مرتبط با حساب کاربری خود را وارد کنید',
       title: 'رمز عبور خود را وارد کنید',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'کد تأیید',
@@ -909,9 +915,11 @@ export const faIR: LocalizationResource = {
     form_password_pwned__sign_in:
       'این رمز عبور به عنوان بخشی از یک نقض امنیتی یافت شده و قابل استفاده نیست، لطفاً رمز عبور خود را مجدداً تنظیم کنید.',
     form_password_size_in_bytes_exceeded: 'رمز عبور خیلی طولانی است.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'اعتبارسنجی رمز عبور ناموفق بود.',
     form_username_invalid_character: 'نام کاربری شامل کاراکترهای نامعتبر است.',
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',
+    form_username_needs_non_number_char: 'نام کاربری شما باید حداقل شامل یک کاراکتر غیر عددی باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
     not_allowed_access: 'دسترسی مجاز نیست.',
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',

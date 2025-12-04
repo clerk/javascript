@@ -694,7 +694,13 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Бүртгэлтэй холбоотой нууц үгээ оруулна уу',
       title: 'Нууц үгээ оруулна уу',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -899,9 +905,11 @@ export const mnMN: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй. Өөр нууц үг оруулж үзнэ үү.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Нууц үг буруу',
     form_username_invalid_character: 'Хэрэглэгчийн нэр буруу тэмдэгт агуулж байна.',
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
+    form_username_needs_non_number_char: 'Таны хэрэглэгчийн нэр дор хаяж нэг тоон бус тэмдэгт агуулсан байх ёстой.',
     identification_deletion_failed: 'Та өөрийн сүүлчийн таниулбараа устгах боломжгүй.',
     not_allowed_access:
       "Имэйл хаяг эсвэл утасны дугаарыг бүртгүүлэхийг хориглоно. Энэ нь '+', '=', '#' эсвэл '.'-г ашигласантай холбоотой байж болно. түр зуурын цахим шуудангийн үйлчилгээтэй холбогдсон домэйн ашиглах, эсвэл шууд хаагдсан байх. Хэрэв та үүнийг алдаа гэж үзэж байгаа бол дэмжлэгтэй холбогдоно уу.",

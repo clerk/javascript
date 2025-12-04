@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { hash } from '../models/helpers';
 import { appConfigs } from '../presets';
@@ -19,7 +19,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       const user = u.services.users.createFakeUser();
       const createdUser = await u.services.users.createBapiUser(user);
 
-      await u.services.users.passwordUntrusted(createdUser.id);
+      await u.services.users.passwordCompromised(createdUser.id);
 
       // Performs sign-in
       await u.po.signIn.goTo();
@@ -27,6 +27,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.continue();
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
+
+      await expect(
+        u.page.getByText(
+          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+        ),
+      ).toBeVisible();
+      await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });
@@ -59,10 +66,11 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       const user = u.services.users.createFakeUser();
       const createdUser = await u.services.users.createBapiUser(user);
 
-      await u.services.users.passwordUntrusted(createdUser.id);
+      await u.services.users.passwordCompromised(createdUser.id);
       const fakeOrganization = u.services.organizations.createFakeOrganization();
       await u.services.organizations.createBapiOrganization({
-        ...fakeOrganization,
+        name: fakeOrganization.name,
+        slug: fakeOrganization.slug + Date.now().toString(),
         createdBy: createdUser.id,
       });
 
@@ -73,9 +81,15 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
-      await u.page.getByRole('textbox', { name: 'code' }).fill('424242');
+      await expect(
+        u.page.getByText(
+          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+        ),
+      ).toBeVisible();
+      await u.po.signIn.getAltMethodsEmailCodeButton().click();
 
-      await u.po.expect.toBeSignedIn();
+      await u.page.getByRole('textbox', { name: 'code' }).click();
+      await u.page.keyboard.type('424242', { delay: 100 });
 
       // Redirects back to tasks when accessing protected route by `auth.protect`
       await u.page.goToRelative('/page-protected');
