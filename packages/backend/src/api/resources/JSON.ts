@@ -405,19 +405,19 @@ export interface OrganizationInvitationAcceptedJSON extends OrganizationInvitati
  */
 export interface PublicOrganizationDataJSON extends ClerkResourceJSON {
   /**
-   * The name of the organization.
+   * The name of the Organization.
    */
   name: string;
   /**
-   * The slug of the organization.
+   * The slug of the Organization.
    */
   slug: string;
   /**
-   * Holds the default organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
+   * Holds the default Organization profile image. Compatible with Clerk's [Image Optimization](https://clerk.com/docs/guides/development/image-optimization).
    */
   image_url?: string;
   /**
-   * Whether the organization has a profile image.
+   * Whether the Organization has a profile image.
    */
   has_image: boolean;
 }

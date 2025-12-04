@@ -69,7 +69,7 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
    *
    * @experimental
    */

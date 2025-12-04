@@ -2,7 +2,7 @@ import type { OrganizationInvitationStatus, OrganizationMembershipRole } from '.
 import type { OrganizationInvitationJSON, PublicOrganizationDataJSON } from './JSON';
 
 /**
- * The Backend `OrganizationInvitation` object is similar to the [`OrganizationInvitation`](https://clerk.com/docs/reference/javascript/types/organization-invitation) object as it's the model around an organization invitation. However, the Backend `OrganizationInvitation` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `OrganizationInvitation` object is similar to the [`OrganizationInvitation`](https://clerk.com/docs/reference/javascript/types/organization-invitation) object as it's the model around an Organization invitation. However, the Backend `OrganizationInvitation` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class OrganizationInvitation {
   private _raw: OrganizationInvitationJSON | null = null;
@@ -21,11 +21,11 @@ export class OrganizationInvitation {
      */
     readonly emailAddress: string,
     /**
-     * The role of the invited user.
+     * The Role of the invited user.
      */
     readonly role: OrganizationMembershipRole,
     /**
-     * The name of the role of the invited user.
+     * The name of the Role of the invited user.
      */
     readonly roleName: string,
     /**
@@ -61,7 +61,7 @@ export class OrganizationInvitation {
      */
     readonly privateMetadata: OrganizationInvitationPrivateMetadata = {},
     /**
-     * Public data about the organization that the user is invited to.
+     * Public data about the Organization that the user is invited to.
      */
     readonly publicOrganizationData?: PublicOrganizationDataJSON | null,
   ) {}
