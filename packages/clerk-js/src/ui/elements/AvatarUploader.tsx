@@ -1,7 +1,16 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } from '../customizables';
+import {
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  SimpleButton,
+  Text,
+  useLocalizations,
+} from '../customizables';
 import { handleError } from '../utils/errorHandler';
 import { useCardState } from './contexts';
 
@@ -29,6 +38,7 @@ const validType = (f: File | DataTransferItem) => SUPPORTED_MIME_TYPES.includes(
 const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
+  const { t } = useLocalizations();
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
@@ -68,12 +78,12 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     }
 
     if (!validType(f)) {
-      card.setError('File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.');
+      card.setError(t(localizationKeys('unstable__errors.avatar_file_type_invalid')));
       return;
     }
 
     if (!validSize(f)) {
-      card.setError('File size exceeds the maximum limit of 10MB. Please choose a smaller file.');
+      card.setError(t(localizationKeys('unstable__errors.avatar_file_size_exceeded')));
       return;
     }
 
