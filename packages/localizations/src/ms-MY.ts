@@ -698,8 +698,14 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan yang berkaitan dengan akaun anda',
       title: 'Masukkan kata laluan anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata laluan dikompromi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kod pengesahan',
@@ -909,6 +915,7 @@ export const msMY: LocalizationResource = {
       'Kata laluan ini telah dijumpai sebagai sebahagian daripada pelanggaran dan tidak boleh digunakan, sila tetapkan semula kata laluan anda.',
     form_password_size_in_bytes_exceeded:
       'Kata laluan anda telah melebihi bilangan maksimum bait yang dibenarkan, sila pendekkannya atau keluarkan beberapa aksara khas.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Kata Laluan Tidak Betul',
     form_username_invalid_character:
       'Nama pengguna anda mengandungi aksara yang tidak sah. Sila gunakan hanya huruf, nombor, dan garis bawah.',

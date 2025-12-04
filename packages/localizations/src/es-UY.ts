@@ -697,8 +697,14 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá la contraseña asociada a tu cuenta',
       title: 'Ingresá tu contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Contraseña comprometida',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -907,6 +913,7 @@ export const esUY: LocalizationResource = {
       'Esta contraseña se encontró en una filtración y no se puede usar. Por favor, restablecé tu contraseña.',
     form_password_size_in_bytes_exceeded:
       'Tu contraseña ha excedido el número máximo de bytes permitidos. Por favor, acortala o eliminá algunos caracteres especiales.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contraseña incorrecta',
     form_username_invalid_character:
       'Tu nombre de usuario contiene caracteres inválidos. Por favor, usá solo letras, números y guiones bajos.',
