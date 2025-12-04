@@ -11,7 +11,7 @@ const astroNode = applicationConfig()
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm preview')
   .addDependency('@clerk/astro', linkPackage('astro', 'integration'))
-  .addDependency('@clerk/shared', linkPackage('types', 'integration'))
+  .addDependency('@clerk/shared', linkPackage('shared', 'integration'))
   .addDependency('@clerk/localizations', linkPackage('localizations', 'integration'));
 
 const astroStatic = astroNode.clone().setName('astro-hybrid').useTemplate(templates['astro-hybrid']);
