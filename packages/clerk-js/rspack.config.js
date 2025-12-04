@@ -126,17 +126,41 @@ const common = ({ mode, variant, disableRHC = false }) => {
           signUp: {
             minChunks: 1,
             name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
+            test: module =>
+              !!(
+                module instanceof rspack.NormalModule &&
+                module.resource &&
+                module.resource.includes('/ui/components/SignUp')
+              ),
           },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
+            test: module =>
+              !!(
+                module instanceof rspack.NormalModule &&
+                module.resource &&
+                !module.resource.includes('/ui/components') &&
+                !module.resource.includes('node_modules')
+              ),
           },
           defaultVendors: {
             minChunks: 1,
-            test: /[\\/]node_modules[\\/]/,
+            test: module => {
+              if (!(module instanceof rspack.NormalModule) || !module.resource) {
+                return false;
+              }
+              // Exclude Solana packages and their known transitive dependencies
+              if (
+                /[\\/]node_modules[\\/](@solana|@solana-mobile|@wallet-standard|bn\.js|borsh|buffer|superstruct|bs58|jayson|rpc-websockets|qrcode)[\\/]/.test(
+                  module.resource,
+                )
+              ) {
+                return false;
+              }
+              return /[\\/]node_modules[\\/]/.test(module.resource);
+            },
             name: 'vendors',
             priority: -10,
           },
