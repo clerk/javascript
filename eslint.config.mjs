@@ -89,6 +89,61 @@ const noNavigateUseClerk = {
   },
 };
 
+const noUnstableMethods = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow methods or properties starting with `__unstable_`',
+      recommended: false,
+    },
+    messages: {
+      noUnstable:
+        'Do not define methods or properties starting with `__unstable_`. For internal APIs, use `__internal_`, for experimental APIs, use `__experimental_`.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      MemberExpression(node) {
+        if (
+          node.property.type === 'Identifier' &&
+          typeof node.property.name === 'string' &&
+          node.property.name.startsWith('__unstable_')
+        ) {
+          context.report({
+            node: node.property,
+            messageId: 'noUnstable',
+          });
+        }
+      },
+      Property(node) {
+        if (
+          node.key.type === 'Identifier' &&
+          typeof node.key.name === 'string' &&
+          node.key.name.startsWith('__unstable_')
+        ) {
+          context.report({
+            node: node.key,
+            messageId: 'noUnstable',
+          });
+        }
+      },
+      MethodDefinition(node) {
+        if (
+          node.key.type === 'Identifier' &&
+          typeof node.key.name === 'string' &&
+          node.key.name.startsWith('__unstable_')
+        ) {
+          context.report({
+            node: node.key,
+            messageId: 'noUnstable',
+          });
+        }
+      },
+    };
+  },
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -161,6 +216,11 @@ export default tseslint.config([
   {
     name: 'repo/global',
     plugins: {
+      'custom-rules': {
+        rules: {
+          'no-unstable-methods': noUnstableMethods,
+        },
+      },
       'simple-import-sort': pluginSimpleImportSort,
       'unused-imports': pluginUnusedImports,
       turbo: pluginTurbo,
@@ -176,6 +236,7 @@ export default tseslint.config([
       },
     },
     rules: {
+      'custom-rules/no-unstable-methods': 'error',
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
@@ -359,11 +420,13 @@ export default tseslint.config([
       'custom-rules': {
         rules: {
           'no-navigate-useClerk': noNavigateUseClerk,
+          'no-unstable-methods': noUnstableMethods,
         },
       },
     },
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
+      'custom-rules/no-unstable-methods': 'error',
     },
   },
   {

@@ -7,7 +7,7 @@ import { createCacheKeys } from './createCacheKeys';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
- * @interface
+ * @internal
  */
 export type UseAPIKeysParams = PaginatedHookConfig<
   GetAPIKeysParams & {
@@ -21,7 +21,7 @@ export type UseAPIKeysParams = PaginatedHookConfig<
 >;
 
 /**
- * @interface
+ * @internal
  */
 export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
   APIKeyResource,
@@ -29,6 +29,8 @@ export type UseAPIKeysReturn<T extends UseAPIKeysParams> = PaginatedResources<
 >;
 
 /**
+ * @internal
+ *
  * The `useAPIKeys()` hook provides access to paginated API keys for the current user or organization.
  *
  * @example
@@ -93,7 +95,9 @@ export function useAPIKeys<T extends UseAPIKeysParams>(params?: T): UseAPIKeysRe
   const isEnabled = (safeValues.enabled ?? true) && clerk.loaded;
 
   return usePagesOrInfinite({
-    fetcher: clerk.apiKeys?.getAll ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll(params) : undefined,
+    fetcher: clerk.apiKeys?.getAll
+      ? (params: GetAPIKeysParams) => clerk.apiKeys.getAll({ ...params, subject: safeValues.subject })
+      : undefined,
     config: {
       keepPreviousData: safeValues.keepPreviousData,
       infinite: safeValues.infinite,

@@ -406,7 +406,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       // If this fails again, we will let the caller handle the error accordingly.
       if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        await SignUp.clerk.__unstable__environment!.reload();
+        await SignUp.clerk.__internal_environment!.reload();
         return authenticateFn();
       }
       throw e;
@@ -456,9 +456,9 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   validatePassword: ReturnType<typeof createValidatePassword> = (password, cb) => {
-    if (SignUp.clerk.__unstable__environment?.userSettings.passwordSettings) {
+    if (SignUp.clerk.__internal_environment?.userSettings.passwordSettings) {
       return createValidatePassword(loadZxcvbn(), {
-        ...SignUp.clerk.__unstable__environment?.userSettings.passwordSettings,
+        ...SignUp.clerk.__internal_environment?.userSettings.passwordSettings,
         validatePassword: true,
       })(password, cb);
     }
@@ -533,7 +533,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const captchaOauthBypass = SignUp.clerk.__unstable__environment!.displayConfig.captchaOauthBypass;
+    const captchaOauthBypass = SignUp.clerk.__internal_environment!.displayConfig.captchaOauthBypass;
 
     if (captchaOauthBypass.some(strategy => strategy === params.strategy)) {
       return true;
@@ -571,102 +571,105 @@ class SignUpFuture implements SignUpFutureResource {
   };
 
   #hasBeenFinalized = false;
+  readonly #resource: SignUp;
 
-  constructor(readonly resource: SignUp) {}
+  constructor(resource: SignUp) {
+    this.#resource = resource;
+  }
 
   get id() {
-    return this.resource.id;
+    return this.#resource.id;
   }
 
   get requiredFields() {
-    return this.resource.requiredFields;
+    return this.#resource.requiredFields;
   }
 
   get optionalFields() {
-    return this.resource.optionalFields;
+    return this.#resource.optionalFields;
   }
 
   get missingFields() {
-    return this.resource.missingFields;
+    return this.#resource.missingFields;
   }
 
   get status() {
     // @TODO hooks-revamp: Consolidate this fallback val with stateProxy
-    return this.resource.status || 'missing_requirements';
+    return this.#resource.status || 'missing_requirements';
   }
 
   get username() {
-    return this.resource.username;
+    return this.#resource.username;
   }
 
   get firstName() {
-    return this.resource.firstName;
+    return this.#resource.firstName;
   }
 
   get lastName() {
-    return this.resource.lastName;
+    return this.#resource.lastName;
   }
 
   get emailAddress() {
-    return this.resource.emailAddress;
+    return this.#resource.emailAddress;
   }
 
   get phoneNumber() {
-    return this.resource.phoneNumber;
+    return this.#resource.phoneNumber;
   }
 
   get web3Wallet() {
-    return this.resource.web3wallet;
+    return this.#resource.web3wallet;
   }
 
   get hasPassword() {
-    return this.resource.hasPassword;
+    return this.#resource.hasPassword;
   }
 
   get unsafeMetadata() {
-    return this.resource.unsafeMetadata;
+    return this.#resource.unsafeMetadata;
   }
 
   get createdSessionId() {
-    return this.resource.createdSessionId;
+    return this.#resource.createdSessionId;
   }
 
   get createdUserId() {
-    return this.resource.createdUserId;
+    return this.#resource.createdUserId;
   }
 
   get abandonAt() {
-    return this.resource.abandonAt;
+    return this.#resource.abandonAt;
   }
 
   get legalAcceptedAt() {
-    return this.resource.legalAcceptedAt;
+    return this.#resource.legalAcceptedAt;
   }
 
   get locale() {
-    return this.resource.locale;
+    return this.#resource.locale;
   }
 
   get unverifiedFields() {
-    return this.resource.unverifiedFields;
+    return this.#resource.unverifiedFields;
   }
 
   get isTransferable() {
     // TODO: we can likely remove the error code check as the status should be sufficient
     return (
-      this.resource.verifications.externalAccount.status === 'transferable' &&
-      this.resource.verifications.externalAccount.error?.code === 'external_account_exists'
+      this.#resource.verifications.externalAccount.status === 'transferable' &&
+      this.#resource.verifications.externalAccount.error?.code === 'external_account_exists'
     );
   }
 
   get existingSession() {
     if (
-      (this.resource.verifications.externalAccount.status === 'failed' ||
-        this.resource.verifications.externalAccount.status === 'unverified') &&
-      this.resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
-      this.resource.verifications.externalAccount.error?.meta?.sessionId
+      (this.#resource.verifications.externalAccount.status === 'failed' ||
+        this.#resource.verifications.externalAccount.status === 'unverified') &&
+      this.#resource.verifications.externalAccount.error?.code === 'identifier_already_signed_in' &&
+      this.#resource.verifications.externalAccount.error?.meta?.sessionId
     ) {
-      return { sessionId: this.resource.verifications.externalAccount.error?.meta?.sessionId };
+      return { sessionId: this.#resource.verifications.externalAccount.error?.meta?.sessionId };
     }
 
     return undefined;
@@ -704,28 +707,28 @@ class SignUpFuture implements SignUpFutureResource {
       locale: params.locale ?? getBrowserLocale(),
     };
 
-    await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+    await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
   }
 
   async create(params: SignUpFutureCreateParams): Promise<{ error: ClerkError | null }> {
-    return runAsyncResourceTask(this.resource, async () => {
+    return runAsyncResourceTask(this.#resource, async () => {
       await this._create(params);
     });
   }
 
   async update(params: SignUpFutureUpdateParams): Promise<{ error: ClerkError | null }> {
-    return runAsyncResourceTask(this.resource, async () => {
+    return runAsyncResourceTask(this.#resource, async () => {
       const body: Record<string, unknown> = {
         ...params,
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.resource.__internal_basePatch({ path: this.resource.pathRoot, body });
+      await this.#resource.__internal_basePatch({ path: this.#resource.pathRoot, body });
     });
   }
 
   async password(params: SignUpFuturePasswordParams): Promise<{ error: ClerkError | null }> {
-    return runAsyncResourceTask(this.resource, async () => {
+    return runAsyncResourceTask(this.#resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
       const body: Record<string, unknown> = {
@@ -737,13 +740,13 @@ class SignUpFuture implements SignUpFutureResource {
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
-      await this.resource.__internal_basePost({ path: this.resource.pathRoot, body });
+      await this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
     });
   }
 
   async sendEmailCode(): Promise<{ error: ClerkError | null }> {
-    return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'email_code' },
         action: 'prepare_verification',
       });
@@ -752,8 +755,8 @@ class SignUpFuture implements SignUpFutureResource {
 
   async verifyEmailCode(params: SignUpFutureEmailCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'email_code', code },
         action: 'attempt_verification',
       });
@@ -762,16 +765,16 @@ class SignUpFuture implements SignUpFutureResource {
 
   async sendPhoneCode(params: SignUpFuturePhoneCodeSendParams): Promise<{ error: ClerkError | null }> {
     const { phoneNumber, channel = 'sms' } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.id) {
+    return runAsyncResourceTask(this.#resource, async () => {
+      if (!this.#resource.id) {
         const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
-        await this.resource.__internal_basePost({
-          path: this.resource.pathRoot,
+        await this.#resource.__internal_basePost({
+          path: this.#resource.pathRoot,
           body: { phoneNumber, captchaToken, captchaWidgetType, captchaError },
         });
       }
 
-      await this.resource.__internal_basePost({
+      await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', channel },
         action: 'prepare_verification',
       });
@@ -780,8 +783,8 @@ class SignUpFuture implements SignUpFutureResource {
 
   async verifyPhoneCode(params: SignUpFuturePhoneCodeVerifyParams): Promise<{ error: ClerkError | null }> {
     const { code } = params;
-    return runAsyncResourceTask(this.resource, async () => {
-      await this.resource.__internal_basePost({
+    return runAsyncResourceTask(this.#resource, async () => {
+      await this.#resource.__internal_basePost({
         body: { strategy: 'phone_code', code },
         action: 'attempt_verification',
       });
@@ -800,7 +803,7 @@ class SignUpFuture implements SignUpFutureResource {
       emailAddress,
       popup,
     } = params;
-    return runAsyncResourceTask(this.resource, async () => {
+    return runAsyncResourceTask(this.#resource, async () => {
       const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken();
 
       let redirectUrlComplete = redirectUrl;
@@ -824,8 +827,8 @@ class SignUpFuture implements SignUpFutureResource {
       }
 
       const authenticateFn = () => {
-        return this.resource.__internal_basePost({
-          path: this.resource.pathRoot,
+        return this.#resource.__internal_basePost({
+          path: this.#resource.pathRoot,
           body: {
             strategy,
             ...routes,
@@ -844,19 +847,19 @@ class SignUpFuture implements SignUpFutureResource {
       await authenticateFn().catch(async e => {
         if (isClerkAPIResponseError(e) && isCaptchaError(e)) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          await SignUp.clerk.__unstable__environment!.reload();
+          await SignUp.clerk.__internal_environment!.reload();
           return authenticateFn();
         }
         throw e;
       });
 
-      const { status, externalVerificationRedirectURL } = this.resource.verifications.externalAccount;
+      const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
 
       if (status === 'unverified' && externalVerificationRedirectURL) {
         if (popup) {
           await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignUp resource
-          await this.resource.reload();
+          await this.#resource.reload();
         } else {
           windowNavigate(externalVerificationRedirectURL);
         }
@@ -868,7 +871,7 @@ class SignUpFuture implements SignUpFutureResource {
     const { strategy, unsafeMetadata, legalAccepted } = params;
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
-    return runAsyncResourceTask(this.resource, async () => {
+    return runAsyncResourceTask(this.#resource, async () => {
       let identifier;
       let generateSignature;
       switch (provider) {
@@ -893,14 +896,14 @@ class SignUpFuture implements SignUpFutureResource {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const web3Wallet = identifier || this.resource.web3wallet!;
+      const web3Wallet = identifier || this.#resource.web3wallet!;
       await this._create({ web3Wallet, unsafeMetadata, legalAccepted });
-      await this.resource.__internal_basePost({
+      await this.#resource.__internal_basePost({
         body: { strategy },
         action: 'prepare_verification',
       });
 
-      const { message } = this.resource.verifications.web3Wallet;
+      const { message } = this.#resource.verifications.web3Wallet;
       if (!message) {
         clerkVerifyWeb3WalletCalledBeforeCreate('SignUp');
       }
@@ -923,7 +926,7 @@ class SignUpFuture implements SignUpFutureResource {
         }
       }
 
-      await this.resource.__internal_basePost({
+      await this.#resource.__internal_basePost({
         body: { signature, strategy },
         action: 'attempt_verification',
       });
@@ -937,13 +940,13 @@ class SignUpFuture implements SignUpFutureResource {
 
   async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
-    return runAsyncResourceTask(this.resource, async () => {
-      if (!this.resource.createdSessionId) {
+    return runAsyncResourceTask(this.#resource, async () => {
+      if (!this.#resource.createdSessionId) {
         throw new Error('Cannot finalize sign-up without a created session.');
       }
 
       this.#hasBeenFinalized = true;
-      await SignUp.clerk.setActive({ session: this.resource.createdSessionId, navigate });
+      await SignUp.clerk.setActive({ session: this.#resource.createdSessionId, navigate });
     });
   }
 }

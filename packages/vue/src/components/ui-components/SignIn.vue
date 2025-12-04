@@ -25,6 +25,6 @@ const hasInitialWithSignUp = 'withSignUp' in (currentInstance?.vnode.props ?? {}
       transferable: hasInitialTransferable ? $props.transferable : undefined,
       withSignUp: hasInitialWithSignUp ? $props.withSignUp : undefined,
     }"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
   />
 </template>

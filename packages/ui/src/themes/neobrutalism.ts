@@ -1,4 +1,4 @@
-import { experimental_createTheme } from './createTheme';
+import { createTheme } from './createTheme';
 
 const buttonStyle = {
   boxShadow: '3px 3px 0px #000',
@@ -19,7 +19,7 @@ const shadowStyle = {
   border: '2px solid #000',
 };
 
-export const neobrutalism = experimental_createTheme({
+export const neobrutalism = createTheme({
   name: 'neobrutalism',
   //@ts-expect-error not public api
   simpleStyles: true,

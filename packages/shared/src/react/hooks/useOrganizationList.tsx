@@ -14,6 +14,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useUserContex
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -251,6 +252,7 @@ export function useOrganizationList<T extends UseOrganizationListParams>(params?
   const { userMemberships, userInvitations, userSuggestions } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganizationList');
+  useAttemptToEnableOrganizations('useOrganizationList');
 
   const userMembershipsSafeValues = useWithSafeValues(userMemberships, {
     initialPage: 1,

@@ -2,7 +2,7 @@ import type { ClerkAPIResponseError } from '../../error';
 import type { BillingPaymentResource, ForPayerType } from '../../types';
 
 /**
- * @interface
+ * @internal
  */
 export type UsePaymentAttemptQueryParams = {
   /**
@@ -30,7 +30,7 @@ export type UsePaymentAttemptQueryParams = {
 };
 
 /**
- * @interface
+ * @internal
  */
 export type PaymentAttemptQueryResult = {
   /**

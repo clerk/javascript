@@ -700,8 +700,14 @@ export const viVN: LocalizationResource = {
       subtitle: 'Nhập mật khẩu được liên kết với tài khoản của bạn',
       title: 'Nhập mật khẩu',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mật khẩu bị rò rỉ',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Mã xác minh',
@@ -869,6 +875,14 @@ export const viVN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
     captcha_invalid: undefined,
@@ -898,9 +912,11 @@ export const viVN: LocalizationResource = {
     form_password_pwned__sign_in:
       'Mật khẩu này đã được tìm thấy trong một rò rỉ và không thể được sử dụng, vui lòng đặt lại mật khẩu của bạn.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Tên người dùng của bạn phải có giữa {{min_length}} và {{max_length}} ký tự.',
+    form_username_needs_non_number_char: 'Tên người dùng của bạn phải chứa ít nhất một ký tự không phải là số.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

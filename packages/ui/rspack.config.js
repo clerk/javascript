@@ -107,7 +107,7 @@ const commonForProdBrowser = () => {
   return {
     devtool: false,
     output: {
-      path: path.resolve(__dirname, 'dist/browser'),
+      path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',

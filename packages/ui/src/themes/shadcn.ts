@@ -1,6 +1,6 @@
-import { experimental_createTheme } from './createTheme';
+import { createTheme } from './createTheme';
 
-export const shadcn = experimental_createTheme({
+export const shadcn = createTheme({
   name: 'shadcn',
   cssLayerName: 'components',
   variables: {
@@ -35,5 +35,6 @@ export const shadcn = experimental_createTheme({
     providerIcon__apple: 'dark:invert',
     providerIcon__github: 'dark:invert',
     providerIcon__okx_wallet: 'dark:invert',
+    providerIcon__vercel: 'dark:invert',
   },
 });

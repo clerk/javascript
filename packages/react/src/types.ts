@@ -29,7 +29,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __unstable_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
 

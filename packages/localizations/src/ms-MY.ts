@@ -698,8 +698,14 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan yang berkaitan dengan akaun anda',
       title: 'Masukkan kata laluan anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata laluan dikompromi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kod pengesahan',
@@ -869,6 +875,14 @@ export const msMY: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
     captcha_invalid:
@@ -901,11 +915,14 @@ export const msMY: LocalizationResource = {
       'Kata laluan ini telah dijumpai sebagai sebahagian daripada pelanggaran dan tidak boleh digunakan, sila tetapkan semula kata laluan anda.',
     form_password_size_in_bytes_exceeded:
       'Kata laluan anda telah melebihi bilangan maksimum bait yang dibenarkan, sila pendekkannya atau keluarkan beberapa aksara khas.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Kata Laluan Tidak Betul',
     form_username_invalid_character:
       'Nama pengguna anda mengandungi aksara yang tidak sah. Sila gunakan hanya huruf, nombor, dan garis bawah.',
     form_username_invalid_length:
       'Nama pengguna anda mestilah antara {{min_length}} dan {{max_length}} aksara panjang.',
+    form_username_needs_non_number_char:
+      'Nama pengguna anda mesti mengandungi sekurang-kurangnya satu aksara bukan nombor.',
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',

@@ -180,8 +180,8 @@ describe('Clerk singleton', () => {
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('does not call session touch on signOut', async () => {
@@ -219,11 +219,11 @@ describe('Clerk singleton', () => {
         });
       });
 
-      it('calls __unstable__onBeforeSetActive before session.touch', async () => {
+      it('calls __internal_onBeforeSetActive before session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        (window as any).__unstable__onBeforeSetActive = () => {
+        (window as any).__internal_onBeforeSetActive = () => {
           expect(mockSession.touch).not.toHaveBeenCalled();
         };
 
@@ -233,11 +233,11 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
+      it('sets __session and __client_uat cookie before calling __internal_onBeforeSetActive', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        (window as any).__unstable__onBeforeSetActive = () => {
+        (window as any).__internal_onBeforeSetActive = () => {
           expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
         };
 
@@ -421,8 +421,8 @@ describe('Clerk singleton', () => {
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('calls session.touch by default', async () => {
@@ -435,12 +435,12 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('does not call __unstable__onBeforeSetActive before session.touch', async () => {
+      it('does not call __internal_onBeforeSetActive before session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const onBeforeSetActive = vi.fn();
-        (window as any).__unstable__onBeforeSetActive = onBeforeSetActive;
+        (window as any).__internal_onBeforeSetActive = onBeforeSetActive;
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -448,12 +448,12 @@ describe('Clerk singleton', () => {
         expect(onBeforeSetActive).not.toHaveBeenCalled();
       });
 
-      it('does not call __unstable__onAfterSetActive after session.touch', async () => {
+      it('does not call __internal_onAfterSetActive after session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const onAfterSetActive = vi.fn();
-        (window as any).__unstable__onAfterSetActive = onAfterSetActive;
+        (window as any).__internal_onAfterSetActive = onAfterSetActive;
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -522,8 +522,8 @@ describe('Clerk singleton', () => {
         mockEnvironmentFetch.mockReset();
 
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('does not update session to personal workspace', async () => {
@@ -586,8 +586,8 @@ describe('Clerk singleton', () => {
 
         afterEach(() => {
           // cleanup global window pollution
-          (window as any).__unstable__onBeforeSetActive = null;
-          (window as any).__unstable__onAfterSetActive = null;
+          (window as any).__internal_onBeforeSetActive = null;
+          (window as any).__internal_onAfterSetActive = null;
         });
 
         it('gracefully handles an incorrect value returned from the user provided selectInitialSession', async () => {
@@ -2352,15 +2352,15 @@ describe('Clerk singleton', () => {
   describe('updateClient', () => {
     afterEach(() => {
       // cleanup global window pollution
-      (window as any).__unstable__onBeforeSetActive = null;
-      (window as any).__unstable__onAfterSetActive = null;
+      (window as any).__internal_onBeforeSetActive = null;
+      (window as any).__internal_onAfterSetActive = null;
     });
 
     it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
       const mockOnBeforeSetActive = vi.fn().mockReturnValue(Promise.resolve());
       const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      (window as any).__unstable__onBeforeSetActive = mockOnBeforeSetActive;
-      (window as any).__unstable__onAfterSetActive = mockOnAfterSetActive;
+      (window as any).__internal_onBeforeSetActive = mockOnBeforeSetActive;
+      (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
 
       const mockActiveSession = {
         id: 'session_1',
@@ -2403,6 +2403,197 @@ describe('Clerk singleton', () => {
       // Verify hooks were called
       await waitFor(() => {
         expect(mockOnAfterSetActive).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
+
+  describe('__internal_attemptToEnableEnvironmentSetting', () => {
+    afterEach(() => {
+      mockEnvironmentFetch.mockReset();
+      mockClientFetch.mockReset();
+    });
+
+    describe('for organizations', () => {
+      it('does not open prompt if organizations is enabled in development', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: true,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      it('does not open prompt if organizations is enabled in production', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => true,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: true,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      it('opens prompt if organizations is disabled in development', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        const sut = new Clerk(developmentPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).toHaveBeenCalled();
+      });
+
+      it('does not open prompt if organizations is disabled in production', async () => {
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      // Handles case where environment gets enabled via BAPI, but it gets cached and the user is redirected to the choose-organization task
+      // The enable org prompt should not appear in the task screen since orgs have already been enabled
+      it('does not open prompt if organizations is disabled in development and session has choose-organization task', async () => {
+        const mockSession = {
+          id: '1',
+          remove: vi.fn(),
+          status: 'pending',
+          user: {},
+          touch: vi.fn(() => Promise.resolve()),
+          getToken: vi.fn(),
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+          tasks: [{ key: 'choose-organization' }],
+          currentTask: { key: 'choose-organization' },
+          reload: vi.fn(() =>
+            Promise.resolve({
+              id: '1',
+              status: 'pending',
+              user: {},
+              tasks: [{ key: 'choose-organization' }],
+              currentTask: {
+                key: 'choose-organization',
+              },
+            }),
+          ),
+        };
+
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+          }),
+        );
+
+        const sut = new Clerk(developmentPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        // Contains the organization task, so the prompt should not be opened
+        expect(result?.isEnabled).toBe(true);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
     });
   });

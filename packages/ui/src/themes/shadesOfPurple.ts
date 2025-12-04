@@ -1,9 +1,9 @@
-import { experimental_createTheme } from './createTheme';
+import { createTheme } from './createTheme';
 import { dark } from './dark';
 
-export const shadesOfPurple = experimental_createTheme({
+export const shadesOfPurple = createTheme({
   name: 'shadesOfPurple',
-  baseTheme: dark,
+  theme: dark,
   variables: {
     colorBackground: '#3f3c77',
     colorPrimary: '#f8d80d',

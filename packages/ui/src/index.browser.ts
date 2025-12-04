@@ -7,8 +7,8 @@ import './utils/setWebpackChunkPublicPath';
 // import 'scheduler';
 import { ClerkUi } from './ClerkUi';
 
-if (!window.__unstable_ClerkUiCtor) {
-  window.__unstable_ClerkUiCtor = ClerkUi;
+if (!window.__internal_ClerkUiCtor) {
+  window.__internal_ClerkUiCtor = ClerkUi;
 }
 
 // Hot module replacement for development

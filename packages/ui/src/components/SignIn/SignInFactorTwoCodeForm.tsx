@@ -2,14 +2,14 @@ import { isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { useClerk } from '@clerk/shared/react';
 import type { EmailCodeFactor, PhoneCodeFactor, SignInResource, TOTPFactor } from '@clerk/shared/types';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
 import type { VerificationCodeCardProps } from '@/ui/elements/VerificationCodeCard';
 import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { useCoreSignIn, useSignInContext } from '../../contexts';
+import { useCoreSignIn, useEnvironment, useSignInContext } from '../../contexts';
 import { localizationKeys, Text } from '../../customizables';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import type { LocalizationKey } from '../../localization';
@@ -34,9 +34,8 @@ const isResettingPassword = (resource: SignInResource) =>
   isResetPasswordStrategy(resource.firstFactorVerification?.strategy) &&
   resource.firstFactorVerification?.status === 'verified';
 
-const isNewDevice = (resource: SignInResource) => resource.clientTrustState === 'new';
-
 export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => {
+  const env = useEnvironment();
   const signIn = useCoreSignIn();
   const card = useCardState();
   const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
@@ -44,6 +43,15 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const { navigate } = useRouter();
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
+
+  // Only show the new device verification notice if the user is new
+  // and no attributes are explicitly used for second factor.
+  const showNewDeviceVerificationNotice = useMemo(() => {
+    const anyAttributeUsedForSecondFactor = Object.values(env.userSettings.attributes).some(
+      attr => attr.used_for_second_factor,
+    );
+    return signIn.clientTrustState === 'new' && !anyAttributeUsedForSecondFactor;
+  }, [signIn.clientTrustState, env.userSettings.attributes]);
 
   React.useEffect(() => {
     if (props.factorAlreadyPrepared) {
@@ -107,7 +115,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       cardSubtitle={
         isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
       }
-      cardNotice={isNewDevice(signIn) ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
+      cardNotice={showNewDeviceVerificationNotice ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
       resendButton={props.resendButton}
       inputLabel={props.inputLabel}
       onCodeEntryFinishedAction={action}

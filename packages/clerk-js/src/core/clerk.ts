@@ -44,7 +44,10 @@ import {
 } from '@clerk/shared/telemetry';
 import type {
   __experimental_CheckoutOptions,
+  __internal_AttemptToEnableEnvironmentSettingParams,
+  __internal_AttemptToEnableEnvironmentSettingResult,
   __internal_CheckoutProps,
+  __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
@@ -553,13 +556,13 @@ export class Clerk implements ClerkInterface {
     }
 
     const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
+      typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
+        ? window.__internal_onBeforeSetActive
         : noop;
 
     const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
+      typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
+        ? window.__internal_onAfterSetActive
         : noop;
 
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -744,6 +747,62 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.closeModal('userVerification'));
   };
 
+  public __internal_attemptToEnableEnvironmentSetting = (
+    params: __internal_AttemptToEnableEnvironmentSettingParams,
+  ): __internal_AttemptToEnableEnvironmentSettingResult => {
+    const { for: setting, caller } = params;
+
+    if (!this.user && this.#instanceType === 'development') {
+      logger.warnOnce(
+        `Clerk: "${caller}" requires an active user session. Ensure a user is signed in before executing ${caller}.`,
+      );
+    }
+
+    switch (setting) {
+      case 'organizations': {
+        const isSettingDisabled =
+          disabledOrganizationsFeature(this, this.environment) &&
+          // Handles case where environment gets enabled via BAPI, but it gets cached and the user is redirected to the choose-organization task
+          // The enable org prompt should not appear in the task screen since orgs have already been enabled
+          this.session?.currentTask?.key !== 'choose-organization';
+
+        if (!isSettingDisabled) {
+          return { isEnabled: true };
+        }
+
+        if (this.#instanceType === 'development') {
+          this.__internal_openEnableOrganizationsPrompt({
+            caller,
+            // Reload current window to all invalidate all resources
+            // related to organizations, eg: roles
+            onSuccess: () => window.location.reload(),
+            onClose: params.onClose,
+          } as __internal_EnableOrganizationsPromptProps);
+        }
+
+        return { isEnabled: false };
+      }
+      default:
+        throw new Error(`Attempted to enable an unknown or unsupported setting "${setting}".`);
+    }
+  };
+
+  public __internal_openEnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps): void => {
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted({ preloadHint: 'EnableOrganizationsPrompt' }))
+      .then(controls => controls.openModal('enableOrganizationsPrompt', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('EnableOrganizationsPrompt', props));
+  };
+
+  public __internal_closeEnableOrganizationsPrompt = (): void => {
+    this.assertComponentsReady(this.#clerkUi);
+    void this.#clerkUi
+      ?.then(ui => ui.ensureMounted())
+      .then(controls => controls.closeModal('enableOrganizationsPrompt'));
+  };
+
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
     this.assertComponentsReady(this.#clerkUi);
     return this.#clerkUi.then(ui => ui.ensureMounted()).then(controls => controls.openModal('blankCaptcha', {}));
@@ -804,14 +863,20 @@ export class Clerk implements ClerkInterface {
   };
 
   public openOrganizationProfile = (props?: OrganizationProfileProps): void => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'OrganizationProfile',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
+
     if (noOrganizationExists(this)) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderComponentWhenOrgDoesNotExist, {
@@ -820,6 +885,7 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+
     this.assertComponentsReady(this.#clerkUi);
     void this.#clerkUi
       .then(ui => ui.ensureMounted())
@@ -833,14 +899,20 @@ export class Clerk implements ClerkInterface {
   };
 
   public openCreateOrganization = (props?: CreateOrganizationProps): void => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'CreateOrganization',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
+
     this.assertComponentsReady(this.#clerkUi);
     void this.#clerkUi
       .then(ui => ui.ensureMounted())
@@ -959,14 +1031,20 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountOrganizationProfile = (node: HTMLDivElement, props?: OrganizationProfileProps) => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'OrganizationProfile',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationProfile'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
+
     const userExists = !noUserExists(this);
     if (noOrganizationExists(this) && userExists) {
       if (this.#instanceType === 'development') {
@@ -976,6 +1054,7 @@ export class Clerk implements ClerkInterface {
       }
       return;
     }
+
     this.assertComponentsReady(this.#clerkUi);
     const component = 'OrganizationProfile';
     void this.#clerkUi
@@ -997,14 +1076,20 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountCreateOrganization = (node: HTMLDivElement, props?: CreateOrganizationProps) => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'CreateOrganization',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('CreateOrganization'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
+
     this.assertComponentsReady(this.#clerkUi);
     const component = 'CreateOrganization';
     void this.#clerkUi
@@ -1026,14 +1111,20 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountOrganizationSwitcher = (node: HTMLDivElement, props?: OrganizationSwitcherProps) => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'OrganizationSwitcher',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationSwitcher'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
+
     this.assertComponentsReady(this.#clerkUi);
     const component = 'OrganizationSwitcher';
     void this.#clerkUi
@@ -1065,14 +1156,20 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountOrganizationList = (node: HTMLDivElement, props?: OrganizationListProps) => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'OrganizationList',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('OrganizationList'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
+
     this.assertComponentsReady(this.#clerkUi);
     const component = 'OrganizationList';
     void this.#clerkUi
@@ -1259,12 +1356,17 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountTaskChooseOrganization = (node: HTMLDivElement, props?: TaskChooseOrganizationProps) => {
-    if (disabledOrganizationsFeature(this, this.environment)) {
-      if (this.#instanceType === 'development') {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'TaskChooseOrganization',
+      onClose: () => {
         throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('TaskChooseOrganization'), {
           code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
         });
-      }
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
       return;
     }
 
@@ -1324,13 +1426,13 @@ export class Clerk implements ClerkInterface {
       }
 
       const onBeforeSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-          ? window.__unstable__onBeforeSetActive
+        typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
+          ? window.__internal_onBeforeSetActive
           : noop;
 
       const onAfterSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-          ? window.__unstable__onAfterSetActive
+        typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
+          ? window.__internal_onAfterSetActive
           : noop;
 
       let newSession = session === undefined ? this.session : session;
@@ -2371,8 +2473,8 @@ export class Clerk implements ClerkInterface {
       const hasTransitionedToPendingStatus = this.session.status === 'active' && newSession?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
         const onAfterSetActive: SetActiveHook =
-          typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-            ? window.__unstable__onAfterSetActive
+          typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
+            ? window.__internal_onAfterSetActive
             : noop;
 
         // Execute hooks to update server authentication context and trigger
@@ -2400,13 +2502,13 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  get __unstable__environment(): EnvironmentResource | null | undefined {
+  get __internal_environment(): EnvironmentResource | null | undefined {
     return this.environment;
   }
 
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
-  __unstable__setEnvironment = async (env: EnvironmentJSON) => {
+  __internal_setEnvironment = async (env: EnvironmentJSON) => {
     this.environment = new Environment(env);
 
     // TODO @nikos update
@@ -2415,16 +2517,16 @@ export class Clerk implements ClerkInterface {
     // }
   };
 
-  __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
+  __internal_onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onBeforeRequest(callback);
   };
 
-  __unstable__onAfterResponse = (callback: FapiRequestCallback<any>): void => {
+  __internal_onAfterResponse = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onAfterResponse(callback);
   };
 
   // TODO @userland-errors:
-  __unstable__updateProps = (_props: any) => {
+  __internal_updateProps = (_props: any) => {
     // We need to re-init the options here in order to keep the options passed to ClerkProvider
     // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:
     // 1. User renders <ClerkProvider propA={undefined} propB={1} />

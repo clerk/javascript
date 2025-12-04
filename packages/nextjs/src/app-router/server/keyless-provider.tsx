@@ -13,7 +13,7 @@ import { ClientClerkProvider } from '../client/ClerkProvider';
 import { deleteKeylessAction } from '../keyless-actions';
 
 export async function getKeylessStatus(
-  params: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>,
+  params: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange'>,
 ) {
   let [shouldRunAsKeyless, runningWithClaimedKeys, locallyStoredPublishableKey] = [false, false, ''];
   if (canUseKeyless) {
@@ -32,7 +32,7 @@ export async function getKeylessStatus(
 }
 
 type KeylessProviderProps = PropsWithChildren<{
-  rest: Without<NextClerkProviderProps, '__unstable_invokeMiddlewareOnAuthStateChange'>;
+  rest: Without<NextClerkProviderProps, '__internal_invokeMiddlewareOnAuthStateChange'>;
   runningWithClaimedKeys: boolean;
 }>;
 

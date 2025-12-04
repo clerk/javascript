@@ -707,8 +707,14 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Tapez votre mot de passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mot de passe compromis',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -877,6 +883,14 @@ export const frFR: LocalizationResource = {
       actionText: 'Connecté en tant que {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
     captcha_invalid:
@@ -907,9 +921,11 @@ export const frFR: LocalizationResource = {
     form_password_pwned__sign_in: 'Mot de passe compromis. Veuillez le réinitialiser.',
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Mot de passe incorrect',
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
+    form_username_needs_non_number_char: "Votre nom d'utilisateur doit contenir au moins un caractère non numérique.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access:
       "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",

@@ -138,7 +138,7 @@ const generateTabId = (): string => {
 /**
  * Creates an in-memory token cache with optional BroadcastChannel synchronization across tabs.
  * Automatically manages token expiration and cleanup via scheduled timeouts.
- * BroadcastChannel support is enabled only in the channel build variant.
+ * BroadcastChannel support is enabled whenever the environment provides it.
  */
 const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   const cache = new Map<string, TokenCacheValue>();
@@ -147,20 +147,18 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   let broadcastChannel: BroadcastChannel | null = null;
 
   const ensureBroadcastChannel = (): BroadcastChannel | null => {
-    if (!__BUILD_VARIANT_CHANNEL__) {
-      return null;
-    }
-
     if (broadcastChannel) {
       return broadcastChannel;
     }
 
-    if (typeof BroadcastChannel !== 'undefined') {
-      broadcastChannel = new BroadcastChannel('clerk:session_token');
-      broadcastChannel.addEventListener('message', (e: MessageEvent<SessionTokenEvent>) => {
-        void handleBroadcastMessage(e);
-      });
+    if (typeof BroadcastChannel === 'undefined') {
+      return null;
     }
+
+    broadcastChannel = new BroadcastChannel('clerk:session_token');
+    broadcastChannel.addEventListener('message', (e: MessageEvent<SessionTokenEvent>) => {
+      void handleBroadcastMessage(e);
+    });
 
     return broadcastChannel;
   };
