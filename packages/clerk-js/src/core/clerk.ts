@@ -1456,7 +1456,14 @@ export class Clerk implements ClerkInterface {
       }
 
       if (typeof session === 'string') {
-        session = (this.client.sessions.find(x => x.id === session) as SignedInSessionResource) || null;
+        const sessionId = session;
+        session = (this.client.sessions.find(x => x.id === sessionId) as SignedInSessionResource) || null;
+        // If session not found, reload client to fetch newly created sessions (e.g., impersonation sessions)
+        // This handles the case where setActive is called immediately after creating a session via ticket
+        if (!session) {
+          await this.client.fetch();
+          session = (this.client.sessions.find(x => x.id === sessionId) as SignedInSessionResource) || null;
+        }
       }
 
       const onBeforeSetActive: SetActiveHook =
