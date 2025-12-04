@@ -2,6 +2,7 @@ import { defineKeepPreviousDataFn } from '../clerk-rq/keep-previous-data';
 import { useClerkQuery } from '../clerk-rq/useQuery';
 import { useClerkInstanceContext, useOrganizationContext, useUserContext } from '../contexts';
 import { useBillingHookEnabled } from './useBillingHookEnabled';
+import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
 import { usePaymentAttemptQueryCacheKeys } from './usePaymentAttemptQuery.shared';
 import type { PaymentAttemptQueryResult, UsePaymentAttemptQueryParams } from './usePaymentAttemptQuery.types';
 
@@ -17,7 +18,7 @@ function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAt
   const organizationId = forType === 'organization' ? (organization?.id ?? null) : null;
   const userId = user?.id ?? null;
 
-  const { queryKey } = usePaymentAttemptQueryCacheKeys({
+  const { queryKey, stableKey, authenticated } = usePaymentAttemptQueryCacheKeys({
     paymentAttemptId,
     userId,
     orgId: organizationId,
@@ -27,6 +28,12 @@ function usePaymentAttemptQuery(params: UsePaymentAttemptQueryParams): PaymentAt
   const billingEnabled = useBillingHookEnabled(params);
 
   const queryEnabled = Boolean(paymentAttemptId) && billingEnabled;
+
+  useClearQueriesOnSignOut({
+    isSignedOut: user === null, // works with the transitive state
+    authenticated,
+    stableKeys: stableKey,
+  });
 
   const query = useClerkQuery({
     queryKey,

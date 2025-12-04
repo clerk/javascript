@@ -1,4 +1,5 @@
-import { ClerkLoaded, ClerkLoading, ClerkFailed, ClerkDegraded, useClerk } from '@clerk/react';
+'use client';
+import { ClerkLoaded, ClerkLoading, ClerkFailed, ClerkDegraded, useClerk } from '@clerk/nextjs';
 
 export default function ClerkStatusPage() {
   const { loaded, status } = useClerk();

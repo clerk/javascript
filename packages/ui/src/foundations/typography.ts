@@ -20,11 +20,11 @@ const letterSpacings = Object.freeze({
 } as const);
 
 export const FONT_SIZE_SCALE_RATIOS = Object.freeze({
-  xs: '11 / 13', // 0.846154
-  sm: '12 / 13', // 0.923077
-  md: '1', // 1.0
-  lg: '17 / 13', // 1.307692
-  xl: '24 / 13', // 1.846154
+  xs: '11 / 13', // = 0.846154
+  sm: '12 / 13', // = 0.923077
+  md: '1', // = 1.0
+  lg: '17 / 13', // = 1.307692
+  xl: '24 / 13', // = 1.846154
 } as const);
 
 export type FontSizeKey = keyof typeof FONT_SIZE_SCALE_RATIOS;

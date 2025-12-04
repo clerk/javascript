@@ -788,19 +788,19 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  public __internal_openEnableOrganizationsPrompt = (
-    props: __internal_EnableOrganizationsPromptProps,
-  ): Promise<void> => {
+  public __internal_openEnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps): void => {
     this.assertComponentsReady(this.#clerkUi);
-    return this.#clerkUi
-      .then(ui => ui.ensureMounted())
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted({ preloadHint: 'EnableOrganizationsPrompt' }))
       .then(controls => controls.openModal('enableOrganizationsPrompt', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('EnableOrganizationsPrompt', props));
   };
 
-  public __internal_closeEnableOrganizationsPrompt = (): Promise<unknown> => {
+  public __internal_closeEnableOrganizationsPrompt = (): void => {
     this.assertComponentsReady(this.#clerkUi);
-    return this.#clerkUi
-      .then(ui => ui.ensureMounted())
+    void this.#clerkUi
+      ?.then(ui => ui.ensureMounted())
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
   };
 
