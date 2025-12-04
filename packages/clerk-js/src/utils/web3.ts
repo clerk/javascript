@@ -71,7 +71,7 @@ export const generateWeb3Signature: GenerateSignature = async (params): Promise<
         });
       }
       throw new ClerkRuntimeError('An error occurred while generating the Solana signature.', {
-        code: 'web3_solana_signature_error',
+        code: 'web3_solana_signature_generation_failed',
         cause: err,
       });
     }
