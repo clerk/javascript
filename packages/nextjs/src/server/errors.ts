@@ -34,3 +34,5 @@ export const authSignatureInvalid = `Clerk: Unable to verify request, this usual
 export const encryptionKeyInvalid = `Clerk: Unable to decrypt request data, this usually means the encryption key is invalid. Ensure the encryption key is properly set. For more information, see: https://clerk.com/docs/reference/nextjs/clerk-middleware#dynamic-keys. (code=encryption_key_invalid)`;
 
 export const encryptionKeyInvalidDev = `Clerk: Unable to decrypt request data.\n\nRefresh the page if your .env file was just updated. If the issue persists, ensure the encryption key is valid and properly set.\n\nFor more information, see: https://clerk.com/docs/reference/nextjs/clerk-middleware#dynamic-keys. (code=encryption_key_invalid)`;
+export const encryptionKeyMissing =
+  'Clerk: Missing `CLERK_ENCRYPTION_KEY`. Required for propagating `secretKey` middleware option. See docs: https://clerk.com/docs/references/nextjs/clerk-middleware#dynamic-keys. (code=encryption_key_missing)';
