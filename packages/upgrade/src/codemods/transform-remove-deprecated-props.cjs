@@ -438,8 +438,8 @@ function getPropertyValueExpression(valueNode) {
 
 function buildNavigateArrowFunction(j, originalExpression) {
   const paramIdentifier = j.identifier('params');
-  const calleeExpression = clone(originalExpression);
-  const callExpression = j.callExpression(calleeExpression, [
+  // No need to clone - we're moving the expression from beforeEmit to navigate
+  const callExpression = j.callExpression(originalExpression, [
     j.memberExpression(paramIdentifier, j.identifier('session')),
   ]);
   return j.arrowFunctionExpression([paramIdentifier], callExpression);
