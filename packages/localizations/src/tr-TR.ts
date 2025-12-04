@@ -878,6 +878,8 @@ export const trTR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Güvenlik doğrulamalarındaki hatalar nedeniyle kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     captcha_unavailable:

@@ -875,6 +875,8 @@ export const srRS: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:

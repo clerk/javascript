@@ -864,6 +864,8 @@ export const zhCN: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: undefined,

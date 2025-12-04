@@ -885,6 +885,8 @@ export const esMX: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     captcha_unavailable:

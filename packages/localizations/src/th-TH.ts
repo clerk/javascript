@@ -878,6 +878,8 @@ export const thTH: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: undefined,
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',

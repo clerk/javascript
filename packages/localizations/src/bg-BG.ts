@@ -878,6 +878,8 @@ export const bgBG: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: undefined,
     captcha_unavailable: undefined,
     form_code_incorrect: 'Невалиден код. Моля, опитайте отново.',

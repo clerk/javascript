@@ -888,6 +888,8 @@ export const faIR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',

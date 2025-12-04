@@ -883,6 +883,8 @@ export const idID: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Pendaftaran gagal karena validasi keamanan gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     captcha_unavailable:

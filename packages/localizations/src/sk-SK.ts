@@ -882,6 +882,8 @@ export const skSK: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Registrácia zlyhala z dôvodu neúspešného overenia zabezpečenia. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     captcha_unavailable:

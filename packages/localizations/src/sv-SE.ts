@@ -880,6 +880,8 @@ export const svSE: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} är redan medlem i organisationen.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:

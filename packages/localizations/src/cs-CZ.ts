@@ -888,6 +888,8 @@ export const csCZ: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:

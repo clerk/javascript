@@ -882,6 +882,8 @@ export const bnIN: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'নিরাপত্তা যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     captcha_unavailable:

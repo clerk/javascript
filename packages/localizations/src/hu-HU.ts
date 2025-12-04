@@ -876,6 +876,8 @@ export const huHU: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     captcha_unavailable:

@@ -875,6 +875,8 @@ export const daDK: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Tilmelding mislykkedes på grund af fejlede sikkerhedsvalideringer. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     captcha_unavailable:

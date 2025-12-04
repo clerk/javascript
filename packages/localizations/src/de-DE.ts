@@ -892,6 +892,8 @@ export const deDE: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:

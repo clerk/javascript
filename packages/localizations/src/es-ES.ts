@@ -878,6 +878,8 @@ export const esES: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Registro fallido debido a validaciones de seguridad fallidas. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
     captcha_unavailable:

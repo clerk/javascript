@@ -889,6 +889,8 @@ export const jaJP: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} はすでにこの組織のメンバーです。',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: undefined,
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',

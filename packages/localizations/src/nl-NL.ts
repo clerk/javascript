@@ -877,6 +877,8 @@ export const nlNL: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:

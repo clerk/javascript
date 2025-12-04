@@ -882,6 +882,8 @@ export const beBY: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Рэгістрацыя не ўдалася з-за памылак бяспекі. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз, або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     captcha_unavailable:

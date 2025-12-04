@@ -875,6 +875,8 @@ export const ptPT: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Não foi possível inscrever-se devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:

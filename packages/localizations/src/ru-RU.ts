@@ -889,6 +889,8 @@ export const ruRU: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Регистрация не удалась из-за неудачных проверок безопасности. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     captcha_unavailable:

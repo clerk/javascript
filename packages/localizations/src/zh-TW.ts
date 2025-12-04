@@ -865,6 +865,8 @@ export const zhTW: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,

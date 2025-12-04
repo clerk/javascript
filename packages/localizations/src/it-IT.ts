@@ -885,6 +885,8 @@ export const itIT: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sei già un membro di questa organizzazione.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid:
       'Registrazione non riuscita a causa di fallite convalide di sicurezza. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     captcha_unavailable:

@@ -868,6 +868,8 @@ export const heIL: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     form_code_incorrect: undefined,

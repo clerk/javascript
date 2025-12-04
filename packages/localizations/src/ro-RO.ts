@@ -890,6 +890,8 @@ export const roRO: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
+    avatar_file_size_exceeded: undefined,
+    avatar_file_type_invalid: undefined,
     captcha_invalid: undefined,
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
