@@ -3,4 +3,4 @@ throw new Error(
 );
 
 export {};
-// Force rebuild for exports reordering
+// Force rebuild for explicit exports (replacing wildcard)
