@@ -45,12 +45,6 @@ export const createLongRunningApps = () => {
     { id: 'withBillingJwtV2.vue.vite', config: vue.vite, env: envs.withBillingJwtV2 },
 
     /**
-     * Machine auth apps
-     */
-    { id: 'withMachine.express.vite', config: express.vite, env: envs.withAPIKeys },
-    { id: 'withMachine.next.appRouter', config: next.appRouter, env: envs.withAPIKeys },
-
-    /**
      * Vite apps - basic flows
      */
     { id: 'react.vite.withEmailCodes', config: react.vite, env: envs.withEmailCodes },

@@ -1,9 +1,10 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
-import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
+import { createTestUtils } from '../../testUtils';
 
 const mockAPIKeysEnvironmentSettings = async (
   page: Page,
@@ -27,16 +28,21 @@ const mockAPIKeysEnvironmentSettings = async (
   });
 };
 
-testAgainstRunningApps({
-  withEnv: [appConfigs.envs.withAPIKeys],
-  withPattern: ['withMachine.next.appRouter'],
-})('api keys component @machine', ({ app }) => {
+test.describe('api keys component @machine', () => {
   test.describe.configure({ mode: 'serial' });
 
+  let app: Application;
   let fakeAdmin: FakeUser;
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+    app = await appConfigs.next.appRouter.clone().commit();
+
+    await app.setup();
+    await app.withEnv(appConfigs.envs.withAPIKeys);
+    await app.dev();
+
     const u = createTestUtils({ app });
     fakeAdmin = u.services.users.createFakeUser();
     const admin = await u.services.users.createBapiUser(fakeAdmin);
