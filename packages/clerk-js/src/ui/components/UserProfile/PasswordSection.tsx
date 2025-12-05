@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/shared/react';
 
+import { useEnvironment } from '@/ui/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 
 import { localizationKeys, Text } from '../../customizables';
@@ -19,11 +20,20 @@ const PasswordScreen = () => {
 
 export const PasswordSection = () => {
   const { user } = useUser();
+  const { userSettings } = useEnvironment();
 
   if (!user) {
     return null;
   }
 
+  // First check: Are passwords globally enabled in this app?
+  const passwordsGloballyEnabled = userSettings.attributes.password?.enabled;
+
+  if (!passwordsGloballyEnabled) {
+    return null; // Don't show password section at all
+  }
+
+  // Second check: Does this user have a password set?
   const { passwordEnabled } = user;
 
   return (
