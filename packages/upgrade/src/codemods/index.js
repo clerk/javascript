@@ -41,12 +41,19 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
     silent: true,
   });
 
-  // Second pass: apply the changes
-  const result = await run(resolvedPath, paths ?? [], {
-    ...options,
-    dry: false,
-    silent: true,
-  });
+  let result = {};
+  if (!options.dry) {
+    // Second pass: apply the changes
+    result = await run(resolvedPath, paths ?? [], {
+      ...options,
+      dry: false,
+      silent: true,
+    });
+  }
+
+  if (options.dry) {
+    return dryResult;
+  }
 
   // Merge stats from dry run into final result
   return {

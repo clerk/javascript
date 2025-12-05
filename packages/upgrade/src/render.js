@@ -145,27 +145,20 @@ export function createSpinner(label) {
         clearInterval(interval);
         interval = null;
       }
-      process.stdout.write(`\r\x1b[K${colors.green}✓ ${message}${colors.reset}\n`);
+      process.stdout.write(`\r\x1b[K${colors.green}✓${colors.reset} ${message}\n`);
     },
     error(message) {
       if (interval) {
         clearInterval(interval);
         interval = null;
       }
-      process.stdout.write(`\r\x1b[K${colors.red}✗ ${message}${colors.reset}\n`);
+      process.stdout.write(`\r\x1b[K${colors.red}✗${colors.reset} ${message}\n`);
     },
   };
 }
 
 export function renderCodemodResults(transform, result) {
-  console.log(`${colors.green}✓ Codemod complete: ${transform}${colors.reset}`);
-  console.log(`${colors.red}  ${result.error ?? 0} errors${colors.reset}`);
-  console.log(`${colors.green}  ${result.ok ?? 0} ok${colors.reset}`);
-  console.log(`${colors.yellow}  ${result.skip ?? 0} skipped${colors.reset}`);
-  console.log(`${colors.gray}  ${result.nochange ?? 0} unmodified${colors.reset}`);
-  if (result.timeElapsed) {
-    console.log(`  Time elapsed: ${result.timeElapsed}`);
-  }
+  console.log(`  ${result.ok ?? 0} file(s) modified, ${colors.red}  ${result.error ?? 0} errors${colors.reset}`);
   console.log('');
 }
 

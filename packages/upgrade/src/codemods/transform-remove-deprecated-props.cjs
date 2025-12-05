@@ -1,9 +1,13 @@
 const CLERK_PACKAGE_PREFIX = '@clerk/';
 const COMPONENTS_WITH_HIDE_SLUG = new Set(['CreateOrganization', 'OrganizationSwitcher', 'OrganizationList']);
 const COMPONENT_RENAMES = new Map([
-  ['ClerkProvider', { signInFallbackRedirectUrl: 'signInFallbackRedirectUrl', signUpFallbackRedirectUrl: 'signUpFallbackRedirectUrl' }],
-  ['SignIn', { signInFallbackRedirectUrl: 'fallbackRedirectUrl', signUpFallbackRedirectUrl: 'signUpFallbackRedirectUrl' }],
-  ['SignUp', { signInFallbackRedirectUrl: 'signInFallbackRedirectUrl', signUpFallbackRedirectUrl: 'fallbackRedirectUrl' }],
+  ['ClerkProvider', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'signUpFallbackRedirectUrl' }],
+  ['SignIn', { afterSignUpUrl: 'signUpFallbackRedirectUrl' }],
+  ['SignUp', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'fallbackRedirectUrl' }],
+]);
+// Props that should be removed entirely (not renamed)
+const COMPONENT_REMOVALS = new Map([
+  ['SignIn', ['afterSignInUrl']],
 ]);
 const COMPONENT_REDIRECT_ATTR = new Map([
   ['ClerkProvider', { targetAttrs: ['signInFallbackRedirectUrl', 'signUpFallbackRedirectUrl'] }],
@@ -42,6 +46,15 @@ module.exports = function transformDeprecatedProps({ source }, { jscodeshift: j,
         if (removeJsxAttribute(j, jsxNode, attrName)) {
           dirty = true;
           stats('userbuttonAfterSignOutPropsRemoved');
+        }
+      }
+    }
+
+    if (COMPONENT_REMOVALS.has(canonicalName)) {
+      const propsToRemove = COMPONENT_REMOVALS.get(canonicalName);
+      for (const attrName of propsToRemove) {
+        if (removeJsxAttribute(j, jsxNode, attrName)) {
+          dirty = true;
         }
       }
     }

@@ -5,7 +5,7 @@ import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
 
 import { runCodemod } from './codemods/index.js';
-import { createSpinner, renderCodemodResults, renderManualInterventionSummary, renderText } from './render.js';
+import { createSpinner, renderCodemodResults, renderManualInterventionSummary } from './render.js';
 
 const GLOBBY_IGNORE = [
   'node_modules/**',
@@ -39,15 +39,10 @@ export async function runCodemods(config, sdk, options) {
   const glob = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
 
   for (const transform of codemods) {
-    if (options.dryRun) {
-      renderText(`[Dry run] Would run codemod: ${transform}`, 'yellow');
-      continue;
-    }
-
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {
-      const result = await runCodemod(transform, glob);
+      const result = await runCodemod(transform, glob, { dry: options.dryRun });
       spinner.success(`Codemod complete: ${transform}`);
       renderCodemodResults(transform, result);
 
@@ -87,7 +82,9 @@ export async function runScans(config, sdk, options) {
       for (const matcher of matchers) {
         const matches = findMatches(content, matcher.matcher);
 
-        if (matches.length === 0) continue;
+        if (matches.length === 0) {
+          continue;
+        }
 
         if (!results[matcher.title]) {
           results[matcher.title] = { instances: [], ...matcher };
@@ -126,7 +123,9 @@ function loadMatchers(config, sdk) {
   }
 
   return config.changes.filter(change => {
-    if (!change.matcher) return false;
+    if (!change.matcher) {
+      return false;
+    }
 
     const packages = change.packages || ['*'];
     return packages.includes('*') || packages.includes(sdk);

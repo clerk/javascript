@@ -146,6 +146,7 @@ async function main() {
     renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
     await runCodemods(config, sdk, options);
     renderSuccess('All codemods completed');
+    renderNewline();
   }
 
   // Step 7: Run scans
@@ -169,6 +170,7 @@ async function performUpgrade(sdk, packageManager, config, options) {
     if (oldPackage) {
       renderText(`[Dry run] Would remove old package ${oldPackage}`, 'yellow');
     }
+    renderNewline();
     return;
   }
 
