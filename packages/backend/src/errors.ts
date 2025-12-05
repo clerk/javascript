@@ -74,6 +74,7 @@ export const MachineTokenVerificationErrorCode = {
   TokenInvalid: 'token-invalid',
   InvalidSecretKey: 'secret-key-invalid',
   UnexpectedError: 'unexpected-error',
+  TokenVerificationFailed: 'token-verification-failed',
 } as const;
 
 export type MachineTokenVerificationErrorCode =
@@ -82,17 +83,29 @@ export type MachineTokenVerificationErrorCode =
 export class MachineTokenVerificationError extends Error {
   code: MachineTokenVerificationErrorCode;
   long_message?: string;
-  status: number;
+  status?: number;
+  action?: TokenVerificationErrorAction;
 
-  constructor({ message, code, status }: { message: string; code: MachineTokenVerificationErrorCode; status: number }) {
+  constructor({
+    message,
+    code,
+    status,
+    action,
+  }: {
+    message: string;
+    code: MachineTokenVerificationErrorCode;
+    status?: number;
+    action?: TokenVerificationErrorAction;
+  }) {
     super(message);
     Object.setPrototypeOf(this, MachineTokenVerificationError.prototype);
 
     this.code = code;
     this.status = status;
+    this.action = action;
   }
 
   public getFullMessage() {
-    return `${this.message} (code=${this.code}, status=${this.status})`;
+    return `${this.message} (code=${this.code}, status=${this.status || 'n/a'})`;
   }
 }
