@@ -410,7 +410,7 @@ jobs:
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else ${{ matrix.clerk-use-rq == 'true' && 'CLERK_USE_RQ=true' || '' }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag integration; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else ${{ matrix.clerk-use-rq == 'true' && 'CLERK_USE_RQ=true' || '' }} pnpm turbo build $TURBO_ARGS --only && GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} pnpm changeset version --snapshot ci && pnpm changeset publish --no-git-tag --tag latest; fi
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc

@@ -75,7 +75,7 @@ runs:
     - name: Print published Clerk package versions
       shell: bash
       run: |
-        echo "Published @clerk packages under 'integration' tag:"
+        echo "Published @clerk packages (snapshot versions):"
         echo "=================================================="
         packages=(
           "@clerk/agent-toolkit"
@@ -102,6 +102,6 @@ runs:
           "@clerk/vue"
         )
         for pkg in "${packages[@]}"; do
-          version=$(pnpm view "$pkg@integration" version 2>/dev/null || echo "not found")
-          printf "%-35s %s\n" "$pkg@integration:" "$version"
+          version=$(pnpm view "$pkg" version 2>/dev/null || echo "not found")
+          printf "%-35s %s\n" "$pkg:" "$version"
         done
