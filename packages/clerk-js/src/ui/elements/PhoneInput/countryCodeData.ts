@@ -13,7 +13,7 @@ const data = [
   ['France', 'fr', '33', '. .. .. .. ..', 100],
   ['Russia', 'ru', '7', '... ...-..-..', 100],
   ['Afghanistan', 'af', '93'],
-  ['Aland Islands', 'ax', '358'],
+  ['Åland Islands', 'ax', '358'],
   ['Albania', 'al', '355'],
   ['Algeria', 'dz', '213'],
   ['American Samoa', 'as', '1684'],
