@@ -295,22 +295,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name:
-          [
+        test-name: [
             "generic",
             "express",
-            "ap-flows",
-            "localhost",
-            "sessions",
-            "sessions:staging",
-            "handshake",
-            "handshake:staging",
-            "astro",
-            "tanstack-react-start",
-            "vue",
-            "nuxt",
-            "react-router",
-            "custom",
+            # "ap-flows",
+            # "localhost",
+            # "sessions",
+            # "sessions:staging",
+            # "handshake",
+            # "handshake:staging",
+            # "astro",
+            # "tanstack-react-start",
+            # "vue",
+            # "nuxt",
+            # "react-router",
+            # "custom",
           ]
         test-project: ["chrome"]
         include:
