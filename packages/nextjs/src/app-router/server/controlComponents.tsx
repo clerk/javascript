@@ -1,8 +1,13 @@
-import type { ProtectProps } from '@clerk/react';
-import type { PendingSessionOptions } from '@clerk/shared/types';
+import type { PendingSessionOptions, ProtectProps as _ProtectProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { auth } from './auth';
+
+type ProtectProps = React.PropsWithChildren<
+  _ProtectProps & {
+    fallback?: React.ReactNode;
+  } & PendingSessionOptions
+>;
 
 export async function SignedIn(
   props: React.PropsWithChildren<PendingSessionOptions>,

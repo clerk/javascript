@@ -68,3 +68,40 @@ export type ProtectProps =
       feature?: never;
       plan?: never;
     };
+
+/**
+ * Authorization condition for the `when` prop in `<Show />`.
+ * Can be an object specifying role, permission, feature, or plan,
+ * or a callback function receiving the `has` helper for complex conditions.
+ */
+export type ShowWhenCondition =
+  | { role: OrganizationCustomRoleKey }
+  | { permission: OrganizationCustomPermissionKey }
+  | { feature: Autocomplete<`org:${string}` | `user:${string}`> }
+  | { plan: Autocomplete<`org:${string}` | `user:${string}`> }
+  | ((has: CheckAuthorizationWithCustomPermissions) => boolean);
+
+/**
+ * Props for the `<Show />` component, which conditionally renders children based on authorization.
+ *
+ * @example
+ * ```tsx
+ * // Require a specific permission
+ * <Show when={{ permission: "org:billing:manage" }}>...</Show>
+ *
+ * // Require a specific role
+ * <Show when={{ role: "admin" }}>...</Show>
+ *
+ * // Use a custom condition callback
+ * <Show when={(has) => has({ permission: "org:read" }) && someCondition}>...</Show>
+ *
+ * // Require a specific feature
+ * <Show when={{ feature: "user:premium" }}>...</Show>
+ *
+ * // Require a specific plan
+ * <Show when={{ plan: "pro" }}>...</Show>
+ * ```
+ */
+export type ShowProps = {
+  when: ShowWhenCondition;
+};
