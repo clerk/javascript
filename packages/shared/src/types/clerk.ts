@@ -647,6 +647,22 @@ export interface Clerk {
   unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskResetPassword component at the target element.
+   *
+   * @param targetNode - Target node to mount the TaskResetPassword component.
+   * @param props - configuration parameters.
+   */
+  mountTaskResetPassword: (targetNode: HTMLDivElement, props?: TaskResetPasswordProps) => void;
+
+  /**
+   * Unmount a TaskResetPassword component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskResetPassword component from.
+   */
+  unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
