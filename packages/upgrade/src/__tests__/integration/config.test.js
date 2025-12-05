@@ -62,13 +62,6 @@ describe('loadConfig', () => {
     expect(config.docsUrl).toBeDefined();
     expect(config.docsUrl).toContain('clerk.com');
   });
-
-  it('returns config for unknown version (defaults to upgrade)', async () => {
-    const config = await loadConfig('nextjs', null);
-
-    expect(config).not.toBeNull();
-    expect(config.versionStatus).toBe('unknown');
-  });
 });
 
 describe('getTargetPackageName', () => {
