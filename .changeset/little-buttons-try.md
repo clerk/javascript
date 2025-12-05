@@ -5,7 +5,7 @@
 "@clerk/vue": patch
 ---
 
-Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`
+Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`.
 
 Example:
 
