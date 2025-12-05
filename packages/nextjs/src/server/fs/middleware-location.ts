@@ -1,3 +1,4 @@
+import { isNext16OrHigher } from '../../utils/sdk-versions';
 import { nodeCwdOrThrow, nodeFsOrThrow, nodePathOrThrow } from './utils';
 
 function hasSrcAppDir() {
@@ -12,12 +13,17 @@ function hasSrcAppDir() {
 
 function suggestMiddlewareLocation() {
   const fileExtensions = ['ts', 'js'] as const;
+  // Next.js 16+ supports both middleware.ts (Edge runtime) and proxy.ts (Node.js runtime)
+  const fileNames = isNext16OrHigher ? ['middleware', 'proxy'] : ['middleware'];
+  const fileNameDisplay = isNext16OrHigher ? 'middleware or proxy' : 'middleware';
+
   const suggestionMessage = (
+    fileName: string,
     extension: (typeof fileExtensions)[number],
     to: 'src/' | '',
     from: 'src/app/' | 'app/' | '',
   ) =>
-    `Clerk: clerkMiddleware() was not run, your middleware file might be misplaced. Move your middleware file to ./${to}middleware.${extension}. Currently located at ./${from}middleware.${extension}`;
+    `Clerk: clerkMiddleware() was not run, your ${fileNameDisplay} file might be misplaced. Move your ${fileNameDisplay} file to ./${to}${fileName}.${extension}. Currently located at ./${from}${fileName}.${extension}`;
 
   const { existsSync } = nodeFsOrThrow();
   const path = nodePathOrThrow();
@@ -31,9 +37,11 @@ function suggestMiddlewareLocation() {
     to: 'src/' | '',
     from: 'src/app/' | 'app/' | '',
   ): string | undefined => {
-    for (const fileExtension of fileExtensions) {
-      if (existsSync(path.join(basePath, `middleware.${fileExtension}`))) {
-        return suggestionMessage(fileExtension, to, from);
+    for (const fileName of fileNames) {
+      for (const fileExtension of fileExtensions) {
+        if (existsSync(path.join(basePath, `${fileName}.${fileExtension}`))) {
+          return suggestionMessage(fileName, fileExtension, to, from);
+        }
       }
     }
     return undefined;

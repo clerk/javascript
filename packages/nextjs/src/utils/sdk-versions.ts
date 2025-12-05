@@ -8,4 +8,9 @@ const isNext13 = nextPkg.version.startsWith('13.');
  */
 const isNextWithUnstableServerActions = isNext13 || nextPkg.version.startsWith('14.0');
 
-export { isNext13, isNextWithUnstableServerActions };
+/**
+ * Next.js 16+ renamed middleware.ts to proxy.ts
+ */
+const isNext16OrHigher = nextPkg.version.startsWith('16.') || parseInt(nextPkg.version.split('.')[0]) >= 16;
+
+export { isNext13, isNextWithUnstableServerActions, isNext16OrHigher };
