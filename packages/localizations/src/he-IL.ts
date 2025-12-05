@@ -868,6 +868,8 @@ export const heIL: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} כבר חבר בארגון',
+    avatar_file_size_exceeded: 'גודל הקובץ חורג מהמגבלה המקסימלית של 10MB. אנא בחר קובץ קטן יותר.',
+    avatar_file_type_invalid: 'סוג הקובץ אינו נתמך. אנא העלה תמונה בפורמט JPG, PNG, GIF או WEBP.',
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     form_code_incorrect: undefined,

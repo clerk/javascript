@@ -889,6 +889,9 @@ export const ptBR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do arquivo excede o limite máximo de 10 MB. Por favor, escolha um arquivo menor.',
+    avatar_file_type_invalid: 'Tipo de arquivo não suportado. Por favor, envie uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:

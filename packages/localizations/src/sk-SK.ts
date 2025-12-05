@@ -882,6 +882,9 @@ export const skSK: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Veľkosť súboru presahuje maximálny limit 10 MB. Vyberte prosím menší súbor.',
+    avatar_file_type_invalid:
+      'Typ súboru nie je podporovaný. Nahrajte prosím obrázok vo formáte JPG, PNG, GIF alebo WEBP.',
     captcha_invalid:
       'Registrácia zlyhala z dôvodu neúspešného overenia zabezpečenia. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     captcha_unavailable:

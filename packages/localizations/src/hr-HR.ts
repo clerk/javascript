@@ -879,6 +879,9 @@ export const hrHR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
+    avatar_file_size_exceeded:
+      'Veličina datoteke premašuje maksimalno ograničenje od 10 MB. Molimo odaberite manju datoteku.',
+    avatar_file_type_invalid: 'Vrsta datoteke nije podržana. Molimo prenesite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspješna zbog neuspjelih sigurnosnih provjera. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     captcha_unavailable:

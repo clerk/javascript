@@ -870,6 +870,8 @@ export const koKR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '파일 크기가 최대 10MB 제한을 초과합니다. 더 작은 파일을 선택해 주세요.',
+    avatar_file_type_invalid: '지원되지 않는 파일 형식입니다. JPG, PNG, GIF 또는 WEBP 이미지를 업로드해 주세요.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:

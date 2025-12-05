@@ -888,6 +888,9 @@ export const csCZ: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    avatar_file_size_exceeded: 'Velikost souboru přesahuje maximální limit 10 MB. Vyberte prosím menší soubor.',
+    avatar_file_type_invalid:
+      'Typ souboru není podporován. Nahrajte prosím obrázek ve formátu JPG, PNG, GIF nebo WEBP.',
     captcha_invalid:
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:

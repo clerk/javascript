@@ -878,6 +878,8 @@ export const thTH: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
+    avatar_file_size_exceeded: 'ขนาดไฟล์เกินขีดจำกัดสูงสุด 10MB กรุณาเลือกไฟล์ที่เล็กกว่า',
+    avatar_file_type_invalid: 'ประเภทไฟล์ไม่รองรับ กรุณาอัปโหลดรูปภาพ JPG, PNG, GIF หรือ WEBP',
     captcha_invalid: undefined,
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',

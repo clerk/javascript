@@ -876,6 +876,8 @@ export const nbNO: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider maksgrensen på 10 MB. Vennligst velg en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen støttes ikke. Vennligst last opp et JPG-, PNG-, GIF- eller WEBP-bilde.',
     captcha_invalid:
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:

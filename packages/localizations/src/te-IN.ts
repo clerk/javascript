@@ -884,6 +884,8 @@ export const teIN: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
+    avatar_file_size_exceeded: 'ఫైల్ పరిమాణం గరిష్ట 10MB పరిమితిని మించిపోయింది. దయచేసి చిన్న ఫైల్‌ను ఎంచుకోండి.',
+    avatar_file_type_invalid: 'ఫైల్ రకం సపోర్ట్ చేయబడలేదు. దయచేసి JPG, PNG, GIF లేదా WEBP చిత్రాన్ని అప్‌లోడ్ చేయండి.',
     captcha_invalid:
       'భద్రతా ధృవీకరణలు విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     captcha_unavailable:
