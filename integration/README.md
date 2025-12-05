@@ -75,10 +75,10 @@ Below you can find code snippets for running tests in a specific manner, easily 
 
 #### Keep temporary site
 
-During E2E runs a temporary site is created in which the template is copied into. If you want to keep the site around, pass the `CLEANUP` environment variable:
+During E2E runs a temporary site is created in which the template is copied into. If you want to keep the site around, pass the `E2E_CLEANUP` environment variable:
 
 ```shell
-CLEANUP=0 pnpm test:integration:base
+E2E_CLEANUP=0 pnpm test:integration:base
 ```
 
 For all available environment variables, check the [`constants.ts`](../integration/constants.ts) file.

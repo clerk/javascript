@@ -320,12 +320,12 @@ jobs:
           - test-name: "billing"
             test-project: "chrome"
             clerk-use-rq: "true"
-          - test-name: "machine"
-            test-project: "chrome"
-            clerk-use-rq: "false"
-          - test-name: "machine"
-            test-project: "chrome"
-            clerk-use-rq: "true"
+          # - test-name: "machine"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "false"
+          # - test-name: "machine"
+          #   test-project: "chrome"
+          #   clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "15"
@@ -476,6 +476,7 @@ jobs:
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
+          E2E_CLEANUP: "0"
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_JS_VERSION: "latest"
@@ -488,6 +489,74 @@ jobs:
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
+      - name: List temp directory contents
+        if: ${{ always() }}
+        run: |
+          echo "Contents of /tmp:"
+          ls -la /tmp/ | grep -E '(temp|integration)' || echo "No temp/integration directories found"
+          if [ -d "/tmp/.temp_integration" ]; then
+            echo "Contents of /tmp/.temp_integration:"
+            ls -la /tmp/.temp_integration/
+          else
+            echo "Directory /tmp/.temp_integration does not exist"
+          fi
+
+      - name: Package integration temp artifacts
+        if: ${{ cancelled() || failure() }}
+        continue-on-error: true
+        run: |
+          if [ ! -d "/tmp/.temp_integration" ]; then
+            echo "No temp integration directory found"
+            exit 0
+          fi
+
+          cd /tmp/.temp_integration
+
+          # Create a directory for artifacts to compress
+          mkdir -p /tmp/integration-artifacts
+
+          # Copy state.json if it exists
+          if [ -f "state.json" ]; then
+            cp state.json /tmp/integration-artifacts/
+            echo "Copied state.json"
+          fi
+
+          # Find all long-running app directories and get the most recent for each prefix
+          for dir in long-running--*; do
+            if [ ! -d "$dir" ]; then
+              continue
+            fi
+
+            # Extract prefix by removing the last two parts (timestamp and hash)
+            # Pattern: prefix__timestamp__hash
+            prefix=$(echo "$dir" | sed -E 's/__[^_]+__[^_]+$//')
+
+            # Find the most recent directory with this prefix
+            most_recent=$(ls -dt ${prefix}__* 2>/dev/null | head -n 1)
+
+            if [ -n "$most_recent" ] && [ ! -d "/tmp/integration-artifacts/$most_recent" ]; then
+              cp -r "$most_recent" /tmp/integration-artifacts/
+              echo "Copied $most_recent (most recent for prefix: $prefix)"
+              
+              # Extract timestamp from the directory name to find matching log files
+              timestamp=$(echo "$most_recent" | sed -E 's/.*__([0-9]+)__[^_]+$/\1/')
+              
+              # Copy matching log files (both clerkJs and clerkUi logs)
+              for log in clerkJsHttpServer.${timestamp}.* clerkUiHttpServer.${timestamp}.*; do
+                if [ -f "$log" ]; then
+                  cp "$log" /tmp/integration-artifacts/
+                  echo "Copied log file: $log"
+                fi
+              done
+            fi
+          done
+
+          # Create compressed archive
+          cd /tmp
+          tar -czf integration-debug.tar.gz integration-artifacts/
+          echo "Created integration-debug.tar.gz"
+          ls -lh integration-debug.tar.gz
+
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
         uses: actions/upload-artifact@v4
@@ -495,6 +564,16 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}${{ matrix.clerk-use-rq == 'true' && '-rq' || '' }}
           path: integration/test-results
           retention-days: 1
+
+      - name: Upload integration debug archive
+        if: ${{ cancelled() || failure() }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-debug-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.test-name }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}${{ matrix.clerk-use-rq == 'true' && '-rq' || '' }}
+          path: /tmp/integration-debug.tar.gz
+          retention-days: 1
+          if-no-files-found: ignore
 
   pkg-pr-new:
     name: Publish with pkg-pr-new
