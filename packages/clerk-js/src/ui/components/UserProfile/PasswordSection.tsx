@@ -22,7 +22,15 @@ export const PasswordSection = () => {
   const { user } = useUser();
   const { userSettings } = useEnvironment();
 
+  console.log('PasswordSection Debug:', {
+    'user exists': !!user,
+    'password.enabled': userSettings.attributes.password?.enabled,
+    'password.required': userSettings.attributes.password?.required,
+    'user.passwordEnabled': user?.passwordEnabled,
+  });
+
   if (!user) {
+    console.log('PasswordSection: No user, returning null');
     return null;
   }
 
@@ -30,8 +38,11 @@ export const PasswordSection = () => {
   const passwordsGloballyEnabled = userSettings.attributes.password?.enabled;
 
   if (!passwordsGloballyEnabled) {
+    console.log(' PasswordSection: Passwords not globally enabled, returning null');
     return null; // Don't show password section at all
   }
+
+  console.log('PasswordSection: All checks passed, rendering section');
 
   // Second check: Does this user have a password set?
   const { passwordEnabled } = user;

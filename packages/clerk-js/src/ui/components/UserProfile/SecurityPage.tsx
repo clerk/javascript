@@ -18,6 +18,15 @@ export const SecurityPage = withCardStateProvider(() => {
   const card = useCardState();
   const { user } = useUser();
   const { shouldAllowIdentificationCreation } = useUserProfileContext();
+
+  // DEBUG: Let's see what's actually happening
+  console.log('SecurityPage Debug:', {
+    'password.enabled': attributes.password?.enabled,
+    'password.required': attributes.password?.required,
+    instanceIsPasswordBased,
+    'Will show password section': instanceIsPasswordBased,
+  });
+
   const showPassword = instanceIsPasswordBased;
   const showPasskey = attributes.passkey?.enabled && shouldAllowIdentificationCreation;
   const showMfa = getSecondFactors(attributes).length > 0;

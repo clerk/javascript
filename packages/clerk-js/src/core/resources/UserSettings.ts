@@ -191,7 +191,14 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   get instanceIsPasswordBased() {
-    return Boolean(this.attributes?.password?.enabled);
+    const result = Boolean(this.attributes?.password?.enabled);
+    console.log('UserSettings.instanceIsPasswordBased:', {
+      'attributes.password': this.attributes?.password,
+      'password.enabled': this.attributes?.password?.enabled,
+      result: result,
+      'full attributes': this.attributes,
+    });
+    return result;
   }
 
   get hasValidAuthFactor() {
@@ -206,16 +213,29 @@ export class UserSettings extends BaseResource implements UserSettingsResource {
   }
 
   protected fromJSON(data: UserSettingsJSON | UserSettingsJSONSnapshot | null): this {
+    console.log('UserSettings.fromJSON called with data:', {
+      'has data': !!data,
+      'data.attributes': data?.attributes,
+      'data.attributes.password': data?.attributes?.password,
+      'current default attributes.password': this.attributes.password,
+    });
+
     if (!data) {
+      console.log('UserSettings.fromJSON: No data provided, using defaults');
       return this;
     }
 
-    this.attributes = this.withDefault(
-      data.attributes
-        ? (Object.fromEntries(Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }])) as Attributes)
-        : null,
-      this.attributes,
-    );
+    const processedAttributes = data.attributes
+      ? (Object.fromEntries(Object.entries(data.attributes).map(a => [a[0], { ...a[1], name: a[0] }])) as Attributes)
+      : null;
+
+    console.log('UserSettings.fromJSON processed attributes:', {
+      processedAttributes: processedAttributes,
+      'processedAttributes.password': processedAttributes?.password,
+      'about to withDefault with': { processedAttributes, defaultAttributes: this.attributes },
+    });
+
+    this.attributes = this.withDefault(processedAttributes, this.attributes);
     this.actions = this.withDefault(data.actions, this.actions);
     this.enterpriseSSO = this.withDefault(data.enterprise_sso, this.enterpriseSSO);
     this.passkeySettings = this.withDefault(data.passkey_settings, this.passkeySettings);

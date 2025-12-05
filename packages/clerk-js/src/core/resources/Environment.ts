@@ -44,6 +44,13 @@ export class Environment extends BaseResource implements EnvironmentResource {
   }
 
   protected fromJSON(data: EnvironmentJSONSnapshot | EnvironmentJSON | null): this {
+    console.log('Environment.fromJSON called:', {
+      'has data': !!data,
+      'data.user_settings': data?.user_settings,
+      'data.user_settings.attributes': data?.user_settings?.attributes,
+      'data.user_settings.attributes.password': data?.user_settings?.attributes?.password,
+    });
+
     if (!data) {
       return this;
     }
