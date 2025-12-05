@@ -64,14 +64,9 @@ export default defineNuxtModule<ModuleOptions>({
           signUpForceRedirectUrl: options.signUpForceRedirectUrl,
           signUpUrl: options.signUpUrl,
           domain: options.domain,
-          // Unfortunately, Nuxt's runtime config nests these under `clerk`, so the env var
-          // for `clerkJSUrl` would need to be NUXT_PUBLIC_CLERK_CLERK_JS_URL (double CLERK).
-          // To avoid this awkward naming, we read NUXT_PUBLIC_CLERK_JS_* directly via process.env
-          // at build/dev time, which is consistent with other Clerk packages.
-          // For both build and runtime overrides in production, use NUXT_PUBLIC_CLERK_CLERK_JS_* instead.
-          clerkJSUrl: options.clerkJSUrl || process.env.NUXT_PUBLIC_CLERK_JS_URL,
-          clerkJSVariant: options.clerkJSVariant || process.env.NUXT_PUBLIC_CLERK_JS_VARIANT,
-          clerkJSVersion: options.clerkJSVersion || process.env.NUXT_PUBLIC_CLERK_JS_VERSION,
+          clerkJSUrl: options.clerkJSUrl,
+          clerkJSVariant: options.clerkJSVariant,
+          clerkJSVersion: options.clerkJSVersion,
           isSatellite: options.isSatellite,
           // Backend specific variables that are safe to share.
           // We want them to be overridable like the other public keys (e.g NUXT_PUBLIC_CLERK_PROXY_URL)
