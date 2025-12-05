@@ -898,6 +898,7 @@ export const ptBR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
     form_identifier_not_found: 'Não foi possível encontrar o usuário.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',
     form_param_format_invalid__phone_number: 'Número de telefone precisa estar num formato internacional válido.',

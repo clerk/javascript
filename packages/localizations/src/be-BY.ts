@@ -891,6 +891,7 @@ export const beBY: LocalizationResource = {
     form_identifier_exists__phone_number: 'Гэты нумар тэлефона ўжо выкарыстоўваецца.',
     form_identifier_exists__username: 'Гэта імя ўжо занята.',
     form_identifier_not_found: 'Мы не знойдзем акаўнта з такімі данымі.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address:
       'Адрас электроннай пошты павінен быць сапраўдным адрасам электроннай пошты.',

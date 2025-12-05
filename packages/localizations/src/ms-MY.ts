@@ -894,6 +894,7 @@ export const msMY: LocalizationResource = {
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
     form_identifier_not_found: 'Tiada akaun dijumpai dengan pengenal ini. Sila periksa dan cuba lagi.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid:
       'Nilai yang dimasukkan adalah dalam format yang tidak sah. Sila periksa dan betulkannya.',
     form_param_format_invalid__email_address: 'Alamat e-mel mestilah alamat e-mel yang sah.',

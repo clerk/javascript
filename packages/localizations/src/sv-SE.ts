@@ -889,6 +889,7 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
     form_identifier_not_found: 'Vi kunde inte hitta ett konto med dessa uppgifter.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formatet är ogiltigt.',
     form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
     form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',

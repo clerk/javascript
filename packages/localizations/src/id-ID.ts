@@ -892,6 +892,7 @@ export const idID: LocalizationResource = {
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_not_found: 'Kami tidak dapat menemukan akun dengan detail tersebut.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Alamat email harus berupa alamat email yang valid.',
     form_param_format_invalid__phone_number: 'Nomor telepon harus dalam format internasional yang valid',

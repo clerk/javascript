@@ -894,6 +894,7 @@ export const esMX: LocalizationResource = {
     form_identifier_exists__phone_number: 'El número telefónico ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
     form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'El correo electrónico debe ser válido.',
     form_param_format_invalid__phone_number: 'El número telefónico debe ser en un formato válido internacional.',

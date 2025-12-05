@@ -888,6 +888,7 @@ export const isIS: LocalizationResource = {
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_not_found: 'Við getum ekki fundið reikning með þessum upplýsingum.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Netfang verður að vera gilt netfang.',
     form_param_format_invalid__phone_number: 'Símanúmer verður að vera á giltu alþjóðlegu formi',

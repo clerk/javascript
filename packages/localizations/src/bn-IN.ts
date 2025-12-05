@@ -892,6 +892,7 @@ export const bnIN: LocalizationResource = {
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_not_found:
       'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'লেখা মানটি একটি অবৈধ ফরম্যাটে আছে। দয়া করে চেক করুন এবং সংশোধন করুন।',
     form_param_format_invalid__email_address: 'ইমেইল ঠিকানা একটি বৈধ ইমেইল ঠিকানা হতে হবে।',
     form_param_format_invalid__phone_number: 'ফোন নম্বর একটি বৈধ আন্তর্জাতিক ফরম্যাটে হতে হবে।',
