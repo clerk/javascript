@@ -1,9 +1,9 @@
 const CLERK_PACKAGE_PREFIX = '@clerk/';
 const COMPONENTS_WITH_HIDE_SLUG = new Set(['CreateOrganization', 'OrganizationSwitcher', 'OrganizationList']);
 const COMPONENT_RENAMES = new Map([
-  ['ClerkProvider', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'signUpFallbackRedirectUrl' }],
-  ['SignIn', { afterSignInUrl: 'fallbackRedirectUrl', afterSignUpUrl: 'signUpFallbackRedirectUrl' }],
-  ['SignUp', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'fallbackRedirectUrl' }],
+  ['ClerkProvider', { signInFallbackRedirectUrl: 'signInFallbackRedirectUrl', signUpFallbackRedirectUrl: 'signUpFallbackRedirectUrl' }],
+  ['SignIn', { signInFallbackRedirectUrl: 'fallbackRedirectUrl', signUpFallbackRedirectUrl: 'signUpFallbackRedirectUrl' }],
+  ['SignUp', { signInFallbackRedirectUrl: 'signInFallbackRedirectUrl', signUpFallbackRedirectUrl: 'fallbackRedirectUrl' }],
 ]);
 const COMPONENT_REDIRECT_ATTR = new Map([
   ['ClerkProvider', { targetAttrs: ['signInFallbackRedirectUrl', 'signUpFallbackRedirectUrl'] }],
