@@ -748,8 +748,8 @@ export const enUS: LocalizationResource = {
       title: 'Two-step verification',
     },
     web3Solana: {
-      title: 'Sign in with Solana',
       subtitle: 'Select a wallet below to sign in',
+      title: 'Sign in with Solana',
     },
   },
   signInEnterPasswordTitle: 'Enter your password',
@@ -844,15 +844,9 @@ export const enUS: LocalizationResource = {
       titleCombined: 'Create your account',
     },
     web3Solana: {
-      title: 'Sign up with Solana',
       subtitle: 'Select a wallet below to sign up',
+      title: 'Sign up with Solana',
     },
-  },
-  web3WalletButtons: {
-    connect: 'Connect with {{walletName}}',
-    continue: 'Continue with {{walletName}}',
-    noneAvailable:
-      'No Solana Web3 wallets detected. Please install a Web3 supported {{ solanaWalletsLink || link("wallet extension") }}.',
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -1358,5 +1352,11 @@ export const enUS: LocalizationResource = {
       subtitle: 'We’ll be in touch when your spot is ready',
       title: 'Thanks for joining the waitlist!',
     },
+  },
+  web3WalletButtons: {
+    connect: 'Connect with {{walletName}}',
+    continue: 'Continue with {{walletName}}',
+    noneAvailable:
+      'No Solana Web3 wallets detected. Please install a Web3 supported {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

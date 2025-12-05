@@ -751,6 +751,10 @@ export const skSK: LocalizationResource = {
       subtitle: 'Pre pokračovanie zadajte overovací kód z vašej autentifikačnej aplikácie',
       title: 'Dvojfaktorové overenie',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
@@ -844,6 +848,10 @@ export const skSK: LocalizationResource = {
       subtitleCombined: 'Vitajte! Pre pokračovanie prosím vyplňte informácie.',
       title: 'Vytvorte si účet',
       titleCombined: 'Vytvorte si účet',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
@@ -943,6 +951,8 @@ export const skSK: LocalizationResource = {
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -1345,5 +1355,10 @@ export const skSK: LocalizationResource = {
       subtitle: 'Budeme vás informovať, keď bude prístup povolený.',
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

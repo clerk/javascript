@@ -748,6 +748,10 @@ export const srRS: LocalizationResource = {
       subtitle: 'Da nastaviš, molimo unesi verifikacioni kod generisan tvojom aplikacijom za autentifikaciju',
       title: 'Dvostepena verifikacija',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Unesi svoju lozinku',
   signUp: {
@@ -837,6 +841,10 @@ export const srRS: LocalizationResource = {
       subtitleCombined: 'Dobrodošao! Molimo popuni detalje da započneš.',
       title: 'Kreiraj svoj nalog',
       titleCombined: 'Kreiraj svoj nalog',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
@@ -936,6 +944,8 @@ export const srRS: LocalizationResource = {
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',
       goodPassword: 'Tvoja lozinka ispunjava sve potrebne zahteve.',
@@ -1338,5 +1348,10 @@ export const srRS: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

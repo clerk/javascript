@@ -751,6 +751,10 @@ export const svSE: LocalizationResource = {
       subtitle: 'För att fortsätta, vänligen ange verifieringskoden som genereras av din autentiseringsapp',
       title: 'Tvåstegsverifiering',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
   signUp: {
@@ -842,6 +846,10 @@ export const svSE: LocalizationResource = {
       subtitleCombined: 'för att fortsätta till {{applicationName}}',
       title: 'Skapa ditt konto',
       titleCombined: 'Skapa ditt konto',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
@@ -939,6 +947,8 @@ export const svSE: LocalizationResource = {
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
@@ -1341,5 +1351,10 @@ export const svSE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

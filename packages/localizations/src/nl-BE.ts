@@ -749,6 +749,10 @@ export const nlBE: LocalizationResource = {
       subtitle: '',
       title: 'Tweestapsverificatie',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
   signUp: {
@@ -839,6 +843,10 @@ export const nlBE: LocalizationResource = {
       subtitleCombined: 'om door te gaan naar {{applicationName}}',
       title: 'Maak je account aan',
       titleCombined: 'Maak je account aan',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
@@ -936,6 +944,8 @@ export const nlBE: LocalizationResource = {
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',
@@ -1337,5 +1347,10 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Je ontvangt een bericht zodra er ruimte beschikbaar is.',
       title: 'Succes!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

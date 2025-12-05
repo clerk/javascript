@@ -752,6 +752,10 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जारी रखने के लिए, कृपया अपने प्रमाणकर्ता ऐप द्वारा जनरेट किए गए कोड को दर्ज करें',
       title: 'दो-चरण सत्यापन',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'अपना पासवर्ड दर्ज करें',
   signUp: {
@@ -844,6 +848,10 @@ export const hiIN: LocalizationResource = {
       subtitleCombined: 'स्वागत है! आरंभ करने के लिए कृपया विवरण भरें।',
       title: 'अपना खाता बनाएं',
       titleCombined: 'अपना खाता बनाएं',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
@@ -947,6 +955,8 @@ export const hiIN: LocalizationResource = {
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'आपका पासवर्ड काम करता है, लेकिन मजबूत हो सकता है। अधिक अक्षर जोड़ने का प्रयास करें।',
       goodPassword: 'आपका पासवर्ड सभी आवश्यक आवश्यकताओं को पूरा करता है।',
@@ -1350,5 +1360,10 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जब आपका स्थान तैयार होगा तो हम आपसे संपर्क करेंगे',
       title: 'प्रतीक्षा सूची में शामिल होने के लिए धन्यवाद!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

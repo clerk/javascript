@@ -750,6 +750,10 @@ export const bgBG: LocalizationResource = {
         'За да продължите, моля въведете кода за потвърждение, генериран от вашето приложение за удостоверяване',
       title: 'Двустепенна верификация',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Въведете вашата парола',
   signUp: {
@@ -840,6 +844,10 @@ export const bgBG: LocalizationResource = {
       subtitleCombined: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
       titleCombined: 'Създайте своя акаунт',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
@@ -935,6 +943,8 @@ export const bgBG: LocalizationResource = {
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     session_exists: 'Вече сте влезнали.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Вашата парола работи, но може да бъде по-сигурна. Опитайте да добавите повече символи.',
       goodPassword: 'Вашата парола отговаря на всички необходими изисквания.',
@@ -1339,5 +1349,10 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Thank you for your patience.',
       title: 'Waitlist successful',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

@@ -750,6 +750,10 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Үргэлжлүүлэхийн тулд authenticator апп-аар үүсгэсэн баталгаажуулах кодыг оруулна уу',
       title: 'Two-step баталгаажуулалт',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
   signUp: {
@@ -839,6 +843,10 @@ export const mnMN: LocalizationResource = {
       subtitleCombined: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',
       titleCombined: 'Бүртгэл үүсгэх',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
@@ -937,6 +945,8 @@ export const mnMN: LocalizationResource = {
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
       goodPassword: 'Таны нууц үг шаардлагатай бүх шаардлагыг хангаж байна.',
@@ -1340,5 +1350,10 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

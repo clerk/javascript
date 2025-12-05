@@ -750,6 +750,10 @@ export const trTR: LocalizationResource = {
       subtitle: 'Devam etmek için lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan doğrulama kodunu girin',
       title: 'İki aşamalı doğrulama',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
   signUp: {
@@ -840,6 +844,10 @@ export const trTR: LocalizationResource = {
       subtitleCombined: '{{applicationName}} ile devam etmek için',
       title: 'Hesap oluştur',
       titleCombined: 'Hesap oluştur',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
@@ -939,6 +947,8 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger:
         'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
@@ -1342,5 +1352,10 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bekleme listesinde olduğunuz için teşekkür ederiz.',
       title: 'Bekleme Listesine Katıldınız',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

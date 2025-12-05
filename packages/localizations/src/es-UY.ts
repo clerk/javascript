@@ -753,6 +753,10 @@ export const esUY: LocalizationResource = {
       subtitle: 'Para continuar, ingresá el código generado por tu aplicación autenticadora',
       title: 'Verificación en dos pasos',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Ingresá tu contraseña',
   signUp: {
@@ -846,6 +850,10 @@ export const esUY: LocalizationResource = {
       subtitleCombined: '¡Bienvenido! Completá los datos para comenzar.',
       title: 'Creá tu cuenta',
       titleCombined: 'Creá tu cuenta',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
@@ -948,6 +956,8 @@ export const esUY: LocalizationResource = {
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     session_exists: 'Ya has iniciado sesión',
     web3_missing_identifier: 'No se encontró una extensión de cartera Web3. Por favor, instalá una para continuar.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero podría ser más fuerte. Intentá agregar más caracteres.',
       goodPassword: 'Tu contraseña cumple con todos los requisitos necesarios.',
@@ -1352,5 +1362,10 @@ export const esUY: LocalizationResource = {
       subtitle: 'Nos pondremos en contacto cuando tu lugar esté listo',
       title: '¡Gracias por unirte a la lista de espera!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

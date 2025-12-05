@@ -749,6 +749,10 @@ export const huHU: LocalizationResource = {
       subtitle: 'A folytatáshoz, kérlek írd be a visszaigazoló kódot, amit a hitelesítő app készített.',
       title: 'Két lépécsős azonosítás',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
@@ -838,6 +842,10 @@ export const huHU: LocalizationResource = {
       subtitleCombined: 'Üdv! Kérlek add meg az adatokat, hogy elkezdhesd.',
       title: 'Fiók létrehozása',
       titleCombined: 'Fiók létrehozása',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
@@ -937,6 +945,8 @@ export const huHU: LocalizationResource = {
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'A jelszavad, jó, de lehetne erősebb. Adj hozzá több karaktert.',
       goodPassword: 'A jelszavad megfelel az elvárásoknak.',
@@ -1342,5 +1352,10 @@ export const huHU: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

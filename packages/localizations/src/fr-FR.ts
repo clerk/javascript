@@ -764,6 +764,10 @@ export const frFR: LocalizationResource = {
       subtitle: "Entrez le code de l'application d'authentification.",
       title: 'Vérification en deux étapes',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
   signUp: {
@@ -855,6 +859,10 @@ export const frFR: LocalizationResource = {
       subtitleCombined: 'pour continuer vers {{applicationName}}',
       title: 'Créez votre compte',
       titleCombined: 'Créez votre compte',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
@@ -955,6 +963,8 @@ export const frFR: LocalizationResource = {
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",
@@ -1362,5 +1372,10 @@ export const frFR: LocalizationResource = {
       subtitle: 'Nous vous contacterons bientôt avec plus de détails.',
       title: 'Inscription réussie',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

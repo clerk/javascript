@@ -737,6 +737,10 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: '兩步驟驗證',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: '輸入您的密碼',
   signUp: {
@@ -827,6 +831,10 @@ export const zhTW: LocalizationResource = {
       subtitleCombined: '以繼續前往 {{applicationName}}',
       title: '建立您的帳戶',
       titleCombined: '建立您的帳戶',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '以 {{provider|titleize}} 帳戶登入',
@@ -920,6 +928,8 @@ export const zhTW: LocalizationResource = {
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     session_exists: '您已經登錄。',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: '您的密碼強度尚可，但可以更安全。請嘗試增加長度或複雜度。',
       goodPassword: '密碼強度良好。',
@@ -1306,5 +1316,10 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

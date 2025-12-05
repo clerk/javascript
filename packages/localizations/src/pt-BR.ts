@@ -758,6 +758,10 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Para continuar, insira o código gerado pelo seu aplicativo autenticador.',
       title: 'Verificação em duas etapas',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Insira sua senha',
   signUp: {
@@ -851,6 +855,10 @@ export const ptBR: LocalizationResource = {
       subtitleCombined: 'para continuar em {{applicationName}}',
       title: 'Criar sua conta',
       titleCombined: 'Criar sua conta',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -952,6 +960,8 @@ export const ptBR: LocalizationResource = {
     session_exists: 'Você já está conectado.',
     web3_missing_identifier:
       'Uma extensão de carteira Web3 não pode ser encontrada. Por favor, instale uma para continuar.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'Sua senha atende a todos os requisitos necessários.',
@@ -1358,5 +1368,10 @@ export const ptBR: LocalizationResource = {
       subtitle: 'Entraremos em contato quando seu lugar estiver disponível',
       title: 'Obrigado por entrar na lista de espera!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

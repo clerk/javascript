@@ -751,6 +751,10 @@ export const elGR: LocalizationResource = {
       subtitle: undefined,
       title: 'Aυθεντικοποίηση δύο βημάτων',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Εισαγωγή κωδικού πρόσβασης',
   signUp: {
@@ -841,6 +845,10 @@ export const elGR: LocalizationResource = {
       subtitleCombined: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Δημιουργήστε τον λογαριασμό σας',
       titleCombined: 'Δημιουργήστε τον λογαριασμό σας',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
@@ -939,6 +947,8 @@ export const elGR: LocalizationResource = {
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
     session_exists: 'Έχετε ήδη συνδεθεί.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger:
         'Ο κωδικός πρόσβασής σας είναι αρκετός, αλλά θα μπορούσε να είναι πιο ισχυρός. Δοκιμάστε να προσθέσετε περισσότερους χαρακτήρες.',
@@ -1348,5 +1358,10 @@ export const elGR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

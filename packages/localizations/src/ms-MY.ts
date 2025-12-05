@@ -754,6 +754,10 @@ export const msMY: LocalizationResource = {
       subtitle: 'Untuk meneruskan, sila masukkan kod pengesahan yang dijana oleh aplikasi pengesah anda',
       title: 'Pengesahan dua langkah',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Masukkan kata laluan anda',
   signUp: {
@@ -847,6 +851,10 @@ export const msMY: LocalizationResource = {
       subtitleCombined: 'Selamat datang! Sila isi butiran untuk memulakan.',
       title: 'Cipta akaun anda',
       titleCombined: 'Cipta akaun anda',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Teruskan dengan {{provider|titleize}}',
@@ -952,6 +960,8 @@ export const msMY: LocalizationResource = {
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     session_exists: undefined,
     web3_missing_identifier: 'Sambungan Dompet Web3 tidak dapat dijumpai. Sila pasang satu untuk meneruskan.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Kata laluan anda berfungsi, tetapi boleh lebih kuat. Cuba tambah lebih banyak aksara.',
       goodPassword: 'Kata laluan anda memenuhi semua keperluan yang diperlukan.',
@@ -1358,5 +1368,10 @@ export const msMY: LocalizationResource = {
       subtitle: 'Kami akan menghubungi anda apabila tempat anda sudah bersedia',
       title: 'Terima kasih kerana menyertai senarai menunggu!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

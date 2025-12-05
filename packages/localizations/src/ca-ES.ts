@@ -750,6 +750,10 @@ export const caES: LocalizationResource = {
       subtitle: "Per continuar, introdueix el codi de verificació generat per la teva aplicació d'autenticació",
       title: 'Verificació de dos passos',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Introdueix la teva contrasenya',
   signUp: {
@@ -839,6 +843,10 @@ export const caES: LocalizationResource = {
       subtitleCombined: 'Benvingut! Si us plau, completa els detalls per començar.',
       title: 'Crea el teu compte',
       titleCombined: 'Crea el teu compte',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continua amb {{provider|titleize}}',
@@ -937,6 +945,8 @@ export const caES: LocalizationResource = {
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
     session_exists: 'Ja estàs connectat.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',
       goodPassword: 'La teva contrasenya compleix tots els requisits necessaris.',
@@ -1345,5 +1355,10 @@ export const caES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;
