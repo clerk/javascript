@@ -653,12 +653,18 @@ importers:
       expo-auth-session:
         specifier: ^5.4.0
         version: 5.4.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
+      expo-constants:
+        specifier: ^18.0.0
+        version: 18.0.9(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))
       expo-crypto:
         specifier: ^15.0.7
         version: 15.0.7(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
       expo-local-authentication:
         specifier: ^13.8.0
         version: 13.8.0(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
+      expo-modules-core:
+        specifier: ^3.0.0
+        version: 3.0.21(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1)
       expo-secure-store:
         specifier: ^12.8.1
         version: 12.8.1(expo@54.0.13(@babel/core@7.28.4)(graphql@16.11.0)(react-native@0.81.4(@babel/core@7.28.4)(@react-native-community/cli@12.3.7)(@types/react@18.3.26)(react@18.3.1))(react@18.3.1))
