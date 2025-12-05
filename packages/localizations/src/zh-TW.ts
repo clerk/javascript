@@ -872,6 +872,7 @@ export const zhTW: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '我們無法找到具有這些信息的帳戶。',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: '電子郵件地址必須是有效的格式。',
     form_param_format_invalid__phone_number: '電話號碼必須是有效的國際格式。',
