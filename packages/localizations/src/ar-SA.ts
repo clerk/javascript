@@ -874,8 +874,8 @@ export const arSA: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'حجم الملف يتجاوز الحد الأقصى البالغ 10 ميغابايت. يرجى اختيار ملف أصغر.',
+    avatar_file_type_invalid: 'نوع الملف غير مدعوم. يرجى تحميل صورة بصيغة JPG أو PNG أو GIF أو WEBP.',
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
     captcha_unavailable:

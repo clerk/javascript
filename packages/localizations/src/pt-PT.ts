@@ -875,8 +875,9 @@ export const ptPT: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded:
+      'O tamanho do ficheiro excede o limite máximo de 10 MB. Por favor, escolha um ficheiro mais pequeno.',
+    avatar_file_type_invalid: 'Tipo de ficheiro não suportado. Por favor, carregue uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível inscrever-se devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:

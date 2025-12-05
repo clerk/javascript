@@ -875,8 +875,8 @@ export const daDK: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider den maksimale grænse på 10 MB. Vælg venligst en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen understøttes ikke. Upload venligst et JPG-, PNG-, GIF- eller WEBP-billede.',
     captcha_invalid:
       'Tilmelding mislykkedes på grund af fejlede sikkerhedsvalideringer. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     captcha_unavailable:

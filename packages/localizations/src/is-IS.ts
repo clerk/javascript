@@ -879,8 +879,8 @@ export const isIS: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'Skráarstærð fer yfir hámarksmörk 10 MB. Vinsamlegast veldu minni skrá.',
+    avatar_file_type_invalid: 'Skráargerð er ekki studd. Vinsamlegast hlaðið upp JPG, PNG, GIF eða WEBP mynd.',
     captcha_invalid:
       'Skráning mistókst vegna misheppnaðra öryggisstaðfestinga. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     captcha_unavailable:

@@ -878,8 +878,9 @@ export const bgBG: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'Размерът на файла надвишава максималния лимит от 10 MB. Моля, изберете по-малък файл.',
+    avatar_file_type_invalid:
+      'Типът на файла не се поддържа. Моля, качете изображение във формат JPG, PNG, GIF или WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable: undefined,
     form_code_incorrect: 'Невалиден код. Моля, опитайте отново.',

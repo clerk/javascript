@@ -893,8 +893,10 @@ export const frFR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded:
+      'La taille du fichier dépasse la limite maximale de 10 Mo. Veuillez choisir un fichier plus petit.',
+    avatar_file_type_invalid:
+      'Type de fichier non pris en charge. Veuillez télécharger une image JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:

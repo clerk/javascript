@@ -885,8 +885,8 @@ export const itIT: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sei già un membro di questa organizzazione.',
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'La dimensione del file supera il limite massimo di 10 MB. Scegli un file più piccolo.',
+    avatar_file_type_invalid: "Tipo di file non supportato. Carica un'immagine JPG, PNG, GIF o WEBP.",
     captcha_invalid:
       'Registrazione non riuscita a causa di fallite convalide di sicurezza. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     captcha_unavailable:

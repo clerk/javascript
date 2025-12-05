@@ -878,8 +878,8 @@ export const fiFI: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
+    avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:

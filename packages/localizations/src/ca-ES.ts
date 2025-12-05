@@ -877,8 +877,9 @@ export const caES: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded:
+      'La mida del fitxer supera el límit màxim de 10 MB. Si us plau, tria un fitxer més petit.',
+    avatar_file_type_invalid: 'El tipus de fitxer no és compatible. Si us plau, puja una imatge JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:

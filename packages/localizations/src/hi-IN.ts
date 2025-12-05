@@ -882,8 +882,8 @@ export const hiIN: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'फ़ाइल का आकार 10MB की अधिकतम सीमा से अधिक है। कृपया एक छोटी फ़ाइल चुनें।',
+    avatar_file_type_invalid: 'फ़ाइल प्रकार समर्थित नहीं है। कृपया JPG, PNG, GIF या WEBP छवि अपलोड करें।',
     captcha_invalid:
       'असफल सुरक्षा सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     captcha_unavailable:

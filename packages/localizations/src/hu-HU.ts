@@ -876,8 +876,8 @@ export const huHU: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
-    avatar_file_size_exceeded: undefined,
-    avatar_file_type_invalid: undefined,
+    avatar_file_size_exceeded: 'A fájl mérete meghaladja a 10 MB-os maximális korlátot. Kérlek válassz kisebb fájlt.',
+    avatar_file_type_invalid: 'A fájltípus nem támogatott. Kérlek tölts fel JPG, PNG, GIF vagy WEBP képet.',
     captcha_invalid:
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     captcha_unavailable:
