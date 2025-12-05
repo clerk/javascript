@@ -1,3 +1,4 @@
+import type { AuthenticateWithSolanaParams } from './clerk';
 import type {
   ClerkResourceJSON,
   ClientTrustState,
@@ -75,6 +76,8 @@ export interface SignInResource extends ClerkResource {
   authenticateWithOKXWallet: () => Promise<SignInResource>;
 
   authenticateWithBase: () => Promise<SignInResource>;
+
+  authenticateWithSolana: (params: AuthenticateWithSolanaParams) => Promise<SignInResource>;
 
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
