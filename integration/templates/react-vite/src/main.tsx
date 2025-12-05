@@ -45,7 +45,6 @@ const Root = () => {
           : undefined,
       }}
     >
-      here?
       <Outlet />
     </ClerkProvider>
   );

@@ -551,6 +551,39 @@ jobs:
               echo "--- $(basename $log_file) ---"
               cat "$log_file"
             done
+            
+            # Find and print all @clerk package.json files in node_modules (recursively)
+            echo ""
+            echo "=========================================="
+            echo "@clerk packages in node_modules (all)"
+            echo "=========================================="
+            
+            if [ -d "$app_dir/node_modules" ]; then
+              # Find all @clerk packages recursively in node_modules
+              clerk_packages=$(find "$app_dir/node_modules" -type d -path "*/node_modules/@clerk/*" -maxdepth 10 2>/dev/null | sort -u)
+              
+              if [ -n "$clerk_packages" ]; then
+                echo "Found @clerk packages:"
+                echo "$clerk_packages" | while read -r pkg_path; do
+                  echo "  - $pkg_path"
+                done
+                echo ""
+                
+                # Print each package.json
+                echo "$clerk_packages" | while read -r pkg_path; do
+                  if [ -f "$pkg_path/package.json" ]; then
+                    rel_path=$(echo "$pkg_path" | sed "s|$app_dir/||")
+                    echo ""
+                    echo "--- $rel_path/package.json ---"
+                    cat "$pkg_path/package.json"
+                  fi
+                done
+              else
+                echo "No @clerk packages found in node_modules"
+              fi
+            else
+              echo "No node_modules directory found at: $app_dir/node_modules"
+            fi
           done
 
       - name: Upload test-results
