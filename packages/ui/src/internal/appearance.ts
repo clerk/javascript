@@ -1066,6 +1066,10 @@ export type Appearance<T = Theme> = T &
      */
     taskChooseOrganization?: T;
     /**
+     * Theme overrides that only apply to the `<TaskResetPassword />` component
+     */
+    taskResetPassword?: T;
+    /**
      * Theme overrides that only apply to the `<EnableOrganizations/>` component
      */
     enableOrganizations?: T;
