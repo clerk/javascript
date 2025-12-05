@@ -83,14 +83,14 @@ type PageProps<T extends string> =
       url?: never;
     };
 
-export type UserProfilePageProps = PageProps<'account' | 'security'>;
+export type UserProfilePageProps = PageProps<'account' | 'security' | 'billing' | 'apiKeys'>;
 
 export type UserProfileLinkProps = {
   url: string;
   label: string;
 };
 
-export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members' | 'billing' | 'apiKeys'>;
 
 export type OrganizationLinkProps = {
   url: string;
