@@ -157,7 +157,7 @@ async function main() {
   }
 
   // Step 8: Done
-  renderComplete(sdk);
+  renderComplete(sdk, config.docsUrl);
 }
 
 async function performUpgrade(sdk, packageManager, config, options) {
@@ -166,9 +166,9 @@ async function performUpgrade(sdk, packageManager, config, options) {
   const targetVersion = config.sdkVersions?.[sdk]?.to;
 
   if (options.dryRun) {
-    renderText(`[Dry run] Would upgrade ${targetPackage} to version ${targetVersion}`, 'yellow');
+    renderText(`[dry run] Would upgrade ${targetPackage} to version ${targetVersion}`, 'yellow');
     if (oldPackage) {
-      renderText(`[Dry run] Would remove old package ${oldPackage}`, 'yellow');
+      renderText(`[dry run] Would remove old package ${oldPackage}`, 'yellow');
     }
     renderNewline();
     return;

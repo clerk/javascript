@@ -227,9 +227,10 @@ export function renderScanResults(results, docsUrl) {
   }
 }
 
-export function renderComplete(sdk) {
+export function renderComplete(sdk, docsUrl) {
   console.log('');
   console.log(`${colors.green}${colors.bold}✓ Upgrade complete for @clerk/${sdk}${colors.reset}`);
-  console.log(`${colors.gray}Review the changes above and test your application.${colors.reset}`);
   console.log('');
+  console.log(`Review the changes above and test your application before deployment.`);
+  console.log(`${colors.gray}For more information, see the migration guide: ${docsUrl}${colors.reset}`);
 }
