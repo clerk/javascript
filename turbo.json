@@ -205,13 +205,6 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:generic": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/ui#build",
-        "@clerk/backend#build",
-        "@clerk/react#build"
-      ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
@@ -230,13 +223,6 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:nextjs": {
-      "dependsOn": [
-        "@clerk/testing#build",
-        "@clerk/clerk-js#build",
-        "@clerk/ui#build",
-        "@clerk/backend#build",
-        "@clerk/nextjs#build"
-      ],
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
