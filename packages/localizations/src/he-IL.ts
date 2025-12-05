@@ -875,6 +875,7 @@ export const heIL: LocalizationResource = {
     form_identifier_exists__phone_number: 'מספר הטלפון הזה כבר תפוס. אנא נסה מספר אחר.',
     form_identifier_exists__username: 'שם המשתמש הזה כבר תפוס. אנא נסה שם משתמש אחר',
     form_identifier_not_found: 'לא ניתן למצוא חשבון עם אלו הפרטים.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'כתובת האימייל חייבת להיות כתובת אימייל תקינה.',
     form_param_format_invalid__phone_number: 'מספר הטלפון חייב להיות בפורמט בינלאומי תקין.',
