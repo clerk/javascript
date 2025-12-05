@@ -1,10 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type {
-  HandleOAuthCallbackParams,
-  PendingSessionOptions,
-  ShowProps as _ShowProps,
-  ShowWhenCondition,
-} from '@clerk/shared/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -75,7 +70,8 @@ export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) =>
 };
 
 export type ShowProps = React.PropsWithChildren<
-  _ShowProps & {
+  {
+    when: ShowWhenCondition;
     fallback?: React.ReactNode;
   } & PendingSessionOptions
 >;

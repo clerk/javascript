@@ -3,9 +3,9 @@ import type { CheckAuthorizationWithCustomPermissions } from './session';
 import type { Autocomplete } from './utils';
 
 /**
- * Props for the `<Protect />` component, which restricts access to its children based on authentication and authorization.
+ * Authorization parameters used by `<Protect />` and `auth.protect()`.
  *
- * Use `ProtectProps` to specify the required role, permission, feature, or plan for access.
+ * Use `ProtectParams` to specify the required role, permission, feature, or plan for access.
  *
  * @example
  * ```tsx
@@ -22,10 +22,10 @@ import type { Autocomplete } from './utils';
  * <Protect feature="a_feature_key" />
  *
  * // Require a specific plan
- * <Protect plan=a_plan_key" />
+ * <Protect plan="a_plan_key" />
  * ```
  */
-export type ProtectProps =
+export type ProtectParams =
   | {
       condition?: never;
       role: OrganizationCustomRoleKey;
@@ -68,6 +68,11 @@ export type ProtectProps =
       feature?: never;
       plan?: never;
     };
+
+/**
+ * @deprecated Use {@link ProtectParams} instead.
+ */
+export type ProtectProps = ProtectParams;
 
 /**
  * Authorization condition for the `when` prop in `<Show />`.

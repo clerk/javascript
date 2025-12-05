@@ -1,10 +1,10 @@
-import type { PendingSessionOptions, ProtectProps as _ProtectProps } from '@clerk/shared/types';
+import type { PendingSessionOptions, ProtectParams } from '@clerk/shared/types';
 import React from 'react';
 
 import { auth } from './auth';
 
-type ProtectProps = React.PropsWithChildren<
-  _ProtectProps & {
+export type AppRouterProtectProps = React.PropsWithChildren<
+  ProtectParams & {
     fallback?: React.ReactNode;
   } & PendingSessionOptions
 >;
@@ -37,7 +37,7 @@ export async function SignedOut(
  * <Protect fallback={<p>Unauthorized</p>} />
  * ```
  */
-export async function Protect(props: ProtectProps): Promise<React.JSX.Element | null> {
+export async function Protect(props: AppRouterProtectProps): Promise<React.JSX.Element | null> {
   const { children, fallback, ...restAuthorizedParams } = props;
   const { has, userId } = await auth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 

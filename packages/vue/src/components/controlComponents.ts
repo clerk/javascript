@@ -2,7 +2,7 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type {
   HandleOAuthCallbackParams,
   PendingSessionOptions,
-  ProtectProps as _ProtectProps,
+  ProtectParams,
   RedirectOptions,
 } from '@clerk/shared/types';
 import { defineComponent } from 'vue';
@@ -112,7 +112,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = _ProtectProps & PendingSessionOptions;
+export type ProtectProps = ProtectParams & PendingSessionOptions;
 
 export const Protect = defineComponent((props: ProtectProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
