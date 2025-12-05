@@ -1,5 +1,5 @@
 import type { OrganizationCustomPermissionKey, OrganizationCustomRoleKey } from './organizationMembership';
-import type { CheckAuthorizationWithCustomPermissions } from './session';
+import type { CheckAuthorizationWithCustomPermissions, PendingSessionOptions } from './session';
 import type { Autocomplete } from './utils';
 
 /**
@@ -80,10 +80,9 @@ export type ProtectProps = ProtectParams;
  * or a callback function receiving the `has` helper for complex conditions.
  */
 export type ShowWhenCondition =
-  | { role: OrganizationCustomRoleKey }
-  | { permission: OrganizationCustomPermissionKey }
-  | { feature: Autocomplete<`org:${string}` | `user:${string}`> }
-  | { plan: Autocomplete<`org:${string}` | `user:${string}`> }
+  | 'signedIn'
+  | 'signedOut'
+  | ProtectParams
   | ((has: CheckAuthorizationWithCustomPermissions) => boolean);
 
 /**
@@ -106,7 +105,9 @@ export type ShowWhenCondition =
  * // Require a specific plan
  * <Show when={{ plan: "pro" }}>...</Show>
  * ```
+ *
  */
-export type ShowProps = {
+export type ShowProps = PendingSessionOptions & {
+  fallback?: unknown;
   when: ShowWhenCondition;
 };

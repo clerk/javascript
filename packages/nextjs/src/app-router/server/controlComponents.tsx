@@ -1,4 +1,4 @@
-import type { PendingSessionOptions, ProtectParams } from '@clerk/shared/types';
+import type { PendingSessionOptions, ProtectParams, ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 
 import { auth } from './auth';
@@ -7,6 +7,13 @@ export type AppRouterProtectProps = React.PropsWithChildren<
   ProtectParams & {
     fallback?: React.ReactNode;
   } & PendingSessionOptions
+>;
+
+export type AppRouterShowProps = React.PropsWithChildren<
+  PendingSessionOptions & {
+    fallback?: React.ReactNode;
+    when: ShowWhenCondition;
+  }
 >;
 
 export async function SignedIn(
@@ -73,4 +80,33 @@ export async function Protect(props: AppRouterProtectProps): Promise<React.JSX.E
    * If fallback is present render that instead of rendering nothing.
    */
   return authorized;
+}
+
+/**
+ * Use `<Show/>` to render children based on authorization or sign-in state.
+ */
+export async function Show(props: AppRouterShowProps): Promise<React.JSX.Element | null> {
+  const { children, fallback, treatPendingAsSignedOut, when } = props;
+  const { has, userId } = await auth({ treatPendingAsSignedOut });
+
+  const resolvedWhen = when;
+  const authorized = <>{children}</>;
+  const unauthorized = fallback ? <>{fallback}</> : null;
+
+  if (typeof resolvedWhen === 'string') {
+    if (resolvedWhen === 'signedOut') {
+      return userId ? unauthorized : authorized;
+    }
+    return userId ? authorized : unauthorized;
+  }
+
+  if (!userId) {
+    return unauthorized;
+  }
+
+  if (typeof resolvedWhen === 'function') {
+    return resolvedWhen(has) ? authorized : unauthorized;
+  }
+
+  return has(resolvedWhen) ? authorized : unauthorized;
 }

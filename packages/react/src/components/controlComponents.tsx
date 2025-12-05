@@ -71,13 +71,13 @@ export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) =>
 
 export type ShowProps = React.PropsWithChildren<
   {
-    when: ShowWhenCondition;
     fallback?: React.ReactNode;
+    when: ShowWhenCondition;
   } & PendingSessionOptions
 >;
 
 /**
- * Use `<Show/>` to conditionally render content based on user authorization.
+ * Use `<Show/>` to conditionally render content based on user authorization or sign-in state.
  *
  * @example
  * ```tsx
@@ -93,6 +93,7 @@ export type ShowProps = React.PropsWithChildren<
  *   <ProtectedFeature />
  * </Show>
  * ```
+ *
  */
 export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: ShowProps) => {
   useAssertWrappedByClerkProvider('Show');
@@ -103,22 +104,34 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
     return null;
   }
 
+  const resolvedWhen = when;
   const authorized = children;
   const unauthorized = fallback ?? null;
+
+  if (resolvedWhen === 'signedOut') {
+    return userId ? unauthorized : authorized;
+  }
 
   if (!userId) {
     return unauthorized;
   }
 
+  if (resolvedWhen === 'signedIn') {
+    return authorized;
+  }
+
   // At this point, userId is defined so has() is guaranteed to be available
-  if (checkAuthorization(when, has!)) {
+  if (checkAuthorization(resolvedWhen, has!)) {
     return authorized;
   }
 
   return unauthorized;
 };
 
-function checkAuthorization(when: ShowWhenCondition, has: NonNullable<ReturnType<typeof useAuth>['has']>): boolean {
+function checkAuthorization(
+  when: Exclude<ShowWhenCondition, 'signedIn' | 'signedOut'>,
+  has: NonNullable<ReturnType<typeof useAuth>['has']>,
+): boolean {
   if (typeof when === 'function') {
     return when(has);
   }
