@@ -35,6 +35,7 @@ export {
   SignUp,
   SignUpButton,
   TaskChooseOrganization,
+  TaskResetPassword,
   UserAvatar,
   UserButton,
   UserProfile,
