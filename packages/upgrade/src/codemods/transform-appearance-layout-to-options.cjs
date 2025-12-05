@@ -65,4 +65,3 @@ module.exports = function transformAppearanceLayoutToOptions({ source }, { jscod
 };
 
 module.exports.parser = 'tsx';
-

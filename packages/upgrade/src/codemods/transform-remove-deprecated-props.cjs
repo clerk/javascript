@@ -6,9 +6,7 @@ const COMPONENT_RENAMES = new Map([
   ['SignUp', { afterSignInUrl: 'signInFallbackRedirectUrl', afterSignUpUrl: 'fallbackRedirectUrl' }],
 ]);
 // Props that should be removed entirely (not renamed)
-const COMPONENT_REMOVALS = new Map([
-  ['SignIn', ['afterSignInUrl']],
-]);
+const COMPONENT_REMOVALS = new Map([['SignIn', ['afterSignInUrl']]]);
 const COMPONENT_REDIRECT_ATTR = new Map([
   ['ClerkProvider', { targetAttrs: ['signInFallbackRedirectUrl', 'signUpFallbackRedirectUrl'] }],
   ['SignIn', { targetAttrs: ['fallbackRedirectUrl'] }],
