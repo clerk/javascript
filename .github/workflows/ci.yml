@@ -307,7 +307,7 @@ jobs:
             # "astro",
             # "tanstack-react-start",
             # "vue",
-            # "nuxt",
+            "nuxt",
             # "react-router",
             # "custom",
           ]

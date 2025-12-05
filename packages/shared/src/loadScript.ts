@@ -54,7 +54,6 @@ export async function loadScript(src = '', opts: LoadScriptOptions): Promise<HTM
 
   return retry(load, {
     shouldRetry: (_, iterations) => {
-      console.log('nikos 3', _, iterations);
       return iterations <= 5;
     },
   });
