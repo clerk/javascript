@@ -64,10 +64,10 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        with:
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        # with:
+        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+        # turbo-team: ${{ vars.TURBO_TEAM }}
+        # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Verify lockfile is deduped
         run: pnpm dedupe --check
@@ -110,11 +110,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        with:
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        # with:
+        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+        # turbo-team: ${{ vars.TURBO_TEAM }}
+        # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
         run: pnpm turbo build $TURBO_ARGS --only
@@ -154,11 +154,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        with:
-          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          # turbo-team: ${{ vars.TURBO_TEAM }}
-          # turbo-token: ${{ secrets.TURBO_TOKEN }}
+        # with:
+        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+        # turbo-team: ${{ vars.TURBO_TEAM }}
+        # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
         continue-on-error: true
@@ -232,7 +232,7 @@ jobs:
           # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
           # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
@@ -521,7 +521,7 @@ jobs:
           turbo-enabled: true
           node-version: 22
           # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
           # turbo-team: ${{ vars.TURBO_TEAM }}
           # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
