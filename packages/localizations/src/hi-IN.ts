@@ -891,6 +891,7 @@ export const hiIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_not_found: 'इस पहचानकर्ता के साथ कोई खाता नहीं मिला। कृपया जांचें और पुनः प्रयास करें।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'दर्ज किया गया मान अमान्य प्रारूप में है। कृपया इसे जांचें और सही करें।',
     form_param_format_invalid__email_address: 'ईमेल पता एक वैध ईमेल पता होना चाहिए।',
     form_param_format_invalid__phone_number: 'फोन नंबर एक वैध अंतरराष्ट्रीय प्रारूप में होना चाहिए।',

@@ -888,6 +888,7 @@ export const enGB: LocalizationResource = {
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',
     form_identifier_not_found: "We couldn't find an account with those details.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'The value entered is in an invalid format. Please check and correct it.',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',
