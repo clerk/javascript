@@ -22,7 +22,13 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        layout: {
+          showOptionalFields: true,
+        },
+      }}
+    >
       <html>
         <head>
           <HeadContent />

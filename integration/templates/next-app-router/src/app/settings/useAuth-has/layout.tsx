@@ -1,5 +1,16 @@
 import { ClerkProvider } from '@clerk/nextjs';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <ClerkProvider dynamic>{children}</ClerkProvider>;
+  return (
+    <ClerkProvider
+      dynamic
+      appearance={{
+        layout: {
+          showOptionalFields: true,
+        },
+      }}
+    >
+      {children}
+    </ClerkProvider>
+  );
 }

@@ -14,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider
       appearance={{
         layout: {
+          showOptionalFields: true,
           // Icon buttons only contain accessible labels when they use an icon; our generated letter icon does not have
           // an accessible label. Using the "blockButton" variant ensures that the button contains a visible label that
           // can be selected by a Playwright selector.

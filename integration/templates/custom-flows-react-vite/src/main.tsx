@@ -23,6 +23,11 @@ createRoot(document.getElementById('root')!).render(
           publishableKey={PUBLISHABLE_KEY}
           clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
           clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL as string}
+          appearance={{
+            layout: {
+              showOptionalFields: true,
+            },
+          }}
         >
           <BrowserRouter>
             <Routes>

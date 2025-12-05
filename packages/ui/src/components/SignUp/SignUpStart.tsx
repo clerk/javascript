@@ -439,6 +439,7 @@ function SignUpStartInternal(): JSX.Element {
                     legalAccepted={Boolean(formState.legalAccepted.checked) || undefined}
                   />
                 )}
+                hello there
                 {shouldShowForm && (
                   <SignUpForm
                     handleSubmit={handleSubmit}

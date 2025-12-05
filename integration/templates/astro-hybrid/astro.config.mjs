@@ -4,7 +4,16 @@ import react from '@astrojs/react';
 
 export default defineConfig({
   output: 'hybrid',
-  integrations: [clerk(), react()],
+  integrations: [
+    clerk({
+      appearance: {
+        layout: {
+          showOptionalFields: true,
+        },
+      },
+    }),
+    react(),
+  ],
   server: {
     port: Number(process.env.PORT),
   },
