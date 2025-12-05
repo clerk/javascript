@@ -152,12 +152,12 @@ export abstract class BaseResource {
           const value = parseInt(retryAfter, 10);
           if (!isNaN(value)) {
             apiResponseOptions.retryAfter = value;
-          }
-
-          const date = new Date(retryAfter);
-          if (!isNaN(date.getTime())) {
-            const value = date.getTime() - Date.now();
-            apiResponseOptions.retryAfter = value > 0 ? value : 0;
+          } else {
+            const date = new Date(retryAfter);
+            if (!isNaN(date.getTime())) {
+              const value = Math.ceil((date.getTime() - Date.now()) / 1000);
+              apiResponseOptions.retryAfter = value > 0 ? value : 0;
+            }
           }
         }
       }

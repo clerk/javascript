@@ -6,3 +6,4 @@ export { noop } from './noop';
 export * from './runtimeEnvironment';
 export { handleValueOrFn } from './handleValueOrFn';
 export { fastDeepMergeAndReplace, fastDeepMergeAndKeep } from './fastDeepMerge';
+export * from './retry';

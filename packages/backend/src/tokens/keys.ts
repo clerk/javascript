@@ -1,3 +1,5 @@
+import { with503Retry } from '@clerk/shared/utils';
+
 import {
   API_URL,
   API_VERSION,
@@ -185,7 +187,7 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
   const url = new URL(apiUrl);
   url.pathname = joinPaths(url.pathname, apiVersion, '/jwks');
 
-  const response = await runtime.fetch(url.href, {
+  const response = await with503Retry(runtime.fetch)(url.href, {
     headers: {
       Authorization: `Bearer ${key}`,
       'Clerk-API-Version': SUPPORTED_BAPI_VERSION,
