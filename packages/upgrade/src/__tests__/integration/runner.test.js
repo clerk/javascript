@@ -12,7 +12,7 @@ vi.mock('../../render.js', () => ({
     success: vi.fn(),
     error: vi.fn(),
   })),
-  promptText: vi.fn(async (msg, defaultValue) => defaultValue),
+  promptText: vi.fn((msg, defaultValue) => defaultValue),
   renderCodemodResults: vi.fn(),
   renderText: vi.fn(),
 }));

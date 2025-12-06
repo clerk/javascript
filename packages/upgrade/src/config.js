@@ -53,7 +53,7 @@ export async function loadConfig(sdk, currentVersion) {
   }
 
   if (applicableConfig) {
-    const changes = await loadChanges(applicableConfig.versionDir, sdk);
+    const changes = loadChanges(applicableConfig.versionDir, sdk);
     return {
       ...applicableConfig.config,
       changes,

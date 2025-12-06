@@ -1,6 +1,7 @@
 import * as readline from 'node:readline';
 
 // ANSI color codes
+// eslint-disable-next-line turbo/no-undeclared-env-vars
 export const colors = process.env.NO_COLOR
   ? {
       reset: '',
