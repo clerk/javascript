@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import jwksJson from '../../fixtures/jwks.json';
 import userJson from '../../fixtures/user.json';
@@ -7,6 +7,11 @@ import { server, validateHeaders } from '../../mock-server';
 import { createBackendApiClient } from '../factory';
 
 describe('api.client', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(0).getTime()); // set to epoch start for consistent retry-after calculations
+  });
+
   const apiClient = createBackendApiClient({
     apiUrl: 'https://api.clerk.test',
     secretKey: 'deadbeef',
@@ -153,7 +158,7 @@ describe('api.client', () => {
     expect(errResponse.clerkTraceId).toBe('mock_cf_ray');
   });
 
-  it('executes a failed backend API request and includes Retry-After header', async () => {
+  it('executes a failed backend API request and includes Retry-After header for non 503', async () => {
     server.use(
       http.get(
         `https://api.clerk.test/v1/users/user_deadbeef`,
@@ -167,6 +172,25 @@ describe('api.client', () => {
 
     expect(errResponse.status).toBe(429);
     expect(errResponse.retryAfter).toBe(123);
+  });
+
+  it('executes a failed backend API request and includes Retry-After header RFC1123 date for non 503', async () => {
+    server.use(
+      http.get(
+        `https://api.clerk.test/v1/users/user_deadbeef`,
+        validateHeaders(() => {
+          return HttpResponse.json(
+            { errors: [] },
+            { status: 429, headers: { 'retry-after': new Date(new Date().getTime() + 60000).toUTCString() } },
+          );
+        }),
+      ),
+    );
+
+    const errResponse = await apiClient.users.getUser('user_deadbeef').catch(err => err);
+
+    expect(errResponse.status).toBe(429);
+    expect(errResponse.retryAfter).not.toBeNaN();
   });
 
   it('executes a failed backend API request and ignores invalid Retry-After header', async () => {
