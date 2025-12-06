@@ -74,6 +74,11 @@ export const SignUpSocialButtons = React.memo((props: SignUpSocialButtonsProps) 
           .catch(err => handleError(err, [], card.setError));
       }}
       web3Callback={strategy => {
+        if (strategy === 'web3_solana_signature') {
+          // TODO: Add support to pass legalAccepted status
+          return navigate(`choose-wallet?strategy=${strategy}`);
+        }
+
         return clerk
           .authenticateWithWeb3({
             customNavigate: navigate,
