@@ -38,10 +38,10 @@ export const constants = {
    */
   E2E_APP_CLERK_UI_DIR: process.env.E2E_APP_CLERK_UI_DIR,
   /**
-   * If CLEANUP=0 is used, the .tmp_integration directory will not be deleted.
+   * If E2E_CLEANUP=0 is used, the .tmp_integration directory will not be deleted.
    * This is useful for debugging locally.
    */
-  CLEANUP: !(process.env.CLEANUP === '0' || process.env.CLEANUP === 'false'),
+  E2E_CLEANUP: !(process.env.E2E_CLEANUP === '0' || process.env.E2E_CLEANUP === 'false'),
   DEBUG: process.env.DEBUG === 'true' || process.env.DEBUG === '1',
   /**
    * Used with E2E_APP_URL if the tests need to access BAPI.

@@ -17,9 +17,13 @@ export default defineNuxtPlugin(nuxtApp => {
   }
 
   const runtimeConfig = useRuntimeConfig();
+  const clerkConfig = runtimeConfig.public.clerk ?? {};
 
   nuxtApp.vueApp.use(clerkPlugin as any, {
-    ...(runtimeConfig.public.clerk ?? {}),
+    ...clerkConfig,
+    // Map jsUrl/uiUrl to clerkJSUrl/clerkUiUrl as expected by the Vue plugin
+    clerkJSUrl: clerkConfig.jsUrl,
+    clerkUiUrl: clerkConfig.uiUrl,
     sdkMetadata: {
       name: PACKAGE_NAME,
       version: PACKAGE_VERSION,

@@ -34,12 +34,21 @@ const Root = () => {
       clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL as string}
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
+      appearance={{
+        colors: {
+          colorPrimary: 'red',
+        },
+        options: {
+          showOptionalFields: true,
+        },
+      }}
       experimental={{
         persistClient: import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT
           ? import.meta.env.VITE_EXPERIMENTAL_PERSIST_CLIENT === 'true'
           : undefined,
       }}
     >
+      is this the correct app?
       <Outlet />
     </ClerkProvider>
   );

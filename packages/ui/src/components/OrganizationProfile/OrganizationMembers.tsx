@@ -8,7 +8,7 @@ import { Header } from '@/ui/elements/Header';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
 import { NotificationCountBadge, useProtect } from '../../common';
-import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { mqu } from '../../styledSystem';

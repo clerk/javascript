@@ -44,6 +44,7 @@ const common = ({ mode, variant }) => {
         PACKAGE_VERSION: JSON.stringify(packageJSON.version),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         PACKAGE_NAME: JSON.stringify(packageJSON.name),
+        __BUILD_DISABLE_RHC__: JSON.stringify(false),
       }),
       new rspack.EnvironmentPlugin({
         NODE_ENV: mode,
@@ -166,7 +167,7 @@ const devConfig = (mode, env) => {
       rules: [svgLoader(), ...typescriptLoaderDev()],
     },
     plugins: [new ReactRefreshPlugin({ overlay: { sockHost: devUrl.host } })],
-    devtool: 'eval-cheap-source-map',
+    devtool: 'eval-source-map',
     output: {
       publicPath: `${devUrl.origin}/npm/`,
       crossOriginLoading: 'anonymous',
@@ -175,6 +176,8 @@ const devConfig = (mode, env) => {
     },
     optimization: {
       minimize: false,
+      usedExports: false,
+      providedExports: false,
     },
     devServer: {
       allowedHosts: ['all'],

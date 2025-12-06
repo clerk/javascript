@@ -61,7 +61,13 @@ const FetchStatus = ({
 
   const internalFetchStatus = useMemo(() => {
     if (errors.global) {
-      const errorCodes = errors.global.map(e => e.code);
+      const errorCodes = errors.global.flatMap(e => {
+        if (e.isClerkApiResponseError()) {
+          return e.errors.map(e => e.code);
+        }
+      });
+
+      console.log({ errorCodes });
 
       if (errorCodes.includes('missing_payer_email')) {
         return 'missing_payer_email';

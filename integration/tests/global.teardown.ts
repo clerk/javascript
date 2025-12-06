@@ -12,7 +12,7 @@ setup('teardown long running apps', async () => {
   await killClerkJsHttpServer();
   await killClerkUiHttpServer();
 
-  if (appUrl || !constants.CLEANUP) {
+  if (appUrl || !constants.E2E_CLEANUP) {
     // if appUrl is provided, it means that the user is running an app manually
     console.log('Skipping cleanup');
     return;

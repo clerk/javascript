@@ -37,7 +37,10 @@ function SignUpStartInternal(): JSX.Element {
   const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
-  const { showOptionalFields } = useAppearance().parsedOptions;
+  const appearance = useAppearance();
+  const { showOptionalFields } = appearance.parsedOptions;
+  console.log('[SignUpStart] useAppearance().parsedOptions', JSON.stringify(appearance.parsedOptions));
+  console.log('[SignUpStart] showOptionalFields', showOptionalFields);
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;

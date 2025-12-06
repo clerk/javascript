@@ -22,7 +22,7 @@ export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
+  'theme' | 'elements' | 'options' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
@@ -68,15 +68,25 @@ const defaultCaptchaOptions: ParsedCaptcha = {
  */
 export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance => {
   const { globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
-
+  console.log('[parseAppearance] globalAppearance', JSON.stringify(globalAppearance));
+  console.log('[parseAppearance] componentAppearance', JSON.stringify(componentAppearance));
+  console.log('[parseAppearance] appearanceKey', appearanceKey);
   const appearanceList: Appearance[] = [];
   [globalAppearance, globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey], componentAppearance].forEach(a =>
     expand(a, appearanceList),
   );
 
+  console.log('[parseAppearance] appearanceList length', appearanceList.length);
+  console.log(
+    '[parseAppearance] appearanceList options',
+    appearanceList.map(a => JSON.stringify(a?.options)),
+  );
+
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedOptions = parseOptions(appearanceList);
   const parsedCaptcha = parseCaptcha(appearanceList);
+
+  console.log('[parseAppearance] parsedOptions', JSON.stringify(parsedOptions));
 
   if (
     !appearanceList.find(a => {
