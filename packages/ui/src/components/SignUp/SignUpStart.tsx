@@ -37,7 +37,10 @@ function SignUpStartInternal(): JSX.Element {
   const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
-  const { showOptionalFields } = useAppearance().parsedLayout;
+  const appearance = useAppearance();
+  const { showOptionalFields } = appearance.parsedLayout;
+  console.log('[SignUpStart] useAppearance().parsedLayout', JSON.stringify(appearance.parsedLayout));
+  console.log('[SignUpStart] showOptionalFields', showOptionalFields);
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
@@ -439,7 +442,6 @@ function SignUpStartInternal(): JSX.Element {
                     legalAccepted={Boolean(formState.legalAccepted.checked) || undefined}
                   />
                 )}
-                hello there
                 {shouldShowForm && (
                   <SignUpForm
                     handleSubmit={handleSubmit}

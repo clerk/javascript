@@ -68,15 +68,26 @@ const defaultCaptchaOptions: ParsedCaptcha = {
  */
 export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance => {
   const { globalAppearance, appearance: componentAppearance, appearanceKey } = cascade;
+  console.log('[parseAppearance] globalAppearance', JSON.stringify(globalAppearance));
+  console.log('[parseAppearance] componentAppearance', JSON.stringify(componentAppearance));
+  console.log('[parseAppearance] appearanceKey', appearanceKey);
 
   const appearanceList: Appearance[] = [];
   [globalAppearance, globalAppearance?.[appearanceKey as PublicAppearanceTopLevelKey], componentAppearance].forEach(a =>
     expand(a, appearanceList),
   );
 
+  console.log('[parseAppearance] appearanceList length', appearanceList.length);
+  console.log(
+    '[parseAppearance] appearanceList layouts',
+    appearanceList.map(a => JSON.stringify(a?.layout)),
+  );
+
   const parsedInternalTheme = parseVariables(appearanceList);
   const parsedLayout = parseLayout(appearanceList);
   const parsedCaptcha = parseCaptcha(appearanceList);
+
+  console.log('[parseAppearance] parsedLayout', JSON.stringify(parsedLayout));
 
   if (
     !appearanceList.find(a => {

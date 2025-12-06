@@ -17,14 +17,13 @@ import type {
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/shared/types';
-
-import type { Appearance } from './internal/appearance';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense } from 'react';
 
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
+import type { Appearance } from './internal/appearance';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
@@ -292,6 +291,10 @@ const Components = (props: ComponentsProps) => {
     nodes: new Map(),
     impersonationFab: false,
   });
+
+  console.log('props.options.appearance', JSON.stringify(props.options.appearance));
+  console.log('props.options', JSON.stringify(props.options));
+  console.log('state.appearance', JSON.stringify(state.appearance));
 
   const {
     googleOneTapModal,

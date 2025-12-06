@@ -35,6 +35,9 @@ const Root = () => {
       routerPush={(to: string) => navigate(to)}
       routerReplace={(to: string) => navigate(to, { replace: true })}
       appearance={{
+        colors: {
+          colorPrimary: 'red',
+        },
         layout: {
           showOptionalFields: true,
         },
@@ -45,6 +48,7 @@ const Root = () => {
           : undefined,
       }}
     >
+      is this the correct app?
       <Outlet />
     </ClerkProvider>
   );
