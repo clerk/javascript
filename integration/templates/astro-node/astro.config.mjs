@@ -13,7 +13,7 @@ export default defineConfig({
   integrations: [
     clerk({
       appearance: {
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       },

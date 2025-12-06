@@ -46,7 +46,7 @@ export function useTooltip({
   const setOpen = setControlledOpen ?? setUncontrolledOpen;
 
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const { animations: layoutAnimations } = useAppearance().parsedOptions;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
   const data = useFloating({

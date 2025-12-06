@@ -74,7 +74,7 @@ const PopoverCardContent = (props: PropsOfComponent<typeof Flex>) => {
 const PopoverCardFooter = (props: PropsOfComponent<typeof Flex>) => {
   const { sx, children, ...rest } = props;
   const { branded } = useEnvironment().displayConfig;
-  const { privacyPageUrl, termsPageUrl, helpPageUrl } = useAppearance().parsedLayout;
+  const { privacyPageUrl, termsPageUrl, helpPageUrl } = useAppearance().parsedOptions;
   const shouldShowTagOrLinks = branded || privacyPageUrl || termsPageUrl || helpPageUrl;
 
   return (

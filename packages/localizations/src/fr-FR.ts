@@ -902,6 +902,7 @@ export const frFR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
     form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',

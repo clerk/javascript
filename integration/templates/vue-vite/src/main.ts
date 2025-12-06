@@ -11,7 +11,7 @@ app.use(clerkPlugin, {
   clerkUiUrl: import.meta.env.VITE_CLERK_UI_URL,
   clerkJSVersion: import.meta.env.VITE_CLERK_JS_VERSION,
   appearance: {
-    layout: {
+    options: {
       showOptionalFields: true,
     },
   },

@@ -12,7 +12,7 @@ root.render(
       clerkJSUrl={process.env.REACT_APP_CLERK_JS as string}
       clerkUiUrl={process.env.REACT_APP_CLERK_UI as string}
       appearance={{
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       }}

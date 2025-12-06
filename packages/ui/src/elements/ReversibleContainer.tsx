@@ -11,7 +11,7 @@ export const SocialButtonsReversibleContainerWithDivider = (props: React.PropsWi
 
   return (
     <ReversibleContainer
-      reverse={appearance.parsedLayout.socialButtonsPlacement === 'bottom'}
+      reverse={appearance.parsedOptions.socialButtonsPlacement === 'bottom'}
       {...props}
     >
       {childrenWithDivider}

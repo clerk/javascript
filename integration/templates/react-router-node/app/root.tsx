@@ -33,7 +33,7 @@ export default function App({ loaderData }: Route.ComponentProps) {
     <ClerkProvider
       loaderData={loaderData}
       appearance={{
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       }}

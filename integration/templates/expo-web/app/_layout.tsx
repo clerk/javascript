@@ -11,7 +11,7 @@ export default function RootLayout() {
       clerkJSUrl={process.env.EXPO_PUBLIC_CLERK_JS_URL}
       clerkUiUrl={process.env.EXPO_PUBLIC_CLERK_UI_URL}
       appearance={{
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       }}

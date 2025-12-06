@@ -20,7 +20,7 @@ import type { FeedbackType, useFormControlFeedback } from '../utils/useFormContr
 
 function useFormTextAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: appearanceAnimations } = useAppearance().parsedLayout;
+  const { animations: appearanceAnimations } = useAppearance().parsedOptions;
 
   const getFormTextAnimation = useCallback(
     (enterAnimation: boolean, options?: { inDelay?: boolean }): ThemableCssProp => {

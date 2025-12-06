@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   modules: ['@clerk/nuxt'],
   clerk: {
     appearance: {
-      layout: {
+      options: {
         showOptionalFields: true,
       },
     },

@@ -53,10 +53,10 @@ describe('ClerkProvider', () => {
       expectTypeOf({ ...defaultProps, appearance: {} }).toMatchTypeOf<ClerkProviderProps>();
     });
 
-    it('includes variables, elements, layout, theme', () => {
+    it('includes variables, elements, options baseTheme', () => {
       expectTypeOf({
         ...defaultProps,
-        appearance: { elements: {}, variables: {}, layout: {}, theme: dark },
+        appearance: { elements: {}, variables: {}, options: {}, thene: dark },
       }).toMatchTypeOf<ClerkProviderProps>();
     });
 
@@ -68,7 +68,7 @@ describe('ClerkProvider', () => {
 
       expectTypeOf({
         ...defaultProps,
-        appearance: { layout: { nonExistentKey: '' } },
+        appearance: { options: { nonExistentKey: '' } },
       }).not.toMatchTypeOf<ClerkProviderProps>();
 
       // expectTypeOf({

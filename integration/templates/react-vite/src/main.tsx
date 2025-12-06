@@ -38,7 +38,7 @@ const Root = () => {
         colors: {
           colorPrimary: 'red',
         },
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       }}

@@ -6,7 +6,7 @@ export default function Page() {
     <ClerkProvider
       dynamic
       appearance={{
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       }}

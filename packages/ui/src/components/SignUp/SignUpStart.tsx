@@ -38,8 +38,8 @@ function SignUpStartInternal(): JSX.Element {
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
   const appearance = useAppearance();
-  const { showOptionalFields } = appearance.parsedLayout;
-  console.log('[SignUpStart] useAppearance().parsedLayout', JSON.stringify(appearance.parsedLayout));
+  const { showOptionalFields } = appearance.parsedOptions;
+  console.log('[SignUpStart] useAppearance().parsedOptions', JSON.stringify(appearance.parsedOptions));
   console.log('[SignUpStart] showOptionalFields', showOptionalFields);
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();

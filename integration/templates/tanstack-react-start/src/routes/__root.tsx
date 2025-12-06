@@ -24,7 +24,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
       appearance={{
-        layout: {
+        options: {
           showOptionalFields: true,
         },
       }}

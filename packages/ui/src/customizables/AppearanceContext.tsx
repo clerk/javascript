@@ -20,11 +20,11 @@ const AppearanceProvider = (props: AppearanceProviderProps) => {
   const ctxValue = useDeepEqualMemo(() => {
     console.log('[AppearanceProvider] useDeepEqualMemo factory called');
     const value = parseAppearance(props);
-    console.log('[AppearanceProvider] parsed value.parsedLayout:', JSON.stringify(value.parsedLayout));
+    console.log('[AppearanceProvider] parsed value.parsedOptions:', JSON.stringify(value.parsedOptions));
     return { value };
   }, [props.appearance, props.globalAppearance, props.appearanceKey]);
 
-  console.log('[AppearanceProvider] ctxValue.value.parsedLayout:', JSON.stringify(ctxValue.value.parsedLayout));
+  console.log('[AppearanceProvider] ctxValue.value.parsedOptions:', JSON.stringify(ctxValue.value.parsedOptions));
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };
