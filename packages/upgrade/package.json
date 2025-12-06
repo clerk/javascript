@@ -32,21 +32,14 @@
     ]
   },
   "dependencies": {
-    "@inkjs/ui": "^2.0.0",
-    "@jescalan/ink-markdown": "^2.0.0",
     "ejs": "3.1.10",
     "execa": "9.4.1",
     "globby": "^14.0.1",
     "gray-matter": "^4.0.3",
     "index-to-position": "^0.1.2",
-    "ink": "^5.0.1",
-    "ink-big-text": "^2.0.0",
-    "ink-gradient": "^3.0.0",
-    "ink-link": "^4.1.0",
     "jscodeshift": "^17.0.0",
     "marked": "^11.1.1",
     "meow": "^11.0.0",
-    "react": "catalog:react",
     "read-pkg": "^9.0.1",
     "semver-regex": "^4.0.5",
     "temp-dir": "^3.0.0"
