@@ -23,6 +23,7 @@ export {
   SignOutButton,
   SignUpButton,
   TaskChooseOrganization,
+  TaskResetPassword,
   UserAvatar,
   UserButton,
   Waitlist,

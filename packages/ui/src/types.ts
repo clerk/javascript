@@ -59,7 +59,8 @@ export type AvailableComponentProps =
   | __internal_SubscriptionDetailsProps
   | __internal_PlanDetailsProps
   | APIKeysProps
-  | TaskChooseOrganizationProps;
+  | TaskChooseOrganizationProps
+  | TaskResetPasswordProps;
 
 type ComponentMode = 'modal' | 'mounted';
 type SignInMode = 'modal' | 'redirect';
