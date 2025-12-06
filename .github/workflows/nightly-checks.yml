@@ -71,7 +71,6 @@ jobs:
           E2E_REACT_DOM_VERSION: "19.1.0"
           E2E_REACT_VERSION: "19.1.0"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts
