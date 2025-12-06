@@ -6,8 +6,7 @@ import { nodeFsOrThrow, nodePathOrThrow } from './fs/utils';
 
 const EVENT_KEYLESS_ENV_DRIFT_DETECTED = 'KEYLESS_ENV_DRIFT_DETECTED';
 const EVENT_SAMPLING_RATE = 1; // 100% sampling rate
-const TELEMETRY_FLAG_FILE = '.clerk/.tmp/telemetry.json';
-
+const TELEMETRY_FLAG_FILE_TEMPLATE = '.clerk/.tmp/telemetry.{pk}.log';
 type EventKeylessEnvDriftPayload = {
   publicKeyMatch: boolean;
   secretKeyMatch: boolean;
@@ -25,9 +24,9 @@ type EventKeylessEnvDriftPayload = {
  *
  * @returns The absolute path to the telemetry flag file in the project's .clerk/.tmp directory
  */
-function getTelemetryFlagFilePath(): string {
+function getTelemetryFlagFilePath(pk: string): string {
   const path = nodePathOrThrow();
-  return path.join(process.cwd(), TELEMETRY_FLAG_FILE);
+  return path.join(process.cwd(), TELEMETRY_FLAG_FILE_TEMPLATE.replace('{pk}', pk));
 }
 
 /**
@@ -41,26 +40,22 @@ function getTelemetryFlagFilePath(): string {
  *   the event should be fired), false if the file already exists (meaning the event was
  *   already fired) or if there was an error creating the file
  */
-function tryMarkTelemetryEventAsFired(): boolean {
+function tryMarkTelemetryEventAsFired(pk: string): boolean {
+  if (!canUseKeyless) {
+    return false;
+  }
   try {
-    if (canUseKeyless) {
-      const { mkdirSync, writeFileSync } = nodeFsOrThrow();
-      const path = nodePathOrThrow();
-      const flagFilePath = getTelemetryFlagFilePath();
-      const flagDirectory = path.dirname(flagFilePath);
+    const { mkdirSync, writeFileSync } = nodeFsOrThrow();
+    const path = nodePathOrThrow();
+    const flagFilePath = getTelemetryFlagFilePath(pk);
+    const flagDirectory = path.dirname(flagFilePath);
 
-      // Ensure the directory exists before attempting to write the file
-      mkdirSync(flagDirectory, { recursive: true });
+    // Ensure the directory exists before attempting to write the file
+    mkdirSync(flagDirectory, { recursive: true });
 
-      const flagData = {
-        firedAt: new Date().toISOString(),
-        event: EVENT_KEYLESS_ENV_DRIFT_DETECTED,
-      };
-      writeFileSync(flagFilePath, JSON.stringify(flagData, null, 2), { flag: 'wx' });
-      return true;
-    } else {
-      return false;
-    }
+    const fileContent = `Content not important. File name is the identifier for the telemetry event.`;
+    writeFileSync(flagFilePath, fileContent, { flag: 'wx' });
+    return true;
   } catch (error: unknown) {
     if ((error as { code?: string })?.code === 'EEXIST') {
       return false;
@@ -94,10 +89,6 @@ function tryMarkTelemetryEventAsFired(): boolean {
  */
 export async function detectKeylessEnvDrift(): Promise<void> {
   if (!canUseKeyless) {
-    return;
-  }
-  // Only run on server side
-  if (typeof window !== 'undefined') {
     return;
   }
 
@@ -165,7 +156,7 @@ export async function detectKeylessEnvDrift(): Promise<void> {
       secretKeyMatch,
       envVarsMissing,
       keylessFileHasKeys,
-      keylessPublishableKey: keylessFile.publishableKey ?? '',
+      keylessPublishableKey: keylessFile.publishableKey,
       envPublishableKey: envPublishableKey ?? '',
     };
 
@@ -178,7 +169,7 @@ export async function detectKeylessEnvDrift(): Promise<void> {
       },
     });
 
-    const shouldFireEvent = tryMarkTelemetryEventAsFired();
+    const shouldFireEvent = tryMarkTelemetryEventAsFired(keylessFile.publishableKey);
 
     if (shouldFireEvent) {
       // Fire drift detected event only if we successfully created the flag
