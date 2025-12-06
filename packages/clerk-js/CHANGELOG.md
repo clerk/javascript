@@ -1,5 +1,28 @@
 # Change Log
 
+## 5.113.1
+
+### Patch Changes
+
+- Improve error handling for invalid avatar file uploads. Previously, avatar images which exceeded the max file size limit of 10MB did not return an error within the Avatar upload component so the user was unaware why their upload did not work. ([#7357](https://github.com/clerk/javascript/pull/7357)) by [@jigar-clerk](https://github.com/jigar-clerk)
+
+- Country code updates: Aland Islands, Ascension Island, Kosovo, Mayotte, Western Sahara, and updated names for Algeria, Congo (split into Democratic Republic and Republic), Macedonia (to North Macedonia), and Swaziland (to Eswatini). ([#7378](https://github.com/clerk/javascript/pull/7378)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
 ## 5.113.0
 
 ### Minor Changes

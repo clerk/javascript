@@ -1,5 +1,26 @@
 # Change Log
 
+## 5.58.1
+
+### Patch Changes
+
+- Re-export experimental `useAPIKeys` hook ([#7387](https://github.com/clerk/javascript/pull/7387)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
 ## 5.58.0
 
 ### Minor Changes
