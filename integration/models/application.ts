@@ -48,8 +48,8 @@ export const application = (
         state.completedSetup = true;
         // Print all Clerk package versions (direct and transitive)
         const clerkPackagesLog = logger.child({ prefix: 'clerk-packages' }).info;
-        clerkPackagesLog('Installed Clerk packages:');
-        await run('pnpm list "@clerk/*" --depth 100', { cwd: appDirPath, log: clerkPackagesLog });
+        clerkPackagesLog('Installed @clerk/* packages:');
+        await run('pnpm list @clerk/* --depth 100', { cwd: appDirPath, log: clerkPackagesLog });
       }
     },
     dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
