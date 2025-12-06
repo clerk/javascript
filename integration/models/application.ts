@@ -1,5 +1,8 @@
 import * as path from 'node:path';
 
+import { parsePublishableKey } from '@clerk/shared/keys';
+import { clerkSetup } from '@clerk/testing/playwright';
+
 import { awaitableTreekill, createLogger, fs, getPort, run, waitForIdleProcess, waitForServer } from '../scripts';
 import type { ApplicationConfig } from './applicationConfig.js';
 import type { EnvironmentConfig } from './environment.js';
@@ -86,6 +89,36 @@ export const application = (
       log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
+
+      // Setup Clerk testing tokens after the server is running
+      if (state.env) {
+        try {
+          const publishableKey = state.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+          const secretKey = state.env.privateVariables.get('CLERK_SECRET_KEY');
+          const apiUrl = state.env.privateVariables.get('CLERK_API_URL');
+
+          if (publishableKey && secretKey) {
+            const { instanceType, frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
+
+            if (instanceType !== 'development') {
+              log('Skipping clerkSetup for non-development instance');
+            } else {
+              await clerkSetup({
+                publishableKey,
+                frontendApiUrl,
+                secretKey,
+                // @ts-expect-error apiUrl is not a typed option for clerkSetup, but it is accepted at runtime.
+                apiUrl,
+                dotenv: false,
+              });
+              log('Clerk testing tokens setup complete');
+            }
+          }
+        } catch (error) {
+          logger.warn('Failed to setup Clerk testing tokens:', error);
+        }
+      }
+
       return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
     },
     build: async () => {
