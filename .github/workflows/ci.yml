@@ -296,21 +296,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
+        test-name:
+          [
             "generic",
-            # "express",
-            # "ap-flows",
-            # "localhost",
-            # "sessions",
-            # "sessions:staging",
-            # "handshake",
-            # "handshake:staging",
-            # "astro",
-            # "tanstack-react-start",
-            # "vue",
-            # "nuxt",
-            # "react-router",
-            # "custom",
+            "express",
+            "ap-flows",
+            "localhost",
+            "sessions",
+            "sessions:staging",
+            "handshake",
+            "handshake:staging",
+            "astro",
+            "tanstack-react-start",
+            "vue",
+            "nuxt",
+            "react-router",
+            "custom",
           ]
         test-project: ["chrome"]
         include:
@@ -330,10 +331,10 @@ jobs:
             test-project: "chrome"
             next-version: "15"
             clerk-use-rq: "false"
-          # - test-name: "nextjs"
-          #   test-project: "chrome"
-          #   next-version: "15"
-          #   clerk-use-rq: "true"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
             next-version: "16"
