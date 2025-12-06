@@ -1,7 +1,7 @@
 import * as readline from 'node:readline';
 
 // ANSI color codes
-const colors = process.env.NO_COLOR
+export const colors = process.env.NO_COLOR
   ? {
       reset: '',
       bold: '',
@@ -167,44 +167,6 @@ export function createSpinner(label) {
 
 export function renderCodemodResults(transform, result) {
   console.log(`  ${result.ok ?? 0} file(s) modified, ${colors.red}  ${result.error ?? 0} errors${colors.reset}`);
-  console.log('');
-}
-
-export function renderManualInterventionSummary(stats) {
-  if (!stats) {
-    return;
-  }
-
-  const userButtonCount = stats.userbuttonAfterSignOutPropsRemoved || 0;
-  const hideSlugCount = stats.hideSlugRemoved || 0;
-  const beforeEmitCount = stats.beforeEmitTransformed || 0;
-
-  if (!userButtonCount && !hideSlugCount && !beforeEmitCount) {
-    return;
-  }
-
-  console.log(`${colors.yellow}${colors.bold}Manual intervention may be required:${colors.reset}`);
-
-  if (userButtonCount > 0) {
-    console.log(`${colors.yellow}• Removed ${userButtonCount} UserButton sign-out redirect prop(s)${colors.reset}`);
-    console.log(`${colors.gray}  To configure sign-out redirects:${colors.reset}`);
-    console.log(`${colors.gray}  - Global: Add afterSignOutUrl to <ClerkProvider>${colors.reset}`);
-    console.log(`${colors.gray}  - Per-button: Use <SignOutButton redirectUrl="...">${colors.reset}`);
-    console.log(`${colors.gray}  - Programmatic: clerk.signOut({ redirectUrl: "..." })${colors.reset}`);
-  }
-
-  if (hideSlugCount > 0) {
-    console.log(`${colors.yellow}• Removed ${hideSlugCount} hideSlug prop(s)${colors.reset}`);
-    console.log(`${colors.gray}  Slugs are now managed in the Clerk Dashboard.${colors.reset}`);
-  }
-
-  if (beforeEmitCount > 0) {
-    console.log(
-      `${colors.yellow}• Transformed ${beforeEmitCount} setActive({ beforeEmit }) → setActive({ navigate })${colors.reset}`,
-    );
-    console.log(`${colors.gray}  The callback now receives an object with session property.${colors.reset}`);
-  }
-
   console.log('');
 }
 

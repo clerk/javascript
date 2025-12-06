@@ -5,6 +5,7 @@ import { runScans } from '../../runner.js';
 import { createTempFixture } from '../helpers/create-fixture.js';
 
 vi.mock('../../render.js', () => ({
+  colors: { reset: '', bold: '', yellow: '', gray: '' },
   createSpinner: vi.fn(() => ({
     update: vi.fn(),
     stop: vi.fn(),
@@ -13,7 +14,6 @@ vi.mock('../../render.js', () => ({
   })),
   promptText: vi.fn(async (msg, defaultValue) => defaultValue),
   renderCodemodResults: vi.fn(),
-  renderManualInterventionSummary: vi.fn(),
   renderText: vi.fn(),
 }));
 
