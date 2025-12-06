@@ -68,8 +68,8 @@ jobs:
           E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: "canary"
           E2E_NPM_FORCE: "true"
-          E2E_REACT_DOM_VERSION: "19.1.0"
-          E2E_REACT_VERSION: "19.1.0"
+          E2E_REACT_DOM_VERSION: "19.2.1"
+          E2E_REACT_VERSION: "19.2.1"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
 
       # Upload test artifacts if tests failed
