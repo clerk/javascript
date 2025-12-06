@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.26.0
+
+### Minor Changes
+
+- Added support for JWTs in oauth token type ([#7308](https://github.com/clerk/javascript/pull/7308)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 2.25.1
 
 ### Patch Changes
