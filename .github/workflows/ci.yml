@@ -497,94 +497,16 @@ jobs:
           if [ -d "/tmp/.temp_integration" ]; then
             echo "Contents of /tmp/.temp_integration:"
             ls -la /tmp/.temp_integration/
+            echo "Contents of all directories inside /tmp/.temp_integration:"
+            for dir in /tmp/.temp_integration/*/; do
+              if [ -d "$dir" ]; then
+                echo "Directory: $dir"
+                ls -la "$dir"
+              fi
+            done
           else
             echo "Directory /tmp/.temp_integration does not exist"
           fi
-
-      - name: Print integration logs
-        if: ${{ cancelled() || failure() }}
-        continue-on-error: true
-        run: |
-          if [ ! -d "/tmp/.temp_integration" ]; then
-            echo "No temp integration directory found"
-            exit 0
-          fi
-
-          cd /tmp/.temp_integration
-
-          echo "=========================================="
-          echo "state.json"
-          echo "=========================================="
-          cat state.json 2>/dev/null || echo "not found"
-          echo ""
-
-          if [ ! -f "state.json" ]; then
-            exit 0
-          fi
-
-          echo "=========================================="
-          echo "App Logs from Long Running Apps"
-          echo "=========================================="
-
-          # Extract app directories from state.json using jq
-          app_dirs=$(cat state.json | jq -r '.longRunningApps | to_entries[] | .value.appDir' 2>/dev/null)
-
-          if [ -z "$app_dirs" ]; then
-            echo "No app directories found in state.json"
-            exit 0
-          fi
-
-          # For each app directory, print all log files
-          echo "$app_dirs" | while read -r app_dir; do
-            if [ -z "$app_dir" ] || [ ! -d "$app_dir" ]; then
-              continue
-            fi
-            
-            echo ""
-            echo "=========================================="
-            echo "App: $app_dir"
-            echo "=========================================="
-            
-            # Find and print all log files in the app directory
-            find "$app_dir" -name "*.log" -type f 2>/dev/null | while read -r log_file; do
-              echo ""
-              echo "--- $(basename $log_file) ---"
-              cat "$log_file"
-            done
-            
-            # Find and print all @clerk package.json files in node_modules (recursively)
-            echo ""
-            echo "=========================================="
-            echo "@clerk packages in node_modules (all)"
-            echo "=========================================="
-            
-            if [ -d "$app_dir/node_modules" ]; then
-              # Find all @clerk packages recursively in node_modules
-              clerk_packages=$(find "$app_dir/node_modules" -type d -path "*/node_modules/@clerk/*" -maxdepth 10 2>/dev/null | sort -u)
-              
-              if [ -n "$clerk_packages" ]; then
-                echo "Found @clerk packages:"
-                echo "$clerk_packages" | while read -r pkg_path; do
-                  echo "  - $pkg_path"
-                done
-                echo ""
-                
-                # Print each package.json
-                echo "$clerk_packages" | while read -r pkg_path; do
-                  if [ -f "$pkg_path/package.json" ]; then
-                    rel_path=$(echo "$pkg_path" | sed "s|$app_dir/||")
-                    echo ""
-                    echo "--- $rel_path/package.json ---"
-                    cat "$pkg_path/package.json"
-                  fi
-                done
-              else
-                echo "No @clerk packages found in node_modules"
-              fi
-            else
-              echo "No node_modules directory found at: $app_dir/node_modules"
-            fi
-          done
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}
