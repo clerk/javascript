@@ -1,24 +1,31 @@
 import * as readline from 'node:readline';
 
 // ANSI color codes
-const colors = {
-  reset: '\x1b[0m',
-  bold: '\x1b[1m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  gray: '\x1b[90m',
-};
+const colors = process.env.NO_COLOR
+  ? {
+      reset: '',
+      bold: '',
+      red: '',
+      green: '',
+      yellow: '',
+      blue: '',
+      magenta: '',
+      gray: '',
+    }
+  : {
+      reset: '\x1b[0m',
+      bold: '\x1b[1m',
+      red: '\x1b[31m',
+      green: '\x1b[32m',
+      yellow: '\x1b[33m',
+      blue: '\x1b[34m',
+      magenta: '\x1b[35m',
+      gray: '\x1b[90m',
+    };
 
 export function renderHeader() {
   console.log('');
-  console.log(`${colors.magenta}  ╔═══════════════════════════════╗${colors.reset}`);
-  console.log(
-    `${colors.magenta}  ║       ${colors.bold}Clerk Upgrade CLI${colors.reset}${colors.magenta}       ║${colors.reset}`,
-  );
-  console.log(`${colors.magenta}  ╚═══════════════════════════════╝${colors.reset}`);
+  console.log(`${colors.magenta}${colors.bold}>> Clerk Upgrade CLI <<${colors.reset}`);
   console.log('');
 }
 
@@ -43,13 +50,14 @@ export function renderNewline() {
   console.log('');
 }
 
-export function renderConfig({ sdk, currentVersion, fromVersion, toVersion, dir, packageManager }) {
+export function renderConfig({ sdk, currentVersion, fromVersion, toVersion, versionName, dir, packageManager }) {
   console.log(
     `Clerk SDK: ${colors.green}@clerk/${sdk}${colors.reset}${currentVersion ? ` ${colors.gray}(v${currentVersion})${colors.reset}` : ''}`,
   );
   if (fromVersion && toVersion) {
+    const versionLabel = versionName ? ` ${colors.gray}(${versionName})${colors.reset}` : '';
     console.log(
-      `Upgrade path: ${colors.green}v${fromVersion}${colors.reset} → ${colors.green}v${toVersion}${colors.reset}`,
+      `Upgrade: ${colors.green}v${fromVersion}${colors.reset} → ${colors.green}v${toVersion}${colors.reset}${versionLabel}`,
     );
   }
   console.log(`Directory: ${colors.green}${dir}${colors.reset}`);

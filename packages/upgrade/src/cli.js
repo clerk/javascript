@@ -56,6 +56,7 @@ const cli = meow(
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
       dryRun: { type: 'boolean', default: false },
+      skipCodemods: { type: 'boolean', default: false },
     },
   },
 );
@@ -68,6 +69,7 @@ async function main() {
     glob: cli.flags.glob,
     ignore: cli.flags.ignore,
     dryRun: cli.flags.dryRun,
+    skipCodemods: cli.flags.skipCodemods,
   };
 
   if (options.dryRun) {
@@ -125,11 +127,12 @@ async function main() {
     currentVersion,
     fromVersion: config.sdkVersions?.[sdk]?.from,
     toVersion: config.sdkVersions?.[sdk]?.to,
+    versionName: config.name,
     dir: options.dir,
     packageManager: getPackageManagerDisplayName(packageManager),
   });
 
-  if (!(await promptConfirm('Ready to upgrade?'))) {
+  if (isInteractive && !(await promptConfirm('Ready to upgrade?'))) {
     renderError('Upgrade cancelled. Exiting...');
     process.exit(0);
   }

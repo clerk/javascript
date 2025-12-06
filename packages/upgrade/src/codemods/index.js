@@ -34,6 +34,16 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
 
   const paths = await globby(glob, { ignore: GLOBBY_IGNORE });
 
+  if (options.skipCodemods) {
+    return {
+      stats: {
+        total: 0,
+        modified: 0,
+        deleted: 0,
+      },
+    };
+  }
+
   // First pass: dry run to collect stats (jscodeshift only reports stats in dry mode)
   const dryResult = await run(resolvedPath, paths ?? [], {
     ...options,
@@ -42,7 +52,7 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
   });
 
   let result = {};
-  if (!options.dry) {
+  if (!options.dryRun) {
     // Second pass: apply the changes
     result = await run(resolvedPath, paths ?? [], {
       ...options,

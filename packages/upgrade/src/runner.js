@@ -42,7 +42,7 @@ export async function runCodemods(config, sdk, options) {
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {
-      const result = await runCodemod(transform, glob, { dry: options.dryRun });
+      const result = await runCodemod(transform, glob, options);
       spinner.success(`Codemod complete: ${transform}`);
       renderCodemodResults(transform, result);
 
