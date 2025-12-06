@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 
 import { $csrState } from '../stores/internal';
-import type { ProtectProps as _ProtectProps } from '../types';
+import type { ProtectParams } from '@clerk/shared/types';
 import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
 import { withClerk } from './utils';
@@ -70,7 +70,7 @@ export const ClerkLoading = ({ children }: React.PropsWithChildren): JSX.Element
 };
 
 export type ProtectProps = React.PropsWithChildren<
-  _ProtectProps & { fallback?: React.ReactNode } & PendingSessionOptions
+  ProtectParams & { fallback?: React.ReactNode } & PendingSessionOptions
 >;
 
 /**

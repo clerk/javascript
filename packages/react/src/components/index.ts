@@ -21,18 +21,18 @@ export {
   ClerkFailed,
   ClerkLoaded,
   ClerkLoading,
-  Protect,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToTasks,
   RedirectToUserProfile,
+  Show,
   SignedIn,
   SignedOut,
 } from './controlComponents';
 
-export type { ProtectProps } from './controlComponents';
+export type { ShowProps } from './controlComponents';
 
 export { SignInButton } from './SignInButton';
 export { SignInWithMetamaskButton } from './SignInWithMetamaskButton';

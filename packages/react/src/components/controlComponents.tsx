@@ -1,9 +1,5 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type {
-  HandleOAuthCallbackParams,
-  PendingSessionOptions,
-  ProtectProps as _ProtectProps,
-} from '@clerk/shared/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 
 import { useIsomorphicClerkContext } from '../contexts/IsomorphicClerkContext';
@@ -73,75 +69,74 @@ export const ClerkDegraded = ({ children }: React.PropsWithChildren<unknown>) =>
   return children;
 };
 
-export type ProtectProps = React.PropsWithChildren<
-  _ProtectProps & {
+export type ShowProps = React.PropsWithChildren<
+  {
     fallback?: React.ReactNode;
+    when: ShowWhenCondition;
   } & PendingSessionOptions
 >;
 
 /**
- * Use `<Protect/>` in order to prevent unauthenticated or unauthorized users from accessing the children passed to the component.
+ * Use `<Show/>` to conditionally render content based on user authorization or sign-in state.
  *
- * Examples:
+ * @example
+ * ```tsx
+ * <Show when={{ permission: "org:billing:manage" }} fallback={<p>Unauthorized</p>}>
+ *   <BillingSettings />
+ * </Show>
+ *
+ * <Show when={{ role: "admin" }}>
+ *   <AdminPanel />
+ * </Show>
+ *
+ * <Show when={(has) => has({ permission: "org:read" }) && isFeatureEnabled}>
+ *   <ProtectedFeature />
+ * </Show>
  * ```
- * <Protect permission="a_permission_key" />
- * <Protect role="a_role_key" />
- * <Protect condition={(has) => has({permission:"a_permission_key"})} />
- * <Protect condition={(has) => has({role:"a_role_key"})} />
- * <Protect fallback={<p>Unauthorized</p>} />
- * ```
+ *
  */
-export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAuthorizedParams }: ProtectProps) => {
-  useAssertWrappedByClerkProvider('Protect');
+export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: ShowProps) => {
+  useAssertWrappedByClerkProvider('Show');
 
-  const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut });
+  const { has, isLoaded, userId } = useAuth({ treatPendingAsSignedOut });
 
-  /**
-   * Avoid flickering children or fallback while clerk is loading sessionId or userId
-   */
   if (!isLoaded) {
     return null;
   }
 
-  /**
-   * Fallback to UI provided by user or `null` if authorization checks failed
-   */
+  const resolvedWhen = when;
+  const authorized = children;
   const unauthorized = fallback ?? null;
 
-  const authorized = children;
+  if (resolvedWhen === 'signedOut') {
+    return userId ? unauthorized : authorized;
+  }
 
   if (!userId) {
     return unauthorized;
   }
 
-  /**
-   * Check against the results of `has` called inside the callback
-   */
-  if (typeof restAuthorizedParams.condition === 'function') {
-    if (restAuthorizedParams.condition(has)) {
-      return authorized;
-    }
-    return unauthorized;
+  if (resolvedWhen === 'signedIn') {
+    return authorized;
   }
 
-  if (
-    restAuthorizedParams.role ||
-    restAuthorizedParams.permission ||
-    restAuthorizedParams.feature ||
-    restAuthorizedParams.plan
-  ) {
-    if (has(restAuthorizedParams)) {
-      return authorized;
-    }
-    return unauthorized;
+  // At this point, userId is defined so has() is guaranteed to be available
+  if (checkAuthorization(resolvedWhen, has!)) {
+    return authorized;
   }
 
-  /**
-   * If neither of the authorization params are passed behave as the `<SignedIn/>`.
-   * If fallback is present render that instead of rendering nothing.
-   */
-  return authorized;
+  return unauthorized;
 };
+
+function checkAuthorization(
+  when: Exclude<ShowWhenCondition, 'signedIn' | 'signedOut'>,
+  has: NonNullable<ReturnType<typeof useAuth>['has']>,
+): boolean {
+  if (typeof when === 'function') {
+    return when(has);
+  }
+  return has(when);
+}
 
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
