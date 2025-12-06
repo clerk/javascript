@@ -406,12 +406,16 @@ jobs:
         env:
           CLERK_USE_RQ: true
 
+      - name: Version packages for snapshot
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: npm run version-packages:snapshot ci
+
       - name: Verdaccio
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else node ./scripts/snapshot.mjs ci && ${{ matrix.clerk-use-rq == 'true' && 'CLERK_USE_RQ=true' || '' }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else ${{ matrix.clerk-use-rq == 'true' && 'CLERK_USE_RQ=true' || '' }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
