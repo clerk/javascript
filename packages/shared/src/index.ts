@@ -3,3 +3,4 @@ throw new Error(
 );
 
 export {};
+// Force rebuild for explicit exports (replacing wildcard)
