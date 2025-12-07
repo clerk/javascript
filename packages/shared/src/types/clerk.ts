@@ -1072,11 +1072,11 @@ export type ClerkOptions = ClerkOptionsNavigation &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     appearance?: Appearance;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -1089,7 +1089,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -1140,7 +1140,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     sdkMetadata?: SDKMetadata;
     /**
-     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/customizing-clerk/account-portal#waitlist).
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/account-portal/overview#waitlist).
      */
     waitlistUrl?: string;
     /**
