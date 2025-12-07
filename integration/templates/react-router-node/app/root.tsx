@@ -30,7 +30,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App({ loaderData }: Route.ComponentProps) {
   return (
-    <ClerkProvider loaderData={loaderData}>
+    <ClerkProvider
+      loaderData={loaderData}
+      appearance={{
+        options: {
+          showOptionalFields: true,
+        },
+      }}
+    >
       <main>
         <Outlet />
       </main>
