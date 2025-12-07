@@ -20,6 +20,16 @@
         "default": "./dist/runtime/index.js"
       }
     },
+    "./internal/clerk-js/*": {
+      "import": {
+        "types": "./dist/runtime/internal/clerk-js/*.d.mts",
+        "default": "./dist/runtime/internal/clerk-js/*.mjs"
+      },
+      "require": {
+        "types": "./dist/runtime/internal/clerk-js/*.d.ts",
+        "default": "./dist/runtime/internal/clerk-js/*.js"
+      }
+    },
     "./*": {
       "import": {
         "types": "./dist/runtime/*.d.mts",
@@ -88,16 +98,6 @@
       "require": {
         "types": "./dist/types/index.d.ts",
         "default": "./dist/types/index.js"
-      }
-    },
-    "./internal/clerk-js/*": {
-      "import": {
-        "types": "./dist/runtime/internal/clerk-js/*.d.mts",
-        "default": "./dist/runtime/internal/clerk-js/*.mjs"
-      },
-      "require": {
-        "types": "./dist/runtime/internal/clerk-js/*.d.ts",
-        "default": "./dist/runtime/internal/clerk-js/*.js"
       }
     },
     "./package.json": "./package.json"
