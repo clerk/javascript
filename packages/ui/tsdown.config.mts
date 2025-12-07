@@ -20,6 +20,7 @@ export default defineConfig(({ watch }) => {
       PACKAGE_VERSION: `"${uiPackage.version}"`,
       __PKG_VERSION__: `"${uiPackage.version}"`,
       __DEV__: `${watch}`,
+      __BUILD_DISABLE_RHC__: JSON.stringify(false),
     },
   } satisfies Options;
 
