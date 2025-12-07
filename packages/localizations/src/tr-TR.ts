@@ -878,6 +878,9 @@ export const trTR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
+    avatar_file_size_exceeded: 'Dosya boyutu maksimum 10 MB sınırını aşıyor. Lütfen daha küçük bir dosya seçin.',
+    avatar_file_type_invalid:
+      'Dosya türü desteklenmiyor. Lütfen JPG, PNG, GIF veya WEBP formatında bir görsel yükleyin.',
     captcha_invalid:
       'Güvenlik doğrulamalarındaki hatalar nedeniyle kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     captcha_unavailable:
@@ -887,6 +890,7 @@ export const trTR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
     form_identifier_not_found: 'Bu bilgilere sahip bir hesap bulunamadı.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Parametre formatı geçersiz.',
     form_param_format_invalid__email_address: 'E-posta adresi geçerli olmalıdır.',
     form_param_format_invalid__phone_number: 'Telefon numarası geçerli olmalıdır.',

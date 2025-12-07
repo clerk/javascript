@@ -870,6 +870,8 @@ export const koKR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '파일 크기가 최대 10MB 제한을 초과합니다. 더 작은 파일을 선택해 주세요.',
+    avatar_file_type_invalid: '지원되지 않는 파일 형식입니다. JPG, PNG, GIF 또는 WEBP 이미지를 업로드해 주세요.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -879,6 +881,7 @@ export const koKR: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '이 세부 정보와 일치하는 계정을 찾을 수 없습니다.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',

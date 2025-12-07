@@ -876,6 +876,8 @@ export const huHU: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'A fájl mérete meghaladja a 10 MB-os maximális korlátot. Kérlek válassz kisebb fájlt.',
+    avatar_file_type_invalid: 'A fájltípus nem támogatott. Kérlek tölts fel JPG, PNG, GIF vagy WEBP képet.',
     captcha_invalid:
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     captcha_unavailable:
@@ -885,6 +887,7 @@ export const huHU: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_not_found: 'Nem találtunk fiókot ezekkel a részletekkel.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Az email címnek érvényes email címnek kell lennie.',
     form_param_format_invalid__phone_number: 'A telefonszámnak érvényes telefonszámnak kell lennie.',

@@ -53,9 +53,9 @@ export type AuthenticateRequestOptions = {
    */
   afterSignUpUrl?: string;
   /**
-   * Used to activate a specific [organization](https://clerk.com/docs/guides/organizations/overview) or [personal account](https://clerk.com/docs/guides/dashboard/overview) based on URL path parameters. If there's a mismatch between the active organization in the session (e.g., as reported by `auth()`) and the organization indicated by the URL, an attempt to activate the organization specified in the URL will be made.
+   * Used to activate a specific [Organization](https://clerk.com/docs/guides/organizations/overview) or [Personal Account](https://clerk.com/docs/guides/dashboard/overview) based on URL path parameters. If there's a mismatch between the Active Organization in the session (e.g., as reported by `auth()`) and the Organization indicated by the URL, an attempt to activate the Organization specified in the URL will be made.
    *
-   * If the activation can't be performed, either because an organization doesn't exist or the user lacks access, the active organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
+   * If the activation can't be performed, either because an Organization doesn't exist or the user lacks access, the Active Organization in the session won't be changed. Ultimately, it's the responsibility of the page to verify that the resources are appropriate to render given the URL and handle mismatches appropriately (e.g., by returning a 404).
    */
   organizationSyncOptions?: OrganizationSyncOptions;
   /**
@@ -79,13 +79,13 @@ export type AuthenticateRequestOptions = {
  */
 export type OrganizationSyncOptions = {
   /**
-   * Specifies URL patterns that are organization-specific, containing an organization ID or slug as a path parameter. If a request matches this path, the organization identifier will be used to set that org as active.
+   * Specifies URL patterns that are Organization-specific, containing an Organization ID or slug as a path parameter. If a request matches this path, the Organization identifier will be used to set that Organization as active.
    *
    * If the route also matches the `personalAccountPatterns` prop, this prop takes precedence.
    *
-   * Patterns must have a path parameter named either `:id` (to match a Clerk organization ID) or `:slug` (to match a Clerk organization slug).
+   * Patterns must have a path parameter named either `:id` (to match a Clerk Organization ID) or `:slug` (to match a Clerk Organization slug).
    *
-   * If the organization can't be activated—either because it doesn't exist or the user lacks access—the previously active organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/reference/components/organization/organization-switcher).
+   * If the Organization can't be activated—either because it doesn't exist or the user lacks access—the previously active Organization will remain unchanged. Components must detect this case and provide an appropriate error and/or resolution pathway, such as calling `notFound()` or displaying an [`<OrganizationSwitcher />`](https://clerk.com/docs/reference/components/organization/organization-switcher).
    *
    * @example
    * ["/orgs/:slug", "/orgs/:slug/(.*)"]
@@ -97,7 +97,7 @@ export type OrganizationSyncOptions = {
   organizationPatterns?: Pattern[];
 
   /**
-   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/guides/dashboard/overview) (user-specific, outside any organization).
+   * URL patterns for resources that exist within the context of a [Clerk Personal Account](https://clerk.com/docs/guides/dashboard/overview) (user-specific, outside any Organization).
    *
    * If the route also matches the `organizationPattern` prop, the `organizationPattern` prop takes precedence.
    *
@@ -149,7 +149,7 @@ export type OrganizationSyncTargetMatchers = {
 };
 
 /**
- * Represents an organization or a personal account - e.g. an
+ * Represents an Organization or a Personal Account - e.g. an
  * entity that can be activated by the handshake API.
  */
 export type OrganizationSyncTarget =

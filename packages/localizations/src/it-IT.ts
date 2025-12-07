@@ -885,6 +885,8 @@ export const itIT: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sei già un membro di questa organizzazione.',
+    avatar_file_size_exceeded: 'La dimensione del file supera il limite massimo di 10 MB. Scegli un file più piccolo.',
+    avatar_file_type_invalid: "Tipo di file non supportato. Carica un'immagine JPG, PNG, GIF o WEBP.",
     captcha_invalid:
       'Registrazione non riuscita a causa di fallite convalide di sicurezza. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     captcha_unavailable:
@@ -894,6 +896,7 @@ export const itIT: LocalizationResource = {
     form_identifier_exists__phone_number: 'Questo numero di telefono è già registrato.',
     form_identifier_exists__username: 'Questo username è già in uso.',
     form_identifier_not_found: 'Non abbiamo trovato nessun account con queste informazioni.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato non valido.',
     form_param_format_invalid__email_address: "L'indirizzo email deve essere un indirizzo email valido.",
     form_param_format_invalid__phone_number: 'Il numero di telefono deve essere in un formato internazionale valido.',

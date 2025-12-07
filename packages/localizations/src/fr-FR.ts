@@ -893,6 +893,10 @@ export const frFR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
+    avatar_file_size_exceeded:
+      'La taille du fichier dépasse la limite maximale de 10 Mo. Veuillez choisir un fichier plus petit.',
+    avatar_file_type_invalid:
+      'Type de fichier non pris en charge. Veuillez télécharger une image JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:
@@ -902,6 +906,7 @@ export const frFR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
     form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',

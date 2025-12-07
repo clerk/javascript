@@ -131,7 +131,7 @@ type PageProps<T extends string> =
       labelIcon?: never;
     };
 
-export type UserProfilePageProps = PageProps<'account' | 'security'>;
+export type UserProfilePageProps = PageProps<'account' | 'security' | 'billing' | 'apiKeys'>;
 
 export type UserProfileLinkProps = {
   url: string;
@@ -139,7 +139,7 @@ export type UserProfileLinkProps = {
   labelIcon: React.ReactNode;
 };
 
-export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members' | 'billing' | 'apiKeys'>;
 export type OrganizationProfileLinkProps = UserProfileLinkProps;
 
 type ButtonActionProps<T extends string> =

@@ -885,6 +885,9 @@ export const esMX: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded:
+      'El tamaño del archivo supera el límite máximo de 10 MB. Por favor, elige un archivo más pequeño.',
+    avatar_file_type_invalid: 'Tipo de archivo no compatible. Por favor, sube una imagen JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     captcha_unavailable:
@@ -894,6 +897,7 @@ export const esMX: LocalizationResource = {
     form_identifier_exists__phone_number: 'El número telefónico ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
     form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'El correo electrónico debe ser válido.',
     form_param_format_invalid__phone_number: 'El número telefónico debe ser en un formato válido internacional.',
