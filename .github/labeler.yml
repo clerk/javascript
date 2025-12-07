@@ -1,70 +1,100 @@
 # See https://github.com/actions/labeler
 
 astro:
-  - packages/astro/**
+  - changed-files:
+      - any-glob-to-any-file: packages/astro/**
 
 backend:
-  - packages/backend/**
+  - changed-files:
+      - any-glob-to-any-file: packages/backend/**
 
 chrome-extension:
-  - packages/chrome-extension/**
+  - changed-files:
+      - any-glob-to-any-file: packages/chrome-extension/**
 
 clerk-js:
-  - packages/clerk-js/**
+  - changed-files:
+      - any-glob-to-any-file: packages/clerk-js/**
 
 elements:
-  - packages/elements/**
+  - changed-files:
+      - any-glob-to-any-file: packages/elements/**
 
 expo:
-  - packages/expo/**
+  - changed-files:
+      - any-glob-to-any-file: packages/expo/**
 
 express:
-  - packages/express/**
+  - changed-files:
+      - any-glob-to-any-file: packages/express/**
 
 fastify:
-  - packages/fastify/**
+  - changed-files:
+      - any-glob-to-any-file: packages/fastify/**
 
 localizations:
-  - packages/localizations/**
+  - changed-files:
+      - any-glob-to-any-file: packages/localizations/**
 
 nextjs:
-  - packages/nextjs/**
+  - changed-files:
+      - any-glob-to-any-file: packages/nextjs/**
 
 nuxt:
-  - packages/nuxt/**
+  - changed-files:
+      - any-glob-to-any-file: packages/nuxt/**
 
 react:
-  - packages/react/**
+  - changed-files:
+      - any-glob-to-any-file: packages/react/**
 
 react-router:
-  - packages/react-router/**
+  - changed-files:
+      - any-glob-to-any-file: packages/react-router/**
 
 remix:
-  - packages/remix/**
+  - changed-files:
+      - any-glob-to-any-file: packages/remix/**
 
 tanstack:
-  - packages/tanstack-react-start/**
+  - changed-files:
+      - any-glob-to-any-file: packages/tanstack-react-start/**
 
 testing:
-  - packages/testing/**
+  - changed-files:
+      - any-glob-to-any-file: packages/testing/**
 
 themes:
-  - packages/themes/**
+  - changed-files:
+      - any-glob-to-any-file: packages/themes/**
 
 types:
-  - packages/types/**
+  - changed-files:
+      - any-glob-to-any-file: packages/types/**
 
 vue:
-  - packages/vue/**
+  - changed-files:
+      - any-glob-to-any-file: packages/vue/**
 
 playground:
-  - playground/**
+  - changed-files:
+      - any-glob-to-any-file: playground/**
 
 actions:
-  - .github/workflows/**
+  - changed-files:
+      - any-glob-to-any-file: .github/workflows/**
 
 integration:
-  - integration/**
+  - changed-files:
+      - any-glob-to-any-file: integration/**
 
 agent-toolkit:
-  - packages/agent-toolkit/**
+  - changed-files:
+      - any-glob-to-any-file: packages/agent-toolkit/**
+
+# Base branch labels
+core2:
+  - base-branch: '^main$'
+
+core3:
+  - base-branch: '^vincent-and-the-doctor$'
