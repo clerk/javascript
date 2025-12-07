@@ -31,7 +31,13 @@
     "VERCEL",
     "VITE_CLERK_*"
   ],
-  "globalPassThroughEnv": ["AWS_SECRET_KEY", "GITHUB_TOKEN", "ACTIONS_RUNNER_DEBUG", "ACTIONS_STEP_DEBUG"],
+  "globalPassThroughEnv": [
+    "AWS_SECRET_KEY",
+    "GITHUB_TOKEN",
+    "ACTIONS_RUNNER_DEBUG",
+    "ACTIONS_STEP_DEBUG",
+    "VERCEL_AUTOMATION_BYPASS_SECRET"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -218,7 +224,7 @@
       "outputLogs": "new-only"
     },
     "//#test:integration:quickstart": {
-      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS"],
+      "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "VERCEL_AUTOMATION_BYPASS_SECRET"],
       "inputs": ["integration/**"],
       "outputLogs": "new-only"
     },
