@@ -481,6 +481,7 @@ jobs:
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
+          E2E_DEBUG: "1"
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_JS_VERSION: "latest"
