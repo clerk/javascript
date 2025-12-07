@@ -1,4 +1,5 @@
 import { ClerkAPIResponseError, parseError } from '@clerk/shared/error';
+import { getRetryAfterSeconds, with503Retry } from '@clerk/shared/utils';
 import type { ClerkAPIError, ClerkAPIErrorJSON } from '@clerk/types';
 import snakecaseKeys from 'snakecase-keys';
 
@@ -154,7 +155,7 @@ export function buildRequest(options: BuildRequestOptions) {
     let res: Response | undefined;
     try {
       if (formData) {
-        res = await runtime.fetch(finalUrl.href, {
+        res = await with503Retry(runtime.fetch)(finalUrl.href, {
           method,
           headers,
           body: formData,
@@ -177,7 +178,7 @@ export function buildRequest(options: BuildRequestOptions) {
           };
         };
 
-        res = await runtime.fetch(finalUrl.href, {
+        res = await with503Retry(runtime.fetch)(finalUrl.href, {
           method,
           headers,
           ...buildBody(),
@@ -196,7 +197,7 @@ export function buildRequest(options: BuildRequestOptions) {
           status: res?.status,
           statusText: res?.statusText,
           clerkTraceId: getTraceId(responseBody, res?.headers),
-          retryAfter: getRetryAfter(res?.headers),
+          retryAfter: getRetryAfterSeconds(res?.headers),
         };
       }
 
@@ -224,7 +225,7 @@ export function buildRequest(options: BuildRequestOptions) {
         status: res?.status,
         statusText: res?.statusText,
         clerkTraceId: getTraceId(err, res?.headers),
-        retryAfter: getRetryAfter(res?.headers),
+        retryAfter: getRetryAfterSeconds(res?.headers),
       };
     }
   };
@@ -241,20 +242,6 @@ function getTraceId(data: unknown, headers?: Headers): string {
 
   const cfRay = headers?.get('cf-ray');
   return cfRay || '';
-}
-
-function getRetryAfter(headers?: Headers): number | undefined {
-  const retryAfter = headers?.get('Retry-After');
-  if (!retryAfter) {
-    return;
-  }
-
-  const value = parseInt(retryAfter, 10);
-  if (isNaN(value)) {
-    return;
-  }
-
-  return value;
 }
 
 function parseErrors(data: unknown): ClerkAPIError[] {
