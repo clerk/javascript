@@ -32,6 +32,8 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <ClerkProvider
       loaderData={loaderData}
+      clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL}
+      clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL}
       appearance={{
         options: {
           showOptionalFields: true,
