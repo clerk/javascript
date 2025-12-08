@@ -30,7 +30,7 @@ export function renderNewline() {
 }
 
 export function renderConfig({ sdk, currentVersion, fromVersion, toVersion, versionName, dir, packageManager }) {
-  console.log(`🔧 ${chalk.bold('Upgrade config')}`);
+  console.log(`⚙️ ${chalk.bold('Upgrade config')}`);
   const versionSuffix = currentVersion ? ` ${chalk.gray(`(v${currentVersion})`)}` : '';
   console.log(`Clerk SDK: ${chalk.green(`@clerk/${sdk}`)}${versionSuffix}`);
   if (fromVersion && toVersion) {
@@ -130,14 +130,14 @@ export function createSpinner(label) {
         clearInterval(interval);
         interval = null;
       }
-      process.stdout.write(`\r\x1b[K${chalk.green('✓')} ${message}\n`);
+      process.stdout.write(`\r\x1b[K${message}\n`);
     },
     error(message) {
       if (interval) {
         clearInterval(interval);
         interval = null;
       }
-      process.stdout.write(`\r\x1b[K${chalk.red('✗')} ${message}\n`);
+      process.stdout.write(`\r\x1b[K${message}\n`);
     },
   };
 }
@@ -149,16 +149,16 @@ export function renderCodemodResults(transform, result) {
 
 export function renderScanResults(results, docsUrl) {
   if (results.length === 0) {
-    console.log(chalk.green('✓ No breaking changes detected!'));
+    renderSuccess('No breaking changes detected!');
     console.log('');
     return;
   }
 
-  console.log(chalk.yellow.bold(`Found ${results.length} potential issue(s) to review:`));
+  renderWarning(`Found ${results.length} potential issue(s) to review:`);
   console.log('');
 
   for (const item of results) {
-    console.log(chalk.bold(item.title));
+    console.log(chalk.bold(`- ${item.title}`));
     if (item.warning) {
       console.log(chalk.yellow('(warning - may not require action)'));
     }
@@ -168,7 +168,7 @@ export function renderScanResults(results, docsUrl) {
     }
     const link = docsUrl && item.docsAnchor ? `${docsUrl}#${item.docsAnchor}` : null;
     if (link) {
-      console.log(chalk.blue(`→ View in migration guide: ${link}`));
+      console.log(chalk.dim(`Migration guide: ${link}`));
     }
     console.log('');
   }
@@ -178,5 +178,5 @@ export function renderComplete(sdk, docsUrl) {
   console.log(chalk.green.bold(`✅ Upgrade complete for @clerk/${sdk}`));
   console.log('');
   console.log(`Review the changes above and test your application before deployment.`);
-  console.log(chalk.gray(`For more information, see the migration guide: ${docsUrl}`));
+  console.log(chalk.dim(`For more information, see the migration guide: ${docsUrl}`));
 }

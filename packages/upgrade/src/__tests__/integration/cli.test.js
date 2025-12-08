@@ -235,4 +235,78 @@ describe('CLI Integration', () => {
       expect(result.stdout).toContain('codemod');
     });
   });
+
+  describe('Scan Results', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v6-scan-issues');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('detects and displays breaking changes found in source files', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+
+      const output = result.stdout + result.stderr;
+
+      // Should scan for breaking changes
+      expect(output).toContain('Scanning');
+      expect(output).toContain('Scanned');
+    });
+
+    it('shows file paths with line and column numbers for scan results', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+
+      const output = result.stdout + result.stderr;
+
+      // Should show file:line:column format for detected issues
+      expect(output).toMatch(/src\/app\.tsx:\d+:\d+/);
+    });
+
+    it('displays issue titles for detected breaking changes', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+
+      const output = result.stdout + result.stderr;
+
+      // Should display the issue titles from the change definitions
+      // These are defined in the core-3 changes directory
+      expect(output).toMatch(/potential issue|breaking change/i);
+    });
+
+    it('shows migration guide links for detected issues', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+
+      const output = result.stdout + result.stderr;
+
+      // Should include link to migration guide
+      expect(output).toContain('migration guide');
+    });
+
+    it('shows instance counts for detected issues', async () => {
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+
+      const output = result.stdout + result.stderr;
+
+      // Should show instance counts
+      expect(output).toMatch(/\d+ instance/i);
+    });
+
+    it('shows no breaking changes message when project has no issues', async () => {
+      const cleanFixture = createTempFixture('nextjs-v7');
+
+      try {
+        const result = await runCli(['--dir', cleanFixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+
+        const output = result.stdout + result.stderr;
+
+        // When already on latest version, should show success message
+        expect(output).toContain('already on the latest');
+      } finally {
+        cleanFixture.cleanup();
+      }
+    });
+  });
 });

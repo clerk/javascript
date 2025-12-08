@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import chalk from 'chalk';
 import meow from 'meow';
 
 import { getOldPackageName, getTargetPackageName, loadConfig } from './config.js';
@@ -146,9 +147,12 @@ async function main() {
     await performUpgrade(sdk, packageManager, config, options);
   }
 
+  // Scans triggered early to make it run faster
+  const scansPromise = config.changes?.length > 0 ? runScans(config, sdk, options) : Promise.resolve([]);
+
   // Step 6: Run codemods
   if (config.codemods?.length > 0) {
-    renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
+    renderText(chalk.bold(`🔧 Running ${config.codemods.length} codemod(s)...`), 'blue');
     await runCodemods(config, sdk, options);
     renderSuccess('All codemods applied');
     renderNewline();
@@ -156,9 +160,17 @@ async function main() {
 
   // Step 7: Run scans
   if (config.changes?.length > 0) {
-    renderText('Scanning for additional breaking changes...', 'blue');
-    const results = await runScans(config, sdk, options);
-    renderScanResults(results, config.docsUrl);
+    renderText(chalk.bold('🔎 Scanning for additional breaking changes...'), 'blue');
+    const spinner = createSpinner('Scanning files for breaking changes...');
+    try {
+      const results = await scansPromise;
+      spinner.success(chalk.dim(`Scanned ${results.length} files`));
+      renderNewline();
+      renderScanResults(results, config.docsUrl);
+    } catch (error) {
+      spinner.error('Scan failed');
+      throw error;
+    }
   }
 
   // Step 8: Done
@@ -195,9 +207,9 @@ async function performUpgrade(sdk, packageManager, config, options) {
 
   try {
     await upgradePackage(packageManager, targetPackage, targetVersion, options.dir);
-    spinner.success(`Upgraded ${targetPackage} to version ${targetVersion}`);
+    spinner.success(chalk.green.bold(`✅ Upgraded ${targetPackage} to version ${targetVersion}`));
   } catch (error) {
-    spinner.error(`Failed to upgrade ${targetPackage}`);
+    spinner.error(chalk.red.bold(`⛔ Failed to upgrade ${targetPackage}`));
     renderError(error.message);
     process.exit(1);
   }

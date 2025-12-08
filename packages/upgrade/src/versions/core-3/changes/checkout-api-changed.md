@@ -3,7 +3,6 @@ title: '`useCheckout` and `Clerk.checkout()` return value changed'
 matcher:
   - 'useCheckout'
   - 'Clerk\\.checkout'
-  - '\\.checkout\\('
 category: 'breaking'
 ---
 

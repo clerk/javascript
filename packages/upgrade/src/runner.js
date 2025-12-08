@@ -65,58 +65,48 @@ export async function runScans(config, sdk, options) {
     return [];
   }
 
-  const spinner = createSpinner('Scanning files for breaking changes...');
+  const pattern = convertPathToPattern(path.resolve(options.dir));
+  const files = await globby(pattern, {
+    ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
+  });
 
-  try {
-    const pattern = convertPathToPattern(path.resolve(options.dir));
-    const files = await globby(pattern, {
-      ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
-    });
+  const results = {};
 
-    const results = {};
+  for (let idx = 0; idx < files.length; idx++) {
+    const file = files[idx];
+    const content = await fs.readFile(file, 'utf8');
 
-    for (let idx = 0; idx < files.length; idx++) {
-      const file = files[idx];
-      spinner.update(`Scanning ${path.basename(file)} (${idx + 1}/${files.length})`);
+    for (const matcher of matchers) {
+      const matches = findMatches(content, matcher.matcher);
 
-      const content = await fs.readFile(file, 'utf8');
+      if (matches.length === 0) {
+        continue;
+      }
 
-      for (const matcher of matchers) {
-        const matches = findMatches(content, matcher.matcher);
+      if (!results[matcher.title]) {
+        results[matcher.title] = { instances: [], ...matcher };
+      }
 
-        if (matches.length === 0) {
-          continue;
-        }
+      for (const match of matches) {
+        const position = indexToPosition(content, match.index, { oneBased: true });
+        const fileRelative = path.relative(process.cwd(), file);
 
-        if (!results[matcher.title]) {
-          results[matcher.title] = { instances: [], ...matcher };
-        }
+        const isDuplicate = results[matcher.title].instances.some(
+          i => i.position.line === position.line && i.position.column === position.column && i.file === fileRelative,
+        );
 
-        for (const match of matches) {
-          const position = indexToPosition(content, match.index, { oneBased: true });
-          const fileRelative = path.relative(process.cwd(), file);
-
-          const isDuplicate = results[matcher.title].instances.some(
-            i => i.position.line === position.line && i.position.column === position.column && i.file === fileRelative,
-          );
-
-          if (!isDuplicate) {
-            results[matcher.title].instances.push({
-              sdk,
-              position,
-              file: fileRelative,
-            });
-          }
+        if (!isDuplicate) {
+          results[matcher.title].instances.push({
+            sdk,
+            position,
+            file: fileRelative,
+          });
         }
       }
     }
-
-    spinner.success(`Scanned ${files.length} files`);
-    return Object.values(results);
-  } catch (error) {
-    spinner.error('Scan failed');
-    throw error;
   }
+
+  return Object.values(results);
 }
 
 function loadMatchers(config, sdk) {
