@@ -1,7 +1,7 @@
 ---
-'@clerk/localizations': patch
-'@clerk/clerk-js': patch
-'@clerk/shared': patch
+'@clerk/localizations': minor
+'@clerk/clerk-js': minor
+'@clerk/shared': minor
 ---
 
 Add a subtitle on the Reset password session task screen
