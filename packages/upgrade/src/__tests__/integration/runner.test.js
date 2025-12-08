@@ -88,8 +88,7 @@ describe('runScans with theme imports', () => {
     const results = await runScans(config, 'nextjs', options);
     const themeChange = results.find(r => r.title?.includes('Theme') || r.docsAnchor?.includes('theme'));
 
-    if (themeChange) {
-      expect(themeChange.instances.length).toBeGreaterThan(0);
-    }
+    expect(themeChange).toBeDefined();
+    expect(themeChange.instances.length).toBeGreaterThan(0);
   });
 });
