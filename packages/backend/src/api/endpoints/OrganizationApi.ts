@@ -58,7 +58,7 @@ type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   organizationId: string;
 
   /**
-   * Sorts organizations memberships by phone_number, email_address, created_at, first_name, last_name or username.
+   * Sorts Organization memberships by phone_number, email_address, created_at, first_name, last_name or username.
    * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
    */
   orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;
@@ -82,7 +82,7 @@ type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
   /* Returns users with the specified web3 wallet addresses. Accepts up to 100 web3 wallet addresses. Any web3 wallet addressed not found are ignored. */
   web3Wallet?: string[];
 
-  /* Returns users with the specified roles. Accepts up to 100 roles. Any roles not found are ignored. */
+  /* Returns users with the specified Roles. Accepts up to 100 Roles. Any Roles not found are ignored. */
   role?: OrganizationMembershipRole[];
 
   /**
@@ -139,7 +139,7 @@ type GetOrganizationMembershipListParams = ClerkPaginationRequest<{
 
 type GetInstanceOrganizationMembershipListParams = ClerkPaginationRequest<{
   /**
-   * Sorts organizations memberships by phone_number, email_address, created_at, first_name, last_name or username.
+   * Sorts Organization memberships by phone_number, email_address, created_at, first_name, last_name or username.
    * By prepending one of those values with + or -, we can choose to sort in ascending (ASC) or descending (DESC) order.
    */
   orderBy?: WithSign<'phone_number' | 'email_address' | 'created_at' | 'first_name' | 'last_name' | 'username'>;

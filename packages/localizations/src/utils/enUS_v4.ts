@@ -711,6 +711,8 @@ export const enUS_v4: any = {
     action__createOrganization: 'Create organization',
   },
   unstable__errors: {
+    avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     form_identifier_not_found: "We couldn't find an account with those details.",
     captcha_unavailable:

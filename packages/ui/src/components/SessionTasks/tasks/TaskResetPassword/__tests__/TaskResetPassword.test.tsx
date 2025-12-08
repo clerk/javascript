@@ -53,7 +53,7 @@ describe('TaskResetPassword', () => {
 
     fixtures.clerk.user?.updatePassword.mockResolvedValue({});
     const { getByRole, userEvent, getByLabelText } = render(<TaskResetPassword />, { wrapper });
-    await waitFor(() => getByRole('heading', { name: /Reset password/i }));
+    await waitFor(() => getByRole('heading', { name: /Reset your password/i }));
 
     await userEvent.type(getByLabelText(/new password/i), 'testtest');
     await userEvent.type(getByLabelText(/confirm password/i), 'testtest');
@@ -73,7 +73,7 @@ describe('TaskResetPassword', () => {
       });
     });
     const { getByRole, getByTestId } = render(<TaskResetPassword />, { wrapper });
-    await waitFor(() => getByRole('heading', { name: /Reset password/i }));
+    await waitFor(() => getByRole('heading', { name: /Reset your password/i }));
 
     const identifierField = getByTestId('hidden-identifier');
     expect(identifierField).toHaveValue('test@clerk.com');

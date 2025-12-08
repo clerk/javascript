@@ -3,7 +3,7 @@ import type { OrganizationMembershipRole } from './Enums';
 import type { OrganizationMembershipJSON, OrganizationMembershipPublicUserDataJSON } from './JSON';
 
 /**
- * The Backend `OrganizationMembership` object is similar to the [`OrganizationMembership`](https://clerk.com/docs/reference/javascript/types/organization-membership) object as it's the model around an organization membership entity and describes the relationship between users and organizations. However, the Backend `OrganizationMembership` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/CreateOrganizationMembership){{ target: '_blank' }} and is not directly accessible from the Frontend API.
+ * The Backend `OrganizationMembership` object is similar to the [`OrganizationMembership`](https://clerk.com/docs/reference/javascript/types/organization-membership) object as it's the model around an Organization membership entity and describes the relationship between users and Organizations. However, the Backend `OrganizationMembership` object is different in that it's used in the [Backend API](https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/CreateOrganizationMembership){{ target: '_blank' }} and is not directly accessible from the Frontend API.
  */
 export class OrganizationMembership {
   private _raw: OrganizationMembershipJSON | null = null;
@@ -18,11 +18,11 @@ export class OrganizationMembership {
      */
     readonly id: string,
     /**
-     * The role of the user.
+     * The Role of the user.
      */
     readonly role: OrganizationMembershipRole,
     /**
-     * The permissions granted to the user in the organization.
+     * The Permissions granted to the user in the Organization.
      */
     readonly permissions: string[],
     /**
@@ -42,7 +42,7 @@ export class OrganizationMembership {
      */
     readonly updatedAt: number,
     /**
-     * The organization that the user is a member of.
+     * The Organization that the user is a member of.
      */
     readonly organization: Organization,
     /**

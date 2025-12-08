@@ -4,8 +4,8 @@ run-name: Release
 on:
   push:
     branches:
-      - main
-      - release/v4
+      - main-disabled
+      - release/v4-disabled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

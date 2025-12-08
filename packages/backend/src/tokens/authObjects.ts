@@ -51,7 +51,7 @@ export type SignedInAuthObject = SharedSignedInAuthObjectProperties & {
    */
   getToken: ServerGetToken;
   /**
-   * A function that checks if the user has an organization role or custom permission.
+   * A function that checks if the user has an Organization Role or Custom Permission.
    */
   has: CheckAuthorizationFromSessionClaims;
   /**

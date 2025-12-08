@@ -871,10 +871,13 @@ export const srRS: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Veličina fajla premašuje maksimalno ograničenje od 10 MB. Molimo izaberite manji fajl.',
+    avatar_file_type_invalid: 'Tip fajla nije podržan. Molimo otpremite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:

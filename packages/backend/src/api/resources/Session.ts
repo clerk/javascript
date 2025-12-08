@@ -95,7 +95,7 @@ export class Session {
      */
     readonly updatedAt: number,
     /**
-     * The ID of the last active organization.
+     * The ID of the last active Organization.
      */
     readonly lastActiveOrganizationId?: string,
     /**

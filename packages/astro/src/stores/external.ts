@@ -56,7 +56,7 @@ export const $sessionStore = computed([$authStore], auth => auth.session as Sign
 
 /**
  * A client side store that is populated after clerk-js has loaded.
- * The store returns the active organization of the authenticated user or `null`.
+ * The store returns the Active Organization of the authenticated user or `null`.
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example

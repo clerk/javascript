@@ -878,10 +878,13 @@ export const plPL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
+    avatar_file_size_exceeded: 'Rozmiar pliku przekracza maksymalny limit 10 MB. Wybierz mniejszy plik.',
+    avatar_file_type_invalid: 'Nieobsługiwany typ pliku. Prześlij obraz w formacie JPG, PNG, GIF lub WEBP.',
     captcha_invalid:
       'Rejestracja nie powiodła się z powodu niepowodzenia weryfikacji zabezpieczeń. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     captcha_unavailable:

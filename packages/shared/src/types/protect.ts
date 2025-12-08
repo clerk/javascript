@@ -9,16 +9,16 @@ import type { Autocomplete } from './utils';
  *
  * @example
  * ```tsx
- * // Require a specific permission
+ * // Require a specific Permission
  * <Protect permission="a_permission_key" />
  *
- * // Require a specific role
+ * // Require a specific Role
  * <Protect role="a_role_key" />
  *
  * // Use a custom condition callback
  * <Protect condition={(has) => has({ permission: "a_permission_key" })} />
  *
- * // Require a specific feature
+ * // Require a specific Feature
  * <Protect feature="a_feature_key" />
  *
  * // Require a specific plan

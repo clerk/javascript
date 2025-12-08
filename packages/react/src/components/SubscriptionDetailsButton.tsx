@@ -21,7 +21,7 @@ import { withClerk } from './withClerk';
  *   );
  * }
  *
- * // Custom button with organization subscription
+ * // Custom button with Organization Subscription
  * function OrganizationSubscriptionDetails() {
  *   return (
  *     <SubscriptionDetailsButton
@@ -35,7 +35,7 @@ import { withClerk } from './withClerk';
  * ```
  *
  * @throws {Error} When rendered outside of a `<SignedIn />` component
- * @throws {Error} When `for="organization"` is used without an active organization context
+ * @throws {Error} When `for="organization"` is used without an Active Organization context
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */

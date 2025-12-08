@@ -19,7 +19,7 @@ export class BillingSubscriptionItem {
      */
     readonly status: BillingSubscriptionItemJSON['status'],
     /**
-     * The plan period for the subscription item.
+     * The Plan period for the subscription item.
      */
     readonly planPeriod: 'month' | 'annual',
     /**
@@ -47,11 +47,11 @@ export class BillingSubscriptionItem {
      */
     readonly amount: BillingMoneyAmount | undefined,
     /**
-     * The plan associated with this subscription item.
+     * The Plan associated with this subscription item.
      */
     readonly plan: BillingPlan | null,
     /**
-     * The plan ID.
+     * The Plan ID.
      */
     readonly planId: string | null,
     /**

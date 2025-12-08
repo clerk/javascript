@@ -21,7 +21,7 @@ type MembersSearchProps = {
    */
   value: string;
   /**
-   * Paginated organization memberships
+   * Paginated Organization memberships
    */
   memberships: ReturnType<typeof useOrganization>['memberships'];
   /**
