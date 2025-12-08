@@ -36,6 +36,17 @@ const CHROME_CLIENT_NAMES = new Set(['__unstable__createClerkClient', 'createCle
 const CHROME_BACKGROUND_SOURCE = '@clerk/chrome-extension/background';
 const CHROME_LEGACY_SOURCE = '@clerk/chrome-extension';
 
+/**
+ * Transforms experimental and unstable prefixed identifiers to their stable or internal equivalents.
+ * Also moves theme-related imports to @clerk/ui/themes/experimental and Chrome extension imports
+ * to @clerk/chrome-extension/background. Removes deprecated billing-related props.
+ *
+ * @param {Object} file - The file object containing the source code
+ * @param {string} file.source - The source code to transform
+ * @param {Object} api - The jscodeshift API
+ * @param {Function} api.jscodeshift - The jscodeshift function
+ * @returns {string|undefined} The transformed source code, or undefined if no changes were made
+ */
 module.exports = function transformAlignExperimentalUnstablePrefixes({ source }, { jscodeshift: j }) {
   const root = j(source);
   let dirty = false;
