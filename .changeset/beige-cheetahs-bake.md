@@ -1,5 +1,5 @@
 ---
-"@clerk/clerk-react": patch
+"@clerk/react": patch
 ---
 
 Re-export experimental `useAPIKeys` hook

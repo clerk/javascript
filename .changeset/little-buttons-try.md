@@ -1,7 +1,7 @@
 ---
 "@clerk/astro": patch
 "@clerk/clerk-js": patch
-"@clerk/clerk-react": patch
+"@clerk/react": patch
 "@clerk/vue": patch
 ---
 
