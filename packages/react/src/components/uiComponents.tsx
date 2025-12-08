@@ -715,7 +715,7 @@ export const TaskResetPassword = withClerk(
             component={component}
             mount={clerk.mountTaskResetPassword}
             unmount={clerk.unmountTaskResetPassword}
-            updateProps={(clerk as any).__unstable__updateProps}
+            updateProps={(clerk as any).__internal_updateProps}
             props={props}
             rootProps={rendererRootProps}
           />
