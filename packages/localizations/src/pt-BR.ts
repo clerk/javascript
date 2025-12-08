@@ -885,6 +885,7 @@ export const ptBR: LocalizationResource = {
       actionLink: 'Sair',
       actionText: 'Conectado como {{identifier}}',
     },
+    subtitle: undefined,
     title: 'Resetar senha',
   },
   unstable__errors: {
