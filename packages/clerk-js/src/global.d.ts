@@ -17,4 +17,5 @@ const __BUILD_VARIANT_CHIPS__: boolean;
 interface Window {
   __internal_onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;
   __internal_onAfterSetActive: () => Promise<void> | void;
+  __internal_ClerkUiCtor?: import('@clerk/shared').ClerkUiConstructor;
 }
