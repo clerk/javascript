@@ -23,6 +23,8 @@ const componentImportPaths = {
   SessionTasks: () => import(/* webpackChunkName: "sessionTasks" */ '../components/SessionTasks'),
   TaskChooseOrganization: () =>
     import(/* webpackChunkName: "taskChooseOrganization" */ '../components/SessionTasks/tasks/TaskChooseOrganization'),
+  TaskResetPassword: () =>
+    import(/* webpackChunkName: "taskResetPassword" */ '../components/SessionTasks/tasks/TaskResetPassword'),
   PlanDetails: () => import(/* webpackChunkName: "planDetails" */ '../components/Plans/PlanDetails'),
   SubscriptionDetails: () => import(/* webpackChunkName: "subscriptionDetails" */ '../components/SubscriptionDetails'),
   APIKeys: () => import(/* webpackChunkName: "apiKeys" */ '../components/APIKeys/APIKeys'),
@@ -123,6 +125,10 @@ export const TaskChooseOrganization = lazy(() =>
   componentImportPaths.TaskChooseOrganization().then(module => ({ default: module.TaskChooseOrganization })),
 );
 
+export const TaskResetPassword = lazy(() =>
+  componentImportPaths.TaskResetPassword().then(module => ({ default: module.TaskResetPassword })),
+);
+
 export const PlanDetails = lazy(() =>
   componentImportPaths.PlanDetails().then(module => ({ default: module.PlanDetails })),
 );
@@ -172,6 +178,7 @@ export const ClerkComponents = {
   OAuthConsent,
   SubscriptionDetails,
   TaskChooseOrganization,
+  TaskResetPassword,
 };
 
 export type ClerkComponentName = keyof typeof ClerkComponents;

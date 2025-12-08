@@ -210,7 +210,7 @@ describe('SignUpStart', () => {
           <AppearanceProvider
             appearanceKey={'signUp'}
             appearance={{
-              layout: {
+              options: {
                 socialButtonsVariant: 'blockButton',
               },
             }}

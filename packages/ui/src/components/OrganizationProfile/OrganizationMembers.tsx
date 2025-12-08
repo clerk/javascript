@@ -8,13 +8,12 @@ import { Header } from '@/ui/elements/Header';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 
 import { NotificationCountBadge, useProtect } from '../../common';
-import { useEnvironment, useOrganizationProfileContext } from '../../contexts';
+import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { mqu } from '../../styledSystem';
 import { ActiveMembersList } from './ActiveMembersList';
 import { MembersActionsRow } from './MembersActions';
-import { MembershipWidget } from './MembershipWidget';
 import { MembersSearch } from './MembersSearch';
 import { OrganizationMembersTabInvitations } from './OrganizationMembersTabInvitations';
 import { OrganizationMembersTabRequests } from './OrganizationMembersTabRequests';
@@ -41,9 +40,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
         }
       : undefined,
   });
-
-  // @ts-expect-error This property is not typed. It is used by our dashboard in order to render a billing widget.
-  const { __unstable_manageBillingUrl } = useOrganizationProfileContext();
 
   if (canManageMemberships === null) {
     return null;
@@ -123,7 +119,6 @@ export const OrganizationMembers = withCardStateProvider(() => {
                       width: '100%',
                     }}
                   >
-                    {canManageMemberships && __unstable_manageBillingUrl && <MembershipWidget />}
                     <Flex
                       gap={2}
                       direction='col'

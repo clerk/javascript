@@ -20,13 +20,20 @@ export default defineConfig(({ watch }) => {
       PACKAGE_VERSION: `"${uiPackage.version}"`,
       __PKG_VERSION__: `"${uiPackage.version}"`,
       __DEV__: `${watch}`,
+      __BUILD_DISABLE_RHC__: JSON.stringify(false),
     },
   } satisfies Options;
 
   return [
     {
       ...common,
-      entry: ['./src/index.ts', './src/entry.ts', './src/internal/index.ts', './src/themes/index.ts'],
+      entry: [
+        './src/index.ts',
+        './src/entry.ts',
+        './src/internal/index.ts',
+        './src/themes/index.ts',
+        './src/themes/experimental.ts',
+      ],
       outDir: './dist',
       unbundle: true,
       onSuccess: async () => {

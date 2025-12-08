@@ -201,7 +201,7 @@ interface ContentProps {
 
 const Content = React.forwardRef<HTMLDivElement, ContentProps>(({ children }, ref) => {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const { animations: layoutAnimations } = useAppearance().parsedLayout;
+  const { animations: layoutAnimations } = useAppearance().parsedOptions;
   const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
   const { strategy, refs, context, getFloatingProps, direction } = useDrawerContext();
   const mergedRefs = useMergeRefs([ref, refs.setFloating]);
@@ -454,7 +454,7 @@ interface ConfirmationProps {
 const Confirmation = React.forwardRef<HTMLDivElement, ConfirmationProps>(
   ({ open, onOpenChange, children, actionsSlot, roleProps }, ref) => {
     const prefersReducedMotion = usePrefersReducedMotion();
-    const { animations: layoutAnimations } = useAppearance().parsedLayout;
+    const { animations: layoutAnimations } = useAppearance().parsedOptions;
     const isMotionSafe = !prefersReducedMotion && layoutAnimations === true;
 
     const { refs, context } = useFloating({

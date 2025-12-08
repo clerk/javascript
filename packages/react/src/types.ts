@@ -29,7 +29,7 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __unstable_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
 
@@ -102,7 +102,7 @@ type PageProps<T extends string> =
       labelIcon?: never;
     };
 
-export type UserProfilePageProps = PageProps<'account' | 'security'>;
+export type UserProfilePageProps = PageProps<'account' | 'security' | 'billing' | 'apiKeys'>;
 
 export type UserProfileLinkProps = {
   url: string;
@@ -110,7 +110,7 @@ export type UserProfileLinkProps = {
   labelIcon: React.ReactNode;
 };
 
-export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members' | 'billing' | 'apiKeys'>;
 export type OrganizationProfileLinkProps = UserProfileLinkProps;
 
 type ButtonActionProps<T extends string> =

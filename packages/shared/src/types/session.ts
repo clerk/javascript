@@ -62,19 +62,19 @@ type WithReverification<T> = T & {
 export type CheckAuthorizationParamsWithCustomPermissions = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -104,19 +104,19 @@ export type CheckAuthorization = CheckAuthorizationFn<CheckAuthorizationParams>;
 type CheckAuthorizationParams = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }
@@ -143,7 +143,7 @@ type CheckAuthorizationParams = WithReverification<
 
 /**
  * Type guard for server-side authorization checks using session claims.
- * System permissions are not allowed since they are not included
+ * System Permissions are not allowed since they are not included
  * in session claims and cannot be verified on the server side.
  */
 export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomPermissionKey>(
@@ -156,19 +156,19 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
   | {
       /**
-       * The [role](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Role](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       role: OrganizationCustomRoleKey;
       /**
-       * The [permission](https://clerk.com/docs/guides/organizations/roles-and-permissions) to check for.
+       * The [Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions) to check for.
        */
       permission?: never;
       /**
-       * The [feature](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Feature](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       feature?: never;
       /**
-       * The [plan](https://clerk.com/docs/guides/billing/overview) to check for.
+       * The [Plan](https://clerk.com/docs/guides/billing/overview) to check for.
        */
       plan?: never;
     }

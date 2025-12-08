@@ -18,7 +18,6 @@ const variants = {
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
   clerkCHIPS: 'clerk.chips.browser',
-  clerkChannelBrowser: 'clerk.channel.browser',
 };
 
 const variantToSourceFile = {
@@ -29,7 +28,6 @@ const variantToSourceFile = {
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
   [variants.clerkCHIPS]: './src/index.browser.ts',
-  [variants.clerkChannelBrowser]: './src/index.browser.ts',
 };
 
 /**
@@ -61,7 +59,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
-        __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
       }),
       new rspack.EnvironmentPlugin({
@@ -255,11 +252,17 @@ const prodConfig = ({ mode, env, analysis }) => {
       ? {
           entry: { sandbox: './sandbox/app.ts' },
           plugins: [
+            new rspack.CopyRspackPlugin({
+              patterns: [{ from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' }],
+            }),
             new rspack.HtmlRspackPlugin({
               minify: false,
               template: './sandbox/template.html',
               inject: false,
               hash: true,
+              templateParameters: {
+                uiScriptUrl: './ui.browser.js',
+              },
             }),
           ],
         }
@@ -306,13 +309,6 @@ const prodConfig = ({ mode, env, analysis }) => {
   const clerkCHIPS = merge(
     entryForVariant(variants.clerkCHIPS),
     common({ mode, variant: variants.clerkCHIPS }),
-    commonForProd(),
-    commonForProdChunked(),
-  );
-
-  const clerkChannelBrowser = merge(
-    entryForVariant(variants.clerkChannelBrowser),
-    common({ mode, variant: variants.clerkChannelBrowser }),
     commonForProd(),
     commonForProdChunked(),
   );
@@ -431,7 +427,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkHeadless,
     clerkHeadlessBrowser,
     clerkCHIPS,
-    clerkChannelBrowser,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -467,6 +462,9 @@ const devConfig = ({ mode, env }) => {
             minify: false,
             template: './sandbox/template.html',
             inject: false,
+            templateParameters: {
+              uiScriptUrl: 'http://localhost:4001/npm/ui.browser.js',
+            },
           }),
       ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
@@ -537,11 +535,6 @@ const devConfig = ({ mode, env }) => {
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),
       common({ mode, variant: variants.clerkCHIPS }),
-      commonForDev(),
-    ),
-    [variants.clerkChannelBrowser]: merge(
-      entryForVariant(variants.clerkChannelBrowser),
-      common({ mode, variant: variants.clerkChannelBrowser }),
       commonForDev(),
     ),
   };

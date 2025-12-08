@@ -108,6 +108,7 @@ import type {
   SignUpRedirectOptions,
   SignUpResource,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -556,13 +557,13 @@ export class Clerk implements ClerkInterface {
     }
 
     const onBeforeSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-        ? window.__unstable__onBeforeSetActive
+      typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
+        ? window.__internal_onBeforeSetActive
         : noop;
 
     const onAfterSetActive: SetActiveHook =
-      typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-        ? window.__unstable__onAfterSetActive
+      typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
+        ? window.__internal_onAfterSetActive
         : noop;
 
     const opts = callbackOrOptions && typeof callbackOrOptions === 'object' ? callbackOrOptions : options || {};
@@ -788,19 +789,19 @@ export class Clerk implements ClerkInterface {
     }
   };
 
-  public __internal_openEnableOrganizationsPrompt = (
-    props: __internal_EnableOrganizationsPromptProps,
-  ): Promise<void> => {
+  public __internal_openEnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps): void => {
     this.assertComponentsReady(this.#clerkUi);
-    return this.#clerkUi
-      .then(ui => ui.ensureMounted())
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted({ preloadHint: 'EnableOrganizationsPrompt' }))
       .then(controls => controls.openModal('enableOrganizationsPrompt', props || {}));
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('EnableOrganizationsPrompt', props));
   };
 
-  public __internal_closeEnableOrganizationsPrompt = (): Promise<unknown> => {
+  public __internal_closeEnableOrganizationsPrompt = (): void => {
     this.assertComponentsReady(this.#clerkUi);
-    return this.#clerkUi
-      .then(ui => ui.ensureMounted())
+    void this.#clerkUi
+      ?.then(ui => ui.ensureMounted())
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
   };
 
@@ -1391,6 +1392,28 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
+  public mountTaskResetPassword = (node: HTMLDivElement, props?: TaskResetPasswordProps) => {
+    this.assertComponentsReady(this.#clerkUi);
+
+    const component = 'TaskResetPassword';
+    void this.#clerkUi
+      .then(ui => ui.ensureMounted())
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'taskResetPassword',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted('TaskResetPassword', props));
+  };
+
+  public unmountTaskResetPassword = (node: HTMLDivElement) => {
+    void this.#clerkUi?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * `setActive` can be used to set the active session and/or organization.
    */
@@ -1427,13 +1450,13 @@ export class Clerk implements ClerkInterface {
       }
 
       const onBeforeSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__unstable__onBeforeSetActive === 'function'
-          ? window.__unstable__onBeforeSetActive
+        typeof window !== 'undefined' && typeof window.__internal_onBeforeSetActive === 'function'
+          ? window.__internal_onBeforeSetActive
           : noop;
 
       const onAfterSetActive: SetActiveHook =
-        typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-          ? window.__unstable__onAfterSetActive
+        typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
+          ? window.__internal_onAfterSetActive
           : noop;
 
       let newSession = session === undefined ? this.session : session;
@@ -2473,8 +2496,8 @@ export class Clerk implements ClerkInterface {
       const hasTransitionedToPendingStatus = this.session.status === 'active' && session?.status === 'pending';
       if (hasTransitionedToPendingStatus) {
         const onAfterSetActive: SetActiveHook =
-          typeof window !== 'undefined' && typeof window.__unstable__onAfterSetActive === 'function'
-            ? window.__unstable__onAfterSetActive
+          typeof window !== 'undefined' && typeof window.__internal_onAfterSetActive === 'function'
+            ? window.__internal_onAfterSetActive
             : noop;
 
         // Execute hooks to update server authentication context and trigger
@@ -2499,13 +2522,13 @@ export class Clerk implements ClerkInterface {
     this.#emit();
   };
 
-  get __unstable__environment(): EnvironmentResource | null | undefined {
+  get __internal_environment(): EnvironmentResource | null | undefined {
     return this.environment;
   }
 
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
-  __unstable__setEnvironment = async (env: EnvironmentJSON) => {
+  __internal_setEnvironment = async (env: EnvironmentJSON) => {
     this.environment = new Environment(env);
 
     // TODO @nikos update
@@ -2514,16 +2537,16 @@ export class Clerk implements ClerkInterface {
     // }
   };
 
-  __unstable__onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
+  __internal_onBeforeRequest = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onBeforeRequest(callback);
   };
 
-  __unstable__onAfterResponse = (callback: FapiRequestCallback<any>): void => {
+  __internal_onAfterResponse = (callback: FapiRequestCallback<any>): void => {
     this.#fapiClient.onAfterResponse(callback);
   };
 
   // TODO @userland-errors:
-  __unstable__updateProps = (_props: any) => {
+  __internal_updateProps = (_props: any) => {
     // We need to re-init the options here in order to keep the options passed to ClerkProvider
     // in sync with the state of clerk-js. If we don't init the options here again, the following scenario is possible:
     // 1. User renders <ClerkProvider propA={undefined} propB={1} />

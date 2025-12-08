@@ -1,5 +1,59 @@
 # Change Log
 
+## 3.39.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+## 3.38.0
+
+### Minor Changes
+
+- Improve error handling and retry logic when loading `@clerk/clerk-js`. ([#6860](https://github.com/clerk/javascript/pull/6860)) by [@brkalow](https://github.com/brkalow)
+
+- Introduce new `<TaskResetPassword/>` session task component ([#7314](https://github.com/clerk/javascript/pull/7314)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Fix for allowing task url customization for specific tasks instead of requiring them all ([#7354](https://github.com/clerk/javascript/pull/7354)) by [@octoper](https://github.com/octoper)
+
+- Show the correct error message on `form_new_password_matches_current` error code ([#7372](https://github.com/clerk/javascript/pull/7372)) by [@octoper](https://github.com/octoper)
+
+- Rename internal `isPasswordUntrustedError` to `isPasswordCompromisedError` ([#7352](https://github.com/clerk/javascript/pull/7352)) by [@octoper](https://github.com/octoper)
+
+## 3.37.0
+
+### Minor Changes
+
+- Add `vercel` to `OAuthProvider` type to support "Sign in with Vercel" OAuth flow ([#7324](https://github.com/clerk/javascript/pull/7324)) by [@Railly](https://github.com/Railly)
+
+- Hide billing types through @internal tag ([#7315](https://github.com/clerk/javascript/pull/7315)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Introduce `reset-password` session task ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+- Introduce a new variant for the alternative methods screen to handle untrusted password error on sign-in ([#7331](https://github.com/clerk/javascript/pull/7331)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Fixed an issue where API keys in `<UserProfile />` are showing organization API keys. ([#7344](https://github.com/clerk/javascript/pull/7344)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Add localization key for username form error ([#7320](https://github.com/clerk/javascript/pull/7320)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Moved helper to enable Organizations feature to React-specific shared path ([#7334](https://github.com/clerk/javascript/pull/7334)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Refactor clearing cache in RQ hooks when a use signs out. ([#7330](https://github.com/clerk/javascript/pull/7330)) by [@panteliselef](https://github.com/panteliselef)
+
+## 3.36.0
+
+### Minor Changes
+
+- Introduce in-app development prompt to enable the Organizations feature ([#7159](https://github.com/clerk/javascript/pull/7159)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  In development instances, when using organization components or hooks for the first time, developers will see a prompt to enable the Organizations feature directly in their app, eliminating the need to visit the Clerk Dashboard.
+
+- Creates compatibility layer for SWR hooks that were previously inside `@clerk/clerk-js` ([#7270](https://github.com/clerk/javascript/pull/7270)) by [@panteliselef](https://github.com/panteliselef)
+
 ## 3.35.2
 
 ### Patch Changes

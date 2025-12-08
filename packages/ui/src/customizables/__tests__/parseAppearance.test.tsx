@@ -17,9 +17,9 @@ const themeA = {
     colorBackground: themeAColor,
     colorInput: themeAColor,
     colorInputForeground: themeAColor,
-    colorText: themeAColor,
+    colorForeground: themeAColor,
     colorPrimaryForeground: themeAColor,
-    colorTextSecondary: themeAColor,
+    colorMutedForeground: themeAColor,
     borderRadius: '1rem',
     fontFamily: 'Comic Sans',
     fontFamilyButtons: 'Comic Sans',
@@ -39,9 +39,9 @@ const themeB = {
     colorBackground: themeBColor,
     colorInput: themeBColor,
     colorInputForeground: themeBColor,
-    colorText: themeBColor,
+    colorForeground: themeBColor,
     colorPrimaryForeground: themeBColor,
-    colorTextSecondary: themeBColor,
+    colorMutedForeground: themeBColor,
     borderRadius: '2rem',
     fontFamily: 'Arial',
     fontFamilyButtons: 'Arial',
@@ -222,13 +222,13 @@ describe('AppearanceProvider element flows', () => {
   });
 });
 
-describe('AppearanceProvider layout flows', () => {
-  it('sets the parsedLayout correctly from the globalAppearance prop', () => {
+describe('AppearanceProvider options flows', () => {
+  it('sets the parsedOptions correctly from the globalAppearance prop', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://example.com/help',
             logoImageUrl: 'https://placehold.co/64x64.png',
             logoLinkUrl: 'https://example.com/',
@@ -246,23 +246,23 @@ describe('AppearanceProvider layout flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedLayout.helpPageUrl).toBe('https://example.com/help');
-    expect(result.current.parsedLayout.logoImageUrl).toBe('https://placehold.co/64x64.png');
-    expect(result.current.parsedLayout.logoLinkUrl).toBe('https://example.com/');
-    expect(result.current.parsedLayout.privacyPageUrl).toBe('https://example.com/privacy');
-    expect(result.current.parsedLayout.termsPageUrl).toBe('https://example.com/terms');
-    expect(result.current.parsedLayout.logoPlacement).toBe('inside');
-    expect(result.current.parsedLayout.showOptionalFields).toBe(false);
-    expect(result.current.parsedLayout.socialButtonsPlacement).toBe('bottom');
-    expect(result.current.parsedLayout.socialButtonsVariant).toBe('iconButton');
+    expect(result.current.parsedOptions.helpPageUrl).toBe('https://example.com/help');
+    expect(result.current.parsedOptions.logoImageUrl).toBe('https://placehold.co/64x64.png');
+    expect(result.current.parsedOptions.logoLinkUrl).toBe('https://example.com/');
+    expect(result.current.parsedOptions.privacyPageUrl).toBe('https://example.com/privacy');
+    expect(result.current.parsedOptions.termsPageUrl).toBe('https://example.com/terms');
+    expect(result.current.parsedOptions.logoPlacement).toBe('inside');
+    expect(result.current.parsedOptions.showOptionalFields).toBe(false);
+    expect(result.current.parsedOptions.socialButtonsPlacement).toBe('bottom');
+    expect(result.current.parsedOptions.socialButtonsVariant).toBe('iconButton');
   });
 
-  it('sets the parsedLayout correctly from the appearance prop', () => {
+  it('sets the parsedOptions correctly from the appearance prop', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         appearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://example.com/help',
             logoImageUrl: 'https://placehold.co/64x64.png',
             logoLinkUrl: 'https://example.com/',
@@ -280,23 +280,23 @@ describe('AppearanceProvider layout flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedLayout.helpPageUrl).toBe('https://example.com/help');
-    expect(result.current.parsedLayout.logoImageUrl).toBe('https://placehold.co/64x64.png');
-    expect(result.current.parsedLayout.logoLinkUrl).toBe('https://example.com/');
-    expect(result.current.parsedLayout.privacyPageUrl).toBe('https://example.com/privacy');
-    expect(result.current.parsedLayout.termsPageUrl).toBe('https://example.com/terms');
-    expect(result.current.parsedLayout.logoPlacement).toBe('outside');
-    expect(result.current.parsedLayout.showOptionalFields).toBe(true);
-    expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
-    expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
+    expect(result.current.parsedOptions.helpPageUrl).toBe('https://example.com/help');
+    expect(result.current.parsedOptions.logoImageUrl).toBe('https://placehold.co/64x64.png');
+    expect(result.current.parsedOptions.logoLinkUrl).toBe('https://example.com/');
+    expect(result.current.parsedOptions.privacyPageUrl).toBe('https://example.com/privacy');
+    expect(result.current.parsedOptions.termsPageUrl).toBe('https://example.com/terms');
+    expect(result.current.parsedOptions.logoPlacement).toBe('outside');
+    expect(result.current.parsedOptions.showOptionalFields).toBe(true);
+    expect(result.current.parsedOptions.socialButtonsPlacement).toBe('top');
+    expect(result.current.parsedOptions.socialButtonsVariant).toBe('blockButton');
   });
 
-  it('sets the parsedLayout correctly from the globalAppearance and appearance prop', () => {
+  it('sets the parsedOptions correctly from the globalAppearance and appearance prop', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
         globalAppearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://example.com/help',
             logoImageUrl: 'https://placehold.co/64x64.png',
             logoLinkUrl: 'https://example.com/',
@@ -309,7 +309,7 @@ describe('AppearanceProvider layout flows', () => {
           },
         }}
         appearance={{
-          layout: {
+          options: {
             helpPageUrl: 'https://second.example.com/help',
             logoImageUrl: 'https://placehold.co/32x32@2.png',
             logoLinkUrl: 'https://second.example.com/',
@@ -327,18 +327,18 @@ describe('AppearanceProvider layout flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    expect(result.current.parsedLayout.helpPageUrl).toBe('https://second.example.com/help');
-    expect(result.current.parsedLayout.logoImageUrl).toBe('https://placehold.co/32x32@2.png');
-    expect(result.current.parsedLayout.logoLinkUrl).toBe('https://second.example.com/');
-    expect(result.current.parsedLayout.privacyPageUrl).toBe('https://second.example.com/privacy');
-    expect(result.current.parsedLayout.termsPageUrl).toBe('https://second.example.com/terms');
-    expect(result.current.parsedLayout.logoPlacement).toBe('outside');
-    expect(result.current.parsedLayout.showOptionalFields).toBe(true);
-    expect(result.current.parsedLayout.socialButtonsPlacement).toBe('top');
-    expect(result.current.parsedLayout.socialButtonsVariant).toBe('blockButton');
+    expect(result.current.parsedOptions.helpPageUrl).toBe('https://second.example.com/help');
+    expect(result.current.parsedOptions.logoImageUrl).toBe('https://placehold.co/32x32@2.png');
+    expect(result.current.parsedOptions.logoLinkUrl).toBe('https://second.example.com/');
+    expect(result.current.parsedOptions.privacyPageUrl).toBe('https://second.example.com/privacy');
+    expect(result.current.parsedOptions.termsPageUrl).toBe('https://second.example.com/terms');
+    expect(result.current.parsedOptions.logoPlacement).toBe('outside');
+    expect(result.current.parsedOptions.showOptionalFields).toBe(true);
+    expect(result.current.parsedOptions.socialButtonsPlacement).toBe('top');
+    expect(result.current.parsedOptions.socialButtonsVariant).toBe('blockButton');
   });
 
-  it('removes the baseTheme when simpleStyles is passed to globalAppearance', () => {
+  it('removes the base theme when simpleStyles is passed to globalAppearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -359,7 +359,7 @@ describe('AppearanceProvider layout flows', () => {
     expect(result.current.parsedElements[0]['alert'].backgroundColor).toBe(themeAColor);
   });
 
-  it('removes the baseTheme when simpleStyles is passed to appearance', () => {
+  it('removes the base theme when simpleStyles is passed to appearance', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -426,7 +426,7 @@ describe('AppearanceProvider captcha', () => {
     expect(result.current.parsedCaptcha.language).toBe('el-GR');
   });
 
-  it('sets the parsedLayout correctly from the globalAppearance and appearance prop', () => {
+  it('sets the parsedOptions correctly from the globalAppearance and appearance prop', () => {
     const wrapper = ({ children }) => (
       <AppearanceProvider
         appearanceKey='signIn'
@@ -479,7 +479,7 @@ describe('AppearanceProvider theme flows', () => {
     );
 
     const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should include clerk theme styles (baseTheme will be included)
+    // Should include clerk theme styles (base theme will be included)
     expect(result.current.parsedElements.length).toBeGreaterThan(0);
   });
 
@@ -500,42 +500,7 @@ describe('AppearanceProvider theme flows', () => {
     expect(result.current.parsedElements.length).toBe(2);
   });
 
-  it('theme property takes precedence over deprecated baseTheme', () => {
-    const wrapper = ({ children }) => (
-      <AppearanceProvider
-        appearanceKey='signIn'
-        appearance={{
-          theme: 'simple',
-          baseTheme: 'clerk', // This should be ignored
-        }}
-      >
-        {children}
-      </AppearanceProvider>
-    );
-
-    const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should include both simple theme and base theme (2 elements total)
-    expect(result.current.parsedElements.length).toBe(2);
-  });
-
-  it('maintains backward compatibility with baseTheme property', () => {
-    const wrapper = ({ children }) => (
-      <AppearanceProvider
-        appearanceKey='signIn'
-        appearance={{
-          baseTheme: 'simple',
-        }}
-      >
-        {children}
-      </AppearanceProvider>
-    );
-
-    const { result } = renderHook(() => useAppearance(), { wrapper });
-    // Should work the same as theme: 'simple' (2 elements total)
-    expect(result.current.parsedElements.length).toBe(2);
-  });
-
-  it('supports object-based themes with new theme property', () => {
+  it('supports object-based themes with theme property', () => {
     const customTheme = {
       elements: {
         card: { backgroundColor: 'red' },
@@ -559,7 +524,7 @@ describe('AppearanceProvider theme flows', () => {
     expect(result.current.parsedElements.some(el => el.card?.backgroundColor === 'red')).toBe(true);
   });
 
-  it('supports array-based themes with new theme property', () => {
+  it('supports array-based themes with theme property', () => {
     const themeA = {
       elements: { card: { backgroundColor: 'red' } },
     };

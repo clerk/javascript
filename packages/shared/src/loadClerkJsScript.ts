@@ -43,7 +43,7 @@ export type LoadClerkUiScriptOptions = {
  *
  * @returns `true` if window.Clerk exists and has the expected structure with a load method.
  */
-function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__unstable_ClerkUiCtor'): boolean {
+function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__internal_ClerkUiCtor'): boolean {
   if (typeof window === 'undefined' || !(window as any)[prop]) {
     return false;
   }
@@ -53,7 +53,52 @@ function isClerkGlobalProperlyLoaded(prop: 'Clerk' | '__unstable_ClerkUiCtor'): 
   return !!val;
 }
 const isClerkProperlyLoaded = () => isClerkGlobalProperlyLoaded('Clerk');
-const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__unstable_ClerkUiCtor');
+const isClerkUiProperlyLoaded = () => isClerkGlobalProperlyLoaded('__internal_ClerkUiCtor');
+
+/**
+ * Checks if an existing script has a request error using Performance API.
+ *
+ * @param scriptUrl - The URL of the script to check.
+ * @returns True if the script has failed to load due to a network/HTTP error.
+ */
+function hasScriptRequestError(scriptUrl: string): boolean {
+  if (typeof window === 'undefined' || !window.performance) {
+    return false;
+  }
+
+  const entries = performance.getEntriesByName(scriptUrl, 'resource') as PerformanceResourceTiming[];
+
+  if (entries.length === 0) {
+    return false;
+  }
+
+  const scriptEntry = entries[entries.length - 1];
+
+  // transferSize === 0 with responseEnd === 0 indicates network failure
+  // transferSize === 0 with responseEnd > 0 might be a 4xx/5xx error or blocked request
+  if (scriptEntry.transferSize === 0 && scriptEntry.decodedBodySize === 0) {
+    // If there was no response at all, it's definitely an error
+    if (scriptEntry.responseEnd === 0) {
+      return true;
+    }
+    // If we got a response but no content, likely an HTTP error (4xx/5xx)
+    if (scriptEntry.responseEnd > 0 && scriptEntry.responseStart > 0) {
+      return true;
+    }
+
+    if ('responseStatus' in scriptEntry) {
+      const status = (scriptEntry as any).responseStatus;
+      if (status >= 400) {
+        return true;
+      }
+      if (scriptEntry.responseStatus === 0) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 /**
  * Hotloads the Clerk JS script with robust failure detection.
@@ -88,20 +133,30 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
     return null;
   }
 
-  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
-
-  if (existingScript) {
-    return waitForPredicateWithTimeout(timeout, isClerkProperlyLoaded, rejectWith());
-  }
-
   if (!opts?.publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
     return null;
   }
 
+  const scriptUrl = clerkJsScriptUrl(opts);
+  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-js-script]');
+
+  if (existingScript) {
+    if (hasScriptRequestError(scriptUrl)) {
+      existingScript.remove();
+    } else {
+      try {
+        await waitForPredicateWithTimeout(timeout, isClerkProperlyLoaded, rejectWith(), existingScript);
+        return null;
+      } catch {
+        existingScript.remove();
+      }
+    }
+  }
+
   const loadPromise = waitForPredicateWithTimeout(timeout, isClerkProperlyLoaded, rejectWith());
 
-  loadScript(clerkJsScriptUrl(opts), {
+  loadScript(scriptUrl, {
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
@@ -125,19 +180,30 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
     return null;
   }
 
-  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-ui-script]');
-
-  if (existingScript) {
-    return waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith());
-  }
-
   if (!opts?.publishableKey) {
     errorThrower.throwMissingPublishableKeyError();
     return null;
   }
 
+  const scriptUrl = clerkUiScriptUrl(opts);
+  const existingScript = document.querySelector<HTMLScriptElement>('script[data-clerk-ui-script]');
+
+  if (existingScript) {
+    if (hasScriptRequestError(scriptUrl)) {
+      existingScript.remove();
+    } else {
+      try {
+        await waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith(), existingScript);
+        return null;
+      } catch {
+        existingScript.remove();
+      }
+    }
+  }
+
   const loadPromise = waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith());
-  loadScript(clerkUiScriptUrl(opts), {
+
+  loadScript(scriptUrl, {
     async: true,
     crossOrigin: 'anonymous',
     nonce: opts.nonce,
@@ -223,6 +289,7 @@ function waitForPredicateWithTimeout(
   timeoutMs: number,
   predicate: () => boolean,
   rejectWith: Error,
+  existingScript?: HTMLScriptElement,
 ): Promise<HTMLScriptElement | null> {
   return new Promise((resolve, reject) => {
     let resolved = false;
@@ -231,6 +298,12 @@ function waitForPredicateWithTimeout(
       clearTimeout(timeoutId);
       clearInterval(pollInterval);
     };
+
+    // Bail out early if the script fails to load, instead of waiting for the entire timeout
+    existingScript?.addEventListener('error', () => {
+      cleanup(timeoutId, pollInterval);
+      reject(rejectWith);
+    });
 
     const checkAndResolve = () => {
       if (resolved) {

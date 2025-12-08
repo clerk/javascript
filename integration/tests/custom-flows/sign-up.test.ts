@@ -1,5 +1,3 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
-import { clerkSetup } from '@clerk/testing/playwright';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
@@ -18,20 +16,6 @@ test.describe('Custom Flows Sign Up @custom', () => {
     await app.setup();
     await app.withEnv(appConfigs.envs.withEmailCodes);
     await app.dev();
-
-    const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
-    const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
-    const apiUrl = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_API_URL');
-    const { frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
-
-    await clerkSetup({
-      publishableKey,
-      frontendApiUrl,
-      secretKey,
-      // @ts-expect-error
-      apiUrl,
-      dotenv: false,
-    });
 
     const u = createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser({

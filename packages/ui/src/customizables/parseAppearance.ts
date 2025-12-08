@@ -3,7 +3,7 @@ import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
 
 import { baseTheme, getBaseTheme } from '../baseTheme';
 import { createInternalTheme, defaultInternalTheme } from '../foundations';
-import type { Appearance, CaptchaAppearanceOptions, Elements, Layout, Theme } from '../internal/appearance';
+import type { Appearance, CaptchaAppearanceOptions, Elements, Options, Theme } from '../internal/appearance';
 import type { InternalTheme } from '../styledSystem';
 import {
   createColorScales,
@@ -17,12 +17,12 @@ import {
 
 export type ParsedElements = Elements[];
 export type ParsedInternalTheme = InternalTheme;
-export type ParsedLayout = Required<Layout>;
+export type ParsedOptions = Required<Options>;
 export type ParsedCaptcha = Required<CaptchaAppearanceOptions>;
 
 type PublicAppearanceTopLevelKey = keyof Omit<
   Appearance,
-  'baseTheme' | 'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
+  'theme' | 'elements' | 'layout' | 'variables' | 'captcha' | 'cssLayerName'
 >;
 
 export type AppearanceCascade = {
@@ -34,17 +34,17 @@ export type AppearanceCascade = {
 export type ParsedAppearance = {
   parsedElements: ParsedElements;
   parsedInternalTheme: ParsedInternalTheme;
-  parsedLayout: ParsedLayout;
+  parsedOptions: ParsedOptions;
   parsedCaptcha: ParsedCaptcha;
 };
 
-const defaultLayout: ParsedLayout = {
+const defaultOptions: ParsedOptions = {
   logoPlacement: 'inside',
   socialButtonsPlacement: 'top',
   socialButtonsVariant: 'auto',
   logoImageUrl: '',
   logoLinkUrl: '',
-  showOptionalFields: true,
+  showOptionalFields: false,
   helpPageUrl: '',
   privacyPageUrl: '',
   termsPageUrl: '',
@@ -75,7 +75,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
   );
 
   const parsedInternalTheme = parseVariables(appearanceList);
-  const parsedLayout = parseLayout(appearanceList);
+  const parsedOptions = parseOptions(appearanceList);
   const parsedCaptcha = parseCaptcha(appearanceList);
 
   if (
@@ -97,7 +97,7 @@ export const parseAppearance = (cascade: AppearanceCascade): ParsedAppearance =>
       return res;
     }),
   );
-  return { parsedElements, parsedInternalTheme, parsedLayout, parsedCaptcha };
+  return { parsedElements, parsedInternalTheme, parsedOptions, parsedCaptcha };
 };
 
 const expand = (theme: Theme | undefined, cascade: any[]) => {
@@ -105,15 +105,14 @@ const expand = (theme: Theme | undefined, cascade: any[]) => {
     return;
   }
 
-  // Use new 'theme' property if available, otherwise fall back to deprecated 'baseTheme'
-  const themeProperty = theme.theme !== undefined ? theme.theme : theme.baseTheme;
+  const themeProperty = theme.theme;
 
   if (themeProperty !== undefined) {
-    (Array.isArray(themeProperty) ? themeProperty : [themeProperty]).forEach(baseTheme => {
-      if (typeof baseTheme === 'string') {
-        expand(getBaseTheme(baseTheme), cascade);
+    (Array.isArray(themeProperty) ? themeProperty : [themeProperty]).forEach(t => {
+      if (typeof t === 'string') {
+        expand(getBaseTheme(t), cascade);
       } else {
-        expand(baseTheme as Theme, cascade);
+        expand(t as Theme, cascade);
       }
     });
   }
@@ -125,8 +124,8 @@ const parseElements = (appearances: Appearance[]) => {
   return appearances.map(appearance => ({ ...appearance?.elements }));
 };
 
-const parseLayout = (appearanceList: Appearance[]) => {
-  return { ...defaultLayout, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.layout }), {}) };
+const parseOptions = (appearanceList: Appearance[]) => {
+  return { ...defaultOptions, ...appearanceList.reduce((acc, appearance) => ({ ...acc, ...appearance.options }), {}) };
 };
 
 const parseCaptcha = (appearanceList: Appearance[]) => {

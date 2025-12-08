@@ -195,6 +195,10 @@ Read more about this in the [`clerk-docs` CONTRIBUTING.md](https://github.com/cl
 
 Then, to preview how the `<Typedoc />` component renders, the `clerk-docs` PR will have a Vercel preview. Or to get local previews set up, see the [section in `clerk/clerk` about setting up local docs](https://github.com/clerk/clerk?tab=readme-ov-file#5-optional-set-up-local-docs).
 
+### Experimental and internal APIs
+
+In some cases, we might need to add new methods to our publicly exposed APIs that are meant for internal use, or as experimental releases before the APIs are stabilized. For internal methods or properties, use the `__internal_` prefix. For experimental methods or properties that are attached to existing APIs, use the `__experimental_` prefix. For new exports, it is also acceptable to export from an `/experimental` subpath. Exports from `/experimental` are not covered by regular SemVer guarantees.
+
 ## Opening a Pull Request
 
 1. Search our repository for open or closed [Pull Requests](https://github.com/clerk/javascript/pulls) that relate to your submission. You don't want to duplicate effort.

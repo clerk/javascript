@@ -7,7 +7,7 @@ type AnimatedProps = PropsWithChildren<{ asChild?: boolean }>;
 
 export const Animated = (props: AnimatedProps) => {
   const { children, asChild } = props;
-  const { animations } = useAppearance().parsedLayout;
+  const { animations } = useAppearance().parsedOptions;
   const [parent] = useAutoAnimate();
 
   if (asChild) {

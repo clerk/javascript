@@ -693,7 +693,13 @@ export const caES: LocalizationResource = {
       subtitle: 'Introdueix la contrasenya associada al teu compte',
       title: 'Introdueix la teva contrasenya',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -867,10 +873,14 @@ export const caES: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded:
+      'La mida del fitxer supera el límit màxim de 10 MB. Si us plau, tria un fitxer més petit.',
+    avatar_file_type_invalid: 'El tipus de fitxer no és compatible. Si us plau, puja una imatge JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:
@@ -880,6 +890,7 @@ export const caES: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'No hem trobat cap compte amb aquests detalls.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
     form_param_format_invalid__phone_number: 'El número de telèfon ha de tenir un format internacional vàlid.',
@@ -899,9 +910,11 @@ export const caES: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'La teva contrasenya ha superat el nombre màxim de bytes permesos, si us plau, redueix-la o elimina alguns caràcters especials.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contrasenya incorrecta',
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
+    form_username_needs_non_number_char: "El vostre nom d'usuari ha de contenir almenys un caràcter no numèric.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
     not_allowed_access:
       "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",

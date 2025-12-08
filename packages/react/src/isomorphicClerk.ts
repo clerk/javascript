@@ -48,6 +48,7 @@ import type {
   SignUpResource,
   State,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   TasksRedirectOptions,
   UnsubscribeCallback,
   UserAvatarProps,
@@ -85,7 +86,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
-  __unstable_ClerkUiCtor?: ClerkUiConstructor;
+  __internal_ClerkUiCtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -152,7 +153,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
-
+  private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
   // A separate Map of `addListener` method calls to handle multiple listeners.
   private premountAddListenerCalls = new Map<
     ListenerCallback,
@@ -521,11 +522,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       nonce: this.options.nonce,
     });
 
-    if (!global.__unstable_ClerkUiCtor) {
+    if (!global.__internal_ClerkUiCtor) {
       throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
     }
 
-    return global.__unstable_ClerkUiCtor;
+    return global.__internal_ClerkUiCtor;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -689,6 +690,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.mountTaskChooseOrganization(node, props);
     });
 
+    this.premountTaskResetPasswordNodes.forEach((props, node) => {
+      clerkjs.mountTaskResetPassword(node, props);
+    });
+
     /**
      * Only update status in case `clerk.status` is missing. In any other case, `clerk-js` should be the orchestrator.
      */
@@ -745,9 +750,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __unstable__environment(): any {
+  get __internal_environment(): any {
     if (this.clerkjs) {
-      return (this.clerkjs as any).__unstable__environment;
+      return (this.clerkjs as any).__internal_environment;
       // TODO: add ssr condition
     } else {
       return undefined;
@@ -780,20 +785,20 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       : this.#stateProxy.checkoutSignal(...args);
   };
 
-  __unstable__setEnvironment(...args: any): void {
-    if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
-      (this.clerkjs as any).__unstable__setEnvironment(args);
+  __internal_setEnvironment(...args: any): void {
+    if (this.clerkjs && '__internal_setEnvironment' in this.clerkjs) {
+      (this.clerkjs as any).__internal_setEnvironment(args);
     } else {
       return undefined;
     }
   }
 
   // TODO @userland-errors:
-  __unstable__updateProps = async (props: any): Promise<void> => {
+  __internal_updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
-    if (clerkjs && '__unstable__updateProps' in clerkjs) {
-      return (clerkjs as any).__unstable__updateProps(props);
+    if (clerkjs && '__internal_updateProps' in clerkjs) {
+      return (clerkjs as any).__internal_updateProps(props);
     }
   };
 
@@ -1230,6 +1235,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       this.clerkjs.unmountTaskChooseOrganization(node);
     } else {
       this.premountTaskChooseOrganizationNodes.delete(node);
+    }
+  };
+
+  mountTaskResetPassword = (node: HTMLDivElement, props?: TaskResetPasswordProps): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.mountTaskResetPassword(node, props);
+    } else {
+      this.premountTaskResetPasswordNodes.set(node, props);
+    }
+  };
+
+  unmountTaskResetPassword = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.unmountTaskResetPassword(node);
+    } else {
+      this.premountTaskResetPasswordNodes.delete(node);
     }
   };
 

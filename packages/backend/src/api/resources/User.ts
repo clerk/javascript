@@ -124,11 +124,11 @@ export class User {
      */
     readonly lastActiveAt: number | null,
     /**
-     * A boolean indicating whether the organization creation is enabled for the user or not.
+     * A boolean indicating whether the Organization creation is enabled for the user or not.
      */
     readonly createOrganizationEnabled: boolean,
     /**
-     * An integer indicating the number of organizations that can be created by the user. If the value is `0`, then the user can create unlimited organizations. Default is `null`.
+     * An integer indicating the number of Organizations that can be created by the user. If the value is `0`, then the user can create unlimited Organizations. Default is `null`.
      */
     readonly createOrganizationsLimit: number | null = null,
     /**

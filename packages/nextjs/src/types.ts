@@ -16,7 +16,7 @@ export type NextClerkProviderProps<TUi extends Ui = Ui> = Without<ClerkProviderP
    *
    * @default true
    */
-  __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
+  __internal_invokeMiddlewareOnAuthStateChange?: boolean;
   /**
    * If set to true, ClerkProvider will opt into dynamic rendering and make auth data available to all wrapper components.
    *

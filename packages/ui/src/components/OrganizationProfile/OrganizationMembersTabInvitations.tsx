@@ -9,12 +9,10 @@ import { mqu } from '../../styledSystem';
 import { DomainList } from './DomainList';
 import { InvitedMembersList } from './InvitedMembersList';
 import { MembersActionsRow } from './MembersActions';
-import { MembershipWidget } from './MembershipWidget';
 
 export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
   const { organizationSettings } = useEnvironment();
-  //@ts-expect-error
-  const { __unstable_manageBillingUrl, navigateToGeneralPageRoot } = useOrganizationProfileContext();
+  const { navigateToGeneralPageRoot } = useOrganizationProfileContext();
 
   const isDomainsEnabled = organizationSettings?.domains?.enabled;
 
@@ -25,8 +23,6 @@ export const OrganizationMembersTabInvitations = withCardStateProvider(() => {
         width: '100%',
       }}
     >
-      {__unstable_manageBillingUrl && <MembershipWidget />}
-
       {isDomainsEnabled && (
         <Protect permission={'org:sys_domains:manage'}>
           <Flex

@@ -17,14 +17,13 @@ import type {
   UserProfileProps,
   WaitlistProps,
 } from '@clerk/shared/types';
-
-import type { Appearance } from './internal/appearance';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import React, { Suspense } from 'react';
 
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
+import type { Appearance } from './internal/appearance';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
@@ -202,7 +201,7 @@ export const mountComponentRenderer = (
   moduleManager: ModuleManager,
 ) => {
   const options = { ..._options };
-  // Extract cssLayerName from baseTheme if present and move it to appearance level
+  // Extract cssLayerName from theme if present and move it to appearance level
   if (options.appearance) {
     options.appearance = extractCssLayerNameFromAppearance(options.appearance);
   }

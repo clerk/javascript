@@ -12,8 +12,6 @@ export const createEmailService = () => {
 
   const fetcher = async (url: string | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers || {});
-    // eslint-disable-next-line turbo/no-undeclared-env-vars
-    headers.set('Mailsac-Key', process.env.MAILSAC_API_KEY);
     return fetch(url, { ...init, headers });
   };
 

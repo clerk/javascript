@@ -51,7 +51,7 @@ export interface HookParams
     }
   > {
   /**
-   * Specifies whether to fetch for the current user or organization.
+   * Specifies whether to fetch for the current user or Organization.
    *
    * @default 'user'
    */
@@ -60,7 +60,7 @@ export interface HookParams
 
 /**
  * A hook factory that creates paginated data fetching hooks for commerce-related resources.
- * It provides a standardized way to create hooks that can fetch either user or organization resources
+ * It provides a standardized way to create hooks that can fetch either user or Organization resources
  * with built-in pagination support.
  *
  * The generated hooks handle:
@@ -129,7 +129,7 @@ export function createBillingPaginatedHook<TResource extends ClerkResource, TPar
         keepPreviousData: safeValues.keepPreviousData,
         infinite: safeValues.infinite,
         enabled: isEnabled,
-        ...(options?.unauthenticated ? {} : { isSignedIn: Boolean(user) }),
+        ...(options?.unauthenticated ? {} : { isSignedIn: user !== null }),
         __experimental_mode: safeValues.__experimental_mode,
         initialPage: safeValues.initialPage,
         pageSize: safeValues.pageSize,

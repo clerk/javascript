@@ -501,7 +501,7 @@ export interface Clerk {
   unmountUserProfile: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mount an organization profile component at the target element.
+   * Mount an Organization profile component at the target element.
    *
    * @param targetNode - Target to mount the OrganizationProfile component.
    * @param props - Configuration parameters.
@@ -509,7 +509,7 @@ export interface Clerk {
   mountOrganizationProfile: (targetNode: HTMLDivElement, props?: OrganizationProfileProps) => void;
 
   /**
-   * Unmount the organization profile component from the target node.
+   * Unmount the Organization profile component from the target node.
    *
    * @param targetNode - Target node to unmount the OrganizationProfile component from.
    */
@@ -531,7 +531,7 @@ export interface Clerk {
   unmountCreateOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Mount an organization switcher component at the target element.
+   * Mount an Organization switcher component at the target element.
    *
    * @param targetNode - Target to mount the OrganizationSwitcher component.
    * @param props - Configuration parameters.
@@ -539,14 +539,14 @@ export interface Clerk {
   mountOrganizationSwitcher: (targetNode: HTMLDivElement, props?: OrganizationSwitcherProps) => void;
 
   /**
-   * Unmount the organization profile component from the target node.*
+   * Unmount the Organization switcher component from the target node.*
    *
    * @param targetNode - Target node to unmount the OrganizationSwitcher component from.
    */
   unmountOrganizationSwitcher: (targetNode: HTMLDivElement) => void;
 
   /**
-   * Prefetches the data displayed by an organization switcher.
+   * Prefetches the data displayed by an Organization switcher.
    * It can be used when `mountOrganizationSwitcher({ asStandalone: true})`, to avoid unwanted loading states.
    *
    * @experimental This experimental API is subject to change.
@@ -556,7 +556,7 @@ export interface Clerk {
   __experimental_prefetchOrganizationSwitcher: () => void;
 
   /**
-   * Mount an organization list component at the target element.
+   * Mount an Organization list component at the target element.
    *
    * @param targetNode - Target to mount the OrganizationList component.
    * @param props - Configuration parameters.
@@ -564,7 +564,7 @@ export interface Clerk {
   mountOrganizationList: (targetNode: HTMLDivElement, props?: OrganizationListProps) => void;
 
   /**
-   * Unmount the organization list component from the target node.*
+   * Unmount the Organization list component from the target node.*
    *
    * @param targetNode - Target node to unmount the OrganizationList component from.
    */
@@ -657,6 +657,22 @@ export interface Clerk {
   unmountTaskChooseOrganization: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mounts a TaskResetPassword component at the target element.
+   *
+   * @param targetNode - Target node to mount the TaskResetPassword component.
+   * @param props - configuration parameters.
+   */
+  mountTaskResetPassword: (targetNode: HTMLDivElement, props?: TaskResetPasswordProps) => void;
+
+  /**
+   * Unmount a TaskResetPassword component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the TaskResetPassword component from.
+   */
+  unmountTaskResetPassword: (targetNode: HTMLDivElement) => void;
+
+  /**
    * @internal
    * Loads Stripe libraries for commerce functionality
    */
@@ -703,7 +719,7 @@ export interface Clerk {
   __internal_addNavigationListener: (callback: () => void) => UnsubscribeCallback;
 
   /**
-   * Set the active session and organization explicitly.
+   * Set the active session and Organization explicitly.
    *
    * If the session param is `null`, the active session is deleted.
    * In a similar fashion, if the organization param is `null`, the current organization is removed as active.
@@ -910,12 +926,12 @@ export interface Clerk {
   ) => Promise<SignInResource | SignUpResource>;
 
   /**
-   * Creates an organization, adding the current user as admin.
+   * Creates an Organization, adding the current user as admin.
    */
   createOrganization: (params: CreateOrganizationParams) => Promise<OrganizationResource>;
 
   /**
-   * Retrieves a single organization by id.
+   * Retrieves a single Organization by ID.
    */
   getOrganization: (organizationId: string) => Promise<OrganizationResource>;
 
@@ -1058,7 +1074,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
     // TODO @nikos
     appearance?: any;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -1071,7 +1087,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -1122,7 +1138,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     sdkMetadata?: SDKMetadata;
     /**
-     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/customizing-clerk/account-portal#waitlist).
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/account-portal/overview#waitlist).
      */
     waitlistUrl?: string;
     /**
@@ -1175,7 +1191,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      *
      * @default undefined
      */
-    taskUrls?: Record<SessionTask['key'], string>;
+    taskUrls?: Partial<Record<SessionTask['key'], string>>;
   };
 
 export interface NavigateOptions {
@@ -1288,7 +1304,7 @@ export type SetActiveParams = {
   session?: SignedInSessionResource | string | null;
 
   /**
-   * The organization resource or organization ID/slug (string version) to be set as active in the current session. If `null`, the currently active organization is removed as active.
+   * The Organization resource or Organization ID/slug (string version) to be set as active in the current session. If `null`, the currently Active Organization is removed as active.
    */
   organization?: OrganizationResource | string | null;
 
@@ -1298,7 +1314,7 @@ export type SetActiveParams = {
   redirectUrl?: string;
 
   /**
-   * A custom navigation function to be called just before the session and/or organization is set.
+   * A custom navigation function to be called just before the session and/or Organization is set.
    *
    * When provided, it takes precedence over the `redirectUrl` parameter for navigation.
    *
@@ -1596,7 +1612,7 @@ export type UserProfileModalProps = WithoutRouting<UserProfileProps>;
 
 export type OrganizationProfileProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate to after the user leaves the currently active organization.
+   * Full URL or path to navigate to after the user leaves the currently Active Organization.
    *
    * @default undefined
    */
@@ -1612,7 +1628,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    */
   customPages?: CustomPage[];
   /**
-   * Specify on which page the organization profile modal will open.
+   * Specify on which page the Organization profile modal will open.
    *
    * @example __experimental_startPath: '/organization-members'
    *
@@ -1639,7 +1655,7 @@ export type OrganizationProfileModalProps = WithoutRouting<OrganizationProfilePr
 
 export type CreateOrganizationProps = RoutingOptions & {
   /**
-   * Full URL or path to navigate to after creating a new organization.
+   * Full URL or path to navigate to after creating a new Organization.
    *
    * @default undefined
    */
@@ -1647,7 +1663,7 @@ export type CreateOrganizationProps = RoutingOptions & {
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Hides the screen for sending invitations after an organization is created.
+   * Hides the screen for sending invitations after an Organization is created.
    *
    * @default undefined When left undefined Clerk will automatically hide the screen if
    * the number of max allowed members is equal to 1
@@ -1760,10 +1776,10 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
     __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
     /**
-     * By default, users can switch between organization and their personal account.
+     * By default, users can switch between Organization and their personal account.
      * This option controls whether OrganizationSwitcher will include the user's personal account
-     * in the organization list. Setting this to `false` will hide the personal account entry,
-     * and users will only be able to switch between organizations.
+     * in the Organization list. Setting this to `false` will hide the personal account entry,
+     * and users will only be able to switch between Organizations.
      *
      * @default true
      */
@@ -1777,7 +1793,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
       | ((organization: OrganizationResource) => string)
       | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
     /**
-     * Full URL or path to navigate to after a successful organization selection.
+     * Full URL or path to navigate to after a successful Organization selection.
      * Accepts a function that returns URL or path
      *
      * @default undefined`
@@ -1793,13 +1809,13 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
     /**
-     * Full URL or path to navigate to after the user leaves the currently active organization.
+     * Full URL or path to navigate to after the user leaves the currently Active Organization.
      *
      * @default undefined
      */
     afterLeaveOrganizationUrl?: string;
     /**
-     * Hides the screen for sending invitations after an organization is created.
+     * Hides the screen for sending invitations after an Organization is created.
      *
      * @default undefined When left undefined Clerk will automatically hide the screen if
      * the number of max allowed members is equal to 1
@@ -1820,7 +1836,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
 
 export type OrganizationListProps = {
   /**
-   * Full URL or path to navigate to after creating a new organization.
+   * Full URL or path to navigate to after creating a new Organization.
    *
    * @default undefined
    */
@@ -1828,7 +1844,7 @@ export type OrganizationListProps = {
     | ((organization: OrganizationResource) => string)
     | LooseExtractedParams<PrimitiveKeys<OrganizationResource>>;
   /**
-   * Full URL or path to navigate to after a successful organization selection.
+   * Full URL or path to navigate to after a successful Organization selection.
    * Accepts a function that returns URL or path
    *
    * @default undefined`
@@ -1843,17 +1859,17 @@ export type OrganizationListProps = {
    */
   appearance?: ClerkAppearanceTheme;
   /**
-   * Hides the screen for sending invitations after an organization is created.
+   * Hides the screen for sending invitations after an Organization is created.
    *
    * @default undefined When left undefined Clerk will automatically hide the screen if
    * the number of max allowed members is equal to 1
    */
   skipInvitationScreen?: boolean;
   /**
-   * By default, users can switch between organization and their personal account.
+   * By default, users can switch between Organization and their personal account.
    * This option controls whether OrganizationList will include the user's personal account
-   * in the organization list. Setting this to `false` will hide the personal account entry,
-   * and users will only be able to switch between organizations.
+   * in the Organization list. Setting this to `false` will hide the personal account entry,
+   * and users will only be able to switch between Organizations.
    *
    * @default true
    */
@@ -1894,7 +1910,7 @@ type PricingTableDefaultProps = {
    */
   ctaPosition?: 'top' | 'bottom';
   /**
-   * Whether to collapse features on the pricing table.
+   * Whether to collapse Features on the pricing table.
    *
    * @default false
    */
@@ -1910,7 +1926,7 @@ type PricingTableDefaultProps = {
 type PricingTableBaseProps = {
   /**
    * The subscriber type to display plans for.
-   * If `organization`, show plans for the active organization; otherwise for the user.
+   * If `organization`, show Plans for the Active Organization; otherwise for the user.
    *
    * @default 'user'
    */
@@ -2022,7 +2038,7 @@ export type __internal_PlanDetailsProps = (
     }
   | {
       /**
-       * The plan object will be used as initial data until the plan is fetched from the server.
+       * The Plan object will be used as initial data until the Plan is fetched from the server.
        */
       plan: BillingPlanResource;
       planId?: never;
@@ -2044,7 +2060,7 @@ export type __experimental_PlanDetailsButtonProps = (
     }
   | {
       /**
-       * The plan object will be used as initial data until the plan is fetched from the server.
+       * The Plan object will be used as initial data until the Plan is fetched from the server.
        */
       plan: BillingPlanResource;
       planId?: never;
@@ -2064,7 +2080,7 @@ export type __experimental_PlanDetailsButtonProps = (
 export type __internal_SubscriptionDetailsProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `organization` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the Active Organization.
    *
    * @default 'user'
    */
@@ -2081,7 +2097,7 @@ export type __internal_SubscriptionDetailsProps = {
 export type __experimental_SubscriptionDetailsButtonProps = {
   /**
    * The subscriber type to display the subscription details for.
-   * If `organization` is provided, the subscription details will be displayed for the active organization.
+   * If `organization` is provided, the subscription details will be displayed for the Active Organization.
    *
    * @default 'user'
    */
@@ -2217,11 +2233,11 @@ export type CreateBulkOrganizationInvitationParams = {
  */
 export interface CreateOrganizationParams {
   /**
-   * The name of the organization.
+   * The name of the Organization.
    */
   name: string;
   /**
-   * The slug of the organization.
+   * The slug of the Organization.
    */
   slug?: string;
 }
