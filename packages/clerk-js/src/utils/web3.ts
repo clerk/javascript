@@ -53,12 +53,13 @@ export const generateWeb3Signature: GenerateSignature = async (params): Promise<
 
   if (provider === 'solana') {
     try {
-      const walletAccount = (wallet as SolanaWalletAdapterWallet).accounts.find(a => a.address === identifier);
+      const solanaWallet = wallet as SolanaWalletAdapterWallet;
+      const walletAccount = solanaWallet.accounts.find(a => a.address === identifier);
       if (!walletAccount) {
         console.warn(`Wallet account with address ${identifier} not found`);
         return '';
       }
-      const signedMessages = await (wallet as SolanaWalletAdapterWallet).features[SolanaSignMessage]?.signMessage({
+      const signedMessages = await solanaWallet.features[SolanaSignMessage]?.signMessage({
         account: walletAccount,
         message: new TextEncoder().encode(nonce),
       });
