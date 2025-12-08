@@ -1,12 +1,12 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
+import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 
 import { ClerkGoogleOneTapSignIn, isSuccessResponse } from '../google-one-tap';
 import { errorThrower } from '../utils/errors';
 
-// Type for unsafe metadata that can be attached to sign-ups
-type SignUpUnsafeMetadata = Record<string, any>;
+type SignUpUnsafeMetadata = Record<string, unknown>;
 
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
@@ -14,9 +14,9 @@ export type StartGoogleAuthenticationFlowParams = {
 
 export type StartGoogleAuthenticationFlowReturnType = {
   createdSessionId: string | null;
-  setActive?: any;
-  signIn?: any;
-  signUp?: any;
+  setActive?: SetActive;
+  signIn?: SignInResource;
+  signUp?: SignUpResource;
 };
 
 /**
@@ -101,13 +101,10 @@ export function useSignInWithGoogle() {
     // Generate a cryptographic nonce for replay attack protection
     const nonce = Crypto.randomUUID();
 
-    // Hash the nonce with SHA-256 (Google requires the hashed version)
-    const hashedNonce = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, nonce);
-
     try {
       // Present Google Sign-In UI with nonce
       const response = await ClerkGoogleOneTapSignIn.presentExplicitSignIn({
-        nonce: hashedNonce,
+        nonce,
       });
 
       // User cancelled

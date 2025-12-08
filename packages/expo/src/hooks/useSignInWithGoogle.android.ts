@@ -1,5 +1,5 @@
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/types';
+import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 
@@ -95,14 +95,11 @@ export function useSignInWithGoogle() {
     // Generate a cryptographic nonce for replay attack protection
     const nonce = Crypto.randomUUID();
 
-    // Hash the nonce with SHA-256 (Google requires the hashed version)
-    const hashedNonce = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, nonce);
-
     try {
       // Try to sign in with Google One Tap (shows saved accounts)
       // Using presentExplicitSignIn for consistent "Sign in with Google" button behavior
       const response = await ClerkGoogleOneTapSignIn.presentExplicitSignIn({
-        nonce: hashedNonce,
+        nonce,
       });
 
       // User cancelled

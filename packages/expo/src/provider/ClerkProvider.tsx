@@ -1,7 +1,7 @@
 import '../polyfills';
 
-import { ClerkProvider as ClerkReactProvider } from '@clerk/react';
-import type { Ui } from '@clerk/react/internal';
+import { ClerkProvider as ClerkReactProvider } from '@clerk/clerk-react';
+import type { Without } from '@clerk/shared/types';
 import * as WebBrowser from 'expo-web-browser';
 
 import type { TokenCache } from '../cache/types';
