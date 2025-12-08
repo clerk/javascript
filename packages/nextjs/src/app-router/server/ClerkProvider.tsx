@@ -7,8 +7,10 @@ import { PromisifiedAuthProvider } from '../../client-boundary/PromisifiedAuthPr
 import { getDynamicAuthData } from '../../server/buildClerkProps';
 import type { NextClerkProviderProps } from '../../types';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
+import { onlyTry } from '../../utils/only-try';
 import { isNext13 } from '../../utils/sdk-versions';
 import { ClientClerkProvider } from '../client/ClerkProvider';
+import { SuspenseWhenCached } from '../suspense-when-cached';
 import { getKeylessStatus, KeylessProvider } from './keyless-provider';
 import { buildRequestLike, getScriptNonceFromHeader } from './utils';
 
@@ -65,39 +67,48 @@ export async function ClerkProvider(
     ...rest,
   });
 
-  const { shouldRunAsKeyless, runningWithClaimedKeys } = await getKeylessStatus(propsWithEnvs);
+  const { shouldRunAsKeyless, runningWithClaimedKeys, runningWithDriftedKeys } = await getKeylessStatus(propsWithEnvs);
+
+  if (runningWithDriftedKeys) {
+    onlyTry(async () => {
+      const detectKeylessEnvDrift = await import('../../server/keyless-telemetry.js').then(
+        mod => mod.detectKeylessEnvDrift,
+      );
+      await detectKeylessEnvDrift();
+    });
+  }
 
   let output: ReactNode;
 
-  try {
-    const detectKeylessEnvDrift = await import('../../server/keyless-telemetry.js').then(
-      mod => mod.detectKeylessEnvDrift,
-    );
-    await detectKeylessEnvDrift();
-  } catch {
-    // ignore
-  }
-
   if (shouldRunAsKeyless) {
     output = (
-      <KeylessProvider
-        rest={propsWithEnvs}
-        generateNonce={generateNonce}
-        generateStatePromise={generateStatePromise}
-        runningWithClaimedKeys={runningWithClaimedKeys}
-      >
-        {children}
-      </KeylessProvider>
+      <SuspenseWhenCached>
+        <KeylessProvider
+          rest={propsWithEnvs}
+          generateNonce={generateNonce}
+          generateStatePromise={generateStatePromise}
+          runningWithClaimedKeys={runningWithClaimedKeys}
+        >
+          {children}
+        </KeylessProvider>
+      </SuspenseWhenCached>
     );
   } else {
     output = (
-      <ClientClerkProvider
-        {...propsWithEnvs}
-        nonce={await generateNonce()}
-        initialState={await generateStatePromise()}
+      // This suspense boundary is required because `cacheComponents` does not like the fact that we await `generateNonce` even though it does not accesss runtime APIs.
+      <SuspenseWhenCached
+        // When dynamic is true, we don't want to ever wrap with Suspense, instead we should let the developer handle it.
+        noopWhen={dynamic}
       >
-        {children}
-      </ClientClerkProvider>
+        <ClientClerkProvider
+          {...propsWithEnvs}
+          nonce={await generateNonce()}
+          initialState={await generateStatePromise()}
+          disableKeylessDriftDetection
+        >
+          {children}
+        </ClientClerkProvider>
+      </SuspenseWhenCached>
     );
   }
 
