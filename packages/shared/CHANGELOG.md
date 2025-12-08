@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.39.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+## 3.38.0
+
+### Minor Changes
+
+- Improve error handling and retry logic when loading `@clerk/clerk-js`. ([#6860](https://github.com/clerk/javascript/pull/6860)) by [@brkalow](https://github.com/brkalow)
+
+- Introduce new `<TaskResetPassword/>` session task component ([#7314](https://github.com/clerk/javascript/pull/7314)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Fix for allowing task url customization for specific tasks instead of requiring them all ([#7354](https://github.com/clerk/javascript/pull/7354)) by [@octoper](https://github.com/octoper)
+
+- Show the correct error message on `form_new_password_matches_current` error code ([#7372](https://github.com/clerk/javascript/pull/7372)) by [@octoper](https://github.com/octoper)
+
+- Rename internal `isPasswordUntrustedError` to `isPasswordCompromisedError` ([#7352](https://github.com/clerk/javascript/pull/7352)) by [@octoper](https://github.com/octoper)
+
 ## 3.37.0
 
 ### Minor Changes

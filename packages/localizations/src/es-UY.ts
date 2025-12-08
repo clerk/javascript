@@ -885,6 +885,9 @@ export const esUY: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded:
+      'El tamaño del archivo supera el límite máximo de 10 MB. Por favor, elegí un archivo más pequeño.',
+    avatar_file_type_invalid: 'Tipo de archivo no compatible. Por favor, subí una imagen JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       'El registro no se pudo completar debido a validaciones de seguridad fallidas. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
     captcha_unavailable:

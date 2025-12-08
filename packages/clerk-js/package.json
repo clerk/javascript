@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.112.1",
+  "version": "5.114.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -35,7 +35,7 @@
     "build:analyze": "rspack build --config rspack.config.js --env production --env variant=\"clerk.browser\" --env analysis --analyze",
     "build:bundle": "pnpm clean && rspack build --config rspack.config.js --env production",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "build:sandbox": "rspack build --config rspack.config.js --env production --env sandbox",
+    "build:sandbox": "pnpm --filter @clerk/ui build:umd && rspack build --config rspack.config.js --env production --env sandbox",
     "build:stats": "rspack build --config rspack.config.js --env production --json=stats.json --env variant=\"clerk.browser\"",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",

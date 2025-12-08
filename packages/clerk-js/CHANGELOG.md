@@ -1,5 +1,52 @@
 # Change Log
 
+## 5.114.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Improve error handling for invalid avatar file uploads. Previously, avatar images which exceeded the max file size limit of 10MB did not return an error within the Avatar upload component so the user was unaware why their upload did not work. ([#7357](https://github.com/clerk/javascript/pull/7357)) by [@jigar-clerk](https://github.com/jigar-clerk)
+
+- Country code updates: Aland Islands, Ascension Island, Kosovo, Mayotte, Western Sahara, and updated names for Algeria, Congo (split into Democratic Republic and Republic), Macedonia (to North Macedonia), and Swaziland (to Eswatini). ([#7378](https://github.com/clerk/javascript/pull/7378)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
+- Updated dependencies [[`b117ebc`](https://github.com/clerk/javascript/commit/b117ebc956e1a5d48d5fdb7210de3344a74a524a)]:
+  - @clerk/localizations@3.30.0
+  - @clerk/shared@3.39.0
+
+## 5.113.0
+
+### Minor Changes
+
+- Introduce new `<TaskResetPassword/>` session task component ([#7314](https://github.com/clerk/javascript/pull/7314)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Show the correct error message on `form_new_password_matches_current` error code ([#7372](https://github.com/clerk/javascript/pull/7372)) by [@octoper](https://github.com/octoper)
+
+- Rename internal `isPasswordUntrustedError` to `isPasswordCompromisedError` ([#7352](https://github.com/clerk/javascript/pull/7352)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`e31f3d5`](https://github.com/clerk/javascript/commit/e31f3d567302f99d8d073ba75cd934fb3c1eca7f), [`8376789`](https://github.com/clerk/javascript/commit/8376789de2383b52fabc563a9382622627055ecd), [`f917d68`](https://github.com/clerk/javascript/commit/f917d68fc2fc5d317770491e9d4d7185e1985d04), [`818c25a`](https://github.com/clerk/javascript/commit/818c25a9eec256245152725c64419c73e762c1a2), [`b41c0d5`](https://github.com/clerk/javascript/commit/b41c0d539835a5a43d15e3399bac7cbf046d9345), [`b41c0d5`](https://github.com/clerk/javascript/commit/b41c0d539835a5a43d15e3399bac7cbf046d9345)]:
+  - @clerk/shared@3.38.0
+  - @clerk/localizations@3.29.1
+
 ## 5.112.1
 
 ### Patch Changes
