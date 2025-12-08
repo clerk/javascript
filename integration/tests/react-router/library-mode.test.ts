@@ -7,6 +7,7 @@ import { createTestUtils } from '../../testUtils';
 
 test.describe('Library Mode basic tests for @react-router', () => {
   test.describe.configure({ mode: 'parallel' });
+
   let app: Application;
   let fakeUser: FakeUser;
   let fakeOrganization: FakeOrganization;

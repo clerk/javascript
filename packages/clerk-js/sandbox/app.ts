@@ -37,6 +37,7 @@ const AVAILABLE_COMPONENTS = [
   'apiKeys',
   'oauthConsent',
   'taskChooseOrganization',
+  'taskResetPassword',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -99,6 +100,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   apiKeys: buildComponentControls('apiKeys'),
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
+  taskResetPassword: buildComponentControls('taskResetPassword'),
 };
 
 declare global {
@@ -348,6 +350,14 @@ void (async () => {
       Clerk.mountTaskChooseOrganization(
         app,
         componentControls.taskChooseOrganization.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
+        },
+      );
+    },
+    '/task-reset-password': () => {
+      Clerk.mountTaskResetPassword(
+        app,
+        componentControls.taskResetPassword.getProps() ?? {
           redirectUrlComplete: '/user-profile',
         },
       );

@@ -1,7 +1,7 @@
 ---
 import CustomProfilePageRenderer from '../CustomProfilePageRenderer.astro';
 
-const reorderItemsLabels = ['general', 'members'] as const;
+const reorderItemsLabels = ['general', 'members', 'billing', 'apiKeys'] as const;
 type ReorderItemsLabels = (typeof reorderItemsLabels)[number];
 
 type Props<Label extends string> = {

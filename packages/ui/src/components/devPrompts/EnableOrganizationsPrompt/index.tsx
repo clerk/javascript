@@ -46,7 +46,7 @@ const EnableOrganizationsPromptInternal = ({
       params.organization_allow_personal_accounts = allowPersonalAccount;
     }
 
-    void new DevTools()
+    void environment
       .__internal_enableEnvironmentSetting(params)
       .then(() => {
         setIsEnabled(true);

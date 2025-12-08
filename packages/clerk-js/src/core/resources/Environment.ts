@@ -2,6 +2,7 @@ import type {
   AuthConfigResource,
   CommerceSettingsResource,
   DisplayConfigResource,
+  EnableEnvironmentSettingParams,
   EnvironmentJSON,
   EnvironmentJSONSnapshot,
   EnvironmentResource,
@@ -100,5 +101,12 @@ export class Environment extends BaseResource implements EnvironmentResource {
       api_keys_settings: this.apiKeysSettings.__internal_toSnapshot(),
       protect_config: this.protectConfig.__internal_toSnapshot(),
     };
+  }
+
+  async __internal_enableEnvironmentSetting(params: EnableEnvironmentSettingParams) {
+    await this._basePatch({
+      path: `/dev_tools/enable_environment_setting`,
+      body: params,
+    });
   }
 }

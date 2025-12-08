@@ -10,9 +10,9 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/express', linkPackage('express', 'integration'))
-  .addDependency('@clerk/clerk-js', linkPackage('clerk-js', 'integration'))
-  .addDependency('@clerk/ui', linkPackage('ui', 'integration'));
+  .addDependency('@clerk/express', linkPackage('express'))
+  .addDependency('@clerk/clerk-js', linkPackage('clerk-js'))
+  .addDependency('@clerk/ui', linkPackage('ui'));
 
 export const express = {
   vite,

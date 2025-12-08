@@ -21,7 +21,7 @@ export type CustomPageContent = {
 };
 
 type ProfileReorderItem = {
-  label: 'account' | 'security' | 'members' | 'general';
+  label: 'account' | 'security' | 'members' | 'general' | 'billing' | 'apiKeys';
 };
 
 type ProfileCustomPage = {

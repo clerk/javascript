@@ -7,6 +7,7 @@ import { createTestUtils } from '../../testUtils';
 
 test.describe('basic tests for @react-router without middleware', () => {
   test.describe.configure({ mode: 'parallel' });
+
   let app: Application;
   let fakeUser: FakeUser;
 

@@ -13,9 +13,8 @@ type AppearanceProviderProps = React.PropsWithChildren<AppearanceCascade>;
 const AppearanceProvider = (props: AppearanceProviderProps) => {
   const ctxValue = useDeepEqualMemo(() => {
     const value = parseAppearance(props);
-
     return { value };
-  }, [props.appearance, props.globalAppearance]);
+  }, [props.appearance, props.globalAppearance, props.appearanceKey]);
 
   return <AppearanceContext.Provider value={ctxValue}>{props.children}</AppearanceContext.Provider>;
 };

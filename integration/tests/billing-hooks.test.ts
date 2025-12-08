@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-import { appConfigs } from '../presets';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
-testAgainstRunningApps({ withEnv: [appConfigs.envs.withBilling] })('billing hooks @billing', ({ app }) => {
+testAgainstRunningApps({})('billing hooks @billing', ({ app }) => {
   test.describe.configure({ mode: 'parallel' });
   test.skip(!app.name.includes('next'), 'Skipping: Only runs on next');
 
