@@ -1,0 +1,8 @@
+{
+  "name": "test-react-v6",
+  "version": "1.0.0",
+  "dependencies": {
+    "@clerk/clerk-react": "^5.0.0",
+    "react": "^18.0.0"
+  }
+}
