@@ -2,7 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import { lazy, Suspense } from 'react';
 
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '@/ui/common/withRedirect';
-import { descriptors, Flex, Flow, localizationKeys } from '@/ui/customizables';
+import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { BackLink } from '@/ui/elements/BackLink';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
@@ -41,7 +41,25 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
             direction='col'
             gap={4}
           >
-            <Suspense fallback={null}>
+            <Suspense
+              fallback={
+                <Flex
+                  direction={'row'}
+                  align={'center'}
+                  justify={'center'}
+                  sx={t => ({
+                    height: '100%',
+                    minHeight: t.sizes.$32,
+                  })}
+                >
+                  <Spinner
+                    size={'lg'}
+                    colorScheme={'primary'}
+                    elementDescriptor={descriptors.spinner}
+                  />
+                </Flex>
+              }
+            >
               <Web3WalletButtons
                 web3AuthCallback={({ walletName }) => {
                   return clerk
