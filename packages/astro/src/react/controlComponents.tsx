@@ -1,10 +1,9 @@
-import type { HandleOAuthCallbackParams, PendingSessionOptions } from '@clerk/shared/types';
+import type { HandleOAuthCallbackParams, PendingSessionOptions, ProtectParams } from '@clerk/shared/types';
 import { computed } from 'nanostores';
 import type { PropsWithChildren } from 'react';
 import React, { useEffect, useState } from 'react';
 
 import { $csrState } from '../stores/internal';
-import type { ProtectParams } from '@clerk/shared/types';
 import { useAuth } from './hooks';
 import type { WithClerkProp } from './utils';
 import { withClerk } from './utils';
