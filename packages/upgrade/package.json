@@ -32,6 +32,7 @@
     ]
   },
   "dependencies": {
+    "chalk": "^5.3.0",
     "ejs": "3.1.10",
     "execa": "9.4.1",
     "globby": "^14.0.1",

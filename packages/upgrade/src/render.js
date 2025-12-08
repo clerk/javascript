@@ -1,60 +1,45 @@
 import * as readline from 'node:readline';
 
-// ANSI color codes
-const colors = {
-  reset: '\x1b[0m',
-  bold: '\x1b[1m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  gray: '\x1b[90m',
-};
+import chalk from 'chalk';
 
 export function renderHeader() {
   console.log('');
-  console.log(`${colors.magenta}  ╔═══════════════════════════════╗${colors.reset}`);
-  console.log(
-    `${colors.magenta}  ║       ${colors.bold}Clerk Upgrade CLI${colors.reset}${colors.magenta}       ║${colors.reset}`,
-  );
-  console.log(`${colors.magenta}  ╚═══════════════════════════════╝${colors.reset}`);
+  console.log(chalk.magenta.bold('>> Clerk Upgrade CLI <<'));
   console.log('');
 }
 
 export function renderText(message, color) {
-  const colorCode = colors[color] || '';
-  console.log(`${colorCode}${message}${colors.reset}`);
+  const colorFn = chalk[color] || (s => s);
+  console.log(colorFn(message));
 }
 
 export function renderSuccess(message) {
-  console.log(`${colors.green}✓ ${message}${colors.reset}`);
+  console.log(chalk.green(`✅ ${message}`));
 }
 
 export function renderError(message) {
-  console.error(`${colors.red}✗ ${message}${colors.reset}`);
+  console.error(chalk.red(`⛔ ${message}`));
 }
 
 export function renderWarning(message) {
-  console.log(`${colors.yellow}⚠ ${message}${colors.reset}`);
+  console.log(chalk.yellow(`⚠️ ${message}`));
 }
 
 export function renderNewline() {
   console.log('');
 }
 
-export function renderConfig({ sdk, currentVersion, fromVersion, toVersion, dir, packageManager }) {
-  console.log(
-    `Clerk SDK: ${colors.green}@clerk/${sdk}${colors.reset}${currentVersion ? ` ${colors.gray}(v${currentVersion})${colors.reset}` : ''}`,
-  );
+export function renderConfig({ sdk, currentVersion, fromVersion, toVersion, versionName, dir, packageManager }) {
+  console.log(`🔧 ${chalk.bold('Upgrade config')}`);
+  const versionSuffix = currentVersion ? ` ${chalk.gray(`(v${currentVersion})`)}` : '';
+  console.log(`Clerk SDK: ${chalk.green(`@clerk/${sdk}`)}${versionSuffix}`);
   if (fromVersion && toVersion) {
-    console.log(
-      `Upgrade path: ${colors.green}v${fromVersion}${colors.reset} → ${colors.green}v${toVersion}${colors.reset}`,
-    );
+    const versionLabel = versionName ? ` ${chalk.gray(`(${versionName})`)}` : '';
+    console.log(`Upgrade: ${chalk.green(`v${fromVersion}`)} → ${chalk.green(`v${toVersion}`)}${versionLabel}`);
   }
-  console.log(`Directory: ${colors.green}${dir}${colors.reset}`);
+  console.log(`Directory: ${chalk.green(dir)}`);
   if (packageManager) {
-    console.log(`Package manager: ${colors.green}${packageManager}${colors.reset}`);
+    console.log(`Package manager: ${chalk.green(packageManager)}`);
   }
   console.log('');
 }
@@ -137,7 +122,7 @@ export function createSpinner(label) {
       if (interval) {
         clearInterval(interval);
         interval = null;
-        process.stdout.write('\r\x1b[K'); // Clear the line
+        process.stdout.write('\r\x1b[K');
       }
     },
     success(message) {
@@ -145,92 +130,53 @@ export function createSpinner(label) {
         clearInterval(interval);
         interval = null;
       }
-      process.stdout.write(`\r\x1b[K${colors.green}✓${colors.reset} ${message}\n`);
+      process.stdout.write(`\r\x1b[K${chalk.green('✓')} ${message}\n`);
     },
     error(message) {
       if (interval) {
         clearInterval(interval);
         interval = null;
       }
-      process.stdout.write(`\r\x1b[K${colors.red}✗${colors.reset} ${message}\n`);
+      process.stdout.write(`\r\x1b[K${chalk.red('✗')} ${message}\n`);
     },
   };
 }
 
 export function renderCodemodResults(transform, result) {
-  console.log(`  ${result.ok ?? 0} file(s) modified, ${colors.red}  ${result.error ?? 0} errors${colors.reset}`);
-  console.log('');
-}
-
-export function renderManualInterventionSummary(stats) {
-  if (!stats) {
-    return;
-  }
-
-  const userButtonCount = stats.userbuttonAfterSignOutPropsRemoved || 0;
-  const hideSlugCount = stats.hideSlugRemoved || 0;
-  const beforeEmitCount = stats.beforeEmitTransformed || 0;
-
-  if (!userButtonCount && !hideSlugCount && !beforeEmitCount) {
-    return;
-  }
-
-  console.log(`${colors.yellow}${colors.bold}Manual intervention may be required:${colors.reset}`);
-
-  if (userButtonCount > 0) {
-    console.log(`${colors.yellow}• Removed ${userButtonCount} UserButton sign-out redirect prop(s)${colors.reset}`);
-    console.log(`${colors.gray}  To configure sign-out redirects:${colors.reset}`);
-    console.log(`${colors.gray}  - Global: Add afterSignOutUrl to <ClerkProvider>${colors.reset}`);
-    console.log(`${colors.gray}  - Per-button: Use <SignOutButton redirectUrl="...">${colors.reset}`);
-    console.log(`${colors.gray}  - Programmatic: clerk.signOut({ redirectUrl: "..." })${colors.reset}`);
-  }
-
-  if (hideSlugCount > 0) {
-    console.log(`${colors.yellow}• Removed ${hideSlugCount} hideSlug prop(s)${colors.reset}`);
-    console.log(`${colors.gray}  Slugs are now managed in the Clerk Dashboard.${colors.reset}`);
-  }
-
-  if (beforeEmitCount > 0) {
-    console.log(
-      `${colors.yellow}• Transformed ${beforeEmitCount} setActive({ beforeEmit }) → setActive({ navigate })${colors.reset}`,
-    );
-    console.log(`${colors.gray}  The callback now receives an object with session property.${colors.reset}`);
-  }
-
+  console.log(`  ${result.ok ?? 0} file(s) modified, ${chalk.red(`  ${result.error ?? 0} errors`)}`);
   console.log('');
 }
 
 export function renderScanResults(results, docsUrl) {
   if (results.length === 0) {
-    console.log(`${colors.green}✓ No breaking changes detected!${colors.reset}`);
+    console.log(chalk.green('✓ No breaking changes detected!'));
     console.log('');
     return;
   }
 
-  console.log(`${colors.yellow}${colors.bold}Found ${results.length} potential issue(s) to review:${colors.reset}`);
+  console.log(chalk.yellow.bold(`Found ${results.length} potential issue(s) to review:`));
   console.log('');
 
   for (const item of results) {
-    console.log(`${colors.bold}${item.title}${colors.reset}`);
+    console.log(chalk.bold(item.title));
     if (item.warning) {
-      console.log(`${colors.yellow}(warning - may not require action)${colors.reset}`);
+      console.log(chalk.yellow('(warning - may not require action)'));
     }
-    console.log(`${colors.gray}Found ${item.instances.length} instance(s):${colors.reset}`);
+    console.log(chalk.gray(`Found ${item.instances.length} instance(s):`));
     for (const inst of item.instances) {
-      console.log(`${colors.gray}  ${inst.file}:${inst.position.line}:${inst.position.column}${colors.reset}`);
+      console.log(chalk.gray(`  ${inst.file}:${inst.position.line}:${inst.position.column}`));
     }
     const link = docsUrl && item.docsAnchor ? `${docsUrl}#${item.docsAnchor}` : null;
     if (link) {
-      console.log(`${colors.blue}→ View in migration guide: ${link}${colors.reset}`);
+      console.log(chalk.blue(`→ View in migration guide: ${link}`));
     }
     console.log('');
   }
 }
 
 export function renderComplete(sdk, docsUrl) {
-  console.log('');
-  console.log(`${colors.green}${colors.bold}✓ Upgrade complete for @clerk/${sdk}${colors.reset}`);
+  console.log(chalk.green.bold(`✅ Upgrade complete for @clerk/${sdk}`));
   console.log('');
   console.log(`Review the changes above and test your application before deployment.`);
-  console.log(`${colors.gray}For more information, see the migration guide: ${docsUrl}${colors.reset}`);
+  console.log(chalk.gray(`For more information, see the migration guide: ${docsUrl}`));
 }

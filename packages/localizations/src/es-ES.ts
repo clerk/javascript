@@ -874,6 +874,7 @@ export const esES: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -887,6 +888,7 @@ export const esES: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ya existe una cuenta con este número de teléfono.',
     form_identifier_exists__username: 'Ya existe una cuenta con este nombre de usuario.',
     form_identifier_not_found: 'No se ha encontrado ninguna cuenta con este identificador.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato de parámetro inválido.',
     form_param_format_invalid__email_address:
       'La dirección de correo electrónico debe ser una dirección de correo electrónico válida.',

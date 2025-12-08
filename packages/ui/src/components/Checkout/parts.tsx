@@ -41,12 +41,15 @@ export const InvalidPlanScreen = () => {
   const { planPeriod } = useCheckoutContext();
   const { errors } = useCheckout();
 
-  const InvalidPlanError = errors?.global?.find(e => e.code === 'invalid_plan_change');
+  const InvalidPlanError = errors?.global
+    ?.filter(e => e.isClerkApiResponseError())
+    .flatMap(e => e.errors)
+    .find(e => e.code === 'invalid_plan_change');
+
   if (!InvalidPlanError) {
     return null;
   }
 
-  // @ts-expect-error - meta is not a property of FieldError
   const { plan: planFromError, isPlanUpgradePossible } = InvalidPlanError?.meta || {};
 
   return (

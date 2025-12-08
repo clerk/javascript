@@ -10,9 +10,9 @@ const cra = applicationConfig()
   .addScript('dev', 'pnpm start')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/react', linkPackage('react', 'integration'))
-  .addDependency('@clerk/shared', linkPackage('shared', 'integration'))
-  .addDependency('@clerk/ui', linkPackage('ui', 'integration'));
+  .addDependency('@clerk/react', linkPackage('react'))
+  .addDependency('@clerk/shared', linkPackage('shared'))
+  .addDependency('@clerk/ui', linkPackage('ui'));
 
 const vite = cra
   .clone()

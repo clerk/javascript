@@ -873,6 +873,7 @@ export const mnMN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -886,6 +887,7 @@ export const mnMN: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Тодорхойлогч олдсонгүй.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Параметрийн формат буруу.',
     form_param_format_invalid__email_address: 'Имэйл хаяг нь хүчинтэй имэйл хаяг байх ёстой.',
     form_param_format_invalid__phone_number: 'Утасны дугаар нь олон улсын хүчинтэй форматтай байх ёстой',

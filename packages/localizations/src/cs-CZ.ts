@@ -884,6 +884,7 @@ export const csCZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -897,6 +898,7 @@ export const csCZ: LocalizationResource = {
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
     form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',

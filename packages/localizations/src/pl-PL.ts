@@ -878,6 +878,7 @@ export const plPL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -891,6 +892,7 @@ export const plPL: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ten numer telefonu jest zajęty. Spróbuj użyć innego.',
     form_identifier_exists__username: 'Ta nazwa użytkownika jest zajęta. Spróbuj użyć innej.',
     form_identifier_not_found: 'Nie znaleziono konta o tym identyfikatorze. Sprawdź i spróbuj ponownie.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Wprowadzona wartość ma nieprawidłowy format. Sprawdź i popraw ją.',
     form_param_format_invalid__email_address: 'Adres e-mail powinien być poprawnym adresem e-mail.',
     form_param_format_invalid__phone_number: 'Numer telefonu powinien mieć prawidłowy format międzynarodowy',

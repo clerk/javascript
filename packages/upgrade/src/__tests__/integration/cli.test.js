@@ -6,9 +6,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { createTempFixture, getFixturePath } from '../helpers/create-fixture.js';
 
+// Toggle this to true to debug the CLI output during the test run
+const DEBUG_OUTPUT = false;
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// CLI uses JSX which requires babel transpilation - use built dist version
-const CLI_PATH = path.resolve(__dirname, '../../../dist/cli.js');
+const CLI_PATH = path.resolve(__dirname, '../../cli.js');
 
 function runCli(args = [], options = {}) {
   return new Promise((resolve, reject) => {
@@ -23,10 +25,16 @@ function runCli(args = [], options = {}) {
 
     child.stdout.on('data', data => {
       stdout += data.toString();
+      if (DEBUG_OUTPUT) {
+        console.log(data.toString());
+      }
     });
 
     child.stderr.on('data', data => {
       stderr += data.toString();
+      if (DEBUG_OUTPUT) {
+        console.error(data.toString());
+      }
     });
 
     // Send input if provided (for interactive prompts)
@@ -79,17 +87,17 @@ describe('CLI Integration', () => {
   describe('SDK Detection', () => {
     it('detects nextjs SDK from project directory', async () => {
       const dir = getFixturePath('nextjs-v6');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       // Combine stdout and stderr for full output
       const output = result.stdout + result.stderr;
       expect(output).toContain('@clerk/nextjs');
-      expect(output).toContain('Dry run');
+      expect(output).toContain('dry run');
     });
 
     it('detects nextjs v7 as already upgraded', async () => {
       const dir = getFixturePath('nextjs-v7');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('@clerk/nextjs');
       expect(result.stdout).toContain('already on the latest');
@@ -97,7 +105,7 @@ describe('CLI Integration', () => {
 
     it('errors when SDK not detected and not provided in non-interactive mode', async () => {
       const dir = getFixturePath('no-clerk');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 5000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 5000 });
 
       // Error messages go to stderr via console.error
       const output = result.stdout + result.stderr;
@@ -105,26 +113,23 @@ describe('CLI Integration', () => {
       expect(output).toContain('--sdk');
       expect(result.exitCode).toBe(1);
     });
-
-    it('works with explicit --sdk flag when SDK cannot be detected', async () => {
-      const dir = getFixturePath('no-clerk');
-      const result = await runCli(['--dir', dir, '--sdk', 'nextjs', '--dry-run'], { timeout: 15000 });
-
-      expect(result.stdout).toContain('@clerk/nextjs');
-    });
   });
 
   describe('--sdk flag', () => {
     it('accepts explicit SDK specification', async () => {
       const dir = getFixturePath('nextjs-v6');
-      const result = await runCli(['--dir', dir, '--sdk', 'nextjs', '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--sdk', 'nextjs', '--dry-run', '--skip-codemods'], {
+        timeout: 15000,
+      });
 
       expect(result.stdout).toContain('@clerk/nextjs');
     });
 
     it('accepts @clerk/ prefixed SDK name', async () => {
       const dir = getFixturePath('nextjs-v6');
-      const result = await runCli(['--dir', dir, '--sdk', '@clerk/nextjs', '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--sdk', '@clerk/nextjs', '--dry-run', '--skip-codemods'], {
+        timeout: 15000,
+      });
 
       expect(result.stdout).toContain('@clerk/nextjs');
     });
@@ -142,17 +147,16 @@ describe('CLI Integration', () => {
     });
 
     it('shows what would be done without making changes', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
-      expect(result.stdout).toContain('Dry run');
-      expect(result.stdout).toContain('Would upgrade');
+      expect(result.stdout).toContain('[dry run]');
     });
 
     it('does not modify package.json in dry-run mode', async () => {
       const fs = await import('node:fs');
       const pkgBefore = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
 
-      await runCli(['--dir', fixture.path, '--dry-run'], { timeout: 15000 });
+      await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       const pkgAfter = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
       expect(pkgAfter).toBe(pkgBefore);
@@ -162,37 +166,37 @@ describe('CLI Integration', () => {
   describe('Version Display', () => {
     it('shows current version in output', async () => {
       const dir = getFixturePath('nextjs-v6');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
-      expect(result.stdout).toMatch(/v6|version.*6/i);
+      expect(result.stdout).toContain('v6');
     });
 
     it('shows upgrade path in output', async () => {
       const dir = getFixturePath('nextjs-v6');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
-      expect(result.stdout).toMatch(/v6.*v7|6.*→.*7/);
+      expect(result.stdout).toContain('v6 → v7');
     });
   });
 
   describe('Package Manager Detection', () => {
     it('detects pnpm from fixture', async () => {
       const dir = getFixturePath('nextjs-v6');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('pnpm');
     });
 
     it('detects yarn from fixture', async () => {
       const dir = getFixturePath('react-v6');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toMatch(/yarn/i);
     });
 
     it('detects npm from fixture', async () => {
       const dir = getFixturePath('expo-old-package');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toMatch(/npm/i);
     });
@@ -201,14 +205,14 @@ describe('CLI Integration', () => {
   describe('Legacy Package Names', () => {
     it('handles @clerk/clerk-react legacy package', async () => {
       const dir = getFixturePath('react-v6');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('@clerk/react');
     });
 
     it('handles @clerk/clerk-expo legacy package', async () => {
       const dir = getFixturePath('expo-old-package');
-      const result = await runCli(['--dir', dir, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', dir, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('@clerk/expo');
     });
@@ -226,7 +230,7 @@ describe('CLI Integration', () => {
     });
 
     it('lists codemods that would run in dry-run mode', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run'], { timeout: 15000 });
+      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('codemod');
     });

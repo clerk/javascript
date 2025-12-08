@@ -871,6 +871,7 @@ export const srRS: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -884,6 +885,7 @@ export const srRS: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
     form_identifier_not_found: 'Nismo mogli pronaći nalog sa ovim podacima.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Format parametra je nevažeći.',
     form_param_format_invalid__email_address: 'E-mail adresa mora biti važeća e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u važećem međunarodnom formatu',

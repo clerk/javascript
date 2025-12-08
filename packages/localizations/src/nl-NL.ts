@@ -873,6 +873,7 @@ export const nlNL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -886,6 +887,7 @@ export const nlNL: LocalizationResource = {
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
     form_identifier_not_found: 'We konden geen account vinden met deze details.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',

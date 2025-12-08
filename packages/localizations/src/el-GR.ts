@@ -875,6 +875,7 @@ export const elGR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -888,6 +889,7 @@ export const elGR: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Δεν βρέθηκε λογαριασμός με αυτές τις λεπτομέρειες.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Η διεύθυνση email πρέπει να είναι μια έγκυρη διεύθυνση email.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',

@@ -11,6 +11,11 @@ root.render(
       publishableKey={process.env.REACT_APP_CLERK_PUBLISHABLE_KEY as string}
       clerkJSUrl={process.env.REACT_APP_CLERK_JS as string}
       clerkUiUrl={process.env.REACT_APP_CLERK_UI as string}
+      appearance={{
+        options: {
+          showOptionalFields: true,
+        },
+      }}
     >
       <App />
     </ClerkProvider>

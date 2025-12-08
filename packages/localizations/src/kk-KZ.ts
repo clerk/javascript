@@ -865,6 +865,7 @@ export const kkKZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -876,6 +877,7 @@ export const kkKZ: LocalizationResource = {
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__username: 'Бұл пайдаланушы аты тіркелген. Басқасын қолданыңыз.',
     form_identifier_not_found: 'Есептік жазба табылмады. Дұрыстығын тексеріңіз.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Енгізілген мән жарамсыз пішімде.',
     form_param_format_invalid__email_address: 'Электрондық пошта жарамсыз.',
     form_param_format_invalid__phone_number: 'Телефон нөмірі жарамсыз.',

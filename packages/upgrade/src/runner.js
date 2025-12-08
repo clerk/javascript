@@ -1,11 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import chalk from 'chalk';
 import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
 
-import { runCodemod } from './codemods/index.js';
-import { createSpinner, renderCodemodResults, renderManualInterventionSummary } from './render.js';
+import { getCodemodConfig, runCodemod } from './codemods/index.js';
+import { createSpinner, renderCodemodResults } from './render.js';
 
 const GLOBBY_IGNORE = [
   'node_modules/**',
@@ -42,12 +43,13 @@ export async function runCodemods(config, sdk, options) {
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {
-      const result = await runCodemod(transform, glob, { dry: options.dryRun });
-      spinner.success(`Codemod complete: ${transform}`);
+      const result = await runCodemod(transform, glob, options);
+      spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
       renderCodemodResults(transform, result);
 
-      if (transform === 'transform-remove-deprecated-props' && result.stats) {
-        renderManualInterventionSummary(result.stats);
+      const codemodConfig = getCodemodConfig(transform);
+      if (codemodConfig?.renderSummary && result.stats) {
+        codemodConfig.renderSummary(result.stats);
       }
     } catch (error) {
       spinner.error(`Codemod failed: ${transform}`);

@@ -8,31 +8,62 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const VERSIONS_DIR = path.join(__dirname, 'versions');
 
 export async function loadConfig(sdk, currentVersion) {
-  const configPath = path.join(VERSIONS_DIR, 'core-3', 'index.js');
+  const versionDirs = fs
+    .readdirSync(VERSIONS_DIR, { withFileTypes: true })
+    .filter(d => d.isDirectory())
+    .map(d => d.name);
 
-  if (!fs.existsSync(configPath)) {
-    return null;
+  let applicableConfig = null;
+
+  for (const versionDir of versionDirs) {
+    const configPath = path.join(VERSIONS_DIR, versionDir, 'index.js');
+
+    if (!fs.existsSync(configPath)) {
+      continue;
+    }
+
+    const moduleUrl = pathToFileURL(configPath).href;
+    const mod = await import(moduleUrl);
+    const config = mod.default ?? mod;
+
+    if (!config.sdkVersions) {
+      continue;
+    }
+
+    const versionStatus = getVersionStatus(config, sdk, currentVersion);
+
+    if (versionStatus === 'unsupported' || versionStatus === 'unknown') {
+      continue;
+    }
+
+    if (versionStatus === 'needs-upgrade') {
+      const changes = loadChanges(versionDir, sdk);
+      return {
+        ...config,
+        changes,
+        versionStatus,
+        needsUpgrade: true,
+        alreadyUpgraded: false,
+      };
+    }
+
+    if (versionStatus === 'already-upgraded' && !applicableConfig) {
+      applicableConfig = { config, versionDir };
+    }
   }
 
-  const moduleUrl = pathToFileURL(configPath).href;
-  const mod = await import(moduleUrl);
-  const config = mod.default ?? mod;
-
-  const versionStatus = getVersionStatus(config, sdk, currentVersion);
-
-  if (versionStatus === 'unsupported') {
-    return null;
+  if (applicableConfig) {
+    const changes = loadChanges(applicableConfig.versionDir, sdk);
+    return {
+      ...applicableConfig.config,
+      changes,
+      versionStatus: 'already-upgraded',
+      needsUpgrade: false,
+      alreadyUpgraded: true,
+    };
   }
 
-  const changes = await loadChanges(sdk);
-
-  return {
-    ...config,
-    changes,
-    versionStatus,
-    needsUpgrade: versionStatus === 'needs-upgrade',
-    alreadyUpgraded: versionStatus === 'already-upgraded',
-  };
+  return null;
 }
 
 function getVersionStatus(config, sdk, currentVersion) {
@@ -81,8 +112,8 @@ export function getOldPackageName(sdk) {
   return null;
 }
 
-async function loadChanges(sdk) {
-  const changesDir = path.join(VERSIONS_DIR, 'core-3', 'changes');
+function loadChanges(versionDir, sdk) {
+  const changesDir = path.join(VERSIONS_DIR, versionDir, 'changes');
 
   if (!fs.existsSync(changesDir)) {
     return [];

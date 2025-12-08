@@ -1,4 +1,4 @@
-import { ClerkProvider, useAuth } from '@clerk/expo';
+import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 
 export default function App() {
   return (

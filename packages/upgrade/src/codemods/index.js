@@ -1,10 +1,17 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import chalk from 'chalk';
 import { globby } from 'globby';
 import { run } from 'jscodeshift/src/Runner.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const CODEMOD_CONFIG = {
+  'transform-remove-deprecated-props': {
+    renderSummary: renderDeprecatedPropsSummary,
+  },
+};
 
 const GLOBBY_IGNORE = [
   '**/*.md',
@@ -34,6 +41,16 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
 
   const paths = await globby(glob, { ignore: GLOBBY_IGNORE });
 
+  if (options.skipCodemods) {
+    return {
+      stats: {
+        total: 0,
+        modified: 0,
+        deleted: 0,
+      },
+    };
+  }
+
   // First pass: dry run to collect stats (jscodeshift only reports stats in dry mode)
   const dryResult = await run(resolvedPath, paths ?? [], {
     ...options,
@@ -42,7 +59,7 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
   });
 
   let result = {};
-  if (!options.dry) {
+  if (!options.dryRun) {
     // Second pass: apply the changes
     result = await run(resolvedPath, paths ?? [], {
       ...options,
@@ -60,4 +77,44 @@ export async function runCodemod(transform = 'transform-async-request', glob, op
     ...result,
     stats: dryResult.stats,
   };
+}
+
+export function getCodemodConfig(transform) {
+  return CODEMOD_CONFIG[transform] || null;
+}
+
+function renderDeprecatedPropsSummary(stats) {
+  if (!stats) {
+    return;
+  }
+
+  const userButtonCount = stats.userbuttonAfterSignOutPropsRemoved || 0;
+  const hideSlugCount = stats.hideSlugRemoved || 0;
+  const beforeEmitCount = stats.beforeEmitTransformed || 0;
+
+  if (!userButtonCount && !hideSlugCount && !beforeEmitCount) {
+    return;
+  }
+
+  console.log(chalk.yellow.bold('Manual intervention may be required:'));
+
+  if (userButtonCount > 0) {
+    console.log(chalk.yellow(`• Removed ${userButtonCount} UserButton sign-out redirect prop(s)`));
+    console.log(chalk.gray('  To configure sign-out redirects:'));
+    console.log(chalk.gray('  - Global: Add afterSignOutUrl to <ClerkProvider>'));
+    console.log(chalk.gray('  - Per-button: Use <SignOutButton redirectUrl="...">'));
+    console.log(chalk.gray('  - Programmatic: clerk.signOut({ redirectUrl: "..." })'));
+  }
+
+  if (hideSlugCount > 0) {
+    console.log(chalk.yellow(`• Removed ${hideSlugCount} hideSlug prop(s)`));
+    console.log(chalk.gray('  Slugs are now managed in the Clerk Dashboard.'));
+  }
+
+  if (beforeEmitCount > 0) {
+    console.log(chalk.yellow(`• Transformed ${beforeEmitCount} setActive({ beforeEmit }) → setActive({ navigate })`));
+    console.log(chalk.gray('  The callback now receives an object with session property.'));
+  }
+
+  console.log('');
 }

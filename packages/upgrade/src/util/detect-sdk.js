@@ -4,6 +4,8 @@ import path from 'node:path';
 import { readPackageSync } from 'read-pkg';
 import semverRegex from 'semver-regex';
 
+import { getOldPackageName } from '../config.js';
+
 const SUPPORTED_SDKS = [
   { label: '@clerk/nextjs', value: 'nextjs' },
   { label: '@clerk/react', value: 'react' },
@@ -56,7 +58,13 @@ export function getSdkVersion(sdk, dir) {
   }
 
   const pkgName = sdk.startsWith('@clerk/') ? sdk : `@clerk/${sdk}`;
-  const version = pkg.dependencies?.[pkgName] || pkg.devDependencies?.[pkgName];
+  const oldPkgName = getOldPackageName(sdk);
+
+  const version =
+    pkg.dependencies?.[pkgName] ||
+    pkg.devDependencies?.[pkgName] ||
+    (oldPkgName && pkg.dependencies?.[oldPkgName]) ||
+    (oldPkgName && pkg.devDependencies?.[oldPkgName]);
 
   if (!version) {
     return null;
