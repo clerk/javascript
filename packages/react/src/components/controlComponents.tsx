@@ -120,8 +120,7 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
     return authorized;
   }
 
-  // At this point, userId is defined so has() is guaranteed to be available
-  if (checkAuthorization(resolvedWhen, has!)) {
+  if (checkAuthorization(resolvedWhen, has)) {
     return authorized;
   }
 

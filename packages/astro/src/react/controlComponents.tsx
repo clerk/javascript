@@ -1,12 +1,10 @@
 import type { HandleOAuthCallbackParams, PendingSessionOptions, ProtectParams } from '@clerk/shared/types';
 import { computed } from 'nanostores';
-import type { PropsWithChildren } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { type PropsWithChildren, useEffect, useState } from 'react';
 
 import { $csrState } from '../stores/internal';
 import { useAuth } from './hooks';
-import type { WithClerkProp } from './utils';
-import { withClerk } from './utils';
+import { withClerk, type WithClerkProp } from './utils';
 
 export function SignedOut({ children, treatPendingAsSignedOut }: PropsWithChildren<PendingSessionOptions>) {
   const { userId } = useAuth({ treatPendingAsSignedOut });
@@ -139,9 +137,9 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
  */
 export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
-    React.useEffect(() => {
+    useEffect(() => {
       void clerk?.handleRedirectCallback(handleRedirectCallbackParams);
-    }, []);
+    }, [clerk, handleRedirectCallbackParams]);
 
     return null;
   },
