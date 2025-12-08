@@ -1,10 +1,10 @@
+import type { ShowWhenCondition } from '@clerk/shared/types';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { ShowWhenCondition } from '@clerk/shared/types';
-import { Show } from '../controlComponents';
 import { auth } from '../auth';
+import { Show } from '../controlComponents';
 
 vi.mock('../auth', () => ({
   auth: vi.fn(),
