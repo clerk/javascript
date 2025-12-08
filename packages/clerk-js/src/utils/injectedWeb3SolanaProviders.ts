@@ -1,5 +1,5 @@
 import type { SolanaWalletAdapterWallet } from '@solana/wallet-standard';
-import { type Wallet } from '@wallet-standard/core';
+import type { Wallet } from '@wallet-standard/core';
 
 //https://eips.ethereum.org/EIPS/eip-4361
 
