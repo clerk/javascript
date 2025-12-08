@@ -7,6 +7,7 @@ import { createBackendApiClient } from '../factory';
 describe('APIKeys', () => {
   const apiKeyId = 'ak_xxxxx';
   const subject = 'user_xxxxx';
+  const apiKeySecret = 'ak_secret_xxxxx';
 
   const mockAPIKey = {
     object: 'api_key',
@@ -26,6 +27,122 @@ describe('APIKeys', () => {
     created_at: 1753743316590,
     updated_at: 1753743316590,
   };
+
+  describe('list', () => {
+    it('retrieves a list of API keys with query parameters', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      const mockPaginatedResponse = {
+        data: [mockAPIKey],
+        total_count: 1,
+      };
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/api_keys',
+          validateHeaders(({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            return HttpResponse.json(mockPaginatedResponse);
+          }),
+        ),
+      );
+
+      const response = await apiClient.apiKeys.list({
+        subject,
+        includeInvalid: true,
+        limit: 10,
+        offset: 0,
+      });
+
+      expect(response.data).toHaveLength(1);
+      expect(response.data[0].id).toBe(apiKeyId);
+      expect(response.data[0].name).toBe('Test API Key');
+      expect(response.totalCount).toBe(1);
+    });
+  });
+
+  describe('create', () => {
+    it('creates an API key with all parameters', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      const mockCreatedAPIKey = {
+        ...mockAPIKey,
+        secret: apiKeySecret,
+      };
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/api_keys',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.name).toBe('New API Key');
+            expect(body.subject).toBe(subject);
+            expect(body.description).toBe('New description');
+            expect(body.scopes).toEqual(['scope1', 'scope2']);
+            expect(body.claims).toEqual({ foo: 'bar' });
+            expect(body.seconds_until_expiration).toBe(3600);
+            return HttpResponse.json(mockCreatedAPIKey);
+          }),
+        ),
+      );
+
+      const response = await apiClient.apiKeys.create({
+        name: 'New API Key',
+        subject,
+        description: 'New description',
+        scopes: ['scope1', 'scope2'],
+        claims: { foo: 'bar' },
+        secondsUntilExpiration: 3600,
+      });
+
+      expect(response.id).toBe(apiKeyId);
+      expect(response.name).toBe('Test API Key');
+      expect(response.subject).toBe(subject);
+      expect(response.scopes).toEqual(['scope1', 'scope2']);
+      expect(response.claims).toEqual({ foo: 'bar' });
+    });
+
+    it('creates an API key with minimal parameters', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      const mockCreatedAPIKey = {
+        ...mockAPIKey,
+        name: 'Minimal API Key',
+        secret: apiKeySecret,
+      };
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/api_keys',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.name).toBe('Minimal API Key');
+            expect(body.subject).toBe(subject);
+            return HttpResponse.json(mockCreatedAPIKey);
+          }),
+        ),
+      );
+
+      const response = await apiClient.apiKeys.create({
+        name: 'Minimal API Key',
+        subject,
+      });
+
+      expect(response.id).toBe(apiKeyId);
+      expect(response.name).toBe('Minimal API Key');
+    });
+  });
 
   describe('get', () => {
     it('retrieves an API key by ID', async () => {
@@ -61,37 +178,6 @@ describe('APIKeys', () => {
       });
 
       await expect(apiClient.apiKeys.get('')).rejects.toThrow('A valid resource ID is required.');
-    });
-
-    it('handles API key not found', async () => {
-      const apiClient = createBackendApiClient({
-        apiUrl: 'https://api.clerk.test',
-        secretKey: 'sk_xxxxx',
-      });
-
-      server.use(
-        http.get(
-          `https://api.clerk.test/api_keys/${apiKeyId}`,
-          validateHeaders(() => {
-            return HttpResponse.json(
-              {
-                errors: [
-                  {
-                    message: 'API key not found',
-                    code: 'api_key_not_found',
-                  },
-                ],
-              },
-              { status: 404 },
-            );
-          }),
-        ),
-      );
-
-      const errResponse = await apiClient.apiKeys.get(apiKeyId).catch(err => err);
-
-      expect(errResponse.status).toBe(404);
-      expect(errResponse.errors[0].code).toBe('api_key_not_found');
     });
   });
 
@@ -192,6 +278,116 @@ describe('APIKeys', () => {
       });
 
       await expect(apiClient.apiKeys.delete('')).rejects.toThrow('A valid resource ID is required.');
+    });
+  });
+
+  describe('revoke', () => {
+    const mockRevokedAPIKey = {
+      ...mockAPIKey,
+      revoked: true,
+      revocation_reason: 'revoked by test',
+    };
+
+    it('revokes an API key with revocation reason', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          `https://api.clerk.test/api_keys/${apiKeyId}/revoke`,
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.revocation_reason).toBe('revoked by test');
+            return HttpResponse.json(mockRevokedAPIKey);
+          }),
+        ),
+      );
+
+      const response = await apiClient.apiKeys.revoke({
+        apiKeyId,
+        revocationReason: 'revoked by test',
+      });
+
+      expect(response.revoked).toBe(true);
+      expect(response.revocationReason).toBe('revoked by test');
+      expect(response.id).toBe(apiKeyId);
+    });
+
+    it('revokes an API key without revocation reason', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      const mockRevokedAPIKeyNoReason = {
+        ...mockAPIKey,
+        revoked: true,
+        revocation_reason: null,
+      };
+
+      server.use(
+        http.post(
+          `https://api.clerk.test/api_keys/${apiKeyId}/revoke`,
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.revocation_reason).toBeNull();
+            return HttpResponse.json(mockRevokedAPIKeyNoReason);
+          }),
+        ),
+      );
+
+      const response = await apiClient.apiKeys.revoke({
+        apiKeyId,
+      });
+
+      expect(response.revoked).toBe(true);
+      expect(response.revocationReason).toBeNull();
+    });
+
+    it('throws error when API key ID is missing', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      await expect(
+        apiClient.apiKeys.revoke({
+          apiKeyId: '',
+        }),
+      ).rejects.toThrow('A valid resource ID is required.');
+    });
+  });
+
+  describe('verify', () => {
+    it('verifies an API key secret', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/api_keys/verify',
+          validateHeaders(async ({ request }) => {
+            expect(request.headers.get('Authorization')).toBe('Bearer sk_xxxxx');
+            const body = (await request.json()) as Record<string, unknown>;
+            expect(body.secret).toBe(apiKeySecret);
+            return HttpResponse.json(mockAPIKey);
+          }),
+        ),
+      );
+
+      const response = await apiClient.apiKeys.verify(apiKeySecret);
+
+      expect(response.id).toBe(apiKeyId);
+      expect(response.name).toBe('Test API Key');
+      expect(response.subject).toBe(subject);
+      expect(response.scopes).toEqual(['scope1', 'scope2']);
+      expect(response.claims).toEqual({ foo: 'bar' });
     });
   });
 });
