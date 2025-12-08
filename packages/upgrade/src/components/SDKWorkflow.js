@@ -12,6 +12,7 @@ import { UpgradeSDK } from './UpgradeSDK.js';
 const CODEMODS = {
   ASYNC_REQUEST: 'transform-async-request',
   CLERK_REACT_V6: 'transform-clerk-react-v6',
+  PROTECT_TO_SHOW: 'transform-protect-to-show',
   REMOVE_DEPRECATED_PROPS: 'transform-remove-deprecated-props',
 };
 
@@ -141,6 +142,7 @@ function NextjsWorkflow({
   version,
 }) {
   const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
+  const [removeDeprecatedPropsComplete, setRemoveDeprecatedPropsComplete] = useState(false);
   const [glob, setGlob] = useState();
 
   return (
@@ -174,9 +176,17 @@ function NextjsWorkflow({
           ) : null}
           {v6CodemodComplete ? (
             <Codemod
-              callback={setDone}
+              callback={setRemoveDeprecatedPropsComplete}
               sdk={sdk}
               transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+              glob={glob}
+            />
+          ) : null}
+          {removeDeprecatedPropsComplete ? (
+            <Codemod
+              callback={setDone}
+              sdk={sdk}
+              transform={CODEMODS.PROTECT_TO_SHOW}
               glob={glob}
             />
           ) : null}
@@ -198,9 +208,17 @@ function NextjsWorkflow({
           ) : null}
           {v6CodemodComplete ? (
             <Codemod
-              callback={setDone}
+              callback={setRemoveDeprecatedPropsComplete}
               sdk={sdk}
               transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+              glob={glob}
+            />
+          ) : null}
+          {removeDeprecatedPropsComplete ? (
+            <Codemod
+              callback={setDone}
+              sdk={sdk}
+              transform={CODEMODS.PROTECT_TO_SHOW}
               glob={glob}
             />
           ) : null}
@@ -218,9 +236,17 @@ function NextjsWorkflow({
               />
               {v6CodemodComplete ? (
                 <Codemod
-                  callback={setDone}
+                  callback={setRemoveDeprecatedPropsComplete}
                   sdk={sdk}
                   transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+                  glob={glob}
+                />
+              ) : null}
+              {removeDeprecatedPropsComplete ? (
+                <Codemod
+                  callback={setDone}
+                  sdk={sdk}
+                  transform={CODEMODS.PROTECT_TO_SHOW}
                   glob={glob}
                 />
               ) : null}
@@ -302,6 +328,7 @@ function ReactSdkWorkflow({
   version,
 }) {
   const [v6CodemodComplete, setV6CodemodComplete] = useState(false);
+  const [removeDeprecatedPropsComplete, setRemoveDeprecatedPropsComplete] = useState(false);
   const [glob, setGlob] = useState();
   const replacePackage = sdk === 'clerk-react' || sdk === 'clerk-expo';
   const needsUpgrade = versionNeedsUpgrade(sdk, version);
@@ -338,9 +365,17 @@ function ReactSdkWorkflow({
           ) : null}
           {v6CodemodComplete ? (
             <Codemod
-              callback={setDone}
+              callback={setRemoveDeprecatedPropsComplete}
               sdk={sdk}
               transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+              glob={glob}
+            />
+          ) : null}
+          {removeDeprecatedPropsComplete ? (
+            <Codemod
+              callback={setDone}
+              sdk={sdk}
+              transform={CODEMODS.PROTECT_TO_SHOW}
               glob={glob}
             />
           ) : null}
@@ -358,9 +393,17 @@ function ReactSdkWorkflow({
               />
               {v6CodemodComplete ? (
                 <Codemod
-                  callback={setDone}
+                  callback={setRemoveDeprecatedPropsComplete}
                   sdk={sdk}
                   transform={CODEMODS.REMOVE_DEPRECATED_PROPS}
+                  glob={glob}
+                />
+              ) : null}
+              {removeDeprecatedPropsComplete ? (
+                <Codemod
+                  callback={setDone}
+                  sdk={sdk}
+                  transform={CODEMODS.PROTECT_TO_SHOW}
                   glob={glob}
                 />
               ) : null}

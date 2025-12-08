@@ -25,6 +25,15 @@ import { Protect } from "@clerk/nextjs"
     output: null,
   },
   {
+    name: 'Import transform for @clerk/chrome-extension',
+    source: `
+import { Protect } from "@clerk/chrome-extension"
+        `,
+    output: `
+import { Show } from "@clerk/chrome-extension"
+`,
+  },
+  {
     name: 'Basic permission prop transform',
     source: `
 import { Protect } from "@clerk/react"

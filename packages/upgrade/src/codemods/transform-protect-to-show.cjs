@@ -1,5 +1,5 @@
 // Packages that are always client-side
-const CLIENT_ONLY_PACKAGES = ['@clerk/react', '@clerk/expo'];
+const CLIENT_ONLY_PACKAGES = ['@clerk/chrome-extension', '@clerk/expo', '@clerk/react'];
 // Packages that can be used in both RSC and client components
 const HYBRID_PACKAGES = ['@clerk/nextjs'];
 
