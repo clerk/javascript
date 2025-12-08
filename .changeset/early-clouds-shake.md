@@ -10,7 +10,7 @@ Usage:
 await clerkClient.apiKeys.get('api_key_id')
 
 await clerkClient.apiKeys.update({
-  apiKeyId: apiKey.id,
+  apiKeyId: 'api_key_id',
   scopes: ['scope1', 'scope2']
 })
 
