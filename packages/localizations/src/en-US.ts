@@ -872,7 +872,8 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
-    title: 'Reset password',
+    subtitle: 'Your account requires a new password before you can continue',
+    title: 'Reset your password',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
