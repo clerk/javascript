@@ -1293,6 +1293,7 @@ export type __internal_LocalizationResource = {
   };
   taskResetPassword: {
     title: LocalizationValue;
+    subtitle: LocalizationValue;
     signOut: {
       actionLink: LocalizationValue;
       actionText: LocalizationValue<'identifier'>;
