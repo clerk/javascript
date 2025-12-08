@@ -878,10 +878,14 @@ export const skSK: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Veľkosť súboru presahuje maximálny limit 10 MB. Vyberte prosím menší súbor.',
+    avatar_file_type_invalid:
+      'Typ súboru nie je podporovaný. Nahrajte prosím obrázok vo formáte JPG, PNG, GIF alebo WEBP.',
     captcha_invalid:
       'Registrácia zlyhala z dôvodu neúspešného overenia zabezpečenia. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     captcha_unavailable:
@@ -891,6 +895,7 @@ export const skSK: LocalizationResource = {
     form_identifier_exists__phone_number: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     form_identifier_exists__username: 'Táto použivateľské meno je už obsadené. Skúste prosím iné.',
     form_identifier_not_found: 'Účet s týmto identifikátorom nebol nájdený. Skontrolujte údaje a skúste to znova.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Zadaná hodnota nie je v správnom formáte. Skontrolujte a opravte.',
     form_param_format_invalid__email_address: 'Emailová adresa musí byť platná.',
     form_param_format_invalid__phone_number: 'Telefónne číslo musí byť v platnom medzinárodnom formáte.',

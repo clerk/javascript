@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.29.1
+
+### Patch Changes
+
+- Show the correct error message on `form_new_password_matches_current` error code ([#7372](https://github.com/clerk/javascript/pull/7372)) by [@octoper](https://github.com/octoper)
+
+- Deprecating `passwordUntrusted` in favour of `passwordCompromised` and `form_password_untrusted__sign_in` to `form_password_compromised__sign_in` ([#7352](https://github.com/clerk/javascript/pull/7352)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.5
+
 ## 3.29.0
 
 ### Minor Changes

@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import * as publicExports from '../index';
 import * as ssrExports from '../ssr/index';
 

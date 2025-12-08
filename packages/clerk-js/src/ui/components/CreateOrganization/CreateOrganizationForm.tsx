@@ -37,7 +37,7 @@ type CreateOrganizationFormProps = {
   /**
    * @deprecated
    * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
+   * Configure whether Organization slug is enabled via the Clerk Dashboard under Organization Settings.
    */
   hideSlug?: boolean;
 };

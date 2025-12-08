@@ -874,10 +874,13 @@ export const thTH: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
+    avatar_file_size_exceeded: 'ขนาดไฟล์เกินขีดจำกัดสูงสุด 10MB กรุณาเลือกไฟล์ที่เล็กกว่า',
+    avatar_file_type_invalid: 'ประเภทไฟล์ไม่รองรับ กรุณาอัปโหลดรูปภาพ JPG, PNG, GIF หรือ WEBP',
     captcha_invalid: undefined,
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
@@ -886,6 +889,7 @@ export const thTH: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,

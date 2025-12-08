@@ -4,7 +4,7 @@ import type { ClerkResource } from './resource';
 
 type WithOptionalOrgType<T> = T & {
   /**
-   * The organization ID to perform the request on.
+   * The Organization ID to perform the request on.
    */
   orgId?: string;
 };
@@ -76,7 +76,7 @@ export type ForPayerType = 'organization' | 'user';
 export type BillingSubscriptionStatus = 'active' | 'ended' | 'upcoming' | 'past_due';
 
 /**
- * The billing period for the plan.
+ * The billing period for the Plan.
  *
  * @inline
  */
@@ -107,109 +107,109 @@ export interface BillingPayerMethods {
  */
 export type GetPlansParams = ClerkPaginationParams<{
   /**
-   * The type of payer for the plans.
+   * The type of payer for the Plans.
    */
   for?: ForPayerType;
 }>;
 
 /**
- * The `BillingPlanResource` type represents a subscription plan with its details.
+ * The `BillingPlanResource` type represents a Subscription Plan with its details.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface BillingPlanResource extends ClerkResource {
   /**
-   * The unique identifier for the plan.
+   * The unique identifier for the Plan.
    */
   id: string;
   /**
-   * The name of the plan.
+   * The name of the Plan.
    */
   name: string;
   /**
-   * The monthly price of the plan.
+   * The monthly price of the Plan.
    */
   fee: BillingMoneyAmount;
   /**
-   * The annual price of the plan or `null` if the plan is not annual.
+   * The annual price of the Plan or `null` if the Plan is not annual.
    */
   annualFee: BillingMoneyAmount | null;
   /**
-   * The effective monthly price when billed annually or `null` if the plan is not annual.
+   * The effective monthly price when billed annually or `null` if the Plan is not annual.
    */
   annualMonthlyFee: BillingMoneyAmount | null;
   /**
-   * A short description of what the plan offers, or `null` if no description is provided.
+   * A short description of what the Plan offers, or `null` if no description is provided.
    */
   description: string | null;
   /**
-   * Whether the plan is the default plan.
+   * Whether the Plan is the default Plan.
    */
   isDefault: boolean;
   /**
-   * Whether the plan is recurring.
+   * Whether the Plan is recurring.
    */
   isRecurring: boolean;
   /**
-   * Whether the plan has a base fee.
+   * Whether the Plan has a base fee.
    */
   hasBaseFee: boolean;
   /**
-   * Specifies the subscriber type this plan is designed for.
+   * Specifies the subscriber type this Plan is designed for.
    *
-   * Each plan is exclusively created for either individual users or organizations, and cannot be used interchangeably.
+   * Each Plan is exclusively created for either individual users or Organizations, and cannot be used interchangeably.
    */
   forPayerType: BillingPayerResourceType;
   /**
-   * Whether the plan is visible to the public.
+   * Whether the Plan is visible to the public.
    */
   publiclyVisible: boolean;
   /**
-   * The URL-friendly identifier of the plan.
+   * The URL-friendly identifier of the Plan.
    */
   slug: string;
   /**
-   * The URL of the plan's avatar image, or `null` if not set.
+   * The URL of the Plan's avatar image, or `null` if not set.
    */
   avatarUrl: string | null;
   /**
-   * The features the plan offers.
+   * The Features the Plan offers.
    */
   features: FeatureResource[];
   /**
-   * The number of days of the free trial for the plan. `null` if the plan does not have a free trial.
+   * The number of days of the free trial for the Plan. `null` if the Plan does not have a free trial.
    */
   freeTrialDays: number | null;
   /**
-   * Whether the plan has a free trial.
+   * Whether the Plan has a free trial.
    */
   freeTrialEnabled: boolean;
 }
 
 /**
- * The `FeatureResource` type represents a feature of a plan.
+ * The `FeatureResource` type represents a Feature of a Plan.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export interface FeatureResource extends ClerkResource {
   /**
-   * The unique identifier for the feature.
+   * The unique identifier for the Feature.
    */
   id: string;
   /**
-   * The display name of the feature.
+   * The display name of the Feature.
    */
   name: string;
   /**
-   * A short description of what the feature provides, or `null` if not provided.
+   * A short description of what the Feature provides, or `null` if not provided.
    */
   description: string | null;
   /**
-   * A unique, URL-friendly identifier for the feature.
+   * A unique, URL-friendly identifier for the Feature.
    */
   slug: string;
   /**
-   * The URL of the feature's avatar image, or `null` if not set.
+   * The URL of the Feature's avatar image, or `null` if not set.
    */
   avatarUrl: string | null;
 }
@@ -324,7 +324,7 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * A function that removes this payment method from the account. Accepts the following parameters:
    * <ul>
-   *  <li>`orgId?` (`string`): The ID of the organization to remove the payment method from.</li>
+   *  <li>`orgId?` (`string`): The ID of the Organization to remove the payment method from.</li>
    * </ul>
    *
    * @param params - The parameters for the remove operation.
@@ -334,7 +334,7 @@ export interface BillingPaymentMethodResource extends ClerkResource {
   /**
    * A function that sets this payment method as the default for the account. Accepts the following parameters:
    * <ul>
-   *  <li>`orgId?` (`string`): The ID of the organization to set as the default.</li>
+   *  <li>`orgId?` (`string`): The ID of the Organization to set as the default.</li>
    * </ul>
    *
    * @param params - The parameters for the make default operation.
@@ -376,7 +376,7 @@ export type BillingPaymentChargeType = 'checkout' | 'recurring';
 export type BillingPaymentStatus = 'pending' | 'paid' | 'failed';
 
 /**
- * The `BillingPaymentResource` type represents a payment attempt for a user or organization.
+ * The `BillingPaymentResource` type represents a payment attempt for a user or Organization.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -438,7 +438,7 @@ export type GetStatementsParams = WithOptionalOrgType<ClerkPaginationParams>;
 export type BillingStatementStatus = 'open' | 'closed';
 
 /**
- * The `BillingStatementResource` type represents a billing statement for a user or organization.
+ * The `BillingStatementResource` type represents a billing statement for a user or Organization.
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
@@ -504,7 +504,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
    */
   id: string;
   /**
-   * The plan associated with the subscription item.
+   * The Plan associated with the subscription item.
    */
   plan: BillingPlanResource;
   /**
@@ -551,7 +551,7 @@ export interface BillingSubscriptionItemResource extends ClerkResource {
   /**
    * A function to cancel the subscription item. Accepts the following parameters:
    * <ul>
-   *  <li>`orgId?` (`string`): The ID of the organization to cancel the subscription item from.</li>
+   *  <li>`orgId?` (`string`): The ID of the Organization to cancel the subscription item from.</li>
    * </ul>
    *
    * @param params - The parameters for the cancel operation.
@@ -652,7 +652,7 @@ export interface BillingMoneyAmount {
  */
 export interface BillingCheckoutTotals {
   /**
-   * The price of the items or plan before taxes, credits, or discounts are applied.
+   * The price of the items or Plan before taxes, credits, or discounts are applied.
    */
   subtotal: BillingMoneyAmount;
   /**
@@ -688,7 +688,7 @@ export interface BillingCheckoutTotals {
  */
 export interface BillingStatementTotals {
   /**
-   * The price of the items or plan before taxes, credits, or discounts are applied.
+   * The price of the items or Plan before taxes, credits, or discounts are applied.
    */
   subtotal: BillingMoneyAmount;
   /**
@@ -708,11 +708,11 @@ export interface BillingStatementTotals {
  */
 export type CreateCheckoutParams = WithOptionalOrgType<{
   /**
-   * The unique identifier for the plan.
+   * The unique identifier for the Plan.
    */
   planId: string;
   /**
-   * The billing period for the plan.
+   * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
 }>;
@@ -776,15 +776,15 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   paymentMethod?: BillingPaymentMethodResource;
   /**
-   * The subscription plan details for the checkout.
+   * The Subscription Plan details for the checkout.
    */
   plan: BillingPlanResource;
   /**
-   * The billing period for the plan.
+   * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
   /**
-   * The start date of the plan period, represented as a Unix timestamp.
+   * The start date of the Plan period, represented as a Unix timestamp.
    */
   planPeriodStart?: number;
   /**
@@ -800,7 +800,7 @@ export interface BillingCheckoutResource extends ClerkResource {
    */
   confirm: (params: ConfirmCheckoutParams) => Promise<BillingCheckoutResource>;
   /**
-   * Whether the plan change will take effect immediately after checkout.
+   * Whether the Plan change will take effect immediately after checkout.
    */
   isImmediatePlanChange: boolean;
   /**
@@ -856,11 +856,11 @@ export interface BillingPayerResource extends ClerkResource {
    */
   lastName?: string | null;
   /**
-   * The unique identifier for the organization that the payer belongs to.
+   * The unique identifier for the Organization that the payer belongs to.
    */
   organizationId: string | null;
   /**
-   * The name of the organization that the payer belongs to.
+   * The name of the Organization that the payer belongs to.
    */
   organizationName?: string | null;
 }

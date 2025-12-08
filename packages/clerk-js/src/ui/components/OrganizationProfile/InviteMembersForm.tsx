@@ -224,8 +224,8 @@ const AsyncRoleSelect = (field: ReturnType<typeof useFormControl<'role'>>) => {
 };
 
 /**
- * Determines default role from the organization settings or fallback to
- * the only available role.
+ * Determines default Role from the Organization settings or fallback to
+ * the only available Role.
  */
 const useDefaultRole = () => {
   const { options } = useFetchRoles();
