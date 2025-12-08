@@ -872,7 +872,8 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
-    title: 'Reset password',
+    subtitle: 'Your account requires a new password before you can continue',
+    title: 'Reset your password',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
@@ -884,6 +885,7 @@ export const enUS: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: 'New password cannot be the same as the current password.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,

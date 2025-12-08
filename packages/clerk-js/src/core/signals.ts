@@ -62,7 +62,6 @@ export function errorsToParsedErrors<T extends Record<string, unknown>>(
   function isFieldError(error: ClerkAPIError): boolean {
     return 'meta' in error && error.meta && 'paramName' in error.meta && error.meta.paramName !== undefined;
   }
-
   const hasFieldErrors = error.errors.some(isFieldError);
   if (hasFieldErrors) {
     error.errors.forEach(error => {

@@ -874,6 +874,7 @@ export const bgBG: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -885,6 +886,7 @@ export const bgBG: LocalizationResource = {
     form_identifier_exists__phone_number: 'Този телефонен номер вече е използван.',
     form_identifier_exists__username: 'Това потребителско име вече съществува.',
     form_identifier_not_found: 'Не можем да намерим този идентификатор.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Имейл адресът не е във валиден формат.',
     form_param_format_invalid__phone_number: 'Телефонният номер не е във валиден формат.',

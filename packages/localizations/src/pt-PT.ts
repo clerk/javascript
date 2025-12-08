@@ -871,6 +871,7 @@ export const ptPT: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -884,6 +885,7 @@ export const ptPT: LocalizationResource = {
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
     form_identifier_not_found: 'Não foi possível encontrar uma conta com esses detalhes.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato de parâmetro inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
     form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',

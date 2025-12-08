@@ -10,6 +10,11 @@ export default function RootLayout() {
       routerReplace={to => router.replace(to)}
       clerkJSUrl={process.env.EXPO_PUBLIC_CLERK_JS_URL}
       clerkUiUrl={process.env.EXPO_PUBLIC_CLERK_UI_URL}
+      appearance={{
+        options: {
+          showOptionalFields: true,
+        },
+      }}
     >
       <ClerkLoaded>
         <Stack>

@@ -860,6 +860,7 @@ export const zhCN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -871,6 +872,7 @@ export const zhCN: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '我们无法找到具有这些信息的账户。',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: '邮箱地址必须是有效的邮箱格式。',
     form_param_format_invalid__phone_number: '电话号码必须符合有效的国际格式。',
