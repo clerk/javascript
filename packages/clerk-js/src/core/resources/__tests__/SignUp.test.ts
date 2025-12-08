@@ -283,7 +283,7 @@ describe('SignUp', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
-          __unstable__environment: {
+          __internal_environment: {
             reload: vi.fn().mockResolvedValue({}),
           },
         } as any;
@@ -374,17 +374,18 @@ describe('SignUp', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getMetamaskIdentifierModule, 'generateSignatureWithMetamask').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        const mockGenerateSignature = vi.fn().mockResolvedValue('signature_123');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithMetamask: mockGenerateSignature,
+        } as any);
 
         const signUp = new SignUp();
         await signUp.__internal_future.web3({ strategy: 'web3_metamask_signature' });
 
         // Verify signature generation was called
-        expect(getMetamaskIdentifierModule.generateSignatureWithMetamask).toHaveBeenCalled();
+        expect(mockGenerateSignature).toHaveBeenCalled();
       });
 
       it('authenticates with coinbase_wallet strategy', async () => {
@@ -414,19 +415,18 @@ describe('SignUp', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockResolvedValue(
-          'signature_123',
-        );
+        const utilsModule = await import('../../../utils');
+        const mockGenerateSignature = vi.fn().mockResolvedValue('signature_123');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: mockGenerateSignature,
+        } as any);
 
         const signUp = new SignUp();
         await signUp.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
 
         // Verify signature generation was called
-        expect(getCoinbaseWalletIdentifierModule.generateSignatureWithCoinbaseWallet).toHaveBeenCalled();
+        expect(mockGenerateSignature).toHaveBeenCalled();
       });
 
       it('authenticates with base strategy', async () => {
@@ -456,17 +456,18 @@ describe('SignUp', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getBaseIdentifierModule = await import('../../../utils');
-        vi.spyOn(getBaseIdentifierModule, 'getBaseIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getBaseIdentifierModule, 'generateSignatureWithBase').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        const mockGenerateSignature = vi.fn().mockResolvedValue('signature_123');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getBaseIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithBase: mockGenerateSignature,
+        } as any);
 
         const signUp = new SignUp();
         await signUp.__internal_future.web3({ strategy: 'web3_base_signature' });
 
         // Verify signature generation was called
-        expect(getBaseIdentifierModule.generateSignatureWithBase).toHaveBeenCalled();
+        expect(mockGenerateSignature).toHaveBeenCalled();
       });
 
       it('authenticates with okx_wallet strategy', async () => {
@@ -496,17 +497,18 @@ describe('SignUp', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getOKXWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getOKXWalletIdentifierModule, 'getOKXWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getOKXWalletIdentifierModule, 'generateSignatureWithOKXWallet').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        const mockGenerateSignature = vi.fn().mockResolvedValue('signature_123');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getOKXWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithOKXWallet: mockGenerateSignature,
+        } as any);
 
         const signUp = new SignUp();
         await signUp.__internal_future.web3({ strategy: 'web3_okx_wallet_signature' });
 
         // Verify signature generation was called
-        expect(getOKXWalletIdentifierModule.generateSignatureWithOKXWallet).toHaveBeenCalled();
+        expect(mockGenerateSignature).toHaveBeenCalled();
       });
 
       it('retries coinbase_wallet signature on error code 4001', async () => {
@@ -536,19 +538,16 @@ describe('SignUp', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-
+        const utilsModule = await import('../../../utils');
         const mockGenerateSignature = vi
           .fn()
           .mockRejectedValueOnce({ code: 4001, message: 'User rejected' })
           .mockResolvedValueOnce('signature_123');
 
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockImplementation(
-          mockGenerateSignature,
-        );
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: mockGenerateSignature,
+        } as any);
 
         const signUp = new SignUp();
         await signUp.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -580,13 +579,12 @@ describe('SignUp', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-
+        const utilsModule = await import('../../../utils');
         const mockError = { code: 5000, message: 'Other error' };
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockRejectedValue(mockError);
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: vi.fn().mockRejectedValue(mockError),
+        } as any);
 
         const signUp = new SignUp();
         const result = await signUp.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });

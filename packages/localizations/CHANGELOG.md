@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.30.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/types@4.101.6
+
 ## 3.29.1
 
 ### Patch Changes

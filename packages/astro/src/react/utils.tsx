@@ -1,4 +1,4 @@
-import type { LoadedClerk } from '@clerk/types';
+import type { LoadedClerk } from '@clerk/shared/types';
 import { computed, type Store, type StoreValue } from 'nanostores';
 import React from 'react';
 
@@ -46,7 +46,7 @@ export type WithClerkProp<T = unknown> = T & {
   clerk: LoadedClerk | undefined | null;
 };
 
-// TODO-SHARED: Duplicate from @clerk/clerk-react
+// TODO-SHARED: Duplicate from @clerk/react
 export const assertSingleChild =
   (children: React.ReactNode) =>
   (
@@ -66,7 +66,7 @@ export const assertSingleChild =
     }
   };
 
-// TODO-SHARED: Duplicate from @clerk/clerk-react
+// TODO-SHARED: Duplicate from @clerk/react
 export const normalizeWithDefaultValue = (children: React.ReactNode | undefined, defaultText: string) => {
   if (!children) {
     children = defaultText;
@@ -77,7 +77,7 @@ export const normalizeWithDefaultValue = (children: React.ReactNode | undefined,
   return children;
 };
 
-// TODO-SHARED: Duplicate from @clerk/clerk-react
+// TODO-SHARED: Duplicate from @clerk/react
 export const safeExecute =
   (cb: unknown) =>
   (...args: any) => {

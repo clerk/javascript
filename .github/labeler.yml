@@ -93,8 +93,8 @@ agent-toolkit:
       - any-glob-to-any-file: packages/agent-toolkit/**
 
 # Base branch labels
-core2:
+core-3:
   - base-branch: '^main$'
 
-core3:
-  - base-branch: '^vincent-and-the-doctor$'
+core-2:
+  - base-branch: '^release/core-2$'

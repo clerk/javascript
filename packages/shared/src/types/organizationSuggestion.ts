@@ -7,6 +7,7 @@ export type OrganizationSuggestionStatus = 'pending' | 'accepted';
 
 /**
  * An interface representing an organization suggestion.
+ *
  * @interface
  */
 export interface OrganizationSuggestionResource extends ClerkResource {

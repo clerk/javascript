@@ -64,10 +64,10 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+        # with:
+        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+        # turbo-team: ${{ vars.TURBO_TEAM }}
+        # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Verify lockfile is deduped
         run: pnpm dedupe --check
@@ -110,11 +110,11 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+        # with:
+        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+        # turbo-team: ${{ vars.TURBO_TEAM }}
+        # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Turbo Build
         run: pnpm turbo build $TURBO_ARGS --only
@@ -154,21 +154,22 @@ jobs:
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
-        with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+        # with:
+        # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+        # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+        # turbo-team: ${{ vars.TURBO_TEAM }}
+        # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Check size using bundlewatch
-        run: pnpm turbo bundlewatch $TURBO_ARGS
+        continue-on-error: true
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
-          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
-          CI_REPO_NAME: ${{ vars.REPO_NAME }}
-          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
           CI_BRANCH: ${{ github.ref	}}
           CI_BRANCH_BASE: refs/heads/main
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          CI_REPO_NAME: ${{ vars.REPO_NAME }}
+          CI_REPO_OWNER: ${{ vars.REPO_OWNER }}
+        run: pnpm turbo bundlewatch $TURBO_ARGS
 
       - name: Lint packages using publint
         run: pnpm turbo lint:publint $TURBO_ARGS
@@ -191,7 +192,7 @@ jobs:
   unit-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Unit Tests (${{ matrix.node-version }}, ${{ matrix.filter-label }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
+    name: Unit Tests (${{ matrix.filter-label }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
     permissions:
       contents: read
       actions: write # needed for actions/upload-artifact
@@ -228,12 +229,12 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (18)`.
+          # Ensures that all builds are cached appropriately with a consistent run name `Unit Tests (20)`.
           node-version: ${{ matrix.node-version }}
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Rebuild @clerk/shared with CLERK_USE_RQ=true
         if: ${{ matrix.clerk-use-rq == 'true' }}
@@ -264,7 +265,7 @@ jobs:
         run: |
           # Only run Typedoc tests for one matrix version and main test run
           if [ "${{ matrix.node-version }}" == "22" ] && [ "${{ matrix.test-filter }}" = "**" ]; then
-            pnpm test:typedoc
+            pnpm turbo run //#test:typedoc
           fi
         env:
           NODE_VERSION: ${{ matrix.node-version }}
@@ -279,7 +280,8 @@ jobs:
           retention-days: 5
 
   integration-tests:
-    needs: [check-permissions, build-packages]
+    # needs: [check-permissions, build-packages]
+    needs: [check-permissions]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Integration Tests (${{ matrix.test-name }}, ${{ matrix.test-project }}${{ matrix.next-version && format(', {0}', matrix.next-version) || '' }}${{ matrix.clerk-use-rq == 'true' && ', RQ' || '' }})
     permissions:
@@ -299,14 +301,12 @@ jobs:
             "generic",
             "express",
             "ap-flows",
-            "elements",
             "localhost",
             "sessions",
             "sessions:staging",
             "handshake",
             "handshake:staging",
             "astro",
-            "expo-web",
             "tanstack-react-start",
             "vue",
             "nuxt",
@@ -329,14 +329,10 @@ jobs:
             clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
-            next-version: "14"
+            next-version: "15"
           - test-name: "nextjs"
             test-project: "chrome"
-            next-version: "15"
-            clerk-use-rq: "false"
-          - test-name: "nextjs"
-            test-project: "chrome"
-            next-version: "15"
+            next-version: "16"
             clerk-use-rq: "true"
           - test-name: "nextjs"
             test-project: "chrome"
@@ -359,9 +355,9 @@ jobs:
         id: config
         uses: ./.github/actions/init-blacksmith
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true
 
       - name: Verify jq is installed
@@ -377,7 +373,9 @@ jobs:
         id: task-status
         env:
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
@@ -407,12 +405,16 @@ jobs:
         env:
           CLERK_USE_RQ: true
 
+      - name: Version packages for snapshot
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        run: npm run version-packages:snapshot ci
+
       - name: Verdaccio
         if: ${{ steps.task-status.outputs.affected == '1' }}
         uses: ./.github/actions/verdaccio
         with:
           publish-cmd: |
-            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else CLERK_USE_RQ=${{ matrix.clerk-use-rq }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag; fi
+            if [ "$(pnpm config get registry)" = "https://registry.npmjs.org/" ]; then echo 'Error: Using default registry' && exit 1; else ${{ matrix.clerk-use-rq == 'true' && 'CLERK_USE_RQ=true' || '' }} pnpm turbo build $TURBO_ARGS --only && pnpm changeset publish --no-git-tag --tag latest; fi
 
       - name: Edit .npmrc [link-workspace-packages=false]
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
@@ -425,6 +427,8 @@ jobs:
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/backend
 
+      # Install published packages from Verdaccio to test against real npm install scenarios
+      # rather than local monorepo builds. Validates package structure, dependencies, and entry points.
       - name: Install @clerk/clerk-js in os temp
         if: ${{ steps.task-status.outputs.affected == '1' }}
         working-directory: ${{runner.temp}}
@@ -433,6 +437,15 @@ jobs:
           pnpm init
           pnpm config set minimum-release-age-exclude @clerk/*
           pnpm add @clerk/clerk-js
+
+      - name: Install @clerk/ui in os temp
+        if: ${{ steps.task-status.outputs.affected == '1' }}
+        working-directory: ${{runner.temp}}
+        run: |
+          mkdir clerk-ui && cd clerk-ui
+          pnpm init
+          pnpm config set minimum-release-age-exclude @clerk/*
+          pnpm add @clerk/ui
 
       - name: Copy components @clerk/astro
         if: ${{ matrix.test-name == 'astro' }}
@@ -467,14 +480,16 @@ jobs:
         timeout-minutes: 25
         run: pnpm turbo test:integration:${{ matrix.test-name }} $TURBO_ARGS
         env:
+          E2E_DEBUG: "1"
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
-          E2E_CLERK_VERSION: "latest"
+          E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
+          E2E_CLERK_JS_VERSION: "latest"
+          E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           E2E_CLERK_ENCRYPTION_KEY: ${{ matrix.clerk-encryption-key }}
           CLERK_USE_RQ: ${{ matrix.clerk-use-rq }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
@@ -510,10 +525,10 @@ jobs:
         with:
           turbo-enabled: true
           node-version: 22
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-summarize: ${{ env.TURBO_SUMMARIZE }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Publish with pkg-pr-new
         run: pnpm run build && pnpx pkg-pr-new@${{ vars.PKG_PR_NEW_VERSION || '0.0.49' }} publish --compact --pnpm './packages/*'

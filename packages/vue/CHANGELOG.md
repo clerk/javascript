@@ -1,5 +1,28 @@
 # @clerk/vue
 
+## 1.17.3
+
+### Patch Changes
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
+- Updated dependencies [[`b117ebc`](https://github.com/clerk/javascript/commit/b117ebc956e1a5d48d5fdb7210de3344a74a524a)]:
+  - @clerk/shared@3.39.0
+  - @clerk/types@4.101.6
+
 ## 1.17.2
 
 ### Patch Changes

@@ -1,5 +1,5 @@
+import type { RoutingStrategy } from '@clerk/shared/types';
 import { isProductionEnvironment } from '@clerk/shared/utils';
-import type { RoutingStrategy } from '@clerk/types';
 import React from 'react';
 
 import { useSession } from '../hooks';

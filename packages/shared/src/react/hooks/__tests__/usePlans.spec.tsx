@@ -2,7 +2,11 @@ import { act, render, renderHook, screen, waitFor } from '@testing-library/react
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { BillingPlanResource } from '@/types/billing';
+
+import { usePlans } from '../usePlans';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
+import { wrapper } from './wrapper';
 
 const mockUser: any = createMockUser();
 const mockOrganization: any = createMockOrganization();
@@ -36,16 +40,12 @@ vi.mock('../../contexts', () => {
   };
 });
 
-import type { BillingPlanResource } from '../../../types/billing';
-import { usePlans } from '../usePlans';
-import { wrapper } from './wrapper';
-
 describe('usePlans', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockClerk.loaded = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = true;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = true;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = true;
     defaultQueryClient.client.clear();
   });
 

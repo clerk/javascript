@@ -73,9 +73,10 @@ const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 
 /**
- * Checks if a user has the required Organization-level authorization.
- * Verifies if the user has the specified Role or Permission within their Organization.
- * @returns null, if unable to determine due to missing data or unspecified Role/Permission.
+ * Checks if a user has the required organization-level authorization.
+ * Verifies if the user has the specified role or permission within their organization.
+ *
+ * @returns null, if unable to determine due to missing data or unspecified role/permission.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;
@@ -162,6 +163,7 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined |
  * Evaluates if the user meets re-verification authentication requirements.
  * Compares the user's factor verification ages against the specified maxAge.
  * Handles different verification levels (first factor, second factor, multi-factor).
+ *
  * @returns null, if requirements or verification data are missing.
  */
 const checkReverificationAuthorization: CheckReverificationAuthorization = (params, { factorVerificationAge }) => {
@@ -237,6 +239,7 @@ type AuthStateOptions = {
 /**
  * Shared utility function that centralizes auth state resolution logic,
  * preventing duplication across different packages.
+ *
  * @internal
  */
 const resolveAuthState = ({

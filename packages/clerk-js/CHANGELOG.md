@@ -1,5 +1,36 @@
 # Change Log
 
+## 5.114.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Improve error handling for invalid avatar file uploads. Previously, avatar images which exceeded the max file size limit of 10MB did not return an error within the Avatar upload component so the user was unaware why their upload did not work. ([#7357](https://github.com/clerk/javascript/pull/7357)) by [@jigar-clerk](https://github.com/jigar-clerk)
+
+- Country code updates: Aland Islands, Ascension Island, Kosovo, Mayotte, Western Sahara, and updated names for Algeria, Congo (split into Democratic Republic and Republic), Macedonia (to North Macedonia), and Swaziland (to Eswatini). ([#7378](https://github.com/clerk/javascript/pull/7378)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
+- Updated dependencies [[`b117ebc`](https://github.com/clerk/javascript/commit/b117ebc956e1a5d48d5fdb7210de3344a74a524a)]:
+  - @clerk/localizations@3.30.0
+  - @clerk/shared@3.39.0
+
 ## 5.113.0
 
 ### Minor Changes

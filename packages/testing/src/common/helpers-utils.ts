@@ -1,4 +1,4 @@
-import type { EmailCodeFactor, PhoneCodeFactor, SignInFirstFactor } from '@clerk/types';
+import type { EmailCodeFactor, PhoneCodeFactor, SignInFirstFactor } from '@clerk/shared/types';
 
 import type { SignInHelperParams } from './types';
 

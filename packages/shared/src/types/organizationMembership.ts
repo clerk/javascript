@@ -40,7 +40,8 @@ declare global {
 }
 
 /**
- * The `OrganizationMembership` object is the model around an Organization membership entity and describes the relationship between users and Organizations.
+ * The `OrganizationMembership` object is the model around an organization membership entity and describes the relationship between users and organizations.
+ *
  * @interface
  */
 export interface OrganizationMembershipResource extends ClerkResource {

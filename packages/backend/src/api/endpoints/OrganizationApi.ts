@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/types';
+import type { ClerkPaginationRequest, OrganizationEnrollmentMode } from '@clerk/shared/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
