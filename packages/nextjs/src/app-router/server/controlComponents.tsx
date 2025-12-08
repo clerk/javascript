@@ -83,7 +83,34 @@ export async function Protect(props: AppRouterProtectProps): Promise<React.JSX.E
 }
 
 /**
- * Use `<Show/>` to render children based on authorization or sign-in state.
+ * Use `<Show/>` to render children when an authorization or sign-in condition passes.
+ *
+ * @param props.when Condition that controls rendering. Accepts:
+ * - authorization objects such as `{ permission: "..." }`, `{ role: "..." }`, `{ feature: "..." }`, or `{ plan: "..." }`
+ * - the string `"signedIn"` to render when a user is present
+ * - the string `"signedOut"` to render when no user is present
+ * - predicate functions `(has) => boolean` that receive the `has` helper
+ * @param props.fallback Optional content rendered when the condition fails.
+ * @param props.children Content rendered when the condition passes.
+ *
+ * @example
+ * ```tsx
+ * <Show when={{ permission: "org:billing:manage" }} fallback={<p>Unauthorized</p>}>
+ *   <BillingSettings />
+ * </Show>
+ *
+ * <Show when={{ role: "admin" }}>
+ *   <AdminPanel />
+ * </Show>
+ *
+ * <Show when={(has) => has({ permission: "org:read" }) && isFeatureEnabled}>
+ *   <ProtectedFeature />
+ * </Show>
+ *
+ * <Show when="signedIn">
+ *   <Dashboard />
+ * </Show>
+ * ```
  */
 export async function Show(props: AppRouterShowProps): Promise<React.JSX.Element | null> {
   const { children, fallback, treatPendingAsSignedOut, when } = props;
