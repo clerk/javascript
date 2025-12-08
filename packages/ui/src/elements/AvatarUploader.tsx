@@ -1,7 +1,16 @@
 import React from 'react';
 
 import type { LocalizationKey } from '../customizables';
-import { Button, Col, descriptors, Flex, localizationKeys, SimpleButton, Text } from '../customizables';
+import {
+  Button,
+  Col,
+  descriptors,
+  Flex,
+  localizationKeys,
+  SimpleButton,
+  Text,
+  useLocalizations,
+} from '../customizables';
 import { handleError } from '../utils/errorHandler';
 import { useCardState } from './contexts';
 
@@ -27,9 +36,9 @@ const SUPPORTED_MIME_TYPES = Object.freeze(['image/png', 'image/jpeg', 'image/gi
 
 const validType = (f: File | DataTransferItem) => SUPPORTED_MIME_TYPES.includes(f.type);
 const validSize = (f: File) => f.size <= MAX_SIZE_BYTES;
-const validFile = (f: File) => validType(f) && validSize(f);
 
 export const AvatarUploader = (props: AvatarUploaderProps) => {
+  const { t } = useLocalizations();
   const [showUpload, setShowUpload] = React.useState(false);
   const [objectUrl, setObjectUrl] = React.useState<string>();
   const card = useCardState();
@@ -64,9 +73,21 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
   };
 
   const upload = async (f: File | undefined) => {
-    if (f && validFile(f)) {
-      await handleFileDrop(f);
+    if (!f) {
+      return;
     }
+
+    if (!validType(f)) {
+      card.setError(t(localizationKeys('unstable__errors.avatar_file_type_invalid')));
+      return;
+    }
+
+    if (!validSize(f)) {
+      card.setError(t(localizationKeys('unstable__errors.avatar_file_size_exceeded')));
+      return;
+    }
+
+    await handleFileDrop(f);
   };
 
   const previewElement = objectUrl

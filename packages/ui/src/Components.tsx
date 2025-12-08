@@ -1,10 +1,11 @@
 import { clerkUIErrorDOMElementNotFound } from '@clerk/shared/internal/clerk-js/errors';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type {
   __internal_CheckoutProps,
+  __internal_EnableOrganizationsPromptProps,
   __internal_PlanDetailsProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
-  Appearance,
   Clerk,
   ClerkOptions,
   CreateOrganizationProps,
@@ -22,10 +23,12 @@ import React, { Suspense } from 'react';
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
 import { useClerkModalStateParams } from './hooks/useClerkModalStateParams';
+import type { Appearance } from './internal/appearance';
 import type { ClerkComponentName } from './lazyModules/components';
 import {
   BlankCaptchaModal,
   CreateOrganizationModal,
+  EnableOrganizationsPrompt,
   ImpersonationFab,
   KeylessPrompt,
   OrganizationProfileModal,
@@ -39,6 +42,7 @@ import {
 import { MountedCheckoutDrawer, MountedPlanDetailDrawer, MountedSubscriptionDetailDrawer } from './lazyModules/drawers';
 import {
   LazyComponentRenderer,
+  LazyEnableOrganizationsPromptProvider,
   LazyImpersonationFabProvider,
   LazyModalRenderer,
   LazyOneTapRenderer,
@@ -84,7 +88,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'enableOrganizationsPrompt',
   >(
     modal: T,
     props: T extends 'signIn'
@@ -95,7 +100,9 @@ export type ComponentControls = {
           ? __internal_UserVerificationProps
           : T extends 'waitlist'
             ? WaitlistProps
-            : UserProfileProps,
+            : T extends 'enableOrganizationsPrompt'
+              ? __internal_EnableOrganizationsPromptProps
+              : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -107,7 +114,8 @@ export type ComponentControls = {
       | 'createOrganization'
       | 'userVerification'
       | 'waitlist'
-      | 'blankCaptcha',
+      | 'blankCaptcha'
+      | 'enableOrganizationsPrompt',
     options?: {
       notify?: boolean;
     },
@@ -145,6 +153,7 @@ interface ComponentsProps {
   getEnvironment: () => EnvironmentResource | null | undefined;
   options: ClerkOptions;
   onComponentsMounted: () => void;
+  moduleManager: ModuleManager;
 }
 
 interface ComponentsState {
@@ -157,6 +166,7 @@ interface ComponentsState {
   userVerificationModal: null | __internal_UserVerificationProps;
   organizationProfileModal: null | OrganizationProfileProps;
   createOrganizationModal: null | CreateOrganizationProps;
+  enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistProps;
@@ -188,9 +198,10 @@ export const mountComponentRenderer = (
   getClerk: () => Clerk,
   getEnvironment: () => EnvironmentResource | null | undefined,
   _options: ClerkOptions,
+  moduleManager: ModuleManager,
 ) => {
   const options = { ..._options };
-  // Extract cssLayerName from baseTheme if present and move it to appearance level
+  // Extract cssLayerName from theme if present and move it to appearance level
   if (options.appearance) {
     options.appearance = extractCssLayerNameFromAppearance(options.appearance);
   }
@@ -226,6 +237,7 @@ export const mountComponentRenderer = (
               getEnvironment={getEnvironment}
               options={options}
               onComponentsMounted={deferredPromise.resolve}
+              moduleManager={moduleManager}
             />,
           );
           return deferredPromise.promise.then(() => componentsControls);
@@ -260,6 +272,7 @@ const Components = (props: ComponentsProps) => {
     userVerificationModal: null,
     organizationProfileModal: null,
     createOrganizationModal: null,
+    enableOrganizationsPromptModal: null,
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
@@ -340,9 +353,10 @@ const Components = (props: ComponentsProps) => {
       clearUrlStateParam();
       setState(s => {
         function handleCloseModalForExperimentalUserVerification() {
-          const modal = s[`${name}Modal`] || {};
+          const modal = s[`${name}Modal`];
           if (modal && typeof modal === 'object' && 'afterVerificationCancelled' in modal && notify) {
-            modal.afterVerificationCancelled?.();
+            // TypeScript doesn't narrow properly with template literal access and 'in' operator
+            (modal as { afterVerificationCancelled?: () => void }).afterVerificationCancelled?.();
           }
         }
 
@@ -357,6 +371,20 @@ const Components = (props: ComponentsProps) => {
     };
 
     componentsControls.openModal = (name, props) => {
+      // Prevent opening enableOrganizations prompt if it's already open
+      // It should open the first call and ignore the subsequent calls
+      if (name === 'enableOrganizationsPrompt') {
+        setState(prev => {
+          // Modal is already open, don't update state
+          if (prev.enableOrganizationsPromptModal) {
+            return prev;
+          }
+
+          return { ...prev, [`${name}Modal`]: props };
+        });
+        return;
+      }
+
       function handleCloseModalForExperimentalUserVerification() {
         if (!('afterVerificationCancelled' in props)) {
           return;
@@ -578,6 +606,7 @@ const Components = (props: ComponentsProps) => {
         clerk={props.getClerk()}
         environment={props.getEnvironment()}
         options={state.options}
+        moduleManager={props.moduleManager}
       >
         {[...nodes].map(([node, component]) => {
           return (
@@ -625,6 +654,12 @@ const Components = (props: ComponentsProps) => {
           <LazyImpersonationFabProvider globalAppearance={state.appearance}>
             <ImpersonationFab />
           </LazyImpersonationFabProvider>
+        )}
+
+        {state.enableOrganizationsPromptModal && (
+          <LazyEnableOrganizationsPromptProvider globalAppearance={state.appearance}>
+            <EnableOrganizationsPrompt {...state.enableOrganizationsPromptModal} />
+          </LazyEnableOrganizationsPromptProvider>
         )}
 
         {state.options?.__internal_keyless_claimKeylessApplicationUrl &&

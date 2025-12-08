@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react",
-  "version": "5.56.2",
+  "version": "5.58.1",
   "description": "Clerk React library",
   "keywords": [
     "clerk",
@@ -100,7 +100,7 @@
   },
   "devDependencies": {
     "@clerk/localizations": "workspace:*",
-    "@clerk/themes": "workspace:*",
+    "@clerk/ui": "workspace:*",
     "@types/semver": "^7.7.1"
   },
   "peerDependencies": {

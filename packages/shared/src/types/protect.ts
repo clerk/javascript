@@ -5,24 +5,24 @@ import type { Autocomplete } from './utils';
 /**
  * Props for the `<Protect />` component, which restricts access to its children based on authentication and authorization.
  *
- * Use `ProtectProps` to specify the required role, permission, feature, or plan for access.
+ * Use `ProtectProps` to specify the required Role, Permission, Feature, or Plan for access.
  *
  * @example
  * ```tsx
- * // Require a specific permission
+ * // Require a specific Permission
  * <Protect permission="a_permission_key" />
  *
- * // Require a specific role
+ * // Require a specific Role
  * <Protect role="a_role_key" />
  *
  * // Use a custom condition callback
  * <Protect condition={(has) => has({ permission: "a_permission_key" })} />
  *
- * // Require a specific feature
+ * // Require a specific Feature
  * <Protect feature="a_feature_key" />
  *
- * // Require a specific plan
- * <Protect plan=a_plan_key" />
+ * // Require a specific Plan
+ * <Protect plan="a_plan_key" />
  * ```
  */
 export type ProtectProps =

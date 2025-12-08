@@ -697,8 +697,14 @@ export const beBY: LocalizationResource = {
       subtitle: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Увядзіце пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль быў узламаны',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Код верыфікацыі',
@@ -866,8 +872,20 @@ export const beBY: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
+    avatar_file_size_exceeded: 'Памер файла перавышае максімальны ліміт 10 МБ. Калі ласка, абярыце меншы файл.',
+    avatar_file_type_invalid:
+      'Тып файла не падтрымліваецца. Калі ласка, загрузіце малюнак у фармаце JPG, PNG, GIF або WEBP.',
     captcha_invalid:
       'Рэгістрацыя не ўдалася з-за памылак бяспекі. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз, або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     captcha_unavailable:
@@ -877,6 +895,7 @@ export const beBY: LocalizationResource = {
     form_identifier_exists__phone_number: 'Гэты нумар тэлефона ўжо выкарыстоўваецца.',
     form_identifier_exists__username: 'Гэта імя ўжо занята.',
     form_identifier_not_found: 'Мы не знойдзем акаўнта з такімі данымі.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address:
       'Адрас электроннай пошты павінен быць сапраўдным адрасам электроннай пошты.',
@@ -896,9 +915,11 @@ export const beBY: LocalizationResource = {
     form_password_pwned__sign_in: 'Гэты пароль быў узламаны, калі ласка, абярыце іншы.',
     form_password_size_in_bytes_exceeded:
       'Ваш пароль перавышае максімальна дапушчальнае колькасць байтаў, скараціце яго або выдаліце некаторыя спецыяльныя сімвалы.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Неверагодны пароль',
     form_username_invalid_character: 'Імя карыстальніка змяшчае недапушчальныя сімвалы.',
     form_username_invalid_length: 'Імя карыстальніка павінна быць ад 3 да 50 сімвалаў.',
+    form_username_needs_non_number_char: 'Імя карыстальніка павінна ўтрымліваць прынамсі адзін нелічбавы сімвал.',
     identification_deletion_failed: 'Вы не можаце выдаліць вашу апошнюю ідэнтыфікацыю.',
     not_allowed_access:
       "Адрас электроннай пошты ці нумар тэлефона не дазволены для рэгістрацыі. Гэта можа быць звязана з выкарыстаннем знакаў '+', '=', '#' або '.' у вашым адрасе электроннай пошты, з дапамогай дамена, падлучанага да часовай службы электроннай пошты, або відавочна заблакіраваны. Калі вы лічыце, што гэта памылка, звярніцеся ў службу падтрымкі.",

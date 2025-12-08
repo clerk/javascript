@@ -1,7 +1,8 @@
 import type { ClerkProviderProps } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import type { Without } from '@clerk/shared/types';
 
-export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey'> & {
+export type NextClerkProviderProps<TUi extends Ui = Ui> = Without<ClerkProviderProps<TUi>, 'publishableKey'> & {
   /**
    * Used to override the default NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if needed.
    * This is optional for NextJS as the ClerkProvider will automatically use the NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY env variable if it exists.
@@ -15,7 +16,7 @@ export type NextClerkProviderProps = Without<ClerkProviderProps, 'publishableKey
    *
    * @default true
    */
-  __unstable_invokeMiddlewareOnAuthStateChange?: boolean;
+  __internal_invokeMiddlewareOnAuthStateChange?: boolean;
   /**
    * If set to true, ClerkProvider will opt into dynamic rendering and make auth data available to all wrapper components.
    *

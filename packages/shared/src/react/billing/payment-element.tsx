@@ -27,8 +27,8 @@ type PaymentElementError = {
 
 const useInternalEnvironment = () => {
   const clerk = useClerk();
-  // @ts-expect-error `__unstable__environment` is not typed
-  return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  // @ts-expect-error `__internal_environment` is not typed
+  return clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
 };
 
 const useLocalization = () => {
@@ -106,7 +106,7 @@ export type PaymentElementProviderProps = {
    */
   stripeAppearance?: internalStripeAppearance;
   /**
-   * Specifies whether to fetch for the current user or organization.
+   * Specifies whether to fetch for the current user or Organization.
    *
    * @default 'user'
    */

@@ -1,8 +1,8 @@
-import { useUser } from '@clerk/shared/react';
 import { useState } from 'react';
 
+import { CreateOrganizationAction } from '@/common/CreateOrganizationAction';
 import { OrganizationPreviewSpinner } from '@/ui/common/organizations/OrganizationPreview';
-import { Action, Actions } from '@/ui/elements/Actions';
+import { Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
@@ -10,7 +10,6 @@ import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView'
 
 import { useEnvironment, useOrganizationListContext } from '../../contexts';
 import { Box, Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
-import { Add } from '../../icons';
 import { CreateOrganizationForm } from '../CreateOrganization/CreateOrganizationForm';
 import { PreviewListItems } from './shared';
 import { InvitationPreview } from './UserInvitationList';
@@ -22,16 +21,9 @@ const CreateOrganizationButton = ({
 }: {
   onCreateOrganizationClick: React.MouseEventHandler;
 }) => {
-  const { user } = useUser();
-
-  if (!user?.createOrganizationEnabled) {
-    return null;
-  }
-
   return (
-    <Action
+    <CreateOrganizationAction
       elementDescriptor={descriptors.organizationListCreateOrganizationActionButton}
-      icon={Add}
       label={localizationKeys('organizationList.action__createOrganization')}
       onClick={onCreateOrganizationClick}
       sx={t => ({

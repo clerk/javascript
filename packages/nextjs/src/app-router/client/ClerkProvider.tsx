@@ -1,5 +1,6 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
+import type { Ui } from '@clerk/react/internal';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -24,8 +25,8 @@ const LazyCreateKeylessApplication = dynamic(() =>
   import('./keyless-creator-reader.js').then(m => m.KeylessCreatorOrReader),
 );
 
-const NextClientClerkProvider = (props: NextClerkProviderProps) => {
-  const { __unstable_invokeMiddlewareOnAuthStateChange = true, children } = props;
+const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderProps<TUi>) => {
+  const { __internal_invokeMiddlewareOnAuthStateChange = true, children } = props;
   const router = useRouter();
   const push = useAwaitablePush();
   const replace = useAwaitableReplace();
@@ -44,7 +45,7 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   }
 
   useSafeLayoutEffect(() => {
-    window.__unstable__onBeforeSetActive = intent => {
+    window.__internal_onBeforeSetActive = intent => {
       /**
        * We need to invalidate the cache in case the user is navigating to a page that
        * was previously cached using the auth state that was active at the time.
@@ -68,12 +69,12 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
         const nextVersion = window?.next?.version || '';
 
         // On Next.js 15+ calling a server action that returns a 404 error when deployed on Vercel is prohibited, failing with 405 status code.
-        // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__unstable__onBeforeSetActive`.
+        // When a user transitions from "signed in" to "signed out", we clear the `__session` cookie, then we call `__internal_onBeforeSetActive`.
         // If we were to call `invalidateCacheAction` while the user is already signed out (deleted cookie), any page protected by `auth.protect()`
         // will result to the server action returning a 404 error (this happens because server actions inherit the protection rules of the page they are called from).
         // SOLUTION:
         // To mitigate this, since the router cache on version 15+ is much less aggressive, we can treat this as a noop and simply resolve the promise.
-        // Once `setActive` performs the navigation, `__unstable__onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
+        // Once `setActive` performs the navigation, `__internal_onAfterSetActive` will kick in and perform a router.refresh ensuring shared layouts will also update with the correct authentication context.
         if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
           resolve(); // noop
         } else {
@@ -82,8 +83,8 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
       });
     };
 
-    window.__unstable__onAfterSetActive = () => {
-      if (__unstable_invokeMiddlewareOnAuthStateChange) {
+    window.__internal_onAfterSetActive = () => {
+      if (__internal_invokeMiddlewareOnAuthStateChange) {
         return router.refresh();
       }
     };
@@ -108,7 +109,9 @@ const NextClientClerkProvider = (props: NextClerkProviderProps) => {
   );
 };
 
-export const ClientClerkProvider = (props: NextClerkProviderProps & { disableKeyless?: boolean }) => {
+export const ClientClerkProvider = <TUi extends Ui = Ui>(
+  props: NextClerkProviderProps<TUi> & { disableKeyless?: boolean },
+) => {
   const { children, disableKeyless = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
 

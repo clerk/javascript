@@ -1,28 +1,20 @@
-import { isPublishableKey } from '@clerk/shared/keys';
+import type { IsomorphicClerkOptions } from '@clerk/shared/types';
+import type { Ui } from '@clerk/ui/internal';
 import React from 'react';
 
-import { errorThrower } from '../errors/errorThrower';
 import { multipleClerkProvidersError } from '../errors/messages';
 import type { ClerkProviderProps } from '../types';
 import { withMaxAllowedInstancesGuard } from '../utils';
 import { ClerkContextProvider } from './ClerkContextProvider';
 
-function ClerkProviderBase(props: ClerkProviderProps) {
-  const { initialState, children, __internal_bypassMissingPublishableKey, ...restIsomorphicClerkOptions } = props;
-  const { publishableKey = '', Clerk: userInitialisedClerk } = restIsomorphicClerkOptions;
-
-  if (!userInitialisedClerk && !__internal_bypassMissingPublishableKey) {
-    if (!publishableKey) {
-      errorThrower.throwMissingPublishableKeyError();
-    } else if (publishableKey && !isPublishableKey(publishableKey)) {
-      errorThrower.throwInvalidPublishableKeyError({ key: publishableKey });
-    }
-  }
+function ClerkProviderBase<TUi extends Ui>(props: ClerkProviderProps<TUi>) {
+  const { initialState, children, ...restIsomorphicClerkOptions } = props;
+  const isomorphicClerkOptions = restIsomorphicClerkOptions as unknown as IsomorphicClerkOptions;
 
   return (
     <ClerkContextProvider
       initialState={initialState}
-      isomorphicClerkOptions={restIsomorphicClerkOptions}
+      isomorphicClerkOptions={isomorphicClerkOptions}
     >
       {children}
     </ClerkContextProvider>

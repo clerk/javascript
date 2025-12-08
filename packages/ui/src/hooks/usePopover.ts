@@ -1,4 +1,4 @@
-import type { UseFloatingOptions } from '@floating-ui/react';
+import type { UseFloatingOptions, UseFloatingReturn } from '@floating-ui/react';
 import { autoUpdate, flip, offset, shift, size, useDismiss, useFloating, useFloatingNodeId } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
@@ -20,9 +20,21 @@ type UsePopoverProps = {
       };
 };
 
-export type UsePopoverReturn = ReturnType<typeof usePopover>;
+// Need to be explicitly defined to avoid type errors in the Popover component
+// due to the way floating-ui types work with pnpm (without hoisting)
+export type UsePopoverReturn = {
+  reference: UseFloatingReturn['refs']['setReference'];
+  floating: UseFloatingReturn['refs']['setFloating'];
+  toggle: () => void;
+  open: () => void;
+  nodeId: string | undefined;
+  close: () => void;
+  isOpen: boolean;
+  styles: { position: React.CSSProperties['position']; top: number; left: number };
+  context: UseFloatingReturn['context'];
+};
 
-export const usePopover = (props: UsePopoverProps = {}) => {
+export const usePopover = (props: UsePopoverProps = {}): UsePopoverReturn => {
   const {
     bubbles = false,
     shoudFlip = true,

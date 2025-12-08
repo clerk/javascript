@@ -1,4 +1,8 @@
-import type { Appearance, Clerk, ClerkOptions, EnvironmentResource } from '../types';
+import type { ModuleManager } from '../moduleManager';
+import type { Clerk, ClerkOptions, EnvironmentResource } from '../types';
+
+// TODO @nikos
+type Appearance = any;
 
 export type UIVersion = string;
 
@@ -31,7 +35,7 @@ export interface ClerkUiConstructor {
     getClerk: () => Clerk,
     getEnvironment: () => EnvironmentResource | null | undefined,
     options: ClerkOptions,
-    importModule: (module: string) => Promise<any>,
+    moduleManager: ModuleManager,
   ): ClerkUiInstance;
   version: string;
 }

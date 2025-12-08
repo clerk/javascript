@@ -212,7 +212,7 @@ describe('SignInStart', () => {
           <AppearanceProvider
             appearanceKey={'signIn'}
             appearance={{
-              layout: {
+              options: {
                 socialButtonsVariant: 'blockButton',
               },
             }}
@@ -250,6 +250,38 @@ describe('SignInStart', () => {
       OAUTH_PROVIDERS.forEach(providerData => {
         const icon = container.getElementsByClassName(`cl-socialButtonsIconButton__${providerData.provider}`);
         expect(icon.length).toEqual(1);
+      });
+    });
+
+    it('redirects user when session_exists error is returned during OAuth sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+
+      const sessionExistsError = new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'session_exists',
+            long_message: 'A session already exists',
+            message: 'Session exists',
+          },
+        ],
+        status: 422,
+      });
+
+      fixtures.clerk.client.lastActiveSessionId = 'sess_123';
+      fixtures.signIn.authenticateWithRedirect.mockRejectedValueOnce(sessionExistsError);
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+
+      const googleButton = screen.getByText('Continue with Google');
+      await userEvent.click(googleButton);
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+          session: 'sess_123',
+          navigate: expect.any(Function),
+        });
       });
     });
   });
@@ -309,30 +341,6 @@ describe('SignInStart', () => {
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.create).toHaveBeenCalled();
       expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-two');
-    });
-  });
-
-  describe('SAML', () => {
-    it('initiates a SAML flow if saml is listed as a supported first factor', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
-      });
-      fixtures.signIn.create.mockReturnValueOnce(
-        Promise.resolve({
-          status: 'needs_identifier',
-          supportedFirstFactors: [{ strategy: 'saml' }],
-        } as unknown as SignInResource),
-      );
-      const { userEvent } = render(<SignInStart />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
-      await userEvent.click(screen.getByText('Continue'));
-      expect(fixtures.signIn.create).toHaveBeenCalled();
-      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
-        strategy: 'enterprise_sso',
-        redirectUrl: 'http://localhost:3000/#/sso-callback',
-        redirectUrlComplete: '/',
-        continueSignIn: true,
-      });
     });
   });
 
@@ -519,6 +527,76 @@ describe('SignInStart', () => {
             identifier: 'hello@clerk.com',
           });
         });
+      });
+    });
+  });
+
+  describe('Session already exists error handling', () => {
+    it('redirects user when session_exists error is returned during sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+
+      const sessionExistsError = new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'session_exists',
+            long_message: 'A session already exists',
+            message: 'Session exists',
+          },
+        ],
+        status: 422,
+      });
+
+      fixtures.clerk.client.lastActiveSessionId = 'sess_123';
+      fixtures.signIn.create.mockRejectedValueOnce(sessionExistsError);
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+          session: 'sess_123',
+          navigate: expect.any(Function),
+        });
+      });
+    });
+
+    it('calls navigate after setting session active on session_exists error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+
+      const sessionExistsError = new ClerkAPIResponseError('Error', {
+        data: [
+          {
+            code: 'session_exists',
+            long_message: 'A session already exists',
+            message: 'Session exists',
+          },
+        ],
+        status: 422,
+      });
+
+      fixtures.clerk.client.lastActiveSessionId = 'sess_123';
+      fixtures.signIn.create.mockRejectedValueOnce(sessionExistsError);
+
+      const mockSession = { id: 'sess_123' } as any;
+      (fixtures.clerk.setActive as any).mockImplementation(
+        async ({ navigate }: { navigate: ({ session }: { session: any }) => Promise<void> }) => {
+          await navigate({ session: mockSession });
+        },
+      );
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalled();
       });
     });
   });

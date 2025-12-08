@@ -55,6 +55,7 @@ describe('useEnabledThirdPartyProviders', () => {
       'oauth_tiktok',
       'oauth_twitch',
       'oauth_twitter',
+      'oauth_vercel',
       'oauth_x',
       'oauth_xero',
     ]);

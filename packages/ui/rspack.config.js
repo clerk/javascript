@@ -15,14 +15,10 @@ const isDevelopment = mode => !isProduction(mode);
 
 const variants = {
   uiBrowser: 'ui.browser',
-  ui: 'ui',
-  entry: 'entry',
 };
 
 const variantToSourceFile = {
   [variants.uiBrowser]: './src/index.browser.ts',
-  [variants.ui]: './src/index.ts',
-  [variants.entry]: './src/entry.ts',
 };
 
 /**
@@ -48,6 +44,7 @@ const common = ({ mode, variant }) => {
         PACKAGE_VERSION: JSON.stringify(packageJSON.version),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
         PACKAGE_NAME: JSON.stringify(packageJSON.name),
+        __BUILD_DISABLE_RHC__: JSON.stringify(false),
       }),
       new rspack.EnvironmentPlugin({
         NODE_ENV: mode,
@@ -59,45 +56,19 @@ const common = ({ mode, variant }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          zxcvbnTSCoreVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts\/core|fastest-levenshtein)[\\/]/,
-            name: 'zxcvbn-ts-core',
-            chunks: 'all',
-          },
-          zxcvbnTSCommonVendor: {
-            test: /[\\/]node_modules[\\/](@zxcvbn-ts)[\\/](language-common)[\\/]/,
-            name: 'zxcvbn-common',
-            chunks: 'all',
-          },
-          baseAccountSDKVendor: {
-            test: /[\\/]node_modules[\\/](@base-org\/account|@noble\/curves|abitype|ox|preact|eventemitter3|viem|zustand)[\\/]/,
-            name: 'base-account-sdk',
-            chunks: 'all',
-          },
-          coinbaseWalletSDKVendor: {
-            test: /[\\/]node_modules[\\/](@coinbase\/wallet-sdk|preact|eventemitter3|@noble\/hashes)[\\/]/,
-            name: 'coinbase-wallet-sdk',
-            chunks: 'all',
-          },
-          stripeVendor: {
-            test: /[\\/]node_modules[\\/](@stripe\/stripe-js)[\\/]/,
-            name: 'stripe-vendors',
-            chunks: 'all',
-            enforce: true,
-          },
           /**
            * Sign up is shared between the SignUp component and the SignIn component.
            */
           signUp: {
             minChunks: 1,
             name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
+            test: module => !!(module.resource && module.resource.includes('/components/SignUp')),
           },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
+            test: module => !!(module.resource && !module.resource.includes('/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -137,7 +108,7 @@ const commonForProdBrowser = () => {
   return {
     devtool: false,
     output: {
-      path: path.resolve(__dirname, 'dist/browser'),
+      path: path.resolve(__dirname, 'dist'),
       filename: '[name].js',
       libraryTarget: 'umd',
       globalObject: 'globalThis',
@@ -166,43 +137,9 @@ const commonForProdBrowser = () => {
 };
 
 /**
- * Common production configuration for bundled module builds (no chunks)
- * @returns {import('@rspack/core').Configuration}
- */
-const commonForProdBundled = () => {
-  return {
-    devtool: false,
-    output: {
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: '',
-    },
-    module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets: 'last 2 years' })],
-    },
-    optimization: {
-      minimize: true,
-      minimizer: [
-        new rspack.SwcJsMinimizerRspackPlugin({
-          minimizerOptions: {
-            compress: {
-              unused: true,
-              dead_code: true,
-              passes: 2,
-            },
-            mangle: {
-              safari10: true,
-            },
-          },
-        }),
-      ],
-    },
-  };
-};
-
-/**
- * Production configuration - builds multiple variants
+ * Production configuration - builds UMD browser variant only
  * @param {'development'|'production'} mode
- * @returns {(import('@rspack/core').Configuration)[]}
+ * @returns {import('@rspack/core').Configuration}
  */
 const prodConfig = mode => {
   // Browser bundle with chunks (UMD)
@@ -212,52 +149,7 @@ const prodConfig = mode => {
     commonForProdBrowser(),
   );
 
-  // ESM module bundle (no chunks)
-  const uiEsm = merge(entryForVariant(variants.ui), common({ mode, variant: variants.ui }), commonForProdBundled(), {
-    experiments: {
-      outputModule: true,
-    },
-    output: {
-      filename: '[name].mjs',
-      libraryTarget: 'module',
-    },
-    plugins: [
-      // Bundle everything into a single file for ESM
-      new rspack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1,
-      }),
-    ],
-    optimization: {
-      splitChunks: false,
-    },
-  });
-
-  // Entry ESM module bundle (no chunks)
-  const entryEsm = merge(
-    entryForVariant(variants.entry),
-    common({ mode, variant: variants.entry }),
-    commonForProdBundled(),
-    {
-      experiments: {
-        outputModule: true,
-      },
-      output: {
-        filename: '[name].mjs',
-        libraryTarget: 'module',
-      },
-      plugins: [
-        // Bundle everything into a single file for ESM
-        new rspack.optimize.LimitChunkCountPlugin({
-          maxChunks: 1,
-        }),
-      ],
-      optimization: {
-        splitChunks: false,
-      },
-    },
-  );
-
-  return [uiBrowser, uiEsm, entryEsm];
+  return uiBrowser;
 };
 
 /**
@@ -275,7 +167,7 @@ const devConfig = (mode, env) => {
       rules: [svgLoader(), ...typescriptLoaderDev()],
     },
     plugins: [new ReactRefreshPlugin({ overlay: { sockHost: devUrl.host } })],
-    devtool: 'eval-cheap-source-map',
+    devtool: 'eval-source-map',
     output: {
       publicPath: `${devUrl.origin}/npm/`,
       crossOriginLoading: 'anonymous',
@@ -284,6 +176,8 @@ const devConfig = (mode, env) => {
     },
     optimization: {
       minimize: false,
+      usedExports: false,
+      providedExports: false,
     },
     devServer: {
       allowedHosts: ['all'],

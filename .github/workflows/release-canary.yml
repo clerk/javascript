@@ -4,7 +4,7 @@ run-name: Canary release from ${{ github.ref_name }}
 on:
   push:
     branches:
-      - main
+      - main-disabled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -65,9 +65,9 @@ jobs:
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'sdk-infra-workers',
-                workflow_id: 'update-pkg-versions',
+                workflow_id: 'update-pkg-versions.yml',
                 ref: 'main',
-                inputs: { version: clerkjsVersion }
+                inputs: { clerkjsVersion: clerkjsVersion }
               })
 
             if (nextjsVersion.includes('canary')) {

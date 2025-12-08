@@ -1,9 +1,10 @@
 import { deprecated } from '@clerk/shared/deprecated';
-import type { Appearance } from '@clerk/shared/types';
+import type { ModuleManager } from '@clerk/shared/moduleManager';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';
 import type { Drawer } from '../elements/Drawer';
+import type { Appearance } from '../internal/appearance';
 import type { ThemableCssProp } from '../styledSystem';
 import type { AvailableComponentCtx } from '../types';
 import type { ClerkComponentName } from './components';
@@ -12,6 +13,7 @@ import { ClerkComponents } from './components';
 const CoreClerkContextWrapper = lazy(() => import('../contexts').then(m => ({ default: m.CoreClerkContextWrapper })));
 const EnvironmentProvider = lazy(() => import('../contexts').then(m => ({ default: m.EnvironmentProvider })));
 const OptionsProvider = lazy(() => import('../contexts').then(m => ({ default: m.OptionsProvider })));
+const ModuleManagerProvider = lazy(() => import('../contexts').then(m => ({ default: m.ModuleManagerProvider })));
 const AppearanceProvider = lazy(() => import('../customizables').then(m => ({ default: m.AppearanceProvider })));
 const VirtualRouter = lazy(() => import('../router').then(m => ({ default: m.VirtualRouter })));
 const InternalThemeProvider = lazy(() => import('../styledSystem').then(m => ({ default: m.InternalThemeProvider })));
@@ -32,7 +34,13 @@ const OrganizationSwitcherPrefetch = lazy(() =>
   })),
 );
 
-type LazyProvidersProps = React.PropsWithChildren<{ clerk: any; environment: any; options: any; children: any }>;
+type LazyProvidersProps = React.PropsWithChildren<{
+  clerk: any;
+  environment: any;
+  options: any;
+  moduleManager: ModuleManager;
+  children: any;
+}>;
 
 export const LazyProviders = (props: LazyProvidersProps) => {
   return (
@@ -40,11 +48,13 @@ export const LazyProviders = (props: LazyProvidersProps) => {
       nonce={props.options.nonce}
       cssLayerName={props.options.appearance?.cssLayerName}
     >
-      <CoreClerkContextWrapper clerk={props.clerk}>
-        <EnvironmentProvider value={props.environment}>
-          <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
-        </EnvironmentProvider>
-      </CoreClerkContextWrapper>
+      <ModuleManagerProvider moduleManager={props.moduleManager}>
+        <CoreClerkContextWrapper clerk={props.clerk}>
+          <EnvironmentProvider value={props.environment}>
+            <OptionsProvider value={props.options}>{props.children}</OptionsProvider>
+          </EnvironmentProvider>
+        </CoreClerkContextWrapper>
+      </ModuleManagerProvider>
     </StyleCacheProvider>
   );
 };
@@ -201,6 +211,23 @@ export const LazyImpersonationFabProvider = (
         <AppearanceProvider
           globalAppearance={props.globalAppearance}
           appearanceKey={'impersonationFab'}
+        >
+          {props.children}
+        </AppearanceProvider>
+      </VirtualRouter>
+    </Suspense>
+  );
+};
+
+export const LazyEnableOrganizationsPromptProvider = (
+  props: React.PropsWithChildren<{ globalAppearance: Appearance | undefined }>,
+) => {
+  return (
+    <Suspense>
+      <VirtualRouter startPath=''>
+        <AppearanceProvider
+          globalAppearance={props.globalAppearance}
+          appearanceKey={'enableOrganizationsPrompt'}
         >
           {props.children}
         </AppearanceProvider>

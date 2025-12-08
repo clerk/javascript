@@ -37,7 +37,7 @@ function SignUpStartInternal(): JSX.Element {
   const clerk = useClerk();
   const status = useLoadingStatus();
   const signUp = useCoreSignUp();
-  const { showOptionalFields } = useAppearance().parsedLayout;
+  const { showOptionalFields } = useAppearance().parsedOptions;
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
@@ -188,7 +188,7 @@ function SignUpStartInternal(): JSX.Element {
         // Keep the card in loading state during SSO redirect to prevent UI flicker
         // This is necessary because there's a brief delay between initiating the SSO flow
         // and the actual redirect to the external Identity Provider
-        const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'saml' || mf === 'enterprise_sso');
+        const isRedirectingToSSOProvider = signUp.missingFields.some(mf => mf === 'enterprise_sso');
         if (isRedirectingToSSOProvider) {
           return;
         }

@@ -18,7 +18,6 @@ const variants = {
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
   clerkCHIPS: 'clerk.chips.browser',
-  clerkChannelBrowser: 'clerk.channel.browser',
 };
 
 const variantToSourceFile = {
@@ -29,7 +28,6 @@ const variantToSourceFile = {
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
   [variants.clerkCHIPS]: './src/index.browser.ts',
-  [variants.clerkChannelBrowser]: './src/index.browser.ts',
 };
 
 /**
@@ -61,7 +59,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
          */
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
-        __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
       }),
       new rspack.EnvironmentPlugin({
@@ -123,20 +120,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'query-core-vendors',
             chunks: 'all',
             enforce: true,
-          },
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -324,13 +307,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     commonForProdChunked(),
   );
 
-  const clerkChannelBrowser = merge(
-    entryForVariant(variants.clerkChannelBrowser),
-    common({ mode, variant: variants.clerkChannelBrowser }),
-    commonForProd(),
-    commonForProdChunked(),
-  );
-
   const clerkEsm = merge(
     entryForVariant(variants.clerk),
     common({ mode, variant: variants.clerk }),
@@ -445,7 +421,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkHeadless,
     clerkHeadlessBrowser,
     clerkCHIPS,
-    clerkChannelBrowser,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -551,11 +526,6 @@ const devConfig = ({ mode, env }) => {
     [variants.clerkCHIPS]: merge(
       entryForVariant(variants.clerkCHIPS),
       common({ mode, variant: variants.clerkCHIPS }),
-      commonForDev(),
-    ),
-    [variants.clerkChannelBrowser]: merge(
-      entryForVariant(variants.clerkChannelBrowser),
-      common({ mode, variant: variants.clerkChannelBrowser }),
       commonForDev(),
     ),
   };

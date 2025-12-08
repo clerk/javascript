@@ -83,17 +83,17 @@ export interface ClerkJWTClaims {
   act?: ActClaim;
 
   /**
-   * Active organization ID.
+   * Active Organization ID.
    */
   org_id?: string;
 
   /**
-   * Active organization slug.
+   * Active Organization Slug.
    */
   org_slug?: string;
 
   /**
-   * Active organization role.
+   * Active Organization Role.
    */
   org_role?: OrganizationCustomRoleKey;
 

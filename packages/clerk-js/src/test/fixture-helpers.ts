@@ -45,6 +45,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
     Partial<UserJSON>,
     'email_addresses' | 'phone_numbers' | 'external_accounts' | 'organization_memberships'
   > & {
+    identifier?: string;
     email_addresses?: Array<string | Partial<EmailAddressJSON>>;
     phone_numbers?: Array<string | Partial<PhoneNumberJSON>>;
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
@@ -57,7 +58,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       first_name: 'FirstName',
       last_name: 'LastName',
       image_url: '',
-      identifier: 'email@test.com',
+      identifier: params.identifier || 'email@test.com',
       user_id: '',
       ...params,
     } as PublicUserDataJSON;

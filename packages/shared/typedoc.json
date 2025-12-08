@@ -6,6 +6,7 @@
     "./src/react/hooks/*.{ts,tsx}",
     "./src/react/commerce.tsx",
     "./src/react/contexts.tsx",
+    "./src/react/billing/*.{ts,tsx}",
     "./src/types/*.ts"
   ],
   "compilerOptions": {

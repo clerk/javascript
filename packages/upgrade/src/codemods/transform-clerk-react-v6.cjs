@@ -44,16 +44,20 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
 
       if (legacySpecifiers.length > 0 && nonLegacySpecifiers.length > 0) {
         // Mixed import: keep non-legacy on targetPackage, emit a new import for legacy hooks
-        node.specifiers = nonLegacySpecifiers;
-        node.source = j.literal(targetPackage);
+        // Use replaceWith to avoid formatting issues with insertAfter
+        const mainImport = j.importDeclaration(nonLegacySpecifiers, j.stringLiteral(targetPackage));
         if (importKind) {
-          node.importKind = importKind;
+          mainImport.importKind = importKind;
         }
-        const legacyImportDecl = j.importDeclaration(legacySpecifiers, j.literal(`${targetPackage}/legacy`));
+        // Preserve leading comments/whitespace from original import
+        mainImport.comments = node.comments;
+
+        const legacyImport = j.importDeclaration(legacySpecifiers, j.stringLiteral(`${targetPackage}/legacy`));
         if (importKind) {
-          legacyImportDecl.importKind = importKind;
+          legacyImport.importKind = importKind;
         }
-        j(path).insertAfter(legacyImportDecl);
+
+        j(path).replaceWith([mainImport, legacyImport]);
         dirtyFlag = true;
         return;
       }
@@ -137,7 +141,14 @@ module.exports = function transformClerkReactV6({ source }, { jscodeshift: j }) 
       });
   });
 
-  return dirtyFlag ? root.toSource() : undefined;
+  if (!dirtyFlag) {
+    return undefined;
+  }
+
+  let result = root.toSource();
+  // Fix double semicolons that can occur when recast reprints directive prologues (e.g., "use client";)
+  result = result.replace(/^(['"`][^'"`]+['"`]);;/gm, '$1;');
+  return result;
 };
 
 module.exports.parser = 'tsx';

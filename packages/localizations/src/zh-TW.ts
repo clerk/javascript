@@ -681,7 +681,13 @@ export const zhTW: LocalizationResource = {
       subtitle: '以繼續前往 {{applicationName}}',
       title: '輸入您的密碼',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -849,8 +855,19 @@ export const zhTW: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '檔案大小超過10MB的上限。請選擇較小的檔案。',
+    avatar_file_type_invalid: '不支援的檔案類型。請上傳 JPG、PNG、GIF 或 WEBP 格式的圖片。',
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,
@@ -858,6 +875,7 @@ export const zhTW: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '我們無法找到具有這些信息的帳戶。',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: '電子郵件地址必須是有效的格式。',
     form_param_format_invalid__phone_number: '電話號碼必須是有效的國際格式。',
@@ -875,9 +893,11 @@ export const zhTW: LocalizationResource = {
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: '您的密碼超過允許的大小上限，請縮短或移除部分特殊字元。',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '密碼驗證失敗',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '您的使用者名稱必須包含至少一個非數字字元。',
     identification_deletion_failed: '您無法刪除最後一個驗證方式。',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

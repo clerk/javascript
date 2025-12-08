@@ -9,6 +9,7 @@ import type {
   TasksRedirectOptions,
 } from '@clerk/shared/types';
 import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Appearance, ExtractAppearanceType, Ui } from '@clerk/ui/internal';
 import type React from 'react';
 
 // Re-export types from @clerk/shared that are used by other modules
@@ -28,14 +29,14 @@ declare global {
     __clerk_publishable_key?: string;
     __clerk_proxy_url?: Clerk['proxyUrl'];
     __clerk_domain?: Clerk['domain'];
-    __unstable_ClerkUiCtor?: ClerkUiConstructor;
+    __internal_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
 
 /**
  * @interface
  */
-export type ClerkProviderProps = IsomorphicClerkOptions & {
+export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<IsomorphicClerkOptions, 'appearance'> & {
   children: React.ReactNode;
   /**
    * Provide an initial state of the Clerk client during server-side rendering. You don't need to set this value yourself unless you're [developing an SDK](https://clerk.com/docs/guides/development/sdk-development/overview).
@@ -47,6 +48,16 @@ export type ClerkProviderProps = IsomorphicClerkOptions & {
    * @internal
    */
   __internal_bypassMissingPublishableKey?: boolean;
+  /**
+   * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+   */
+  appearance?: ExtractAppearanceType<TUi, Appearance>;
+  /**
+   * Optional object to pin the UI version your app will be using. Useful when you've extensively customize the look and feel of the
+   * components using the appearance prop.
+   * Note: When `ui` is used, appearance is automatically typed based on the specific UI version.
+   */
+  ui?: TUi;
 };
 
 export type WithClerkProp<T = unknown> = T & { clerk: LoadedClerk; component?: string };
@@ -91,7 +102,7 @@ type PageProps<T extends string> =
       labelIcon?: never;
     };
 
-export type UserProfilePageProps = PageProps<'account' | 'security'>;
+export type UserProfilePageProps = PageProps<'account' | 'security' | 'billing' | 'apiKeys'>;
 
 export type UserProfileLinkProps = {
   url: string;
@@ -99,7 +110,7 @@ export type UserProfileLinkProps = {
   labelIcon: React.ReactNode;
 };
 
-export type OrganizationProfilePageProps = PageProps<'general' | 'members'>;
+export type OrganizationProfilePageProps = PageProps<'general' | 'members' | 'billing' | 'apiKeys'>;
 export type OrganizationProfileLinkProps = UserProfileLinkProps;
 
 type ButtonActionProps<T extends string> =
