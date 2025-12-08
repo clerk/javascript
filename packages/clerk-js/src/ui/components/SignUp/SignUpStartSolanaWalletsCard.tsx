@@ -51,8 +51,6 @@ const SignUpStartSolanaWalletsCardInner = () => {
                       signUpContinueUrl: '../continue',
                       strategy: 'web3_solana_signature',
                       unsafeMetadata: ctx.unsafeMetadata,
-                      // TODO: Add support to pass legalAccepted status
-                      // legalAccepted: ,
                       walletName,
                     })
                     .catch(err => web3CallbackErrorHandler(err, card.setError));
