@@ -1,8 +1,8 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { GenerateSignature, Web3Provider } from '@clerk/shared/types';
 import type { SolanaWalletAdapterWallet } from '@solana/wallet-standard';
 
 import { clerkUnsupportedEnvironmentWarning } from '@/core/errors';
-import { ClerkRuntimeError } from '@/index.headless';
 import { errorThrower } from '@/utils/errorThrower';
 import { getInjectedWeb3SolanaProviders } from '@/utils/injectedWeb3SolanaProviders';
 
