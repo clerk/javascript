@@ -63,6 +63,9 @@ jobs:
           filter: "blob:none"
           show-progress: false
 
+      - name: Fetch main branch for changeset comparison
+        run: git fetch origin main:refs/remotes/origin/main --depth=100
+
       - name: Setup
         id: config
         uses: ./.github/actions/init-blacksmith
