@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
@@ -880,10 +880,13 @@ export const taIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
+    avatar_file_size_exceeded: 'கோப்பு அளவு 10MB அதிகபட்ச வரம்பை மீறுகிறது. சிறிய கோப்பை தேர்வு செய்யவும்.',
+    avatar_file_type_invalid: 'கோப்பு வகை ஆதரிக்கப்படவில்லை. JPG, PNG, GIF அல்லது WEBP படத்தை பதிவேற்றவும்.',
     captcha_invalid:
       'பாதுகாப்பு சரிபார்ப்புகள் தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     captcha_unavailable:
@@ -893,6 +896,7 @@ export const taIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__username: 'இந்த பயனர்பெயர் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_not_found: 'இந்த அடையாளத்துடன் கணக்கு எதுவும் இல்லை. சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறான வடிவத்தில் உள்ளது. சரிபார்த்து திருத்தவும்.',
     form_param_format_invalid__email_address: 'மின்னஞ்சல் முகவரி சரியான மின்னஞ்சல் முகவரியாக இருக்க வேண்டும்.',
     form_param_format_invalid__phone_number: 'தொலைபேசி எண் சரியான சர்வதேச வடிவமைப்பில் இருக்க வேண்டும்.',

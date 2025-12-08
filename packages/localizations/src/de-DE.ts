@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
@@ -888,10 +888,15 @@ export const deDE: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
+    avatar_file_size_exceeded:
+      'Die Dateigröße überschreitet das Maximum von 10 MB. Bitte wählen Sie eine kleinere Datei.',
+    avatar_file_type_invalid:
+      'Dateityp wird nicht unterstützt. Bitte laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch.',
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:
@@ -901,6 +906,7 @@ export const deDE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
     form_identifier_not_found: 'Wir konnten kein Konto mit diesen Details finden.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Das Format des eingegebenen Parameters ist ungültig.',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_format_invalid__phone_number: 'Die Telefonnummer muss ein gültiges internationales Format haben.',

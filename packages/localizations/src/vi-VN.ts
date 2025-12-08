@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
@@ -881,10 +881,13 @@ export const viVN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
+    avatar_file_size_exceeded: 'Kích thước tệp vượt quá giới hạn tối đa 10MB. Vui lòng chọn tệp nhỏ hơn.',
+    avatar_file_type_invalid: 'Loại tệp không được hỗ trợ. Vui lòng tải lên hình ảnh JPG, PNG, GIF hoặc WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Đăng ký không thành công do lỗi bot. Vui lòng tải lại trang để thử lại hoặc liên hệ hỗ trợ để được hỗ trợ.',
@@ -893,6 +896,7 @@ export const viVN: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,

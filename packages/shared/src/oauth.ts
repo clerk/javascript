@@ -182,6 +182,9 @@ interface getOAuthProviderDataProps {
   strategy?: OAuthStrategy;
 }
 
+/**
+ *
+ */
 export function getOAuthProviderData({
   provider,
   strategy,

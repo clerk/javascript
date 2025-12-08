@@ -1,4 +1,4 @@
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
@@ -872,10 +872,13 @@ export const enUS: LocalizationResource = {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',
     },
-    title: 'Reset password',
+    subtitle: 'Your account requires a new password before you can continue',
+    title: 'Reset your password',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
@@ -884,6 +887,7 @@ export const enUS: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: 'New password cannot be the same as the current password.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -903,6 +907,8 @@ export const enUS: LocalizationResource = {
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_compromised__sign_in:
+      "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
     form_password_untrusted__sign_in:
       "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
     form_password_validation_failed: undefined,

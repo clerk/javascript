@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
@@ -886,10 +886,15 @@ export const roRO: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
+    avatar_file_size_exceeded:
+      'Dimensiunea fișierului depășește limita maximă de 10 MB. Te rugăm să alegi un fișier mai mic.',
+    avatar_file_type_invalid:
+      'Tipul fișierului nu este acceptat. Te rugăm să încarci o imagine JPG, PNG, GIF sau WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
@@ -898,6 +903,7 @@ export const roRO: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,

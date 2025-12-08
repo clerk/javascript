@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const faIR: LocalizationResource = {
   locale: 'fa-IR',
@@ -884,10 +884,13 @@ export const faIR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
+    avatar_file_size_exceeded: 'حجم فایل از حداکثر مجاز ۱۰ مگابایت بیشتر است. لطفاً فایل کوچکتری انتخاب کنید.',
+    avatar_file_type_invalid: 'نوع فایل پشتیبانی نمی‌شود. لطفاً تصویری با فرمت JPG، PNG، GIF یا WEBP آپلود کنید.',
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
@@ -896,6 +899,7 @@ export const faIR: LocalizationResource = {
     form_identifier_exists__phone_number: 'این شماره تلفن قبلاً استفاده شده است.',
     form_identifier_exists__username: 'این نام کاربری قبلاً گرفته شده است.',
     form_identifier_not_found: 'شناسه یافت نشد.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'فرمت پارامتر نامعتبر است.',
     form_param_format_invalid__email_address: 'آدرس ایمیل نامعتبر است.',
     form_param_format_invalid__phone_number: 'شماره تلفن نامعتبر است.',

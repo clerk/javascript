@@ -3,7 +3,7 @@ import {
   type GetAuthFn,
   getAuthObjectForAcceptedToken,
 } from '@clerk/backend/internal';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { LoaderFunctionArgs } from 'react-router';
 
 import { IsOptIntoMiddleware } from '../server/utils';

@@ -1,13 +1,13 @@
 import type { FapiRequestInit, FapiResponse } from '@clerk/clerk-js/dist/types/core/fapiClient';
 import { type Clerk, isClerkRuntimeError } from '@clerk/clerk-js/headless';
-import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/clerk-react';
+import type { BrowserClerk, HeadlessBrowserClerk } from '@clerk/react';
 import { is4xxError } from '@clerk/shared/error';
 import type {
   ClientJSONSnapshot,
   EnvironmentJSONSnapshot,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { Platform } from 'react-native';
 
 import packageJson from '../../../package.json';
@@ -116,7 +116,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
           __internal_clerk.addListener(({ client }) => {
             // @ts-expect-error - This is an internal API
-            const environment = __internal_clerk?.__unstable__environment as EnvironmentResource;
+            const environment = __internal_clerk?.__internal_environment as EnvironmentResource;
             if (environment) {
               void EnvironmentResourceCache.save(environment.__internal_toSnapshot());
             }
@@ -152,7 +152,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
       }
 
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__unstable__onBeforeRequest(async (requestInit: FapiRequestInit) => {
+      __internal_clerk.__internal_onBeforeRequest(async (requestInit: FapiRequestInit) => {
         // https://reactnative.dev/docs/0.61/network#known-issues-with-fetch-and-cookie-based-authentication
         requestInit.credentials = 'omit';
 
@@ -172,7 +172,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       let nativeApiErrorShown = false;
       // @ts-expect-error - This is an internal API
-      __internal_clerk.__unstable__onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
+      __internal_clerk.__internal_onAfterResponse(async (_: FapiRequestInit, response: FapiResponse<unknown>) => {
         const authHeader = response.headers.get('authorization');
         if (authHeader) {
           await saveToken(KEY, authHeader);

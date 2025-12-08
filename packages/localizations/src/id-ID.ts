@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
@@ -879,10 +879,13 @@ export const idID: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
+    avatar_file_size_exceeded: 'Ukuran file melebihi batas maksimum 10MB. Silakan pilih file yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis file tidak didukung. Silakan unggah gambar JPG, PNG, GIF, atau WEBP.',
     captcha_invalid:
       'Pendaftaran gagal karena validasi keamanan gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     captcha_unavailable:
@@ -892,6 +895,7 @@ export const idID: LocalizationResource = {
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_not_found: 'Kami tidak dapat menemukan akun dengan detail tersebut.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Alamat email harus berupa alamat email yang valid.',
     form_param_format_invalid__phone_number: 'Nomor telepon harus dalam format internasional yang valid',

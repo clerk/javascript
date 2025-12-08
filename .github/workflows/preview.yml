@@ -77,7 +77,7 @@ jobs:
           turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - name: Build packages
         run: pnpm turbo build $TURBO_ARGS
@@ -101,12 +101,17 @@ jobs:
         run: |
           cp -r $GITHUB_WORKSPACE/packages/clerk-js/dist $FULL_TMP_FOLDER/public/clerk-js
 
+      - name: Copy ui/dist/browser into public/clerk-ui of test site
+        run: |
+          cp -r $GITHUB_WORKSPACE/packages/ui/dist/browser $FULL_TMP_FOLDER/public/clerk-ui
+
       - name: Build with Vercel
         run: |
           cd $FULL_TMP_FOLDER
           vercel build --yes
         env:
           NEXT_PUBLIC_CLERK_JS_URL: /clerk-js/clerk.browser.js
+          NEXT_PUBLIC_CLERK_UI_URL: /clerk-ui/ui.browser.js
 
       - name: Deploy to Vercel (prebuilt)
         id: vercel-deploy

@@ -1,3 +1,6 @@
+/* eslint-disable  */
+// @ts-nocheck
+
 import type { ClerkOptions, ClientJSON, EnvironmentJSON, LoadedClerk } from '@clerk/shared/types';
 import { useState } from 'react';
 import { vi } from 'vitest';

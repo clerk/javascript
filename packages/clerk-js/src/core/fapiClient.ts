@@ -1,16 +1,13 @@
 import { isBrowserOnline } from '@clerk/shared/browser';
+import { buildEmailAddress as buildEmailAddressUtil } from '@clerk/shared/internal/clerk-js/email';
+import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
 import { retry } from '@clerk/shared/retry';
 import type { ClerkAPIErrorJSON, ClientJSON, InstanceType } from '@clerk/shared/types';
 import { camelToSnake } from '@clerk/shared/underscore';
 
 import { debugLogger } from '@/utils/debug';
 
-import {
-  buildEmailAddress as buildEmailAddressUtil,
-  buildURL as buildUrlUtil,
-  filterUndefinedValues,
-  stringifyQueryParams,
-} from '../utils';
+import { buildURL as buildUrlUtil, filterUndefinedValues } from '../utils';
 import { SUPPORTED_FAPI_VERSION } from './constants';
 import { clerkNetworkError } from './errors';
 
@@ -90,7 +87,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   async function runBeforeRequestCallbacks(requestInit: FapiRequestInit) {
-    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onBeforeRequest;
+    const windowCallback = typeof window !== 'undefined' && (window as any).__internal_onBeforeRequest;
     for await (const callback of [windowCallback, ...onBeforeRequestCallbacks].filter(s => s)) {
       if ((await callback(requestInit)) === false) {
         return false;
@@ -100,7 +97,7 @@ export function createFapiClient(options: FapiClientOptions): FapiClient {
   }
 
   async function runAfterResponseCallbacks(requestInit: FapiRequestInit, response: FapiResponse<unknown>) {
-    const windowCallback = typeof window !== 'undefined' && (window as any).__unstable__onAfterResponse;
+    const windowCallback = typeof window !== 'undefined' && (window as any).__internal_onAfterResponse;
     for await (const callback of [windowCallback, ...onAfterResponseCallbacks].filter(s => s)) {
       if ((await callback(requestInit, response)) === false) {
         return false;

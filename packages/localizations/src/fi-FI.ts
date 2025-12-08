@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
@@ -874,10 +874,13 @@ export const fiFI: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
+    avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:
@@ -887,6 +890,7 @@ export const fiFI: LocalizationResource = {
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
     form_identifier_not_found: 'Ei voi löytää tiliä näillä tiedoilla.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Sähköpostiosoiteen tulee olla kelvollinen.',
     form_param_format_invalid__phone_number: 'Puhelinnumeron on oltava kelvollisessa kansainvälisessä muodossa',

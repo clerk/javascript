@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
@@ -871,10 +871,14 @@ export const ptPT: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do ficheiro excede o limite máximo de 10 MB. Por favor, escolha um ficheiro mais pequeno.',
+    avatar_file_type_invalid: 'Tipo de ficheiro não suportado. Por favor, carregue uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível inscrever-se devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
@@ -884,6 +888,7 @@ export const ptPT: LocalizationResource = {
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
     form_identifier_not_found: 'Não foi possível encontrar uma conta com esses detalhes.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato de parâmetro inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
     form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/localizations",
-  "version": "3.29.0",
+  "version": "3.30.0",
   "description": "Localizations for the Clerk components",
   "keywords": [
     "react",
@@ -51,54 +51,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist",
-    "ar-SA",
-    "be-BY",
-    "ca-ES",
-    "cs-CZ",
-    "da-DK",
-    "de-DE",
-    "el-GR",
-    "en-GB",
-    "en-US",
-    "es-CR",
-    "es-ES",
-    "fa-IR",
-    "fi-FI",
-    "fr-FR",
-    "he-IL",
-    "id-ID",
-    "is-IS",
-    "it-IT",
-    "ja-JP",
-    "ko-KR",
-    "mn-MN",
-    "nb-NO",
-    "nl-NL",
-    "nl-BE",
-    "pl-PL",
-    "pt-BR",
-    "pt-PT",
-    "ro-RO",
-    "ru-RU",
-    "sk-SK",
-    "sv-SE",
-    "tr-TR",
-    "uk-UA",
-    "vi-VN",
-    "zh-CN",
-    "zh-TW",
-    "es-MX",
-    "bg-BG",
-    "th-TH",
-    "hu-HU",
-    "sr-RS",
-    "hr-HR",
-    "es-UY"
+    "dist"
   ],
   "scripts": {
     "build": "tsup --env.NODE_ENV production",
-    "postbuild": "node ../../scripts/subpath-workaround.mjs localizations",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "format": "node ../../scripts/format-package.mjs",
@@ -108,11 +64,11 @@
     "lint:attw": "attw --pack . --profile node16"
   },
   "dependencies": {
-    "@clerk/types": "workspace:^"
+    "@clerk/shared": "workspace:^"
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

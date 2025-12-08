@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
@@ -875,10 +875,14 @@ export const hrHR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
+    avatar_file_size_exceeded:
+      'Veličina datoteke premašuje maksimalno ograničenje od 10 MB. Molimo odaberite manju datoteku.',
+    avatar_file_type_invalid: 'Vrsta datoteke nije podržana. Molimo prenesite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspješna zbog neuspjelih sigurnosnih provjera. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     captcha_unavailable:
@@ -888,6 +892,7 @@ export const hrHR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
     form_identifier_not_found: 'Nismo pronašli račun s tim podacima.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-mail adresa mora biti valjana e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u valjanom međunarodnom formatu',

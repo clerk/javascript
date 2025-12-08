@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const svSE: LocalizationResource = {
   locale: 'sv-SE',
@@ -876,10 +876,13 @@ export const svSE: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} är redan medlem i organisationen.',
+    avatar_file_size_exceeded: 'Filstorleken överskrider maxgränsen på 10 MB. Vänligen välj en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen stöds inte. Vänligen ladda upp en JPG-, PNG-, GIF- eller WEBP-bild.',
     captcha_invalid:
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:
@@ -889,6 +892,7 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
     form_identifier_not_found: 'Vi kunde inte hitta ett konto med dessa uppgifter.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formatet är ogiltigt.',
     form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
     form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',

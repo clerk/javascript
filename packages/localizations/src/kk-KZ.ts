@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const kkKZ: LocalizationResource = {
   locale: 'kk-KZ',
@@ -865,10 +865,13 @@ export const kkKZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
+    avatar_file_size_exceeded: 'Файл өлшемі 10 МБ шегінен асып кетті. Кішірек файлды таңдаңыз.',
+    avatar_file_type_invalid: 'Файл түрі қолдау көрсетілмейді. JPG, PNG, GIF немесе WEBP суретін жүктеңіз.',
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
     captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
     form_code_incorrect: undefined,
@@ -876,6 +879,7 @@ export const kkKZ: LocalizationResource = {
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__username: 'Бұл пайдаланушы аты тіркелген. Басқасын қолданыңыз.',
     form_identifier_not_found: 'Есептік жазба табылмады. Дұрыстығын тексеріңіз.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Енгізілген мән жарамсыз пішімде.',
     form_param_format_invalid__email_address: 'Электрондық пошта жарамсыз.',
     form_param_format_invalid__phone_number: 'Телефон нөмірі жарамсыз.',

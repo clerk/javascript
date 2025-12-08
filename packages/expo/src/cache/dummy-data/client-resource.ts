@@ -1,4 +1,4 @@
-import type { ClientJSONSnapshot } from '@clerk/types';
+import type { ClientJSONSnapshot } from '@clerk/shared/types';
 
 export const DUMMY_CLERK_CLIENT_RESOURCE = {
   object: 'client',

@@ -1,7 +1,7 @@
 import type { Stripe, StripeElements, StripeElementsOptions } from '@stripe/stripe-js';
 import React, { type PropsWithChildren, type ReactNode, useCallback, useMemo, useState } from 'react';
 
-import type { BillingCheckoutResource, EnvironmentResource, ForPayerType } from '../../types';
+import type { BillingCheckoutResource, CheckoutFlowResource, EnvironmentResource, ForPayerType } from '../../types';
 import { createContextAndHook } from '../hooks/createContextAndHook';
 import type { useCheckout } from '../hooks/useCheckout';
 import { useClerk } from '../hooks/useClerk';
@@ -27,8 +27,8 @@ type PaymentElementError = {
 
 const useInternalEnvironment = () => {
   const clerk = useClerk();
-  // @ts-expect-error `__unstable__environment` is not typed
-  return clerk.__unstable__environment as unknown as EnvironmentResource | null | undefined;
+  // @ts-expect-error `__internal_environment` is not typed
+  return clerk.__internal_environment as unknown as EnvironmentResource | null | undefined;
 };
 
 const useLocalization = () => {
@@ -100,13 +100,13 @@ export type PaymentElementProviderProps = {
   /**
    * An optional checkout resource object. When provided, the payment element is scoped to the specific checkout session.
    */
-  checkout?: BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
+  checkout?: CheckoutFlowResource | BillingCheckoutResource | ReturnType<typeof useCheckout>['checkout'];
   /**
    * An optional object to customize the appearance of the Stripe Payment Element. This allows you to match the form's styling to your application's theme.
    */
   stripeAppearance?: internalStripeAppearance;
   /**
-   * Specifies whether to fetch for the current user or organization.
+   * Specifies whether to fetch for the current user or Organization.
    *
    * @default 'user'
    */
