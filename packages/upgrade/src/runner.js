@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import chalk from 'chalk';
 import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
 
@@ -43,7 +44,7 @@ export async function runCodemods(config, sdk, options) {
 
     try {
       const result = await runCodemod(transform, glob, options);
-      spinner.success(`Codemod complete: ${transform}`);
+      spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
       renderCodemodResults(transform, result);
 
       const codemodConfig = getCodemodConfig(transform);

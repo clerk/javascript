@@ -73,7 +73,7 @@ async function main() {
   };
 
   if (options.dryRun) {
-    renderWarning('Upgrade running in dry run mode - no changes will be made');
+    renderWarning(' Upgrade running in dry run mode - no changes will be made');
     renderNewline();
   }
 
@@ -137,6 +137,8 @@ async function main() {
     process.exit(0);
   }
 
+  console.log('');
+
   // Step 5: Handle upgrade status
   if (config.alreadyUpgraded) {
     renderSuccess(`You're already on the latest major version of @clerk/${sdk}`);
@@ -148,7 +150,7 @@ async function main() {
   if (config.codemods?.length > 0) {
     renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
     await runCodemods(config, sdk, options);
-    renderSuccess('All codemods completed');
+    renderSuccess('All codemods applied');
     renderNewline();
   }
 

@@ -1,10 +1,9 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import chalk from 'chalk';
 import { globby } from 'globby';
 import { run } from 'jscodeshift/src/Runner.js';
-
-import { colors } from '../render.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -97,26 +96,24 @@ function renderDeprecatedPropsSummary(stats) {
     return;
   }
 
-  console.log(`${colors.yellow}${colors.bold}Manual intervention may be required:${colors.reset}`);
+  console.log(chalk.yellow.bold('Manual intervention may be required:'));
 
   if (userButtonCount > 0) {
-    console.log(`${colors.yellow}• Removed ${userButtonCount} UserButton sign-out redirect prop(s)${colors.reset}`);
-    console.log(`${colors.gray}  To configure sign-out redirects:${colors.reset}`);
-    console.log(`${colors.gray}  - Global: Add afterSignOutUrl to <ClerkProvider>${colors.reset}`);
-    console.log(`${colors.gray}  - Per-button: Use <SignOutButton redirectUrl="...">${colors.reset}`);
-    console.log(`${colors.gray}  - Programmatic: clerk.signOut({ redirectUrl: "..." })${colors.reset}`);
+    console.log(chalk.yellow(`• Removed ${userButtonCount} UserButton sign-out redirect prop(s)`));
+    console.log(chalk.gray('  To configure sign-out redirects:'));
+    console.log(chalk.gray('  - Global: Add afterSignOutUrl to <ClerkProvider>'));
+    console.log(chalk.gray('  - Per-button: Use <SignOutButton redirectUrl="...">'));
+    console.log(chalk.gray('  - Programmatic: clerk.signOut({ redirectUrl: "..." })'));
   }
 
   if (hideSlugCount > 0) {
-    console.log(`${colors.yellow}• Removed ${hideSlugCount} hideSlug prop(s)${colors.reset}`);
-    console.log(`${colors.gray}  Slugs are now managed in the Clerk Dashboard.${colors.reset}`);
+    console.log(chalk.yellow(`• Removed ${hideSlugCount} hideSlug prop(s)`));
+    console.log(chalk.gray('  Slugs are now managed in the Clerk Dashboard.'));
   }
 
   if (beforeEmitCount > 0) {
-    console.log(
-      `${colors.yellow}• Transformed ${beforeEmitCount} setActive({ beforeEmit }) → setActive({ navigate })${colors.reset}`,
-    );
-    console.log(`${colors.gray}  The callback now receives an object with session property.${colors.reset}`);
+    console.log(chalk.yellow(`• Transformed ${beforeEmitCount} setActive({ beforeEmit }) → setActive({ navigate })`));
+    console.log(chalk.gray('  The callback now receives an object with session property.'));
   }
 
   console.log('');
