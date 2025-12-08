@@ -33,7 +33,7 @@ const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
 
-const Web3WalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
+const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
   const card = useCardState();
   const { wallets } = useWallet();
   const { t } = useLocalizations();
@@ -259,7 +259,7 @@ const WalletButtonBlock = forwardRef((props: WalletButtonProps, ref: Ref<HTMLBut
   );
 });
 
-export const Web3WalletButtons = (props: Web3WalletButtonsProps) => {
+export const Web3SolanaWalletButtons = (props: Web3WalletButtonsProps) => {
   const network = MAINNET_ENDPOINT;
   const wallets = useMemo(() => [], [network]);
   return (
@@ -270,7 +270,7 @@ export const Web3WalletButtons = (props: Web3WalletButtonsProps) => {
           console.error(err);
         }}
       >
-        <Web3WalletButtonsInner web3AuthCallback={props.web3AuthCallback} />
+        <Web3SolanaWalletButtonsInner web3AuthCallback={props.web3AuthCallback} />
       </WalletProvider>
     </ConnectionProvider>
   );
