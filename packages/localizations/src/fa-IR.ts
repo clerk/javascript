@@ -889,6 +889,8 @@ export const faIR: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
+    avatar_file_size_exceeded: 'حجم فایل از حداکثر مجاز ۱۰ مگابایت بیشتر است. لطفاً فایل کوچکتری انتخاب کنید.',
+    avatar_file_type_invalid: 'نوع فایل پشتیبانی نمی‌شود. لطفاً تصویری با فرمت JPG، PNG، GIF یا WEBP آپلود کنید.',
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',

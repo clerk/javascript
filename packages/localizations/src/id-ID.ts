@@ -884,6 +884,8 @@ export const idID: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
+    avatar_file_size_exceeded: 'Ukuran file melebihi batas maksimum 10MB. Silakan pilih file yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis file tidak didukung. Silakan unggah gambar JPG, PNG, GIF, atau WEBP.',
     captcha_invalid:
       'Pendaftaran gagal karena validasi keamanan gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     captcha_unavailable:

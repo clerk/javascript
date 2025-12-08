@@ -877,6 +877,8 @@ export const enUS: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',

@@ -878,6 +878,8 @@ export const mnMN: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Файлын хэмжээ 10MB-ийн дээд хязгаараас хэтэрсэн. Жижиг файл сонгоно уу.',
+    avatar_file_type_invalid: 'Файлын төрөл дэмжигдэхгүй байна. JPG, PNG, GIF эсвэл WEBP зураг байршуулна уу.',
     captcha_invalid:
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     captcha_unavailable:

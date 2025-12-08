@@ -51,7 +51,7 @@ export interface HookParams
     }
   > {
   /**
-   * Specifies whether to fetch for the current user or organization.
+   * Specifies whether to fetch for the current user or Organization.
    *
    * @default 'user'
    */
@@ -60,7 +60,7 @@ export interface HookParams
 
 /**
  * A hook factory that creates paginated data fetching hooks for commerce-related resources.
- * It provides a standardized way to create hooks that can fetch either user or organization resources
+ * It provides a standardized way to create hooks that can fetch either user or Organization resources
  * with built-in pagination support.
  *
  * The generated hooks handle:
