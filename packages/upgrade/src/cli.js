@@ -37,6 +37,8 @@ const cli = meow(
       --dir              Directory to scan (defaults to current directory)
       --glob             Glob pattern for files to transform (defaults to **/*.{js,jsx,ts,tsx,mjs,cjs})
       --ignore           Directories/files to ignore (can be used multiple times)
+      --skip-upgrade     Skip the upgrade step
+      --release          Name of the release you're upgrading to (e.g. core-3)
       --dry-run          Show what would be done without making changes
 
     Examples
@@ -55,6 +57,8 @@ const cli = meow(
       dir: { type: 'string', default: process.cwd() },
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
+      skipUpgrade: { type: 'boolean', default: false },
+      release: { type: 'string' },
       dryRun: { type: 'boolean', default: false },
       skipCodemods: { type: 'boolean', default: false },
     },
@@ -68,6 +72,8 @@ async function main() {
     dir: cli.flags.dir,
     glob: cli.flags.glob,
     ignore: cli.flags.ignore,
+    skipUpgrade: cli.flags.skipUpgrade,
+    release: cli.flags.release,
     dryRun: cli.flags.dryRun,
     skipCodemods: cli.flags.skipCodemods,
   };
@@ -114,7 +120,7 @@ async function main() {
   const packageManager = detectPackageManager(options.dir);
 
   // Step 3: Load version config
-  const config = await loadConfig(sdk, currentVersion);
+  const config = await loadConfig(sdk, currentVersion, options.release);
 
   if (!config) {
     renderError(`No upgrade path found for @clerk/${sdk}. Your version may be too old for this upgrade tool.`);
@@ -140,7 +146,10 @@ async function main() {
   console.log('');
 
   // Step 5: Handle upgrade status
-  if (config.alreadyUpgraded) {
+  if (options.skipUpgrade) {
+    renderText('Skipping package upgrade (--skip-upgrade flag)', 'yellow');
+    renderNewline();
+  } else if (config.alreadyUpgraded) {
     renderSuccess(`You're already on the latest major version of @clerk/${sdk}`);
   } else if (config.needsUpgrade) {
     await performUpgrade(sdk, packageManager, config, options);

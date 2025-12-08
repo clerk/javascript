@@ -62,6 +62,35 @@ describe('loadConfig', () => {
     expect(config.docsUrl).toBeDefined();
     expect(config.docsUrl).toContain('clerk.com');
   });
+
+  describe('release parameter', () => {
+    it('loads specific release when provided', async () => {
+      const config = await loadConfig('nextjs', 7, 'core-3');
+
+      expect(config).not.toBeNull();
+      expect(config.id).toBe('core-3');
+    });
+
+    it('returns null for non-existent release', async () => {
+      const config = await loadConfig('nextjs', 6, 'nonexistent-release');
+
+      expect(config).toBeNull();
+    });
+
+    it('ignores version status when release is specified', async () => {
+      const config = await loadConfig('nextjs', 7, 'core-3');
+
+      expect(config).not.toBeNull();
+      expect(config.alreadyUpgraded).toBe(true);
+    });
+
+    it('loads changes for specific release', async () => {
+      const config = await loadConfig('nextjs', 6, 'core-3');
+
+      expect(config.changes).toBeDefined();
+      expect(Array.isArray(config.changes)).toBe(true);
+    });
+  });
 });
 
 describe('getTargetPackageName', () => {
