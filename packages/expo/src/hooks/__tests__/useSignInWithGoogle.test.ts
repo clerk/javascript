@@ -129,7 +129,7 @@ describe('useSignInWithGoogle', () => {
         webClientId: 'mock-web-client-id.apps.googleusercontent.com',
       });
       expect(mocks.ClerkGoogleOneTapSignIn.presentExplicitSignIn).toHaveBeenCalledWith({
-        nonce: 'mock-hashed-nonce',
+        nonce: 'mock-uuid-nonce',
       });
       expect(mockSignIn.create).toHaveBeenCalledWith({
         strategy: 'google_one_tap',
