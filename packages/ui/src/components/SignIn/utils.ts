@@ -14,6 +14,17 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
+export const factorKey = (factor: SignInFactor | null | undefined) => {
+  if (!factor) {
+    return '';
+  }
+  let key = factor.strategy;
+  if ('phoneNumberId' in factor) {
+    key += factor.phoneNumberId;
+  }
+  return key;
+};
+
 const factorForIdentifier = (i: string | null) => (f: SignInFactor) => {
   return 'safeIdentifier' in f && f.safeIdentifier === i;
 };

@@ -7,14 +7,12 @@ import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { withRedirectToAfterSignIn, withRedirectToSignInTask } from '../../common';
 import { useCoreSignIn } from '../../contexts';
 import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeMethods';
-import { SignInFactorTwoBackupCodeCard } from './SignInFactorTwoBackupCodeCard';
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
-import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { determineStartingSignInSecondFactor, factorKey } from './utils';
 
-function SignInFactorTwoInternal(): JSX.Element {
+function SignInClientTrustInternal(): JSX.Element {
   const signIn = useCoreSignIn();
   const availableFactors = signIn.supportedSecondFactors;
 
@@ -52,26 +50,17 @@ function SignInFactorTwoInternal(): JSX.Element {
     case 'phone_code':
       return (
         <SignInFactorTwoPhoneCodeCard
+          showClientTrustNotice
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
         />
       );
-    case 'totp':
-      return (
-        <SignInFactorTwoTOTPCard
-          factorAlreadyPrepared={factorAlreadyPrepared}
-          onFactorPrepare={handleFactorPrepare}
-          factor={currentFactor}
-          onShowAlternativeMethodsClicked={toggleAllStrategies}
-        />
-      );
-    case 'backup_code':
-      return <SignInFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
     case 'email_code':
       return (
         <SignInFactorTwoEmailCodeCard
+          showClientTrustNotice
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
@@ -81,6 +70,7 @@ function SignInFactorTwoInternal(): JSX.Element {
     case 'email_link':
       return (
         <SignInFactorTwoEmailLinkCard
+          showClientTrustNotice
           factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
@@ -92,6 +82,6 @@ function SignInFactorTwoInternal(): JSX.Element {
   }
 }
 
-export const SignInFactorTwo = withRedirectToSignInTask(
-  withRedirectToAfterSignIn(withCardStateProvider(SignInFactorTwoInternal)),
+export const SignInClientTrust = withRedirectToSignInTask(
+  withRedirectToAfterSignIn(withCardStateProvider(SignInClientTrustInternal)),
 );
