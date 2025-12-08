@@ -73,7 +73,7 @@ describe('TaskResetPassword', () => {
       });
     });
     const { getByRole, getByTestId } = render(<TaskResetPassword />, { wrapper });
-    await waitFor(() => getByRole('heading', { name: /Reset password/i }));
+    await waitFor(() => getByRole('heading', { name: /Reset your password/i }));
 
     const identifierField = getByTestId('hidden-identifier');
     expect(identifierField).toHaveValue('test@clerk.com');
