@@ -907,8 +907,7 @@ export const enUS: LocalizationResource = {
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
-    form_password_compromised__sign_in:
-      'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
+    form_password_compromised__sign_in: undefined,
     form_password_untrusted__sign_in:
       'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
     form_password_validation_failed: undefined,
