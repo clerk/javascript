@@ -355,6 +355,12 @@
     </main>
 
     <!-- This app is in the Team SDK organization. -->
+    <!-- Load the UI bundle first, so window.__internal_ClerkUiCtor is available -->
+    <script
+      type="text/javascript"
+      src="<%= uiScriptUrl %>"
+      crossorigin="anonymous"
+    ></script>
     <script
       type="text/javascript"
       src="/<%= htmlRspackPlugin.files.js[0] %>"

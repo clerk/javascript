@@ -176,6 +176,7 @@ export default tseslint.config([
       'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
       'packages/shared/tsdown.config.mjs',
+      'packages/upgrade/src/__tests__/fixtures/**/*',
     ],
   },
   {
@@ -488,7 +489,7 @@ export default tseslint.config([
     name: 'packages/upgrade',
     files: ['packages/upgrade/src/**/*'],
     rules: {
-      'import/no-unresolved': ['error', { ignore: ['^#', '^~', '@inkjs/ui', '^ink'] }],
+      'custom-rules/no-unstable-methods': 'off',
       'react/no-unescaped-entities': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
     },

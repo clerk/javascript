@@ -12,6 +12,7 @@
     "clean": "turbo clean",
     "dev": "TURBO_UI=0 FORCE_COLOR=1 turbo dev --filter=@clerk/* --filter=!@clerk/expo --filter=!@clerk/tanstack-react-start --filter=!@clerk/chrome-extension",
     "dev:js": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:current --filter=@clerk/clerk-js",
+    "dev:sandbox": "TURBO_UI=0 FORCE_COLOR=1 turbo dev:sandbox --filter=@clerk/clerk-js --filter=@clerk/ui",
     "format": "turbo format && node scripts/format-non-workspace.mjs",
     "format:check": "turbo format:check && node scripts/format-non-workspace.mjs --check",
     "preinstall": "npx only-allow pnpm",
