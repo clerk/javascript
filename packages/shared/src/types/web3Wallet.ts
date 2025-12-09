@@ -34,10 +34,6 @@ export interface AuthenticateWithWeb3Params {
   walletName?: string;
 }
 
-export interface SignInAuthenticateWithSolanaParams {
-  walletName: string;
-}
-
 export interface GenerateSignatureParams {
   identifier: string;
   nonce: string;
