@@ -175,18 +175,6 @@ import { BaseResource, Client, Environment, Organization, Waitlist } from './res
 import { State } from './state';
 
 type SetActiveHook = (intent?: 'sign-out') => void | Promise<void>;
-
-type ComponentRenderer = {
-  ensureMounted: ClerkUi['ensureMounted'];
-  prioritizedOn?: ReturnType<typeof createClerkEventBus>['prioritizedOn'];
-};
-
-type MountComponentRenderer = (
-  clerk: ClerkInterface,
-  environment: EnvironmentResource | null | undefined,
-  options: ClerkOptions,
-) => ComponentRenderer;
-
 declare global {
   interface Window {
     Clerk?: Clerk;
@@ -226,7 +214,6 @@ export class Clerk implements ClerkInterface {
     version: __PKG_VERSION__,
   };
 
-  public static mountComponentRenderer?: MountComponentRenderer;
   private static _billing: BillingNamespace;
   private static _apiKeys: APIKeysNamespace;
   private _checkout: ClerkInterface['__experimental_checkout'] | undefined;
@@ -252,7 +239,6 @@ export class Clerk implements ClerkInterface {
   #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: BroadcastChannel | null = null;
   #clerkUi?: Promise<ClerkUi>;
-  #componentControls?: ComponentRenderer;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
@@ -2773,9 +2759,7 @@ export class Clerk implements ClerkInterface {
       };
 
       const initComponents = () => {
-        if (Clerk.mountComponentRenderer && !this.#componentControls && this.environment) {
-          this.#componentControls = Clerk.mountComponentRenderer(this, this.environment, this.#options);
-        }
+        void this.#clerkUi?.then(ui => ui.ensureMounted());
       };
 
       const [envResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
