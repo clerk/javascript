@@ -236,7 +236,7 @@ export const clerkUiScriptUrl = (opts: LoadClerkUiScriptOptions) => {
   }
 
   const scriptHost = buildScriptHost({ publishableKey, proxyUrl, domain });
-  const version = versionSelector(clerkUiVersion);
+  const version = versionSelector(clerkUiVersion, UI_PACKAGE_VERSION);
   return `https://${scriptHost}/npm/@clerk/ui@${version}/dist/ui.browser.js`;
 };
 
