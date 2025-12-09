@@ -67,11 +67,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.continue();
 
       // Sign-in again back with active session
-      await u.po.signIn.goTo();
-      await u.po.signIn.setIdentifier(user1.email);
-      await u.po.signIn.continue();
-      await u.po.signIn.setPassword(user1.password);
-      await u.po.signIn.continue();
+      await u.page.goToRelative('/');
+      await u.po.userButton.waitForMounted();
+      await u.po.userButton.toggleTrigger();
+      await u.po.userButton.waitForPopover();
+      await u.po.userButton.switchAccount(user1.email);
+      await u.po.userButton.waitForPopoverClosed();
 
       // Navigate to protected page, with active session, where user button gets rendered
       await u.page.goToRelative('/user-button');
