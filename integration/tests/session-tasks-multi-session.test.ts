@@ -66,7 +66,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.setPassword(user2.password);
       await u.po.signIn.continue();
 
-      // Sign-in again back with active session
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Select the active session
       await u.page.goToRelative('/');
       await u.po.userButton.waitForMounted();
       await u.po.userButton.toggleTrigger();
