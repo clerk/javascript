@@ -37,9 +37,16 @@ import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
 import { eventBus, events } from '../events';
+import { TokenService } from '../services/TokenService';
 import { SessionTokenCache } from '../tokenCache';
 import { BaseResource, PublicUserData, Token, User } from './internal';
 import { SessionVerification } from './SessionVerification';
+
+type TokenFetcher = (params: {
+  organizationId?: string | null;
+  sessionId: string;
+  template?: string;
+}) => Promise<Token>;
 
 export class Session extends BaseResource implements SessionResource {
   pathRoot = '/client/sessions';
@@ -58,6 +65,7 @@ export class Session extends BaseResource implements SessionResource {
   abandonAt!: Date;
   createdAt!: Date;
   updatedAt!: Date;
+  private tokenService: TokenService | null = null;
 
   static isSessionResource(resource: unknown): resource is Session {
     return !!resource && resource instanceof Session;
@@ -68,6 +76,26 @@ export class Session extends BaseResource implements SessionResource {
 
     this.fromJSON(data);
     this.#hydrateCache(this.lastActiveToken);
+
+    if (Session.clerk?.__internal_useNewTokenService) {
+      this.tokenService = new TokenService(this.id, {
+        fetcher: this.createTokenFetcher(),
+        onTokenResolved: token => {
+          eventBus.emit(events.TokenUpdate, { token });
+          if (token.jwt) {
+            this.lastActiveToken = token;
+            eventBus.emit(events.SessionTokenResolved, null);
+          }
+        },
+      });
+
+      if (this.lastActiveToken) {
+        const cacheKey = this.tokenService.buildCacheKey();
+        const ingestedToken =
+          this.lastActiveToken instanceof Token ? this.lastActiveToken : new Token(this.lastActiveToken as any);
+        this.tokenService.ingestToken(ingestedToken, cacheKey);
+      }
+    }
   }
 
   end = (): Promise<SessionResource> => {
@@ -102,6 +130,10 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   getToken: GetToken = async (options?: GetTokenOptions): Promise<string | null> => {
+    if (this.tokenService) {
+      return this.tokenService.getToken(options);
+    }
+
     // This will retry the getToken call if it fails with a non-4xx error
     // We're going to trigger 8 retries in the span of ~3 minutes,
     // Example delays: 3s, 5s, 13s, 19s, 26s, 34s, 43s, 50s, total: ~193s
@@ -138,6 +170,14 @@ export class Session extends BaseResource implements SessionResource {
       });
     }
   };
+
+  private createTokenFetcher(): TokenFetcher {
+    return async params => {
+      const path = params.template ? `${this.path()}/tokens/${params.template}` : `${this.path()}/tokens`;
+      const queryParams = params.template ? {} : { organizationId: params.organizationId };
+      return Token.create(path, queryParams);
+    };
+  }
 
   // If it's a session token, retrieve it with their session id, otherwise it's a jwt template token
   // and retrieve it using the session id concatenated with the jwt template name.
