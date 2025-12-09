@@ -66,6 +66,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.setPassword(user2.password);
       await u.po.signIn.continue();
 
+      // If the subsequent session touch call happens too quickly, the backend will rate limit it and not update the session activity timestamp.
+      // To get around this rate limit, and realistically emulate a more human-like pace, we add an arbitrary delay here
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Select the active session
