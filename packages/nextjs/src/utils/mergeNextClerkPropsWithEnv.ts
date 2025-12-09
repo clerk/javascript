@@ -1,10 +1,12 @@
+import type { Ui } from '@clerk/react/internal';
 import { isTruthy } from '@clerk/shared/underscore';
 
 import { SDK_METADATA } from '../server/constants';
 import type { NextClerkProviderProps } from '../types';
 
-// @ts-ignore - https://github.com/microsoft/TypeScript/issues/47663
-export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, 'children'>): any => {
+export const mergeNextClerkPropsWithEnv = <TUi extends Ui = Ui>(
+  props: Omit<NextClerkProviderProps<TUi>, 'children'>,
+) => {
   return {
     ...props,
     publishableKey: props.publishableKey || process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
@@ -31,5 +33,5 @@ export const mergeNextClerkPropsWithEnv = (props: Omit<NextClerkProviderProps, '
       debug: isTruthy(process.env.NEXT_PUBLIC_CLERK_TELEMETRY_DEBUG),
     },
     sdkMetadata: SDK_METADATA,
-  };
+  } satisfies Omit<NextClerkProviderProps<TUi>, 'children'>;
 };
