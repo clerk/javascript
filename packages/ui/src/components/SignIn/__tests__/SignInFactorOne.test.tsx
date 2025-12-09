@@ -369,9 +369,9 @@ describe('SignInFactorOne', () => {
         const errJSON = {
           code: 'form_password_compromised',
           long_message:
-            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
           message:
-            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
           meta: { param_name: 'password' },
         };
 
@@ -387,7 +387,7 @@ describe('SignInFactorOne', () => {
 
         await screen.findByText('Password compromised');
         await screen.findByText(
-          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
         );
 
         await screen.findByText('Email code to hello@clerk.com');
@@ -410,9 +410,9 @@ describe('SignInFactorOne', () => {
         const errJSON = {
           code: 'form_password_compromised',
           long_message:
-            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
           message:
-            "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+            'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
           meta: { param_name: 'password' },
         };
 
