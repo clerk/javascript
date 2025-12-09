@@ -252,11 +252,17 @@ const prodConfig = ({ mode, env, analysis }) => {
       ? {
           entry: { sandbox: './sandbox/app.ts' },
           plugins: [
+            new rspack.CopyRspackPlugin({
+              patterns: [{ from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' }],
+            }),
             new rspack.HtmlRspackPlugin({
               minify: false,
               template: './sandbox/template.html',
               inject: false,
               hash: true,
+              templateParameters: {
+                uiScriptUrl: './ui.browser.js',
+              },
             }),
           ],
         }
@@ -456,6 +462,9 @@ const devConfig = ({ mode, env }) => {
             minify: false,
             template: './sandbox/template.html',
             inject: false,
+            templateParameters: {
+              uiScriptUrl: 'http://localhost:4001/npm/ui.browser.js',
+            },
           }),
       ].filter(Boolean),
       devtool: 'eval-cheap-source-map',

@@ -79,6 +79,11 @@
       "dependsOn": ["^build", "dev"],
       "persistent": true
     },
+    "dev:sandbox": {
+      "cache": false,
+      "dependsOn": ["^build"],
+      "persistent": true
+    },
     "clean": {
       "cache": false
     },

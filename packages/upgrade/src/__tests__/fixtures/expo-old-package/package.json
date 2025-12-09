@@ -1,0 +1,10 @@
+{
+  "name": "test-expo-old",
+  "version": "1.0.0",
+  "dependencies": {
+    "@clerk/clerk-expo": "^2.0.0",
+    "expo": "^50.0.0",
+    "react": "^18.0.0",
+    "react-native": "^0.73.0"
+  }
+}
