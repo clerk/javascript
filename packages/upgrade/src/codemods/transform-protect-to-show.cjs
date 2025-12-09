@@ -120,10 +120,15 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
       return;
     }
 
-    // Rename to Show
-    openingElement.name.name = 'Show';
-    if (closingElement && j.JSXIdentifier.check(closingElement.name)) {
-      closingElement.name.name = 'Show';
+    const originalName = openingElement.name.name;
+
+    // Only rename if the component was used without an alias (as <Protect>).
+    // For aliased imports (e.g., Protect as MyProtect), keep the alias in place.
+    if (originalName === 'Protect') {
+      openingElement.name.name = 'Show';
+      if (closingElement && j.JSXIdentifier.check(closingElement.name)) {
+        closingElement.name.name = 'Show';
+      }
     }
 
     const attributes = openingElement.attributes || [];
