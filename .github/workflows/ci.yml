@@ -80,7 +80,7 @@ jobs:
             echo 'Skipping';
             exit 0;
           else
-            pnpm changeset status --since=origin/main;
+            pnpm changeset status --since=origin/release/core-2;
           fi
 
   build-packages:
