@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { ClerkProvider, SignIn } from '@clerk/clerk-react';
+import { ClerkProvider, SignIn } from '@clerk/react';
 
 function App() {
   return (

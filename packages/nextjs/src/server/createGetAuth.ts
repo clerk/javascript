@@ -1,10 +1,9 @@
 import type { AuthObject } from '@clerk/backend';
 import { constants, type SignedInAuthObject, type SignedOutAuthObject } from '@clerk/backend/internal';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import { isTruthy } from '@clerk/shared/underscore';
-import type { PendingSessionOptions } from '@clerk/types';
 
 import { withLogger } from '../utils/debugLogger';
-import { isNextWithUnstableServerActions } from '../utils/sdk-versions';
 import type { GetAuthDataFromRequestOptions } from './data/getAuthDataFromRequest';
 import {
   getAuthDataFromRequest as getAuthDataFromRequestOriginal,
@@ -37,11 +36,6 @@ export const createAsyncGetAuth = ({
       }
 
       if (!detectClerkMiddleware(req)) {
-        // Keep the same behaviour for versions that may have issues with bundling `node:fs`
-        if (isNextWithUnstableServerActions) {
-          assertAuthStatus(req, noAuthStatusMessage);
-        }
-
         const missConfiguredMiddlewareLocation = await import('./fs/middleware-location.js')
           .then(m => m.suggestMiddlewareLocation())
           .catch(() => undefined);

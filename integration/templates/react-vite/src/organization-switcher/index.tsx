@@ -1,4 +1,4 @@
-import { OrganizationSwitcher } from '@clerk/clerk-react';
+import { OrganizationSwitcher } from '@clerk/react';
 
 export default function Page() {
   return (

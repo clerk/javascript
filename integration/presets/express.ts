@@ -1,4 +1,3 @@
-import { constants } from '../constants';
 import { applicationConfig } from '../models/applicationConfig';
 import { templates } from '../templates';
 import { linkPackage } from './utils';
@@ -11,8 +10,9 @@ const vite = applicationConfig()
   .addScript('dev', 'pnpm dev')
   .addScript('build', 'pnpm build')
   .addScript('serve', 'pnpm start')
-  .addDependency('@clerk/express', constants.E2E_CLERK_VERSION || linkPackage('express'))
-  .addDependency('@clerk/clerk-js', constants.E2E_CLERK_VERSION || linkPackage('clerk-js'));
+  .addDependency('@clerk/express', linkPackage('express'))
+  .addDependency('@clerk/clerk-js', linkPackage('clerk-js'))
+  .addDependency('@clerk/ui', linkPackage('ui'));
 
 export const express = {
   vite,

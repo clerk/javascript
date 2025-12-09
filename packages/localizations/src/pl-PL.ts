@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
@@ -878,10 +878,13 @@ export const plPL: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
+    avatar_file_size_exceeded: 'Rozmiar pliku przekracza maksymalny limit 10 MB. Wybierz mniejszy plik.',
+    avatar_file_type_invalid: 'Nieobsługiwany typ pliku. Prześlij obraz w formacie JPG, PNG, GIF lub WEBP.',
     captcha_invalid:
       'Rejestracja nie powiodła się z powodu niepowodzenia weryfikacji zabezpieczeń. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     captcha_unavailable:
@@ -891,6 +894,7 @@ export const plPL: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ten numer telefonu jest zajęty. Spróbuj użyć innego.',
     form_identifier_exists__username: 'Ta nazwa użytkownika jest zajęta. Spróbuj użyć innej.',
     form_identifier_not_found: 'Nie znaleziono konta o tym identyfikatorze. Sprawdź i spróbuj ponownie.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Wprowadzona wartość ma nieprawidłowy format. Sprawdź i popraw ją.',
     form_param_format_invalid__email_address: 'Adres e-mail powinien być poprawnym adresem e-mail.',
     form_param_format_invalid__phone_number: 'Numer telefonu powinien mieć prawidłowy format międzynarodowy',

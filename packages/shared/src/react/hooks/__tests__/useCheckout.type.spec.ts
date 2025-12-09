@@ -1,14 +1,14 @@
 import { describe, expectTypeOf, it } from 'vitest';
 
+import type { ClerkError } from '@/error';
 import type {
-  __experimental_CheckoutCacheState,
-  __experimental_CheckoutInstance,
-  BillingCheckoutResource,
   BillingSubscriptionPlanPeriod,
-  ClerkAPIResponseError,
+  CheckoutErrors,
+  CheckoutFlowFinalizeParams,
+  CheckoutFlowResource,
   ConfirmCheckoutParams,
-  SetActiveNavigate,
-} from '../../../types';
+} from '@/types';
+
 import type { useCheckout } from '../useCheckout';
 
 type UseCheckoutParameters = Parameters<typeof useCheckout>[0];
@@ -59,39 +59,48 @@ describe('useCheckout type tests', () => {
   });
 
   describe('return value', () => {
+    it('has correct top-level structure', () => {
+      expectTypeOf<UseCheckoutReturn>().toHaveProperty('errors');
+      expectTypeOf<UseCheckoutReturn>().toHaveProperty('fetchStatus');
+      expectTypeOf<UseCheckoutReturn>().toHaveProperty('checkout');
+    });
+
+    it('has correct errors type', () => {
+      type Errors = UseCheckoutReturn['errors'];
+      expectTypeOf<Errors>().toEqualTypeOf<CheckoutErrors>();
+      expectTypeOf<Errors>().toHaveProperty('raw');
+      expectTypeOf<Errors>().toHaveProperty('global');
+    });
+
+    it('has correct fetchStatus type', () => {
+      type FetchStatus = UseCheckoutReturn['fetchStatus'];
+      expectTypeOf<FetchStatus>().toEqualTypeOf<'idle' | 'fetching'>();
+    });
+
     type CheckoutObject = UseCheckoutReturn['checkout'];
+
     describe('methods', () => {
       it('has required methods', () => {
-        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'finalize'>;
 
         type MethodNames = keyof Methods;
-        expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>();
+        expectTypeOf<MethodNames>().toEqualTypeOf<'confirm' | 'start' | 'finalize'>();
       });
 
       it('has correct method signatures', () => {
-        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'clear' | 'finalize' | 'getState'>;
+        type Methods = Pick<CheckoutObject, 'confirm' | 'start' | 'finalize'>;
         type ConfirmMethod = Methods['confirm'];
         type StartMethod = Methods['start'];
-        type ClearMethod = Methods['clear'];
         type FinalizeMethod = Methods['finalize'];
-        type GetStateMethod = Methods['getState'];
 
-        type CheckoutResult =
-          | {
-              data: BillingCheckoutResource;
-              error: null;
-            }
-          | {
-              data: null;
-              error: ClerkAPIResponseError;
-            };
+        type MethodResult = Promise<{ error: ClerkError | null }>;
 
         expectTypeOf<ConfirmMethod>().parameter(0).toEqualTypeOf<ConfirmCheckoutParams>();
-        expectTypeOf<ConfirmMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
-        expectTypeOf<StartMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
-        expectTypeOf<ClearMethod>().returns.toBeVoid();
-        expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<{ navigate?: SetActiveNavigate } | undefined>();
-        expectTypeOf<GetStateMethod>().returns.toEqualTypeOf<__experimental_CheckoutCacheState>();
+        expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<MethodResult>();
+        expectTypeOf<StartMethod>().parameters.toEqualTypeOf<[]>();
+        expectTypeOf<StartMethod>().returns.toEqualTypeOf<MethodResult>();
+        expectTypeOf<FinalizeMethod>().parameter(0).toEqualTypeOf<CheckoutFlowFinalizeParams | undefined>();
+        expectTypeOf<FinalizeMethod>().returns.toEqualTypeOf<MethodResult>();
       });
 
       it('has correct return types for start and confirm', () => {
@@ -99,45 +108,27 @@ describe('useCheckout type tests', () => {
         type ConfirmMethod = Methods['confirm'];
         type StartMethod = Methods['start'];
 
-        type CheckoutResult =
-          | {
-              data: BillingCheckoutResource;
-              error: null;
-            }
-          | {
-              data: null;
-              error: ClerkAPIResponseError;
-            };
+        type MethodResult = Promise<{ error: ClerkError | null }>;
 
-        // Test that start returns a Promise of CheckoutResult
+        // Test that start returns a Promise of { error: ClerkError | null }
         expectTypeOf<StartMethod>().parameters.toEqualTypeOf<[]>();
-        expectTypeOf<StartMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
+        expectTypeOf<StartMethod>().returns.toEqualTypeOf<MethodResult>();
 
-        // Test that confirm returns a Promise of CheckoutResult and accepts correct parameters
+        // Test that confirm returns a Promise of { error: ClerkError | null } and accepts correct parameters
         expectTypeOf<ConfirmMethod>().parameters.toEqualTypeOf<[ConfirmCheckoutParams]>();
-        expectTypeOf<ConfirmMethod>().returns.resolves.toEqualTypeOf<CheckoutResult>();
+        expectTypeOf<ConfirmMethod>().returns.toEqualTypeOf<MethodResult>();
       });
     });
 
     describe('properties', () => {
-      it('has required status properties with correct types', () => {
-        type StatusProps = Pick<CheckoutObject, 'isStarting' | 'isConfirming' | 'error' | 'status' | 'fetchStatus'>;
-        type PropNames = keyof StatusProps;
-        expectTypeOf<PropNames>().toEqualTypeOf<'isStarting' | 'isConfirming' | 'error' | 'status' | 'fetchStatus'>();
-
-        type IsStarting = StatusProps['isStarting'];
-        type IsConfirming = StatusProps['isConfirming'];
-        type FetchStatus = StatusProps['fetchStatus'];
-
-        expectTypeOf<IsStarting>().toBeBoolean();
-        expectTypeOf<IsConfirming>().toBeBoolean();
-        expectTypeOf<FetchStatus>().toEqualTypeOf<'idle' | 'fetching' | 'error'>();
+      it('has required status property', () => {
+        type Status = CheckoutObject['status'];
+        expectTypeOf<Status>().toEqualTypeOf<'needs_initialization' | 'needs_confirmation' | 'completed'>();
       });
 
-      it('has nullable checkout properties', () => {
+      it('has checkout data properties', () => {
         type CheckoutProps = Pick<
           CheckoutObject,
-          | 'id'
           | 'externalClientSecret'
           | 'externalGatewayId'
           | 'totals'
@@ -145,11 +136,14 @@ describe('useCheckout type tests', () => {
           | 'planPeriod'
           | 'plan'
           | 'paymentMethod'
+          | 'payer'
+          | 'needsPaymentMethod'
+          | 'planPeriodStart'
+          | 'freeTrialEndsAt'
         >;
 
         type PropNames = keyof CheckoutProps;
         expectTypeOf<PropNames>().toEqualTypeOf<
-          | 'id'
           | 'externalClientSecret'
           | 'externalGatewayId'
           | 'totals'
@@ -157,33 +151,15 @@ describe('useCheckout type tests', () => {
           | 'planPeriod'
           | 'plan'
           | 'paymentMethod'
+          | 'payer'
+          | 'needsPaymentMethod'
+          | 'planPeriodStart'
+          | 'freeTrialEndsAt'
         >();
       });
     });
 
     describe('discriminated unions', () => {
-      describe('error state discrimination', () => {
-        it('has correct fetchStatus type union', () => {
-          type FetchStatus = CheckoutObject['fetchStatus'];
-          expectTypeOf<FetchStatus>().toEqualTypeOf<'idle' | 'fetching' | 'error'>();
-        });
-
-        it('has correct error type union', () => {
-          type ErrorType = CheckoutObject['error'];
-          expectTypeOf<ErrorType>().toMatchTypeOf<ClerkAPIResponseError | null>();
-        });
-
-        it('enforces error state correlation', () => {
-          // When fetchStatus is 'error', error should not be null
-          type ErrorFetchState = CheckoutObject & { fetchStatus: 'error' };
-          expectTypeOf<ErrorFetchState['error']>().not.toEqualTypeOf<null>();
-
-          // When fetchStatus is not 'error', error must be null
-          type NonErrorFetchState = CheckoutObject & { fetchStatus: 'idle' | 'fetching' };
-          expectTypeOf<NonErrorFetchState['error']>().toEqualTypeOf<null>();
-        });
-      });
-
       describe('status-based property discrimination', () => {
         it('has correct status type union', () => {
           type Status = CheckoutObject['status'];
@@ -193,15 +169,16 @@ describe('useCheckout type tests', () => {
         it('enforces null properties when status is needs_initialization', () => {
           type InitializationState = CheckoutObject & { status: 'needs_initialization' };
 
-          // Test that properties are nullable (null or undefined) in initialization state
-          expectTypeOf<InitializationState['id']>().toEqualTypeOf<null>();
+          // Test that properties are null in initialization state
           expectTypeOf<InitializationState['externalClientSecret']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['externalGatewayId']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['totals']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['isImmediatePlanChange']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['planPeriod']>().toEqualTypeOf<null>();
           expectTypeOf<InitializationState['plan']>().toEqualTypeOf<null>();
-          expectTypeOf<InitializationState['paymentMethod']>().toEqualTypeOf<null | undefined>();
+          expectTypeOf<InitializationState['paymentMethod']>().toEqualTypeOf<null>();
+          expectTypeOf<InitializationState['payer']>().toEqualTypeOf<null>();
+          expectTypeOf<InitializationState['needsPaymentMethod']>().toEqualTypeOf<null>();
 
           // Test that the status property is correctly typed
           expectTypeOf<InitializationState['status']>().toEqualTypeOf<'needs_initialization'>();
@@ -212,13 +189,15 @@ describe('useCheckout type tests', () => {
           type CompletedState = CheckoutObject & { status: 'completed' };
 
           // These should not be null for confirmation and completed states
-          expectTypeOf<ConfirmationState['id']>().not.toEqualTypeOf<null>();
+          expectTypeOf<ConfirmationState['externalClientSecret']>().not.toEqualTypeOf<null>();
           expectTypeOf<ConfirmationState['totals']>().not.toEqualTypeOf<null>();
           expectTypeOf<ConfirmationState['plan']>().not.toEqualTypeOf<null>();
+          expectTypeOf<ConfirmationState['payer']>().not.toEqualTypeOf<null>();
 
-          expectTypeOf<CompletedState['id']>().not.toEqualTypeOf<null>();
+          expectTypeOf<CompletedState['externalClientSecret']>().not.toEqualTypeOf<null>();
           expectTypeOf<CompletedState['totals']>().not.toEqualTypeOf<null>();
           expectTypeOf<CompletedState['plan']>().not.toEqualTypeOf<null>();
+          expectTypeOf<CompletedState['payer']>().not.toEqualTypeOf<null>();
         });
       });
 
@@ -227,29 +206,31 @@ describe('useCheckout type tests', () => {
           // Test that CheckoutObject is a proper discriminated union
           type CheckoutUnion = CheckoutObject;
 
-          // Should include all required properties
+          // Should include all required properties and methods
           expectTypeOf<CheckoutUnion>().toHaveProperty('status');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('fetchStatus');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('error');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('id');
+          expectTypeOf<CheckoutUnion>().toHaveProperty('externalClientSecret');
+          expectTypeOf<CheckoutUnion>().toHaveProperty('externalGatewayId');
+          expectTypeOf<CheckoutUnion>().toHaveProperty('totals');
+          expectTypeOf<CheckoutUnion>().toHaveProperty('plan');
           expectTypeOf<CheckoutUnion>().toHaveProperty('confirm');
           expectTypeOf<CheckoutUnion>().toHaveProperty('start');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('clear');
           expectTypeOf<CheckoutUnion>().toHaveProperty('finalize');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('getState');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('isStarting');
-          expectTypeOf<CheckoutUnion>().toHaveProperty('isConfirming');
         });
 
-        it('validates method types remain unchanged', () => {
-          // Ensure the discriminated union doesn't affect method types
-          expectTypeOf<CheckoutObject['confirm']>().toEqualTypeOf<__experimental_CheckoutInstance['confirm']>();
-          expectTypeOf<CheckoutObject['start']>().toEqualTypeOf<__experimental_CheckoutInstance['start']>();
-          expectTypeOf<CheckoutObject['clear']>().toEqualTypeOf<() => void>();
+        it('validates method types are consistent across all status states', () => {
+          type MethodResult = Promise<{ error: ClerkError | null }>;
+
+          // Methods should have the same signature regardless of status
+          expectTypeOf<CheckoutObject['confirm']>().toEqualTypeOf<(params: ConfirmCheckoutParams) => MethodResult>();
+          expectTypeOf<CheckoutObject['start']>().toEqualTypeOf<() => MethodResult>();
           expectTypeOf<CheckoutObject['finalize']>().toEqualTypeOf<
-            (params?: { navigate?: SetActiveNavigate }) => void
+            (params?: CheckoutFlowFinalizeParams) => MethodResult
           >();
-          expectTypeOf<CheckoutObject['getState']>().toEqualTypeOf<() => __experimental_CheckoutCacheState>();
+        });
+
+        it('validates CheckoutFlowResource type', () => {
+          // Ensure CheckoutObject matches CheckoutFlowResource
+          expectTypeOf<CheckoutObject>().toEqualTypeOf<CheckoutFlowResource>();
         });
       });
     });

@@ -33,8 +33,8 @@ describe('Typedoc output', () => {
     expect(folders).toMatchInlineSnapshot(`
       [
         "backend",
-        "clerk-react",
         "nextjs",
+        "react",
         "shared",
       ]
     `);

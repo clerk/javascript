@@ -3,7 +3,14 @@ import { SSR } from './client';
 
 export default function Page() {
   return (
-    <ClerkProvider dynamic>
+    <ClerkProvider
+      dynamic
+      appearance={{
+        options: {
+          showOptionalFields: true,
+        },
+      }}
+    >
       <SSR />
     </ClerkProvider>
   );

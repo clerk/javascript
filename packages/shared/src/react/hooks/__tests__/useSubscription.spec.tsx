@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createDeferredPromise } from '../../../utils/createDeferredPromise';
+import { createDeferredPromise } from '@/utils/createDeferredPromise';
+
 import { useSubscription } from '../useSubscription';
 import { createMockClerk, createMockOrganization, createMockQueryClient, createMockUser } from './mocks/clerk';
 import { wrapper } from './wrapper';
@@ -51,13 +52,13 @@ describe('useSubscription', () => {
     orgBillingEnabled = true;
     mockUser = createMockUser();
     mockOrganization = createMockOrganization();
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = userBillingEnabled;
-    mockClerk.__unstable__environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = userBillingEnabled;
+    mockClerk.__internal_environment.commerceSettings.billing.organization.enabled = orgBillingEnabled;
     defaultQueryClient.client.clear();
   });
 
   it('does not fetch when billing disabled for user', () => {
-    mockClerk.__unstable__environment.commerceSettings.billing.user.enabled = false;
+    mockClerk.__internal_environment.commerceSettings.billing.user.enabled = false;
 
     const { result } = renderHook(() => useSubscription(), { wrapper });
 

@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
@@ -885,10 +885,14 @@ export const ptBR: LocalizationResource = {
       actionLink: 'Sair',
       actionText: 'Conectado como {{identifier}}',
     },
+    subtitle: undefined,
     title: 'Resetar senha',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do arquivo excede o limite máximo de 10 MB. Por favor, escolha um arquivo menor.',
+    avatar_file_type_invalid: 'Tipo de arquivo não suportado. Por favor, envie uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
@@ -898,6 +902,7 @@ export const ptBR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
     form_identifier_not_found: 'Não foi possível encontrar o usuário.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',
     form_param_format_invalid__phone_number: 'Número de telefone precisa estar num formato internacional válido.',

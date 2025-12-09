@@ -12,6 +12,13 @@ exports[`errors public exports > should not change unexpectedly 1`] = `
 ]
 `;
 
+exports[`legacy public exports > should not change unexpectedly 1`] = `
+[
+  "useSignIn",
+  "useSignUp",
+]
+`;
+
 exports[`root public exports > should not change unexpectedly 1`] = `
 [
   "APIKeys",
@@ -43,6 +50,7 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "SignedIn",
   "SignedOut",
   "TaskChooseOrganization",
+  "TaskResetPassword",
   "UserAvatar",
   "UserButton",
   "UserProfile",

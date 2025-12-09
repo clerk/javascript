@@ -4,8 +4,8 @@ run-name: Release
 on:
   push:
     branches:
-      - main
-      - release/v4
+      - main-disabled
+      - release/v4-disabled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -38,6 +38,15 @@ jobs:
         with:
           fetch-depth: 0
           show-progress: false
+
+      - name: Safety check - Prevent production releases on canary-core3 branch
+        run: |
+          if [ -f ".canary-core3-branch" ]; then
+            echo "❌ ERROR: This branch is marked for canary-core3 releases only!"
+            echo "Production releases (latest tag) are not allowed on this branch."
+            echo "If you need to make a production release, use the main production branch."
+            exit 1
+          fi
 
       - name: Setup
         id: config
@@ -139,6 +148,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})

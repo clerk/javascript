@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hiIN: LocalizationResource = {
   locale: 'hi-IN',
@@ -878,10 +878,13 @@ export const hiIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
+    avatar_file_size_exceeded: 'फ़ाइल का आकार 10MB की अधिकतम सीमा से अधिक है। कृपया एक छोटी फ़ाइल चुनें।',
+    avatar_file_type_invalid: 'फ़ाइल प्रकार समर्थित नहीं है। कृपया JPG, PNG, GIF या WEBP छवि अपलोड करें।',
     captcha_invalid:
       'असफल सुरक्षा सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     captcha_unavailable:
@@ -891,6 +894,7 @@ export const hiIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_not_found: 'इस पहचानकर्ता के साथ कोई खाता नहीं मिला। कृपया जांचें और पुनः प्रयास करें।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'दर्ज किया गया मान अमान्य प्रारूप में है। कृपया इसे जांचें और सही करें।',
     form_param_format_invalid__email_address: 'ईमेल पता एक वैध ईमेल पता होना चाहिए।',
     form_param_format_invalid__phone_number: 'फोन नंबर एक वैध अंतरराष्ट्रीय प्रारूप में होना चाहिए।',

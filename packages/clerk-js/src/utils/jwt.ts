@@ -1,6 +1,5 @@
+import { urlDecodeB64 } from '@clerk/shared/internal/clerk-js/encoders';
 import type { JWT, JwtPayload } from '@clerk/shared/types';
-
-import { urlDecodeB64 } from './encoders';
 
 export function decode(token: string): JWT {
   const parts = (token || '').split('.');
