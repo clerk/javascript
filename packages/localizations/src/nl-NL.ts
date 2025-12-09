@@ -878,6 +878,8 @@ export const nlNL: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
+    avatar_file_size_exceeded: 'Bestandsgrootte overschrijdt de maximale limiet van 10 MB. Kies een kleiner bestand.',
+    avatar_file_type_invalid: 'Bestandstype wordt niet ondersteund. Upload een JPG-, PNG-, GIF- of WEBP-afbeelding.',
     captcha_invalid:
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:

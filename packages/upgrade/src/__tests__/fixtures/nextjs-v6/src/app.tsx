@@ -1,8 +1,8 @@
-import { ClerkProvider, useAuth, useUser } from '@clerk/nextjs';
-import { dark } from '@clerk/nextjs/themes';
+import { ClerkProvider, useAuth } from '@clerk/nextjs';
+import { useUser } from '@clerk/clerk-react';
 
 export default function App({ children }) {
-  return <ClerkProvider appearance={{ baseTheme: dark }}>{children}</ClerkProvider>;
+  return <ClerkProvider>{children}</ClerkProvider>;
 }
 
 export function UserProfile() {

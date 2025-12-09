@@ -37,7 +37,7 @@ describe('runScans', () => {
 
     const results = await runScans(config, 'nextjs', options);
 
-    expect(Array.isArray(results)).toBe(true);
+    expect(results.length).toBeGreaterThan(0);
   });
 
   it('returns empty array when no matchers match', async () => {
@@ -63,33 +63,6 @@ describe('runScans', () => {
 
     const results = await runScans(config, 'nextjs', options);
 
-    expect(Array.isArray(results)).toBe(true);
-  });
-});
-
-describe('runScans with theme imports', () => {
-  let fixture;
-
-  beforeEach(() => {
-    fixture = createTempFixture('nextjs-v6');
-  });
-
-  afterEach(() => {
-    fixture?.cleanup();
-  });
-
-  it('detects theme imports from @clerk/nextjs/themes', async () => {
-    const config = await loadConfig('nextjs', 6);
-    const options = {
-      dir: fixture.path,
-      ignore: [],
-    };
-
-    const results = await runScans(config, 'nextjs', options);
-    const themeChange = results.find(r => r.title?.includes('Theme') || r.docsAnchor?.includes('theme'));
-
-    if (themeChange) {
-      expect(themeChange.instances.length).toBeGreaterThan(0);
-    }
+    expect(results).toEqual([]);
   });
 });

@@ -14,11 +14,11 @@ export class SamlConnection {
      */
     readonly name: string,
     /**
-     * The domain of your organization. Sign in flows using an email with this domain will use the connection.
+     * The domain of your Organization. Sign in flows using an email with this domain will use the connection.
      */
     readonly domain: string,
     /**
-     * The organization ID of the organization.
+     * The Organization ID of the Organization.
      */
     readonly organizationId: string | null,
     /**

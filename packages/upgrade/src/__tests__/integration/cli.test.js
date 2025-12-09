@@ -71,6 +71,8 @@ describe('CLI Integration', () => {
       expect(result.stdout).toContain('--sdk');
       expect(result.stdout).toContain('--dir');
       expect(result.stdout).toContain('--dry-run');
+      expect(result.stdout).toContain('--skip-upgrade');
+      expect(result.stdout).toContain('--release');
       expect(result.exitCode).toBe(0);
     });
   });
@@ -233,6 +235,57 @@ describe('CLI Integration', () => {
       const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 15000 });
 
       expect(result.stdout).toContain('codemod');
+    });
+  });
+
+  describe('--skip-upgrade flag', () => {
+    let fixture;
+
+    beforeEach(() => {
+      fixture = createTempFixture('nextjs-v6');
+    });
+
+    afterEach(() => {
+      fixture?.cleanup();
+    });
+
+    it('skips the package upgrade step', async () => {
+      const result = await runCli(['--dir', fixture.path, '--skip-upgrade', '--skip-codemods'], { timeout: 15000 });
+
+      expect(result.stdout).toContain('Skipping package upgrade');
+      expect(result.stdout).toContain('--skip-upgrade');
+    });
+
+    it('does not modify package.json when skipping upgrade', async () => {
+      const fs = await import('node:fs');
+      const pkgBefore = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+
+      await runCli(['--dir', fixture.path, '--skip-upgrade', '--skip-codemods'], { timeout: 15000 });
+
+      const pkgAfter = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+      expect(pkgAfter).toBe(pkgBefore);
+    });
+  });
+
+  describe('--release flag', () => {
+    it('loads specific release configuration', async () => {
+      const dir = getFixturePath('nextjs-v7');
+      const result = await runCli(['--dir', dir, '--release', 'core-3', '--dry-run', '--skip-codemods'], {
+        timeout: 15000,
+      });
+
+      expect(result.stdout).toContain('core-3');
+    });
+
+    it('errors when release does not exist', async () => {
+      const dir = getFixturePath('nextjs-v6');
+      const result = await runCli(['--dir', dir, '--release', 'nonexistent-release', '--dry-run', '--skip-codemods'], {
+        timeout: 15000,
+      });
+
+      const output = result.stdout + result.stderr;
+      expect(output).toContain('No upgrade path found');
+      expect(result.exitCode).toBe(1);
     });
   });
 });
