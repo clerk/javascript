@@ -1,7 +1,7 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import type {
   BillingSubscriptionPlanPeriod,
@@ -22,7 +22,7 @@ export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase
 const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
   InitialState | Promise<InitialState> | undefined
 >('InitialStateContext');
-export { useInitialStateContext };
+
 export function InitialStateProvider({
   children,
   initialState,
@@ -30,22 +30,22 @@ export function InitialStateProvider({
   children: React.ReactNode;
   initialState: InitialState | Promise<InitialState> | undefined;
 }) {
-  const initialStateCtx = React.useMemo(() => ({ value: initialState }), [initialState]);
+  // The initialState is not allowed to change, we snapshot it to turn that expectation into a guarantee.
+  // Note that despite this, it could still be different for different parts of the React tree which is fine,
+  // but that requires using a separate provider.
+  // eslint-disable-next-line react/hook-use-state
+  const [initialStateSnapshot] = useState(initialState);
+  const initialStateCtx = React.useMemo(() => ({ value: initialStateSnapshot }), [initialStateSnapshot]);
   return <InitialStateContext.Provider value={initialStateCtx}>{children}</InitialStateContext.Provider>;
 }
-function useInitialStateContext(): InitialState | undefined {
+
+export function useInitialStateContext(): InitialState | undefined {
   const initialState = _useInitialStateContext();
 
-  if (!initialState) {
-    return undefined;
-  }
+  // @ts-expect-error TODO: If we do want to support promises, we need to throw here instead
+  const resolvedInitialState = initialState && 'then' in initialState ? React.use(initialState) : initialState;
 
-  if (initialState && 'then' in initialState) {
-    // TODO: If we want to preserve backwards compatibility, we'd need to throw here instead
-    // @ts-expect-error See above
-    return React.use(initialState);
-  }
-  return initialState;
+  return resolvedInitialState;
 }
 
 const OptionsContext = React.createContext<ClerkOptions>({});
