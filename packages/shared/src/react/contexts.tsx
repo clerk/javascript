@@ -19,16 +19,16 @@ export { useUserBase as useUserContext } from './hooks/base/useUserBase';
 export { useClientBase as useClientContext } from './hooks/base/useClientBase';
 export { useSessionBase as useSessionContext } from './hooks/base/useSessionBase';
 
-const [InitialStateContext, _useInitialStateContext] = createContextAndHook<
-  InitialState | Promise<InitialState> | undefined
->('InitialStateContext');
+const [InitialStateContext, _useInitialStateContext] = createContextAndHook<InitialState | undefined>(
+  'InitialStateContext',
+);
 
 export function InitialStateProvider({
   children,
   initialState,
 }: {
   children: React.ReactNode;
-  initialState: InitialState | Promise<InitialState> | undefined;
+  initialState: InitialState | undefined;
 }) {
   // The initialState is not allowed to change, we snapshot it to turn that expectation into a guarantee.
   // Note that despite this, it could still be different for different parts of the React tree which is fine,
@@ -42,10 +42,11 @@ export function InitialStateProvider({
 export function useInitialStateContext(): InitialState | undefined {
   const initialState = _useInitialStateContext();
 
-  // @ts-expect-error TODO: If we do want to support promises, we need to throw here instead
-  const resolvedInitialState = initialState && 'then' in initialState ? React.use(initialState) : initialState;
+  // If we want to support passing initialState as a promise, this is where we would handle that.
+  // Note that we can not use(promise) as long as we support React 18, so we'll need to have some extra handling
+  // and throw the promise instead.
 
-  return resolvedInitialState;
+  return initialState;
 }
 
 const OptionsContext = React.createContext<ClerkOptions>({});

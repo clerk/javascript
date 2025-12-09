@@ -14,7 +14,7 @@ type ClerkContextProps = {
   clerkStatus?: ClerkStatus;
   children: React.ReactNode;
   swrConfig?: any;
-  initialState?: InitialState | Promise<InitialState>;
+  initialState?: InitialState;
 };
 
 export function ClerkContextProvider(props: ClerkContextProps): JSX.Element | null {

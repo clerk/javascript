@@ -36,7 +36,7 @@ export async function ClerkProvider<TUi extends Ui = Ui>(
 
   const propsWithEnvs = mergeNextClerkPropsWithEnv({
     ...rest,
-    initialState: statePromiseOrValue as InitialState | Promise<InitialState> | undefined,
+    initialState: (await statePromiseOrValue) as InitialState | undefined,
     nonce: await noncePromiseOrValue,
   });
 
