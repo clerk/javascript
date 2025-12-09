@@ -1,5 +1,5 @@
-name: Release
-run-name: Release
+name: Release (Core 2)
+run-name: Release (Core 2)
 
 on:
   push:
