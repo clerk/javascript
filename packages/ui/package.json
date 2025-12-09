@@ -54,6 +54,7 @@
     "clean": "rimraf ./dist",
     "dev": "tsdown --watch src",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4001}",
+    "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4001",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
@@ -62,7 +63,8 @@
     "showerrors": "tsc",
     "test:ci": "vitest --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html",
-    "test:disabled": "vitest"
+    "test:disabled": "vitest",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/localizations": "workspace:^",

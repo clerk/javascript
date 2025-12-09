@@ -31,7 +31,7 @@ ${entry.content}
   return output;
 }
 
-generate().then(console.log);
+void generate().then(console.log);
 
 function getSdkName(val) {
   return SDKS.find(sdk => val === sdk.value).label;

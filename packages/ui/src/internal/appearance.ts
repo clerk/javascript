@@ -817,7 +817,7 @@ export type BaseTheme = (BaseThemeTaggedType | 'clerk' | 'simple') & { cssLayerN
 export type Theme = {
   /**
    * A theme used as the base theme for the components.
-   * For further customisation, you can use the {@link Theme.layout}, {@link Theme.variables} and {@link Theme.elements} props.
+   * For further customisation, you can use the {@link Theme.options}, {@link Theme.variables} and {@link Theme.elements} props.
    *
    * Supports both object-based themes and string-based themes:
    *
@@ -836,7 +836,7 @@ export type Theme = {
    * customizations that hard to implement with just CSS.
    * Eg: placing the logo outside the card element
    */
-  layout?: Layout;
+  options?: Options;
   /**
    * General theme overrides. This styles will be merged with our base theme.
    * Can override global styles like colors, fonts etc.
@@ -857,7 +857,7 @@ export type Theme = {
   captcha?: CaptchaAppearanceOptions;
 };
 
-export type Layout = {
+export type Options = {
   /**
    * Controls whether the logo will be rendered inside or outside the component card.
    * To customise the logo further, you can use {@link Appearance.elements}
@@ -1065,6 +1065,10 @@ export type Appearance<T = Theme> = T &
      * Theme overrides that only apply to the `<TaskChooseOrganization />` component
      */
     taskChooseOrganization?: T;
+    /**
+     * Theme overrides that only apply to the `<TaskResetPassword />` component
+     */
+    taskResetPassword?: T;
     /**
      * Theme overrides that only apply to the `<EnableOrganizations/>` component
      */

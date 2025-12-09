@@ -37,6 +37,7 @@ const AVAILABLE_COMPONENTS = [
   'apiKeys',
   'oauthConsent',
   'taskChooseOrganization',
+  'taskResetPassword',
 ] as const;
 
 const COMPONENT_PROPS_NAMESPACE = 'clerk-js-sandbox';
@@ -99,6 +100,7 @@ const componentControls: Record<(typeof AVAILABLE_COMPONENTS)[number], Component
   apiKeys: buildComponentControls('apiKeys'),
   oauthConsent: buildComponentControls('oauthConsent'),
   taskChooseOrganization: buildComponentControls('taskChooseOrganization'),
+  taskResetPassword: buildComponentControls('taskResetPassword'),
 };
 
 declare global {
@@ -352,6 +354,14 @@ void (async () => {
         },
       );
     },
+    '/task-reset-password': () => {
+      Clerk.mountTaskResetPassword(
+        app,
+        componentControls.taskResetPassword.getProps() ?? {
+          redirectUrlComplete: '/user-profile',
+        },
+      );
+    },
     '/open-sign-in': () => {
       mountOpenSignInButton(app, componentControls.signIn.getProps() ?? {});
     },
@@ -368,6 +378,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
+      clerkUiCtor: window.__internal_ClerkUiCtor,
     });
     renderCurrentRoute();
     updateVariables();

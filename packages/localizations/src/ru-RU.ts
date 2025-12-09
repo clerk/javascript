@@ -885,10 +885,15 @@ export const ruRU: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
+    avatar_file_size_exceeded:
+      'Размер файла превышает максимальный лимит 10 МБ. Пожалуйста, выберите файл меньшего размера.',
+    avatar_file_type_invalid:
+      'Тип файла не поддерживается. Пожалуйста, загрузите изображение в формате JPG, PNG, GIF или WEBP.',
     captcha_invalid:
       'Регистрация не удалась из-за неудачных проверок безопасности. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     captcha_unavailable:
@@ -898,6 +903,7 @@ export const ruRU: LocalizationResource = {
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
     form_identifier_not_found: 'Мы не смогли найти учетную запись с этими данными.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Адрес электронной почты должен быть действительным.',
     form_param_format_invalid__phone_number: 'Номер телефона должен быть в действующем международном формате.',

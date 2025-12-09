@@ -15,7 +15,7 @@ export const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>((pro
   const { displayConfig } = useEnvironment();
   const { branded } = displayConfig;
   const { showDevModeNotice } = useDevMode();
-  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedOptions;
   const sponsorOrLinksExist = !!(branded || helpPageUrl || privacyPageUrl || termsPageUrl);
   const showSponsorAndLinks = isProfileFooter ? branded : sponsorOrLinksExist;
 
@@ -87,7 +87,7 @@ const CardFooterLink = (props: PropsOfComponent<typeof Link>): JSX.Element => {
 };
 
 export const CardFooterLinks = React.memo((): JSX.Element | null => {
-  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedLayout;
+  const { helpPageUrl, privacyPageUrl, termsPageUrl } = useAppearance().parsedOptions;
 
   if (!helpPageUrl && !privacyPageUrl && !termsPageUrl) {
     return null;

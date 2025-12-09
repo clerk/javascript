@@ -875,10 +875,13 @@ export const isIS: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Skráarstærð fer yfir hámarksmörk 10 MB. Vinsamlegast veldu minni skrá.',
+    avatar_file_type_invalid: 'Skráargerð er ekki studd. Vinsamlegast hlaðið upp JPG, PNG, GIF eða WEBP mynd.',
     captcha_invalid:
       'Skráning mistókst vegna misheppnaðra öryggisstaðfestinga. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     captcha_unavailable:
@@ -888,6 +891,7 @@ export const isIS: LocalizationResource = {
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_not_found: 'Við getum ekki fundið reikning með þessum upplýsingum.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Netfang verður að vera gilt netfang.',
     form_param_format_invalid__phone_number: 'Símanúmer verður að vera á giltu alþjóðlegu formi',

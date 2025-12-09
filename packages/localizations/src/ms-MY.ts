@@ -881,10 +881,13 @@ export const msMY: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
+    avatar_file_size_exceeded: 'Saiz fail melebihi had maksimum 10MB. Sila pilih fail yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis fail tidak disokong. Sila muat naik imej JPG, PNG, GIF atau WEBP.',
     captcha_invalid:
       'Pendaftaran tidak berjaya kerana pengesahan keselamatan gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     captcha_unavailable:
@@ -894,6 +897,7 @@ export const msMY: LocalizationResource = {
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
     form_identifier_not_found: 'Tiada akaun dijumpai dengan pengenal ini. Sila periksa dan cuba lagi.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid:
       'Nilai yang dimasukkan adalah dalam format yang tidak sah. Sila periksa dan betulkannya.',
     form_param_format_invalid__email_address: 'Alamat e-mel mestilah alamat e-mel yang sah.',

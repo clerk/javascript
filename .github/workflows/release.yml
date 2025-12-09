@@ -4,8 +4,8 @@ run-name: Release
 on:
   push:
     branches:
-      - main
-      - release/v4
+      - main-disabled
+      - release/v4-disabled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -148,6 +148,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})

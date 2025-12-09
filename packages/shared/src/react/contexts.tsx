@@ -55,17 +55,17 @@ const OptionsContext = React.createContext<ClerkOptions>({});
  */
 export type UseCheckoutOptions = {
   /**
-   * Specifies if the checkout is for an organization.
+   * Specifies if the checkout is for an Organization.
    *
    * @default 'user'
    */
   for?: ForPayerType;
   /**
-   * The billing period for the plan.
+   * The billing period for the Plan.
    */
   planPeriod: BillingSubscriptionPlanPeriod;
   /**
-   * The ID of the subscription plan to check out (e.g. `cplan_xxx`).
+   * The ID of the Subscription Plan to check out (e.g. `cplan_xxx`).
    */
   planId: string;
 };

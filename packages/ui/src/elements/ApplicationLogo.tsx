@@ -48,10 +48,10 @@ export const ApplicationLogo: React.FC<ApplicationLogoProps> = (props: Applicati
   const imageRef = React.useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = React.useState(false);
   const { logoImageUrl, applicationName, homeUrl } = useEnvironment().displayConfig;
-  const { parsedLayout } = useAppearance();
-  const imageSrc = src || parsedLayout.logoImageUrl || logoImageUrl;
+  const { parsedOptions } = useAppearance();
+  const imageSrc = src || parsedOptions.logoImageUrl || logoImageUrl;
   const imageAlt = alt || applicationName;
-  const logoUrl = href || parsedLayout.logoLinkUrl || homeUrl;
+  const logoUrl = href || parsedOptions.logoLinkUrl || homeUrl;
 
   if (!imageSrc) {
     return null;

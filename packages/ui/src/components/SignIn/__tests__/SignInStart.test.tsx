@@ -212,7 +212,7 @@ describe('SignInStart', () => {
           <AppearanceProvider
             appearanceKey={'signIn'}
             appearance={{
-              layout: {
+              options: {
                 socialButtonsVariant: 'blockButton',
               },
             }}

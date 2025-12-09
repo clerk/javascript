@@ -885,10 +885,14 @@ export const jaJP: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} はすでにこの組織のメンバーです。',
+    avatar_file_size_exceeded: 'ファイルサイズが10MBの上限を超えています。より小さいファイルを選択してください。',
+    avatar_file_type_invalid:
+      'サポートされていないファイル形式です。JPG、PNG、GIF、またはWEBP画像をアップロードしてください。',
     captcha_invalid: undefined,
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
@@ -897,6 +901,7 @@ export const jaJP: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,

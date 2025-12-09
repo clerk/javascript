@@ -875,10 +875,13 @@ export const enGB: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organisation.',
+    avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please try using a different browser or disabling browser extensions. If issues persist, contact support for assistance.',
     captcha_unavailable:
@@ -888,6 +891,7 @@ export const enGB: LocalizationResource = {
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',
     form_identifier_not_found: "We couldn't find an account with those details.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'The value entered is in an invalid format. Please check and correct it.',
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format.',

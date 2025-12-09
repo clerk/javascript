@@ -878,10 +878,13 @@ export const bnIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
+    avatar_file_size_exceeded: 'ফাইলের আকার সর্বোচ্চ ১০ এমবি সীমা অতিক্রম করেছে। দয়া করে একটি ছোট ফাইল নির্বাচন করুন।',
+    avatar_file_type_invalid: 'ফাইলের ধরন সমর্থিত নয়। দয়া করে JPG, PNG, GIF বা WEBP ছবি আপলোড করুন।',
     captcha_invalid:
       'নিরাপত্তা যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     captcha_unavailable:
@@ -892,6 +895,7 @@ export const bnIN: LocalizationResource = {
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_not_found:
       'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'লেখা মানটি একটি অবৈধ ফরম্যাটে আছে। দয়া করে চেক করুন এবং সংশোধন করুন।',
     form_param_format_invalid__email_address: 'ইমেইল ঠিকানা একটি বৈধ ইমেইল ঠিকানা হতে হবে।',
     form_param_format_invalid__phone_number: 'ফোন নম্বর একটি বৈধ আন্তর্জাতিক ফরম্যাটে হতে হবে।',

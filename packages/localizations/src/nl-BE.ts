@@ -873,10 +873,13 @@ export const nlBE: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
+    avatar_file_size_exceeded: 'Bestandsgrootte overschrijdt de maximale limiet van 10 MB. Kies een kleiner bestand.',
+    avatar_file_type_invalid: 'Bestandstype wordt niet ondersteund. Upload een JPG-, PNG-, GIF- of WEBP-afbeelding.',
     captcha_invalid:
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:
@@ -886,6 +889,7 @@ export const nlBE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
     form_identifier_not_found: 'We konden geen account vinden met deze details.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',

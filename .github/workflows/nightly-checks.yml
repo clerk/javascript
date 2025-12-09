@@ -18,7 +18,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -68,10 +70,9 @@ jobs:
           E2E_CLERK_UI_VERSION: "latest"
           E2E_NEXTJS_VERSION: "canary"
           E2E_NPM_FORCE: "true"
-          E2E_REACT_DOM_VERSION: "19.1.0"
-          E2E_REACT_VERSION: "19.1.0"
+          E2E_REACT_DOM_VERSION: "19.2.1"
+          E2E_REACT_VERSION: "19.2.1"
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
-          MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
 
       # Upload test artifacts if tests failed
       - name: Upload Test Artifacts

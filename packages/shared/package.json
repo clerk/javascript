@@ -1,6 +1,6 @@
 {
   "name": "@clerk/shared",
-  "version": "3.37.0",
+  "version": "3.39.0",
   "description": "Internal package utils used by the Clerk SDKs",
   "repository": {
     "type": "git",
@@ -18,6 +18,16 @@
       "require": {
         "types": "./dist/runtime/index.d.ts",
         "default": "./dist/runtime/index.js"
+      }
+    },
+    "./internal/clerk-js/*": {
+      "import": {
+        "types": "./dist/runtime/internal/clerk-js/*.d.mts",
+        "default": "./dist/runtime/internal/clerk-js/*.mjs"
+      },
+      "require": {
+        "types": "./dist/runtime/internal/clerk-js/*.d.ts",
+        "default": "./dist/runtime/internal/clerk-js/*.js"
       }
     },
     "./*": {
@@ -90,20 +100,11 @@
         "default": "./dist/types/index.js"
       }
     },
-    "./internal/clerk-js/*": {
-      "import": {
-        "types": "./dist/runtime/internal/clerk-js/*.d.mts",
-        "default": "./dist/runtime/internal/clerk-js/*.mjs"
-      },
-      "require": {
-        "types": "./dist/runtime/internal/clerk-js/*.d.ts",
-        "default": "./dist/runtime/internal/clerk-js/*.js"
-      }
-    },
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "scripts"
   ],
   "scripts": {
     "build": "tsdown",

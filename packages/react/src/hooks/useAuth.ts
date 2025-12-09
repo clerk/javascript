@@ -126,7 +126,7 @@ export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
  * @remarks
  * This hook inspects session, user, and organization information to determine the current authentication state.
  * It returns an object that includes various properties such as whether the state is loaded, if a user is signed in,
- * session and user identifiers, organization roles, and a `has` function for authorization checks.
+ * session and user identifiers, Organization Roles, and a `has` function for authorization checks.
  * Additionally, it provides `signOut` and `getToken` functions if applicable.
  *
  * @example

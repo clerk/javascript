@@ -117,4 +117,18 @@ const clerk = require("@clerk/clerk-react")
 const clerk = require("@clerk/react")
 `,
   },
+  {
+    name: 'Handles directives with mixed legacy imports without double semicolons',
+    source: `"use client";
+
+import { ClerkProvider, useSignIn, useSignUp } from "@clerk/nextjs";
+
+export const dynamic = "force-dynamic";
+`,
+    output: `"use client";
+import { ClerkProvider } from "@clerk/nextjs";
+import { useSignIn, useSignUp } from "@clerk/nextjs/legacy";
+
+export const dynamic = "force-dynamic";`,
+  },
 ];
