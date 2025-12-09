@@ -169,6 +169,8 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
           value = attr.value.expression;
         } else if (j.StringLiteral.check(attr.value) || j.Literal.check(attr.value)) {
           value = attr.value;
+        } else if (attr.value == null) {
+          value = j.booleanLiteral(true);
         } else {
           // Default string value
           value = j.stringLiteral(attr.value?.value || '');

@@ -88,6 +88,33 @@ function App() {
 `,
   },
   {
+    name: 'Boolean shorthand auth prop transforms to true',
+    source: `
+import { Protect } from "@clerk/react"
+
+function App() {
+  return (
+    <Protect role>
+      <Content />
+    </Protect>
+  )
+}
+        `,
+    output: `
+import { Show } from "@clerk/react"
+
+function App() {
+  return (
+    <Show when={{
+      role: true
+    }}>
+      <Content />
+    </Show>
+  );
+}
+`,
+  },
+  {
     name: 'Feature prop transform',
     source: `
 import { Protect } from "@clerk/react"
