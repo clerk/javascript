@@ -77,7 +77,7 @@ export class Session extends BaseResource implements SessionResource {
     this.fromJSON(data);
     this.#hydrateCache(this.lastActiveToken);
 
-    if (Session.clerk?.__internal_useNewTokenService) {
+    if (__BUILD_VARIANT_EXPERIMENTAL__) {
       this.tokenService = new TokenService(this.id, {
         fetcher: this.createTokenFetcher(),
         onTokenResolved: token => {
