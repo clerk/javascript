@@ -2,7 +2,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import chalk from 'chalk';
-import { globby } from 'globby';
+import { glob } from 'tinyglobby';
 import { run } from 'jscodeshift/src/Runner.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -33,13 +33,13 @@ const GLOBBY_IGNORE = [
   '**/*.{css,scss,sass,less,styl}',
 ];
 
-export async function runCodemod(transform = 'transform-async-request', glob, options = {}) {
+export async function runCodemod(transform = 'transform-async-request', patterns, options = {}) {
   if (!transform) {
     throw new Error('No transform provided');
   }
   const resolvedPath = resolve(__dirname, `${transform}.cjs`);
 
-  const paths = await globby(glob, { ignore: GLOBBY_IGNORE });
+  const paths = await glob(patterns, { ignore: GLOBBY_IGNORE });
 
   if (options.skipCodemods) {
     return {
