@@ -886,10 +886,14 @@ export const beBY: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: 'Вы ўжо з’яўляецеся членам гэтай арганізацыі.',
+    avatar_file_size_exceeded: 'Памер файла перавышае максімальны ліміт 10 МБ. Калі ласка, абярыце меншы файл.',
+    avatar_file_type_invalid:
+      'Тып файла не падтрымліваецца. Калі ласка, загрузіце малюнак у фармаце JPG, PNG, GIF або WEBP.',
     captcha_invalid:
       'Рэгістрацыя не ўдалася з-за памылак бяспекі. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз, або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     captcha_unavailable:
@@ -899,6 +903,7 @@ export const beBY: LocalizationResource = {
     form_identifier_exists__phone_number: 'Гэты нумар тэлефона ўжо выкарыстоўваецца.',
     form_identifier_exists__username: 'Гэта імя ўжо занята.',
     form_identifier_not_found: 'Мы не знойдзем акаўнта з такімі данымі.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address:
       'Адрас электроннай пошты павінен быць сапраўдным адрасам электроннай пошты.',

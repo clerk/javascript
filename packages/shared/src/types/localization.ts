@@ -69,7 +69,7 @@ export type __internal_LocalizationResource = {
   locale: string;
   maintenanceMode: LocalizationValue;
   /**
-   * Add role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
+   * Add Role keys and their localized values, e.g. `roles: { 'org:teacher': 'Teacher'}`.
    *
    * @experimental
    */
@@ -1302,6 +1302,7 @@ export type __internal_LocalizationResource = {
   };
   taskResetPassword: {
     title: LocalizationValue;
+    subtitle: LocalizationValue;
     signOut: {
       actionLink: LocalizationValue;
       actionText: LocalizationValue<'identifier'>;
@@ -1319,6 +1320,8 @@ type WithParamName<T> = T &
   Partial<Record<`${keyof T & string}__${CamelToSnake<Exclude<FieldId, 'role'>>}`, LocalizationValue>>;
 
 type UnstableErrors = WithParamName<{
+  avatar_file_type_invalid: LocalizationValue;
+  avatar_file_size_exceeded: LocalizationValue;
   external_account_not_found: LocalizationValue;
   identification_deletion_failed: LocalizationValue;
   phone_number_exists: LocalizationValue;
@@ -1335,6 +1338,7 @@ type UnstableErrors = WithParamName<{
   web3_signature_request_rejected: LocalizationValue;
   form_password_pwned: LocalizationValue;
   form_password_pwned__sign_in: LocalizationValue;
+  form_new_password_matches_current: LocalizationValue;
   /** @deprecated Use `form_password_compromised__sign_in` instead */
   form_password_untrusted__sign_in: LocalizationValue;
   form_password_compromised__sign_in: LocalizationValue;

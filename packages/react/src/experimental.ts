@@ -10,6 +10,7 @@ export type {
 } from '@clerk/shared/types';
 
 export {
+  __experimental_useAPIKeys as useAPIKeys,
   __experimental_PaymentElementProvider as PaymentElementProvider,
   __experimental_usePaymentElement as usePaymentElement,
   __experimental_PaymentElement as PaymentElement,

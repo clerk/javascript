@@ -883,10 +883,14 @@ export const elGR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded:
+      'Το μέγεθος του αρχείου υπερβαίνει το μέγιστο όριο των 10 MB. Επιλέξτε ένα μικρότερο αρχείο.',
+    avatar_file_type_invalid: 'Ο τύπος αρχείου δεν υποστηρίζεται. Ανεβάστε μια εικόνα JPG, PNG, GIF ή WEBP.',
     captcha_invalid:
       'Η εγγραφή απέτυχε λόγω αποτυχημένων ελέγχων ασφαλείας. Ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με το κέντρο υποστήριξης για περισσότερη βοήθεια.',
     captcha_unavailable:
@@ -896,6 +900,7 @@ export const elGR: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Δεν βρέθηκε λογαριασμός με αυτές τις λεπτομέρειες.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Η διεύθυνση email πρέπει να είναι μια έγκυρη διεύθυνση email.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',

@@ -878,10 +878,14 @@ export const ukUA: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Розмір файлу перевищує максимальний ліміт 10 МБ. Будь ласка, виберіть менший файл.',
+    avatar_file_type_invalid:
+      'Тип файлу не підтримується. Будь ласка, завантажте зображення у форматі JPG, PNG, GIF або WEBP.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -891,6 +895,7 @@ export const ukUA: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Не вдалося знайти акаунт з цими даними.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
