@@ -41,7 +41,6 @@ export const defaultDerivedInitialState = {
 export function useAuthState(): AuthStateValue {
   const clerk = useClerkInstanceContext();
   const initialState = useInitialStateContext();
-
   const getInitialState = useCallback(() => initialState, [initialState]);
 
   const state = useSyncExternalStore(
