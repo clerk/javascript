@@ -98,11 +98,9 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
       specifiers.forEach(spec => {
         if (j.ImportSpecifier.check(spec)) {
           if (spec.imported.name === 'Protect') {
-            const effectiveLocalName = spec.local ? spec.local.name : spec.imported.name;
+            const originalImportedName = spec.imported.name;
+            const effectiveLocalName = spec.local ? spec.local.name : originalImportedName;
             spec.imported.name = 'Show';
-            if (spec.local && spec.local.name === 'Protect') {
-              spec.local.name = 'Show';
-            }
             if (!protectLocalNames.includes(effectiveLocalName)) {
               protectLocalNames.push(effectiveLocalName);
             }
