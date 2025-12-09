@@ -1,7 +1,7 @@
 ---
 title: 'Encryption key required when passing `secretKey` at runtime'
 packages: ['nextjs']
-matcher: 'clerkMiddleware\\([\\s\\S]*?secretKey'
+matcher: 'clerkMiddleware\([\\s\\S]*?secretKey'
 matcherFlags: 'm'
 category: 'breaking'
 ---
