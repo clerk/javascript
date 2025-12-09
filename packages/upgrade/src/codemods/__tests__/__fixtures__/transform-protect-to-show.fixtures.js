@@ -362,4 +362,42 @@ function Component() {
   );
 }`,
   },
+  {
+    name: 'Bare Protect defaults to signedIn',
+    source: `
+import { Protect } from "@clerk/react"
+
+function App() {
+  return (
+    <Protect>
+      <Content />
+    </Protect>
+  )
+}
+        `,
+    output: `
+import { Show } from "@clerk/react"
+
+function App() {
+  return (
+    <Show when="signedIn">
+      <Content />
+    </Show>
+  );
+}
+`,
+  },
+  {
+    name: 'ProtectProps import rewrites to ShowProps',
+    source: `
+import { ProtectProps } from "@clerk/react";
+
+type Props = ProtectProps;
+        `,
+    output: `
+import { ShowProps } from "@clerk/react";
+
+type Props = ShowProps;
+`,
+  },
 ];

@@ -67,6 +67,7 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
   const root = j(source);
   let dirtyFlag = false;
   const protectLocalNames = [];
+  const protectPropsLocalsToRename = [];
 
   const isClientComponent = hasUseClientDirective(root, j);
 
@@ -87,7 +88,7 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     return undefined;
   }
 
-  // Transform imports: Protect → Show
+  // Transform imports: Protect → Show, ProtectProps → ShowProps
   const allPackages = [...CLIENT_ONLY_PACKAGES, ...HYBRID_PACKAGES];
   allPackages.forEach(packageName => {
     root.find(j.ImportDeclaration, { source: { value: packageName } }).forEach(path => {
@@ -95,20 +96,52 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
       const specifiers = node.specifiers || [];
 
       specifiers.forEach(spec => {
-        if (j.ImportSpecifier.check(spec) && spec.imported.name === 'Protect') {
-          const effectiveLocalName = spec.local ? spec.local.name : spec.imported.name;
-          spec.imported.name = 'Show';
-          if (spec.local && spec.local.name === 'Protect') {
-            spec.local.name = 'Show';
+        if (j.ImportSpecifier.check(spec)) {
+          if (spec.imported.name === 'Protect') {
+            const effectiveLocalName = spec.local ? spec.local.name : spec.imported.name;
+            spec.imported.name = 'Show';
+            if (spec.local && spec.local.name === 'Protect') {
+              spec.local.name = 'Show';
+            }
+            if (!protectLocalNames.includes(effectiveLocalName)) {
+              protectLocalNames.push(effectiveLocalName);
+            }
+            dirtyFlag = true;
           }
-          if (!protectLocalNames.includes(effectiveLocalName)) {
-            protectLocalNames.push(effectiveLocalName);
+
+          if (spec.imported.name === 'ProtectProps') {
+            const effectiveLocalName = spec.local ? spec.local.name : spec.imported.name;
+            spec.imported.name = 'ShowProps';
+            if (spec.local && spec.local.name === 'ProtectProps') {
+              spec.local.name = 'ShowProps';
+            }
+            if (effectiveLocalName === 'ProtectProps') {
+              protectPropsLocalsToRename.push(effectiveLocalName);
+            }
+            dirtyFlag = true;
           }
-          dirtyFlag = true;
         }
       });
     });
   });
+
+  // Rename references to ProtectProps (only when local name was ProtectProps)
+  if (protectPropsLocalsToRename.length > 0) {
+    root
+      .find(j.TSTypeReference, {
+        typeName: {
+          type: 'Identifier',
+          name: 'ProtectProps',
+        },
+      })
+      .forEach(path => {
+        const typeName = path.node.typeName;
+        if (j.Identifier.check(typeName) && typeName.name === 'ProtectProps') {
+          typeName.name = 'ShowProps';
+          dirtyFlag = true;
+        }
+      });
+  }
 
   // Transform JSX: <Protect ...> → <Show when={...}>
   root.find(j.JSXElement).forEach(path => {
@@ -185,9 +218,9 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     // Reconstruct attributes with `when` prop
     const newAttributes = [];
 
-    if (whenValue) {
-      newAttributes.push(j.jsxAttribute(j.jsxIdentifier('when'), whenValue));
-    }
+    const finalWhenValue = whenValue || j.stringLiteral('signedIn');
+
+    newAttributes.push(j.jsxAttribute(j.jsxIdentifier('when'), finalWhenValue));
 
     // Add remaining attributes (fallback, etc.)
     otherAttributes.forEach(attr => newAttributes.push(attr));
