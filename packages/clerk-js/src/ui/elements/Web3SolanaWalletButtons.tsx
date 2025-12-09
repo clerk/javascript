@@ -4,7 +4,7 @@ import { MAINNET_ENDPOINT } from '@solana/wallet-standard';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement, useMemo } from 'react';
 
-import { ProviderInitialIcon } from '@/ui/common';
+import { WalletInitialIcon } from '@/ui/common/WalletInitialIcon';
 import {
   Button,
   descriptors,
@@ -94,6 +94,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
     <Flex
       direction='col'
       gap={2}
+      elementDescriptor={descriptors.web3WalletButtonsRoot}
     >
       {strategyRows.map((row, rowIndex) => (
         <Grid
@@ -102,6 +103,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
               return r.name;
             })
             .join('-')}
+          elementDescriptor={descriptors.web3WalletButtons}
           gap={2}
           sx={t => ({
             justifyContent: 'center',
@@ -130,6 +132,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
 
             const imageOrInitial = w.icon ? (
               <Image
+                elementDescriptor={[descriptors.walletIcon, descriptors.web3WalletButtonsWalletInitialIcon]}
                 isDisabled={card.isLoading}
                 isLoading={card.loadingMetadata === w.name}
                 src={w.icon}
@@ -137,10 +140,10 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
                 sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
               />
             ) : (
-              <ProviderInitialIcon
+              <WalletInitialIcon
                 value={w.name}
                 isDisabled={card.isLoading}
-                id={'linear'}
+                id={w.name}
               />
             );
 

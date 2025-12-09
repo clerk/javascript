@@ -515,6 +515,17 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionsRoot',
   'enterpriseConnectionButton',
   'enterpriseConnectionButtonText',
+
+  'web3WalletButtonsRoot',
+  'web3WalletButtons',
+  'web3WalletButtonsIconButton',
+  'web3WalletButtonsBlockButton',
+  'web3WalletButtonsBlockButtonText',
+  'web3WalletButtonsWalletIcon',
+  'web3WalletButtonsWalletInitialIcon',
+
+  'walletIcon',
+  'walletInitialIcon',
 ] as const).map(camelize) as (keyof ElementsConfig)[];
 
 type TargettableClassname<K extends keyof ElementsConfig> = `${typeof CLASS_PREFIX}${K}`;
