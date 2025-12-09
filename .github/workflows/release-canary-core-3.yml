@@ -25,6 +25,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
 
       - name: Setup
         id: config

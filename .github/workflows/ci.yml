@@ -58,8 +58,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 100 # Enough for changeset status comparison, much faster than full history
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
+
+      - name: Fetch main branch for changeset comparison
+        run: git fetch origin main:refs/remotes/origin/main --depth=100
 
       - name: Setup
         id: config
@@ -104,7 +109,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -148,7 +155,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -222,7 +231,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -348,7 +359,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup
@@ -517,7 +530,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Setup Node
