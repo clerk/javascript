@@ -1,11 +1,10 @@
-name: Release
-run-name: Release
+name: Release (Core 2)
+run-name: Release (Core 2)
 
 on:
   push:
     branches:
-      - main
-      - release/v4
+      - release/core-2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -43,10 +42,10 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
@@ -55,8 +54,8 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: "ci(repo): Version packages"
-          title: "ci(repo): Version packages"
+          commit: "ci(repo): Version packages (Core 2)"
+          title: "ci(repo): Version packages (Core 2)"
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
@@ -139,6 +138,9 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
