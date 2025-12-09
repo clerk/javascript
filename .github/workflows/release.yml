@@ -57,16 +57,13 @@ jobs:
           turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
 
-      - name: Build release
-        run: pnpm turbo build $TURBO_ARGS --force
-
       - name: Create Release PR
         id: changesets
         uses: changesets/action@v1
         with:
           commit: "ci(repo): Version packages"
           title: "ci(repo): Version packages"
-          publish: pnpm release
+          publish: pnpm turbo build $TURBO_ARGS --force && pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
