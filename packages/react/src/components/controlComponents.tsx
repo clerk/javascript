@@ -78,6 +78,13 @@ export type ShowProps = React.PropsWithChildren<
 
 /**
  * Use `<Show/>` to conditionally render content based on user authorization or sign-in state.
+ * Returns `null` while auth is loading. Set `treatPendingAsSignedOut` to treat
+ * pending sessions as signed out during that period.
+ *
+ * The `when` prop supports:
+ * - `"signedIn"` or `"signedOut"` shorthands
+ * - Authorization descriptors (e.g., `{ permission: "org:billing:manage" }`, `{ role: "admin" }`)
+ * - A predicate function `(has) => boolean` that receives the `has` helper
  *
  * @example
  * ```tsx

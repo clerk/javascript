@@ -84,14 +84,13 @@ export async function Protect(props: AppRouterProtectProps): Promise<React.JSX.E
 
 /**
  * Use `<Show/>` to render children when an authorization or sign-in condition passes.
+ * When `treatPendingAsSignedOut` is true, pending sessions are treated as signed out.
+ * Renders the provided `fallback` (or `null`) when the condition fails.
  *
- * @param props.when Condition that controls rendering. Accepts:
- * - authorization objects such as `{ permission: "..." }`, `{ role: "..." }`, `{ feature: "..." }`, or `{ plan: "..." }`
- * - the string `"signedIn"` to render when a user is present
- * - the string `"signedOut"` to render when no user is present
- * - predicate functions `(has) => boolean` that receive the `has` helper
- * @param props.fallback Optional content rendered when the condition fails.
- * @param props.children Content rendered when the condition passes.
+ * The `when` prop supports:
+ * - `"signedIn"` or `"signedOut"` shorthands
+ * - Authorization objects such as `{ permission: "..." }`, `{ role: "..." }`, `{ feature: "..." }`, or `{ plan: "..." }`
+ * - Predicate functions `(has) => boolean` that receive the `has` helper
  *
  * @example
  * ```tsx
