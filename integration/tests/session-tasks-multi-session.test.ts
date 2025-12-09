@@ -68,7 +68,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
       // If the subsequent session touch call happens too quickly, the backend will rate limit it and not update the session activity timestamp.
       // To get around this rate limit, and realistically emulate a more human-like pace, we add an arbitrary delay here
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
       // Select the active session
       await u.page.goToRelative('/');
