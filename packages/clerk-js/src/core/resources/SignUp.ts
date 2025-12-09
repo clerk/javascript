@@ -14,6 +14,7 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpEnterpriseConnectionJSON,
@@ -319,11 +320,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     return this.attemptWeb3WalletVerification({ signature, strategy });
   };
 
-  public authenticateWithMetamask = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
+  public authenticateWithMetamask = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     const identifier = await getMetamaskIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -335,9 +332,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   public authenticateWithCoinbaseWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
+    params?: SignUpAuthenticateWithWeb3Params,
   ): Promise<SignUpResource> => {
     const identifier = await getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
@@ -349,11 +344,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithBase = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
+  public authenticateWithBase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     const identifier = await getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -364,11 +355,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithOKXWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
+  public authenticateWithOKXWallet = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     const identifier = await getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -379,12 +366,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithSolana = async (
-    params: SignUpAuthenticateWithWeb3Params & {
-      walletName: string;
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
+  public authenticateWithSolana = async (params: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
     const identifier = await getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({
       identifier,

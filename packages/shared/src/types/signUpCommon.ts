@@ -115,6 +115,7 @@ export type SignUpAuthenticateWithMetamaskParams = SignUpAuthenticateWithWeb3Par
 
 export type SignUpAuthenticateWithWeb3Params = {
   unsafeMetadata?: SignUpUnsafeMetadata;
+  legalAccepted?: boolean;
 };
 
 export type SignUpAuthenticateWithSolanaParams = SignUpAuthenticateWithWeb3Params & {

@@ -7,7 +7,6 @@ import type {
   AuthenticateWithPasskeyParams,
   AuthenticateWithPopupParams,
   AuthenticateWithRedirectParams,
-  AuthenticateWithSolanaParams,
   AuthenticateWithWeb3Params,
   ClientTrustState,
   CreateEmailLinkFlowReturn,
@@ -27,6 +26,7 @@ import type {
   ResetPasswordParams,
   ResetPasswordPhoneCodeFactorConfig,
   SamlConfig,
+  SignInAuthenticateWithSolanaParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInFutureBackupCodeVerifyParams,
@@ -469,7 +469,7 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
-  public authenticateWithSolana = async (params: AuthenticateWithSolanaParams): Promise<SignInResource> => {
+  public authenticateWithSolana = async (params: SignInAuthenticateWithSolanaParams): Promise<SignInResource> => {
     const identifier = await getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({
       identifier,
