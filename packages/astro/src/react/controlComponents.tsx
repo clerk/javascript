@@ -137,7 +137,6 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
  */
 export const AuthenticateWithRedirectCallback = withClerk(
   ({ clerk, ...handleRedirectCallbackParams }: WithClerkProp<HandleOAuthCallbackParams>) => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
       void clerk?.handleRedirectCallback(handleRedirectCallbackParams);
     }, []);

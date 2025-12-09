@@ -1,7 +1,7 @@
 // Packages that are always client-side
-const CLIENT_ONLY_PACKAGES = ['@clerk/chrome-extension', '@clerk/expo', '@clerk/react'];
+const CLIENT_ONLY_PACKAGES = ['@clerk/chrome-extension', '@clerk/expo', '@clerk/react', '@clerk/vue'];
 // Packages that can be used in both RSC and client components
-const HYBRID_PACKAGES = ['@clerk/nextjs'];
+const HYBRID_PACKAGES = ['@clerk/astro', '@clerk/nextjs'];
 
 /**
  * Checks if a file has a 'use client' directive at the top.
@@ -66,6 +66,7 @@ function hasUseClientDirective(root, j) {
 module.exports = function transformProtectToShow({ source }, { jscodeshift: j }) {
   const root = j(source);
   let dirtyFlag = false;
+  const protectLocalNames = [];
 
   const isClientComponent = hasUseClientDirective(root, j);
 
@@ -95,9 +96,13 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
 
       specifiers.forEach(spec => {
         if (j.ImportSpecifier.check(spec) && spec.imported.name === 'Protect') {
+          const effectiveLocalName = spec.local ? spec.local.name : spec.imported.name;
           spec.imported.name = 'Show';
           if (spec.local && spec.local.name === 'Protect') {
             spec.local.name = 'Show';
+          }
+          if (!protectLocalNames.includes(effectiveLocalName)) {
+            protectLocalNames.push(effectiveLocalName);
           }
           dirtyFlag = true;
         }
@@ -111,7 +116,7 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     const closingElement = path.node.closingElement;
 
     // Check if this is a <Protect> element
-    if (!j.JSXIdentifier.check(openingElement.name) || openingElement.name.name !== 'Protect') {
+    if (!j.JSXIdentifier.check(openingElement.name) || !protectLocalNames.includes(openingElement.name.name)) {
       return;
     }
 
