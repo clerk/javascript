@@ -879,6 +879,7 @@ export const plPL: LocalizationResource = {
       actionText: 'Zalogowano jako {{identifier}}',
     },
     title: 'Zresetuj hasło',
+    subtitle: undefined,
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',

@@ -4,9 +4,7 @@ on:
   merge_group:
   pull_request:
     branches:
-      - main
-      - release/v4
-      - vincent-and-the-doctor
+      - release/core-2
 
 permissions:
   contents: read
@@ -82,7 +80,7 @@ jobs:
             echo 'Skipping';
             exit 0;
           else
-            pnpm changeset status --since=origin/main;
+            pnpm changeset status --since=origin/release/core-2;
           fi
 
   build-packages:
@@ -294,58 +292,59 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-name: [
-            'generic',
-            'express',
-            'ap-flows',
-            'elements',
-            'localhost',
-            'sessions',
-            'sessions:staging',
-            'handshake',
-            'handshake:staging',
-            'astro',
-            'expo-web',
-            'tanstack-react-start',
-            'vue',
-            'nuxt',
-            'react-router',
-            'custom',
+        test-name:
+          [
+            "generic",
+            "express",
+            "ap-flows",
+            "elements",
+            "localhost",
+            "sessions",
+            "sessions:staging",
+            "handshake",
+            "handshake:staging",
+            "astro",
+            "expo-web",
+            "tanstack-react-start",
+            "vue",
+            "nuxt",
+            "react-router",
+            "custom",
           ]
         test-project: ["chrome"]
         include:
-          - test-name: 'billing'
-            test-project: 'chrome'
-            clerk-use-rq: 'false'
-          - test-name: 'billing'
-            test-project: 'chrome'
-            clerk-use-rq: 'true'
-          - test-name: 'machine'
-            test-project: 'chrome'
-            clerk-use-rq: 'false'
-          - test-name: 'machine'
-            test-project: 'chrome'
-            clerk-use-rq: 'true'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '14'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-            clerk-use-rq: 'false'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '15'
-            clerk-use-rq: 'true'
-          - test-name: 'nextjs'
-            test-project: 'chrome'
-            next-version: '16'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '15'
-          - test-name: 'quickstart'
-            test-project: 'chrome'
-            next-version: '16'
+          - test-name: "billing"
+            test-project: "chrome"
+            clerk-use-rq: "false"
+          - test-name: "billing"
+            test-project: "chrome"
+            clerk-use-rq: "true"
+          - test-name: "machine"
+            test-project: "chrome"
+            clerk-use-rq: "false"
+          - test-name: "machine"
+            test-project: "chrome"
+            clerk-use-rq: "true"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "14"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "false"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "15"
+            clerk-use-rq: "true"
+          - test-name: "nextjs"
+            test-project: "chrome"
+            next-version: "16"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "15"
+          - test-name: "quickstart"
+            test-project: "chrome"
+            next-version: "16"
 
     steps:
       - name: Checkout Repo
@@ -475,6 +474,7 @@ jobs:
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
           MAILSAC_API_KEY: ${{ secrets.MAILSAC_API_KEY }}
           NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload test-results
         if: ${{ cancelled() || failure() }}

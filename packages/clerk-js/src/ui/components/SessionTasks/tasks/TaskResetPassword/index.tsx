@@ -112,6 +112,7 @@ const TaskResetPasswordInternal = () => {
           <Card.Content>
             <Header.Root showLogo>
               <Header.Title localizationKey={localizationKeys('taskResetPassword.title')} />
+              <Header.Subtitle localizationKey={localizationKeys('taskResetPassword.subtitle')} />
             </Header.Root>
             <Card.Alert>{card.error}</Card.Alert>
             <Col
