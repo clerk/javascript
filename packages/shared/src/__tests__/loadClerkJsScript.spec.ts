@@ -19,6 +19,7 @@ vi.mock('../loadScript');
 
 setClerkJsLoadingErrorPackageName('@clerk/react');
 const jsPackageMajorVersion = getMajorVersion(JS_PACKAGE_VERSION);
+const uiPackageMajorVersion = getMajorVersion(UI_PACKAGE_VERSION);
 
 const mockClerk = {
   status: 'ready',
@@ -318,7 +319,7 @@ describe('loadClerkUiScript(options)', () => {
     expect(result).toBeNull();
     expect(loadScript).toHaveBeenCalledWith(
       expect.stringContaining(
-        `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/ui@${jsPackageMajorVersion}/dist/ui.browser.js`,
+        `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`,
       ),
       expect.objectContaining({
         async: true,
@@ -401,13 +402,13 @@ describe('clerkUiScriptUrl()', () => {
   test('constructs URL correctly for development key', () => {
     const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey });
     expect(result).toBe(
-      `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/ui@${jsPackageMajorVersion}/dist/ui.browser.js`,
+      `https://foo-bar-13.clerk.accounts.dev/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`,
     );
   });
 
   test('constructs URL correctly for production key', () => {
     const result = clerkUiScriptUrl({ publishableKey: mockProdPublishableKey });
-    expect(result).toBe(`https://example.clerk.com/npm/@clerk/ui@${jsPackageMajorVersion}/dist/ui.browser.js`);
+    expect(result).toBe(`https://example.clerk.com/npm/@clerk/ui@${uiPackageMajorVersion}/dist/ui.browser.js`);
   });
 
   test('uses provided clerkUiVersion', () => {
@@ -418,7 +419,23 @@ describe('clerkUiScriptUrl()', () => {
   test('uses latest as default version when not specified', () => {
     const result = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey });
     // When no version is specified, versionSelector should return the major version
-    expect(result).toContain(`/npm/@clerk/ui@${jsPackageMajorVersion}/`);
+    expect(result).toContain(`/npm/@clerk/ui@${uiPackageMajorVersion}/`);
+  });
+
+  test('uses UI_PACKAGE_VERSION independently from JS_PACKAGE_VERSION', () => {
+    // Verify that clerkUiScriptUrl uses UI_PACKAGE_VERSION, not JS_PACKAGE_VERSION
+    const uiResult = clerkUiScriptUrl({ publishableKey: mockDevPublishableKey });
+    const jsResult = clerkJsScriptUrl({ publishableKey: mockDevPublishableKey });
+
+    // UI script should use UI package version
+    expect(uiResult).toContain(`/npm/@clerk/ui@${uiPackageMajorVersion}/`);
+    // JS script should use JS package version
+    expect(jsResult).toContain(`/npm/@clerk/clerk-js@${jsPackageMajorVersion}/`);
+
+    // They should be using their respective versions (which may differ)
+    // This test ensures we don't accidentally use JS version for UI
+    expect(uiResult).not.toContain('@clerk/clerk-js');
+    expect(jsResult).not.toContain('@clerk/ui');
   });
 });
 
