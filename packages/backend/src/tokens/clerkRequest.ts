@@ -82,7 +82,12 @@ class ClerkRequest extends Request {
 }
 
 export const createClerkRequest = (...args: ConstructorParameters<typeof ClerkRequest>): ClerkRequest => {
-  return args[0] instanceof ClerkRequest ? args[0] : new ClerkRequest(...args);
+  const isClerkRequest = args[0] && 
+    typeof args[0] === 'object' && 
+    'clerkUrl' in args[0] && 
+    'cookies' in args[0];
+  
+  return isClerkRequest ? args[0] as ClerkRequest : new ClerkRequest(...args);
 };
 
 export type { ClerkRequest };
