@@ -751,6 +751,10 @@ export const isIS: LocalizationResource = {
       subtitle: 'Til að halda áfram, vinsamlegast sláðu inn staðfestingarkóðann sem auðkennisforritið þitt bjó til',
       title: 'Tveggja þrepa auðkenning',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
   signUp: {
@@ -841,6 +845,10 @@ export const isIS: LocalizationResource = {
       subtitleCombined: 'Velkomin! Vinsamlegast fylltu út upplýsingar til að byrja.',
       title: 'Stofna reikning',
       titleCombined: 'Stofna reikning',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
@@ -945,6 +953,8 @@ export const isIS: LocalizationResource = {
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     session_exists: 'Þú ert nú þegar innskráður.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Lykilorðið þitt virkar, en gæti verið sterkara. Reyndu að bæta við fleiri stöfum.',
       goodPassword: 'Lykilorðið þitt uppfyllir allar nauðsynlegar kröfur.',
@@ -1350,5 +1360,10 @@ export const isIS: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

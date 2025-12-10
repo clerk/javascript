@@ -754,6 +754,10 @@ export const teIN: LocalizationResource = {
       subtitle: 'కొనసాగించడానికి, దయచేసి మీ ప్రమాణీకరణ యాప్ ద్వారా రూపొందించిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'రెండు-దశల ధృవీకరణ',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   signUp: {
@@ -846,6 +850,10 @@ export const teIN: LocalizationResource = {
       subtitleCombined: 'స్వాగతం! ప్రారంభించడానికి దయచేసి వివరాలను పూరించండి.',
       title: 'మీ ఖాతాను సృష్టించండి',
       titleCombined: 'మీ ఖాతాను సృష్టించండి',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
@@ -951,6 +959,8 @@ export const teIN: LocalizationResource = {
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger:
         'మీ పాస్‌వర్డ్ పనిచేస్తుంది, కానీ మరింత బలంగా ఉండవచ్చు. మరిన్ని అక్షరాలను జోడించడానికి ప్రయత్నించండి.',
@@ -1356,5 +1366,10 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ స్థానం సిద్ధంగా ఉన్నప్పుడు మేము మిమ్మల్ని సంప్రదిస్తాము',
       title: 'వెయిట్‌లిస్ట్‌లో చేరినందుకు ధన్యవాదాలు!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

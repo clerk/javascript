@@ -756,6 +756,10 @@ export const itIT: LocalizationResource = {
       subtitle: 'Inserisci il codice di verifica dalla tua app di autenticazione.',
       title: 'Verifica in due passaggi',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Inserisci la tua password',
   signUp: {
@@ -847,6 +851,10 @@ export const itIT: LocalizationResource = {
       subtitleCombined: 'per continuare su {{applicationName}}',
       title: 'Crea il tuo account',
       titleCombined: 'Crea il tuo account',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
@@ -949,6 +957,8 @@ export const itIT: LocalizationResource = {
     phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
     session_exists: 'Sei già loggato.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: undefined,
       goodPassword: undefined,
@@ -1355,5 +1365,10 @@ export const itIT: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

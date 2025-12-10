@@ -741,6 +741,10 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Аутентификатор қолданбасындағы кодты енгізіңіз',
       title: 'Екі қадамды растау',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Құпия сөзді енгізіңіз',
   signUp: {
@@ -831,6 +835,10 @@ export const kkKZ: LocalizationResource = {
       subtitleCombined: 'Қош келдіңіз! Тіркелу үшін ақпаратты толтырыңыз.',
       title: 'Есептік жазбаны құру',
       titleCombined: 'Есептік жазбаны құру',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} арқылы жалғастыру',
@@ -930,6 +938,8 @@ export const kkKZ: LocalizationResource = {
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Құпия сөз әлсіз. Таңбалар санын көбейтіңіз.',
       goodPassword: 'Құпия сөз талаптарға сай.',
@@ -1322,5 +1332,10 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Даяр болған кезде хабарласамыз',
       title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

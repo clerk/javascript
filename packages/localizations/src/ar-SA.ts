@@ -747,6 +747,10 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة، يرجى إدخال رمز التحقق الذي تم إنشاؤه بواسطة تطبيق المصادقة الخاص بك',
       title: 'نظام التحقق بخطوتين',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
   signUp: {
@@ -836,6 +840,10 @@ export const arSA: LocalizationResource = {
       subtitleCombined: undefined,
       title: 'أنشاء حساب جديد',
       titleCombined: 'أنشاء حساب جديد',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -937,6 +945,8 @@ export const arSA: LocalizationResource = {
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',
@@ -1335,5 +1345,10 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

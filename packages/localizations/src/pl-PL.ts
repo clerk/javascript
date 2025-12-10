@@ -751,6 +751,10 @@ export const plPL: LocalizationResource = {
       subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez aplikację uwierzytelniającą',
       title: 'Weryfikacja dwustopniowa',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Wprowadź swoje hasło',
   signUp: {
@@ -844,6 +848,10 @@ export const plPL: LocalizationResource = {
       subtitleCombined: 'by przejść do aplikacji {{applicationName}}',
       title: 'Utwórz swoje konto',
       titleCombined: 'Utwórz swoje konto',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
@@ -949,6 +957,8 @@ export const plPL: LocalizationResource = {
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
     session_exists: 'Jesteś już zalogowany.',
     web3_missing_identifier: 'Nie można znaleźć rozszerzenia Web3 Wallet. Zainstaluj je, aby kontynuować.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',
       goodPassword: 'Twoje hasło jest wystarczająco silne.',
@@ -1353,5 +1363,10 @@ export const plPL: LocalizationResource = {
       subtitle: 'Skontaktujemy się z Tobą, gdy miejsce dla Ciebie będzie gotowe',
       title: 'Dziękujemy za dołączenie do listy oczekujących!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

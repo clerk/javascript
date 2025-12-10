@@ -760,6 +760,10 @@ export const roRO: LocalizationResource = {
       subtitle: 'Pentru a continua, introdu codul generat de aplicația ta de autentificare',
       title: 'Verificare în doi pași',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Introdu parola',
   signUp: {
@@ -852,6 +856,10 @@ export const roRO: LocalizationResource = {
       subtitleCombined: 'Bun venit! Completează detaliile pentru a începe.',
       title: 'Creează-ți contul',
       titleCombined: 'Creează-ți contul',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuă cu {{provider|titleize}}',
@@ -958,6 +966,8 @@ export const roRO: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
       goodPassword: 'Parola ta îndeplinește toate cerințele necesare.',
@@ -1360,5 +1370,10 @@ export const roRO: LocalizationResource = {
       subtitle: 'Te vom contacta când îți vine rândul',
       title: 'Mulțumim pentru înscriere!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

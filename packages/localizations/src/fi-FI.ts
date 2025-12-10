@@ -750,6 +750,10 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä todennuskoodi autentikointisovelluksestasi',
       title: 'Kaksivaiheinen todennus',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
   signUp: {
@@ -840,6 +844,10 @@ export const fiFI: LocalizationResource = {
       subtitleCombined: 'Tervetuloa! Luo tili jatkaaksesi.',
       title: 'Luo tili',
       titleCombined: 'Luo tili',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -941,6 +949,8 @@ export const fiFI: LocalizationResource = {
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',
@@ -1346,5 +1356,10 @@ export const fiFI: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

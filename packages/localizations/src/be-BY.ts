@@ -753,6 +753,10 @@ export const beBY: LocalizationResource = {
       subtitle: 'Увядзіце код, атрыманы з вашага TOTP-генератара.',
       title: 'Двухфактарная верыфікацыя',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: undefined,
   signUp: {
@@ -844,6 +848,10 @@ export const beBY: LocalizationResource = {
       subtitleCombined: 'каб працягнуць працу ў "{{applicationName}}"',
       title: 'Стварыце Ваш акаўнт',
       titleCombined: 'Стварыце Ваш акаўнт',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Працягнуць з дапамогай {{provider|titleize}}',
@@ -947,6 +955,8 @@ export const beBY: LocalizationResource = {
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
     session_exists: 'Вы ўжо ўвайшлі.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль падыходзіць, але мог бы быць надзейнейшым. Паспрабуйце дадаць больш сімвалаў.',
       goodPassword: 'Добрая праца. Гэта выдатны пароль.',
@@ -1353,5 +1363,10 @@ export const beBY: LocalizationResource = {
       subtitle: 'Дзякуй за вашае терпліванне, мы паведамім вам, калі з’явяцца месцы.',
       title: 'Вы ў чакальным спісе',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;
