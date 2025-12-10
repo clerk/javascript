@@ -4,8 +4,7 @@ run-name: Release
 on:
   push:
     branches:
-      - main-disabled
-      - release/v4-disabled
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -39,34 +38,22 @@ jobs:
           fetch-depth: 0
           show-progress: false
 
-      - name: Safety check - Prevent production releases on canary-core3 branch
-        run: |
-          if [ -f ".canary-core3-branch" ]; then
-            echo "❌ ERROR: This branch is marked for canary-core3 releases only!"
-            echo "Production releases (latest tag) are not allowed on this branch."
-            echo "If you need to make a production release, use the main production branch."
-            exit 1
-          fi
-
       - name: Setup
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
-
-      - name: Build release
-        run: pnpm turbo build $TURBO_ARGS --force
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Create Release PR
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: "ci(repo): Version packages"
-          title: "ci(repo): Version packages"
-          publish: pnpm release
+          commit: "ci(repo): Version packages (Core 3)"
+          title: "ci(repo): Version packages (Core 3)"
+          publish: pnpm turbo build $TURBO_ARGS --force && pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
@@ -87,6 +74,7 @@ jobs:
             const preMode = require("fs").existsSync("./.changeset/pre.json");
             if (!preMode) {
               const clerkjsVersion = require('./packages/clerk-js/package.json').version;
+              const clerkUiVersion = require('./packages/ui/package.json').version;
               const nextjsVersion = require('./packages/nextjs/package.json').version;
 
               github.rest.actions.createWorkflowDispatch({
@@ -94,7 +82,7 @@ jobs:
                 repo: 'sdk-infra-workers',
                 workflow_id: 'update-pkg-versions.yml',
                 ref: 'main',
-                inputs: { clerkjsVersion }
+                inputs: { clerkjsVersion, clerkUiVersion }
               })
 
               github.rest.actions.createWorkflowDispatch({
@@ -103,7 +91,7 @@ jobs:
                 workflow_id: 'prepare-nextjs-sdk-update.yml',
                 ref: 'main',
                 inputs: { version: nextjsVersion }
-              })
+              }) 
 
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
