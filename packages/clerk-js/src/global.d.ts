@@ -13,6 +13,7 @@ const __DEV__: boolean;
 const __BUILD_DISABLE_RHC__: string;
 const __BUILD_VARIANT_CHANNEL__: boolean;
 const __BUILD_VARIANT_CHIPS__: boolean;
+const __BUILD_VARIANT_EXPERIMENTAL__: boolean;
 
 interface Window {
   __internal_onBeforeSetActive: (intent?: 'sign-out') => Promise<void> | void;

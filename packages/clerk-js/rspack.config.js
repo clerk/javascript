@@ -14,6 +14,7 @@ const variants = {
   clerk: 'clerk',
   clerkNoRHC: 'clerk.no-rhc', // Omit Remotely Hosted Code
   clerkBrowser: 'clerk.browser',
+  clerkExperimental: 'clerk.experimental',
   clerkHeadless: 'clerk.headless',
   clerkHeadlessBrowser: 'clerk.headless.browser',
   clerkLegacyBrowser: 'clerk.legacy.browser',
@@ -24,6 +25,7 @@ const variantToSourceFile = {
   [variants.clerk]: './src/index.ts',
   [variants.clerkNoRHC]: './src/index.ts',
   [variants.clerkBrowser]: './src/index.browser.ts',
+  [variants.clerkExperimental]: './src/index.ts',
   [variants.clerkHeadless]: './src/index.headless.ts',
   [variants.clerkHeadlessBrowser]: './src/index.headless.browser.ts',
   [variants.clerkLegacyBrowser]: './src/index.legacy.browser.ts',
@@ -51,15 +53,16 @@ const common = ({ mode, variant, disableRHC = false }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
-        __DEV__: isDevelopment(mode),
-        __PKG_VERSION__: JSON.stringify(packageJSON.version),
-        __PKG_NAME__: JSON.stringify(packageJSON.name),
         /**
          * Build time feature flags.
          */
-        __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
+        __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
+        __BUILD_VARIANT_EXPERIMENTAL__: variant === variants.clerkExperimental,
+        __DEV__: isDevelopment(mode),
+        __PKG_NAME__: JSON.stringify(packageJSON.name),
+        __PKG_VERSION__: JSON.stringify(packageJSON.version),
       }),
       new rspack.EnvironmentPlugin({
         CLERK_ENV: mode,

@@ -27,6 +27,7 @@ export default defineConfig({
   define: {
     __BUILD_DISABLE_RHC__: JSON.stringify(false),
     __BUILD_VARIANT_CHIPS__: JSON.stringify(false),
+    __BUILD_VARIANT_EXPERIMENTAL__: JSON.stringify(false),
     __PKG_NAME__: JSON.stringify('@clerk/clerk-js'),
     __PKG_VERSION__: JSON.stringify('test'),
   },
