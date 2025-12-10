@@ -20,8 +20,10 @@ vi.mock('@clerk/react', () => {
   };
 });
 
-vi.mock('../../google-one-tap', () => {
+vi.mock('../../google-one-tap', async importOriginal => {
+  const actual = await importOriginal<typeof import('../../google-one-tap')>();
   return {
+    ...actual,
     ClerkGoogleOneTapSignIn: mocks.ClerkGoogleOneTapSignIn,
     isSuccessResponse: mocks.isSuccessResponse,
   };
