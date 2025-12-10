@@ -167,7 +167,6 @@ function appearanceVariableOptions() {
     'colorDanger',
     'colorSuccess',
     'colorWarning',
-    'colorForeground',
     'colorMutedForeground',
     'colorInputForeground',
     'colorInput',
