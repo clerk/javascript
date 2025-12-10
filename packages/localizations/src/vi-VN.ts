@@ -756,6 +756,10 @@ export const viVN: LocalizationResource = {
       subtitle: 'Để tiếp tục, vui lòng nhập mã xác minh được tạo bởi ứng dụng xác thực của bạn',
       title: 'Xác thực hai bước',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu',
   signUp: {
@@ -847,6 +851,10 @@ export const viVN: LocalizationResource = {
       subtitleCombined: 'Chào mừng! Vui lòng điền các chi tiết để bắt đầu.',
       title: 'Tạo tài khoản của bạn',
       titleCombined: 'Tạo tài khoản của bạn',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
@@ -951,6 +959,8 @@ export const viVN: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
@@ -1356,5 +1366,10 @@ export const viVN: LocalizationResource = {
       subtitle: 'Chúng tôi sẽ liên hệ khi vị trí của bạn đã sẵn sàng',
       title: 'Cảm ơn bạn đã tham gia danh sách chờ!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

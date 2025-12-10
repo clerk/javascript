@@ -747,6 +747,10 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: 'Двоетапна перевірка',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
   signUp: {
@@ -836,6 +840,10 @@ export const ukUA: LocalizationResource = {
       subtitleCombined: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',
       titleCombined: 'Створіть Ваш акаунт',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
@@ -942,6 +950,8 @@ export const ukUA: LocalizationResource = {
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     session_exists: 'Ви вже увійшли в систему.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль підходить, але міг би бути надійнішим. Спробуйте додати більше символів.',
       goodPassword: 'Хороша робота. Це відмінний пароль.',
@@ -1345,5 +1355,10 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

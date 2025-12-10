@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
+import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
 import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
 import { Flow } from '@/customizables';
@@ -86,6 +87,9 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='enterprise-connections'>
           <SignUpEnterpriseConnections />
+        </Route>
+        <Route path='choose-wallet'>
+          <SignUpStartSolanaWalletsCard />
         </Route>
         <Route index>
           <SignUpStart />

@@ -3,6 +3,7 @@ import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import {
   SignInContext,
   SignUpContext,
@@ -81,6 +82,9 @@ function SignInRoutes(): JSX.Element {
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
+        </Route>
+        <Route path='choose-wallet'>
+          <SignInFactorOneSolanaWalletsCard />
         </Route>
         <Route path='verify'>
           <SignInEmailLinkFlowComplete

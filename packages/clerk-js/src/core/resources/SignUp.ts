@@ -16,6 +16,7 @@ import type {
   PreparePhoneNumberVerificationParams,
   PrepareVerificationParams,
   PrepareWeb3WalletVerificationParams,
+  SignUpAuthenticateWithSolanaParams,
   SignUpAuthenticateWithWeb3Params,
   SignUpCreateParams,
   SignUpEnterpriseConnectionJSON,
@@ -268,6 +269,7 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata,
       strategy = 'web3_metamask_signature',
       legalAccepted,
+      walletName,
     } = params || {};
     const provider = strategy.replace('web3_', '').replace('_signature', '') as Web3Provider;
 
@@ -287,7 +289,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
     let signature: string;
     try {
-      signature = await generateSignature({ identifier, nonce: message, provider });
+      signature = await generateSignature({ identifier, nonce: message, provider, walletName });
     } catch (err) {
       // There is a chance that as a first time visitor when you try to setup and use the
       // Coinbase Wallet from scratch in order to authenticate, the initial generate
@@ -322,9 +324,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   public authenticateWithCoinbaseWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
+    params?: SignUpAuthenticateWithWeb3Params,
   ): Promise<SignUpResource> => {
     const identifier = await web3().getCoinbaseWalletIdentifier();
     return this.authenticateWithWeb3({
@@ -336,11 +336,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithBase = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
+  public authenticateWithBase = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     const identifier = await web3().getBaseIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -351,11 +347,7 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithOKXWallet = async (
-    params?: SignUpAuthenticateWithWeb3Params & {
-      legalAccepted?: boolean;
-    },
-  ): Promise<SignUpResource> => {
+  public authenticateWithOKXWallet = async (params?: SignUpAuthenticateWithWeb3Params): Promise<SignUpResource> => {
     const identifier = await web3().getOKXWalletIdentifier();
     return this.authenticateWithWeb3({
       identifier,
@@ -363,6 +355,18 @@ export class SignUp extends BaseResource implements SignUpResource {
       unsafeMetadata: params?.unsafeMetadata,
       strategy: 'web3_okx_wallet_signature',
       legalAccepted: params?.legalAccepted,
+    });
+  };
+
+  public authenticateWithSolana = async (params: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
+    const identifier = await web3().getSolanaIdentifier(params.walletName);
+    return this.authenticateWithWeb3({
+      identifier,
+      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName: params.walletName }),
+      unsafeMetadata: params?.unsafeMetadata,
+      strategy: 'web3_solana_signature',
+      legalAccepted: params?.legalAccepted,
+      walletName: params.walletName,
     });
   };
 

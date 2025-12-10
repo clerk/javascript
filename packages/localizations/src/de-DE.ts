@@ -764,6 +764,10 @@ export const deDE: LocalizationResource = {
         'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
       title: 'Bestätigung in zwei Schritten',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   signUp: {
@@ -854,6 +858,10 @@ export const deDE: LocalizationResource = {
       subtitleCombined: 'weiter zu {{applicationName}}',
       title: 'Erstellen Sie Ihr Konto',
       titleCombined: 'Erstellen Sie Ihr Konto',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
@@ -972,6 +980,8 @@ export const deDE: LocalizationResource = {
     session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -1382,5 +1392,10 @@ export const deDE: LocalizationResource = {
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;
