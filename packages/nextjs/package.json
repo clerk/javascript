@@ -92,10 +92,10 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "15.2.3"
+    "next": "15.2.6"
   },
   "peerDependencies": {
-    "next": "^15.2.3 || ^16",
+    "next": "^15.2.6 || ^16",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
