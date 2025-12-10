@@ -1,5 +1,24 @@
 # Change Log
 
+## 2.27.0
+
+### Minor Changes
+
+- Added API keys `get`, `delete` and `update` methods. ([#7400](https://github.com/clerk/javascript/pull/7400)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Usage:
+
+  ```ts
+  await clerkClient.apiKeys.get('api_key_id');
+
+  await clerkClient.apiKeys.update({
+    apiKeyId: 'api_key_id',
+    scopes: ['scope1', 'scope2'],
+  });
+
+  await clerkClient.apiKeys.delete('api_key_id');
+  ```
+
 ## 2.26.0
 
 ### Minor Changes

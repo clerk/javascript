@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.30.1
+
+### Patch Changes
+
+- Added translations for Polish in UI elements for Organizations ([#7390](https://github.com/clerk/javascript/pull/7390)) by [@kamil-homer](https://github.com/kamil-homer)
+
 ## 3.30.0
 
 ### Minor Changes
