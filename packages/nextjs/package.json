@@ -92,7 +92,7 @@
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "15.2.3"
+    "next": "15.4.8"
   },
   "peerDependencies": {
     "next": "^15.2.3 || ^16",
