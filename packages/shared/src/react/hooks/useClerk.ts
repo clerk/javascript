@@ -1,5 +1,4 @@
-import type { LoadedClerk } from '@clerk/types';
-
+import type { LoadedClerk } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../contexts';
 
 /**
@@ -20,7 +19,7 @@ import { useAssertWrappedByClerkProvider, useClerkInstanceContext } from '../con
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useClerk } from '@clerk/clerk-react'
+ * import { useClerk } from '@clerk/react'
  *
  * export default function Home() {
  *   const clerk = useClerk()

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ruRU: LocalizationResource = {
   locale: 'ru-RU',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копировать и закрыть',
+      formHint: 'По соображениям безопасности мы не позволим вам просмотреть его позже.',
+      formTitle: 'Скопируйте ваш API-ключ "{{name}}" сейчас',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -223,9 +228,10 @@ export const ruRU: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Введите ваш номер телефона',
   formFieldInputPlaceholder__username: 'Имя пользователя',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Срок действия',
+  formFieldLabel__apiKeyName: 'Название секретного ключа',
   formFieldLabel__automaticInvitations: 'Включить автоматические приглашения для этого домена',
   formFieldLabel__backupCode: 'Код восстановления',
   formFieldLabel__confirmDeletion: 'Подтверждение',
@@ -496,9 +502,11 @@ export const ruRU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Создать организацию',
     action__invitationAccept: 'Присоединиться',
     action__manageOrganization: 'Настройки',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Запрос на присоединение',
     notSelected: 'Организация не выбрана',
     personalWorkspace: 'Личный профиль',
@@ -612,6 +620,12 @@ export const ruRU: LocalizationResource = {
       subtitle: 'для продолжения работы в "{{applicationName}}"',
       title: 'Проверьте Вашу почту',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверьте Вашу почту',
+      resendButton: 'Не получили код? Отправить снова.',
+      subtitle: 'для продолжения работы в "{{applicationName}}"',
+      title: 'Проверьте Вашу почту',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -648,6 +662,12 @@ export const ruRU: LocalizationResource = {
         titleNewTab: 'Залогиньтесь на другой вкладке',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Используйте ссылку для подтверждения, отправленную на вашу электронную почту',
+      resendButton: 'Не получили ссылку? Отправить повторно',
+      subtitle: 'чтобы продолжить в {{applicationName}}',
+      title: 'Проверьте свою электронную почту',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -665,6 +685,8 @@ export const ruRU: LocalizationResource = {
       label__alternativeMethods: 'Или, войти другим способом',
       title: 'Забыли пароль?',
     },
+    newDeviceVerificationNotice:
+      'Вы входите с нового устройства. Мы просим подтверждение для обеспечения безопасности вашего аккаунта.',
     noAvailableMethods: {
       message: 'Невозможно войти. Нет доступных факторов аутентификации.',
       subtitle: 'Произошла ошибка',
@@ -680,8 +702,14 @@ export const ruRU: LocalizationResource = {
       subtitle: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Введите пароль',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Пароль скомпрометирован',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Верификационный код',
@@ -851,8 +879,21 @@ export const ruRU: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} уже является членом организации.',
+    avatar_file_size_exceeded:
+      'Размер файла превышает максимальный лимит 10 МБ. Пожалуйста, выберите файл меньшего размера.',
+    avatar_file_type_invalid:
+      'Тип файла не поддерживается. Пожалуйста, загрузите изображение в формате JPG, PNG, GIF или WEBP.',
     captcha_invalid:
       'Регистрация не удалась из-за неудачных проверок безопасности. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     captcha_unavailable:
@@ -862,6 +903,7 @@ export const ruRU: LocalizationResource = {
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
     form_identifier_not_found: 'Мы не смогли найти учетную запись с этими данными.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Адрес электронной почты должен быть действительным.',
     form_param_format_invalid__phone_number: 'Номер телефона должен быть в действующем международном формате.',
@@ -881,9 +923,11 @@ export const ruRU: LocalizationResource = {
       'Этот пароль был найден в утечке данных и не может быть использован. Пожалуйста, сбросьте пароль.',
     form_password_size_in_bytes_exceeded:
       'Ваш пароль превышает максимально допустимое количество байтов, сократите его или удалите некоторые специальные символы.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Неверный пароль',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Имя пользователя должно содержать хотя бы один нецифровой символ.',
     identification_deletion_failed: 'Вы не можете удалить последнюю идентификацию.',
     not_allowed_access:
       "Адрес электронной почты или номер телефона не разрешен для регистрации. Это может быть связано с использованием '+', '=', '#' или '.' в вашем адресе электронной почты, использованием домена, связанного с временной электронной почтой, или явным исключением.",
@@ -955,7 +999,9 @@ export const ruRU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавить учетную запись',
+    action__closeUserMenu: 'Закрыть меню пользователя',
     action__manageAccount: 'Управление учетной записью',
+    action__openUserMenu: 'Открыть меню пользователя',
     action__signOut: 'Выйти',
     action__signOutAll: 'Выйти из всех учетных записей',
   },

@@ -1,6 +1,5 @@
-import type { UseSessionListReturn } from '@clerk/types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { UseSessionListReturn } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useClientContext } from '../contexts';
 
 const hookName = 'useSessionList';
@@ -21,7 +20,7 @@ const hookName = 'useSessionList';
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useSessionList } from '@clerk/clerk-react'
+ * import { useSessionList } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isLoaded, sessions } = useSessionList()

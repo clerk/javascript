@@ -2,6 +2,7 @@ export { errorToJSON, parseError, parseErrors } from './errors/parseError';
 
 export { ClerkAPIError } from './errors/clerkApiError';
 export { ClerkAPIResponseError } from './errors/clerkApiResponseError';
+export { ClerkError } from './errors/clerkError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';
 
@@ -23,7 +24,10 @@ export {
   isMetamaskError,
   isNetworkError,
   isPasswordPwnedError,
+  isPasswordCompromisedError,
   isReverificationCancelledError,
   isUnauthorizedError,
   isUserLockedError,
 } from './errors/helpers';
+
+export { createClerkGlobalHookError } from './errors/globalHookError';

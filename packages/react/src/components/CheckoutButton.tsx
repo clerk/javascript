@@ -1,4 +1,4 @@
-import type { __experimental_CheckoutButtonProps } from '@clerk/types';
+import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { useAuth } from '../hooks';
@@ -12,8 +12,8 @@ import { withClerk } from './withClerk';
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/clerk-react';
- * import { CheckoutButton } from '@clerk/clerk-react/experimental';
+ * import { SignedIn } from '@clerk/react';
+ * import { CheckoutButton } from '@clerk/react/experimental';
  *
  * // Basic usage with default "Checkout" text
  * function BasicCheckout() {

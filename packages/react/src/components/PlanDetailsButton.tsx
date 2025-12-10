@@ -1,4 +1,4 @@
-import type { __experimental_PlanDetailsButtonProps } from '@clerk/types';
+import type { __experimental_PlanDetailsButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import type { WithClerkProp } from '../types';
@@ -11,8 +11,8 @@ import { withClerk } from './withClerk';
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/clerk-react';
- * import { PlanDetailsButton } from '@clerk/clerk-react/experimental';
+ * import { SignedIn } from '@clerk/react';
+ * import { PlanDetailsButton } from '@clerk/react/experimental';
  *
  * // Basic usage with default "Plan details" text
  * function BasicPlanDetails() {

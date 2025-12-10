@@ -5,11 +5,15 @@ import type {
   MultiDomainAndOrProxyPrimitives,
   ProtectProps,
   Without,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
+import type { Appearance, Ui } from '@clerk/ui/internal';
 
-type AstroClerkUpdateOptions = Pick<ClerkOptions, 'appearance' | 'localization'>;
+type AstroClerkUpdateOptions<TUi extends Ui = Ui> = Pick<ClerkOptions, 'localization'> & {
+  appearance?: Appearance<TUi>;
+};
 
-type AstroClerkIntegrationParams = Without<
+type AstroClerkIntegrationParams<TUi extends Ui = Ui> = Without<
   ClerkOptions,
   | 'isSatellite'
   | 'sdkMetadata'
@@ -20,18 +24,30 @@ type AstroClerkIntegrationParams = Without<
   | 'routerPush'
   | 'polling'
   | 'touchSession'
+  | 'appearance'
 > &
-  MultiDomainAndOrProxyPrimitives;
+  MultiDomainAndOrProxyPrimitives & {
+    appearance?: Appearance<TUi>;
+    clerkJSUrl?: string;
+    clerkJSVariant?: 'headless' | '';
+    clerkJSVersion?: string;
+    /**
+     * The URL that `@clerk/ui` should be hot-loaded from.
+     */
+    clerkUiUrl?: string;
+  };
 
-type AstroClerkCreateInstanceParams = AstroClerkIntegrationParams & { publishableKey: string };
+type AstroClerkCreateInstanceParams<TUi extends Ui = Ui> = AstroClerkIntegrationParams<TUi> & {
+  publishableKey: string;
+};
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface HeadlessBrowserClerk extends Clerk {
   load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
   updateClient: (client: ClientResource) => void;
 }
 
-// Copied from `@clerk/clerk-react`
+// Copied from `@clerk/react`
 export interface BrowserClerk extends HeadlessBrowserClerk {
   onComponentsReady: Promise<void>;
   components: any;
@@ -42,6 +58,7 @@ declare global {
     __astro_clerk_component_props: Map<string, Map<string, Record<string, unknown>>>;
     __astro_clerk_function_props: Map<string, Map<string, Record<string, unknown>>>;
     Clerk: BrowserClerk;
+    __internal_ClerkUiCtor?: ClerkUiConstructor;
   }
 }
 
@@ -72,4 +89,5 @@ export type InternalUIComponentId =
   | 'user-profile'
   | 'google-one-tap'
   | 'waitlist'
-  | 'pricing-table';
+  | 'pricing-table'
+  | 'api-keys';

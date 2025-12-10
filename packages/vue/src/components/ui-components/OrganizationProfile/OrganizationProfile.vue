@@ -2,7 +2,7 @@
 import { computed, provide } from 'vue';
 import { useOrganizationProfileCustomPages } from '../../../utils/useCustomPages';
 import { useClerk } from '../../../composables';
-import type { OrganizationProfileProps } from '@clerk/types';
+import type { OrganizationProfileProps } from '@clerk/shared/types';
 import { OrganizationProfileInjectionKey } from '../../../keys';
 import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 
@@ -28,7 +28,7 @@ provide(OrganizationProfileInjectionKey, {
     :mount="clerk?.mountOrganizationProfile"
     :unmount="clerk?.unmountOrganizationProfile"
     :props="finalProps"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
   />
   <CustomPortalsRenderer :custom-pages-portals="customPagesPortals" />
   <slot />

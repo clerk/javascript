@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useClerk } from '../../../composables';
-import type { OrganizationSwitcherProps, OrganizationProfileProps } from '@clerk/types';
+import type { OrganizationSwitcherProps, OrganizationProfileProps } from '@clerk/shared/types';
 import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 import { useOrganizationProfileCustomPages } from '../../../utils/useCustomPages';
 import { computed, provide } from 'vue';
@@ -32,7 +32,7 @@ provide(OrganizationProfileInjectionKey, {
   <ClerkHostRenderer
     :mount="clerk?.mountOrganizationSwitcher"
     :unmount="clerk?.unmountOrganizationSwitcher"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="finalProps"
   />
   <CustomPortalsRenderer :custom-pages-portals="customPagesPortals" />

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const idID: LocalizationResource = {
   locale: 'id-ID',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Salin & Tutup',
+      formHint: 'Untuk alasan keamanan, kami tidak akan mengizinkan Anda untuk melihatnya lagi nanti.',
+      formTitle: 'Salin kunci API "{{name}}" Anda sekarang',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const idID: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Kunci API',
+  formFieldLabel__apiKeyDescription: 'Deskripsi',
+  formFieldLabel__apiKeyExpiration: 'Kedaluwarsa',
+  formFieldLabel__apiKeyName: 'Nama kunci rahasia',
   formFieldLabel__automaticInvitations: 'Aktifkan undangan otomatis untuk domain ini',
   formFieldLabel__backupCode: 'Kode cadangan',
   formFieldLabel__confirmDeletion: 'Konfirmasi',
@@ -490,9 +496,11 @@ export const idID: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Buat organisasi',
     action__invitationAccept: 'Gabung',
     action__manageOrganization: 'Kelola',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Minta bergabung',
     notSelected: 'Tidak ada organisasi dipilih',
     personalWorkspace: 'Akun pribadi',
@@ -606,6 +614,12 @@ export const idID: LocalizationResource = {
       subtitle: 'untuk melanjutkan ke {{applicationName}}',
       title: 'Periksa email Anda',
     },
+    emailCodeMfa: {
+      formTitle: 'Periksa email Anda',
+      resendButton: 'Tidak menerima kode? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -642,6 +656,12 @@ export const idID: LocalizationResource = {
         titleNewTab: 'Masuk di tab lain',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gunakan tautan verifikasi yang dikirim ke email Anda',
+      resendButton: 'Tidak menerima tautan? Kirim ulang',
+      subtitle: 'untuk melanjutkan ke {{applicationName}}',
+      title: 'Periksa email Anda',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +679,8 @@ export const idID: LocalizationResource = {
       label__alternativeMethods: 'Atau, masuk dengan metode lain',
       title: 'Lupa Kata Sandi?',
     },
+    newDeviceVerificationNotice:
+      'Anda masuk dari perangkat baru. Kami meminta verifikasi untuk menjaga keamanan akun Anda.',
     noAvailableMethods: {
       message: 'Tidak dapat melanjutkan masuk. Tidak ada faktor autentikasi yang tersedia.',
       subtitle: 'Terjadi kesalahan',
@@ -674,8 +696,14 @@ export const idID: LocalizationResource = {
       subtitle: 'Masukkan kata sandi yang terkait dengan akun Anda',
       title: 'Masukkan kata sandi Anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata sandi terkompromi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kode verifikasi',
@@ -845,8 +873,19 @@ export const idID: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi anggota organisasi.',
+    avatar_file_size_exceeded: 'Ukuran file melebihi batas maksimum 10MB. Silakan pilih file yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis file tidak didukung. Silakan unggah gambar JPG, PNG, GIF, atau WEBP.',
     captcha_invalid:
       'Pendaftaran gagal karena validasi keamanan gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     captcha_unavailable:
@@ -856,6 +895,7 @@ export const idID: LocalizationResource = {
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_not_found: 'Kami tidak dapat menemukan akun dengan detail tersebut.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Alamat email harus berupa alamat email yang valid.',
     form_param_format_invalid__phone_number: 'Nomor telepon harus dalam format internasional yang valid',
@@ -876,9 +916,11 @@ export const idID: LocalizationResource = {
       'Kata sandi ini telah ditemukan sebagai bagian dari kebocoran data dan tidak dapat digunakan, silakan reset kata sandi Anda.',
     form_password_size_in_bytes_exceeded:
       'Kata sandi Anda telah melebihi jumlah byte maksimum yang diizinkan, silakan persingkat atau hapus beberapa karakter khusus.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Kata Sandi Salah',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Nama pengguna Anda harus berisi setidaknya satu karakter non-numerik.',
     identification_deletion_failed: 'Anda tidak dapat menghapus identifikasi terakhir Anda.',
     not_allowed_access:
       "Alamat email atau nomor telepon tidak diizinkan untuk mendaftar. Ini mungkin disebabkan oleh penggunaan '+', '=', '#' atau '.' dalam alamat email Anda, penggunaan domain yang terhubung dengan layanan email sementara, atau pengecualian eksplisit. Jika Anda menganggap ini sebagai kesalahan, silakan hubungi dukungan.",
@@ -950,7 +992,9 @@ export const idID: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Tambah akun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Kelola akun',
+    action__openUserMenu: undefined,
     action__signOut: 'Keluar',
     action__signOutAll: 'Keluar dari semua akun',
   },

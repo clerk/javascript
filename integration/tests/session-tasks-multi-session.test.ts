@@ -71,17 +71,17 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       await u.po.signIn.setPassword(user2.password);
       await u.po.signIn.continue();
 
-      // Sign-in again back with active session
-      await u.po.signIn.goTo();
-      await u.page.waitForURL(/sign-in\/choose/);
-      await u.page.getByText('Add account').click();
-      await u.page.waitForURL(/sign-in$/);
-      await u.po.signIn.waitForMounted();
-      await u.po.signIn.getIdentifierInput().waitFor({ state: 'visible' });
-      await u.po.signIn.setIdentifier(user1.email);
-      await u.po.signIn.continue();
-      await u.po.signIn.setPassword(user1.password);
-      await u.po.signIn.continue();
+      // If the subsequent session touch call happens too quickly, the backend will rate limit it and not update the session activity timestamp.
+      // To get around this rate limit, and realistically emulate a more human-like pace, we add an arbitrary delay here
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      // Select the active session
+      await u.page.goToRelative('/');
+      await u.po.userButton.waitForMounted();
+      await u.po.userButton.toggleTrigger();
+      await u.po.userButton.waitForPopover();
+      await u.po.userButton.switchAccount(user1.email);
+      await u.po.userButton.waitForPopoverClosed();
 
       // Navigate to protected page, with active session, where user button gets rendered
       await u.page.goToRelative('/user-button');

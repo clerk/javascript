@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
   apiKeys: {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copier et fermer',
+      formHint: 'Pour des raisons de sécurité, nous ne vous permettrons pas de le consulter à nouveau plus tard.',
+      formTitle: 'Copiez votre clé API "{{name}}" maintenant',
+    },
     createdAndExpirationStatus__expiresOn:
       "Créée le {{ createdDate | shortDate('fr-FR') }} • Expire le {{ expiresDate | longDate('fr-FR') }}",
     createdAndExpirationStatus__never: "Créée le {{ createdDate | shortDate('fr-FR') }} • N’expire jamais",
@@ -229,6 +234,7 @@ export const frFR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Numéro de téléphone',
   formFieldInputPlaceholder__username: "Nom d'utilisateur",
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'Clé API',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Nom de la clé secrète',
@@ -502,9 +508,11 @@ export const frFR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Créer une organisation',
     action__invitationAccept: 'Rejoindre',
     action__manageOrganization: "Gérer l'organisation",
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Demander à rejoindre',
     notSelected: 'Aucune organisation sélectionnée',
     personalWorkspace: 'Espace de travail personnel',
@@ -619,6 +627,12 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Vérifiez votre messagerie',
     },
+    emailCodeMfa: {
+      formTitle: 'Vérifiez votre messagerie',
+      resendButton: "Vous n'avez pas reçu de code ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Ce lien ne correspond pas à la demande en cours.',
@@ -654,6 +668,12 @@ export const frFR: LocalizationResource = {
         titleNewTab: 'Connecté sur un autre onglet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilisez le lien de vérification envoyé par e-mail',
+      resendButton: "Vous n'avez pas reçu de lien ? Renvoyer",
+      subtitle: 'pour continuer vers {{applicationName}}',
+      title: 'Vérifiez votre messagerie',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -671,6 +691,8 @@ export const frFR: LocalizationResource = {
       label__alternativeMethods: 'Ou connectez-vous avec une autre méthode.',
       title: 'Mot de passe oublié ?',
     },
+    newDeviceVerificationNotice:
+      'Vous vous connectez depuis un nouvel appareil. Nous demandons une vérification pour sécuriser votre compte.',
     noAvailableMethods: {
       message: "Impossible de poursuivre la connexion. Aucun facteur d'authentification n'est disponible.",
       subtitle: "Une erreur s'est produite",
@@ -685,8 +707,14 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Tapez votre mot de passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mot de passe compromis',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -855,8 +883,21 @@ export const frFR: LocalizationResource = {
       actionText: 'Connecté en tant que {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
+    avatar_file_size_exceeded:
+      'La taille du fichier dépasse la limite maximale de 10 Mo. Veuillez choisir un fichier plus petit.',
+    avatar_file_type_invalid:
+      'Type de fichier non pris en charge. Veuillez télécharger une image JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:
@@ -866,6 +907,7 @@ export const frFR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
     form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',
@@ -885,9 +927,11 @@ export const frFR: LocalizationResource = {
     form_password_pwned__sign_in: 'Mot de passe compromis. Veuillez le réinitialiser.',
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Mot de passe incorrect',
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
+    form_username_needs_non_number_char: "Votre nom d'utilisateur doit contenir au moins un caractère non numérique.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access:
       "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
@@ -960,7 +1004,9 @@ export const frFR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Ajouter un compte',
+    action__closeUserMenu: 'Fermer le menu utilisateur',
     action__manageAccount: 'Gérer son compte',
+    action__openUserMenu: 'Ouvrir le menu utilisateur',
     action__signOut: 'Déconnexion',
     action__signOutAll: 'Se déconnecter de tous les comptes',
   },

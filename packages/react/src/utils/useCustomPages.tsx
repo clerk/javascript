@@ -1,5 +1,5 @@
+import type { CustomPage } from '@clerk/shared/types';
 import { logErrorInDevMode } from '@clerk/shared/utils';
-import type { CustomPage } from '@clerk/types';
 import type { ReactElement } from 'react';
 import React from 'react';
 
@@ -20,7 +20,7 @@ export const useUserProfileCustomPages = (
   children: React.ReactNode | React.ReactNode[],
   options?: UseCustomPagesOptions,
 ) => {
-  const reorderItemsLabels = ['account', 'security'];
+  const reorderItemsLabels = ['account', 'security', 'billing', 'apiKeys'];
   return useCustomPages(
     {
       children,
@@ -38,7 +38,7 @@ export const useOrganizationProfileCustomPages = (
   children: React.ReactNode | React.ReactNode[],
   options?: UseCustomPagesOptions,
 ) => {
-  const reorderItemsLabels = ['general', 'members'];
+  const reorderItemsLabels = ['general', 'members', 'billing', 'apiKeys'];
   return useCustomPages(
     {
       children,

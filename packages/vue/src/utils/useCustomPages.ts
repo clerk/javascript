@@ -1,5 +1,5 @@
+import type { CustomPage } from '@clerk/shared/types';
 import { logErrorInDevMode } from '@clerk/shared/utils';
-import type { CustomPage } from '@clerk/types';
 import type { Component } from 'vue';
 import { ref } from 'vue';
 
@@ -12,7 +12,7 @@ import { useCustomElementPortal } from './useCustomElementPortal';
 
 export const useUserProfileCustomPages = () => {
   const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
-    reorderItemsLabels: ['account', 'security'],
+    reorderItemsLabels: ['account', 'security', 'billing', 'apiKeys'],
     PageComponent: UserProfilePage,
     LinkComponent: UserProfileLink,
     componentName: 'UserProfile',
@@ -31,7 +31,7 @@ export const useUserProfileCustomPages = () => {
 
 export const useOrganizationProfileCustomPages = () => {
   const { customPages, customPagesPortals, addCustomPage } = useCustomPages({
-    reorderItemsLabels: ['general', 'members'],
+    reorderItemsLabels: ['general', 'members', 'billing', 'apiKeys'],
     PageComponent: OrganizationProfilePage,
     LinkComponent: OrganizationProfileLink,
     componentName: 'OrganizationProfile',

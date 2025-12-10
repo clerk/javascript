@@ -2,7 +2,7 @@ import type { AuthObject } from '@clerk/backend';
 import type { RequestState } from '@clerk/backend/internal';
 import { AuthStatus, constants, createClerkRequest } from '@clerk/backend/internal';
 import { handleNetlifyCacheInDevInstance } from '@clerk/shared/netlifyCacheHandler';
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { MiddlewareFunction } from 'react-router';
 import { createContext } from 'react-router';
 
@@ -50,12 +50,10 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       authorizedParties,
       signInUrl,
       signUpUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       organizationSyncOptions,
     } = loadedOptions;
 
-    const requestState = await clerkClient(args).authenticateRequest(clerkRequest, {
+    const requestState = await clerkClient(args, options).authenticateRequest(clerkRequest, {
       apiUrl,
       secretKey,
       jwtKey,
@@ -69,8 +67,6 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): MiddlewareFun
       organizationSyncOptions,
       signInUrl,
       signUpUrl,
-      afterSignInUrl,
-      afterSignUpUrl,
       acceptsToken: 'any',
     });
 

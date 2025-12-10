@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
 import { useClerk } from '../../composables';
-import type { CreateOrganizationProps } from '@clerk/types';
+import type { CreateOrganizationProps } from '@clerk/shared/types';
 
 const clerk = useClerk();
 const props = defineProps<CreateOrganizationProps>();
@@ -11,7 +11,7 @@ const props = defineProps<CreateOrganizationProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountCreateOrganization"
     :unmount="clerk?.unmountCreateOrganization"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="props"
   />
 </template>

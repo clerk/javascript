@@ -1,15 +1,15 @@
 export { CheckoutButton } from './components/CheckoutButton';
 export { PlanDetailsButton } from './components/PlanDetailsButton';
 export { SubscriptionDetailsButton } from './components/SubscriptionDetailsButton';
-export { useSignInSignal, useSignUpSignal } from './hooks/useClerkSignal';
 
 export type {
   __experimental_CheckoutButtonProps as CheckoutButtonProps,
   __experimental_SubscriptionDetailsButtonProps as SubscriptionDetailsButtonProps,
   __experimental_PlanDetailsButtonProps as PlanDetailsButtonProps,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 export {
+  __experimental_useAPIKeys as useAPIKeys,
   __experimental_PaymentElementProvider as PaymentElementProvider,
   __experimental_usePaymentElement as usePaymentElement,
   __experimental_PaymentElement as PaymentElement,

@@ -1,6 +1,6 @@
 {
   "name": "@clerk/testing",
-  "version": "1.13.8",
+  "version": "1.13.22",
   "description": "Utilities to help you create E2E test suites for apps using Clerk",
   "keywords": [
     "auth",
@@ -76,11 +76,10 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "dotenv": "17.2.2"
   },
   "devDependencies": {
-    "@playwright/test": "^1.54.1",
+    "@playwright/test": "^1.56.1",
     "cypress": "^14.5.4"
   },
   "peerDependencies": {
@@ -96,7 +95,7 @@
     }
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

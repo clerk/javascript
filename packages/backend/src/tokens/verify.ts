@@ -1,8 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { Simplify } from '@clerk/shared/types';
-import type { JwtPayload } from '@clerk/types';
+import type { Jwt, JwtPayload, Simplify } from '@clerk/shared/types';
 
-import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../api';
+import { type APIKey, IdPOAuthAccessToken, type M2MToken } from '../api';
 import { createBackendApiClient } from '../api/factory';
 import {
   MachineTokenVerificationError,
@@ -16,7 +15,7 @@ import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
-import { API_KEY_PREFIX, M2M_TOKEN_PREFIX, OAUTH_TOKEN_PREFIX } from './machine';
+import { API_KEY_PREFIX, isJwtFormat, M2M_TOKEN_PREFIX, OAUTH_ACCESS_TOKEN_TYPES, OAUTH_TOKEN_PREFIX } from './machine';
 import type { MachineTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
 
@@ -40,21 +39,10 @@ export type VerifyTokenOptions = Simplify<
  * Verifies a Clerk-generated token signature. Networkless if the `jwtKey` is provided. Otherwise, performs a network call to retrieve the JWKS from the [Backend API](https://clerk.com/docs/reference/backend-api/tag/JWKS#operation/GetJWKS){{ target: '_blank' }}.
  *
  * @param token - The token to verify.
- * @param options - Options for verifying the token.
+ * @param options - Options for verifying the token. It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })`.
  *
  * @displayFunctionSignature
  * @hideReturns
- *
- * @paramExtension
- *
- * ### `VerifyTokenOptions`
- *
- * It is recommended to set these options as [environment variables](/docs/guides/development/clerk-environment-variables#api-and-sdk-configuration) where possible, and then pass them to the function. For example, you can set the `secretKey` option using the `CLERK_SECRET_KEY` environment variable, and then pass it to the function like this: `createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })`.
- *
- * > [!WARNING]
- * You must provide either `jwtKey` or `secretKey`.
- *
- * <Typedoc src="backend/verify-token-options" />
  *
  * @example
  *
@@ -210,10 +198,102 @@ async function verifyM2MToken(
 ): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2m.verifyToken({ token });
+    const verifiedToken = await client.m2m.verify({ token });
     return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
+  }
+}
+
+async function verifyJwtOAuthToken(
+  accessToken: string,
+  options: VerifyTokenOptions,
+): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
+  let decoded: JwtReturnType<Jwt, TokenVerificationError>;
+  try {
+    decoded = decodeJwt(accessToken);
+  } catch (e) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: (e as Error).message,
+        }),
+      ],
+    };
+  }
+
+  const { data: decodedResult, errors } = decoded;
+  if (errors) {
+    return {
+      data: undefined,
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenInvalid,
+          message: errors[0].message,
+        }),
+      ],
+    };
+  }
+
+  const { header } = decodedResult;
+  const { kid } = header;
+  let key: JsonWebKey;
+
+  try {
+    if (options.jwtKey) {
+      key = loadClerkJwkFromPem({ kid, pem: options.jwtKey });
+    } else if (options.secretKey) {
+      key = await loadClerkJWKFromRemote({ ...options, kid });
+    } else {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            action: TokenVerificationErrorAction.SetClerkJWTKey,
+            message: 'Failed to resolve JWK during verification.',
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          }),
+        ],
+      };
+    }
+
+    const { data: payload, errors: verifyErrors } = await verifyJwt(accessToken, {
+      ...options,
+      key,
+      headerType: OAUTH_ACCESS_TOKEN_TYPES,
+    });
+
+    if (verifyErrors) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: verifyErrors[0].message,
+          }),
+        ],
+      };
+    }
+
+    const token = IdPOAuthAccessToken.fromJwtPayload(payload, options.clockSkewInMs);
+
+    return { data: token, tokenType: TokenType.OAuthToken, errors: undefined };
+  } catch (error) {
+    return {
+      tokenType: TokenType.OAuthToken,
+      errors: [
+        new MachineTokenVerificationError({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: (error as Error).message,
+        }),
+      ],
+    };
   }
 }
 
@@ -221,9 +301,13 @@ async function verifyOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
+  if (isJwtFormat(accessToken)) {
+    return verifyJwtOAuthToken(accessToken, options);
+  }
+
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.idPOAuthAccessToken.verifyAccessToken(accessToken);
+    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
@@ -236,7 +320,7 @@ async function verifyAPIKey(
 ): Promise<MachineTokenReturnType<APIKey, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.apiKeys.verifySecret(secret);
+    const verifiedToken = await client.apiKeys.verify(secret);
     return { data: verifiedToken, tokenType: TokenType.ApiKey, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.ApiKey, err, 'API key not found');
@@ -253,7 +337,7 @@ export async function verifyMachineAuthToken(token: string, options: VerifyToken
   if (token.startsWith(M2M_TOKEN_PREFIX)) {
     return verifyM2MToken(token, options);
   }
-  if (token.startsWith(OAUTH_TOKEN_PREFIX)) {
+  if (token.startsWith(OAUTH_TOKEN_PREFIX) || isJwtFormat(token)) {
     return verifyOAuthToken(token, options);
   }
   if (token.startsWith(API_KEY_PREFIX)) {

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiraj i zatvori',
+      formHint: 'Iz sigurnosnih razloga, nećemo vam dopustiti da ga ponovo pogledate kasnije.',
+      formTitle: 'Kopirajte svoj API ključ "{{name}}" sada',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const hrHR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API ključ',
+  formFieldLabel__apiKeyDescription: 'Opis',
+  formFieldLabel__apiKeyExpiration: 'Istječe',
+  formFieldLabel__apiKeyName: 'Naziv tajnog ključa',
   formFieldLabel__automaticInvitations: 'Omogući automatske pozivnice za ovu domenu',
   formFieldLabel__backupCode: 'Rezervni kod',
   formFieldLabel__confirmDeletion: 'Potvrda',
@@ -488,9 +494,11 @@ export const hrHR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Kreiraj organizaciju',
     action__invitationAccept: 'Pridruži se',
     action__manageOrganization: 'Upravljaj',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Zatraži pridruživanje',
     notSelected: 'Nije odabrana organizacija',
     personalWorkspace: 'Osobni račun',
@@ -604,6 +612,12 @@ export const hrHR: LocalizationResource = {
       subtitle: 'za nastavak na {{applicationName}}',
       title: 'Provjerite svoju e-poštu',
     },
+    emailCodeMfa: {
+      formTitle: 'Provjerite svoju e-poštu',
+      resendButton: 'Niste primili kod? Pošalji ponovno',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -640,6 +654,12 @@ export const hrHR: LocalizationResource = {
         titleNewTab: 'Prijavljeni na drugoj kartici',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Koristite vezu za provjeru poslanu na vašu e-poštu',
+      resendButton: 'Niste primili vezu? Ponovno pošalji',
+      subtitle: 'za nastavak na {{applicationName}}',
+      title: 'Provjerite svoju e-poštu',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const hrHR: LocalizationResource = {
       label__alternativeMethods: 'Ili se prijavite na drugi način',
       title: 'Zaboravili ste lozinku?',
     },
+    newDeviceVerificationNotice:
+      'Prijavljujete se s novog uređaja. Tražimo provjeru kako bismo zadržali vaš račun sigurnim.',
     noAvailableMethods: {
       message: 'Nije moguće nastaviti s prijavom. Nema dostupnog faktora autentifikacije.',
       subtitle: 'Došlo je do pogreške',
@@ -672,8 +694,14 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite lozinku povezanu s vašim računom',
       title: 'Unesite svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
@@ -841,8 +869,20 @@ export const hrHR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
+    avatar_file_size_exceeded:
+      'Veličina datoteke premašuje maksimalno ograničenje od 10 MB. Molimo odaberite manju datoteku.',
+    avatar_file_type_invalid: 'Vrsta datoteke nije podržana. Molimo prenesite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspješna zbog neuspjelih sigurnosnih provjera. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     captcha_unavailable:
@@ -852,6 +892,7 @@ export const hrHR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
     form_identifier_not_found: 'Nismo pronašli račun s tim podacima.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-mail adresa mora biti valjana e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u valjanom međunarodnom formatu',
@@ -872,9 +913,11 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo resetirajte svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Vaša lozinka je premašila maksimalni dopušteni broj bajtova, molimo skratite je ili uklonite neke posebne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Netočna lozinka',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Vaše korisničko ime mora sadržavati najmanje jedan nebrojčani znak.',
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
@@ -946,7 +989,9 @@ export const hrHR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Dodaj račun',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Upravljaj računom',
+    action__openUserMenu: undefined,
     action__signOut: 'Odjavi se',
     action__signOutAll: 'Odjavi se sa svih računa',
   },

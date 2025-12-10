@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Másolás és bezárás',
+      formHint: 'Biztonsági okokból később nem fogjuk tudni újra megengedni, hogy megtekintsd.',
+      formTitle: 'Másold le az "{{name}}" API kulcsot most',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const huHU: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API kulcs',
+  formFieldLabel__apiKeyDescription: 'Leírás',
+  formFieldLabel__apiKeyExpiration: 'Lejárat',
+  formFieldLabel__apiKeyName: 'API kulcs neve',
   formFieldLabel__automaticInvitations: 'Automatikus meghívások engedélyezése ezen a domainen',
   formFieldLabel__backupCode: 'Tartalék kód',
   formFieldLabel__confirmDeletion: 'Megerősítés',
@@ -489,9 +495,11 @@ export const huHU: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Szervezet létrehozása',
     action__invitationAccept: 'Csatlakozás',
     action__manageOrganization: 'Kezelés',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Csatlakozás kérése',
     notSelected: 'Nincs szervezet kiválasztva',
     personalWorkspace: 'Személyes fiók',
@@ -604,6 +612,12 @@ export const huHU: LocalizationResource = {
       subtitle: 'hogy folytathasd a(z) {{applicationName}}',
       title: 'Ellenőrizd az emailed',
     },
+    emailCodeMfa: {
+      formTitle: 'Ellenőrizd az emailed',
+      resendButton: 'Nem kaptad meg a kódot? Újraküldés',
+      subtitle: 'hogy folytathasd a(z) {{applicationName}}',
+      title: 'Ellenőrizd az emailed',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +653,12 @@ export const huHU: LocalizationResource = {
         titleNewTab: 'Egy másik lapon bejelezkeztél be',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Használja az e-mail címére küldött megerősítő linket',
+      resendButton: 'Nem kapta meg a linket? Újraküldés',
+      subtitle: 'a folytatáshoz a {{applicationName}} alkalmazásban',
+      title: 'Ellenőrizze az e-mailjét',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -656,6 +676,8 @@ export const huHU: LocalizationResource = {
       label__alternativeMethods: 'Vagy jelentkezz be más módon',
       title: 'Efelejtetted a jelszavad?',
     },
+    newDeviceVerificationNotice:
+      'Új eszközről jelentkezel be. Kérünk egy ellenőrzést, hogy fiókod biztonságban maradjon.',
     noAvailableMethods: {
       message: 'Nem lehet bejelentkezni. Nincs elérhető hitelesítő tényező.',
       subtitle: 'Hiba történt',
@@ -671,8 +693,14 @@ export const huHU: LocalizationResource = {
       subtitle: 'Írd be a fiókhoz tartozó jelszavad',
       title: 'Írd be a jelszavad',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Jelszó kompromitálódott',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Visszaigazoló kód',
@@ -838,8 +866,19 @@ export const huHU: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'A fájl mérete meghaladja a 10 MB-os maximális korlátot. Kérlek válassz kisebb fájlt.',
+    avatar_file_type_invalid: 'A fájltípus nem támogatott. Kérlek tölts fel JPG, PNG, GIF vagy WEBP képet.',
     captcha_invalid:
       'Biztonsági okokból a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     captcha_unavailable:
@@ -849,6 +888,7 @@ export const huHU: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_not_found: 'Nem találtunk fiókot ezekkel a részletekkel.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Az email címnek érvényes email címnek kell lennie.',
     form_param_format_invalid__phone_number: 'A telefonszámnak érvényes telefonszámnak kell lennie.',
@@ -869,9 +909,11 @@ export const huHU: LocalizationResource = {
       'Úgy látjuk, hogy ez a jelszó kiszivárgott, ezért ezt nem használhatod, kérlek állítsd át a jelszavad.',
     form_password_size_in_bytes_exceeded:
       'A jelszavad több bájtot tartalmaz mint a megadott maximum, kérlek rövidítsd vagy törölj ki néhány speciális karaktert.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Helytelen jelszó',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'A felhasználónévnek legalább egy nem numerikus karaktert kell tartalmaznia.',
     identification_deletion_failed: 'Nem törölheted ki az utolsó azonosítód.',
     not_allowed_access:
       "Az email címed vagy a telefonszámod nem használható regisztrációhoz. Ez lehet, mert az email címedben vagy a telefonszámodban szerepel a '+', '=', '#' vagy '.' karakter, vagy az email címedben vagy a telefonszámodban szerepel egy időzített email szolgáltató vagy kizárt tartomány. Ha úgy gondolja, hogy ez hiba, vegye fel velünk a kapcsolatot.",
@@ -942,7 +984,9 @@ export const huHU: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Fiók hozzáadása',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Fiók kezelése',
+    action__openUserMenu: undefined,
     action__signOut: 'Kijelentkezés',
     action__signOutAll: 'Kijelentkezés minden fiókból',
   },

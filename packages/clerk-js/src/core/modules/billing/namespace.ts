@@ -15,7 +15,7 @@ import type {
   GetPlansParams,
   GetStatementsParams,
   GetSubscriptionParams,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { convertPageToOffsetSearchParams } from '../../../utils/convertPageToOffsetSearchParams';
 import {
@@ -29,7 +29,7 @@ import {
 
 export class Billing implements BillingNamespace {
   static readonly #pathRoot = '/billing';
-  static path(subPath: string, param?: { orgId?: string }): string {
+  static path(subPath: string, param?: { orgId?: string | null }): string {
     const { orgId } = param || {};
     const prefix = orgId ? `/organizations/${orgId}` : '/me';
     return `${prefix}${Billing.#pathRoot}${subPath}`;

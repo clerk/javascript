@@ -1,10 +1,15 @@
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copy & Close',
+      formHint: "For security reasons, we won't allow you to view it again later.",
+      formTitle: 'Copy your "{{name}}" API Key now',
+    },
     createdAndExpirationStatus__expiresOn:
       "Created {{ createdDate | shortDate('en-US') }} • Expires {{ expiresDate | longDate('en-US') }}",
     createdAndExpirationStatus__never: "Created {{ createdDate | shortDate('en-US') }} • Never expires",
@@ -215,6 +220,7 @@ export const enUS: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Enter your phone number',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: 'Example format: name@example.com',
+  formFieldLabel__apiKey: 'API key',
   formFieldLabel__apiKeyDescription: 'Description',
   formFieldLabel__apiKeyExpiration: 'Expiration',
   formFieldLabel__apiKeyName: 'Secret key name',
@@ -485,9 +491,11 @@ export const enUS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: 'Close organization switcher',
     action__createOrganization: 'Create organization',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Manage',
+    action__openOrganizationSwitcher: 'Open organization switcher',
     action__suggestionsAccept: 'Request to join',
     notSelected: 'No organization selected',
     personalWorkspace: 'Personal account',
@@ -602,6 +610,12 @@ export const enUS: LocalizationResource = {
       subtitle: 'to continue to {{applicationName}}',
       title: 'Check your email',
     },
+    emailCodeMfa: {
+      formTitle: 'Check your email',
+      resendButton: "Didn't receive a code? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -638,6 +652,12 @@ export const enUS: LocalizationResource = {
         titleNewTab: 'Signed in on other tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Use the verification link sent to your email',
+      resendButton: "Didn't receive a link? Resend",
+      subtitle: 'to continue to {{applicationName}}',
+      title: 'Check your email',
+    },
     enterpriseConnections: {
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
@@ -655,6 +675,8 @@ export const enUS: LocalizationResource = {
       label__alternativeMethods: 'Or, sign in with another method',
       title: 'Forgot Password?',
     },
+    newDeviceVerificationNotice:
+      "You're signing in from a new device. We're asking for verification to keep your account secure.",
     noAvailableMethods: {
       message: "Cannot proceed with sign in. There's no available authentication factor.",
       subtitle: 'An error occurred',
@@ -669,8 +691,14 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter the password associated with your account',
       title: 'Enter your password',
     },
+    passwordCompromised: {
+      title: 'Password compromised',
+    },
     passwordPwned: {
       title: 'Password compromised',
+    },
+    passwordUntrusted: {
+      title: 'Password untrusted',
     },
     phoneCode: {
       formTitle: 'Verification code',
@@ -838,8 +866,19 @@ export const enUS: LocalizationResource = {
       actionText: 'Signed in as {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Reset Password',
+    signOut: {
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
+    },
+    subtitle: 'Your account requires a new password before you can continue',
+    title: 'Reset your password',
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} is already a member of the organization.',
+    avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
@@ -848,6 +887,7 @@ export const enUS: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: 'New password cannot be the same as the current password.',
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -867,9 +907,13 @@ export const enUS: LocalizationResource = {
     form_password_pwned__sign_in:
       'This password has been found as part of a breach and can not be used, please reset your password.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_compromised__sign_in: undefined,
+    form_password_untrusted__sign_in:
+      'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Your username must be between {{min_length}} and {{max_length}} characters long.',
+    form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -940,7 +984,9 @@ export const enUS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Add account',
+    action__closeUserMenu: 'Close user menu',
     action__manageAccount: 'Manage account',
+    action__openUserMenu: 'Open user menu',
     action__signOut: 'Sign out',
     action__signOutAll: 'Sign out of all accounts',
   },

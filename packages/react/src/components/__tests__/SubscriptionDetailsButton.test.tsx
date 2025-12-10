@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-import type { Theme } from '@clerk/types';
+import type { Theme } from '@clerk/ui/internal';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';

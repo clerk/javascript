@@ -7,7 +7,7 @@ import type {
   DisplayThemeJSON,
   OAuthStrategy,
   PreferredSignInStrategy,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { BaseResource } from './internal';
 
@@ -33,7 +33,6 @@ export class DisplayConfig extends BaseResource implements DisplayConfigResource
   captchaWidgetType: CaptchaWidgetType = null;
   clerkJSVersion?: string;
   createOrganizationUrl: string = '';
-  experimental__forceOauthFirst?: boolean;
   faviconImageUrl: string = '';
   googleOneTapClientId?: string;
   homeUrl: string = '';

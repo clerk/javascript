@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopier og lukk',
+      formHint: 'Av sikkerhetshensyn kan vi ikke tillate deg å se det igjen senere.',
+      formTitle: 'Kopier API-nøkkelen "{{name}}" din nå',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const nbNO: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-nøkkel',
+  formFieldLabel__apiKeyDescription: 'Beskrivelse',
+  formFieldLabel__apiKeyExpiration: 'Utløper',
+  formFieldLabel__apiKeyName: 'Navn på hemmelig nøkkel',
   formFieldLabel__automaticInvitations: 'Skru på automatiske invitasjoner for dette domenet',
   formFieldLabel__backupCode: 'Sikkerhetskode',
   formFieldLabel__confirmDeletion: 'Bekreftelse',
@@ -489,9 +495,11 @@ export const nbNO: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Opprett organisasjon',
     action__invitationAccept: 'Bli med',
     action__manageOrganization: 'Administrer organisasjon',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Spør om å bli med',
     notSelected: 'Ingen organisasjon valgt',
     personalWorkspace: 'Personlig arbeidsområde',
@@ -604,6 +612,12 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Sjekk e-posten din',
     },
+    emailCodeMfa: {
+      formTitle: 'Sjekk e-posten din',
+      resendButton: 'Ikke mottatt kode? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk e-posten din',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -639,6 +653,12 @@ export const nbNO: LocalizationResource = {
         titleNewTab: 'Logget inn på en annen fane',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Bruk bekreftelseslenken som ble sendt til din e-post',
+      resendButton: 'Har du ikke mottatt lenken? Send på nytt',
+      subtitle: 'for å fortsette til {{applicationName}}',
+      title: 'Sjekk din e-post',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -656,6 +676,8 @@ export const nbNO: LocalizationResource = {
       label__alternativeMethods: 'Eller logg inn med en annen metode.',
       title: 'Glemt passord?',
     },
+    newDeviceVerificationNotice:
+      'Du logger inn fra en ny enhet. Vi ber om verifisering for å holde kontoen din sikker.',
     noAvailableMethods: {
       message: 'Kan ikke fortsette med innloggingen. Det er ingen tilgjengelige autentiseringsfaktorer.',
       subtitle: 'En feil oppstod',
@@ -670,7 +692,13 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Skriv inn passordet ditt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -838,8 +866,19 @@ export const nbNO: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider maksgrensen på 10 MB. Vennligst velg en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen støttes ikke. Vennligst last opp et JPG-, PNG-, GIF- eller WEBP-bilde.',
     captcha_invalid:
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:
@@ -849,6 +888,7 @@ export const nbNO: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Vi klarte ikke finne en konto med disse detaljene.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
     form_param_format_invalid__phone_number: 'Telefonnummeret må være i et gyldig internasjonalt format',
@@ -868,9 +908,11 @@ export const nbNO: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Passordet ditt har overskredet maksimalt antall byte tillatt. Vennligst forkort det eller fjern noen spesialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Feil passord',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Brukernavnet ditt må inneholde minst ett ikke-numerisk tegn.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "E-postadressen eller telefonnummeret ditt er ikke tillatt for registrering. Dette kan være på grunn av bruk av '+', '=', '#' eller '.' i e-postadressen din, bruk av et domenn som er tilknyttet en midlertidig e-posttjeneste, eller eksplisitt blokkering. Hvis du mener dette er en feil, vennligst kontakt støtte.",
@@ -940,7 +982,9 @@ export const nbNO: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Legg til konto',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Administrer konto',
+    action__openUserMenu: undefined,
     action__signOut: 'Logg ut',
     action__signOutAll: 'Logg ut av alle kontoer',
   },

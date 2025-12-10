@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar i tancar',
+      formHint: 'Per raons de seguretat, no podràs veure-ho de nou més tard.',
+      formTitle: 'Copia la teva clau API "{{name}}" ara',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const caES: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Número de telèfon',
   formFieldInputPlaceholder__username: "Nom d'usuari",
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Clau API',
+  formFieldLabel__apiKeyDescription: 'Descripció',
+  formFieldLabel__apiKeyExpiration: 'Expiració',
+  formFieldLabel__apiKeyName: 'Nom de clau secreta',
   formFieldLabel__automaticInvitations: 'Activa invitacions automàtiques per a aquest domini',
   formFieldLabel__backupCode: 'Codi de seguretat',
   formFieldLabel__confirmDeletion: 'Confirmació',
@@ -490,9 +496,11 @@ export const caES: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Crea organització',
     action__invitationAccept: 'Uneix-te',
     action__manageOrganization: 'Gestiona',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Sol·licita unir-te',
     notSelected: "No s'ha seleccionat cap organització",
     personalWorkspace: 'Compte personal',
@@ -605,6 +613,12 @@ export const caES: LocalizationResource = {
       subtitle: 'per continuar a {{applicationName}}',
       title: 'Comprova el teu correu electrònic',
     },
+    emailCodeMfa: {
+      formTitle: 'Comprova el teu correu electrònic',
+      resendButton: 'No has rebut el codi? Reenvia',
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comprova el teu correu electrònic',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -640,6 +654,12 @@ export const caES: LocalizationResource = {
         titleNewTab: "S'ha iniciat sessió en una altra pestanya",
       },
     },
+    emailLinkMfa: {
+      formSubtitle: "Utilitzeu l'enllaç de verificació enviat al vostre correu electrònic",
+      resendButton: "No heu rebut l'enllaç? Reenviar",
+      subtitle: 'per continuar a {{applicationName}}',
+      title: 'Comproveu el vostre correu electrònic',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const caES: LocalizationResource = {
       label__alternativeMethods: 'O bé, inicia sessió amb un altre mètode',
       title: 'Has oblidat la contrasenya?',
     },
+    newDeviceVerificationNotice:
+      "Estàs iniciant sessió des d'un dispositiu nou. Demanem verificació per mantenir el compte segur.",
     noAvailableMethods: {
       message: "No es pot procedir amb l'inici de sessió. No hi ha cap factor d'autenticació disponible.",
       subtitle: "S'ha produït un error",
@@ -671,7 +693,13 @@ export const caES: LocalizationResource = {
       subtitle: 'Introdueix la contrasenya associada al teu compte',
       title: 'Introdueix la teva contrasenya',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -839,8 +867,20 @@ export const caES: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded:
+      'La mida del fitxer supera el límit màxim de 10 MB. Si us plau, tria un fitxer més petit.',
+    avatar_file_type_invalid: 'El tipus de fitxer no és compatible. Si us plau, puja una imatge JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       "El registre no ha estat exitós a causa de validacions de seguretat fallides. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     captcha_unavailable:
@@ -850,6 +890,7 @@ export const caES: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'No hem trobat cap compte amb aquests detalls.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Format de paràmetre no vàlid.',
     form_param_format_invalid__email_address: "L'adreça de correu electrònic ha de ser una adreça vàlida.",
     form_param_format_invalid__phone_number: 'El número de telèfon ha de tenir un format internacional vàlid.',
@@ -869,9 +910,11 @@ export const caES: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'La teva contrasenya ha superat el nombre màxim de bytes permesos, si us plau, redueix-la o elimina alguns caràcters especials.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contrasenya incorrecta',
     form_username_invalid_character: "El nom d'usuari conté caràcters no vàlids.",
     form_username_invalid_length: "El nom d'usuari ha de tenir entre 3 i 50 caràcters.",
+    form_username_needs_non_number_char: "El vostre nom d'usuari ha de contenir almenys un caràcter no numèric.",
     identification_deletion_failed: 'No pots eliminar la teva última identificació.',
     not_allowed_access:
       "L'adreça de correu electrònic o el número de telèfon no es permet registrar-se. Això podria ser degut a l'ús de '+', '=', '#' o '.' a la vostra adreça de correu electrònic, utilitzant un domini connectat amb un servei de correu electrònic temporal o bloquejant-se explícitament. Si creieu que es tracta d'un error, poseu-vos en contacte amb el servei d'assistència.",
@@ -942,7 +985,9 @@ export const caES: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Afegeix compte',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Gestiona compte',
+    action__openUserMenu: undefined,
     action__signOut: 'Tanca sessió',
     action__signOutAll: 'Tanca sessió de tots els comptes',
   },

@@ -1,4 +1,4 @@
-import type { OAuthProvider, OAuthProviderData, OAuthStrategy } from '@clerk/types';
+import type { OAuthProvider, OAuthProviderData, OAuthStrategy } from './types';
 
 export const OAUTH_PROVIDERS: OAuthProviderData[] = [
   {
@@ -169,6 +169,12 @@ export const OAUTH_PROVIDERS: OAuthProviderData[] = [
     name: 'Hugging Face',
     docsUrl: 'https://clerk.com/docs/authentication/social-connections/huggingface',
   },
+  {
+    provider: 'vercel',
+    strategy: 'oauth_vercel',
+    name: 'Vercel',
+    docsUrl: 'https://clerk.com/docs/authentication/social-connections/vercel',
+  },
 ];
 
 interface getOAuthProviderDataProps {
@@ -176,6 +182,9 @@ interface getOAuthProviderDataProps {
   strategy?: OAuthStrategy;
 }
 
+/**
+ *
+ */
 export function getOAuthProviderData({
   provider,
   strategy,

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nlNL: LocalizationResource = {
   locale: 'nl-NL',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopiëren en sluiten',
+      formHint: 'Om veiligheidsredenen kunnen we je dit later niet meer laten zien.',
+      formTitle: 'Kopieer nu je API-sleutel "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const nlNL: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Telefoonnummer',
   formFieldInputPlaceholder__username: 'Gebruikersnaam',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-sleutel',
+  formFieldLabel__apiKeyDescription: 'Beschrijving',
+  formFieldLabel__apiKeyExpiration: 'Vervaldatum',
+  formFieldLabel__apiKeyName: 'Naam geheime sleutel',
   formFieldLabel__automaticInvitations: 'Automatische uitnodigingen inschakelen voor dit domein',
   formFieldLabel__backupCode: 'Backupcode',
   formFieldLabel__confirmDeletion: 'Bevestiging',
@@ -490,9 +496,11 @@ export const nlNL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Maak organisatie aan',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Beheer organisatie',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Verzoek om lid te worden',
     notSelected: 'Geen organisatie geselecteerd',
     personalWorkspace: 'Persoonlijke werkruimte',
@@ -605,6 +613,12 @@ export const nlNL: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Check je e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Check je e-mail',
+      resendButton: 'Niet ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Check je e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'De client komt niet overeen met wat verwacht werd. Probeer het opnieuw.',
@@ -640,6 +654,12 @@ export const nlNL: LocalizationResource = {
         titleNewTab: 'Ingelogd in andere tab',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Gebruik de verificatielink die naar je e-mail is verzonden',
+      resendButton: 'Geen link ontvangen? Opnieuw verzenden',
+      subtitle: 'om door te gaan naar {{applicationName}}',
+      title: 'Controleer je e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const nlNL: LocalizationResource = {
       label__alternativeMethods: 'Of log in met een andere methode',
       title: 'Wachtwoord vergeten?',
     },
+    newDeviceVerificationNotice:
+      'Je meldt je aan vanaf een nieuw apparaat. We vragen om verificatie om je account veilig te houden.',
     noAvailableMethods: {
       message: 'Het is niet mogelijk om door te gaan met inloggen. Er is geen beschikbare authenticatiefactor.',
       subtitle: 'Er heeft zich een fout voorgedaan',
@@ -671,8 +693,14 @@ export const nlNL: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Vul je wachtwoord in',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Dit wachtwoord is gelekt bij een datalek. Kies een ander wachtwoord om veiligheidsredenen.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verificatiecode',
@@ -839,8 +867,19 @@ export const nlNL: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
+    avatar_file_size_exceeded: 'Bestandsgrootte overschrijdt de maximale limiet van 10 MB. Kies een kleiner bestand.',
+    avatar_file_type_invalid: 'Bestandstype wordt niet ondersteund. Upload een JPG-, PNG-, GIF- of WEBP-afbeelding.',
     captcha_invalid:
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:
@@ -850,6 +889,7 @@ export const nlNL: LocalizationResource = {
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
     form_identifier_not_found: 'We konden geen account vinden met deze details.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',
@@ -868,9 +908,11 @@ export const nlNL: LocalizationResource = {
     form_password_pwned__sign_in: 'Als je dit wachtwoord elders gebruikt, moet je het wijzigen.',
     form_password_size_in_bytes_exceeded:
       'Je wachtwoord heeft het maximum aantal bytes overschreden, vermijd speciale tekens.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Wachtwoord is incorrect.',
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
+    form_username_needs_non_number_char: 'Uw gebruikersnaam moet minstens één niet-numeriek teken bevatten.',
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
     not_allowed_access:
       "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",
@@ -940,7 +982,9 @@ export const nlNL: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Account toevoegen',
+    action__closeUserMenu: 'Gebruikersmenu sluiten',
     action__manageAccount: 'Account beheren',
+    action__openUserMenu: 'Gebruikersmenu openen',
     action__signOut: 'Uitloggen',
     action__signOutAll: 'Uitloggen uit alle accounts',
   },

@@ -25,7 +25,6 @@ describe('Cookies', () => {
   const name = '__client';
   const cookie = createCookie({ name, value: 'foo', domain });
 
-  // eslint-disable-next-line jest/unbound-method -- The Jest ESLint plugin doesn't support Vitest
   const getMock = vi.mocked(browser.cookies.get);
 
   afterEach(() => getMock.mockReset());

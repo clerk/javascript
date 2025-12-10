@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Copiar e fechar',
+      formHint: 'Por razões de segurança, não permitiremos que visualize novamente mais tarde.',
+      formTitle: 'Copie a sua chave API "{{name}}" agora',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const ptPT: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Insira o seu número de telefone',
   formFieldInputPlaceholder__username: 'Insira o seu nome de utilizador',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Chave API',
+  formFieldLabel__apiKeyDescription: 'Descrição',
+  formFieldLabel__apiKeyExpiration: 'Expiração',
+  formFieldLabel__apiKeyName: 'Nome da chave secreta',
   formFieldLabel__automaticInvitations: 'Ativar convites automáticos para este domínio',
   formFieldLabel__backupCode: 'Código de backup',
   formFieldLabel__confirmDeletion: 'Confirmar exclusão',
@@ -488,9 +494,11 @@ export const ptPT: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Criar organização',
     action__invitationAccept: 'Participar',
     action__manageOrganization: 'Configurar organização',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Solicitar participação',
     notSelected: 'Nenhuma organização selecionada',
     personalWorkspace: 'Conta pessoal',
@@ -603,6 +611,12 @@ export const ptPT: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Verifique o seu e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Verifique o seu e-mail',
+      resendButton: 'Não recebeu um código? Reenviar',
+      subtitle: 'para continuar em {{applicationName}}',
+      title: 'Verifique o seu e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'O cliente não corresponde ao esperado. Tente novamente.',
@@ -638,6 +652,12 @@ export const ptPT: LocalizationResource = {
         titleNewTab: 'Conectado em outra aba',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Utilize a ligação de verificação enviada para o seu e-mail',
+      resendButton: 'Não recebeu a ligação? Reenviar',
+      subtitle: 'para continuar para {{applicationName}}',
+      title: 'Verifique o seu e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -655,6 +675,8 @@ export const ptPT: LocalizationResource = {
       label__alternativeMethods: 'Ou, faça login com outro método.',
       title: 'Esqueceu-se da palavra-passe?',
     },
+    newDeviceVerificationNotice:
+      'Está a iniciar sessão a partir de um novo dispositivo. Estamos a solicitar verificação para manter a sua conta segura.',
     noAvailableMethods: {
       message: 'Não foi possível fazer login. Não há nenhum método de autenticação disponível.',
       subtitle: 'Ocorreu um erro',
@@ -669,8 +691,14 @@ export const ptPT: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira a sua palavra-passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Este password foi comprometido em uma violação de dados. Escolha outro por motivos de segurança.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -837,8 +865,20 @@ export const ptPT: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do ficheiro excede o limite máximo de 10 MB. Por favor, escolha um ficheiro mais pequeno.',
+    avatar_file_type_invalid: 'Tipo de ficheiro não suportado. Por favor, carregue uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível inscrever-se devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
@@ -848,6 +888,7 @@ export const ptPT: LocalizationResource = {
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
     form_identifier_not_found: 'Não foi possível encontrar uma conta com esses detalhes.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato de parâmetro inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
     form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',
@@ -868,9 +909,11 @@ export const ptPT: LocalizationResource = {
       'Esta palavra-passe foi encontrada como parte de uma violação e não pode ser utilizada para login. Por favor, escolha outra.',
     form_password_size_in_bytes_exceeded:
       'A sua palavra-passe excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Falha na validação da palavra-passe.',
     form_username_invalid_character: 'O nome de utilizador contém caracteres inválidos.',
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
+    form_username_needs_non_number_char: 'O seu nome de utilizador deve conter pelo menos um caractere não numérico.',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",
@@ -940,7 +983,9 @@ export const ptPT: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Adicionar conta',
+    action__closeUserMenu: 'Fechar menu do utilizador',
     action__manageAccount: 'Configurar conta',
+    action__openUserMenu: 'Abrir menu do utilizador',
     action__signOut: 'Terminar sessão',
     action__signOutAll: 'Terminar sessão de todas as contas',
   },

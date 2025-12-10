@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import './index.css';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/react';
 import { Home } from './routes/Home';
 import { SignIn } from './routes/SignIn';
 import { SignUp } from './routes/SignUp';
@@ -22,6 +22,12 @@ createRoot(document.getElementById('root')!).render(
         <ClerkProvider
           publishableKey={PUBLISHABLE_KEY}
           clerkJSUrl={import.meta.env.VITE_CLERK_JS_URL as string}
+          clerkUiUrl={import.meta.env.VITE_CLERK_UI_URL as string}
+          appearance={{
+            options: {
+              showOptionalFields: true,
+            },
+          }}
         >
           <BrowserRouter>
             <Routes>

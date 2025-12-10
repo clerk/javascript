@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Afrita og loka',
+      formHint: 'Af öryggisástæðum munum við ekki leyfa þér að skoða það aftur síðar.',
+      formTitle: 'Afritaðu API-lykilinn "{{name}}" þinn núna',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const isIS: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-lykill',
+  formFieldLabel__apiKeyDescription: 'Lýsing',
+  formFieldLabel__apiKeyExpiration: 'Rennur út',
+  formFieldLabel__apiKeyName: 'Nafn leynilykils',
   formFieldLabel__automaticInvitations: 'Virkja sjálfvirk boð fyrir þetta lén',
   formFieldLabel__backupCode: 'Öryggiskóði',
   formFieldLabel__confirmDeletion: 'Staðfesting',
@@ -490,9 +496,11 @@ export const isIS: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Stofna samtök',
     action__invitationAccept: 'Ganga í',
     action__manageOrganization: 'Stjórna',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Biðja um að ganga í',
     notSelected: 'Engin samtök valin',
     personalWorkspace: 'Persónulegur reikningur',
@@ -605,6 +613,12 @@ export const isIS: LocalizationResource = {
       subtitle: 'til að halda áfram í {{applicationName}}',
       title: 'Athugaðu tölvupóstinn þinn',
     },
+    emailCodeMfa: {
+      formTitle: 'Athugaðu tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki kóða? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -641,6 +655,12 @@ export const isIS: LocalizationResource = {
         titleNewTab: 'Skráður inn á öðrum flipa',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Notaðu staðfestingartengilinn sem sendur var á tölvupóstinn þinn',
+      resendButton: 'Fékkstu ekki tengilinn? Senda aftur',
+      subtitle: 'til að halda áfram í {{applicationName}}',
+      title: 'Athugaðu tölvupóstinn þinn',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -658,6 +678,8 @@ export const isIS: LocalizationResource = {
       label__alternativeMethods: 'Eða, skráðu þig inn með annarri aðferð',
       title: 'Gleymt lykilorð?',
     },
+    newDeviceVerificationNotice:
+      'Þú ert að skrá þig inn frá nýjum tæki. Við biðjum um staðfestingu til að halda reikningnum þínum öruggum.',
     noAvailableMethods: {
       message: 'Ekki er hægt að halda áfram með innskráningu. Engin tiltæk auðkenningaraðferð.',
       subtitle: 'Villa kom upp',
@@ -673,8 +695,14 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn lykilorðið sem tengist reikningnum þínum',
       title: 'Sláðu inn lykilorðið þitt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lykilorð brotið',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Staðfestingarkóði',
@@ -841,8 +869,19 @@ export const isIS: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Skráarstærð fer yfir hámarksmörk 10 MB. Vinsamlegast veldu minni skrá.',
+    avatar_file_type_invalid: 'Skráargerð er ekki studd. Vinsamlegast hlaðið upp JPG, PNG, GIF eða WEBP mynd.',
     captcha_invalid:
       'Skráning mistókst vegna misheppnaðra öryggisstaðfestinga. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     captcha_unavailable:
@@ -852,6 +891,7 @@ export const isIS: LocalizationResource = {
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_not_found: 'Við getum ekki fundið reikning með þessum upplýsingum.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Netfang verður að vera gilt netfang.',
     form_param_format_invalid__phone_number: 'Símanúmer verður að vera á giltu alþjóðlegu formi',
@@ -872,9 +912,12 @@ export const isIS: LocalizationResource = {
       'Þetta lykilorð hefur fundist sem hluti af öryggisbresti og má ekki nota, vinsamlegast endurstilltu lykilorðið þitt.',
     form_password_size_in_bytes_exceeded:
       'Lykilorðið þitt hefur farið yfir hámarksfjölda bæta sem leyfðir eru, vinsamlegast styttu það eða fjarlægðu nokkra sérstafi.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Rangt lykilorð',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char:
+      'Notandanafnið þitt verður að innihalda að minnsta kosti einn staf sem er ekki tala.',
     identification_deletion_failed: 'Þú getur ekki eytt síðasta auðkenni þínu.',
     not_allowed_access:
       "Netfang eða símanúmer þitt er ekki leyft til að skrá sig. Þetta gæti verið vegna þess að þú ert að nota '+', '=', '#' eða '.' í netfangi þínu, að nota domen sem tengist tímabundnum tölvupóstur, eða að þú ert búinn til að nota það. Ef þú reynir að skrá sig og færð villu, vinsamlegast hafið samband við stuðning.",
@@ -944,7 +987,9 @@ export const isIS: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Bæta við reikningi',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Stjórna reikningi',
+    action__openUserMenu: undefined,
     action__signOut: 'Skrá út',
     action__signOutAll: 'Skrá út af öllum reikningum',
   },

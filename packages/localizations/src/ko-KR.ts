@@ -10,26 +10,31 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: '복사하고 닫기',
+      formHint: '보안상의 이유로 나중에 다시 볼 수 없습니다.',
+      formTitle: '지금 "{{name}}" API 키를 복사하세요',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
     formButtonPrimary__add: undefined,
-    formFieldCaption__expiration__expiresOn: undefined,
+    formFieldCaption__expiration__expiresOn: '{{ date }}에 만료',
     formFieldCaption__expiration__never: undefined,
-    formFieldOption__expiration__180d: undefined,
-    formFieldOption__expiration__1d: undefined,
-    formFieldOption__expiration__1y: undefined,
-    formFieldOption__expiration__30d: undefined,
-    formFieldOption__expiration__60d: undefined,
-    formFieldOption__expiration__7d: undefined,
-    formFieldOption__expiration__90d: undefined,
+    formFieldOption__expiration__180d: '180일',
+    formFieldOption__expiration__1d: '1일',
+    formFieldOption__expiration__1y: '1년',
+    formFieldOption__expiration__30d: '30일',
+    formFieldOption__expiration__60d: '60일',
+    formFieldOption__expiration__7d: '7일',
+    formFieldOption__expiration__90d: '90일',
     formFieldOption__expiration__never: undefined,
     formHint: undefined,
     formTitle: undefined,
@@ -207,12 +212,12 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__apiKeyName: undefined,
   formFieldInputPlaceholder__backupCode: undefined,
   formFieldInputPlaceholder__confirmDeletionUserAccount: '계정 삭제',
-  formFieldInputPlaceholder__emailAddress: undefined,
-  formFieldInputPlaceholder__emailAddress_username: undefined,
+  formFieldInputPlaceholder__emailAddress: '이메일 주소를 입력하세요',
+  formFieldInputPlaceholder__emailAddress_username: '이메일 주소 또는 사용자명을 입력하세요',
   formFieldInputPlaceholder__emailAddresses:
     '하나 이상의 이메일 주소를 공백 또는 쉼표로 구분하여 입력하거나 붙여넣습니다',
-  formFieldInputPlaceholder__firstName: undefined,
-  formFieldInputPlaceholder__lastName: undefined,
+  formFieldInputPlaceholder__firstName: '이름',
+  formFieldInputPlaceholder__lastName: '성',
   formFieldInputPlaceholder__organizationDomain: undefined,
   formFieldInputPlaceholder__organizationDomainEmailAddress: undefined,
   formFieldInputPlaceholder__organizationName: undefined,
@@ -221,9 +226,10 @@ export const koKR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API 키',
+  formFieldLabel__apiKeyDescription: '설명',
+  formFieldLabel__apiKeyExpiration: '만료',
+  formFieldLabel__apiKeyName: '시크릿 키 이름',
   formFieldLabel__automaticInvitations: 'Enable automatic invitations for this domain',
   formFieldLabel__backupCode: '백업 코드',
   formFieldLabel__confirmDeletion: '확인',
@@ -486,9 +492,11 @@ export const koKR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: '조직 만들기',
     action__invitationAccept: 'Join',
     action__manageOrganization: '조직 관리',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: '선택한 조직 없음',
     personalWorkspace: '개인 워크스페이스',
@@ -600,6 +608,12 @@ export const koKR: LocalizationResource = {
       subtitle: '{{applicationName}}로 계속하려면',
       title: '이메일을 확인하세요',
     },
+    emailCodeMfa: {
+      formTitle: '이메일을 확인하세요',
+      resendButton: '코드를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}로 계속하려면',
+      title: '이메일을 확인하세요',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -635,6 +649,12 @@ export const koKR: LocalizationResource = {
         titleNewTab: '다른 탭에서 로그인',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: '이메일로 전송된 확인 링크를 사용하세요',
+      resendButton: '링크를 받지 못하셨나요? 다시 보내기',
+      subtitle: '{{applicationName}}(으)로 계속',
+      title: '이메일을 확인하세요',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -652,6 +672,7 @@ export const koKR: LocalizationResource = {
       label__alternativeMethods: '또는 다른 방법으로 로그인',
       title: '비밀번호를 잊으셨나요?',
     },
+    newDeviceVerificationNotice: '새로운 기기에서 로그인하고 있습니다. 계정 보안을 위해 확인을 요청하고 있습니다.',
     noAvailableMethods: {
       message: '로그인을 계속할 수 없습니다. 사용 가능한 인증 방법이 없습니다.',
       subtitle: '오류가 발생했습니다',
@@ -666,7 +687,13 @@ export const koKR: LocalizationResource = {
       subtitle: '계정에 등록된 비밀번호를 입력해 주세요',
       title: '비밀번호를 입력하세요',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -709,7 +736,7 @@ export const koKR: LocalizationResource = {
       subtitle: '환영합니다! 계속하려면 로그인해 주세요',
       subtitleCombined: undefined,
       title: '{{applicationName}}에 로그인',
-      titleCombined: undefined,
+      titleCombined: '{{applicationName}}로 계속',
     },
     totpMfa: {
       formTitle: '인증 코드',
@@ -833,8 +860,19 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '파일 크기가 최대 10MB 제한을 초과합니다. 더 작은 파일을 선택해 주세요.',
+    avatar_file_type_invalid: '지원되지 않는 파일 형식입니다. JPG, PNG, GIF 또는 WEBP 이미지를 업로드해 주세요.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
@@ -844,6 +882,7 @@ export const koKR: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '이 세부 정보와 일치하는 계정을 찾을 수 없습니다.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -862,9 +901,11 @@ export const koKR: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       '비밀번호가 허용되는 최대 바이트 수를 초과했습니다. 비밀번호를 줄이거나 일부 특수 문자를 제거해 주세요.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '잘못된 비밀번호',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '사용자 이름에는 숫자가 아닌 문자가 하나 이상 포함되어야 합니다.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "이메일 주소 또는 전화번호는 가입에 사용할 수 없습니다. 이는 '+', '=', '#' 또는 '.'이 이메일 주소에 사용되었거나 임시 이메일 서비스에 연결된 도메인이 사용되었거나 명시적 제외가 있는 경우입니다. 이 오류가 발생한 경우 지원에 문의하세요.",
@@ -934,7 +975,9 @@ export const koKR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: '계정 추가',
+    action__closeUserMenu: '사용자 메뉴 닫기',
     action__manageAccount: '계정 관리',
+    action__openUserMenu: '사용자 메뉴 열기',
     action__signOut: '로그아웃',
     action__signOutAll: '모든 계정에서 로그아웃',
   },

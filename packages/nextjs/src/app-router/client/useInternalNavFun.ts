@@ -33,12 +33,8 @@ export const useInternalNavFun = (props: {
           // as this is the way to perform a shallow navigation in Next.js App Router
           // without unmounting/remounting the page or fetching data from the server.
           if (opts?.__internal_metadata?.navigationType === 'internal') {
-            // In 14.1.0, useSearchParams becomes reactive to shallow updates,
-            // but only if passing `null` as the history state.
-            // Older versions need to maintain the history state for push/replace to work,
-            // without affecting how the Next router works.
-            const state = ((window as any).next?.version ?? '') < '14.1.0' ? history.state : null;
-            windowNav(state, '', to);
+            // Passing `null` ensures App Router shallow navigations keep search params reactive.
+            windowNav(null, '', to);
           } else {
             // If the navigation is external (usually when navigating away from the component but still within the app),
             // we should use the Next.js router to navigate as it will handle updating the URL and also

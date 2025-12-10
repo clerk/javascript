@@ -39,4 +39,4 @@ export {
   useSignIn,
   useSignUp,
   useUser,
-} from '@clerk/clerk-react';
+} from '@clerk/react';

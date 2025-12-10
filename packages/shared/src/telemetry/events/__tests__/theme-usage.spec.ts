@@ -72,41 +72,6 @@ describe('eventThemeUsage', () => {
     });
   });
 
-  it('should prioritize theme over deprecated baseTheme', () => {
-    const appearance = {
-      theme: 'clerk' as any, // String themes are valid at runtime
-      baseTheme: {
-        __type: 'prebuilt_appearance' as const,
-        name: 'shadcn',
-      },
-    };
-
-    const result = eventThemeUsage(appearance);
-
-    expect(result).toEqual({
-      event: EVENT_THEME_USAGE,
-      eventSamplingRate: EVENT_SAMPLING_RATE,
-      payload: { themeName: 'clerk' },
-    });
-  });
-
-  it('should use baseTheme when theme is not provided', () => {
-    const appearance = {
-      baseTheme: {
-        __type: 'prebuilt_appearance' as const,
-        name: 'shadcn',
-      },
-    };
-
-    const result = eventThemeUsage(appearance);
-
-    expect(result).toEqual({
-      event: EVENT_THEME_USAGE,
-      eventSamplingRate: EVENT_SAMPLING_RATE,
-      payload: { themeName: 'shadcn' },
-    });
-  });
-
   it('should handle undefined appearance', () => {
     const result = eventThemeUsage();
 

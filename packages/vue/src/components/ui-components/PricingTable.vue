@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ClerkHostRenderer } from '../ClerkHostRenderer';
-import type { PricingTableProps } from '@clerk/types';
+import type { PricingTableProps } from '@clerk/shared/types';
 import { useClerk } from '../../composables';
 
 const clerk = useClerk();
@@ -11,7 +11,7 @@ const props = defineProps<PricingTableProps>();
   <ClerkHostRenderer
     :mount="clerk?.mountPricingTable"
     :unmount="clerk?.unmountPricingTable"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
     :props="props"
   />
 </template>

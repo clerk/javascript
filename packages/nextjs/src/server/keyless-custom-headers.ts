@@ -20,7 +20,7 @@ interface MetadataHeaders {
  * Collects metadata from the environment and request headers
  */
 export async function collectKeylessMetadata(): Promise<MetadataHeaders> {
-  const headerStore = await headers(); // eslint-disable-line
+  const headerStore = await headers();
 
   return {
     nodeVersion: process.version,

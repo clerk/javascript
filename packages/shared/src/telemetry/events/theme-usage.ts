@@ -1,4 +1,4 @@
-import type { Appearance, BaseTheme, TelemetryEventRaw } from '@clerk/types';
+import type { TelemetryEventRaw } from '../../types';
 
 export const EVENT_THEME_USAGE = 'THEME_USAGE';
 export const EVENT_SAMPLING_RATE = 1;
@@ -17,7 +17,7 @@ type EventThemeUsage = {
  * @example
  * telemetry.record(eventThemeUsage(appearance));
  */
-export function eventThemeUsage(appearance?: Appearance): TelemetryEventRaw<EventThemeUsage> {
+export function eventThemeUsage(appearance?: any): TelemetryEventRaw<EventThemeUsage> {
   const payload = analyzeThemeUsage(appearance);
 
   return {
@@ -32,13 +32,12 @@ export function eventThemeUsage(appearance?: Appearance): TelemetryEventRaw<Even
  *
  * @internal
  */
-function analyzeThemeUsage(appearance?: Appearance): EventThemeUsage {
+function analyzeThemeUsage(appearance?: any): EventThemeUsage {
   if (!appearance || typeof appearance !== 'object') {
     return {};
   }
 
-  // Prioritize the new theme property over deprecated baseTheme
-  const themeProperty = appearance.theme || appearance.baseTheme;
+  const themeProperty = appearance.theme;
 
   if (!themeProperty) {
     return {};
@@ -67,7 +66,7 @@ function analyzeThemeUsage(appearance?: Appearance): EventThemeUsage {
  *
  * @internal
  */
-function extractThemeName(theme: BaseTheme): string | undefined {
+function extractThemeName(theme: any): string | undefined {
   if (typeof theme === 'string') {
     return theme;
   }

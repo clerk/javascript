@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const elGR: LocalizationResource = {
   locale: 'el-GR',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Αντιγραφή και κλείσιμο',
+      formHint: 'Για λόγους ασφαλείας, δεν θα σας επιτρέψουμε να το δείτε ξανά αργότερα.',
+      formTitle: 'Αντιγράψτε το κλειδί API "{{name}}" σας τώρα',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const elGR: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Εισάγετε τον αριθμό τηλεφώνου σας',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'Κλειδί API',
+  formFieldLabel__apiKeyDescription: 'Περιγραφή',
+  formFieldLabel__apiKeyExpiration: 'Λήξη',
+  formFieldLabel__apiKeyName: 'Όνομα μυστικού κλειδιού',
   formFieldLabel__automaticInvitations: 'Ενεργοποίηση αυτόματων προσκλήσεων για αυτόν τον τομέα',
   formFieldLabel__backupCode: 'Αντίγραφο ασφαλείας κωδικού',
   formFieldLabel__confirmDeletion: 'Επιβεβαίωση',
@@ -489,9 +495,11 @@ export const elGR: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Δημιουργία Οργανισμού',
     action__invitationAccept: 'Join',
     action__manageOrganization: 'Διαχείριση Οργανισμού',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Request to join',
     notSelected: 'Δεν έχει επιλεγεί οργανισμός',
     personalWorkspace: 'Προσωπικός Χώρος Εργασίας',
@@ -605,6 +613,12 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Ελέγξτε το email σας',
     },
+    emailCodeMfa: {
+      formTitle: 'Ελέγξτε το email σας',
+      resendButton: 'Δεν λάβατε κωδικό; Αποστολή ξανά',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -640,6 +654,12 @@ export const elGR: LocalizationResource = {
         titleNewTab: 'Έχετε συνδεθεί σε άλλη καρτέλα',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Χρησιμοποιήστε τον σύνδεσμο επαλήθευσης που στάλθηκε στο email σας',
+      resendButton: 'Δεν λάβατε τον σύνδεσμο; Επανάληψη αποστολής',
+      subtitle: 'για να συνεχίσετε στο {{applicationName}}',
+      title: 'Ελέγξτε το email σας',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const elGR: LocalizationResource = {
       label__alternativeMethods: 'Ή, συνδεθείτε με μια άλλη μέθοδο.',
       title: 'Ξεχάσατε τον κωδικό πρόσβασης;',
     },
+    newDeviceVerificationNotice:
+      'Συνδέεστε από μια νέα συσκευή. Ζητάμε επαλήθευση για να διατηρήσουμε τον λογαριασμό σας ασφαλή.',
     noAvailableMethods: {
       message: 'Δεν είναι δυνατή η σύνδεση. Δεν υπάρχει διαθέσιμος παράγοντας αυθεντικοποίησης.',
       subtitle: 'Προέκυψε σφάλμα',
@@ -672,8 +694,14 @@ export const elGR: LocalizationResource = {
       subtitle: 'για να συνεχίσετε στο {{applicationName}}',
       title: 'Εισαγωγή κωδικού πρόσβασης',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Παραβιασμένος κωδικός',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Κωδικός επαλήθευσης',
@@ -841,8 +869,20 @@ export const elGR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded:
+      'Το μέγεθος του αρχείου υπερβαίνει το μέγιστο όριο των 10 MB. Επιλέξτε ένα μικρότερο αρχείο.',
+    avatar_file_type_invalid: 'Ο τύπος αρχείου δεν υποστηρίζεται. Ανεβάστε μια εικόνα JPG, PNG, GIF ή WEBP.',
     captcha_invalid:
       'Η εγγραφή απέτυχε λόγω αποτυχημένων ελέγχων ασφαλείας. Ανανεώστε τη σελίδα για να δοκιμάσετε ξανά ή επικοινωνήστε με το κέντρο υποστήριξης για περισσότερη βοήθεια.',
     captcha_unavailable:
@@ -852,6 +892,7 @@ export const elGR: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Δεν βρέθηκε λογαριασμός με αυτές τις λεπτομέρειες.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Η διεύθυνση email πρέπει να είναι μια έγκυρη διεύθυνση email.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -871,9 +912,11 @@ export const elGR: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Ο κωδικός πρόσβασής σας έχει υπερβεί το μέγιστο αριθμό bytes που επιτρέπεται. Παρακαλούμε, συντομεύστε τον ή αφαιρέστε μερικούς ειδικούς χαρακτήρες.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Λανθασμένος κωδικός',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Το όνομα χρήστη πρέπει να περιέχει τουλάχιστον έναν μη αριθμητικό χαρακτήρα.',
     identification_deletion_failed: 'Δεν μπορείτε να διαγράψετε το τελευταίο στοιχείο ταυτοποιησής σας.',
     not_allowed_access:
       "Η διεύθυνση email ή το τηλέφωνο δεν επιτρέπεται για την εγγραφή. Αυτό μπορεί να οφείλεται στη χρήση '+', '=', '#' ή '.' στην διεύθυνση email σας, χρήση πεδίου που συνδέεται με υπηρεσία email, ή εμφανής αποκλεισμός. Αν πιστεύετε ότι αυτό είναι ένα σφάλμα, παρακαλούμε επικοινωνήστε με την υποστήριξη.",
@@ -946,7 +989,9 @@ export const elGR: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Προσθήκη λογαριασμού',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Διαχείριση λογαριασμού',
+    action__openUserMenu: undefined,
     action__signOut: 'Αποσύνδεση',
     action__signOutAll: 'Αποσύνδεση από όλους τους λογαριασμούς',
   },

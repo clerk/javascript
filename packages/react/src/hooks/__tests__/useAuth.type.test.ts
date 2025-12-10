@@ -1,4 +1,4 @@
-import type { PendingSessionOptions } from '@clerk/types';
+import type { PendingSessionOptions } from '@clerk/shared/types';
 import { describe, expectTypeOf, it } from 'vitest';
 
 import type { useAuth } from '../useAuth';

@@ -89,6 +89,61 @@ const noNavigateUseClerk = {
   },
 };
 
+const noUnstableMethods = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow methods or properties starting with `__unstable_`',
+      recommended: false,
+    },
+    messages: {
+      noUnstable:
+        'Do not define methods or properties starting with `__unstable_`. For internal APIs, use `__internal_`, for experimental APIs, use `__experimental_`.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      MemberExpression(node) {
+        if (
+          node.property.type === 'Identifier' &&
+          typeof node.property.name === 'string' &&
+          node.property.name.startsWith('__unstable_')
+        ) {
+          context.report({
+            node: node.property,
+            messageId: 'noUnstable',
+          });
+        }
+      },
+      Property(node) {
+        if (
+          node.key.type === 'Identifier' &&
+          typeof node.key.name === 'string' &&
+          node.key.name.startsWith('__unstable_')
+        ) {
+          context.report({
+            node: node.key,
+            messageId: 'noUnstable',
+          });
+        }
+      },
+      MethodDefinition(node) {
+        if (
+          node.key.type === 'Identifier' &&
+          typeof node.key.name === 'string' &&
+          node.key.name.startsWith('__unstable_')
+        ) {
+          context.report({
+            node: node.key,
+            messageId: 'noUnstable',
+          });
+        }
+      },
+    };
+  },
+};
+
 export default tseslint.config([
   {
     name: 'repo/ignores',
@@ -120,6 +175,8 @@ export default tseslint.config([
       'packages/backend/src/runtime/**/*',
       'packages/clerk-js/rspack.config.js',
       'packages/shared/src/compiled/path-to-regexp/index.js',
+      'packages/shared/tsdown.config.mjs',
+      'packages/upgrade/src/__tests__/fixtures/**/*',
     ],
   },
   {
@@ -160,6 +217,11 @@ export default tseslint.config([
   {
     name: 'repo/global',
     plugins: {
+      'custom-rules': {
+        rules: {
+          'no-unstable-methods': noUnstableMethods,
+        },
+      },
       'simple-import-sort': pluginSimpleImportSort,
       'unused-imports': pluginUnusedImports,
       turbo: pluginTurbo,
@@ -175,6 +237,7 @@ export default tseslint.config([
       },
     },
     rules: {
+      'custom-rules/no-unstable-methods': 'error',
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
@@ -358,19 +421,44 @@ export default tseslint.config([
       'custom-rules': {
         rules: {
           'no-navigate-useClerk': noNavigateUseClerk,
+          'no-unstable-methods': noUnstableMethods,
         },
       },
     },
     rules: {
       'custom-rules/no-navigate-useClerk': 'error',
+      'custom-rules/no-unstable-methods': 'error',
     },
   },
   {
-    name: 'packages/clerk-js - vitest',
-    files: ['packages/clerk-js/src/**/*.test.{ts,tsx}'],
+    name: 'packages - vitest',
+    files: ['packages/*/src/**/*.test.{ts,tsx}'],
     rules: {
       'jest/unbound-method': 'off',
       '@typescript-eslint/unbound-method': 'off',
+    },
+  },
+  {
+    name: 'packages/shared',
+    files: ['packages/shared/src/**/*'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@clerk/shared', '@clerk/shared/*'],
+              message:
+                'Do not import from @clerk/shared package exports within the package itself. Use the @/ alias or relative imports from source files instead (e.g., import from "@/types" or "../../types").',
+            },
+            {
+              group: ['../../../*'],
+              message:
+                'Relative imports should not traverse more than 2 levels up (../../). Use the @/ path alias instead (e.g., import from "@/types").',
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -401,7 +489,7 @@ export default tseslint.config([
     name: 'packages/upgrade',
     files: ['packages/upgrade/src/**/*'],
     rules: {
-      'import/no-unresolved': ['error', { ignore: ['^#', '^~', '@inkjs/ui', '^ink'] }],
+      'custom-rules/no-unstable-methods': 'off',
       'react/no-unescaped-entities': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
     },
@@ -441,7 +529,7 @@ export default tseslint.config([
         { definedTags: ['inline', 'unionReturnHeadings', 'displayFunctionSignature', 'paramExtension'], typed: false },
       ],
       'jsdoc/require-hyphen-before-param-description': 'warn',
-      'jsdoc/require-description': 'warn',
+      'jsdoc/require-description': 'off',
       'jsdoc/require-description-complete-sentence': 'warn',
       'jsdoc/require-param': ['warn', { ignoreWhenAllParamsMissing: true }],
       'jsdoc/require-param-description': 'warn',
@@ -452,6 +540,16 @@ export default tseslint.config([
         'always',
         { count: 1, applyToEndTag: false, startLines: 1, tags: { param: { lines: 'never' } } },
       ],
+    },
+  },
+  {
+    name: 'repo/jsdoc-internal',
+    files: ['packages/shared/src/**/internal/**/*.{ts,tsx}', 'packages/shared/src/**/*.{ts,tsx}'],
+    plugins: {
+      jsdoc: pluginJsDoc,
+    },
+    rules: {
+      'jsdoc/require-jsdoc': 'off',
     },
   },
   ...pluginYml.configs['flat/recommended'],

@@ -7,7 +7,7 @@ import type {
   PendingSessionOptions,
   SignOut,
   UseAuthReturn,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 import { useCallback } from 'react';
 
 import { useAuthContext } from '../contexts/AuthContext';
@@ -47,7 +47,7 @@ type UseAuthOptions = Record<string, any> | PendingSessionOptions | undefined | 
  * <Tab>
  *
  * ```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
- * import { useAuth } from '@clerk/clerk-react'
+ * import { useAuth } from '@clerk/react'
  *
  * export default function ExternalDataPage() {
  *   const { userId, sessionId, getToken, isLoaded, isSignedIn } = useAuth()
@@ -133,7 +133,7 @@ export const useAuth = (initialAuthStateOrOptions: UseAuthOptions = {}): UseAuth
  * @remarks
  * This hook inspects session, user, and organization information to determine the current authentication state.
  * It returns an object that includes various properties such as whether the state is loaded, if a user is signed in,
- * session and user identifiers, organization roles, and a `has` function for authorization checks.
+ * session and user identifiers, Organization Roles, and a `has` function for authorization checks.
  * Additionally, it provides `signOut` and `getToken` functions if applicable.
  *
  * @example
@@ -171,7 +171,7 @@ export function useDerivedAuth(
         plans: ((sessionClaims as JwtPayload | undefined)?.pla as string) || '',
       })(params);
     },
-    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge],
+    [has, userId, orgId, orgRole, orgPermissions, factorVerificationAge, sessionClaims],
   );
 
   const payload = resolveAuthState({

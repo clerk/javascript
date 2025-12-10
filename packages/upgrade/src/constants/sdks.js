@@ -1,6 +1,5 @@
 export default [
   { label: '@clerk/nextjs', value: 'nextjs' },
-  { label: '@clerk/remix', value: 'remix' },
   { label: '@clerk/redwood', value: 'redwood' },
   { label: '@clerk/react', value: 'react' },
   { label: '@clerk/expo', value: 'expo' },
@@ -11,6 +10,6 @@ export default [
   { label: '@clerk/backend', value: 'backend' },
   { label: '@clerk/localizations', value: 'localizations' },
   { label: '@clerk/shared', value: 'shared' },
-  { label: '@clerk/types', value: 'types' },
+  { label: '@clerk/shared/types', value: 'types' },
   { label: '@clerk/chrome-extension', value: 'chrome-extension' },
 ];

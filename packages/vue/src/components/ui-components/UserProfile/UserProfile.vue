@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useClerk } from '../../../composables';
-import type { UserProfileProps } from '@clerk/types';
+import type { UserProfileProps } from '@clerk/shared/types';
 import { ClerkHostRenderer, CustomPortalsRenderer } from '../../ClerkHostRenderer';
 import { computed, provide } from 'vue';
 import { UserProfileInjectionKey } from '../../../keys';
@@ -27,7 +27,7 @@ provide(UserProfileInjectionKey, {
     :mount="clerk?.mountUserProfile"
     :unmount="clerk?.unmountUserProfile"
     :props="finalProps"
-    :update-props="(clerk as any)?.__unstable__updateProps"
+    :update-props="(clerk as any)?.__internal_updateProps"
   />
   <CustomPortalsRenderer :custom-pages-portals="customPagesPortals" />
   <slot />

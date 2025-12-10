@@ -1,3 +1,6 @@
+/* eslint-disable  */
+// @ts-nocheck
+
 import type {
   AuthConfigJSON,
   ClientJSON,
@@ -7,7 +10,7 @@ import type {
   OrganizationSettingsJSON,
   UserJSON,
   UserSettingsJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import { containsAllOfType } from '../ui/utils/containsAllOf';
 

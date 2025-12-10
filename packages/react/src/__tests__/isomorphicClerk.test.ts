@@ -1,15 +1,31 @@
-import type { Resources, UnsubscribeCallback } from '@clerk/types';
+import type { Resources, UnsubscribeCallback } from '@clerk/shared/types';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { IsomorphicClerk } from '../isomorphicClerk';
 
+// Mock the script loading functions to prevent unhandled promise rejections in tests
+vi.mock('@clerk/shared/loadClerkJsScript', () => ({
+  loadClerkJsScript: vi.fn().mockResolvedValue(null),
+  loadClerkUiScript: vi.fn().mockResolvedValue(null),
+}));
+
 describe('isomorphicClerk', () => {
   beforeAll(() => {
     vi.useFakeTimers();
+
+    // Set up minimal global Clerk objects to prevent errors during initialization
+    (global as any).Clerk = {
+      load: vi.fn().mockResolvedValue(undefined),
+      loaded: false,
+    };
+    (global as any).__internal_ClerkUiCtor = vi.fn();
   });
 
   afterAll(() => {
     vi.useRealTimers();
+    // Clean up globals
+    delete (global as any).Clerk;
+    delete (global as any).__internal_ClerkUiCtor;
   });
 
   it('instantiates a IsomorphicClerk instance', () => {
@@ -21,35 +37,35 @@ describe('isomorphicClerk', () => {
   it('updates props asynchronously after clerkjs has loaded', async () => {
     const propsHistory: any[] = [];
     const dummyClerkJS = {
-      __unstable__updateProps: (props: any) => propsHistory.push(props),
+      __internal_updateProps: (props: any) => propsHistory.push(props),
     };
 
     const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
     (isomorphicClerk as any).clerkjs = dummyClerkJS as any;
 
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'dark' } });
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'light' } });
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'purple' } });
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'yellow' } });
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'red' } });
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'blue' } });
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'green' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'dark' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'light' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'purple' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'yellow' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'red' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'blue' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'green' } });
     expect(propsHistory).toEqual([]);
 
     vi.spyOn(isomorphicClerk, 'loaded', 'get').mockReturnValue(true);
     isomorphicClerk.emitLoaded();
-    void isomorphicClerk.__unstable__updateProps({ appearance: { baseTheme: 'white' } });
+    void isomorphicClerk.__internal_updateProps({ appearance: { theme: 'white' } });
     await vi.runAllTimersAsync();
 
     expect(propsHistory).toEqual([
-      { appearance: { baseTheme: 'dark' } },
-      { appearance: { baseTheme: 'light' } },
-      { appearance: { baseTheme: 'purple' } },
-      { appearance: { baseTheme: 'yellow' } },
-      { appearance: { baseTheme: 'red' } },
-      { appearance: { baseTheme: 'blue' } },
-      { appearance: { baseTheme: 'green' } },
-      { appearance: { baseTheme: 'white' } },
+      { appearance: { theme: 'dark' } },
+      { appearance: { theme: 'light' } },
+      { appearance: { theme: 'purple' } },
+      { appearance: { theme: 'yellow' } },
+      { appearance: { theme: 'red' } },
+      { appearance: { theme: 'blue' } },
+      { appearance: { theme: 'green' } },
+      { appearance: { theme: 'white' } },
     ]);
   });
 

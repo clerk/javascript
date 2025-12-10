@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopioi ja sulje',
+      formHint: 'Tietoturvasyistä emme voi sallia sen tarkastelua myöhemmin.',
+      formTitle: 'Kopioi API-avaimesi "{{name}}" nyt',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const fiFI: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API-avain',
+  formFieldLabel__apiKeyDescription: 'Kuvaus',
+  formFieldLabel__apiKeyExpiration: 'Vanheneminen',
+  formFieldLabel__apiKeyName: 'Salaisen avaimen nimi',
   formFieldLabel__automaticInvitations: 'Ota automaattiset kutsut käyttöön tälle verkkotunnukselle',
   formFieldLabel__backupCode: 'Varakoodi',
   formFieldLabel__confirmDeletion: 'Vahvistus',
@@ -490,9 +496,11 @@ export const fiFI: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Luo organisaatio',
     action__invitationAccept: 'Liity',
     action__manageOrganization: 'Hallitse',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Pyydä liittymistä',
     notSelected: 'Ei valittua organisaatiota',
     personalWorkspace: 'Henkilökohtainen tili',
@@ -605,6 +613,12 @@ export const fiFI: LocalizationResource = {
       subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
       title: 'Tarkista sähköpostisi',
     },
+    emailCodeMfa: {
+      formTitle: 'Tarkista sähköpostisi',
+      resendButton: 'Etkö saanut koodia? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Jatkaaksesi avaa vahvistuslinkki laitteella ja selaimella, josta aloitit kirjautumisen',
@@ -640,6 +654,12 @@ export const fiFI: LocalizationResource = {
         titleNewTab: 'Kirjautunut toiseen välilehteen',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Käytä sähköpostiisi lähetettyä vahvistuslinkkiä',
+      resendButton: 'Etkö saanut linkkiä? Lähetä uudelleen',
+      subtitle: 'jatkaaksesi kohteeseen {{applicationName}}',
+      title: 'Tarkista sähköpostisi',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const fiFI: LocalizationResource = {
       label__alternativeMethods: 'tai kirjaudu sisään toisella tavalla',
       title: 'Unohditko salasanasi?',
     },
+    newDeviceVerificationNotice:
+      'Kirjaudut sisään uudesta laitteesta. Pyydämme vahvistusta tilisi turvallisuuden varmistamiseksi.',
     noAvailableMethods: {
       message: 'Kirjautuminen ei onnistu. Käytettävissä ei ole yhtään todennusmenetelmää.',
       subtitle: 'Tapahtui virhe',
@@ -672,8 +694,14 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä tilisi salasana',
       title: 'Syötä salasanasi',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Salasana kompromisoitu',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Vahvistuskoodi',
@@ -840,8 +868,19 @@ export const fiFI: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Tiedostokoko ylittää enimmäisrajan 10 Mt. Valitse pienempi tiedosto.',
+    avatar_file_type_invalid: 'Tiedostotyyppiä ei tueta. Lataa JPG-, PNG-, GIF- tai WEBP-kuva.',
     captcha_invalid:
       'Rekisteröityminen epäonnistui epäonnistuneiden tietoturvatarkistusten vuoksi. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     captcha_unavailable:
@@ -851,6 +890,7 @@ export const fiFI: LocalizationResource = {
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
     form_identifier_not_found: 'Ei voi löytää tiliä näillä tiedoilla.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Sähköpostiosoiteen tulee olla kelvollinen.',
     form_param_format_invalid__phone_number: 'Puhelinnumeron on oltava kelvollisessa kansainvälisessä muodossa',
@@ -869,9 +909,11 @@ export const fiFI: LocalizationResource = {
     form_password_pwned__sign_in: 'Salasana on ollut osallisena tietovuodossa. Vaihdathan salasanasi.',
     form_password_size_in_bytes_exceeded:
       'Salasanasi on ylittänyt sallitun tavumäärän, lyhennä sitä tai poista joitain erikoismerkkejä.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Väärä salasana.',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Käyttäjänimessä tulee olla vähintään yksi ei-numeerinen merkki.',
     identification_deletion_failed: 'Et voi poistaa viimeistä henkilöllisyyttäsi.',
     not_allowed_access:
       "Sähköpostiosoite tai puhelinnumero ei ole sallittu rekisteröityäksesi. Tämä voi johtua siitä, että sähköpostiosoite sisältää '+', '=', '#' tai '.' merkkejä, käyttäät aluetta, joka on sidottu tilapäisyyden sähköpostitilaukseen, tai olet eksplisiittisesti estetty. Jos uskoo, että tämä on virhe, ota yhteyttä tukeen.",
@@ -941,7 +983,9 @@ export const fiFI: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Lisää tili',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Hallitse tiliä',
+    action__openUserMenu: undefined,
     action__signOut: 'Kirjaudu ulos',
     action__signOutAll: 'Kirjaudu ulos kaikista tileistä',
   },

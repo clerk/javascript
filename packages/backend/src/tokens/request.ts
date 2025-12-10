@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload } from '@clerk/shared/types';
 
 import { constants } from '../constants';
 import type { TokenCarrier } from '../errors';
@@ -14,7 +14,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
-import { getMachineTokenType, isMachineTokenByPrefix, isTokenTypeAccepted } from './machine';
+import { getMachineTokenType, isMachineToken, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
 import { TokenType } from './tokenTypes';
@@ -102,7 +102,7 @@ function isTokenTypeInAcceptedArray(acceptsToken: TokenType[], authenticateConte
   let parsedTokenType: TokenType | null = null;
   const { tokenInHeader } = authenticateContext;
   if (tokenInHeader) {
-    if (isMachineTokenByPrefix(tokenInHeader)) {
+    if (isMachineToken(tokenInHeader)) {
       parsedTokenType = getMachineTokenType(tokenInHeader);
     } else {
       parsedTokenType = TokenType.SessionToken;
@@ -704,7 +704,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     // Handle case where tokenType is any and the token is not a machine token
-    if (!isMachineTokenByPrefix(tokenInHeader)) {
+    if (!isMachineToken(tokenInHeader)) {
       return signedOut({
         tokenType: acceptsToken as TokenType,
         authenticateContext,
@@ -739,7 +739,7 @@ export const authenticateRequest: AuthenticateRequest = (async (
     }
 
     // Handle as a machine token
-    if (isMachineTokenByPrefix(tokenInHeader)) {
+    if (isMachineToken(tokenInHeader)) {
       const parsedTokenType = getMachineTokenType(tokenInHeader);
       const mismatchState = checkTokenTypeMismatch(parsedTokenType, acceptsToken, authenticateContext);
       if (mismatchState) {

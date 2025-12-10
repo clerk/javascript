@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bnIN: LocalizationResource = {
   locale: 'bn-IN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'কপি করুন এবং বন্ধ করুন',
+      formHint: 'নিরাপত্তার কারণে, আমরা আপনাকে পরে এটি আবার দেখতে অনুমতি দেব না।',
+      formTitle: 'এখনই আপনার "{{name}}" API কী কপি করুন',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const bnIN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'আপনার ফোন নম্বর লিখুন',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API কী',
+  formFieldLabel__apiKeyDescription: 'বিবরণ',
+  formFieldLabel__apiKeyExpiration: 'মেয়াদ শেষ',
+  formFieldLabel__apiKeyName: 'গোপন কী-এর নাম',
   formFieldLabel__automaticInvitations: 'এই ডোমেনের জন্য স্বয়ংক্রিয় আমন্ত্রণ সক্ষম করুন',
   formFieldLabel__backupCode: 'ব্যাকআপ কোড',
   formFieldLabel__confirmDeletion: 'নিশ্চিতকরণ',
@@ -490,9 +496,11 @@ export const bnIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'সংগঠন তৈরি করুন',
     action__invitationAccept: 'যোগ দিন',
     action__manageOrganization: 'পরিচালনা',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'যোগ দেওয়ার অনুরোধ করুন',
     notSelected: 'কোনো সংগঠন নির্বাচিত নেই',
     personalWorkspace: 'ব্যক্তিগত অ্যাকাউন্ট',
@@ -607,6 +615,12 @@ export const bnIN: LocalizationResource = {
       subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
       title: 'আপনার ইমেইল চেক করুন',
     },
+    emailCodeMfa: {
+      formTitle: 'আপনার ইমেইল চেক করুন',
+      resendButton: 'কোনো কোড পাননি? পুনরায় পাঠান',
+      subtitle: '{{applicationName}}-এ চালিয়ে যাওয়ার জন্য',
+      title: 'আপনার ইমেইল চেক করুন',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'চালিয়ে যেতে, যে ডিভাইস এবং ব্রাউজার থেকে আপনি সাইন-ইন শুরু করেছেন সেখানে যাচাইকরণ লিংক খুলুন',
@@ -642,6 +656,12 @@ export const bnIN: LocalizationResource = {
         titleNewTab: 'অন্য ট্যাবে সাইন ইন হয়েছে',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'আপনার ইমেইলে পাঠানো যাচাইকরণ লিঙ্কটি ব্যবহার করুন',
+      resendButton: 'লিঙ্ক পাননি? আবার পাঠান',
+      subtitle: '{{applicationName}} এ চালিয়ে যেতে',
+      title: 'আপনার ইমেইল পরীক্ষা করুন',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -659,6 +679,8 @@ export const bnIN: LocalizationResource = {
       label__alternativeMethods: 'অথবা, অন্য পদ্ধতি দিয়ে সাইন ইন করুন',
       title: 'পাসওয়ার্ড ভুলে গেছেন?',
     },
+    newDeviceVerificationNotice:
+      'আপনি একটি নতুন ডিভাইস থেকে সাইন ইন করছেন। আমরা আপনার অ্যাকাউন্ট নিরাপদ রাখতে যাচাইকরণ চাইছি।',
     noAvailableMethods: {
       message: 'সাইন ইন চালিয়ে যাওয়া যাচ্ছে না। কোনো উপলব্ধ অথেনটিকেশন ফ্যাক্টর নেই।',
       subtitle: 'একটি ত্রুটি ঘটেছে',
@@ -674,8 +696,14 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার অ্যাকাউন্টের সাথে যুক্ত পাসওয়ার্ড লিখুন',
       title: 'আপনার পাসওয়ার্ড লিখুন',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
@@ -844,8 +872,19 @@ export const bnIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
+    avatar_file_size_exceeded: 'ফাইলের আকার সর্বোচ্চ ১০ এমবি সীমা অতিক্রম করেছে। দয়া করে একটি ছোট ফাইল নির্বাচন করুন।',
+    avatar_file_type_invalid: 'ফাইলের ধরন সমর্থিত নয়। দয়া করে JPG, PNG, GIF বা WEBP ছবি আপলোড করুন।',
     captcha_invalid:
       'নিরাপত্তা যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     captcha_unavailable:
@@ -856,6 +895,7 @@ export const bnIN: LocalizationResource = {
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_not_found:
       'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'লেখা মানটি একটি অবৈধ ফরম্যাটে আছে। দয়া করে চেক করুন এবং সংশোধন করুন।',
     form_param_format_invalid__email_address: 'ইমেইল ঠিকানা একটি বৈধ ইমেইল ঠিকানা হতে হবে।',
     form_param_format_invalid__phone_number: 'ফোন নম্বর একটি বৈধ আন্তর্জাতিক ফরম্যাটে হতে হবে।',
@@ -876,10 +916,12 @@ export const bnIN: LocalizationResource = {
       'এই পাসওয়ার্ডটি একটি ডেটা লঙ্ঘনের অংশ হিসাবে পাওয়া গেছে এবং ব্যবহার করা যাবে না, দয়া করে আপনার পাসওয়ার্ড রিসেট করুন।',
     form_password_size_in_bytes_exceeded:
       'আপনার পাসওয়ার্ড অনুমোদিত সর্বাধিক বাইট সংখ্যা অতিক্রম করেছে, দয়া করে এটি ছোট করুন বা কিছু বিশেষ অক্ষর সরান।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'ভুল পাসওয়ার্ড',
     form_username_invalid_character:
       'আপনার ব্যবহারকারীর নামে অবৈধ অক্ষর রয়েছে। দয়া করে শুধুমাত্র অক্ষর, সংখ্যা এবং আন্ডারস্কোর ব্যবহার করুন।',
     form_username_invalid_length: 'আপনার ব্যবহারকারীর নাম {{min_length}} থেকে {{max_length}} অক্ষর দীর্ঘ হতে হবে।',
+    form_username_needs_non_number_char: 'আপনার ব্যবহারকারীর নামে কমপক্ষে একটি অ-সংখ্যাসূচক অক্ষর থাকতে হবে।',
     identification_deletion_failed: 'আপনি আপনার শেষ শনাক্তকরণ মুছতে পারবেন না।',
     not_allowed_access:
       'আপনার এই পৃষ্ঠা অ্যাক্সেস করার অনুমতি নেই। আপনি যদি মনে করেন এটি একটি ত্রুটি, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',
@@ -950,7 +992,9 @@ export const bnIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'অ্যাকাউন্ট যোগ করুন',
+    action__closeUserMenu: 'ব্যবহারকারী মেনু বন্ধ করুন',
     action__manageAccount: 'অ্যাকাউন্ট পরিচালনা করুন',
+    action__openUserMenu: 'ব্যবহারকারী মেনু খুলুন',
     action__signOut: 'সাইন আউট',
     action__signOutAll: 'সব অ্যাকাউন্ট থেকে সাইন আউট করুন',
   },

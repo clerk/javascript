@@ -1,5 +1,6 @@
 import { deriveState } from '@clerk/shared/deriveState';
 import { eventMethodCalled } from '@clerk/shared/telemetry';
+import type { SignedInSessionResource } from '@clerk/shared/types';
 import { batched, computed, onMount, type Store } from 'nanostores';
 
 import { $clerk, $csrState, $initialState } from './internal';
@@ -51,11 +52,11 @@ export const $userStore = computed([$authStore], auth => auth.user);
  * @example
  * $sessionStore.subscribe((session) => console.log(session.id))
  */
-export const $sessionStore = computed([$authStore], auth => auth.session);
+export const $sessionStore = computed([$authStore], auth => auth.session as SignedInSessionResource | null | undefined);
 
 /**
  * A client side store that is populated after clerk-js has loaded.
- * The store returns the active organization of the authenticated user or `null`.
+ * The store returns the Active Organization of the authenticated user or `null`.
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
@@ -69,7 +70,7 @@ export const $organizationStore = computed([$authStore], auth => auth.organizati
  * It is a nanostore, for instructions on how to use nanostores please review the [documentation](https://github.com/nanostores/nanostores)
  *
  * @example
- * $clientStore.subscribe((client) => console.log(client.activeSessions))
+ * $clientStore.subscribe((client) => console.log(client?.signedInSessions?.length))
  */
 export const $clientStore = computed([$csrState], csr => csr.client);
 

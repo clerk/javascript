@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hiIN: LocalizationResource = {
   locale: 'hi-IN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'कॉपी करें और बंद करें',
+      formHint: 'सुरक्षा कारणों से, हम आपको बाद में इसे फिर से देखने की अनुमति नहीं देंगे।',
+      formTitle: 'अभी अपना "{{name}}" API कुंजी कॉपी करें',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const hiIN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'अपना फोन नंबर दर्ज करें',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API कुंजी',
+  formFieldLabel__apiKeyDescription: 'विवरण',
+  formFieldLabel__apiKeyExpiration: 'समाप्ति',
+  formFieldLabel__apiKeyName: 'गुप्त कुंजी का नाम',
   formFieldLabel__automaticInvitations: 'इस डोमेन के लिए स्वचालित आमंत्रण सक्षम करें',
   formFieldLabel__backupCode: 'बैकअप कोड',
   formFieldLabel__confirmDeletion: 'पुष्टिकरण',
@@ -489,9 +495,11 @@ export const hiIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'संगठन बनाएँ',
     action__invitationAccept: 'शामिल हों',
     action__manageOrganization: 'प्रबंधित करें',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
     notSelected: 'कोई संगठन चयनित नहीं',
     personalWorkspace: 'व्यक्तिगत खाता',
@@ -606,6 +614,12 @@ export const hiIN: LocalizationResource = {
       subtitle: '{{applicationName}} पर जारी रखने के लिए',
       title: 'अपना ईमेल जांचें',
     },
+    emailCodeMfa: {
+      formTitle: 'अपना ईमेल जांचें',
+      resendButton: 'कोड नहीं मिला? फिर से भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'जारी रखने के लिए, सत्यापन लिंक को उस डिवाइस और ब्राउज़र पर खोलें जिससे आपने साइन-अप शुरू किया था',
@@ -641,6 +655,12 @@ export const hiIN: LocalizationResource = {
         titleNewTab: 'दूसरे टैब पर साइन इन हो गया',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'अपने ईमेल पर भेजे गए सत्यापन लिंक का उपयोग करें',
+      resendButton: 'लिंक नहीं मिला? पुनः भेजें',
+      subtitle: '{{applicationName}} पर जारी रखने के लिए',
+      title: 'अपना ईमेल जांचें',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -658,6 +678,8 @@ export const hiIN: LocalizationResource = {
       label__alternativeMethods: 'या, दूसरी विधि से साइन इन करें',
       title: 'पासवर्ड भूल गए?',
     },
+    newDeviceVerificationNotice:
+      'आप एक नए डिवाइस से साइन इन कर रहे हैं। हम आपके खाते को सुरक्षित रखने के लिए सत्यापन मांग रहे हैं।',
     noAvailableMethods: {
       message: 'साइन इन जारी नहीं रख सकते। कोई उपलब्ध प्रमाणीकरण कारक नहीं है।',
       subtitle: 'एक त्रुटि हुई',
@@ -673,8 +695,14 @@ export const hiIN: LocalizationResource = {
       subtitle: 'अपने खाते से जुड़ा पासवर्ड दर्ज करें',
       title: 'अपना पासवर्ड दर्ज करें',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
@@ -844,8 +872,19 @@ export const hiIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
+    avatar_file_size_exceeded: 'फ़ाइल का आकार 10MB की अधिकतम सीमा से अधिक है। कृपया एक छोटी फ़ाइल चुनें।',
+    avatar_file_type_invalid: 'फ़ाइल प्रकार समर्थित नहीं है। कृपया JPG, PNG, GIF या WEBP छवि अपलोड करें।',
     captcha_invalid:
       'असफल सुरक्षा सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     captcha_unavailable:
@@ -855,6 +894,7 @@ export const hiIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_not_found: 'इस पहचानकर्ता के साथ कोई खाता नहीं मिला। कृपया जांचें और पुनः प्रयास करें।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'दर्ज किया गया मान अमान्य प्रारूप में है। कृपया इसे जांचें और सही करें।',
     form_param_format_invalid__email_address: 'ईमेल पता एक वैध ईमेल पता होना चाहिए।',
     form_param_format_invalid__phone_number: 'फोन नंबर एक वैध अंतरराष्ट्रीय प्रारूप में होना चाहिए।',
@@ -875,10 +915,12 @@ export const hiIN: LocalizationResource = {
       'यह पासवर्ड डेटा उल्लंघन के हिस्से के रूप में पाया गया है और इसका उपयोग नहीं किया जा सकता, कृपया अपना पासवर्ड रीसेट करें।',
     form_password_size_in_bytes_exceeded:
       'आपके पासवर्ड ने अनुमत बाइट्स की अधिकतम संख्या से अधिक हो गया है, कृपया इसे छोटा करें या कुछ विशेष वर्णों को हटा दें।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'गलत पासवर्ड',
     form_username_invalid_character:
       'आपके उपयोगकर्ता नाम में अमान्य वर्ण हैं। कृपया केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें।',
     form_username_invalid_length: 'आपका उपयोगकर्ता नाम {{min_length}} और {{max_length}} अक्षरों के बीच होना चाहिए।',
+    form_username_needs_non_number_char: 'आपके उपयोगकर्ता नाम में कम से कम एक गैर-संख्यात्मक वर्ण होना चाहिए।',
     identification_deletion_failed: 'आप अपनी अंतिम पहचान को हटा नहीं सकते।',
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',
@@ -951,7 +993,9 @@ export const hiIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'खाता जोड़ें',
+    action__closeUserMenu: 'उपयोगकर्ता मेनू बंद करें',
     action__manageAccount: 'खाता प्रबंधित करें',
+    action__openUserMenu: 'उपयोगकर्ता मेनू खोलें',
     action__signOut: 'साइन आउट',
     action__signOutAll: 'सभी खातों से साइन आउट करें',
   },

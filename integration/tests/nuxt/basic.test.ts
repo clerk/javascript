@@ -30,21 +30,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.page.context().clearCookies();
   });
 
-  test('sign in with hash routing', async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-
-    await u.page.goToRelative('/sign-in');
-    await u.po.signIn.waitForMounted();
-
-    await u.po.signIn.setIdentifier(fakeUser.email);
-    await u.po.signIn.continue();
-    await u.page.waitForURL(`${app.serverUrl}/sign-in#/factor-one`);
-
-    await u.po.signIn.setPassword(fakeUser.password);
-    await u.po.signIn.continue();
-    await u.po.expect.toBeSignedIn();
-  });
-
   test('render user profile with SSR data', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
@@ -54,7 +39,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
     await u.po.expect.toBeSignedIn();
 
     await u.po.userButton.waitForMounted();
-    await u.page.goToRelative('/user');
+    await u.page.goToRelative('/user-profile');
     await u.po.userProfile.waitForMounted();
 
     // Fetched from an API endpoint (/api/me), which is server-rendered.
@@ -66,7 +51,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('basic te
   test('redirects to sign-in when unauthenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
 
-    await u.page.goToRelative('/user');
+    await u.page.goToRelative('/user-profile');
     await u.page.waitForURL(`${app.serverUrl}/sign-in`);
     await u.po.signIn.waitForMounted();
   });

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
   apiKeys: {
     action__add: 'Přidat nový klíč',
     action__search: 'Vyhledat klíče',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopírovat a zavřít',
+      formHint: 'Z bezpečnostních důvodů vám to později nebudeme moci znovu zobrazit.',
+      formTitle: 'Zkopírujte nyní svůj API klíč "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Platí do {{ expiresDate | longDate('cs-CZ') }}",
     createdAndExpirationStatus__never: "Vytvořeno {{ createdDate | shortDate('cs-CZ') }} • Nikdy nevyprší",
@@ -225,6 +230,7 @@ export const csCZ: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Zadejte své telefonní číslo',
   formFieldInputPlaceholder__username: 'Zadejte své uživatelské jméno',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API klíč',
   formFieldLabel__apiKeyDescription: 'Popis',
   formFieldLabel__apiKeyExpiration: 'Platnost',
   formFieldLabel__apiKeyName: 'Název tajného klíče',
@@ -494,9 +500,11 @@ export const csCZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
     action__manageOrganization: 'Spravovat organizaci',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Požádat o připojení',
     notSelected: 'Není vybrána žádná organizace',
     personalWorkspace: 'Osobní účet',
@@ -611,6 +619,12 @@ export const csCZ: LocalizationResource = {
       subtitle: 'pro pokračování do {{applicationName}}',
       title: 'Zkontrolujte svůj e-mail',
     },
+    emailCodeMfa: {
+      formTitle: 'Zkontrolujte svůj e-mail',
+      resendButton: 'Neobdrželi jste kód? Znovu poslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     emailLink: {
       clientMismatch: {
         subtitle:
@@ -647,6 +661,12 @@ export const csCZ: LocalizationResource = {
         titleNewTab: 'Přihlášeno na jiné kartě',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Použijte ověřovací odkaz zaslaný na váš e-mail',
+      resendButton: 'Nedostali jste odkaz? Znovu odeslat',
+      subtitle: 'pro pokračování do {{applicationName}}',
+      title: 'Zkontrolujte svůj e-mail',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -664,6 +684,8 @@ export const csCZ: LocalizationResource = {
       label__alternativeMethods: 'Nebo se přihlaste jinou metodou',
       title: 'Zapomněli jste heslo?',
     },
+    newDeviceVerificationNotice:
+      'Přihlašujete se z nového zařízení. Žádáme o ověření, abychom udrželi váš účet v bezpečí.',
     noAvailableMethods: {
       message: 'Nelze pokračovat v přihlášení. Není k dispozici žádný autentizační faktor.',
       subtitle: 'Došlo k chybě',
@@ -679,8 +701,14 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte heslo spojené s vaším účtem',
       title: 'Zadejte své heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Heslo kompromitováno',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -850,8 +878,20 @@ export const csCZ: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    avatar_file_size_exceeded: 'Velikost souboru přesahuje maximální limit 10 MB. Vyberte prosím menší soubor.',
+    avatar_file_type_invalid:
+      'Typ souboru není podporován. Nahrajte prosím obrázek ve formátu JPG, PNG, GIF nebo WEBP.',
     captcha_invalid:
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
@@ -861,6 +901,7 @@ export const csCZ: LocalizationResource = {
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
     form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
@@ -880,9 +921,11 @@ export const csCZ: LocalizationResource = {
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo překročilo maximální povolený počet bajtů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávné heslo',
     form_username_invalid_character: 'Uživatelské jméno může obsahovat pouze alfanumerické znaky a podtržítka.',
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
+    form_username_needs_non_number_char: 'Uživatelské jméno musí obsahovat alespoň jeden nečíselný znak.',
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -951,7 +994,9 @@ export const csCZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Přidat účet',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Spravovat účet',
+    action__openUserMenu: undefined,
     action__signOut: 'Odhlásit se',
     action__signOutAll: 'Odhlásit se ze všech účtů',
   },

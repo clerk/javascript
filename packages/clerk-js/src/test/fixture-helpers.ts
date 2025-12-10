@@ -8,14 +8,13 @@ import type {
   OrganizationEnrollmentMode,
   PhoneNumberJSON,
   PublicUserDataJSON,
-  SamlAccountJSON,
   SessionJSON,
   SignInJSON,
   SignUpJSON,
   UserJSON,
   UserSettingsJSON,
   VerificationJSON,
-} from '@clerk/types';
+} from '@clerk/shared/types';
 
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
@@ -44,12 +43,12 @@ export const createClientFixtureHelpers = (baseClient: ClientJSON) => {
 const createUserFixtureHelpers = (baseClient: ClientJSON) => {
   type WithUserParams = Omit<
     Partial<UserJSON>,
-    'email_addresses' | 'phone_numbers' | 'external_accounts' | 'saml_accounts' | 'organization_memberships'
+    'email_addresses' | 'phone_numbers' | 'external_accounts' | 'organization_memberships'
   > & {
+    identifier?: string;
     email_addresses?: Array<string | Partial<EmailAddressJSON>>;
     phone_numbers?: Array<string | Partial<PhoneNumberJSON>>;
     external_accounts?: Array<OAuthProvider | Partial<ExternalAccountJSON>>;
-    saml_accounts?: Array<Partial<SamlAccountJSON>>;
     organization_memberships?: Array<string | OrgParams>;
     tasks?: SessionJSON['tasks'];
   };
@@ -59,7 +58,7 @@ const createUserFixtureHelpers = (baseClient: ClientJSON) => {
       first_name: 'FirstName',
       last_name: 'LastName',
       image_url: '',
-      identifier: 'email@test.com',
+      identifier: params.identifier || 'email@test.com',
       user_id: '',
       ...params,
     } as PublicUserDataJSON;
@@ -362,11 +361,21 @@ const createOrganizationSettingsFixtureHelpers = (environment: EnvironmentJSON) 
 
 const createBillingSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
   const os = environment.commerce_settings.billing;
-  const withBilling = () => {
-    os.user.enabled = true;
-    os.user.has_paid_plans = true;
-    os.organization.enabled = true;
-    os.organization.has_paid_plans = true;
+  const withBilling = ({
+    userEnabled = true,
+    userHasPaidPlans = true,
+    organizationEnabled = true,
+    organizationHasPaidPlans = true,
+  }: {
+    userEnabled?: boolean;
+    userHasPaidPlans?: boolean;
+    organizationEnabled?: boolean;
+    organizationHasPaidPlans?: boolean;
+  } = {}) => {
+    os.user.enabled = userEnabled;
+    os.user.has_paid_plans = userHasPaidPlans;
+    os.organization.enabled = organizationEnabled;
+    os.organization.has_paid_plans = organizationHasPaidPlans;
   };
 
   return { withBilling };

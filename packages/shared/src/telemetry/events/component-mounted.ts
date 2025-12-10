@@ -1,4 +1,4 @@
-import type { TelemetryEventRaw } from '@clerk/types';
+import type { TelemetryEventRaw } from '../../types';
 
 const EVENT_COMPONENT_MOUNTED = 'COMPONENT_MOUNTED';
 const EVENT_COMPONENT_OPENED = 'COMPONENT_OPENED';
@@ -25,7 +25,7 @@ type EventPrebuiltComponent = ComponentMountedBase & {
   appearanceProp: boolean;
   elements: boolean;
   variables: boolean;
-  baseTheme: boolean;
+  theme: boolean;
 };
 
 type EventComponentMounted = ComponentMountedBase & TelemetryEventRaw['payload'];
@@ -48,7 +48,7 @@ function createPrebuiltComponentEvent(event: typeof EVENT_COMPONENT_MOUNTED | ty
       payload: {
         component,
         appearanceProp: Boolean(props?.appearance),
-        baseTheme: Boolean(props?.appearance?.baseTheme),
+        theme: Boolean(props?.appearance?.theme),
         elements: Boolean(props?.appearance?.elements),
         variables: Boolean(props?.appearance?.variables),
         ...additionalPayload,

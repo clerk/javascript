@@ -9,8 +9,9 @@ export {
   useSignUp,
   useUser,
   useReverification,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 
+export * from './useSignInWithApple';
 export * from './useSSO';
 export * from './useOAuth';
 export * from './useAuth';

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'نسخ وإغلاق',
+      formHint: 'لأسباب أمنية، لن نسمح لك بعرضه مرة أخرى لاحقاً.',
+      formTitle: 'انسخ مفتاح API الخاص بك "{{name}}" الآن',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const arSA: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: undefined,
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'مفتاح API',
+  formFieldLabel__apiKeyDescription: 'الوصف',
+  formFieldLabel__apiKeyExpiration: 'الانتهاء',
+  formFieldLabel__apiKeyName: 'اسم المفتاح السري',
   formFieldLabel__automaticInvitations: 'تمكين الدعوة الأوتماتكية لهذا النطاق',
   formFieldLabel__backupCode: 'الرمز الأحتياطي',
   formFieldLabel__confirmDeletion: 'تأكيد',
@@ -487,9 +493,11 @@ export const arSA: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'أنشاء منظمة',
     action__invitationAccept: 'أنضمام',
     action__manageOrganization: 'أدارة المنظمة',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'طلب أنضمام',
     notSelected: 'لم يتم أختيار منظمة',
     personalWorkspace: 'الحساب الشخصي',
@@ -602,6 +610,12 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'التحقق من البريد الإلكتروني',
     },
+    emailCodeMfa: {
+      formTitle: 'التحقق من البريد الإلكتروني',
+      resendButton: 'لم يصلك اي رمز؟ حاول مرة أخرى.',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'التحقق من البريد الإلكتروني',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'للمتابعة, قم بفتح رابط التحقق عبر نفس الجهاز والمتصفح الذي انشأت محاولة تسجيل الدخول منه',
@@ -637,6 +651,12 @@ export const arSA: LocalizationResource = {
         titleNewTab: 'تم تسجيل الدخول في علامة تبويب أخرى',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'استخدم رابط التحقق المرسل إلى بريدك الإلكتروني',
+      resendButton: 'لم تستلم الرابط؟ إعادة الإرسال',
+      subtitle: 'للمتابعة إلى {{applicationName}}',
+      title: 'تحقق من بريدك الإلكتروني',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -654,6 +674,7 @@ export const arSA: LocalizationResource = {
       label__alternativeMethods: 'أو سجل الدخول بطريقة أخرى',
       title: 'نسيت كلمة المرور؟',
     },
+    newDeviceVerificationNotice: 'أنت تسجل الدخول من جهاز جديد. نحن نطلب التحقق للحفاظ على أمان حسابك.',
     noAvailableMethods: {
       message: 'لا يمكن متابعة تسجيل الدخول. لا يوجد وسيلة مصادقة متاحة.',
       subtitle: 'حدث خطأ',
@@ -669,8 +690,14 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'ادخل كلمة المرور',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'رمز التحقق',
@@ -837,8 +864,19 @@ export const arSA: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'حجم الملف يتجاوز الحد الأقصى البالغ 10 ميغابايت. يرجى اختيار ملف أصغر.',
+    avatar_file_type_invalid: 'نوع الملف غير مدعوم. يرجى تحميل صورة بصيغة JPG أو PNG أو GIF أو WEBP.',
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
     captcha_unavailable:
@@ -848,6 +886,7 @@ export const arSA: LocalizationResource = {
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
     form_identifier_not_found: 'لم يتم العثور على حساب بهذه التفاصيل',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -866,9 +905,11 @@ export const arSA: LocalizationResource = {
     form_password_pwned__sign_in: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'كلمة مرور خاطئة',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'يجب أن يحتوي اسم المستخدم على حرف واحد على الأقل غير رقمي.',
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access:
       'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',
@@ -938,7 +979,9 @@ export const arSA: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'إضافة حساب',
+    action__closeUserMenu: 'إغلاق قائمة المستخدم',
     action__manageAccount: 'إدارة الحساب',
+    action__openUserMenu: 'فتح قائمة المستخدم',
     action__signOut: 'تسجيل الخروج',
     action__signOutAll: 'تسجيل الخروج من جميع الحسابات',
   },

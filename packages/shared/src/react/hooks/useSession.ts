@@ -1,6 +1,5 @@
-import type { UseSessionReturn } from '@clerk/types';
-
 import { eventMethodCalled } from '../../telemetry/events/method-called';
+import type { UseSessionReturn } from '../../types';
 import { useAssertWrappedByClerkProvider, useClerkInstanceContext, useSessionContext } from '../contexts';
 
 type UseSession = () => UseSessionReturn;
@@ -15,7 +14,6 @@ const hookName = `useSession`;
  * @function
  *
  * @param [options] - An object containing options for the `useSession()` hook.
- *
  * @example
  * ### Access the `Session` object
  *
@@ -25,7 +23,7 @@ const hookName = `useSession`;
  * <Tab>
  *
  * ```tsx {{ filename: 'src/Home.tsx' }}
- * import { useSession } from '@clerk/clerk-react'
+ * import { useSession } from '@clerk/react'
  *
  * export default function Home() {
  *   const { isLoaded, session, isSignedIn } = useSession()

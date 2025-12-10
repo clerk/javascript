@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Kopieren und schließen',
+      formHint: 'Aus Sicherheitsgründen können Sie es später nicht mehr einsehen.',
+      formTitle: 'Kopieren Sie jetzt Ihren API-Key "{{name}}"',
+    },
     createdAndExpirationStatus__expiresOn:
       "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft ab {{ expiresDate | longDate('de-DE') }}",
     createdAndExpirationStatus__never: "Erstellt {{ createdDate | shortDate('de-DE') }} • Läuft nie ab",
@@ -228,6 +233,7 @@ export const deDE: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Telefonnummer eingeben',
   formFieldInputPlaceholder__username: 'Benutzername eingeben',
   formFieldInput__emailAddress_format: undefined,
+  formFieldLabel__apiKey: 'API-Key',
   formFieldLabel__apiKeyDescription: 'Beschreibung',
   formFieldLabel__apiKeyExpiration: 'Ablaufdatum',
   formFieldLabel__apiKeyName: 'Name',
@@ -500,9 +506,11 @@ export const deDE: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Organisation erstellen',
     action__invitationAccept: 'Beitreten',
     action__manageOrganization: 'Organisation verwalten',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Beitritt anfragen',
     notSelected: 'Keine Organisation ausgewählt',
     personalWorkspace: 'Persönlicher Arbeitsbereich',
@@ -617,6 +625,12 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Überprüfen Sie Ihren Posteingang',
     },
+    emailCodeMfa: {
+      formTitle: 'Überprüfen Sie Ihren Posteingang',
+      resendButton: 'Bestätigungscode nicht erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Die Anfrage stammt von einem nicht kompatiblen Client.',
@@ -652,6 +666,12 @@ export const deDE: LocalizationResource = {
         titleNewTab: 'In einem anderen Tab angemeldet',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Verwenden Sie den an Ihre E-Mail gesendeten Bestätigungslink',
+      resendButton: 'Keinen Link erhalten? Erneut senden',
+      subtitle: 'weiter zu {{applicationName}}',
+      title: 'Überprüfen Sie Ihren Posteingang',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -669,6 +689,8 @@ export const deDE: LocalizationResource = {
       label__alternativeMethods: 'Oder melden Sie sich mit einer anderen Methode an',
       title: 'Passwort vergessen?',
     },
+    newDeviceVerificationNotice:
+      'Sie melden sich von einem neuen Gerät an. Wir bitten um eine Überprüfung, um Ihr Konto sicher zu halten.',
     noAvailableMethods: {
       message: 'Die Anmeldung kann nicht fortgesetzt werden. Es ist kein Authentifizierungsfaktor verfügbar.',
       subtitle: 'Ein Fehler ist aufgetreten',
@@ -684,8 +706,14 @@ export const deDE: LocalizationResource = {
       subtitle: 'weiter zu {{applicationName}}',
       title: 'Geben Sie Ihr Passwort ein',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Passwort kompromittiert',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bestätigungscode',
@@ -854,8 +882,21 @@ export const deDE: LocalizationResource = {
       actionText: 'Angemeldet als {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
+    avatar_file_size_exceeded:
+      'Die Dateigröße überschreitet das Maximum von 10 MB. Bitte wählen Sie eine kleinere Datei.',
+    avatar_file_type_invalid:
+      'Dateityp wird nicht unterstützt. Bitte laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch.',
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:
@@ -865,6 +906,7 @@ export const deDE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',
     form_identifier_not_found: 'Wir konnten kein Konto mit diesen Details finden.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Das Format des eingegebenen Parameters ist ungültig.',
     form_param_format_invalid__email_address: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
     form_param_format_invalid__phone_number: 'Die Telefonnummer muss ein gültiges internationales Format haben.',
@@ -885,10 +927,12 @@ export const deDE: LocalizationResource = {
       'Dieses Passwort wurde in einem Datenleck gefunden und kann nicht verwendet werden. Bitte setzen Sie Ihr Passwort zurück.',
     form_password_size_in_bytes_exceeded:
       'Das Passwort hat die maximale Anzahl an Bytes überschritten. Bitte kürzen oder Sonderzeichen entfernen.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Falsches Passwort.',
     form_username_invalid_character:
       'Der Benutzername enthält ungültige Zeichen. Bitte verwenden Sie nur alphanumerische Zeichen und Unterstriche.',
     form_username_invalid_length: 'Der Benutzername muss zwischen 3 und 30 Zeichen lang sein.',
+    form_username_needs_non_number_char: 'Ihr Benutzername muss mindestens ein nicht-numerisches Zeichen enthalten.',
     identification_deletion_failed: 'Sie können Ihre letzte Kennung nicht löschen.',
     not_allowed_access:
       "Die E-Mail-Adresse oder Telefonnummer ist für die Anmeldung nicht zulässig. Dies kann daran liegen, dass Ihre E-Mail-Adresse die Zeichen '+', '=', '#' oder '.' enthält, Sie eine Domain verwenden, die mit einem temporären E-Mail-Dienst verknüpft ist, oder dass Sie explizit gesperrt sind. Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Support.",
@@ -967,7 +1011,9 @@ export const deDE: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Konto hinzufügen',
+    action__closeUserMenu: 'Benutzermenü schließen',
     action__manageAccount: 'Konto verwalten',
+    action__openUserMenu: 'Benutzermenü öffnen',
     action__signOut: 'Abmelden',
     action__signOutAll: 'Melden Sie sich von allen Konten ab',
   },

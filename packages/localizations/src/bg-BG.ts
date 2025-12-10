@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Копирай и затвори',
+      formHint: 'От съображения за сигурност няма да можем да ви позволим да го видите отново по-късно.',
+      formTitle: 'Копирайте вашия API ключ "{{name}}" сега',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -221,9 +226,10 @@ export const bgBG: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: '+359 123 456 789',
   formFieldInputPlaceholder__username: 'Име на потребител',
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API ключ',
+  formFieldLabel__apiKeyDescription: 'Описание',
+  formFieldLabel__apiKeyExpiration: 'Изтичане',
+  formFieldLabel__apiKeyName: 'Име на таен ключ',
   formFieldLabel__automaticInvitations: 'Включи автоматични покани за този домейн',
   formFieldLabel__backupCode: 'Резервен код',
   formFieldLabel__confirmDeletion: 'Потвърждение',
@@ -490,9 +496,11 @@ export const bgBG: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Създаване на организация',
     action__invitationAccept: 'Присъединяване',
     action__manageOrganization: 'Управление',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Заявка за присъединяване',
     notSelected: 'Няма избрана организация',
     personalWorkspace: 'Личен акаунт',
@@ -605,6 +613,12 @@ export const bgBG: LocalizationResource = {
       subtitle: 'за да продължите към {{applicationName}}',
       title: 'Проверете вашия имейл',
     },
+    emailCodeMfa: {
+      formTitle: 'Проверете вашия имейл',
+      resendButton: 'Не сте получили код? Изпрати отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете вашия имейл',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: undefined,
@@ -640,6 +654,12 @@ export const bgBG: LocalizationResource = {
         titleNewTab: 'Влезнали сте в друг таб',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Използвайте връзката за потвърждение, изпратена на вашия имейл',
+      resendButton: 'Не получихте връзката? Изпратете отново',
+      subtitle: 'за да продължите към {{applicationName}}',
+      title: 'Проверете имейла си',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -657,6 +677,8 @@ export const bgBG: LocalizationResource = {
       label__alternativeMethods: 'Или, влезте с друг метод',
       title: 'Забравена парола?',
     },
+    newDeviceVerificationNotice:
+      'Влизате от ново устройство. Искаме потвърждение, за да запазим акаунта ви в безопасност.',
     noAvailableMethods: {
       message: 'Не може да се продължи с влизането. Няма наличен метод за удостоверяване.',
       subtitle: 'Възникна грешка',
@@ -671,7 +693,13 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Въведете паролата, свързана с вашия акаунт',
       title: 'Въведете вашата парола',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -840,8 +868,20 @@ export const bgBG: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Вие вече сте член на тази организация.',
+    avatar_file_size_exceeded: 'Размерът на файла надвишава максималния лимит от 10 MB. Моля, изберете по-малък файл.',
+    avatar_file_type_invalid:
+      'Типът на файла не се поддържа. Моля, качете изображение във формат JPG, PNG, GIF или WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable: undefined,
     form_code_incorrect: 'Невалиден код. Моля, опитайте отново.',
@@ -849,6 +889,7 @@ export const bgBG: LocalizationResource = {
     form_identifier_exists__phone_number: 'Този телефонен номер вече е използван.',
     form_identifier_exists__username: 'Това потребителско име вече съществува.',
     form_identifier_not_found: 'Не можем да намерим този идентификатор.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Имейл адресът не е във валиден формат.',
     form_param_format_invalid__phone_number: 'Телефонният номер не е във валиден формат.',
@@ -867,9 +908,11 @@ export const bgBG: LocalizationResource = {
     form_password_pwned: 'Тази парола е компрометирана в изтекли данни. Моля, изберете друга.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded: 'Паролата ви е твърде дълга. Моля, съкратете я.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Невалидна парола.',
     form_username_invalid_character: 'Потребителското име съдържа невалидни символи.',
     form_username_invalid_length: 'Потребителското име трябва да бъде между 3 и 256 символа.',
+    form_username_needs_non_number_char: 'Потребителското име трябва да съдържа поне един нечислов символ.',
     identification_deletion_failed: 'Не можете да изтриете последната си идентификация.',
     not_allowed_access:
       'Имейл адресът или телефонният номер не са разрешени за регистрация. Това може да се дължи на използването на „+“, „=“, „#“ или „.“ във вашия имейл адрес, като използвате домейн, свързан с временна имейл услуга, или сте изрично блокирани. Ако смятате, че това е грешка, моля, свържете се с поддръжката.',
@@ -939,7 +982,9 @@ export const bgBG: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Добавяне на акаунт',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Управление на акаунта',
+    action__openUserMenu: undefined,
     action__signOut: 'Изход',
     action__signOutAll: 'Изход от всички акаунти',
   },

@@ -1,10 +1,8 @@
 import autoPropsPlugin from '@vue.ts/tsx-auto-props/esbuild';
-import { defineConfig, type Options } from 'tsup';
+import { defineConfig } from 'tsup';
 import vuePlugin from 'unplugin-vue/esbuild';
 
 import { name, version } from './package.json';
-
-type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
 
 export default defineConfig(() => {
   return {

@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const teIN: LocalizationResource = {
   locale: 'te-IN',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'కాపీ చేసి మూసివేయి',
+      formHint: 'భద్రత కారణాల కోసం, మేము మీకు తర్వాత దాన్ని మళ్లీ చూడడానికి అనుమతించము.',
+      formTitle: 'ఇప్పుడే మీ "{{name}}" API కీని కాపీ చేయండి',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const teIN: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'మీ ఫోన్ నంబర్‌ను నమోదు చేయండి',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API కీ',
+  formFieldLabel__apiKeyDescription: 'వివరణ',
+  formFieldLabel__apiKeyExpiration: 'కాలం ముగిసింది',
+  formFieldLabel__apiKeyName: 'రహస్య కీ పేరు',
   formFieldLabel__automaticInvitations: 'ఈ డొమైన్ కోసం స్వయంచాలక ఆహ్వానాలను ప్రారంభించండి',
   formFieldLabel__backupCode: 'బ్యాకప్ కోడ్',
   formFieldLabel__confirmDeletion: 'నిర్ధారణ',
@@ -491,9 +497,11 @@ export const teIN: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'సంస్థను సృష్టించండి',
     action__invitationAccept: 'చేరండి',
     action__manageOrganization: 'నిర్వహించండి',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
     notSelected: 'సంస్థ ఎంచుకోబడలేదు',
     personalWorkspace: 'వ్యక్తిగత ఖాతా',
@@ -608,6 +616,12 @@ export const teIN: LocalizationResource = {
       subtitle: '{{applicationName}}కి కొనసాగించడానికి',
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
+    emailCodeMfa: {
+      formTitle: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+      resendButton: 'కోడ్ అందలేదా? మళ్ళీ పంపండి',
+      subtitle: '{{applicationName}}కి కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'కొనసాగించడానికి, మీరు సైన్-ఇన్ ప్రారంభించిన పరికరం మరియు బ్రౌజర్‌లో ధృవీకరణ లింక్‌ను తెరవండి',
@@ -643,6 +657,12 @@ export const teIN: LocalizationResource = {
         titleNewTab: 'ఇతర ట్యాబ్‌లో సైన్ ఇన్ చేశారు',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'మీ ఇమెయిల్‌కు పంపబడిన ధృవీకరణ లింక్‌ను ఉపయోగించండి',
+      resendButton: 'లింక్ రాలేదా? మళ్లీ పంపండి',
+      subtitle: '{{applicationName}} కు కొనసాగించడానికి',
+      title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -660,6 +680,8 @@ export const teIN: LocalizationResource = {
       label__alternativeMethods: 'లేదా, మరొక పద్ధతితో సైన్ ఇన్ చేయండి',
       title: 'పాస్‌వర్డ్ మర్చిపోయారా?',
     },
+    newDeviceVerificationNotice:
+      'మీరు కొత్త పరికరం నుండి సైన్ ఇన్ చేస్తున్నారు. మీ ఖాతాను సురక్షితంగా ఉంచడానికి మేము ధృవీకరణను అభ్యర్థిస్తున్నాము.',
     noAvailableMethods: {
       message: 'సైన్ ఇన్‌తో కొనసాగలేము. అందుబాటులో ఉన్న ప్రమాణీకరణ కారకం లేదు.',
       subtitle: 'లోపం సంభవించింది',
@@ -675,8 +697,14 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ ఖాతాతో సంబంధం ఉన్న పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
@@ -846,8 +874,19 @@ export const teIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
+    avatar_file_size_exceeded: 'ఫైల్ పరిమాణం గరిష్ట 10MB పరిమితిని మించిపోయింది. దయచేసి చిన్న ఫైల్‌ను ఎంచుకోండి.',
+    avatar_file_type_invalid: 'ఫైల్ రకం సపోర్ట్ చేయబడలేదు. దయచేసి JPG, PNG, GIF లేదా WEBP చిత్రాన్ని అప్‌లోడ్ చేయండి.',
     captcha_invalid:
       'భద్రతా ధృవీకరణలు విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     captcha_unavailable:
@@ -857,6 +896,7 @@ export const teIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__username: 'ఈ వినియోగదారు పేరు తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_not_found: 'ఈ గుర్తింపుదారుతో ఖాతా కనుగొనబడలేదు. దయచేసి తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'నమోదు చేసిన విలువ చెల్లని ఫార్మాట్‌లో ఉంది. దయచేసి తనిఖీ చేసి దిద్దుబాటు చేయండి.',
     form_param_format_invalid__email_address: 'ఇమెయిల్ చిరునామా చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామా అయి ఉండాలి.',
     form_param_format_invalid__phone_number: 'ఫోన్ నంబర్ చెల్లుబాటు అయ్యే అంతర్జాతీయ ఫార్మాట్‌లో ఉండాలి.',
@@ -877,10 +917,12 @@ export const teIN: LocalizationResource = {
       'ఈ పాస్‌వర్డ్ డేటా ఉల్లంఘన భాగంగా కనుగొనబడింది మరియు ఉపయోగించడానికి వీలుపడదు, దయచేసి మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి.',
     form_password_size_in_bytes_exceeded:
       'మీ పాస్‌వర్డ్ అనుమతించిన గరిష్ట బైట్ల సంఖ్యను మించింది, దయచేసి దాన్ని చిన్నదిగా చేయండి లేదా కొన్ని ప్రత్యేక అక్షరాలను తొలగించండి.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'తప్పు పాస్‌వర్డ్',
     form_username_invalid_character:
       'మీ వినియోగదారు పేరులో చెల్లని అక్షరాలు ఉన్నాయి. దయచేసి అక్షరాలు, సంఖ్యలు మరియు అండర్‌స్కోర్‌లను మాత్రమే ఉపయోగించండి.',
     form_username_invalid_length: 'మీ వినియోగదారు పేరు {{min_length}} మరియు {{max_length}} అక్షరాల మధ్య ఉండాలి.',
+    form_username_needs_non_number_char: 'మీ వినియోగదారు పేరులో కనీసం ఒక సంఖ్యేతర అక్షరం ఉండాలి.',
     identification_deletion_failed: 'మీరు మీ చివరి గుర్తింపును తొలగించలేరు.',
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
@@ -952,7 +994,9 @@ export const teIN: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'ఖాతాను జోడించండి',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'ఖాతాను నిర్వహించండి',
+    action__openUserMenu: undefined,
     action__signOut: 'సైన్ అవుట్',
     action__signOutAll: 'అన్ని ఖాతాల నుండి సైన్ అవుట్ అవ్వండి',
   },

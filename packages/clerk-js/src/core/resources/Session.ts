@@ -1,7 +1,11 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { retry } from '@clerk/shared/retry';
-import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 import type {
   ActClaim,
   CheckAuthorization,
@@ -24,15 +28,11 @@ import type {
   SessionVerifyPrepareSecondFactorParams,
   TokenResource,
   UserResource,
-} from '@clerk/types';
+} from '@clerk/shared/types';
+import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/shared/webauthn';
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '@/utils/passkeys';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
@@ -399,7 +399,7 @@ export class Session extends BaseResource implements SessionResource {
     // TODO: update template endpoint to accept organizationId
     const params: Record<string, string | null> = template ? {} : { organizationId };
 
-    const tokenResolver = Token.create(path, params);
+    const tokenResolver = Token.create(path, params, skipCache);
 
     // Cache the promise immediately to prevent concurrent calls from triggering duplicate requests
     SessionTokenCache.set({ tokenId, tokenResolver });

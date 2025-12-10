@@ -1,4 +1,4 @@
-import type { TokenResource } from '@clerk/types';
+import type { TokenResource } from '@clerk/shared/types';
 
 import { debugLogger } from '@/utils/debug';
 import { TokenId } from '@/utils/tokenId';
@@ -131,31 +131,34 @@ interface SessionTokenEvent {
   traceId: string;
 }
 
+const generateTabId = (): string => {
+  return Math.random().toString(36).slice(2);
+};
+
 /**
  * Creates an in-memory token cache with optional BroadcastChannel synchronization across tabs.
  * Automatically manages token expiration and cleanup via scheduled timeouts.
- * BroadcastChannel support is enabled only in the channel build variant.
+ * BroadcastChannel support is enabled whenever the environment provides it.
  */
 const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
   const cache = new Map<string, TokenCacheValue>();
+  const tabId = generateTabId();
 
   let broadcastChannel: BroadcastChannel | null = null;
 
   const ensureBroadcastChannel = (): BroadcastChannel | null => {
-    if (!__BUILD_VARIANT_CHANNEL__) {
-      return null;
-    }
-
     if (broadcastChannel) {
       return broadcastChannel;
     }
 
-    if (typeof BroadcastChannel !== 'undefined') {
-      broadcastChannel = new BroadcastChannel('clerk:session_token');
-      broadcastChannel.addEventListener('message', (e: MessageEvent<SessionTokenEvent>) => {
-        void handleBroadcastMessage(e);
-      });
+    if (typeof BroadcastChannel === 'undefined') {
+      return null;
     }
+
+    broadcastChannel = new BroadcastChannel('clerk:session_token');
+    broadcastChannel.addEventListener('message', (e: MessageEvent<SessionTokenEvent>) => {
+      void handleBroadcastMessage(e);
+    });
 
     return broadcastChannel;
   };
@@ -213,6 +216,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
           expectedTokenId,
           organizationId: data.organizationId,
           receivedTokenId: data.tokenId,
+          tabId,
           template: data.template,
           traceId: data.traceId,
         },
@@ -227,7 +231,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     } catch (error) {
       debugLogger.warn(
         'Failed to parse token from broadcast, skipping cache update',
-        { error, tokenId: data.tokenId, traceId: data.traceId },
+        { error, tabId, tokenId: data.tokenId, traceId: data.traceId },
         'tokenCache',
       );
       return;
@@ -238,7 +242,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     if (!iat || !exp) {
       debugLogger.warn(
         'Token missing iat/exp claim, skipping cache update',
-        { tokenId: data.tokenId, traceId: data.traceId },
+        { tabId, tokenId: data.tokenId, traceId: data.traceId },
         'tokenCache',
       );
       return;
@@ -252,7 +256,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
         if (existingIat && existingIat >= iat) {
           debugLogger.debug(
             'Ignoring older token broadcast',
-            { existingIat, incomingIat: iat, tokenId: data.tokenId, traceId: data.traceId },
+            { existingIat, incomingIat: iat, tabId, tokenId: data.tokenId, traceId: data.traceId },
             'tokenCache',
           );
           return;
@@ -261,7 +265,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
     } catch (error) {
       debugLogger.warn(
         'Existing entry compare failed; proceeding with broadcast update',
-        { error, tokenId: data.tokenId, traceId: data.traceId },
+        { error, tabId, tokenId: data.tokenId, traceId: data.traceId },
         'tokenCache',
       );
     }
@@ -271,6 +275,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
       {
         iat,
         organizationId: data.organizationId,
+        tabId,
         template: data.template,
         tokenId: data.tokenId,
         traceId: data.traceId,
@@ -362,6 +367,7 @@ const MemoryTokenCache = (prefix = KEY_PREFIX): TokenCache => {
                 {
                   organizationId,
                   sessionId,
+                  tabId,
                   template,
                   tokenId: entry.tokenId,
                   traceId,

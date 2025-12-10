@@ -1,6 +1,6 @@
-import type { BillingPlanResource, GetPlansParams } from '@clerk/types';
-
+import type { BillingPlanResource, GetPlansParams } from '../../types';
 import { useClerkInstanceContext } from '../contexts';
+import { STABLE_KEYS } from '../stable-keys';
 import { createBillingPaginatedHook } from './createBillingPaginatedHook';
 
 /**
@@ -8,7 +8,7 @@ import { createBillingPaginatedHook } from './createBillingPaginatedHook';
  */
 export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlansParams>({
   hookName: 'usePlans',
-  resourceType: 'billing-plans',
+  resourceType: STABLE_KEYS.PLANS_KEY,
   useFetcher: _for => {
     const clerk = useClerkInstanceContext();
     if (!clerk.loaded) {
@@ -20,3 +20,8 @@ export const usePlans = createBillingPaginatedHook<BillingPlanResource, GetPlans
     unauthenticated: true,
   },
 });
+
+/**
+ * @interface
+ */
+export type UsePlansReturn = ReturnType<typeof usePlans>;

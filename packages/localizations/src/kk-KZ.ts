@@ -10,13 +10,18 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const kkKZ: LocalizationResource = {
   locale: 'kk-KZ',
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
+    copySecret: {
+      formButtonPrimary__copyAndClose: 'Көшіру және жабу',
+      formHint: 'Қауіпсіздік себептерімен, біз сізге кейінірек оны қайта көруге рұқсат бере алмаймыз.',
+      formTitle: 'API кілтіңізді "{{name}}" қазір көшіріңіз',
+    },
     createdAndExpirationStatus__expiresOn: undefined,
     createdAndExpirationStatus__never: undefined,
     detailsTitle__emptyRow: undefined,
@@ -220,9 +225,10 @@ export const kkKZ: LocalizationResource = {
   formFieldInputPlaceholder__phoneNumber: 'Телефон нөмірін енгізіңіз',
   formFieldInputPlaceholder__username: undefined,
   formFieldInput__emailAddress_format: undefined,
-  formFieldLabel__apiKeyDescription: undefined,
-  formFieldLabel__apiKeyExpiration: undefined,
-  formFieldLabel__apiKeyName: undefined,
+  formFieldLabel__apiKey: 'API кілті',
+  formFieldLabel__apiKeyDescription: 'Сипаттама',
+  formFieldLabel__apiKeyExpiration: 'Мерзімі',
+  formFieldLabel__apiKeyName: 'Құпия кілт атауы',
   formFieldLabel__automaticInvitations: 'Бұл доменге автошақыруларды қосу',
   formFieldLabel__backupCode: 'Сақтық коды',
   formFieldLabel__confirmDeletion: 'Растау',
@@ -481,9 +487,11 @@ export const kkKZ: LocalizationResource = {
     },
   },
   organizationSwitcher: {
+    action__closeOrganizationSwitcher: undefined,
     action__createOrganization: 'Ұйым құру',
     action__invitationAccept: 'Қосылу',
     action__manageOrganization: 'Басқару',
+    action__openOrganizationSwitcher: undefined,
     action__suggestionsAccept: 'Қосылу сұрауы',
     notSelected: 'Ұйым таңдалмады',
     personalWorkspace: 'Жеке есептік жазба',
@@ -596,6 +604,12 @@ export const kkKZ: LocalizationResource = {
       subtitle: '{{applicationName}} қолдануды жалғастыру үшін',
       title: 'Электрондық поштаңызды тексеріңіз',
     },
+    emailCodeMfa: {
+      formTitle: 'Электрондық поштаңызды тексеріңіз',
+      resendButton: 'Код алмадыңыз ба? Қайта жіберу',
+      subtitle: '{{applicationName}} қолдануды жалғастыру үшін',
+      title: 'Электрондық поштаңызды тексеріңіз',
+    },
     emailLink: {
       clientMismatch: {
         subtitle: 'Бастапқы құрылғыда растау сілтемесін ашыңыз.',
@@ -631,6 +645,12 @@ export const kkKZ: LocalizationResource = {
         titleNewTab: 'Басқа бетте кірдіңіз',
       },
     },
+    emailLinkMfa: {
+      formSubtitle: 'Электрондық поштаңызға жіберілген растау сілтемесін пайдаланыңыз',
+      resendButton: 'Сілтеме алмадыңыз ба? Қайта жіберу',
+      subtitle: '{{applicationName}} қосымшасына жалғастыру үшін',
+      title: 'Электрондық поштаңызды тексеріңіз',
+    },
     enterpriseConnections: {
       subtitle: undefined,
       title: undefined,
@@ -648,6 +668,8 @@ export const kkKZ: LocalizationResource = {
       label__alternativeMethods: 'Немесе басқа әдісті қолданыңыз',
       title: 'Құпия сөзді ұмыттыңыз ба?',
     },
+    newDeviceVerificationNotice:
+      'Сіз жаңа құрылғыдан кірудесіз. Біз сіздің есептік жазбаңызды қауіпсіз сақтау үшін растау сұраймыз.',
     noAvailableMethods: {
       message: 'Кіру мүмкін емес. Аутентификация әдісі қолжетімсіз.',
       subtitle: 'Қате орын алды',
@@ -663,8 +685,14 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Есептік жазбаңыздың құпия сөзін енгізіңіз',
       title: 'Құпия сөзді енгізіңіз',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Құпия сөз қауіпті',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Растау коды',
@@ -831,8 +859,19 @@ export const kkKZ: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ұйымға қазірдің өзінде қосылған.',
+    avatar_file_size_exceeded: 'Файл өлшемі 10 МБ шегінен асып кетті. Кішірек файлды таңдаңыз.',
+    avatar_file_type_invalid: 'Файл түрі қолдау көрсетілмейді. JPG, PNG, GIF немесе WEBP суретін жүктеңіз.',
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
     captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
     form_code_incorrect: undefined,
@@ -840,6 +879,7 @@ export const kkKZ: LocalizationResource = {
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__username: 'Бұл пайдаланушы аты тіркелген. Басқасын қолданыңыз.',
     form_identifier_not_found: 'Есептік жазба табылмады. Дұрыстығын тексеріңіз.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Енгізілген мән жарамсыз пішімде.',
     form_param_format_invalid__email_address: 'Электрондық пошта жарамсыз.',
     form_param_format_invalid__phone_number: 'Телефон нөмірі жарамсыз.',
@@ -858,10 +898,12 @@ export const kkKZ: LocalizationResource = {
     form_password_pwned__sign_in: 'Бұл құпия сөз қауіпсіз емес. Құпия сөзді өзгертуге болады.',
     form_password_size_in_bytes_exceeded:
       'Құпия сөзде тым көп байт бар. Оны қысқартыңыз немесе арнайы таңбаларды алып тастаңыз.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Құпия сөз қате',
     form_username_invalid_character:
       'Пайдаланушы атында жарамсыз таңбалар бар. Тек әріптер, сандар және астыңғы сызықшаларды қолданыңыз.',
     form_username_invalid_length: 'Пайдаланушы аты {{min_length}} пен {{max_length}} арасында болуы керек.',
+    form_username_needs_non_number_char: 'Пайдаланушы атыңызда кемінде бір санды емес таңба болуы керек.',
     identification_deletion_failed: 'Соңғы идентификацияны жою мүмкін емес.',
     not_allowed_access: 'Бұл бетке қол жеткізуге рұқсат жоқ. Қате болса, қолдау қызметіне хабарласыңыз.',
     organization_domain_blocked: 'Бұл электрондық пошта домені бұғатталған. Басқасын қолданыңыз.',
@@ -930,7 +972,9 @@ export const kkKZ: LocalizationResource = {
   },
   userButton: {
     action__addAccount: 'Есептік жазба қосу',
+    action__closeUserMenu: undefined,
     action__manageAccount: 'Есептік жазбаны басқару',
+    action__openUserMenu: undefined,
     action__signOut: 'Шығу',
     action__signOutAll: 'Барлық есептік жазбалардан шығу',
   },
