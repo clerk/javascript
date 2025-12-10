@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/types';
+import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/shared/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
@@ -157,10 +157,10 @@ type UpdateUserParams = {
   /** If true, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
 
-  /** If true, the user can create organizations with the Frontend API. */
+  /** If true, the user can create Organizations with the Frontend API. */
   createOrganizationEnabled?: boolean;
 
-  /** The maximum number of organizations the user can create. 0 means unlimited. */
+  /** The maximum number of Organizations the user can create. 0 means unlimited. */
   createOrganizationsLimit?: number;
 } & UserMetadataParams &
   (UserPasswordHashingParams | object);
@@ -445,6 +445,17 @@ export class UserAPI extends AbstractAPI {
     return this.request<UserID>({
       method: 'DELETE',
       path: joinPaths(basePath, userId, 'totp'),
+    });
+  }
+
+  public async __experimental_passwordCompromised(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'password_compromised'),
+      bodyParams: {
+        revokeAllSessions: false,
+      },
     });
   }
 }

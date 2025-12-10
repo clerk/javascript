@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createDeferredPromise } from '../../../utils/createDeferredPromise';
+import { createDeferredPromise } from '@/utils/createDeferredPromise';
+
 import type { ResourceCacheStableKey } from '../../stable-keys';
 import { createCacheKeys } from '../createCacheKeys';
 import { usePagesOrInfinite } from '../usePagesOrInfinite';

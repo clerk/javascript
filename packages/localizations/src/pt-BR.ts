@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
@@ -702,8 +702,14 @@ export const ptBR: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira sua senha',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Senha comprometida',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -873,8 +879,20 @@ export const ptBR: LocalizationResource = {
       actionText: 'Conectado como {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: 'Resetar Senha',
+    signOut: {
+      actionLink: 'Sair',
+      actionText: 'Conectado como {{identifier}}',
+    },
+    subtitle: undefined,
+    title: 'Resetar senha',
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} já é membro da organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do arquivo excede o limite máximo de 10 MB. Por favor, escolha um arquivo menor.',
+    avatar_file_type_invalid: 'Tipo de arquivo não suportado. Por favor, envie uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível se inscrever devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
@@ -884,6 +902,7 @@ export const ptBR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
     form_identifier_not_found: 'Não foi possível encontrar o usuário.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser um endereço de e-mail válido.',
     form_param_format_invalid__phone_number: 'Número de telefone precisa estar num formato internacional válido.',
@@ -902,9 +921,11 @@ export const ptBR: LocalizationResource = {
     form_password_pwned__sign_in: 'Esta senha foi comprometida, por favor redefina sua senha.',
     form_password_size_in_bytes_exceeded:
       'Sua senha excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Senha incorreta',
     form_username_invalid_character: 'Nome de usuário contém caracteres inválidos. Por favor, tente outro.',
     form_username_invalid_length: 'Nome de usuário deve ter entre 3 e 256 caracteres.',
+    form_username_needs_non_number_char: 'Nome de usuário deve conter pelo menos um caractere não número.',
     identification_deletion_failed: 'Você não pode excluir sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",

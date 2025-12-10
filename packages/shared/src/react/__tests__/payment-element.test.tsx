@@ -26,7 +26,7 @@ vi.mock('../hooks/useClerk', () => ({
   useClerk: () => ({
     __internal_loadStripeJs: vi.fn().mockResolvedValue(() => Promise.resolve({})),
     __internal_getOption: mockGetOption,
-    __unstable__environment: {
+    __internal_environment: {
       commerceSettings: {
         billing: {
           stripePublishableKey: 'pk_test_123',
@@ -50,12 +50,6 @@ vi.mock('../hooks/useUser', () => ({
         paymentMethodOrder: ['card'],
       }),
     },
-  }),
-}));
-
-vi.mock('../hooks/useOrganization', () => ({
-  useOrganization: () => ({
-    organization: null,
   }),
 }));
 
@@ -94,6 +88,7 @@ describe('PaymentElement Localization', () => {
   const mockCheckout = {
     id: 'checkout_123',
     needsPaymentMethod: true,
+    paymentMethod: null,
     plan: {
       id: 'plan_123',
       name: 'Test Plan',
@@ -147,6 +142,7 @@ describe('PaymentElement Localization', () => {
     isConfirming: false,
     isStarting: false,
     planPeriod: 'month' as const,
+    planPeriodStart: undefined,
     externalClientSecret: 'seti_123',
     externalGatewayId: 'acct_123',
     isImmediatePlanChange: false,
@@ -171,7 +167,7 @@ describe('PaymentElement Localization', () => {
   const mockClerk = {
     __internal_loadStripeJs: vi.fn().mockResolvedValue(() => Promise.resolve({})),
     __internal_getOption: mockGetOption,
-    __unstable__environment: {
+    __internal_environment: {
       commerceSettings: {
         billing: {
           stripePublishableKey: 'pk_test_123',

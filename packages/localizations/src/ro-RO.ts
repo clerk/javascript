@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
@@ -704,8 +704,14 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu parola asociată contului tău',
       title: 'Introdu parola',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Parola este compromisă',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Cod de verificare',
@@ -874,8 +880,21 @@ export const roRO: LocalizationResource = {
       actionText: 'Autentificat ca {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} este deja membru al organizației.',
+    avatar_file_size_exceeded:
+      'Dimensiunea fișierului depășește limita maximă de 10 MB. Te rugăm să alegi un fișier mai mic.',
+    avatar_file_type_invalid:
+      'Tipul fișierului nu este acceptat. Te rugăm să încarci o imagine JPG, PNG, GIF sau WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
@@ -884,6 +903,7 @@ export const roRO: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -903,10 +923,13 @@ export const roRO: LocalizationResource = {
     form_password_pwned__sign_in:
       'Această parolă a fost găsită într-o breșă de securitate și nu poate fi folosită. Te rugăm resetează parola.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length:
       'Numele de utilizator trebuie să aibă între {{min_length}} și {{max_length}} caractere.',
+    form_username_needs_non_number_char:
+      'Numele dvs. de utilizator trebuie să conțină cel puțin un caracter nenumeric.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

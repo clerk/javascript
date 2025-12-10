@@ -56,14 +56,14 @@ const common = ({ mode, variant, disableRHC = false }) => {
     },
     plugins: [
       new rspack.DefinePlugin({
-        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         /**
          * Build time feature flags.
          */
+        __BUILD_DISABLE_RHC__: JSON.stringify(disableRHC),
         __BUILD_FLAG_KEYLESS_UI__: isDevelopment(mode),
         __BUILD_VARIANT_CHANNEL__: variant === variants.clerkChannelBrowser,
-        __BUILD_VARIANT_EXPERIMENTAL__: variant === variants.clerkExperimentalBrowser,
         __BUILD_VARIANT_CHIPS__: variant === variants.clerkCHIPS,
+        __BUILD_VARIANT_EXPERIMENTAL__: variant === variants.clerkExperimentalBrowser,
         __DEV__: isDevelopment(mode),
         __PKG_NAME__: JSON.stringify(packageJSON.name),
         __PKG_VERSION__: JSON.stringify(packageJSON.version),
@@ -127,20 +127,6 @@ const common = ({ mode, variant, disableRHC = false }) => {
             name: 'query-core-vendors',
             chunks: 'all',
             enforce: true,
-          },
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/ui/components/SignUp')),
-          },
-          common: {
-            minChunks: 1,
-            name: 'ui-common',
-            priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/ui/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -406,11 +392,17 @@ const prodConfig = ({ mode, env, analysis }) => {
       ? {
           entry: { sandbox: './sandbox/app.ts' },
           plugins: [
+            new rspack.CopyRspackPlugin({
+              patterns: [{ from: path.resolve(__dirname, '../ui/dist/*.js'), to: '[name][ext]' }],
+            }),
             new rspack.HtmlRspackPlugin({
               minify: false,
               template: './sandbox/template.html',
               inject: false,
               hash: true,
+              templateParameters: {
+                uiScriptUrl: './ui.browser.js',
+              },
             }),
           ],
         }
@@ -464,13 +456,6 @@ const prodConfig = ({ mode, env, analysis }) => {
   const clerkCHIPS = merge(
     entryForVariant(variants.clerkCHIPS),
     common({ mode, variant: variants.clerkCHIPS }),
-    commonForProd(),
-    commonForProdChunked(),
-  );
-
-  const clerkChannelBrowser = merge(
-    entryForVariant(variants.clerkChannelBrowser),
-    common({ mode, variant: variants.clerkChannelBrowser }),
     commonForProd(),
     commonForProdChunked(),
   );
@@ -590,7 +575,6 @@ const prodConfig = ({ mode, env, analysis }) => {
     clerkHeadless,
     clerkHeadlessBrowser,
     clerkCHIPS,
-    clerkChannelBrowser,
     clerkEsm,
     clerkEsmNoRHC,
     clerkCjs,
@@ -626,6 +610,9 @@ const devConfig = ({ mode, env }) => {
             minify: false,
             template: './sandbox/template.html',
             inject: false,
+            templateParameters: {
+              uiScriptUrl: 'http://localhost:4001/npm/ui.browser.js',
+            },
           }),
       ].filter(Boolean),
       devtool: 'eval-cheap-source-map',
@@ -655,7 +642,7 @@ const devConfig = ({ mode, env }) => {
       cache: true,
       experiments: {
         cache: {
-          type: 'persistent',
+          type: 'memory',
         },
       },
     };

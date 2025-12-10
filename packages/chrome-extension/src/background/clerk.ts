@@ -1,12 +1,10 @@
-import { Clerk } from '@clerk/clerk-js/no-rhc';
+import type { Clerk } from '@clerk/clerk-js/no-rhc';
 
 import {
   createClerkClient as _createClerkClient,
   type CreateClerkClientOptions as _CreateClerkClientOptions,
 } from '../internal';
 import { SCOPE } from '../types';
-
-Clerk.mountComponentRenderer = undefined;
 
 export type CreateClerkClientOptions = Omit<_CreateClerkClientOptions, 'scope'>;
 

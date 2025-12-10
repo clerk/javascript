@@ -1,6 +1,6 @@
 {
   "name": "@clerk/agent-toolkit",
-  "version": "0.2.4",
+  "version": "0.2.8",
   "description": "Clerk Toolkit for AI Agents",
   "homepage": "https://clerk.com/",
   "bugs": {
@@ -49,7 +49,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "@modelcontextprotocol/sdk": "1.7.0",
     "yargs": "17.7.2",
     "zod": "3.24.2"

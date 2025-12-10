@@ -1,7 +1,7 @@
 import type { BillingStatementResource, ClerkAPIResponseError, ForPayerType } from '../../types';
 
 /**
- * @interface
+ * @internal
  */
 export type UseStatementQueryParams = {
   /**
@@ -29,7 +29,7 @@ export type UseStatementQueryParams = {
 };
 
 /**
- * @interface
+ * @internal
  */
 export type StatementQueryResult = {
   /**

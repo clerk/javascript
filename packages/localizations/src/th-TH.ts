@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
@@ -694,8 +694,14 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รหัสผ่านที่เชื่อมโยงกับบัญชีของคุณ',
       title: 'ใส่รหัสผ่านของคุณ',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'รหัสผ่านถูกโจรกรรม',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'รหัสยืนยัน',
@@ -862,8 +868,19 @@ export const thTH: LocalizationResource = {
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} เป็นสมาชิกขององค์กรอยู่แล้ว',
+    avatar_file_size_exceeded: 'ขนาดไฟล์เกินขีดจำกัดสูงสุด 10MB กรุณาเลือกไฟล์ที่เล็กกว่า',
+    avatar_file_type_invalid: 'ประเภทไฟล์ไม่รองรับ กรุณาอัปโหลดรูปภาพ JPG, PNG, GIF หรือ WEBP',
     captcha_invalid: undefined,
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
@@ -872,6 +889,7 @@ export const thTH: LocalizationResource = {
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -891,9 +909,11 @@ export const thTH: LocalizationResource = {
     form_password_pwned__sign_in:
       'รหัสผ่านนี้ถูกพบว่าเป็นส่วนหนึ่งของรหัสผ่านที่เคยถูกโจรกรรมข้อมูลและไม่สามารถใช้ได้ โปรดรีเซ็ตรหัสผ่านของคุณ',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'ชื่อผู้ใช้ของคุณต้องมีความยาวระหว่าง {{min_length}} ถึง {{max_length}} ตัวอักษร',
+    form_username_needs_non_number_char: 'ชื่อผู้ใช้ของคุณต้องมีอักขระที่ไม่ใช่ตัวเลขอย่างน้อยหนึ่งตัว',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hiIN: LocalizationResource = {
   locale: 'hi-IN',
@@ -695,8 +695,14 @@ export const hiIN: LocalizationResource = {
       subtitle: 'अपने खाते से जुड़ा पासवर्ड दर्ज करें',
       title: 'अपना पासवर्ड दर्ज करें',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'पासवर्ड समझौता हो गया',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'सत्यापन कोड',
@@ -866,8 +872,19 @@ export const hiIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} पहले से ही संगठन का सदस्य है।',
+    avatar_file_size_exceeded: 'फ़ाइल का आकार 10MB की अधिकतम सीमा से अधिक है। कृपया एक छोटी फ़ाइल चुनें।',
+    avatar_file_type_invalid: 'फ़ाइल प्रकार समर्थित नहीं है। कृपया JPG, PNG, GIF या WEBP छवि अपलोड करें।',
     captcha_invalid:
       'असफल सुरक्षा सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     captcha_unavailable:
@@ -877,6 +894,7 @@ export const hiIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_not_found: 'इस पहचानकर्ता के साथ कोई खाता नहीं मिला। कृपया जांचें और पुनः प्रयास करें।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'दर्ज किया गया मान अमान्य प्रारूप में है। कृपया इसे जांचें और सही करें।',
     form_param_format_invalid__email_address: 'ईमेल पता एक वैध ईमेल पता होना चाहिए।',
     form_param_format_invalid__phone_number: 'फोन नंबर एक वैध अंतरराष्ट्रीय प्रारूप में होना चाहिए।',
@@ -897,10 +915,12 @@ export const hiIN: LocalizationResource = {
       'यह पासवर्ड डेटा उल्लंघन के हिस्से के रूप में पाया गया है और इसका उपयोग नहीं किया जा सकता, कृपया अपना पासवर्ड रीसेट करें।',
     form_password_size_in_bytes_exceeded:
       'आपके पासवर्ड ने अनुमत बाइट्स की अधिकतम संख्या से अधिक हो गया है, कृपया इसे छोटा करें या कुछ विशेष वर्णों को हटा दें।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'गलत पासवर्ड',
     form_username_invalid_character:
       'आपके उपयोगकर्ता नाम में अमान्य वर्ण हैं। कृपया केवल अक्षर, संख्या और अंडरस्कोर का उपयोग करें।',
     form_username_invalid_length: 'आपका उपयोगकर्ता नाम {{min_length}} और {{max_length}} अक्षरों के बीच होना चाहिए।',
+    form_username_needs_non_number_char: 'आपके उपयोगकर्ता नाम में कम से कम एक गैर-संख्यात्मक वर्ण होना चाहिए।',
     identification_deletion_failed: 'आप अपनी अंतिम पहचान को हटा नहीं सकते।',
     not_allowed_access:
       'आपके पास इस पेज तक पहुंचने की अनुमति नहीं है। यदि आपका मानना है कि यह एक त्रुटि है, तो कृपया सहायता से संपर्क करें।',

@@ -1,9 +1,10 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
+import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
 import type { FakeOrganization, FakeUser } from '../../testUtils';
-import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
+import { createTestUtils } from '../../testUtils';
 
 const mockAPIKeysEnvironmentSettings = async (
   page: Page,
@@ -27,16 +28,21 @@ const mockAPIKeysEnvironmentSettings = async (
   });
 };
 
-testAgainstRunningApps({
-  withEnv: [appConfigs.envs.withAPIKeys],
-  withPattern: ['withMachine.next.appRouter'],
-})('api keys component @machine', ({ app }) => {
+test.describe('api keys component @machine', () => {
   test.describe.configure({ mode: 'serial' });
 
+  let app: Application;
   let fakeAdmin: FakeUser;
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000); // Wait for app to be ready
+    app = await appConfigs.next.appRouter.clone().commit();
+
+    await app.setup();
+    await app.withEnv(appConfigs.envs.withAPIKeys);
+    await app.dev();
+
     const u = createTestUtils({ app });
     fakeAdmin = u.services.users.createFakeUser();
     const admin = await u.services.users.createBapiUser(fakeAdmin);
@@ -283,6 +289,43 @@ testAgainstRunningApps({
     await expect(u.page.locator('.cl-apiKeys')).toBeVisible({ timeout: 5000 });
 
     await u.page.unrouteAll();
+  });
+
+  test('UserProfile API keys uses user ID as subject even when organization is active', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+
+    const admin = await u.services.users.getUser({ email: fakeAdmin.email });
+    expect(admin).toBeDefined();
+    const userId = admin.id;
+
+    await u.po.signIn.goTo();
+    await u.po.signIn.waitForMounted();
+    await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
+    await u.po.expect.toBeSignedIn();
+
+    await u.po.organizationSwitcher.goTo();
+    await u.po.organizationSwitcher.waitForMounted();
+    await u.po.organizationSwitcher.waitForAnOrganizationToSelected();
+
+    let capturedSubject: string | null = null;
+    const apiKeyRequestPromise = u.page.waitForRequest(request => {
+      if (request.url().includes('api_keys')) {
+        const url = new URL(request.url());
+        capturedSubject = url.searchParams.get('subject');
+        return true;
+      }
+      return false;
+    });
+
+    await u.po.page.goToRelative('/user');
+    await u.po.userProfile.waitForMounted();
+    await u.po.userProfile.switchToAPIKeysTab();
+
+    await apiKeyRequestPromise;
+
+    // Verify the subject parameter is the user ID, not the organization ID
+    expect(capturedSubject).toBe(userId);
+    expect(capturedSubject).not.toBe(fakeOrganization.organization.id);
   });
 
   test('standalone API keys component in user context based on user_api_keys_enabled', async ({ page, context }) => {

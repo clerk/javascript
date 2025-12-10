@@ -1,7 +1,7 @@
+import type { LastAuthenticationStrategy } from '@clerk/shared/types';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import type { LastAuthenticationStrategy } from '../../packages/types';
 import { appConfigs } from '../presets';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
 
