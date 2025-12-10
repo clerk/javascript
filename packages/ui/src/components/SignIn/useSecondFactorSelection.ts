@@ -1,12 +1,23 @@
 import type { SignInFactor } from '@clerk/shared/types';
 import React from 'react';
 
-import { determineStartingSignInSecondFactor, secondFactorKey } from './utils';
+import { determineStartingSignInSecondFactor } from './utils';
 
-export function useSecondFactorSelection(availableFactors: SignInFactor[] | null) {
+const secondFactorKey = (factor: SignInFactor | null | undefined) => {
+  if (!factor) {
+    return '';
+  }
+  let key = factor.strategy;
+  if ('phoneNumberId' in factor) {
+    key += factor.phoneNumberId;
+  }
+  return key;
+};
+
+export function useSecondFactorSelection<T extends SignInFactor = SignInFactor>(availableFactors: T[] | null) {
   const lastPreparedFactorKeyRef = React.useRef('');
-  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | null>(() =>
-    determineStartingSignInSecondFactor(availableFactors),
+  const [currentFactor, setCurrentFactor] = React.useState<T | null>(
+    () => determineStartingSignInSecondFactor(availableFactors) as T | null,
   );
 
   const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
@@ -16,7 +27,7 @@ export function useSecondFactorSelection(availableFactors: SignInFactor[] | null
     lastPreparedFactorKeyRef.current = secondFactorKey(currentFactor);
   };
 
-  const selectFactor = (factor: SignInFactor) => {
+  const selectFactor = (factor: T) => {
     setCurrentFactor(factor);
     setShowAllStrategies(false);
   };

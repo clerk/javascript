@@ -5,7 +5,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { useRouter } from '../../router';
-import { determineStartingSignInSecondFactor, secondFactorKey } from '../SignIn/utils';
+import { useSecondFactorSelection } from '../SignIn/useSecondFactorSelection';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
@@ -33,26 +33,19 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     );
   }, [sessionVerification.supportedSecondFactors]);
 
-  const lastPreparedFactorKeyRef = React.useRef('');
-  const [currentFactor, setCurrentFactor] = React.useState<SessionVerificationSecondFactor | null>(
-    () => determineStartingSignInSecondFactor(availableFactors) as SessionVerificationSecondFactor,
-  );
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
-  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
+  const {
+    currentFactor,
+    factorAlreadyPrepared,
+    handleFactorPrepare,
+    selectFactor,
+    showAllStrategies,
+    toggleAllStrategies,
+  } = useSecondFactorSelection<SessionVerificationSecondFactor>(availableFactors);
 
   const secondFactorsExcludingCurrent = useMemo(
     () => availableFactors?.filter(factor => !secondFactorsAreEqual(factor, currentFactor)),
     [availableFactors, currentFactor],
   );
-
-  const handleFactorPrepare = () => {
-    lastPreparedFactorKeyRef.current = secondFactorKey(currentFactor);
-  };
-
-  const selectFactor = (factor: SessionVerificationSecondFactor) => {
-    setCurrentFactor(factor);
-    toggleAllStrategies();
-  };
 
   const hasAlternativeStrategies = useMemo(
     () => (secondFactorsExcludingCurrent && secondFactorsExcludingCurrent.length > 0) || false,
@@ -84,7 +77,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     case 'phone_code':
       return (
         <UVFactorTwoPhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === secondFactorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -94,7 +87,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     case 'totp':
       return (
         <UserVerificationFactorTwoTOTP
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === secondFactorKey(currentFactor)}
+          factorAlreadyPrepared={factorAlreadyPrepared}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
