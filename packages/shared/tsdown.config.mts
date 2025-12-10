@@ -5,6 +5,7 @@ import type { Options } from 'tsdown';
 import { defineConfig } from 'tsdown';
 
 import clerkJsPackage from '../clerk-js/package.json' with { type: 'json' };
+import clerkUiPackage from '../ui/package.json' with { type: 'json' };
 import sharedPackage from './package.json' with { type: 'json' };
 
 export default defineConfig(({ watch }) => {
@@ -21,6 +22,7 @@ export default defineConfig(({ watch }) => {
       PACKAGE_NAME: `"${sharedPackage.name}"`,
       PACKAGE_VERSION: `"${sharedPackage.version}"`,
       JS_PACKAGE_VERSION: `"${clerkJsPackage.version}"`,
+      UI_PACKAGE_VERSION: `"${clerkUiPackage.version}"`,
       __DEV__: `${watch}`,
       __BUILD_DISABLE_RHC__: JSON.stringify(false),
       __CLERK_USE_RQ__: `${process.env.CLERK_USE_RQ === 'true'}`,
