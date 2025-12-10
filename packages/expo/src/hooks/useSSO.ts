@@ -1,4 +1,4 @@
-import { useSignIn, useSignUp } from '@clerk/clerk-react';
+import { useSignIn, useSignUp } from '@clerk/react/legacy';
 import type {
   EnterpriseSSOStrategy,
   OAuthStrategy,
