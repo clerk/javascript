@@ -1,23 +1,15 @@
 import { useClerk } from '@clerk/react';
-import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 
 import { ClerkGoogleOneTapSignIn, isSuccessResponse } from '../google-one-tap';
 import { errorThrower } from '../utils/errors';
+import type {
+  StartGoogleAuthenticationFlowParams,
+  StartGoogleAuthenticationFlowReturnType,
+} from './useSignInWithGoogle.types';
 
-type SignUpUnsafeMetadata = Record<string, unknown>;
-
-export type StartGoogleAuthenticationFlowParams = {
-  unsafeMetadata?: SignUpUnsafeMetadata;
-};
-
-export type StartGoogleAuthenticationFlowReturnType = {
-  createdSessionId: string | null;
-  setActive?: SetActive;
-  signIn?: SignInResource;
-  signUp?: SignUpResource;
-};
+export type { StartGoogleAuthenticationFlowParams, StartGoogleAuthenticationFlowReturnType };
 
 /**
  * Hook for native Google Authentication on Android using Clerk's built-in Google One Tap module.
