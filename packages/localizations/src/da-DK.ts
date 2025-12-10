@@ -1317,6 +1317,10 @@ export const daDK: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Tilføj Web3 tegnebøger',
         title: 'Web3 tegnebøger',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1352,7 +1356,7 @@ export const daDK: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -1326,6 +1326,10 @@ export const isIS: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1361,7 +1365,7 @@ export const isIS: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

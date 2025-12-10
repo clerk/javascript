@@ -1338,6 +1338,10 @@ export const msMY: LocalizationResource = {
         detailsAction__nonPrimary: 'Tetapkan sebagai utama',
         primaryButton: 'Sambung dompet',
         title: 'Dompet web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1373,7 +1377,7 @@ export const msMY: LocalizationResource = {
       title: 'Terima kasih kerana menyertai senarai menunggu!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

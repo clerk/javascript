@@ -1329,6 +1329,10 @@ export const faIR: LocalizationResource = {
         detailsAction__nonPrimary: 'به عنوان اصلی تنظیم کنید',
         primaryButton: 'اتصال کیف پول',
         title: 'کیف پول های Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1364,7 +1368,7 @@ export const faIR: LocalizationResource = {
       title: 'ممنون که به لیست انتظار پیوستید!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

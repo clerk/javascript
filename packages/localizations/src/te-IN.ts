@@ -1332,6 +1332,10 @@ export const teIN: LocalizationResource = {
         detailsAction__nonPrimary: 'ప్రాథమికంగా సెట్ చేయండి',
         primaryButton: 'వాలెట్‌ను కనెక్ట్ చేయండి',
         title: 'Web3 వాలెట్‌లు',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1367,7 +1371,7 @@ export const teIN: LocalizationResource = {
       title: 'వెయిట్‌లిస్ట్‌లో చేరినందుకు ధన్యవాదాలు!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

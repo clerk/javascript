@@ -1330,6 +1330,10 @@ export const hiIN: LocalizationResource = {
         detailsAction__nonPrimary: 'प्राथमिक के रूप में सेट करें',
         primaryButton: 'वॉलेट कनेक्ट करें',
         title: 'Web3 वॉलेट',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1365,7 +1369,7 @@ export const hiIN: LocalizationResource = {
       title: 'प्रतीक्षा सूची में शामिल होने के लिए धन्यवाद!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -1326,6 +1326,10 @@ export const esES: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Agregar cartera Web3',
         title: 'Cartera Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1362,7 +1366,7 @@ export const esES: LocalizationResource = {
       title: '¡Te has unido a la lista de espera!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

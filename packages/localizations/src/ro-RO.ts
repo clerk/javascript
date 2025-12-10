@@ -1336,6 +1336,10 @@ export const roRO: LocalizationResource = {
         detailsAction__nonPrimary: 'Setează ca principal',
         primaryButton: 'Conectează portofel',
         title: 'Portofele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1371,7 +1375,7 @@ export const roRO: LocalizationResource = {
       title: 'Mulțumim pentru înscriere!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -38,8 +38,8 @@ export const Web3SelectWalletScreen = ({ onConnect }: Web3SelectWalletProps) => 
 
   return (
     <FormContainer
-      headerTitle={localizationKeys('userProfile.start.web3WalletsSection.web3SolanaWalletsSection.title')}
-      headerSubtitle={localizationKeys('userProfile.start.web3WalletsSection.web3SolanaWalletsSection.subtitle')}
+      headerTitle={localizationKeys('userProfile.start.web3WalletsSection.web3SelectSolanaWalletScreen.title')}
+      headerSubtitle={localizationKeys('userProfile.start.web3WalletsSection.web3SelectSolanaWalletScreen.subtitle')}
     >
       <Form.Root>
         <Suspense

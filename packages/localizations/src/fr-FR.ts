@@ -1344,6 +1344,10 @@ export const frFR: LocalizationResource = {
         detailsAction__nonPrimary: 'Définir comme principal',
         primaryButton: 'Portefeuilles Web3',
         title: 'Portefeuilles Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1379,7 +1383,7 @@ export const frFR: LocalizationResource = {
       title: 'Inscription réussie',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -1330,6 +1330,10 @@ export const jaJP: LocalizationResource = {
         detailsAction__nonPrimary: 'プライマリに設定する',
         primaryButton: 'ウォレットを接続',
         title: 'Web3ウォレット',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1365,7 +1369,7 @@ export const jaJP: LocalizationResource = {
       title: '待機リストへの参加ありがとうございます！',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

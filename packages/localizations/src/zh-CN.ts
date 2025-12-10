@@ -1288,6 +1288,10 @@ export const zhCN: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 钱包',
         title: 'Web3 钱包',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1323,7 +1327,7 @@ export const zhCN: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

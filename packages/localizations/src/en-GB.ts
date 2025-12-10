@@ -1325,6 +1325,10 @@ export const enGB: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1360,7 +1364,7 @@ export const enGB: LocalizationResource = {
       title: 'Thanks for joining the waitlist!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

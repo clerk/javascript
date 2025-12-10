@@ -1314,6 +1314,10 @@ export const thTH: LocalizationResource = {
         detailsAction__nonPrimary: 'ตั้งเป็นหลัก',
         primaryButton: 'เชื่อมต่อวอลเล็ต',
         title: 'วอลเล็ต Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1349,7 +1353,7 @@ export const thTH: LocalizationResource = {
       title: 'ขอบคุณที่เข้าร่วม Waitlist!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

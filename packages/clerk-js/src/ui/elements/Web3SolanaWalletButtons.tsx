@@ -75,7 +75,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
       <Card.Alert>
         <LinkRenderer
           text={t(
-            localizationKeys('web3WalletButtons.noneAvailable', {
+            localizationKeys('web3SolanaWalletButtons.noneAvailable', {
               solanaWalletsLink: 'https://solana.com/solana-wallets',
             }),
           )}
@@ -127,7 +127,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
           {row.map(w => {
             const shouldShowPreText = installedWallets.length === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD;
             const label = shouldShowPreText
-              ? localizationKeys('web3WalletButtons.continue', { walletName: w.name })
+              ? localizationKeys('web3SolanaWalletButtons.continue', { walletName: w.name })
               : w.name;
 
             const imageOrInitial = w.icon ? (
@@ -136,7 +136,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
                 isDisabled={card.isLoading}
                 isLoading={card.loadingMetadata === w.name}
                 src={w.icon}
-                alt={t(localizationKeys('web3WalletButtons.connect', { walletName: w.name }))}
+                alt={t(localizationKeys('web3SolanaWalletButtons.connect', { walletName: w.name }))}
                 sx={theme => ({ width: theme.sizes.$4, height: 'auto', maxWidth: '100%' })}
               />
             ) : (

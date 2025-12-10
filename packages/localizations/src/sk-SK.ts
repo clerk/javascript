@@ -1326,6 +1326,10 @@ export const skSK: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastaiť ako hlavnú',
         primaryButton: 'Web3 peňaženky',
         title: 'Web3 peňaženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1361,7 +1365,7 @@ export const skSK: LocalizationResource = {
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

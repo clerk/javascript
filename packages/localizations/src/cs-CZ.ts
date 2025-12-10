@@ -1333,6 +1333,10 @@ export const csCZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastavit jako primární',
         primaryButton: 'Připojit peněženku',
         title: 'Web3 peněženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1368,7 +1372,7 @@ export const csCZ: LocalizationResource = {
       title: 'Děkujeme za připojení k čekací listině!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

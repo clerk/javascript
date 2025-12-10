@@ -1319,6 +1319,10 @@ export const nbNO: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lommebøker',
         title: 'Web3-lommebøker',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1354,7 +1358,7 @@ export const nbNO: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -1304,6 +1304,10 @@ export const koKR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 지갑',
         title: 'Web3 지갑',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1339,7 +1343,7 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

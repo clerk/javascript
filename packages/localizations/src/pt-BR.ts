@@ -1339,6 +1339,10 @@ export const ptBR: LocalizationResource = {
         detailsAction__nonPrimary: 'Definir como principal',
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1374,7 +1378,7 @@ export const ptBR: LocalizationResource = {
       title: 'Obrigado por entrar na lista de espera!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

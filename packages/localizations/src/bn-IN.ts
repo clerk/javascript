@@ -1330,6 +1330,10 @@ export const bnIN: LocalizationResource = {
         detailsAction__nonPrimary: 'প্রাথমিক হিসাবে সেট করুন',
         primaryButton: 'ওয়ালেট সংযুক্ত করুন',
         title: 'Web3 ওয়ালেট',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1365,7 +1369,7 @@ export const bnIN: LocalizationResource = {
       title: 'ওয়েটলিস্টে যোগ দেওয়ার জন্য ধন্যবাদ!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

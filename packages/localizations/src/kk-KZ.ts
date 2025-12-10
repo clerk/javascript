@@ -1298,6 +1298,10 @@ export const kkKZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Негізгі ретінде орнату',
         primaryButton: 'Әптәпқалманы қосу',
         title: 'Web3 әптәпқалмалары',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1333,7 +1337,7 @@ export const kkKZ: LocalizationResource = {
       title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

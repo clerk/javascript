@@ -1329,6 +1329,10 @@ export const beBY: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кашалькі',
         title: 'Web3 кашалькі',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1364,7 +1368,7 @@ export const beBY: LocalizationResource = {
       title: 'Вы ў чакальным спісе',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

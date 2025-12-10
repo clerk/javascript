@@ -1353,6 +1353,10 @@ export const deDE: LocalizationResource = {
         detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1389,7 +1393,7 @@ export const deDE: LocalizationResource = {
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

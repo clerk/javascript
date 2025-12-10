@@ -1341,6 +1341,10 @@ export const ruRU: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кошельки',
         title: 'Web3 кошельки',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1376,7 +1380,7 @@ export const ruRU: LocalizationResource = {
       title: 'Спасибо за присоединение к списку ожидания!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

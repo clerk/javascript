@@ -1333,6 +1333,10 @@ export const esCR: LocalizationResource = {
         detailsAction__nonPrimary: 'Establecer como primaria',
         primaryButton: 'Conectar billetera',
         title: 'Billeteras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1368,7 +1372,7 @@ export const esCR: LocalizationResource = {
       title: '¡Gracias por unirte a la lista de espera!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -1318,6 +1318,10 @@ export const srRS: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 novčanici',
         title: 'Web3 novčanici',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1353,7 +1357,7 @@ export const srRS: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

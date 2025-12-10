@@ -886,8 +886,8 @@ export const plPL: LocalizationResource = {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
     },
-    title: 'Zresetuj hasło',
     subtitle: undefined,
+    title: 'Zresetuj hasło',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
@@ -1329,6 +1329,10 @@ export const plPL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Portfele Web3',
         title: 'Portfele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1364,7 +1368,7 @@ export const plPL: LocalizationResource = {
       title: 'Dziękujemy za dołączenie do listy oczekujących!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

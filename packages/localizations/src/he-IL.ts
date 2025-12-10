@@ -1298,6 +1298,10 @@ export const heIL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1333,7 +1337,7 @@ export const heIL: LocalizationResource = {
       title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

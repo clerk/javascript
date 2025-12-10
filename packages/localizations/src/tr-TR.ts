@@ -1323,6 +1323,10 @@ export const trTR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1358,7 +1362,7 @@ export const trTR: LocalizationResource = {
       title: 'Bekleme Listesine Katıldınız',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,

@@ -1336,6 +1336,10 @@ export const taIN: LocalizationResource = {
         detailsAction__nonPrimary: 'முதன்மையாக அமைக்கவும்',
         primaryButton: 'வாலட்டை இணைக்கவும்',
         title: 'Web3 வாலட்டுகள்',
+        web3SelectSolanaWalletScreen: {
+          subtitle: undefined,
+          title: undefined,
+        },
       },
     },
     usernamePage: {
@@ -1371,7 +1375,7 @@ export const taIN: LocalizationResource = {
       title: 'காத்திருப்பில் சேர்ந்ததற்கு நன்றி!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: undefined,
     continue: undefined,
     noneAvailable: undefined,
