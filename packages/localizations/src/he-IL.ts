@@ -741,6 +741,10 @@ export const heIL: LocalizationResource = {
       subtitle: 'להמשך, אנא הכנס את קוד האימות שנוצר על ידי אפליקציית האימות שלך',
       title: 'אימות שני שלבים',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
   signUp: {
@@ -830,6 +834,10 @@ export const heIL: LocalizationResource = {
       subtitleCombined: 'להמשיך אל {{applicationName}}',
       title: 'צור את החשבון שלך',
       titleCombined: 'צור את החשבון שלך',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
@@ -933,6 +941,8 @@ export const heIL: LocalizationResource = {
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
       goodPassword: 'עבודה טובה. זו סיסמה מצוינת.',
@@ -1325,5 +1335,10 @@ export const heIL: LocalizationResource = {
       subtitle: 'אנו ניצור איתך קשר כשהמקום שלך יהיה מוכן',
       title: 'תודה שהצטרפת לרשימת ההמתנה!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

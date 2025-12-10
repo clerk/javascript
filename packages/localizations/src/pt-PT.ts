@@ -747,6 +747,10 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Insira o código de verificação enviado para o seu dispositivo.',
       title: 'Verificação de duas etapas',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Insira a sua palavra-passe',
   signUp: {
@@ -837,6 +841,10 @@ export const ptPT: LocalizationResource = {
       subtitleCombined: 'para continuar em {{applicationName}}',
       title: 'Criar a sua conta',
       titleCombined: 'Criar a sua conta',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -945,6 +953,8 @@ export const ptPT: LocalizationResource = {
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
     session_exists: 'Já está conectado.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'A sua palavra-passe funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'A sua palavra-passe atende a todos os requisitos necessários.',
@@ -1347,5 +1357,10 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Aguarde enquanto processamos o seu pedido.',
       title: 'Inscrição bem-sucedida na lista de espera',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

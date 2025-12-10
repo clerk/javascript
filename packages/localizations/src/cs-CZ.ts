@@ -757,6 +757,10 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Pro pokračování zadejte ověřovací kód vygenerovaný vaší aplikací pro ověřování',
       title: 'Dvoufázové ověření',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Zadejte své heslo',
   signUp: {
@@ -850,6 +854,10 @@ export const csCZ: LocalizationResource = {
       subtitleCombined: 'Vítejte! Prosím vyplňte údaje pro začátek.',
       title: 'Vytvořte si účet',
       titleCombined: 'Vytvořte si účet',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
@@ -956,6 +964,8 @@ export const csCZ: LocalizationResource = {
     phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
     session_exists: 'Jste již přihlášen.',
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
       goodPassword: 'Vaše heslo splňuje všechny potřebné požadavky.',
@@ -1361,5 +1371,10 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Ozveme se vám, až bude vaše místo připraveno',
       title: 'Děkujeme za připojení k čekací listině!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

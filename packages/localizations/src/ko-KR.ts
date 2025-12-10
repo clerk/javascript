@@ -743,6 +743,10 @@ export const koKR: LocalizationResource = {
       subtitle: '계속하려면 인증 앱에서 생성된 인증 코드를 입력하세요',
       title: '2단계 인증',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: '비밀번호를 입력하세요',
   signUp: {
@@ -832,6 +836,10 @@ export const koKR: LocalizationResource = {
       subtitleCombined: '환영합니다! 아래 정보를 입력해주세요.',
       title: '계정 만들기',
       titleCombined: '계정 만들기',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
@@ -937,6 +945,8 @@ export const koKR: LocalizationResource = {
     phone_number_exists: '이 전화번호는 이미 사용중입니다. 다른 번호를 시도해 주세요.',
     session_exists: '이미 로그인 중입니다.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: '비밀번호는 작동하지만 더 강력할 수 있습니다. 문자를 더 추가해 보세요.',
       goodPassword: '수고하셨습니다. 훌륭한 비밀번호입니다.',
@@ -1332,5 +1342,10 @@ export const koKR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

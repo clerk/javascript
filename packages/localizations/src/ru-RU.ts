@@ -758,6 +758,10 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Чтобы продолжить, пожалуйста, введите код проверки, сгенерированный вашим приложением аутентификации.',
       title: 'Двухфакторная верификация',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
   signUp: {
@@ -851,6 +855,10 @@ export const ruRU: LocalizationResource = {
       subtitleCombined: 'чтобы продолжить работу в "{{applicationName}}"',
       title: 'Создайте Вашу учетную запись',
       titleCombined: 'Создайте Вашу учетную запись',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -961,6 +969,8 @@ export const ruRU: LocalizationResource = {
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     session_exists: 'Вы уже вошли в систему.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',
       goodPassword: 'Хорошая работа. Это отличный пароль.',
@@ -1369,5 +1379,10 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Мы свяжемся с вами, когда появится ваш доступ',
       title: 'Спасибо за присоединение к списку ожидания!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

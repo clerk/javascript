@@ -650,6 +650,17 @@ export type ElementsConfig = {
   enterpriseConnectionsRoot: WithOptions;
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
+
+  web3WalletButtonsRoot: WithOptions;
+  web3WalletButtons: WithOptions;
+  web3WalletButtonsIconButton: WithOptions<string, LoadingState>;
+  web3WalletButtonsBlockButton: WithOptions<string, LoadingState>;
+  web3WalletButtonsBlockButtonText: WithOptions<string>;
+  web3WalletButtonsWalletIcon: WithOptions<string, LoadingState>;
+  web3WalletButtonsWalletInitialIcon: WithOptions<string, LoadingState>;
+
+  walletIcon: WithOptions<string, LoadingState>;
+  walletInitialIcon: WithOptions<string, LoadingState>;
 };
 
 export type Elements = {
