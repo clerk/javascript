@@ -56,6 +56,10 @@
       "types": "./dist/experimental.d.ts",
       "default": "./dist/experimental.js"
     },
+    "./legacy": {
+      "types": "./dist/legacy.d.ts",
+      "default": "./dist/legacy.js"
+    },
     "./google-one-tap": {
       "types": "./dist/google-one-tap/index.d.ts",
       "default": "./dist/google-one-tap/index.js"

@@ -72,6 +72,7 @@ export function isErrorWithCode(error: unknown): error is { code: string; messag
  * @example
  * ```typescript
  * import { ClerkGoogleOneTapSignIn } from '@clerk/clerk-expo';
+ * import * as Crypto from 'expo-crypto';
  *
  * // Configure once at app startup
  * ClerkGoogleOneTapSignIn.configure({
@@ -79,7 +80,7 @@ export function isErrorWithCode(error: unknown): error is { code: string; messag
  * });
  *
  * // Sign in with nonce
- * const nonce = generateNonce();
+ * const nonce = Crypto.randomUUID();
  * const response = await ClerkGoogleOneTapSignIn.signIn({ nonce });
  *
  * if (response.type === 'success') {
