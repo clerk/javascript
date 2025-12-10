@@ -1,11 +1,11 @@
-import type { SessionVerificationResource, SessionVerificationSecondFactor, SignInFactor } from '@clerk/shared/types';
+import type { SessionVerificationResource, SessionVerificationSecondFactor } from '@clerk/shared/types';
 import React, { useEffect, useMemo } from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
 import { useRouter } from '../../router';
-import { determineStartingSignInSecondFactor } from '../SignIn/utils';
+import { determineStartingSignInSecondFactor, secondFactorKey } from '../SignIn/utils';
 import { secondFactorsAreEqual } from './useReverificationAlternativeStrategies';
 import { UserVerificationFactorTwoTOTP } from './UserVerificationFactorTwoTOTP';
 import { useUserVerificationSession, withUserVerificationSessionGuard } from './useUserVerificationSession';
@@ -13,17 +13,6 @@ import { sortByPrimaryFactor } from './utils';
 import { UVFactorTwoAlternativeMethods } from './UVFactorTwoAlternativeMethods';
 import { UVFactorTwoBackupCodeCard } from './UVFactorTwoBackupCodeCard';
 import { UVFactorTwoPhoneCodeCard } from './UVFactorTwoPhoneCodeCard';
-
-const factorKey = (factor: SignInFactor | null | undefined) => {
-  if (!factor) {
-    return '';
-  }
-  let key = factor.strategy;
-  if ('phoneNumberId' in factor) {
-    key += factor.phoneNumberId;
-  }
-  return key;
-};
 
 const SUPPORTED_STRATEGIES: SessionVerificationSecondFactor['strategy'][] = [
   'phone_code',
@@ -57,7 +46,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
   );
 
   const handleFactorPrepare = () => {
-    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
+    lastPreparedFactorKeyRef.current = secondFactorKey(currentFactor);
   };
 
   const selectFactor = (factor: SessionVerificationSecondFactor) => {
@@ -95,7 +84,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     case 'phone_code':
       return (
         <UVFactorTwoPhoneCodeCard
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === secondFactorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
@@ -105,7 +94,7 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
     case 'totp':
       return (
         <UserVerificationFactorTwoTOTP
-          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === factorKey(currentFactor)}
+          factorAlreadyPrepared={lastPreparedFactorKeyRef.current === secondFactorKey(currentFactor)}
           onFactorPrepare={handleFactorPrepare}
           factor={currentFactor}
           onShowAlternativeMethodsClicked={toggleAllStrategies}

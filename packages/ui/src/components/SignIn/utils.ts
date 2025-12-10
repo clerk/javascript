@@ -14,7 +14,8 @@ import type { FormControlState } from '@/ui/utils/useFormControl';
 import { PREFERRED_SIGN_IN_STRATEGIES } from '../../common/constants';
 import { otpPrefFactorComparator, passwordPrefFactorComparator } from '../../utils/factorSorting';
 
-export const factorKey = (factor: SignInFactor | null | undefined) => {
+// Specific to SignInSecondFactor, SignInClientTrust, & UserVerificationFactorTwo
+export const secondFactorKey = (factor: SignInFactor | null | undefined) => {
   if (!factor) {
     return '';
   }

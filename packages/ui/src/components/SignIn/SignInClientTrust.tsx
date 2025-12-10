@@ -1,6 +1,3 @@
-import type { SignInFactor } from '@clerk/shared/types';
-import React from 'react';
-
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 
@@ -10,27 +7,18 @@ import { SignInFactorTwoAlternativeMethods } from './SignInFactorTwoAlternativeM
 import { SignInFactorTwoEmailCodeCard } from './SignInFactorTwoEmailCodeCard';
 import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
-import { determineStartingSignInSecondFactor, factorKey } from './utils';
+import { useSecondFactorSelection } from './useSecondFactorSelection';
 
 function SignInClientTrustInternal(): JSX.Element {
   const signIn = useCoreSignIn();
-  const availableFactors = signIn.supportedSecondFactors;
-
-  const lastPreparedFactorKeyRef = React.useRef('');
-  const [currentFactor, setCurrentFactor] = React.useState<SignInFactor | null>(() =>
-    determineStartingSignInSecondFactor(availableFactors),
-  );
-  const [showAllStrategies, setShowAllStrategies] = React.useState<boolean>(!currentFactor);
-  const toggleAllStrategies = () => setShowAllStrategies(s => !s);
-
-  const handleFactorPrepare = () => {
-    lastPreparedFactorKeyRef.current = factorKey(currentFactor);
-  };
-
-  const selectFactor = (factor: SignInFactor) => {
-    setCurrentFactor(factor);
-    toggleAllStrategies();
-  };
+  const {
+    currentFactor,
+    factorAlreadyPrepared,
+    handleFactorPrepare,
+    selectFactor,
+    showAllStrategies,
+    toggleAllStrategies,
+  } = useSecondFactorSelection(signIn.supportedSecondFactors);
 
   if (!currentFactor) {
     return <LoadingCard />;
@@ -45,7 +33,6 @@ function SignInClientTrustInternal(): JSX.Element {
     );
   }
 
-  const factorAlreadyPrepared = lastPreparedFactorKeyRef.current === factorKey(currentFactor);
   switch (currentFactor?.strategy) {
     case 'phone_code':
       return (
