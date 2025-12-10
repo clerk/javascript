@@ -758,6 +758,10 @@ export const faIR: LocalizationResource = {
       subtitle: 'برای ادامه، لطفاً کد تأیید تولید شده توسط برنامه تأیید هویت خود را وارد کنید',
       title: 'تأیید  دو مرحله‌ای',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'رمز عبور خود را وارد کنید',
   signUp: {
@@ -850,6 +854,10 @@ export const faIR: LocalizationResource = {
       subtitleCombined: 'خوش آمدید! لطفا برای شروع، اطلاعات را پر کنید.',
       title: 'حساب کاربری خود را ایجاد کنید',
       titleCombined: 'حساب کاربری خود را ایجاد کنید',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'ادامه با {{provider|titleize}}',
@@ -950,6 +958,8 @@ export const faIR: LocalizationResource = {
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     session_exists: 'جلسه از قبل وجود دارد.',
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'رمز عبور شما کار می‌کند، اما می‌توانست قوی‌تر باشد. سعی کنید کاراکترهای بیشتری اضافه کنید.',
       goodPassword: 'رمز عبور شما تمام شرایط لازم را برآورده می‌کند.',
@@ -1353,5 +1363,10 @@ export const faIR: LocalizationResource = {
       subtitle: 'وقتی رزرو شما آماده شد، با شما تماس خواهیم گرفت',
       title: 'ممنون که به لیست انتظار پیوستید!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

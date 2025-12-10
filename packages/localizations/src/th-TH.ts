@@ -750,6 +750,10 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อ โปรดใส่รหัสยืนยันที่สร้างโดยแอป Authenticator ของคุณ',
       title: 'การยืนยันตัวตนสองขั้นตอน',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'ใส่รหัสผ่านของคุณ',
   signUp: {
@@ -840,6 +844,10 @@ export const thTH: LocalizationResource = {
       subtitleCombined: 'ยินดีต้อนรับ! โปรดกรอกรายละเอียดเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
       titleCombined: 'สร้างบัญชีของคุณ',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
@@ -941,6 +949,8 @@ export const thTH: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'รหัสผ่านของคุณใช้ได้ แต่อาจแข็งแกร่งกว่านี้ ลองเพิ่มตัวอักษรเพิ่มเติม',
       goodPassword: 'รหัสผ่านของคุณตรงตามข้อกำหนดที่จำเป็นทั้งหมด',
@@ -1338,5 +1348,10 @@ export const thTH: LocalizationResource = {
       subtitle: 'เราจะติดต่อเมื่อคิวของคุณพร้อม',
       title: 'ขอบคุณที่เข้าร่วม Waitlist!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

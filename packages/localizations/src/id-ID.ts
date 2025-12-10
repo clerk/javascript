@@ -752,6 +752,10 @@ export const idID: LocalizationResource = {
       subtitle: 'Untuk melanjutkan, masukkan kode verifikasi yang dihasilkan oleh aplikasi autentikator Anda',
       title: 'Verifikasi dua langkah',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Masukkan kata sandi Anda',
   signUp: {
@@ -845,6 +849,10 @@ export const idID: LocalizationResource = {
       subtitleCombined: 'Selamat datang! Silakan isi detail untuk memulai.',
       title: 'Buat akun Anda',
       titleCombined: 'Buat akun Anda',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
@@ -950,6 +958,8 @@ export const idID: LocalizationResource = {
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
       goodPassword: 'Kata sandi Anda memenuhi semua persyaratan yang diperlukan.',
@@ -1343,5 +1353,10 @@ export const idID: LocalizationResource = {
       subtitle: 'Kami akan menghubungi ketika tempat Anda siap',
       title: 'Terima kasih telah bergabung dengan daftar tunggu!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

@@ -737,6 +737,10 @@ export const zhCN: LocalizationResource = {
       subtitle: '请继续输入由您的身份验证应用生成的验证码。',
       title: '两步验证',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: '输入您的密码',
   signUp: {
@@ -826,6 +830,10 @@ export const zhCN: LocalizationResource = {
       subtitleCombined: '继续使用 {{applicationName}}',
       title: '创建您的账户',
       titleCombined: '创建您的账户',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
@@ -924,6 +932,8 @@ export const zhCN: LocalizationResource = {
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
     session_exists: '您已登录。',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',
       goodPassword: '做得好。这是一个优秀的密码。',
@@ -1312,5 +1322,10 @@ export const zhCN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

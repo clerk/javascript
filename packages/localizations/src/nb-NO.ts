@@ -749,6 +749,10 @@ export const nbNO: LocalizationResource = {
       subtitle: undefined,
       title: 'To-trinns verifisering',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Skriv inn passordet ditt',
   signUp: {
@@ -838,6 +842,10 @@ export const nbNO: LocalizationResource = {
       subtitleCombined: 'for å fortsette til {{applicationName}}',
       title: 'Opprett kontoen din',
       titleCombined: 'Opprett kontoen din',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',
@@ -940,6 +948,8 @@ export const nbNO: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
     session_exists: 'Du er allerede logget inn.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Passordet ditt fungerer, men det kan være sterkere. Prøv å legge til flere tegn.',
       goodPassword: 'Godt jobbet. Dette er et utmerket passord.',
@@ -1343,5 +1353,10 @@ export const nbNO: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

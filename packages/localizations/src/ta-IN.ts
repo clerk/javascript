@@ -754,6 +754,10 @@ export const taIN: LocalizationResource = {
       subtitle: 'தொடர, உங்கள் அங்கீகாரி பயன்பாட்டால் உருவாக்கப்பட்ட சரிபார்ப்புக் குறியீட்டை உள்ளிடவும்',
       title: 'இரண்டு-படி சரிபார்ப்பு',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
   signUp: {
@@ -846,6 +850,10 @@ export const taIN: LocalizationResource = {
       subtitleCombined: 'வரவேற்கிறோம்! தொடங்க விவரங்களை நிரப்பவும்.',
       title: 'உங்கள் கணக்கை உருவாக்கவும்',
       titleCombined: 'உங்கள் கணக்கை உருவாக்கவும்',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
@@ -955,6 +963,8 @@ export const taIN: LocalizationResource = {
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger:
         'உங்கள் கடவுச்சொல் செயல்படுகிறது, ஆனால் மேலும் வலுவாக இருக்கலாம். மேலும் எழுத்துகளைச் சேர்க்க முயற்சிக்கவும்.',
@@ -1360,5 +1370,10 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் இடம் தயாராகும் போது உங்களுடன் தொடர்பில் இருப்போம்',
       title: 'காத்திருப்பில் சேர்ந்ததற்கு நன்றி!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

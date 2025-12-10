@@ -748,6 +748,10 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: 'Totrinsbekræftelse',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'Indtast din adgangskode',
   signUp: {
@@ -837,6 +841,10 @@ export const daDK: LocalizationResource = {
       subtitleCombined: 'Forsæt til {{applicationName}}',
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
@@ -938,6 +946,8 @@ export const daDK: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     session_exists: 'Du er allerede logget ind.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',
       goodPassword: 'Din adgangskode opfylder alle nødvendige krav.',
@@ -1341,5 +1351,10 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

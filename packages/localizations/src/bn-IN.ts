@@ -753,6 +753,10 @@ export const bnIN: LocalizationResource = {
       subtitle: 'চালিয়ে যেতে, আপনার অথেনটিকেটর অ্যাপ দ্বারা উৎপন্ন যাচাইকরণ কোড লিখুন',
       title: 'দুই-ধাপ যাচাইকরণ',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   signInEnterPasswordTitle: 'আপনার পাসওয়ার্ড লিখুন',
   signUp: {
@@ -844,6 +848,10 @@ export const bnIN: LocalizationResource = {
       subtitleCombined: 'স্বাগতম! শুরু করতে দয়া করে তথ্য পূরণ করুন।',
       title: 'আপনার অ্যাকাউন্ট তৈরি করুন',
       titleCombined: 'আপনার অ্যাকাউন্ট তৈরি করুন',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} দিয়ে চালিয়ে যান',
@@ -950,6 +958,8 @@ export const bnIN: LocalizationResource = {
     phone_number_exists: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     session_exists: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'আপনার পাসওয়ার্ড কাজ করে, কিন্তু আরও শক্তিশালী হতে পারে। আরও অক্ষর যোগ করার চেষ্টা করুন।',
       goodPassword: 'আপনার পাসওয়ার্ড সমস্ত প্রয়োজনীয় শর্ত পূরণ করে।',
@@ -1354,5 +1364,10 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার স্থান প্রস্তুত হলে আমরা আপনার সাথে যোগাযোগ করব',
       title: 'ওয়েটলিস্টে যোগ দেওয়ার জন্য ধন্যবাদ!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;
