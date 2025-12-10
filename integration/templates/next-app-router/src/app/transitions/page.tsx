@@ -72,8 +72,6 @@ function TransitionController() {
             (promise as any).resolve = resolve;
             setTransitionPromise(promise);
 
-            // Async transition functions were introduced in React 19, but test outcome is the same regardless
-            // @ts-expect-error
             startTransition(async () => {
               await promise;
             });
@@ -117,8 +115,6 @@ function TransitionSwitcherButton({
   return (
     <button
       onClick={() => {
-        // Async transition functions were introduced in React 19, but test outcome is the same regardless
-        // @ts-expect-error
         startTransition(async () => {
           // Note that this does not currently work, as setActive does not support transitions,
           // we are using it to verify the existing behavior.

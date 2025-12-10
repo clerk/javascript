@@ -5,6 +5,7 @@ import type { ClientResource } from '@/types';
 import { useClerkInstanceContext } from '../../contexts';
 
 const initialSnapshot = undefined;
+const getInitialSnapshot = () => initialSnapshot;
 export function useClientBase(): ClientResource | null | undefined {
   const clerk = useClerkInstanceContext();
 
@@ -15,8 +16,8 @@ export function useClientBase(): ClientResource | null | undefined {
         return initialSnapshot;
       }
       return clerk.client;
-    }, [clerk.client, initialSnapshot, clerk.loaded]),
-    useCallback(() => initialSnapshot, []),
+    }, [clerk]),
+    getInitialSnapshot,
   );
 
   return client;

@@ -7,7 +7,9 @@ import { useClerkInstanceContext, useInitialStateContext } from '../../contexts'
 export function useSessionBase(): SignedInSessionResource | null | undefined {
   const clerk = useClerkInstanceContext();
   const initialState = useInitialStateContext();
-  const getInitialState = useCallback(() => initialState?.session as SignedInSessionResource, [initialState?.session]);
+  const getInitialState = useCallback(() => {
+    return initialState?.session as SignedInSessionResource | undefined;
+  }, [initialState?.session]);
 
   const session = useSyncExternalStore(
     useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
