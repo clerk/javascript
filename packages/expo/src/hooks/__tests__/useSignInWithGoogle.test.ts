@@ -5,8 +5,7 @@ import { useSignInWithGoogle } from '../useSignInWithGoogle.android';
 
 const mocks = vi.hoisted(() => {
   return {
-    useSignIn: vi.fn(),
-    useSignUp: vi.fn(),
+    useClerk: vi.fn(),
     ClerkGoogleOneTapSignIn: {
       configure: vi.fn(),
       presentExplicitSignIn: vi.fn(),
@@ -15,10 +14,9 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('@clerk/react/legacy', () => {
+vi.mock('@clerk/react', () => {
   return {
-    useSignIn: mocks.useSignIn,
-    useSignUp: mocks.useSignUp,
+    useClerk: mocks.useClerk,
   };
 });
 
@@ -85,15 +83,13 @@ describe('useSignInWithGoogle', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mocks.useSignIn.mockReturnValue({
-      signIn: mockSignIn,
+    mocks.useClerk.mockReturnValue({
+      loaded: true,
       setActive: mockSetActive,
-      isLoaded: true,
-    });
-
-    mocks.useSignUp.mockReturnValue({
-      signUp: mockSignUp,
-      isLoaded: true,
+      client: {
+        signIn: mockSignIn,
+        signUp: mockSignUp,
+      },
     });
   });
 
@@ -151,9 +147,13 @@ describe('useSignInWithGoogle', () => {
       mockSignIn.firstFactorVerification.status = 'transferable';
 
       const mockSignUpWithSession = { ...mockSignUp, createdSessionId: 'new-user-session-id' };
-      mocks.useSignUp.mockReturnValue({
-        signUp: mockSignUpWithSession,
-        isLoaded: true,
+      mocks.useClerk.mockReturnValue({
+        loaded: true,
+        setActive: mockSetActive,
+        client: {
+          signIn: mockSignIn,
+          signUp: mockSignUpWithSession,
+        },
       });
 
       const { result } = renderHook(() => useSignInWithGoogle());
@@ -166,7 +166,7 @@ describe('useSignInWithGoogle', () => {
         strategy: 'google_one_tap',
         token: mockIdToken,
       });
-      expect(mockSignUp.create).toHaveBeenCalledWith({
+      expect(mockSignUpWithSession.create).toHaveBeenCalledWith({
         transfer: true,
         unsafeMetadata: { source: 'test' },
       });
@@ -201,10 +201,10 @@ describe('useSignInWithGoogle', () => {
     });
 
     test('should return early when clerk is not loaded', async () => {
-      mocks.useSignIn.mockReturnValue({
-        signIn: mockSignIn,
+      mocks.useClerk.mockReturnValue({
+        loaded: false,
         setActive: mockSetActive,
-        isLoaded: false,
+        client: null,
       });
 
       const { result } = renderHook(() => useSignInWithGoogle());
@@ -238,9 +238,13 @@ describe('useSignInWithGoogle', () => {
         create: vi.fn().mockResolvedValue(undefined),
         createdSessionId: 'new-signup-session-id',
       };
-      mocks.useSignUp.mockReturnValue({
-        signUp: mockSignUpWithSession,
-        isLoaded: true,
+      mocks.useClerk.mockReturnValue({
+        loaded: true,
+        setActive: mockSetActive,
+        client: {
+          signIn: mockSignIn,
+          signUp: mockSignUpWithSession,
+        },
       });
 
       const { result } = renderHook(() => useSignInWithGoogle());

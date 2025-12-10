@@ -1,4 +1,4 @@
-import { useSignIn, useSignUp } from '@clerk/react/legacy';
+import { useClerk } from '@clerk/react';
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
@@ -61,20 +61,21 @@ export type StartGoogleAuthenticationFlowReturnType = {
  * @returns An object containing the `startGoogleAuthenticationFlow` function
  */
 export function useSignInWithGoogle() {
-  const { signIn, setActive, isLoaded: isSignInLoaded } = useSignIn();
-  const { signUp, isLoaded: isSignUpLoaded } = useSignUp();
+  const clerk = useClerk();
 
   async function startGoogleAuthenticationFlow(
     startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
   ): Promise<StartGoogleAuthenticationFlowReturnType> {
-    if (!isSignInLoaded || !isSignUpLoaded) {
+    const { client, loaded, setActive } = clerk;
+
+    if (!loaded || !client) {
       return {
         createdSessionId: null,
-        signIn,
-        signUp,
         setActive,
       };
     }
+
+    const { signIn, signUp } = client;
 
     // Get environment variables from expo-constants
     const webClientId =
