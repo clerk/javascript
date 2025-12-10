@@ -27,25 +27,55 @@
 
 ## Getting Started
 
-A tool that helps with upgrading major versions of Clerk's SDKs.
+A CLI that detects your installed Clerk SDK, upgrades packages to the next major release, runs codemods, and scans your codebase for breaking changes.
 
 ### Prerequisites
 
-- Node.js `>=18.17.0` or later
+- Node.js `>=20.9.0`
+- pnpm, npm, or yarn installed in the target project
 
 ## Usage
 
-Navigate to the application you want to upgrade and run the following in your terminal:
+Run the CLI from the root of the project you want to upgrade:
 
 ```sh
+# with pnpm
+pnpm dlx @clerk/upgrade
+
+# with npm
 npx @clerk/upgrade
+
+# if installed locally
+pnpm clerk-upgrade
 ```
 
-Fill out the questionnaire and the CLI will show you the required changes.
+Fill out the prompts and the CLI will:
+
+- Detect your Clerk SDK and version (or prompt for `--sdk`)
+- Upgrade packages (including renames such as `@clerk/clerk-react` → `@clerk/react`)
+- Run codemods for the selected release
+- Scan your files for breaking changes and print a report
+
+### CLI options
+
+- `--sdk` — SDK to upgrade (e.g., `nextjs`, `react`, `expo`); required in non-interactive runs if detection fails
+- `--dir` — directory to scan (default: current working directory)
+- `--glob` — glob of files for codemods (default: `**/*.(js|jsx|ts|tsx|mjs|cjs)`)
+- `--ignore` — extra globs to ignore during scans (repeatable)
+- `--release` — target release (e.g., `core-3`); otherwise auto-selected from installed versions
+- `--skip-upgrade` — skip installing/updating packages
+- `--skip-codemods` — skip codemod execution
+- `--dry-run` — show what would change without writing or installing
+
+### Releases
+
+- `core-3`: upgrades Next.js 6 → 7, React 5 → 7, Expo 2 → 3, React Router 2 → 3, TanStack React Start 0 → 1, Astro 2 → 3, Nuxt 2 → 3, Vue 2 → 3; includes package renames for React/Expo
+
+The CLI selects the appropriate release automatically based on the installed major version, or you can pin a release with `--release` (currently `core-3`).
 
 ### Caveats
 
-This tool uses regular expressions to scan for patterns that match breaking changes. This makes it run substantially faster and makes it more accessible for us at Clerk to author matchers for each breaking change, however it means that _we cannot gurarantee 100% accuracy of the results_. As such, it's important to treat this as a tool that can help you to complete your major version upgrades, rather than an automatic fix to all issues.
+Scans rely on regular expressions, so some patterns (unusual imports, bound methods, indirect calls) can be missed. Codemods cover common upgrades, but you should still review the report, run your test suite, and verify the app before deploying.
 
 The main thing that this tool will miss is cases where _unusual import patterns_ are used in your codebase. As an example, if Clerk made a breaking change to the `getAuth` function exported from `@clerk/nextjs`, `@clerk/upgrade` would likely look for something like `import { getAuth } from "@clerk/nextjs"` in order to detect whether you need to make some changes. If you were using your imports like `import * as ClerkNext from "@clerk/nextjs"`, you could use `getAuth` without it detecting it with its matcher.
 

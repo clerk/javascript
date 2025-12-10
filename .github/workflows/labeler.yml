@@ -19,5 +19,3 @@ jobs:
           filter: "blob:none"
           show-progress: false
       - uses: actions/labeler@v6
-        with:
-          repo-token: ${{ secrets.CLERK_COOKIE_PAT }}

@@ -71,4 +71,29 @@ createClerkClient();
 <OrganizationProfile />;
 `,
   },
+  {
+    name: 'Does not rename class constructors',
+    source: `
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly statusCode: number = 500
+  ) {
+    super(message);
+  }
+}
+    `,
+    output: `
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly statusCode: number = 500
+  ) {
+    super(message);
+  }
+}
+`,
+  },
 ];

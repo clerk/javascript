@@ -158,6 +158,39 @@ describe('createClerkRequest', () => {
       const req2 = new Request('http://localhost:3000////path');
       expect(createClerkRequest(req2).clerkUrl.toString()).toBe('http://localhost:3000////path');
     });
+
+    it('handles malicious host header with script injection gracefully', () => {
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          'x-forwarded-host': 'z2cgvm.xfh"></script><script>alert(document.domain);</script>/',
+          'x-forwarded-proto': 'https',
+        },
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
+    });
+
+    it('handles malicious host header with invalid characters gracefully', () => {
+      const req = new Request('http://localhost:3000/path?foo=bar', {
+        headers: {
+          'x-forwarded-host': '<invalid>host',
+          'x-forwarded-proto': 'https',
+        },
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path?foo=bar');
+    });
+
+    it('handles empty forwarded headers gracefully', () => {
+      const req = new Request('http://localhost:3000/path', {
+        headers: {
+          'x-forwarded-host': '',
+          'x-forwarded-proto': '',
+        },
+      });
+      expect(() => createClerkRequest(req)).not.toThrow();
+      expect(createClerkRequest(req).clerkUrl.toString()).toBe('http://localhost:3000/path');
+    });
   });
 
   describe('toJSON', () => {

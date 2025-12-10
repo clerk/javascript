@@ -6,7 +6,7 @@ import { fixtures } from './__fixtures__/transform-align-experimental-unstable-p
 
 describe('transform-align-experimental-unstable-prefixes', () => {
   it.each(fixtures)('$name', ({ source, output }) => {
-    const result = applyTransform(transformer, {}, { source });
+    const result = applyTransform(transformer, {}, { source }) || source.trim();
 
     expect(result).toEqual(output.trim());
   });

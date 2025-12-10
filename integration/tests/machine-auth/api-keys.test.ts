@@ -65,7 +65,7 @@ test.describe('Next.js API key auth within clerkMiddleware() @machine', () => {
   });
 
   test.afterAll(async () => {
-    await fakeAPIKey.revoke();
+    await fakeAPIKey.revoke('Testing purposes within clerkMiddleware()');
     await fakeUser.deleteIfExists();
     await app.teardown();
   });

@@ -44,16 +44,22 @@ export function renderConfig({ sdk, currentVersion, fromVersion, toVersion, vers
   console.log('');
 }
 
-export async function promptConfirm(message) {
+export async function promptConfirm(message, defaultYes = false) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
 
   return new Promise(resolve => {
-    rl.question(`${message} (y/n): `, answer => {
+    const prompt = defaultYes ? `${message} (Y/n): ` : `${message} (y/N): `;
+    rl.question(prompt, answer => {
       rl.close();
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
+      const normalized = answer.trim().toLowerCase();
+      if (!normalized) {
+        resolve(defaultYes);
+        return;
+      }
+      resolve(normalized === 'y' || normalized === 'yes');
     });
   });
 }

@@ -7,6 +7,7 @@ globalThis.__DEV__ = true;
 globalThis.PACKAGE_NAME = '@clerk/react';
 globalThis.PACKAGE_VERSION = '0.0.0-test';
 globalThis.JS_PACKAGE_VERSION = '5.0.0';
+globalThis.UI_PACKAGE_VERSION = '1.0.0';
 globalThis.__CLERK_USE_RQ__ = process.env.CLERK_USE_RQ === 'true';
 
 // Setup Web Crypto API for tests (Node.js 18+ compatibility)
