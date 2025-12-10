@@ -1,7 +1,7 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { Web3Provider, Web3Strategy } from '@clerk/shared/types';
 
-import { Web3SelectWalletScreen } from '@/ui/components/UserProfile/Web3SelectWalletScreen';
+import { Web3SelectSolanaWalletScreen } from '@/ui/components/UserProfile/Web3SelectSolanaWalletScreen';
 import { Action } from '@/ui/elements/Action';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { useCardState } from '@/ui/elements/contexts';
@@ -107,7 +107,7 @@ export const AddWeb3WalletActionMenu = () => {
       </Action.Closed>
       <Action.Open value='web3Wallets'>
         <Action.Card>
-          <Web3SelectWalletScreen onConnect={connect} />
+          <Web3SelectSolanaWalletScreen onConnect={connect} />
         </Action.Card>
       </Action.Open>
 

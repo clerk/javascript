@@ -19,7 +19,7 @@ export type Web3SelectWalletProps = {
   onConnect: (params: { strategy: Web3Strategy; walletName: string }) => Promise<void>;
 };
 
-export const Web3SelectWalletScreen = ({ onConnect }: Web3SelectWalletProps) => {
+export const Web3SelectSolanaWalletScreen = ({ onConnect }: Web3SelectWalletProps) => {
   const card = useCardState();
   const { close } = useActionContext();
 
