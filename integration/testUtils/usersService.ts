@@ -75,7 +75,7 @@ export type FakeOrganization = {
 export type FakeAPIKey = {
   apiKey: APIKey;
   secret: string;
-  revoke: () => Promise<APIKey>;
+  revoke: (reason?: string | null) => Promise<APIKey>;
 };
 
 export type UserService = {
@@ -232,10 +232,8 @@ export const createUserService = (clerkClient: ClerkClient) => {
       return {
         apiKey,
         secret: apiKey.secret ?? '',
-        revoke: () =>
-          withErrorLogging('revokeAPIKey', () =>
-            clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: 'For testing purposes' }),
-          ),
+        revoke: (reason?: string | null) =>
+          clerkClient.apiKeys.revoke({ apiKeyId: apiKey.id, revocationReason: reason }),
       } satisfies FakeAPIKey;
     },
     passwordCompromised: async (userId: string) => {
