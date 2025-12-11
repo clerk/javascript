@@ -911,6 +911,8 @@ export const frFR: LocalizationResource = {
     captcha_unavailable:
       "Inscription échouée en raison d'une validation de captcha non réussie. Veuillez actualiser la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     form_code_incorrect: 'Code incorrect',
+    form_email_address_blocked:
+      'Les services de messagerie temporaire ne sont pas pris en charge. Veuillez utiliser votre adresse e-mail habituelle pour créer un compte.',
     form_identifier_exists__email_address: 'Cette adresse e-mail existe déjà.',
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",

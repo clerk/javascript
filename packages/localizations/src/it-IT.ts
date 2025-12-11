@@ -901,6 +901,8 @@ export const itIT: LocalizationResource = {
     captcha_unavailable:
       'Registrazione non riuscita a causa della convalida del bot non riuscita. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     form_code_incorrect: 'Il codice inserito non è corretto. Riprova.',
+    form_email_address_blocked:
+      'I servizi di posta elettronica temporanea non sono supportati. Si prega di utilizzare il proprio indirizzo email normale per creare un account.',
     form_identifier_exists__email_address: 'Questa email è già registrata.',
     form_identifier_exists__phone_number: 'Questo numero di telefono è già registrato.',
     form_identifier_exists__username: 'Questo username è già in uso.',

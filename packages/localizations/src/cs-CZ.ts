@@ -905,6 +905,8 @@ export const csCZ: LocalizationResource = {
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
     form_code_incorrect: 'Kód je nesprávný.',
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nejsou podporovány. Pro vytvoření účtu použijte prosím svou běžnou e-mailovou adresu.',
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',

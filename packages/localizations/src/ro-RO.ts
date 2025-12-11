@@ -907,6 +907,8 @@ export const roRO: LocalizationResource = {
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Serviciile de e-mail temporare nu sunt acceptate. Vă rugăm să folosiți adresa dvs. de e-mail obișnuită pentru a crea un cont.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,

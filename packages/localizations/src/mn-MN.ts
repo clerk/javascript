@@ -893,6 +893,8 @@ export const mnMN: LocalizationResource = {
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
+    form_email_address_blocked:
+      'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,

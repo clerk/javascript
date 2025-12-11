@@ -910,6 +910,8 @@ export const deDE: LocalizationResource = {
     captcha_unavailable:
       'Die Anmeldung ist aufgrund einer fehlgeschlagenen Bot-Validierung fehlgeschlagen. Bitte aktualisieren Sie die Seite, um es erneut zu versuchen, oder wenden Sie sich an den Support, um weitere Unterstützung zu erhalten.',
     form_code_incorrect: 'Der eingegebene Code ist falsch. Bitte überprüfen Sie ihn und versuchen Sie es erneut.',
+    form_email_address_blocked:
+      'Temporäre E-Mail-Dienste werden nicht unterstützt. Bitte verwenden Sie Ihre reguläre E-Mail-Adresse, um ein Konto zu erstellen.',
     form_identifier_exists__email_address: 'Diese E-Mail-Adresse ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__phone_number: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine andere.',
     form_identifier_exists__username: 'Dieser Benutzername ist bereits vergeben. Bitte wählen Sie einen anderen.',

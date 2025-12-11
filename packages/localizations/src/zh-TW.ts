@@ -879,6 +879,7 @@ export const zhTW: LocalizationResource = {
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,
+    form_email_address_blocked: '不支援臨時電子郵件服務。請使用您的常規電子郵件地址建立帳戶。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,

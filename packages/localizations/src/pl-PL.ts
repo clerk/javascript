@@ -898,6 +898,8 @@ export const plPL: LocalizationResource = {
     captcha_unavailable:
       'Rejestracja nie powiodła się z powodu niedostępności weryfikacji botów. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tymczasowe usługi e-mail nie są obsługiwane. Proszę użyć zwykłego adresu e-mail, aby utworzyć konto.',
     form_identifier_exists__email_address: 'Adres e-mail jest już zajęty. Proszę spróbować innego.',
     form_identifier_exists__phone_number: 'Ten numer telefonu jest zajęty. Spróbuj użyć innego.',
     form_identifier_exists__username: 'Ta nazwa użytkownika jest zajęta. Spróbuj użyć innej.',

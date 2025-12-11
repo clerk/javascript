@@ -895,6 +895,8 @@ export const esES: LocalizationResource = {
     captcha_unavailable:
       'Registro fallido debido a una validación de bot fallida. Por favor, actualice la página para intentarlo de nuevo o comuníquese con el soporte para más asistencia.',
     form_code_incorrect: 'El código ingresado es incorrecto.',
+    form_email_address_blocked:
+      'Los servicios de correo electrónico temporal no están soportados. Por favor, use su dirección de correo electrónico regular para crear una cuenta.',
     form_identifier_exists__email_address: 'Ya existe una cuenta con esta dirección de correo electrónico.',
     form_identifier_exists__phone_number: 'Ya existe una cuenta con este número de teléfono.',
     form_identifier_exists__username: 'Ya existe una cuenta con este nombre de usuario.',

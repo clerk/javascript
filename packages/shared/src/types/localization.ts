@@ -1350,6 +1350,7 @@ type UnstableErrors = WithParamName<{
   form_param_type_invalid: LocalizationValue;
   form_param_type_invalid__phone_number: LocalizationValue;
   form_param_type_invalid__email_address: LocalizationValue;
+  form_email_address_blocked: LocalizationValue;
   form_password_length_too_short: LocalizationValue;
   form_param_nil: LocalizationValue;
   form_code_incorrect: LocalizationValue;

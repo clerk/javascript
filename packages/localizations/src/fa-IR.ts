@@ -903,6 +903,8 @@ export const faIR: LocalizationResource = {
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
     form_code_incorrect: 'کد وارد شده نادرست است.',
+    form_email_address_blocked:
+      'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
     form_identifier_exists__email_address: 'این آدرس ایمیل قبلاً استفاده شده است.',
     form_identifier_exists__phone_number: 'این شماره تلفن قبلاً استفاده شده است.',
     form_identifier_exists__username: 'این نام کاربری قبلاً گرفته شده است.',

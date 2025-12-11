@@ -906,6 +906,8 @@ export const ptBR: LocalizationResource = {
     captcha_unavailable:
       'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',

@@ -894,6 +894,8 @@ export const caES: LocalizationResource = {
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
+    form_email_address_blocked:
+      'Els serveis de correu electrònic temporal no estan suportats. Si us plau, utilitzeu la vostra adreça de correu electrònic habitual per crear un compte.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,

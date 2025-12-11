@@ -899,6 +899,8 @@ export const skSK: LocalizationResource = {
     captcha_unavailable:
       'Registrácia zlyhala z dôvodu neúspešného overenia proti botom. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nie sú podporované. Prosím, použite svoju bežnú e-mailovú adresu na vytvorenie účtu.',
     form_identifier_exists__email_address: 'Táto emailová adresa je už obsadená. Skúste prosím inú.',
     form_identifier_exists__phone_number: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     form_identifier_exists__username: 'Táto použivateľské meno je už obsadené. Skúste prosím iné.',
