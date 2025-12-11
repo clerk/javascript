@@ -930,6 +930,8 @@ export const frFR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'La valeur fournie est invalide.',
     form_password_incorrect: 'Mot de passe incorrect',
+    form_password_or_identifier_incorrect:
+      "Le mot de passe ou l'adresse e-mail est incorrect. Réessayez ou utilisez une autre méthode.",
     form_password_length_too_short: 'Votre mot de passe est trop court.',
     form_password_not_strong_enough: "Votre mot de passe n'est pas assez fort.",
     form_password_pwned:

@@ -909,6 +909,7 @@ export const enUS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:

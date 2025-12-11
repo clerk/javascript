@@ -912,6 +912,8 @@ export const mnMN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
+    form_password_or_identifier_incorrect:
+      'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
     form_password_pwned:

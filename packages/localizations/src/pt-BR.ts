@@ -925,6 +925,8 @@ export const ptBR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'Número de telefone inválido.',
     form_param_value_invalid: 'Valor inválido.',
     form_password_incorrect: 'Senha incorreta.',
+    form_password_or_identifier_incorrect:
+      'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',

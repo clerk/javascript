@@ -910,6 +910,8 @@ export const srRS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Lozinka je netačna.',
+    form_password_or_identifier_incorrect:
+      'Лозинка или адреса е-поште је нетачна. Покушај поново или користи други метод.',
     form_password_length_too_short: 'Lozinka je prekratka.',
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
     form_password_pwned:

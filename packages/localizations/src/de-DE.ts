@@ -929,6 +929,8 @@ export const deDE: LocalizationResource = {
     form_param_type_invalid__phone_number: 'Bitte geben Sie eine gültige Telefonnummer ein.',
     form_param_value_invalid: 'Der eingegebene Wert ist ungültig.',
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
+    form_password_or_identifier_incorrect:
+      'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
     form_password_pwned:

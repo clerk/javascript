@@ -909,6 +909,8 @@ export const arSA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',

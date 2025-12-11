@@ -901,6 +901,7 @@ export const heIL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'הסיסמה או כתובת האימייל שגויים. נסה שוב או השתמש בשיטה אחרת.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',

@@ -915,6 +915,8 @@ export const hrHR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Lozinka ili e-mail adresa je netočna. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_pwned:

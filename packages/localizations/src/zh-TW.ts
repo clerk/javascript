@@ -897,6 +897,7 @@ export const zhTW: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試，或使用其他方法。',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',

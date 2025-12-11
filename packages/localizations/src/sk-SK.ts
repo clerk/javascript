@@ -918,6 +918,8 @@ export const skSK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Hodnota je neplatná. Skontrolujte a opravte.',
     form_password_incorrect: 'Heslo je nesprávne. Skontrolujte a skúste to znova.',
+    form_password_or_identifier_incorrect:
+      'Heslo alebo e-mailová adresa je nesprávna. Skúste to znova alebo použite inú metódu.',
     form_password_length_too_short: 'Heslo musí mať aspoň 8 znakov.',
     form_password_not_strong_enough: 'Vaše heslo nie je dostatočne silné.',
     form_password_pwned: 'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',

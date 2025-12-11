@@ -924,6 +924,8 @@ export const csCZ: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
     form_password_incorrect: 'Heslo je nesprávné.',
+    form_password_or_identifier_incorrect:
+      'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',

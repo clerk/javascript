@@ -926,6 +926,8 @@ export const ruRU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль или адрес электронной почты неверен. Попробуйте снова или используйте другой метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',

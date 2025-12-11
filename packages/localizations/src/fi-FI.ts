@@ -913,6 +913,8 @@ export const fiFI: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_pwned: 'Salasana on ollut osallisena tietovuodossa. Valitse toinen salasana.',

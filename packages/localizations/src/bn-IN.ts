@@ -918,6 +918,8 @@ export const bnIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
+    form_password_or_identifier_incorrect:
+      'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
     form_password_pwned:

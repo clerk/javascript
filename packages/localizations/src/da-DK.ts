@@ -910,6 +910,8 @@ export const daDK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
+    form_password_or_identifier_incorrect:
+      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
     form_password_pwned: 'Adgangskoden er blevet kompromitteret.',

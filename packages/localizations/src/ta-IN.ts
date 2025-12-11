@@ -919,6 +919,8 @@ export const taIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
+    form_password_or_identifier_incorrect:
+      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',

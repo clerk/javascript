@@ -911,6 +911,8 @@ export const ptPT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor de parâmetro inválido.',
     form_password_incorrect: 'Palavra-passe incorreta.',
+    form_password_or_identifier_incorrect:
+      'A palavra-passe ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'A palavra-passe é muito curta.',
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_pwned:
