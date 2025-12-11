@@ -2,7 +2,7 @@
 
 import { $, argv, echo } from 'zx';
 
-import { constants, getPackageNames } from './common.mjs';
+import { constants, getPackageNames, pinWorkspaceDeps } from './common.mjs';
 
 const packageNames = await getPackageNames();
 const packageEntries = packageNames.map(name => `'${name}': patch`).join('\n');
@@ -32,6 +32,10 @@ try {
 // Always generate a temp .md file that indicates that all packages have changes
 // in order to force a snapshot release of all packages
 await $`touch .changeset/snap.md && echo ${snapshot} > .changeset/snap.md`;
+
+// Convert workspace:^ to workspace:* for @clerk/* deps to ensure exact versions
+// This prevents semver range issues like ^3.0.0-snapshot matching older versions
+await pinWorkspaceDeps();
 
 const res = await $`pnpm changeset version --snapshot ${prefix}`;
 const success = !res.stderr.includes('No unreleased changesets found');

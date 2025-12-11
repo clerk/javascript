@@ -32,8 +32,8 @@ export const testSignIn = async ({ app, page, context, fakeUser }: TestParams) =
   await u.po.signIn.waitForMounted();
 
   const accountPortalURL = page.url();
-  // Check that we are in Account Portal
-  expect(accountPortalURL).toContain('.accounts.dev');
+  // Check that we are in Account Portal (dev or staging)
+  expect(accountPortalURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
   // Check that the DevBrowser JWT between localhost and AP is the same
   const accountPortalDbJwt = await context
     .cookies(accountPortalURL)
@@ -98,8 +98,8 @@ export const testSignUp = async ({ app, page, context }: TestParams) => {
 
   // Check that the DevBrowser JWT between localhost and AP is the same
   const accountPortalURL = page.url();
-  // Check that we are in Account Portal
-  expect(accountPortalURL).toContain('.accounts.dev');
+  // Check that we are in Account Portal (dev or staging)
+  expect(accountPortalURL).toMatch(/\.accounts(stage\.dev|\.dev|\.stg)/);
   const accountPortalDbJwt = await context
     .cookies(accountPortalURL)
     .then(cookies => cookies.find(c => c.name === CLERK_DB_JWT_COOKIE_NAME)?.value);

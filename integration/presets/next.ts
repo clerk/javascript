@@ -44,10 +44,16 @@ const appRouterAPWithClerkNextV4 = appRouterQuickstart
     `,
   );
 
+const appRouterAPWithClerkNextV6 = appRouterQuickstart
+  .clone()
+  .setName('next-app-router-ap-clerk-next-v6')
+  .addDependency('@clerk/nextjs', '6');
+
 export const next = {
   appRouter,
   appRouterTurbo,
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
   appRouterAPWithClerkNextV4,
+  appRouterAPWithClerkNextV6,
 } as const;

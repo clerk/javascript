@@ -6,16 +6,16 @@ import type { FakeUser } from '../../testUtils';
 import { createTestUtils } from '../../testUtils';
 import { testSignIn, testSignUp, testSSR } from './common';
 
-test.describe('Next with ClerkJS V5 <-> Account Portal Core 1 @ap-flows', () => {
+test.describe('Next with ClerkJS V4 <-> Account Portal Core 3 @ap-flows', () => {
   test.describe.configure({ mode: 'serial' });
   let app: Application;
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
     test.setTimeout(90_000); // Wait for app to be ready
-    app = await appConfigs.next.appRouterAPWithClerkNextLatest.clone().commit();
+    app = await appConfigs.next.appRouterAPWithClerkNextV4.clone().commit();
     await app.setup();
-    await app.withEnv(appConfigs.envs.withAPCore1ClerkLatest);
+    await app.withEnv(appConfigs.envs.withAPCore3ClerkV4);
     await app.dev();
     const u = createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser();
