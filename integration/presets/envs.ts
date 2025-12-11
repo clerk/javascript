@@ -116,7 +116,8 @@ const withAPCore3ClerkLatest = environmentConfig()
   .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withDynamicKeys = withEmailCodes
   .clone()
