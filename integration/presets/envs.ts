@@ -77,31 +77,42 @@ const withEmailCodesQuickstart = withEmailCodes
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
-const withAPCore1ClerkLatest = environmentConfig()
-  .setId('withAPCore1ClerkLatest')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
-
 const withAPCore1ClerkV4 = environmentConfig()
   .setId('withAPCore1ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
 
-const withAPCore2ClerkLatest = environmentConfig()
-  .setId('withAPCore2ClerkLatest')
+// Uses staging instance which runs Core 3
+const withAPCore3ClerkV4 = environmentConfig()
+  .setId('withAPCore3ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
 
-const withAPCore2ClerkV4 = environmentConfig()
-  .setId('withAPCore2ClerkV4')
+const withAPCore1ClerkV6 = environmentConfig()
+  .setId('withAPCore1ClerkV6')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
+
+// Uses staging instance which runs Core 3
+const withAPCore3ClerkV6 = environmentConfig()
+  .setId('withAPCore3ClerkV6')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+
+// Uses staging instance which runs Core 3
+const withAPCore3ClerkLatest = environmentConfig()
+  .setId('withAPCore3ClerkLatest')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk)
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
 
 const withDynamicKeys = withEmailCodes
   .clone()
@@ -193,10 +204,11 @@ export const envs = {
   base,
   sessionsProd1,
   withAPIKeys,
-  withAPCore1ClerkLatest,
   withAPCore1ClerkV4,
-  withAPCore2ClerkLatest,
-  withAPCore2ClerkV4,
+  withAPCore1ClerkV6,
+  withAPCore3ClerkV4,
+  withAPCore3ClerkLatest,
+  withAPCore3ClerkV6,
   withBilling,
   withBillingJwtV2,
   withCustomRoles,
