@@ -917,6 +917,8 @@ export const beBY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Невядомы або недапушчальны значэнне.',
     form_password_incorrect: 'Невірны пароль.',
+    form_password_or_identifier_incorrect:
+      'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',
     form_password_length_too_short: 'Пароль занадта кароткі.',
     form_password_not_strong_enough: 'Ваш пароль недастаткова надзейны.',
     form_password_pwned: 'Гэты пароль быў узламаны і не можа быць выкарыстаны, паспрабуйце іншы пароль.',

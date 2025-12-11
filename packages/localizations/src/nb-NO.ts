@@ -909,6 +909,8 @@ export const nbNO: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_pwned:

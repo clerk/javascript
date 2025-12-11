@@ -913,6 +913,8 @@ export const elGR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
     form_password_pwned:

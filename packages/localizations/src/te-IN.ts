@@ -917,6 +917,8 @@ export const teIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'నమోదు చేసిన విలువ చెల్లనిది. దయచేసి దిద్దుబాటు చేయండి.',
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+    form_password_or_identifier_incorrect:
+      'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
     form_password_pwned:

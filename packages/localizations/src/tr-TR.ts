@@ -912,6 +912,8 @@ export const trTR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
     form_password_incorrect: 'Şifre yanlış.',
+    form_password_or_identifier_incorrect:
+      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
     form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
