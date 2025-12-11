@@ -138,7 +138,7 @@ async function main() {
     packageManager: getPackageManagerDisplayName(packageManager),
   });
 
-  if (isInteractive && !(await promptConfirm('Ready to upgrade?'))) {
+  if (isInteractive && !(await promptConfirm('Ready to upgrade?', true))) {
     renderError('Upgrade cancelled. Exiting...');
     process.exit(0);
   }
