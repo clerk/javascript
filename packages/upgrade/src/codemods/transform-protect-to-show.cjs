@@ -12,6 +12,8 @@ const HYBRID_PACKAGES = ['@clerk/astro', '@clerk/nextjs'];
  * - `<Protect feature="user:premium">` → `<Show when={{ feature: 'user:premium' }}>`
  * - `<Protect plan="pro">` → `<Show when={{ plan: 'pro' }}>`
  * - `<Protect condition={(has) => ...}>` → `<Show when={(has) => ...}>`
+ * - `<SignedIn>...` → `<Show when="signedIn">...`
+ * - `<SignedOut>...` → `<Show when="signedOut">...`
  *
  * Also updates imports from `Protect` to `Show`.
  *
@@ -24,6 +26,7 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
   let dirtyFlag = false;
   const componentKindByLocalName = {};
   const protectPropsLocalsToRename = [];
+  const namespaceImports = new Set();
 
   // Transform imports: Protect → Show, ProtectProps → ShowProps
   const allPackages = [...CLIENT_ONLY_PACKAGES, ...HYBRID_PACKAGES];
@@ -33,6 +36,13 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
       const specifiers = node.specifiers || [];
 
       specifiers.forEach(spec => {
+        if (j.ImportNamespaceSpecifier.check(spec)) {
+          if (spec.local?.name) {
+            namespaceImports.add(spec.local.name);
+          }
+          return;
+        }
+
         if (j.ImportSpecifier.check(spec)) {
           const originalImportedName = spec.imported.name;
 
@@ -45,6 +55,9 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
                   ? 'signedIn'
                   : 'signedOut';
             spec.imported.name = 'Show';
+            if (spec.local && spec.local.name === originalImportedName) {
+              spec.local.name = 'Show';
+            }
             dirtyFlag = true;
           }
 
@@ -61,6 +74,28 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
           }
         }
       });
+
+      const seenLocalNames = new Set();
+      node.specifiers = specifiers.reduce((acc, spec) => {
+        let localName = null;
+
+        if (spec.local && j.Identifier.check(spec.local)) {
+          localName = spec.local.name;
+        } else if (j.ImportSpecifier.check(spec) && j.Identifier.check(spec.imported)) {
+          localName = spec.imported.name;
+        }
+
+        if (localName) {
+          if (seenLocalNames.has(localName)) {
+            dirtyFlag = true;
+            return acc;
+          }
+          seenLocalNames.add(localName);
+        }
+
+        acc.push(spec);
+        return acc;
+      }, []);
     });
   });
 
@@ -87,24 +122,46 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     const openingElement = path.node.openingElement;
     const closingElement = path.node.closingElement;
 
-    // Check if this is a transformed control component
-    if (!j.JSXIdentifier.check(openingElement.name)) {
-      return;
-    }
+    let kind = null;
+    let renameNodeToShow = null;
 
-    const originalName = openingElement.name.name;
-    const kind = componentKindByLocalName[originalName];
+    if (j.JSXIdentifier.check(openingElement.name)) {
+      const originalName = openingElement.name.name;
+      kind = componentKindByLocalName[originalName];
+
+      if (['Protect', 'SignedIn', 'SignedOut'].includes(originalName)) {
+        renameNodeToShow = node => {
+          if (j.JSXIdentifier.check(node)) {
+            node.name = 'Show';
+          }
+        };
+      }
+    } else if (j.JSXMemberExpression.check(openingElement.name)) {
+      const member = openingElement.name;
+      if (j.Identifier.check(member.object) && j.Identifier.check(member.property)) {
+        const objectName = member.object.name;
+        const propertyName = member.property.name;
+
+        if (namespaceImports.has(objectName) && ['Protect', 'SignedIn', 'SignedOut'].includes(propertyName)) {
+          kind = propertyName === 'Protect' ? 'protect' : propertyName === 'SignedIn' ? 'signedIn' : 'signedOut';
+
+          renameNodeToShow = node => {
+            if (j.JSXMemberExpression.check(node) && j.Identifier.check(node.property)) {
+              node.property.name = 'Show';
+            }
+          };
+        }
+      }
+    }
 
     if (!kind) {
       return;
     }
 
-    // Only rename if the component was used without an alias (as <Protect>/<SignedIn>/<SignedOut>).
-    // For aliased imports (e.g., Protect as MyProtect), keep the alias in place.
-    if (['Protect', 'SignedIn', 'SignedOut'].includes(originalName)) {
-      openingElement.name.name = 'Show';
-      if (closingElement && j.JSXIdentifier.check(closingElement.name)) {
-        closingElement.name.name = 'Show';
+    if (renameNodeToShow) {
+      renameNodeToShow(openingElement.name);
+      if (closingElement && closingElement.name) {
+        renameNodeToShow(closingElement.name);
       }
     }
 

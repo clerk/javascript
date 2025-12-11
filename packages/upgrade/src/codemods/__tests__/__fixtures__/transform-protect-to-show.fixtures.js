@@ -14,7 +14,7 @@ import { Show } from "@clerk/react"
 import { SignedIn, SignedOut } from "@clerk/react"
         `,
     output: `
-import { Show } from "@clerk/react"
+import { Show } from "@clerk/react";
 `,
   },
   {
@@ -62,7 +62,7 @@ const App = () => (
   <Show when="signedIn">
     <div>Child</div>
   </Show>
-);
+)
 `,
   },
   {
@@ -83,7 +83,28 @@ const App = () => (
   <Show when="signedOut">
     <div>Child</div>
   </Show>
-);
+)
+`,
+  },
+  {
+    name: 'Transforms SignedIn namespace import',
+    source: `
+import * as Clerk from "@clerk/react"
+
+const App = () => (
+  <Clerk.SignedIn>
+    <div>Child</div>
+  </Clerk.SignedIn>
+)
+        `,
+    output: `
+import * as Clerk from "@clerk/react"
+
+const App = () => (
+  <Clerk.Show when="signedIn">
+    <div>Child</div>
+  </Clerk.Show>
+)
 `,
   },
   {
@@ -164,7 +185,7 @@ const App = () => (
   }}>
     <div>Child</div>
   </Show>
-);
+)
 `,
   },
   {
@@ -185,7 +206,28 @@ const App = () => (
   <Show when="signedOut" fallback={<Other />}>
     <div>Child</div>
   </Show>
-);
+)
+`,
+  },
+  {
+    name: 'Transforms SignedOut namespace import with fallback',
+    source: `
+import * as Clerk from "@clerk/react"
+
+const App = () => (
+  <Clerk.SignedOut fallback={<Other />}>
+    <div>Child</div>
+  </Clerk.SignedOut>
+)
+        `,
+    output: `
+import * as Clerk from "@clerk/react"
+
+const App = () => (
+  <Clerk.Show when="signedOut" fallback={<Other />}>
+    <div>Child</div>
+  </Clerk.Show>
+)
 `,
   },
   {
@@ -267,9 +309,7 @@ const App = () => <Protect {...props} />
 import { Show } from "@clerk/react"
 
 const props = { permission: "org:read" }
-const App = () => <Show when={{
-  permission: "org:read"
-}} />
+const App = () => <Show when="signedIn" {...props} />
 `,
   },
 ];
