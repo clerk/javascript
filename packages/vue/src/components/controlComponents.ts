@@ -130,11 +130,16 @@ export const Show = defineComponent((props: ShowProps, { slots }) => {
       return authorized;
     }
 
-    if (typeof props.when === 'function') {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return props.when(has.value!) ? authorized : unauthorized;
+    const hasValue = has.value;
+
+    if (!hasValue) {
+      return unauthorized;
     }
 
-    return has.value?.(props.when) ? authorized : unauthorized;
+    if (typeof props.when === 'function') {
+      return props.when(hasValue) ? authorized : unauthorized;
+    }
+
+    return hasValue(props.when) ? authorized : unauthorized;
   };
 });
