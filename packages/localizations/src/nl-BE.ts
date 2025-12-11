@@ -910,6 +910,8 @@ export const nlBE: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'De waarde die je hebt ingevoerd is ongeldig.',
     form_password_incorrect: 'Het wachtwoord is incorrect.',
+    form_password_or_identifier_incorrect:
+      'Het wachtwoord of het e-mailadres is onjuist. Probeer het opnieuw of gebruik een andere methode.',
     form_password_length_too_short: 'Het wachtwoord is te kort.',
     form_password_not_strong_enough: 'Je wachtwoord is niet sterk genoeg.',
     form_password_pwned: 'Dit wachtwoord is in een datalek gevonden.',

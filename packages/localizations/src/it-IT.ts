@@ -918,6 +918,7 @@ export const itIT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valore non valido.',
     form_password_incorrect: 'Password errata.',
+    form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',
     form_password_pwned: 'Questa password è stata trovata in una violazione dei dati. Scegli una password diversa.',

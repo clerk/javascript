@@ -909,6 +909,8 @@ export const huHU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_pwned:

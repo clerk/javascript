@@ -900,6 +900,8 @@ export const kkKZ: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Енгізілген мән жарамсыз.',
     form_password_incorrect: 'Құпия сөз қате.',
+    form_password_or_identifier_incorrect:
+      'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
     form_password_pwned: 'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',
