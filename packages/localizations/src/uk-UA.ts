@@ -891,6 +891,8 @@ export const ukUA: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Тимчасові поштові служби не підтримуються. Будь ласка, використовуйте свою звичайну адресу електронної пошти для створення облікового запису.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -908,6 +910,8 @@ export const ukUA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль або адреса електронної пошти невірні. Спробуйте ще раз або використайте інший метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостатньо надійний.',
     form_password_pwned: 'Цей пароль було зламано і його не можна використовувати, спробуйте інший пароль.',

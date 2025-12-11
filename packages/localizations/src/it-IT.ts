@@ -901,6 +901,8 @@ export const itIT: LocalizationResource = {
     captcha_unavailable:
       'Registrazione non riuscita a causa della convalida del bot non riuscita. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     form_code_incorrect: 'Il codice inserito non è corretto. Riprova.',
+    form_email_address_blocked:
+      'I servizi di posta elettronica temporanea non sono supportati. Si prega di utilizzare il proprio indirizzo email normale per creare un account.',
     form_identifier_exists__email_address: 'Questa email è già registrata.',
     form_identifier_exists__phone_number: 'Questo numero di telefono è già registrato.',
     form_identifier_exists__username: 'Questo username è già in uso.',
@@ -918,6 +920,7 @@ export const itIT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valore non valido.',
     form_password_incorrect: 'Password errata.',
+    form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',
     form_password_pwned: 'Questa password è stata trovata in una violazione dei dati. Scegli una password diversa.',

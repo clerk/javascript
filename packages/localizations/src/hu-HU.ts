@@ -892,6 +892,8 @@ export const huHU: LocalizationResource = {
     captcha_unavailable:
       'Bot érvényesítése miatt, a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Az ideiglenes e-mail szolgáltatások nem támogatottak. Kérlek, használd a szokásos e-mail címedet a fiók létrehozásához.',
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
@@ -909,6 +911,8 @@ export const huHU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_pwned:

@@ -883,6 +883,8 @@ export const kkKZ: LocalizationResource = {
     captcha_invalid: 'Қауіпсіздік тексерілуі сәтсіз аяқталды. Браузерді өзгерту немесе кеңейтулерді өшіруге тырысыңыз.',
     captcha_unavailable: 'Бот тексерілуі сәтсіз аяқталды. Бетті жаңартып немесе қолдау қызметіне хабарласыңыз.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Уақытша электрондық пошта қызметтері қолдау көрсетілмейді. Есептік жазбаны жасау үшін кәдімгі электрондық пошта мекенжайыңызды пайдаланыңыз.',
     form_identifier_exists__email_address: 'Бұл электрондық пошта тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__phone_number: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     form_identifier_exists__username: 'Бұл пайдаланушы аты тіркелген. Басқасын қолданыңыз.',
@@ -900,6 +902,8 @@ export const kkKZ: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Енгізілген мән жарамсыз.',
     form_password_incorrect: 'Құпия сөз қате.',
+    form_password_or_identifier_incorrect:
+      'Құпия сөз немесе электрондық пошта мекенжайы дұрыс емес. Қайталап көріңіз немесе басқа әдісті пайдаланыңыз.',
     form_password_length_too_short: 'Құпия сөз тым қысқа. Кемінде 8 таңба болуы керек.',
     form_password_not_strong_enough: 'Құпия сөз әлсіз.',
     form_password_pwned: 'Бұл құпия сөз қауіпсіздік бұзылуынан табылды. Басқа құпия сөзді қолданыңыз.',

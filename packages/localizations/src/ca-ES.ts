@@ -894,6 +894,8 @@ export const caES: LocalizationResource = {
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
+    form_email_address_blocked:
+      'Els serveis de correu electrònic temporal no estan suportats. Si us plau, utilitzeu la vostra adreça de correu electrònic habitual per crear un compte.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -911,6 +913,8 @@ export const caES: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
+    form_password_or_identifier_incorrect:
+      "La contrasenya o l'adreça de correu electrònic és incorrecta. Torna-ho a intentar o utilitza un altre mètode.",
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
     form_password_pwned:

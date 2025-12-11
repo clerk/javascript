@@ -886,6 +886,8 @@ export const koKR: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      '임시 이메일 서비스는 지원되지 않습니다. 계정을 만들려면 일반 이메일 주소를 사용해 주세요.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -903,6 +905,8 @@ export const koKR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      '비밀번호 또는 이메일 주소가 올바르지 않습니다. 다시 시도하거나 다른 방법을 사용하세요.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않습니다.',
     form_password_pwned: '이 비밀번호는 유출사항이 발견되어 사용할 수 없으므로 대신 다른 비밀번호를 사용해 보세요.',

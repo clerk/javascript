@@ -901,6 +901,8 @@ export const esCR: LocalizationResource = {
     captcha_unavailable:
       'El registro falló debido a fallos en la validación de robot. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     form_code_incorrect: 'Código incorrecto.',
+    form_email_address_blocked:
+      'Los servicios de correo electrónico temporal no están soportados. Por favor, use su dirección de correo electrónico regular para crear una cuenta.',
     form_identifier_exists__email_address: 'El correo electrónico ya existe',
     form_identifier_exists__phone_number: 'El número telefónico ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
@@ -918,6 +920,8 @@ export const esCR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor inválido',
     form_password_incorrect: 'Contraseña incorrecta.',
+    form_password_or_identifier_incorrect:
+      'La contraseña o la dirección de correo electrónico es incorrecta. Inténtalo de nuevo o usa otro método.',
     form_password_length_too_short: 'La contraseña es muy corta.',
     form_password_not_strong_enough: 'La contraseña no es suficientemente segura.',
     form_password_pwned:
