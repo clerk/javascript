@@ -60,7 +60,6 @@
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
     },
-    "./app.plugin.js": "./app.plugin.js",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -72,17 +71,13 @@
     "ios",
     "expo-module.config.json",
     "app.plugin.js",
-    "web",
-    "local-credentials",
-    "passkeys",
-    "secure-store",
-    "resource-cache",
-    "token-cache"
+    "plugin/build"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm build:plugin",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "clean": "rimraf ./dist",
+    "build:plugin": "tsc -p plugin/tsconfig.json",
+    "clean": "rimraf ./dist ./plugin/build",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
     "format": "node ../../scripts/format-package.mjs",
@@ -102,6 +97,7 @@
   },
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
+    "@expo/config-plugins": "^9.0.0",
     "@types/base-64": "^1.0.2",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
@@ -115,6 +111,7 @@
   },
   "peerDependencies": {
     "@clerk/expo-passkeys": ">=0.0.6",
+    "expo": ">=53 <55",
     "expo-apple-authentication": ">=7.0.0",
     "expo-auth-session": ">=5",
     "expo-constants": ">=12",
