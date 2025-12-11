@@ -463,7 +463,7 @@ const devConfig = ({ mode, env }) => {
             template: './sandbox/template.html',
             inject: false,
             templateParameters: {
-              uiScriptUrl: 'http://localhost:4001/npm/ui.browser.js',
+              uiScriptUrl: 'http://localhost:4011/npm/ui.browser.js',
             },
           }),
       ].filter(Boolean),

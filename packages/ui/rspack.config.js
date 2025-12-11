@@ -160,7 +160,7 @@ const prodConfig = mode => {
  */
 const devConfig = (mode, env) => {
   const devUrl = new URL(env.devOrigin || 'https://ui.lclclerk.com');
-  const port = Number(new URL(env.devOrigin ?? 'http://localhost:4001').port || 4001);
+  const port = Number(new URL(env.devOrigin ?? 'http://localhost:4011').port || 4011);
 
   return merge(entryForVariant(variants.uiBrowser), common({ mode, variant: variants.uiBrowser }), {
     module: {

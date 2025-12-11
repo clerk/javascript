@@ -4,6 +4,7 @@ import type { PaginatedResourceResponse } from '../../api/resources/Deserializer
 import { joinPaths } from '../../util/path';
 import { deprecated } from '../../util/shared';
 import type { APIKey } from '../resources/APIKey';
+import type { DeletedObject } from '../resources/DeletedObject';
 import { AbstractAPI } from './AbstractApi';
 
 const basePath = '/api_keys';
@@ -51,6 +52,24 @@ type RevokeAPIKeyParams = {
   revocationReason?: string | null;
 };
 
+type UpdateAPIKeyParams = {
+  /**
+   * API key ID
+   */
+  apiKeyId: string;
+  /**
+   * The user or Organization ID to associate the API key with
+   */
+  subject: string;
+  /**
+   * API key description
+   */
+  description?: string | null;
+  claims?: Record<string, any> | null;
+  scopes?: string[];
+  secondsUntilExpiration?: number | null;
+};
+
 export class APIKeysAPI extends AbstractAPI {
   async list(queryParams: GetAPIKeyListParams) {
     return this.request<PaginatedResourceResponse<APIKey[]>>({
@@ -68,15 +87,45 @@ export class APIKeysAPI extends AbstractAPI {
     });
   }
 
-  async revoke(params: RevokeAPIKeyParams) {
+  async get(apiKeyId: string) {
+    this.requireId(apiKeyId);
+
+    return this.request<APIKey>({
+      method: 'GET',
+      path: joinPaths(basePath, apiKeyId),
+    });
+  }
+
+  async update(params: UpdateAPIKeyParams) {
     const { apiKeyId, ...bodyParams } = params;
+
+    this.requireId(apiKeyId);
+
+    return this.request<APIKey>({
+      method: 'PATCH',
+      path: joinPaths(basePath, apiKeyId),
+      bodyParams,
+    });
+  }
+
+  async delete(apiKeyId: string) {
+    this.requireId(apiKeyId);
+
+    return this.request<DeletedObject>({
+      method: 'DELETE',
+      path: joinPaths(basePath, apiKeyId),
+    });
+  }
+
+  async revoke(params: RevokeAPIKeyParams) {
+    const { apiKeyId, revocationReason = null } = params;
 
     this.requireId(apiKeyId);
 
     return this.request<APIKey>({
       method: 'POST',
       path: joinPaths(basePath, apiKeyId, 'revoke'),
-      bodyParams,
+      bodyParams: { revocationReason },
     });
   }
 

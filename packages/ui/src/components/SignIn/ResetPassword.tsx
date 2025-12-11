@@ -71,6 +71,10 @@ const ResetPasswordInternal = () => {
   };
 
   const resetPassword = async () => {
+    if (!canSubmit) {
+      return;
+    }
+
     passwordField.clearFeedback();
     confirmField.clearFeedback();
     try {
