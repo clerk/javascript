@@ -2728,6 +2728,12 @@ export class Clerk implements ClerkInterface {
           });
 
         const initClient = async () => {
+          const jwtInCookie = this.#authService?.getSessionCookie();
+          if (jwtInCookie) {
+            const preliminaryClient = createClientFromJwt(jwtInCookie);
+            this.updateClient(preliminaryClient);
+          }
+
           return Client.getOrCreateInstance()
             .fetch()
             .then(res => this.updateClient(res))
