@@ -1,3 +1,4 @@
+import { inBrowser } from '@clerk/shared/browser';
 import { logger } from '@clerk/shared/logger';
 
 export function assertNoLegacyProp(props: Record<string, any>) {
@@ -5,6 +6,17 @@ export function assertNoLegacyProp(props: Record<string, any>) {
   const legacyProp = Object.keys(props).find(key => legacyProps.includes(key));
 
   if (legacyProp && props[legacyProp]) {
+    // Don't warn about redirectUrl if it's auto-set by Clerk for preservation
+    // (i.e., it equals the current window.location.href, which is what buildSignInUrl sets automatically)
+    if (
+      legacyProp === 'redirectUrl' &&
+      inBrowser() &&
+      typeof props[legacyProp] === 'string' &&
+      props[legacyProp] === window.location.href
+    ) {
+      return;
+    }
+
     logger.warnOnce(
       `Clerk: The prop "${legacyProp}" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead. Learn more: https://clerk.com/docs/guides/custom-redirects#redirect-url-props`,
     );
