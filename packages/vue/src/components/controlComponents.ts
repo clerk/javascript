@@ -2,8 +2,8 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type {
   HandleOAuthCallbackParams,
   PendingSessionOptions,
-  ShowWhenCondition,
   RedirectOptions,
+  ShowWhenCondition,
 } from '@clerk/shared/types';
 import { defineComponent, type VNodeChild } from 'vue';
 
@@ -100,6 +100,25 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
+/**
+ * Props for `<Show>` that control when content renders based on sign-in or authorization state.
+ *
+ * @public
+ * @property fallback Optional content shown when the condition fails; can be provided via prop or `fallback` slot.
+ * @property when Condition controlling visibility; supports `"signedIn"`, `"signedOut"`, authorization descriptors, or a predicate that receives the `has` helper.
+ * @property treatPendingAsSignedOut Inherited from `PendingSessionOptions`; treat pending sessions as signed out while loading.
+ * @example
+ * ```vue
+ * <Show :when="{ role: 'admin' }" fallback="Access denied">
+ *   <AdminPanel />
+ * </Show>
+ *
+ * <Show :when="(has) => has({ permission: 'org:read' })">
+ *   <template #fallback>Not authorized</template>
+ *   <ProtectedFeature />
+ * </Show>
+ * ```
+ */
 export type ShowProps = PendingSessionOptions & { fallback?: unknown; when: ShowWhenCondition };
 
 export const Show = defineComponent((props: ShowProps, { slots }) => {
