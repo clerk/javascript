@@ -893,6 +893,8 @@ export const bgBG: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable: undefined,
     form_code_incorrect: 'Невалиден код. Моля, опитайте отново.',
+    form_email_address_blocked:
+      'Временните имейл услуги не се поддържат. Моля, използвайте вашия обикновен имейл адрес, за да създадете акаунт.',
     form_identifier_exists__email_address: 'Този имейл адрес вече е регистриран.',
     form_identifier_exists__phone_number: 'Този телефонен номер вече е използван.',
     form_identifier_exists__username: 'Това потребителско име вече съществува.',

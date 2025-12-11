@@ -886,6 +886,8 @@ export const koKR: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      '임시 이메일 서비스는 지원되지 않습니다. 계정을 만들려면 일반 이메일 주소를 사용해 주세요.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,

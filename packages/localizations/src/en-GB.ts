@@ -895,6 +895,8 @@ export const enGB: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Temporary email services are not supported. Please use your regular email address to create an account.',
     form_identifier_exists__email_address: 'This email address is taken. Please try another.',
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',

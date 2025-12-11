@@ -899,6 +899,8 @@ export const idID: LocalizationResource = {
     captcha_unavailable:
       'Pendaftaran gagal karena validasi bot gagal. Silakan muat ulang halaman untuk mencoba lagi atau hubungi dukungan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Layanan email sementara tidak didukung. Silakan gunakan alamat email reguler Anda untuk membuat akun.',
     form_identifier_exists__email_address: 'Alamat email ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__phone_number: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini sudah digunakan. Silakan coba yang lain.',

@@ -898,6 +898,8 @@ export const hiIN: LocalizationResource = {
     captcha_unavailable:
       'असफल बॉट सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'अस्थायी ईमेल सेवाएं समर्थित नहीं हैं। कृपया खाता बनाने के लिए अपना नियमित ईमेल पता उपयोग करें।',
     form_identifier_exists__email_address: 'यह ईमेल पता पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',

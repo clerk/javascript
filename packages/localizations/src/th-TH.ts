@@ -893,6 +893,7 @@ export const thTH: LocalizationResource = {
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: undefined,
+    form_email_address_blocked: 'บริการอีเมลชั่วคราวไม่ได้รับการสนับสนุน กรุณาใช้อีเมลปกติของคุณเพื่อสร้างบัญชี',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
