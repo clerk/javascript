@@ -29,8 +29,6 @@ export {
   RedirectToTasks,
   RedirectToUserProfile,
   Show,
-  SignedIn,
-  SignedOut,
 } from './controlComponents';
 
 export type { ShowProps } from './controlComponents';

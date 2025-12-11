@@ -1,6 +1,6 @@
 export const fixtures = [
   {
-    name: 'Basic import transform',
+    name: 'Transforms Protect import',
     source: `
 import { Protect } from "@clerk/react"
         `,
@@ -9,32 +9,16 @@ import { Show } from "@clerk/react"
 `,
   },
   {
-    name: 'Import transform with other imports',
+    name: 'Transforms SignedIn and SignedOut imports',
     source: `
-import { ClerkProvider, Protect, SignedIn } from "@clerk/react"
+import { SignedIn, SignedOut } from "@clerk/react"
         `,
     output: `
-import { ClerkProvider, Show, SignedIn } from "@clerk/react"
+import { Show } from "@clerk/react"
 `,
   },
   {
-    name: 'Import from @clerk/nextjs without use client - should NOT transform (RSC)',
-    source: `
-import { Protect } from "@clerk/nextjs"
-        `,
-    output: null,
-  },
-  {
-    name: 'Import transform for @clerk/chrome-extension',
-    source: `
-import { Protect } from "@clerk/chrome-extension"
-        `,
-    output: `
-import { Show } from "@clerk/chrome-extension"
-`,
-  },
-  {
-    name: 'Basic permission prop transform',
+    name: 'Transforms Protect in TSX',
     source: `
 import { Protect } from "@clerk/react"
 
@@ -61,40 +45,55 @@ function App() {
 `,
   },
   {
-    name: 'Basic role prop transform',
+    name: 'Transforms SignedIn usage',
     source: `
-import { Protect } from "@clerk/react"
+import { SignedIn } from "@clerk/react"
 
-function App() {
-  return (
-    <Protect role="admin">
-      <AdminPanel />
-    </Protect>
-  )
-}
+const App = () => (
+  <SignedIn>
+    <div>Child</div>
+  </SignedIn>
+)
         `,
     output: `
 import { Show } from "@clerk/react"
 
-function App() {
-  return (
-    <Show when={{
-      role: "admin"
-    }}>
-      <AdminPanel />
-    </Show>
-  );
-}
+const App = () => (
+  <Show when="signedIn">
+    <div>Child</div>
+  </Show>
+);
 `,
   },
   {
-    name: 'Boolean shorthand auth prop transforms to true',
+    name: 'Transforms SignedOut usage',
+    source: `
+import { SignedOut } from "@clerk/react"
+
+const App = () => (
+  <SignedOut>
+    <div>Child</div>
+  </SignedOut>
+)
+        `,
+    output: `
+import { Show } from "@clerk/react"
+
+const App = () => (
+  <Show when="signedOut">
+    <div>Child</div>
+  </Show>
+);
+`,
+  },
+  {
+    name: 'Transforms Protect condition callback',
     source: `
 import { Protect } from "@clerk/react"
 
 function App() {
   return (
-    <Protect role>
+    <Protect condition={(has) => has({ role: "admin" })}>
       <Content />
     </Protect>
   )
@@ -105,9 +104,7 @@ import { Show } from "@clerk/react"
 
 function App() {
   return (
-    <Show when={{
-      role: true
-    }}>
+    <Show when={(has) => has({ role: "admin" })}>
       <Content />
     </Show>
   );
@@ -115,86 +112,124 @@ function App() {
 `,
   },
   {
-    name: 'Feature prop transform',
+    name: 'Transforms SignedIn import with other specifiers',
+    source: `
+import { ClerkProvider, SignedIn } from "@clerk/nextjs"
+        `,
+    output: `
+import { ClerkProvider, Show } from "@clerk/nextjs"
+`,
+  },
+  {
+    name: 'Transforms ProtectProps type',
+    source: `
+import { ProtectProps } from "@clerk/react";
+type Props = ProtectProps;
+        `,
+    output: `
+import { ShowProps } from "@clerk/react";
+type Props = ShowProps;
+`,
+  },
+  {
+    name: 'Self-closing Protect defaults to signedIn',
     source: `
 import { Protect } from "@clerk/react"
 
-function App() {
-  return (
-    <Protect feature="user:premium">
-      <PremiumContent />
-    </Protect>
-  )
-}
+const Thing = () => <Protect />
         `,
     output: `
 import { Show } from "@clerk/react"
 
+const Thing = () => <Show when="signedIn" />
+`,
+  },
+  {
+    name: 'Transforms Protect from hybrid package without client directive',
+    source: `
+import { Protect } from "@clerk/nextjs"
+
+const App = () => (
+  <Protect role="admin">
+    <div>Child</div>
+  </Protect>
+)
+        `,
+    output: `
+import { Show } from "@clerk/nextjs"
+
+const App = () => (
+  <Show when={{
+    role: "admin"
+  }}>
+    <div>Child</div>
+  </Show>
+);
+`,
+  },
+  {
+    name: 'Transforms SignedOut to Show with fallback prop',
+    source: `
+import { SignedOut } from "@clerk/react"
+
+const App = () => (
+  <SignedOut fallback={<Other />}>
+    <div>Child</div>
+  </SignedOut>
+)
+        `,
+    output: `
+import { Show } from "@clerk/react"
+
+const App = () => (
+  <Show when="signedOut" fallback={<Other />}>
+    <div>Child</div>
+  </Show>
+);
+`,
+  },
+  {
+    name: 'Aliased Protect import is transformed',
+    source: `
+import { Protect as CanAccess } from "@clerk/react"
+
 function App() {
   return (
-    <Show when={{
-      feature: "user:premium"
+    <CanAccess permission="org:billing:manage">
+      <BillingSettings />
+    </CanAccess>
+  )
+}
+        `,
+    output: `
+import { Show as CanAccess } from "@clerk/react"
+
+function App() {
+  return (
+    <CanAccess when={{
+      permission: "org:billing:manage"
     }}>
-      <PremiumContent />
-    </Show>
+      <BillingSettings />
+    </CanAccess>
   );
 }
 `,
   },
   {
-    name: 'Plan prop transform',
+    name: 'ProtectProps type aliases update',
     source: `
-import { Protect } from "@clerk/react"
-
-function App() {
-  return (
-    <Protect plan="pro">
-      <ProFeatures />
-    </Protect>
-  )
-}
+import { ProtectProps } from "@clerk/react";
+type Props = ProtectProps;
+type Another = ProtectProps;
         `,
     output: `
-import { Show } from "@clerk/react"
-
-function App() {
-  return (
-    <Show when={{
-      plan: "pro"
-    }}>
-      <ProFeatures />
-    </Show>
-  );
-}
+import { ShowProps } from "@clerk/react";
+type Props = ShowProps;
+type Another = ShowProps;
 `,
   },
   {
-    name: 'Condition prop transform',
-    source: `
-import { Protect } from "@clerk/react"
-
-function App() {
-  return (
-    <Protect condition={(has) => has({ permission: "org:read" })}>
-      <Content />
-    </Protect>
-  )
-}
-        `,
-    output: `
-import { Show } from "@clerk/react"
-
-function App() {
-  return (
-    <Show when={(has) => has({ permission: "org:read" })}>
-      <Content />
-    </Show>
-  );
-}
-`,
-  },
-  {
-    name: 'With fallback prop',
+    name: 'Protect with fallback prop',
     source: `
 import { Protect } from "@clerk/react"
 
@@ -221,183 +256,20 @@ function App() {
 `,
   },
   {
-    name: 'Self-closing Protect',
+    name: 'Protect with spread props',
     source: `
 import { Protect } from "@clerk/react"
 
-function App() {
-  return <Protect role="admin" />
-}
+const props = { permission: "org:read" }
+const App = () => <Protect {...props} />
         `,
     output: `
 import { Show } from "@clerk/react"
 
-function App() {
-  return (
-    <Show when={{
-      role: "admin"
-    }} />
-  );
-}
-`,
-  },
-  {
-    name: 'Handles directives',
-    source: `"use client";
-
-import { Protect } from "@clerk/nextjs";
-
-export function Protected() {
-  return (
-    <Protect permission="org:read">
-      <Content />
-    </Protect>
-  );
-}
-`,
-    output: `"use client";
-
-import { Show } from "@clerk/nextjs";
-
-export function Protected() {
-  return (
-    <Show when={{
-      permission: "org:read"
-    }}>
-      <Content />
-    </Show>
-  );
-}`,
-  },
-  {
-    name: 'Dynamic permission value',
-    source: `
-import { Protect } from "@clerk/react"
-
-function App({ requiredPermission }) {
-  return (
-    <Protect permission={requiredPermission}>
-      <Content />
-    </Protect>
-  )
-}
-        `,
-    output: `
-import { Show } from "@clerk/react"
-
-function App({ requiredPermission }) {
-  return (
-    <Show when={{
-      permission: requiredPermission
-    }}>
-      <Content />
-    </Show>
-  );
-}
-`,
-  },
-  {
-    name: 'RSC file (no use client) from @clerk/nextjs - should NOT transform',
-    source: `import { Protect } from "@clerk/nextjs";
-
-export default async function Page() {
-  return (
-    <Protect permission="org:read">
-      <Content />
-    </Protect>
-  );
-}
-`,
-    output: null,
-  },
-  {
-    name: 'Client file (use client) from @clerk/nextjs - should transform',
-    source: `"use client";
-
-import { Protect } from "@clerk/nextjs";
-
-export function ClientComponent() {
-  return (
-    <Protect permission="org:read">
-      <Content />
-    </Protect>
-  );
-}
-`,
-    output: `"use client";
-
-import { Show } from "@clerk/nextjs";
-
-export function ClientComponent() {
-  return (
-    <Show when={{
-      permission: "org:read"
-    }}>
-      <Content />
-    </Show>
-  );
-}`,
-  },
-  {
-    name: 'Client-only package (@clerk/react) without use client - should still transform',
-    source: `import { Protect } from "@clerk/react";
-
-function Component() {
-  return (
-    <Protect role="admin">
-      <AdminContent />
-    </Protect>
-  );
-}
-`,
-    output: `import { Show } from "@clerk/react";
-
-function Component() {
-  return (
-    <Show when={{
-      role: "admin"
-    }}>
-      <AdminContent />
-    </Show>
-  );
-}`,
-  },
-  {
-    name: 'Bare Protect defaults to signedIn',
-    source: `
-import { Protect } from "@clerk/react"
-
-function App() {
-  return (
-    <Protect>
-      <Content />
-    </Protect>
-  )
-}
-        `,
-    output: `
-import { Show } from "@clerk/react"
-
-function App() {
-  return (
-    <Show when="signedIn">
-      <Content />
-    </Show>
-  );
-}
-`,
-  },
-  {
-    name: 'ProtectProps import rewrites to ShowProps',
-    source: `
-import { ProtectProps } from "@clerk/react";
-
-type Props = ProtectProps;
-        `,
-    output: `
-import { ShowProps } from "@clerk/react";
-
-type Props = ShowProps;
+const props = { permission: "org:read" }
+const App = () => <Show when={{
+  permission: "org:read"
+}} />
 `,
   },
 ];

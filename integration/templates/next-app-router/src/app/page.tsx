@@ -1,4 +1,4 @@
-import { Show, SignedIn, SignedOut, SignIn, UserButton } from '@clerk/nextjs';
+import { Show, SignIn, UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import { ClientId } from './client-id';
 
@@ -7,8 +7,8 @@ export default function Home() {
     <main>
       <UserButton fallback={<>Loading user button</>} />
       <ClientId />
-      <SignedIn>SignedIn</SignedIn>
-      <SignedOut>SignedOut</SignedOut>
+      <Show when='signedIn'>SignedIn</Show>
+      <Show when='signedOut'>SignedOut</Show>
       <Show
         fallback={'SignedOut from protect'}
         when='signedIn'

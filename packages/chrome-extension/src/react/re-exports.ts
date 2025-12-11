@@ -22,8 +22,6 @@ export {
   SignOutButton,
   SignUp,
   SignUpButton,
-  SignedIn,
-  SignedOut,
   UserAvatar,
   UserButton,
   UserProfile,

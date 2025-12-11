@@ -2,27 +2,15 @@ import { deprecated } from '@clerk/shared/deprecated';
 import type {
   HandleOAuthCallbackParams,
   PendingSessionOptions,
-  ProtectParams,
+  ShowWhenCondition,
   RedirectOptions,
 } from '@clerk/shared/types';
-import { defineComponent } from 'vue';
+import { defineComponent, type VNodeChild } from 'vue';
 
 import { useAuth } from '../composables/useAuth';
 import { useClerk } from '../composables/useClerk';
 import { useClerkContext } from '../composables/useClerkContext';
 import { useClerkLoaded } from '../utils/useClerkLoaded';
-
-export const SignedIn = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-
-  return () => (userId.value ? slots.default?.() : null);
-});
-
-export const SignedOut = defineComponent<PendingSessionOptions>(({ treatPendingAsSignedOut }, { slots }) => {
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-
-  return () => (userId.value === null ? slots.default?.() : null);
-});
 
 export const ClerkLoaded = defineComponent((_, { slots }) => {
   const clerk = useClerk();
@@ -112,9 +100,9 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
   return () => null;
 });
 
-export type ProtectProps = ProtectParams & PendingSessionOptions;
+export type ShowProps = PendingSessionOptions & { fallback?: unknown; when: ShowWhenCondition };
 
-export const Protect = defineComponent((props: ProtectProps, { slots }) => {
+export const Show = defineComponent((props: ShowProps, { slots }) => {
   const { isLoaded, has, userId } = useAuth({ treatPendingAsSignedOut: props.treatPendingAsSignedOut });
 
   return () => {
@@ -125,37 +113,28 @@ export const Protect = defineComponent((props: ProtectProps, { slots }) => {
       return null;
     }
 
-    /**
-     * Fallback to UI provided by user or `null` if authorization checks failed
-     */
+    const authorized = (slots.default?.() ?? null) as VNodeChild | null;
+    const fallbackFromSlot = slots.fallback?.() ?? null;
+    const fallbackFromProp = (props.fallback as VNodeChild | null | undefined) ?? null;
+    const unauthorized = (fallbackFromSlot ?? fallbackFromProp ?? null) as VNodeChild | null;
+
+    if (props.when === 'signedOut') {
+      return userId.value ? unauthorized : authorized;
+    }
+
     if (!userId.value) {
-      return slots.fallback?.();
+      return unauthorized;
     }
 
-    /**
-     * Check against the results of `has` called inside the callback
-     */
-    if (typeof props.condition === 'function') {
+    if (props.when === 'signedIn') {
+      return authorized;
+    }
+
+    if (typeof props.when === 'function') {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (props.condition(has.value!)) {
-        return slots.default?.();
-      }
-
-      return slots.fallback?.();
+      return props.when(has.value!) ? authorized : unauthorized;
     }
 
-    if (props.role || props.permission || props.feature || props.plan) {
-      if (has.value?.(props)) {
-        return slots.default?.();
-      }
-
-      return slots.fallback?.();
-    }
-
-    /**
-     * If neither of the authorization params are passed behave as the `<SignedIn/>`.
-     * If fallback is present render that instead of rendering nothing.
-     */
-    return slots.default?.();
+    return has.value?.(props.when) ? authorized : unauthorized;
   };
 });

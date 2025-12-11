@@ -9,9 +9,7 @@ export {
   // Control components
   ClerkLoaded,
   ClerkLoading,
-  SignedOut,
-  SignedIn,
-  Protect,
+  Show,
   RedirectToSignIn,
   RedirectToSignUp,
   RedirectToUserProfile,

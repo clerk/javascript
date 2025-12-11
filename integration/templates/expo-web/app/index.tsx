@@ -1,6 +1,6 @@
-import { Text, View } from 'react-native';
-import { SignedIn, SignedOut } from '@clerk/expo';
+import { Show } from '@clerk/expo';
 import { UserButton } from '@clerk/expo/web';
+import { Text, View } from 'react-native';
 
 export default function Index() {
   return (
@@ -11,13 +11,13 @@ export default function Index() {
         alignItems: 'center',
       }}
     >
-      <SignedIn>
+      <Show when='signedIn'>
         <Text>You are signed in!</Text>
         <UserButton />
-      </SignedIn>
-      <SignedOut>
+      </Show>
+      <Show when='signedOut'>
         <Text>You are signed out</Text>
-      </SignedOut>
+      </Show>
     </View>
   );
 }

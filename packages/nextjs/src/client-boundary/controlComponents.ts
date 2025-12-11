@@ -13,8 +13,6 @@ export {
   RedirectToTasks,
   RedirectToUserProfile,
   Show,
-  SignedIn,
-  SignedOut,
 } from '@clerk/react';
 
 export { MultisessionAppSupport } from '@clerk/react/internal';

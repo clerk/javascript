@@ -4,46 +4,6 @@ const CLIENT_ONLY_PACKAGES = ['@clerk/chrome-extension', '@clerk/expo', '@clerk/
 const HYBRID_PACKAGES = ['@clerk/astro', '@clerk/nextjs'];
 
 /**
- * Checks if a file has a 'use client' directive at the top.
- */
-function hasUseClientDirective(root, j) {
-  const program = root.find(j.Program).get();
-  const body = program.node.body;
-
-  if (body.length === 0) {
-    return false;
-  }
-
-  const firstStatement = body[0];
-
-  // Check for 'use client' as an expression statement with a string literal
-  if (j.ExpressionStatement.check(firstStatement)) {
-    const expression = firstStatement.expression;
-    if (j.Literal.check(expression) || j.StringLiteral.check(expression)) {
-      const value = expression.value;
-      return value === 'use client';
-    }
-    // Handle DirectiveLiteral (used by some parsers like babel)
-    if (expression.type === 'DirectiveLiteral') {
-      return expression.value === 'use client';
-    }
-  }
-
-  // Also check directive field (some parsers use this)
-  if (firstStatement.directive === 'use client') {
-    return true;
-  }
-
-  // Check for directives array in program node (babel parser)
-  const directives = program.node.directives;
-  if (directives && directives.length > 0) {
-    return directives.some(d => d.value && d.value.value === 'use client');
-  }
-
-  return false;
-}
-
-/**
  * Transforms `<Protect>` component usage to `<Show>` component.
  *
  * Handles the following transformations:
@@ -55,10 +15,6 @@ function hasUseClientDirective(root, j) {
  *
  * Also updates imports from `Protect` to `Show`.
  *
- * NOTE: For @clerk/nextjs, this only transforms files with 'use client' directive.
- * RSC files using <Protect> from @clerk/nextjs should NOT be transformed,
- * as <Protect> is still valid as an RSC-only component.
- *
  * @param {import('jscodeshift').FileInfo} fileInfo - The file information
  * @param {import('jscodeshift').API} api - The API object provided by jscodeshift
  * @returns {string|undefined} - The transformed source code if modifications were made
@@ -66,27 +22,8 @@ function hasUseClientDirective(root, j) {
 module.exports = function transformProtectToShow({ source }, { jscodeshift: j }) {
   const root = j(source);
   let dirtyFlag = false;
-  const protectLocalNames = [];
+  const componentKindByLocalName = {};
   const protectPropsLocalsToRename = [];
-
-  const isClientComponent = hasUseClientDirective(root, j);
-
-  // Check if this file imports Protect from a hybrid package (like @clerk/nextjs)
-  // If so, and it's NOT a client component, skip the transformation
-  let hasHybridPackageImport = false;
-  HYBRID_PACKAGES.forEach(packageName => {
-    root.find(j.ImportDeclaration, { source: { value: packageName } }).forEach(path => {
-      const specifiers = path.node.specifiers || [];
-      if (specifiers.some(spec => j.ImportSpecifier.check(spec) && spec.imported.name === 'Protect')) {
-        hasHybridPackageImport = true;
-      }
-    });
-  });
-
-  // Skip RSC files that import from hybrid packages
-  if (hasHybridPackageImport && !isClientComponent) {
-    return undefined;
-  }
 
   // Transform imports: Protect → Show, ProtectProps → ShowProps
   const allPackages = [...CLIENT_ONLY_PACKAGES, ...HYBRID_PACKAGES];
@@ -97,13 +34,17 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
 
       specifiers.forEach(spec => {
         if (j.ImportSpecifier.check(spec)) {
-          if (spec.imported.name === 'Protect') {
-            const originalImportedName = spec.imported.name;
+          const originalImportedName = spec.imported.name;
+
+          if (['Protect', 'SignedIn', 'SignedOut'].includes(originalImportedName)) {
             const effectiveLocalName = spec.local ? spec.local.name : originalImportedName;
+            componentKindByLocalName[effectiveLocalName] =
+              originalImportedName === 'Protect'
+                ? 'protect'
+                : originalImportedName === 'SignedIn'
+                  ? 'signedIn'
+                  : 'signedOut';
             spec.imported.name = 'Show';
-            if (!protectLocalNames.includes(effectiveLocalName)) {
-              protectLocalNames.push(effectiveLocalName);
-            }
             dirtyFlag = true;
           }
 
@@ -146,16 +87,21 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     const openingElement = path.node.openingElement;
     const closingElement = path.node.closingElement;
 
-    // Check if this is a <Protect> element
-    if (!j.JSXIdentifier.check(openingElement.name) || !protectLocalNames.includes(openingElement.name.name)) {
+    // Check if this is a transformed control component
+    if (!j.JSXIdentifier.check(openingElement.name)) {
       return;
     }
 
     const originalName = openingElement.name.name;
+    const kind = componentKindByLocalName[originalName];
 
-    // Only rename if the component was used without an alias (as <Protect>).
+    if (!kind) {
+      return;
+    }
+
+    // Only rename if the component was used without an alias (as <Protect>/<SignedIn>/<SignedOut>).
     // For aliased imports (e.g., Protect as MyProtect), keep the alias in place.
-    if (originalName === 'Protect') {
+    if (['Protect', 'SignedIn', 'SignedOut'].includes(originalName)) {
       openingElement.name.name = 'Show';
       if (closingElement && j.JSXIdentifier.check(closingElement.name)) {
         closingElement.name.name = 'Show';
@@ -187,7 +133,9 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     // Build the `when` prop
     let whenValue = null;
 
-    if (conditionAttr) {
+    if (kind === 'signedIn' || kind === 'signedOut') {
+      whenValue = j.stringLiteral(kind === 'signedIn' ? 'signedIn' : 'signedOut');
+    } else if (conditionAttr) {
       // condition prop becomes the when callback directly
       whenValue = conditionAttr.value;
     } else if (authAttributes.length > 0) {
@@ -216,7 +164,8 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     // Reconstruct attributes with `when` prop
     const newAttributes = [];
 
-    const finalWhenValue = whenValue || j.stringLiteral('signedIn');
+    const defaultWhenValue = kind === 'signedOut' ? 'signedOut' : 'signedIn';
+    const finalWhenValue = whenValue || j.stringLiteral(defaultWhenValue);
 
     newAttributes.push(j.jsxAttribute(j.jsxIdentifier('when'), finalWhenValue));
 

@@ -9,26 +9,6 @@ import { useAssertWrappedByClerkProvider } from '../hooks/useAssertWrappedByCler
 import type { RedirectToSignInProps, RedirectToSignUpProps, RedirectToTasksProps, WithClerkProp } from '../types';
 import { withClerk } from './withClerk';
 
-export const SignedIn = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
-  useAssertWrappedByClerkProvider('SignedIn');
-
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-  if (userId) {
-    return children;
-  }
-  return null;
-};
-
-export const SignedOut = ({ children, treatPendingAsSignedOut }: React.PropsWithChildren<PendingSessionOptions>) => {
-  useAssertWrappedByClerkProvider('SignedOut');
-
-  const { userId } = useAuth({ treatPendingAsSignedOut });
-  if (userId === null) {
-    return children;
-  }
-  return null;
-};
-
 export const ClerkLoaded = ({ children }: React.PropsWithChildren<unknown>) => {
   useAssertWrappedByClerkProvider('ClerkLoaded');
 

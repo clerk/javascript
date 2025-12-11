@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, UserButton } from '@clerk/react-router';
+import { Show, UserButton } from '@clerk/react-router';
 import type { Route } from './+types/home';
 
 export function meta({}: Route.MetaArgs) {
@@ -9,8 +9,8 @@ export default function Home() {
   return (
     <div>
       <UserButton />
-      <SignedIn>SignedIn</SignedIn>
-      <SignedOut>SignedOut</SignedOut>
+      <Show when='signedIn'>SignedIn</Show>
+      <Show when='signedOut'>SignedOut</Show>
     </div>
   );
 }

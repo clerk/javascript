@@ -175,14 +175,12 @@ export default defineNuxtModule<ModuleOptions>({
       // Control Components
       'ClerkLoaded',
       'ClerkLoading',
-      'Protect',
       'RedirectToSignIn',
       'RedirectToSignUp',
       'RedirectToUserProfile',
       'RedirectToOrganizationProfile',
       'RedirectToCreateOrganization',
-      'SignedIn',
-      'SignedOut',
+      'Show',
       'Waitlist',
     ];
     otherComponents.forEach(component => {
