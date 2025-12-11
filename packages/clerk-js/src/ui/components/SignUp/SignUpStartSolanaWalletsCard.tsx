@@ -9,7 +9,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
-const Web3WalletButtons = lazy(() =>
+const Web3SolanaWalletButtons = lazy(() =>
   import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
     default: m.Web3SolanaWalletButtons,
   })),
@@ -60,7 +60,7 @@ const SignUpStartSolanaWalletsCardInner = () => {
                 </Flex>
               }
             >
-              <Web3WalletButtons
+              <Web3SolanaWalletButtons
                 web3AuthCallback={({ walletName }) => {
                   return clerk
                     .authenticateWithWeb3({

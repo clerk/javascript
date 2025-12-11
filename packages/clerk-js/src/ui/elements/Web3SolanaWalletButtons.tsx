@@ -94,7 +94,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
     <Flex
       direction='col'
       gap={2}
-      elementDescriptor={descriptors.web3WalletButtonsRoot}
+      elementDescriptor={descriptors.web3SolanaWalletButtonsRoot}
     >
       {strategyRows.map((row, rowIndex) => (
         <Grid
@@ -103,7 +103,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
               return r.name;
             })
             .join('-')}
-          elementDescriptor={descriptors.web3WalletButtons}
+          elementDescriptor={descriptors.web3SolanaWalletButtons}
           gap={2}
           sx={t => ({
             justifyContent: 'center',
@@ -132,7 +132,7 @@ const Web3SolanaWalletButtonsInner = ({ web3AuthCallback }: Web3WalletButtonsPro
 
             const imageOrInitial = w.icon ? (
               <Image
-                elementDescriptor={[descriptors.walletIcon, descriptors.web3WalletButtonsWalletInitialIcon]}
+                elementDescriptor={[descriptors.walletIcon, descriptors.web3SolanaWalletButtonsWalletInitialIcon]}
                 isDisabled={card.isLoading}
                 isLoading={card.loadingMetadata === w.name}
                 src={w.icon}
