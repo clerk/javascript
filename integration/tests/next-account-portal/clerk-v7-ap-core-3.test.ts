@@ -1,5 +1,3 @@
-import { parsePublishableKey } from '@clerk/shared/keys';
-import { clerkSetup } from '@clerk/testing/playwright';
 import { test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
@@ -18,13 +16,6 @@ test.describe('Next with ClerkJS V7 <-> Account Portal Core 3 @ap-flows', () => 
     app = await appConfigs.next.appRouterAPWithClerkNextLatest.clone().commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withAPCore3ClerkLatest);
-
-    const publishableKey = app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY');
-    const secretKey = app.env.privateVariables.get('CLERK_SECRET_KEY');
-    const apiUrl = app.env.privateVariables.get('CLERK_API_URL');
-    const { frontendApi: frontendApiUrl } = parsePublishableKey(publishableKey);
-    await clerkSetup({ publishableKey, frontendApiUrl, secretKey, apiUrl });
-
     await app.dev();
     const u = createTestUtils({ app });
     fakeUser = u.services.users.createFakeUser();
