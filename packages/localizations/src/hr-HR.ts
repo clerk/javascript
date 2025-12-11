@@ -694,8 +694,14 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite lozinku povezanu s vašim računom',
       title: 'Unesite svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka je kompromitirana',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifikacijski kod',
@@ -743,6 +749,10 @@ export const hrHR: LocalizationResource = {
       formTitle: 'Verifikacijski kod',
       subtitle: 'Za nastavak, unesite verifikacijski kod generiran vašom aplikacijom za autentifikaciju',
       title: 'Dvostupanjska verifikacija',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Unesite svoju lozinku',
@@ -836,6 +846,10 @@ export const hrHR: LocalizationResource = {
       title: 'Kreirajte svoj račun',
       titleCombined: 'Kreirajte svoj račun',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -863,8 +877,20 @@ export const hrHR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je već član organizacije.',
+    avatar_file_size_exceeded:
+      'Veličina datoteke premašuje maksimalno ograničenje od 10 MB. Molimo odaberite manju datoteku.',
+    avatar_file_type_invalid: 'Vrsta datoteke nije podržana. Molimo prenesite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspješna zbog neuspjelih sigurnosnih provjera. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     captcha_unavailable:
@@ -874,6 +900,7 @@ export const hrHR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
     form_identifier_not_found: 'Nismo pronašli račun s tim podacima.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-mail adresa mora biti valjana e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u valjanom međunarodnom formatu',
@@ -894,9 +921,11 @@ export const hrHR: LocalizationResource = {
       'Ova lozinka je pronađena kao dio curenja podataka i ne može se koristiti, molimo resetirajte svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Vaša lozinka je premašila maksimalni dopušteni broj bajtova, molimo skratite je ili uklonite neke posebne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Netočna lozinka',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Vaše korisničko ime mora sadržavati najmanje jedan nebrojčani znak.',
     identification_deletion_failed: 'Ne možete izbrisati svoju posljednju identifikaciju.',
     not_allowed_access:
       "E-mail adresa ili broj telefona nije dozvoljen za registraciju. Ovo može biti zbog korištenja '+', '=', '#' ili '.' u vašoj e-mail adresi, korištenja domene povezane s vremenskom e-mail uslugom ili eksplicitnog blokiranja. Ako smatrate da je ovo pogreška, obratite se podršci.",
@@ -926,6 +955,8 @@ export const hrHR: LocalizationResource = {
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',
       goodPassword: 'Vaša lozinka zadovoljava sve potrebne zahtjeve.',
@@ -1328,5 +1359,10 @@ export const hrHR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

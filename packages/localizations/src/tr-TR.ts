@@ -694,8 +694,14 @@ export const trTR: LocalizationResource = {
       subtitle: '{{applicationName}} ile devam etmek için',
       title: 'Şifrenizi girin',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Şifre ele geçirildi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Doğrulama kodu',
@@ -743,6 +749,10 @@ export const trTR: LocalizationResource = {
       formTitle: 'Doğrulama kodu',
       subtitle: 'Devam etmek için lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan doğrulama kodunu girin',
       title: 'İki aşamalı doğrulama',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
@@ -835,6 +845,10 @@ export const trTR: LocalizationResource = {
       title: 'Hesap oluştur',
       titleCombined: 'Hesap oluştur',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -862,8 +876,20 @@ export const trTR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Bu organizasyonda zaten üyesiniz.',
+    avatar_file_size_exceeded: 'Dosya boyutu maksimum 10 MB sınırını aşıyor. Lütfen daha küçük bir dosya seçin.',
+    avatar_file_type_invalid:
+      'Dosya türü desteklenmiyor. Lütfen JPG, PNG, GIF veya WEBP formatında bir görsel yükleyin.',
     captcha_invalid:
       'Güvenlik doğrulamalarındaki hatalar nedeniyle kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     captcha_unavailable:
@@ -873,6 +899,7 @@ export const trTR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
     form_identifier_not_found: 'Bu bilgilere sahip bir hesap bulunamadı.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Parametre formatı geçersiz.',
     form_param_format_invalid__email_address: 'E-posta adresi geçerli olmalıdır.',
     form_param_format_invalid__phone_number: 'Telefon numarası geçerli olmalıdır.',
@@ -892,9 +919,11 @@ export const trTR: LocalizationResource = {
       'Bu şifre bir veri ihlalinde tespit edildi ve oturum açmak için kullanılamaz. Lütfen başka bir şifre seçin.',
     form_password_size_in_bytes_exceeded:
       'Şifreniz izin verilen maksimum byte sayısını aştı, lütfen kısaltın veya bazı özel karakterleri çıkarın.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Şifre doğrulaması başarısız.',
     form_username_invalid_character: 'Kullanıcı adı geçersiz karakterler içeriyor.',
     form_username_invalid_length: 'Kullanıcı adı 3 ile 50 karakter arasında olmalıdır.',
+    form_username_needs_non_number_char: 'Kullanıcı adınız en az bir sayısal olmayan karakter içermelidir.',
     identification_deletion_failed: 'Son kimliğinizi silemezsiniz.',
     not_allowed_access:
       "E-posta adresiniz veya telefon numaranız kayıt için izin verilmiyor. Bu, e-posta adresinizde '+', '=', '#' veya '.' kullanmanız, geçici e-posta hizmetiyle ilişkilendirilmiş bir alan adı kullanmanız veya açık bir engellemeyle ilgili olabilir.",
@@ -923,6 +952,8 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger:
         'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
@@ -1326,5 +1357,10 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bekleme listesinde olduğunuz için teşekkür ederiz.',
       title: 'Bekleme Listesine Katıldınız',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

@@ -1,5 +1,158 @@
 # Change Log
 
+## 5.114.1
+
+### Patch Changes
+
+- Updated dependencies [[`893d3e4`](https://github.com/clerk/javascript/commit/893d3e4c4ca1f4f7c9ee13961319ea9423628de9)]:
+  - @clerk/localizations@3.30.1
+
+## 5.114.0
+
+### Minor Changes
+
+- Add a subtitle on the Reset password session task screen ([#7392](https://github.com/clerk/javascript/pull/7392)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Improve error handling for invalid avatar file uploads. Previously, avatar images which exceeded the max file size limit of 10MB did not return an error within the Avatar upload component so the user was unaware why their upload did not work. ([#7357](https://github.com/clerk/javascript/pull/7357)) by [@jigar-clerk](https://github.com/jigar-clerk)
+
+- Country code updates: Aland Islands, Ascension Island, Kosovo, Mayotte, Western Sahara, and updated names for Algeria, Congo (split into Democratic Republic and Republic), Macedonia (to North Macedonia), and Swaziland (to Eswatini). ([#7378](https://github.com/clerk/javascript/pull/7378)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Allow reordering API Keys and Billing pages in `<UserProfile />` and `<OrganizationProfile />`. ([#7383](https://github.com/clerk/javascript/pull/7383)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Example:
+
+  ```tsx
+  export function CustomUserProfile() {
+    return (
+      <UserProfile>
+        <UserProfile.Page label='apiKeys' />
+        <UserProfile.Page label='billing' />
+      </UserProfile>
+    );
+  }
+  ```
+
+- Updated dependencies [[`b117ebc`](https://github.com/clerk/javascript/commit/b117ebc956e1a5d48d5fdb7210de3344a74a524a)]:
+  - @clerk/localizations@3.30.0
+  - @clerk/shared@3.39.0
+
+## 5.113.0
+
+### Minor Changes
+
+- Introduce new `<TaskResetPassword/>` session task component ([#7314](https://github.com/clerk/javascript/pull/7314)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Show the correct error message on `form_new_password_matches_current` error code ([#7372](https://github.com/clerk/javascript/pull/7372)) by [@octoper](https://github.com/octoper)
+
+- Rename internal `isPasswordUntrustedError` to `isPasswordCompromisedError` ([#7352](https://github.com/clerk/javascript/pull/7352)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`e31f3d5`](https://github.com/clerk/javascript/commit/e31f3d567302f99d8d073ba75cd934fb3c1eca7f), [`8376789`](https://github.com/clerk/javascript/commit/8376789de2383b52fabc563a9382622627055ecd), [`f917d68`](https://github.com/clerk/javascript/commit/f917d68fc2fc5d317770491e9d4d7185e1985d04), [`818c25a`](https://github.com/clerk/javascript/commit/818c25a9eec256245152725c64419c73e762c1a2), [`b41c0d5`](https://github.com/clerk/javascript/commit/b41c0d539835a5a43d15e3399bac7cbf046d9345), [`b41c0d5`](https://github.com/clerk/javascript/commit/b41c0d539835a5a43d15e3399bac7cbf046d9345)]:
+  - @clerk/shared@3.38.0
+  - @clerk/localizations@3.29.1
+
+## 5.112.1
+
+### Patch Changes
+
+- Fix line height calculations. ([#7350](https://github.com/clerk/javascript/pull/7350)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+## 5.112.0
+
+### Minor Changes
+
+- Introduce `reset-password` session task ([#7268](https://github.com/clerk/javascript/pull/7268)) by [@octoper](https://github.com/octoper)
+
+- Introduce a new variant for the alternative methods screen to handle untrusted password error on sign-in ([#7331](https://github.com/clerk/javascript/pull/7331)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Prevent enable organization prompt from appearing if there is a session with a pending `choose-organization` task. ([#7307](https://github.com/clerk/javascript/pull/7307)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  This resolves an issue where, after organizations are enabled via the Dashboard, cached environment resources may cause the prompt to show again when the user is redirected to complete the `choose-organization` task.
+
+- Fix issue where `SignIn` and `SignUp` instances were unable to be serialized with `JSON.stringify` due to a circular reference. ([#7321](https://github.com/clerk/javascript/pull/7321)) by [@dstaley](https://github.com/dstaley)
+
+- Conditionally apply `tabIndex={-1}` usage when shown to ensure buttons are keyboard accessible. ([#7306](https://github.com/clerk/javascript/pull/7306)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Fixes line-height discrepancy between browsers. ([#7112](https://github.com/clerk/javascript/pull/7112)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Add localization key for username form error ([#7320](https://github.com/clerk/javascript/pull/7320)) by [@guilherme6191](https://github.com/guilherme6191)
+
+- Ensure client trust messaging is only displayed if no 2FA options are available ([#7313](https://github.com/clerk/javascript/pull/7313)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updates line-height calculations to follow font-sizing to fix differences across browsers. ([#7112](https://github.com/clerk/javascript/pull/7112)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Reverts the changes introduced in [PR #7105](https://github.com/clerk/javascript/pull/7105), as it was causing JWTs returned from client piggybacking not to be inserted into the cache even though their claims had actually changed. ([#7329](https://github.com/clerk/javascript/pull/7329)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`40a841d`](https://github.com/clerk/javascript/commit/40a841d56cd8983dce21376c832f1085c43a9518), [`f364924`](https://github.com/clerk/javascript/commit/f364924708f20f0bc7b8b291ea2ae01ce09e2e9f), [`f115e56`](https://github.com/clerk/javascript/commit/f115e56d14b5c49f52b6aca01b434dbe4f6193cf), [`d4aef71`](https://github.com/clerk/javascript/commit/d4aef71961d6d0abf8f1d1142c4e3ae943181c4b), [`3f99742`](https://github.com/clerk/javascript/commit/3f997427e400248502b0977e1b69e109574dfe7d), [`02798f5`](https://github.com/clerk/javascript/commit/02798f571065d8142cf1dade57b42b3e8ce0f818), [`07a30ce`](https://github.com/clerk/javascript/commit/07a30ce52b7d2ba85ce3533879700b9ec129152e), [`ce8b914`](https://github.com/clerk/javascript/commit/ce8b9149bff27866cdb686f1ab0b56cef8d8c697)]:
+  - @clerk/shared@3.37.0
+  - @clerk/localizations@3.29.0
+
+## 5.111.0
+
+### Minor Changes
+
+- When a session already exists on sign in, complete the sign in and redirect instead of only rendering an error. ([#7156](https://github.com/clerk/javascript/pull/7156)) by [@brkalow](https://github.com/brkalow)
+
+- Optimized session token poller to share token with other open tabs ([#7302](https://github.com/clerk/javascript/pull/7302)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Updated dependencies [[`e6ad12f`](https://github.com/clerk/javascript/commit/e6ad12fb92604d6b5c03951429ef91d04bc85351)]:
+  - @clerk/localizations@3.28.5
+
+## 5.110.0
+
+### Minor Changes
+
+- Removes SWR as direct dependency ([#7270](https://github.com/clerk/javascript/pull/7270)) by [@panteliselef](https://github.com/panteliselef)
+
+- Introduce in-app development prompt to enable the Organizations feature ([#7159](https://github.com/clerk/javascript/pull/7159)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  In development instances, when using organization components or hooks for the first time, developers will see a prompt to enable the Organizations feature directly in their app, eliminating the need to visit the Clerk Dashboard.
+
+### Patch Changes
+
+- Fix useFetch to update fetcher ref ([#7145](https://github.com/clerk/javascript/pull/7145)) by [@iagodahlem](https://github.com/iagodahlem)
+
+- Ensure that organization component warnings are only shown when no user session exists in development ([#7298](https://github.com/clerk/javascript/pull/7298)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`f85abda`](https://github.com/clerk/javascript/commit/f85abdac03fde4a5109f31931c55b56a365aa748), [`36e43cc`](https://github.com/clerk/javascript/commit/36e43cc614865e52eefbd609a9491c32371cda44)]:
+  - @clerk/shared@3.36.0
+  - @clerk/localizations@3.28.4
+
+## 5.109.2
+
+### Patch Changes
+
+- Make subscription actions more visible with inline buttons ([#7255](https://github.com/clerk/javascript/pull/7255)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Added debug query param to token requests initiated with `skipCache` option. ([#7155](https://github.com/clerk/javascript/pull/7155)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`d8f59a6`](https://github.com/clerk/javascript/commit/d8f59a66d56d8fb0dfea353ecd86af97d0ec56b7)]:
+  - @clerk/shared@3.35.2
+  - @clerk/localizations@3.28.3
+
+## 5.109.1
+
+### Patch Changes
+
+- Only render last used badge when there are multiple strategies enabled. ([#7224](https://github.com/clerk/javascript/pull/7224)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Internal change, not user-facing: Replace `useOrganization` with `useOrganizationContext` in billing components ([#7257](https://github.com/clerk/javascript/pull/7257)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Fix issue where network errors were being masked by fraud protection logic, preventing cache fallback from triggering properly. ([#7254](https://github.com/clerk/javascript/pull/7254)) by [@chriscanin](https://github.com/chriscanin)
+
+- Generate a stable tab identifier in `MemoryTokenCache` so multi-tab token broadcasts can be traced via consistent debug logs. ([#7150](https://github.com/clerk/javascript/pull/7150)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`a9c13ca`](https://github.com/clerk/javascript/commit/a9c13cae5a6f46ca753d530878f7e4492ca7938b)]:
+  - @clerk/shared@3.35.1
+  - @clerk/localizations@3.28.2
+
 ## 5.109.0
 
 ### Minor Changes
@@ -137,7 +290,6 @@
   **What Changed:**
 
   All type definitions including:
-
   - Resource types (User, Organization, Session, etc.)
   - API response types
   - Configuration types
@@ -705,7 +857,6 @@
 - [Billing Beta] Replace usage of top level amounts in plan with fees for displaying prices. ([#6490](https://github.com/clerk/javascript/pull/6490)) by [@panteliselef](https://github.com/panteliselef)
 
 - Add support for trials in `<Checkout/>` ([#6494](https://github.com/clerk/javascript/pull/6494)) by [@panteliselef](https://github.com/panteliselef)
-
   - Added `freeTrialEndsAt` property to `CommerceCheckoutResource` interface.
 
 - Update billing resources with trial properties. ([#6492](https://github.com/clerk/javascript/pull/6492)) by [@panteliselef](https://github.com/panteliselef)
@@ -734,7 +885,6 @@
 - [Billing Beta] Cleanup naming inconsistencies in billing dates. ([#6513](https://github.com/clerk/javascript/pull/6513)) by [@panteliselef](https://github.com/panteliselef)
 
   ## Migration
-
   - subscriptionItem.periodStartDate → subscriptionItem.periodStart
   - subscriptionItem.periodEndDate → subscriptionItem.periodEnd
   - subscriptionItem.canceledAtDate → subscriptionItem.canceledAt
@@ -1036,7 +1186,6 @@
   Deprecated variables will continue to work but will be removed in the next major version.
 
   ## New variables
-
   - `colorRing` - The color of the ring when an interactive element is focused.
   - `colorMuted` - The background color for elements of lower importance, eg: a muted background.
   - `colorShadow` - The base shadow color used in the components.
@@ -1111,7 +1260,6 @@
 - Convert date properties from number to Date in CommerceSubscriptionResource ([#6233](https://github.com/clerk/javascript/pull/6233)) by [@panteliselef](https://github.com/panteliselef)
 
   Deprecates fields of type `number`
-
   - subscription.periodStart
   - subscription.periodEnd
   - subscription.canceledAt
@@ -1235,7 +1383,6 @@
 - Introduce internal `<OAuthConsent />` component to be used internally in the machine auth OAuth flow in account portal. ([#6021](https://github.com/clerk/javascript/pull/6021)) by [@alexcarpenter](https://github.com/alexcarpenter)
 
 - feat(types,clerk-js): Update types; RoleSelect allows fallbackLabel ([#6037](https://github.com/clerk/javascript/pull/6037)) by [@thiskevinwang](https://github.com/thiskevinwang)
-
   - this updates OrganizationInvitation and OrganizationMembership resource+types to include `roleName` which is already present on frontend-api responses, as `role_name`.
   - this updates RoleSelect to allow rendering a `fallbackLabel` in the event that `value` does not map to any of the supplied roles
 
@@ -1488,18 +1635,15 @@
 - Expose Clerk Billing APIs. ([#5833](https://github.com/clerk/javascript/pull/5833)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   ## Render the pricing table component
-
   - `Clerk.mountPricingTable`
   - `Clerk.unmountPricingTable`
 
   ## Manage payment methods
-
   - `Clerk.[user|organization].initializePaymentSource()`
   - `Clerk.[user|organization].addPaymentSource()`
   - `Clerk.[user|organization].getPaymentSources()`
 
   ## Billing namespace
-
   - `Clerk.billing`
     - `Clerk.billing.getPlans()`
     - `Clerk.billing.getSubscriptions()`
@@ -1673,7 +1817,6 @@
 - Remove stale properties from `__experimental_CommerceInvoiceResource` ([#5738](https://github.com/clerk/javascript/pull/5738)) by [@panteliselef](https://github.com/panteliselef)
 
 - Switch to "Payment method" terminology instead of "Payment source". ([#5721](https://github.com/clerk/javascript/pull/5721)) by [@panteliselef](https://github.com/panteliselef)
-
   - Removes `userProfile.__experimental_billingPage.start.headerTitle__paymentSources`
   - Adds `userProfile.__experimental_billingPage.start.headerTitle__paymentMethods`
 
@@ -1703,7 +1846,6 @@
 - Invalidate invoices after successful checkout. ([#5717](https://github.com/clerk/javascript/pull/5717)) by [@panteliselef](https://github.com/panteliselef)
 
 - Incremental improvements for account funds in checkout. ([#5705](https://github.com/clerk/javascript/pull/5705)) by [@panteliselef](https://github.com/panteliselef)
-
   - Fixes CLS issues when rendering account funds
   - Renames "accounts funds" to "payment sources" for consistency
   - Auto opes the "Add a new payment source" drawer only if no payments sources exist
@@ -1733,14 +1875,12 @@
 - Introduce `Clerk.status` for tracking the state of the clerk singleton. ([#5476](https://github.com/clerk/javascript/pull/5476)) by [@panteliselef](https://github.com/panteliselef)
 
   Possible values for `Clerk.status` are:
-
   - `"loading"`: Set during initialization
   - `"error"`: Set when hotloading clerk-js failed or `Clerk.load()` failed
   - `"ready"`: Set when Clerk is fully operational
   - `"degraded"`: Set when Clerk is partially operational
 
   The computed value of `Clerk.loaded` is:
-
   - `true` when `Clerk.status` is either `"ready"` or `"degraded"`.
   - `false` when `Clerk.status` is `"loading"` or `"error"`.
 
@@ -1823,15 +1963,12 @@
 - Add support for feature or plan based authorization ([#5582](https://github.com/clerk/javascript/pull/5582)) by [@panteliselef](https://github.com/panteliselef)
 
   ### Plan
-
   - `Clerk.session.checkAuthorization({ plan: "my-plan" })`
 
   ### Feature
-
   - `Clerk.session.checkAuthorization({ feature: "my-feature" })`
 
   ### Scoped per user or per org
-
   - `Clerk.session.checkAuthorization({ feature: "org:my-feature" })`
   - `Clerk.session.checkAuthorization({ feature: "user:my-feature" })`
   - `Clerk.session.checkAuthorization({ plan: "user:my-plan" })`
@@ -1865,7 +2002,6 @@
 ### Minor Changes
 
 - Introduce `sessionClaims` to useAuth(). ([#5565](https://github.com/clerk/javascript/pull/5565)) by [@panteliselef](https://github.com/panteliselef)
-
   - thanks to [@ijxy](https://github.com/ijxy) for the [contribution](https://github.com/clerk/javascript/pull/4823)
 
 ### Patch Changes
@@ -1945,7 +2081,6 @@
 ### Minor Changes
 
 - Improve session refresh logic. ([#5397](https://github.com/clerk/javascript/pull/5397)) by [@panteliselef](https://github.com/panteliselef)
-
   - Switched from interval-based polling to timeout-based polling, ensuring retries for a `getToken()` call complete before the next poll begins.
   - `Clerk.handleUnauthenticated()` now sets the session to null when a `/client` request returns a `500` status code, preventing infinite request loops.
   - Improved error handling: If the `/client` request fails during initialization, the poller stops, a dummy client is created, a manual request to `/tokens` is attempted, and polling resumes.
@@ -2741,7 +2876,6 @@
 - Introduce a `toJSON()` function on resources. ([#4604](https://github.com/clerk/javascript/pull/4604)) by [@anagstef](https://github.com/anagstef)
 
   This change also introduces two new internal methods on the Clerk resource, to be used by the expo package.
-
   - `__internal_getCachedResources()`: (Optional) This function is used to load cached Client and Environment resources if Clerk fails to load them from the Frontend API.
   - `__internal_reloadInitialResources()`: This function is used to reload the initial resources (Environment/Client) from the Frontend API.
 
@@ -2860,7 +2994,6 @@
 ### Minor Changes
 
 - - Update the supported API version to `2024-10-01` that includes the following changes ([#4596](https://github.com/clerk/javascript/pull/4596)) by [@Nikpolik](https://github.com/Nikpolik)
-
     - Notification for new sign ins to users' accounts feature becomes available.
     - The response for Sign Ins with an email address that matches a **SAML connection** is updated. Instead of responding with a status of `needs_identifier` the API will now return a status of `needs_first_factor` and the email address that matched will be returned in the identifier field. the only strategy that will be included in supported first factors is `enterprise_sso`
 
@@ -2896,14 +3029,12 @@
 - Drop experimental tag related to reverification. ([#4536](https://github.com/clerk/javascript/pull/4536)) by [@panteliselef](https://github.com/panteliselef)
 
   Properties of Clerk class:
-
   - `__experimental_openUserVerification` -> `__internal_openReverification`
   - `__experimental_closeUserVerification` -> `__internal_closeReverification`
   - `__experimental_UserVerificationProps` -> `__internal_ReverificationProps`
   - `__experimental_UserVerificationModalProps` -> `__internal_ReverificationModalProps`
 
   Properties of `Session`:
-
   - `__experimental_factorVerificationAge` -> `factorVerificationAge`
   - `__experimental_startVerification` -> `startVerification`
   - `__experimental_prepareFirstFactorVerification` -> `prepareFirstFactorVerification`
@@ -3121,7 +3252,6 @@
 ### Minor Changes
 
 - New Feature: Introduce the `<Waitlist />` component and the `waitlist` sign up mode. ([#4376](https://github.com/clerk/javascript/pull/4376)) by [@nikospapcom](https://github.com/nikospapcom)
-
   - Allow users to request access with an email address via the new `<Waitlist />` component.
   - Show `Join waitlist` prompt from `<SignIn />` component when mode is `waitlist`.
   - Appropriate the text in the Sign Up component when mode is `waitlist`.
@@ -3231,7 +3361,6 @@
   When `__experimental_asStandalone: true` the component will not render its trigger, and instead it will render only the contents of the popover in place.
 
   APIs that changed:
-
   - (For internal usage) Added `__experimental_prefetchOrganizationSwitcher` as a way to mount an internal component that will render the `useOrganizationList()` hook and prefetch the necessary data for the popover of `<OrganizationSwitcher />`. This enhances the UX since no loading state will be visible and keeps CLS to the minimum.
   - New property for `mountOrganizationSwitcher(node, { __experimental_asStandalone: true })`
   - New property for `mountUserButton(node, { __experimental_asStandalone: true })`
@@ -3300,7 +3429,6 @@
 ### Minor Changes
 
 - Rename `__experimental_assurance` to `__experimental_reverification`. ([#4268](https://github.com/clerk/javascript/pull/4268)) by [@panteliselef](https://github.com/panteliselef)
-
   - Supported levels are now are `firstFactor`, `secondFactor`, `multiFactor`.
   - Support maxAge is now replaced by maxAgeMinutes and afterMinutes depending on usage.
   - Introduced `____experimental_SessionVerificationTypes` that abstracts away the level and maxAge
@@ -3320,7 +3448,6 @@
 - Drop the experimental mounted variant of `UserVerification`. ([#4266](https://github.com/clerk/javascript/pull/4266)) by [@panteliselef](https://github.com/panteliselef)
 
   Removes:
-
   - `<__experimental_UserVerification/>`
   - `__experimental_mountUserVerification()`
   - `__experimental_unmountUserVerification()`
@@ -3581,14 +3708,12 @@
 - Add new `UserVerification` component (experimental feature). This UI component allows for a user to "re-enter" their credentials (first factor and/or second factor) which results in them being re-verified. ([#4016](https://github.com/clerk/javascript/pull/4016)) by [@panteliselef](https://github.com/panteliselef)
 
   New methods have been added:
-
   - `__experimental_openUserVerification()`
   - `__experimental_closeUserVerification()`
   - `__experimental_mountUserVerification(targetNode: HTMLDivElement)`
   - `__experimental_unmountUserVerification(targetNode: HTMLDivElement)`
 
 - Move SessionVerification methods from UserResource to SessionResource: ([#4073](https://github.com/clerk/javascript/pull/4073)) by [@panteliselef](https://github.com/panteliselef)
-
   - `user.__experimental_verifySession` -> `session.__experimental_startVerification`
   - `user.__experimental_verifySessionPrepareFirstFactor` -> `session.__experimental_prepareFirstFactorVerification`
   - `user.__experimental_verifySessionAttemptFirstFactor` -> `session.__experimental_attemptFirstFactorVerification`
@@ -3664,7 +3789,6 @@
 - Expose `SessionVerification` as an experimental resource. ([#4011](https://github.com/clerk/javascript/pull/4011)) by [@panteliselef](https://github.com/panteliselef)
 
   Update `UserResource` with 5 new experimental methods:
-
   - `experimental_verifySession` for creating a new SessionVerification record and initiating a new flow.
   - `experimental_verifySessionPrepareFirstFactor` for preparing a supported first factor like `phone_code`
   - `experimental_verifySessionAttemptFirstFactor` for attempting a supported first factor like `password`
@@ -3819,7 +3943,6 @@
 ### Minor Changes
 
 - Introduce support for custom menu items in `<UserButton/>`. ([#3784](https://github.com/clerk/javascript/pull/3784)) by [@nikospapcom](https://github.com/nikospapcom)
-
   - Use `<UserButton.MenuItems>` as a child component to wrap custom menu items.
   - Use `<UserButton.Link/>` for creating external or internal links.
   - Use `<UserButton.Action/>` for opening a specific custom page of "UserProfile" or to trigger your own custom logic via `onClick`.
@@ -3914,7 +4037,6 @@
 ### Minor Changes
 
 - Added support for Custom OAuth providers by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
   - Updated strategy types to include `CustomOAuthStrategy`:
     - Added the `CustomOAuthStrategy` type with the value `oauth_custom_${string}`
     - Modified `OAuthStrategy` to include `CustomOAuthStrategy`:
@@ -4065,7 +4187,6 @@
 - Add support for GoogleOneTap. New APIs listed: ([#3392](https://github.com/clerk/javascript/pull/3392)) by [@panteliselef](https://github.com/panteliselef)
 
   ### React component
-
   - `<GoogleOneTap/>`
 
   Customize the UX of the prompt
@@ -4079,12 +4200,10 @@
   ```
 
   ### Use the component from with Vanilla JS
-
   - `Clerk.openGoogleOneTap(props: GoogleOneTapProps)`
   - `Clerk.closeGoogleOneTap()`
 
   ### Low level APIs for custom flows
-
   - `await Clerk.authenticateWithGoogleOneTap({ token: 'xxxx'})`
   - `await Clerk.handleGoogleOneTapCallback()`
 
@@ -4170,7 +4289,6 @@
 ### Minor Changes
 
 - Updates related to experimental Google One Tap support ([#3250](https://github.com/clerk/javascript/pull/3250)) by [@panteliselef](https://github.com/panteliselef)
-
   - By default we are returning back to the location where the flow started.
     To accomplish that internally we will use the redirect_url query parameter to build the url.
 
@@ -4404,7 +4522,6 @@
 
 - 97407d8aa: Dropping support for Node 14 and 16 as they both reached EOL status. The minimal Node.js version required by Clerk is `18.18.0` now.
 - 4bb57057e: Breaking Changes:
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -4413,7 +4530,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -4442,7 +4558,6 @@
 - 08dd88c4a: Introducing sign out from all open tabs at once.
 - afec17953: Improved error handling for registration and retrieval of passkeys.
   ClerkRuntimeError codes introduced:
-
   - `passkey_not_supported`
   - `passkeys_pa_not_supported`
   - `passkey_invalid_rpID_or_domain`
@@ -4478,7 +4593,6 @@
 - e400fa9e3: Introducing default values for `allowedRedirectOrigins`. If no value is provided, default values similar to the example below will apply.
 
   Let's assume the host of the application is `test.host`, the origins will be
-
   - `https://test.host/`
   - `https://yourawesomeapp.clerk.accounts.dev/`
   - `https://*.yourawesomeapp.clerk.accounts.dev/`
@@ -4490,7 +4604,6 @@
 
 - 492b8a7b1: Increase the duration until data become stale for organization hooks.
 - 2352149f6: Move passkey related apis to stable:
-
   - Register passkey for a user
     Usage: `await clerk.user.createPasskey()`
   - Authenticate with passkey
@@ -4507,7 +4620,6 @@
     }
     ```
   - ClerkRuntimeError codes introduced:
-
     - `passkey_not_supported`
     - `passkeys_pa_not_supported`
     - `passkey_invalid_rpID_or_domain`
@@ -4571,7 +4683,6 @@
 - 12962bc58: Re-use common pagination types for consistency across types.
 
   Types introduced in `@clerk/types`:
-
   - `ClerkPaginationRequest` : describes pagination related props in request payload
   - `ClerkPaginatedResponse` : describes pagination related props in response body
   - `ClerkPaginationParams` : describes pagination related props in api client method params
@@ -4674,7 +4785,6 @@
 - 63373bf21: Correct the HTML structure of the UI components to ensure validity
 - 0ee1777e0: Allow retries for all 300xxx error codes for CF Turnstile.
 - 78fc5eec0: Introduces new element appearance descriptors:
-
   - `activeDeviceListItem` allows you to customize the appearance of the active device list (accordion) item
     - `activeDeviceListItem__current` allows you to customize the appearance of the _current_ active device list (accordion) item
   - `activeDevice` allows you to customize the appearance of the active device item
@@ -4916,7 +5026,6 @@
 ### Minor Changes
 
 - Introduce experimental support for Google One Tap ([#3176](https://github.com/clerk/javascript/pull/3176)) by [@panteliselef](https://github.com/panteliselef)
-
   - React Component `<__experimental_GoogleOneTap/>`
   - JS `clerk.__experimental_mountGoogleOneTap(node,props)`
 
@@ -4973,7 +5082,6 @@
 ### Minor Changes
 
 - Move passkey related apis to stable: ([#3134](https://github.com/clerk/javascript/pull/3134)) by [@panteliselef](https://github.com/panteliselef)
-
   - Register passkey for a user
     Usage: `await clerk.user.createPasskey()`
   - Authenticate with passkey
@@ -4990,7 +5098,6 @@
     }
     ```
   - ClerkRuntimeError codes introduced:
-
     - `passkey_not_supported`
     - `passkeys_pa_not_supported`
     - `passkey_invalid_rpID_or_domain`
@@ -5087,7 +5194,6 @@
 - Improved error handling for registration and retrieval of passkeys. ([#3025](https://github.com/clerk/javascript/pull/3025)) by [@panteliselef](https://github.com/panteliselef)
 
   ClerkRuntimeError codes introduced:
-
   - `passkey_not_supported`
   - `passkeys_pa_not_supported`
   - `passkey_invalid_rpID_or_domain`
@@ -5125,7 +5231,6 @@
 ### Minor Changes
 
 - List passkeys under security in UserProfile. ([#2958](https://github.com/clerk/javascript/pull/2958)) by [@panteliselef](https://github.com/panteliselef)
-
   - Supports renaming a passkey.
   - Supports deleting a passkey.
 
@@ -5140,7 +5245,6 @@
   Example usage: `await signIn.authenticateWithPasskey()`.
 
 - Remove unused error helpers. ([#2978](https://github.com/clerk/javascript/pull/2978)) by [@panteliselef](https://github.com/panteliselef)
-
   - clerkErrorInvalidColor()
   - clerkCoreErrorUserIsNotDefined()
   - clerkCoreErrorSessionIsNotDefined()
@@ -5183,7 +5287,6 @@
 ### Minor Changes
 
 - Experimental support for reading, updating, and deleting a user's registered passkeys. ([#2926](https://github.com/clerk/javascript/pull/2926)) by [@panteliselef](https://github.com/panteliselef)
-
   - Get the user's passkeys
     `clerk.user.__experimental__passkeys`
   - Update the name of a passkey
@@ -5426,7 +5529,6 @@
 - Remove fallback data and allow promise to throw for paginated endpoint methods. ([#2491](https://github.com/clerk/javascript/pull/2491)) by [@panteliselef](https://github.com/panteliselef)
 
   Affected methods:
-
   - Organization.getDomains
   - Organization.getInvitations
   - Organization.getMembershipRequests
@@ -5567,7 +5669,6 @@
 - Introduce Protect for authorization. ([#2170](https://github.com/clerk/javascript/pull/2170)) by [@panteliselef](https://github.com/panteliselef)
 
   Changes in public APIs:
-
   - Rename Gate to Protect
   - Support for permission checks. (Previously only roles could be used)
   - Remove the `experimental` tags and prefixes
@@ -5678,7 +5779,6 @@
 - Re-use common pagination types for consistency across types. ([#2210](https://github.com/clerk/javascript/pull/2210)) by [@dimkl](https://github.com/dimkl)
 
   Types introduced in `@clerk/types`:
-
   - `ClerkPaginationRequest` : describes pagination related props in request payload
   - `ClerkPaginatedResponse` : describes pagination related props in response body
   - `ClerkPaginationParams` : describes pagination related props in api client method params
@@ -5723,7 +5823,6 @@
   to fix issues with vite & rollup building.
 
 - Breaking Changes: ([#2169](https://github.com/clerk/javascript/pull/2169)) by [@dimkl](https://github.com/dimkl)
-
   - Drop `isLegacyFrontendApiKey` from `@clerk/shared`
   - Drop default exports from `@clerk/clerk-js`
     - on headless Clerk type
@@ -5732,7 +5831,6 @@
   - Use `isDevelopmentFromSecretKey` instead of `isDevelopmentFromApiKey`
 
   Changes:
-
   - Rename `HeadlessBrowserClerkConstrutor` / `HeadlessBrowserClerkConstructor` (typo)
   - Use `isomorphicAtob` / `isomorhpicBtoa` to replace `base-64` in `@clerk/expo`
   - Refactor merging build-time and runtime props in `@clerk/backend` clerk client
@@ -5740,7 +5838,6 @@
   - Drop duplicate test in `@clerk/backend`
 
 - Introducing some changes and some addition for the appearence descriptors for the organization preview in `<OrganizationSwitcher/>`: ([#2158](https://github.com/clerk/javascript/pull/2158)) by [@octoper](https://github.com/octoper)
-
   - `.cl-organizationPreview__organizationSwitcher` has been renamed to `.cl-organizationPreview__organizationSwitcherTrigger`.
   - `.cl-organizationPreview__organizationSwitcherListedOrganization` was added to allow you to customize the appearance of all the listed organization previews.
   - `.cl-organizationPreview__organizationSwitcherActiveOrganizationn` was added to allow you to customize the appearance of the active organization.
@@ -5774,7 +5871,6 @@
 ### Major Changes
 
 - Drop default exports from all packages. Migration guide: ([#2150](https://github.com/clerk/javascript/pull/2150)) by [@dimkl](https://github.com/dimkl)
-
   - use `import { Clerk } from '@clerk/backend';`
   - use `import { clerkInstance } from '@clerk/clerk-sdk-node';`
   - use `import { Clerk } from '@clerk/clerk-sdk-node';`
@@ -5783,7 +5879,6 @@
   - use `import { IsomorphicClerk } from '@clerk/clerk-react'`
 
 - Drop deprecations. Migration steps: ([#2082](https://github.com/clerk/javascript/pull/2082)) by [@dimkl](https://github.com/dimkl)
-
   - use `publishableKey` instead of `frontendApi`
   - use `Clerk.handleEmailLinkVerification()` instead of `Clerk.handleMagicLinkVerification()`
   - use `isEmailLinkError` instead of `isMagicLinkError`
@@ -5820,7 +5915,6 @@
 - Introducing default values for `allowedRedirectOrigins`. If no value is provided, default values similar to the example below will apply. ([#2128](https://github.com/clerk/javascript/pull/2128)) by [@octoper](https://github.com/octoper)
 
   Let's assume the host of the application is `test.host`, the origins will be
-
   - `https://test.host/`
   - `https://yourawesomeapp.clerk.accounts.dev/`
   - `https://*.yourawesomeapp.clerk.accounts.dev/`
@@ -5902,7 +5996,6 @@
 - Tests for internal PlainInput component. ([#2029](https://github.com/clerk/javascript/pull/2029)) by [@panteliselef](https://github.com/panteliselef)
 
 - Introduces new element appearance descriptors: ([#1994](https://github.com/clerk/javascript/pull/1994)) by [@tmilewski](https://github.com/tmilewski)
-
   - `activeDeviceListItem` allows you to customize the appearance of the active device list (accordion) item
     - `activeDeviceListItem__current` allows you to customize the appearance of the _current_ active device list (accordion) item
   - `activeDevice` allows you to customize the appearance of the active device item
@@ -6015,7 +6108,6 @@
 ### Minor Changes
 
 - Introduces three new element appearance descriptors: ([#1803](https://github.com/clerk/javascript/pull/1803)) by [@octoper](https://github.com/octoper)
-
   - `tableHead` let's you customize the tables head styles.
   - `paginationButton` let's you customize the pagination buttons.
   - `paginationRowText` let's you customize the pagination text.
@@ -6029,7 +6121,6 @@
 - Update default organization permissions with a `sys_` prefix as part of the entitlement. This changes makes it easy to distinguish between clerk reserved permissions and custom permissions created by developers. ([#1865](https://github.com/clerk/javascript/pull/1865)) by [@mzhong9723](https://github.com/mzhong9723)
 
 - Mark the following SAML related types as stable: ([#1876](https://github.com/clerk/javascript/pull/1876)) by [@dimkl](https://github.com/dimkl)
-
   - `User.samlAccounts`
   - `SamlAccount`
   - `UserSettingsResource.saml`
@@ -6078,7 +6169,6 @@
 ### Patch Changes
 
 - Warn about _MagicLink_ deprecations: ([#1836](https://github.com/clerk/javascript/pull/1836)) by [@dimkl](https://github.com/dimkl)
-
   - `MagicLinkError`
   - `isMagicLinkError`
   - `MagicLinkErrorCode`
@@ -6116,7 +6206,6 @@
 ### Patch Changes
 
 - Apply deprecation warnings for @clerk/types: ([#1823](https://github.com/clerk/javascript/pull/1823)) by [@dimkl](https://github.com/dimkl)
-
   - `orgs` jwt claims
   - `apiKey`
   - `frontendApi`
@@ -6168,7 +6257,6 @@
 ### Patch Changes
 
 - Apply deprecation warnings for `@clerk/clerk-js`: ([#1800](https://github.com/clerk/javascript/pull/1800)) by [@dimkl](https://github.com/dimkl)
-
   - `Clerk.setSession`
 
 - Updated dependencies [[`cecf74d79`](https://github.com/clerk/javascript/commit/cecf74d79069662d25f73e4745aa01348d398afb)]:
@@ -6187,7 +6275,6 @@
 - Fix: localized key for invalid email addresses in InviteMembers form. ([#1781](https://github.com/clerk/javascript/pull/1781)) by [@panteliselef](https://github.com/panteliselef)
 
 - Apply deprecation warnings clerk-js package for: ([#1779](https://github.com/clerk/javascript/pull/1779)) by [@dimkl](https://github.com/dimkl)
-
   - Organization.create() using string parameter
   - Organization.retrieve() `limit` & `offset`
   - Clerk.getOrganizationMemberships()
@@ -6236,7 +6323,6 @@
 ### Minor Changes
 
 - Introduce the new brand-new component OrganizationList ([#1692](https://github.com/clerk/javascript/pull/1692)) by [@panteliselef](https://github.com/panteliselef)
-
   - Lists all the memberships, invitations or suggestions an active user may have
   - Powered by our `useOrganizationList` react hook
 
@@ -6315,7 +6401,6 @@
 ### Minor Changes
 
 - Introducing validatePassword for SignIn and SignUp resources ([#1445](https://github.com/clerk/javascript/pull/1445)) by [@panteliselef](https://github.com/panteliselef)
-
   - Validate a password based on the instance's configuration set in Password Policies in Dashboard
 
 - Introduce a new resource called OrganizationSuggestion along with retrieve() & accept() methods ([#1574](https://github.com/clerk/javascript/pull/1574)) by [@chanioxaris](https://github.com/chanioxaris)
@@ -6344,15 +6429,12 @@
 - Pass dev_browser to AP via query param, fix AP origin detection util ([#1567](https://github.com/clerk/javascript/pull/1567)) by [@yourtallness](https://github.com/yourtallness)
 
 - Introduces a new resource called OrganizationMembership ([#1572](https://github.com/clerk/javascript/pull/1572)) by [@panteliselef](https://github.com/panteliselef)
-
   - useOrganization has been updated in order to return a list of domain with the above type
 
 - Introduces Membership Requests in <OrganizationProfile /> ([#1576](https://github.com/clerk/javascript/pull/1576)) by [@panteliselef](https://github.com/panteliselef)
-
   - This is a list of users that have requested to join the active organization
 
 - Updates signature of OrganizationMembership.retrieve to support backwards compatibility while allowing using the new paginated responses. ([#1606](https://github.com/clerk/javascript/pull/1606)) by [@panteliselef](https://github.com/panteliselef)
-
   - userMemberships is now also part of the returned values of useOrganizationList
 
 - Introduces the accept method in UserOrganizationInvitation class ([#1550](https://github.com/clerk/javascript/pull/1550)) by [@panteliselef](https://github.com/panteliselef)
@@ -6360,36 +6442,30 @@
 - Display a notification counter for organization invitations in OrganizationSwitcher ([#1627](https://github.com/clerk/javascript/pull/1627)) by [@panteliselef](https://github.com/panteliselef)
 
 - Introduces a new resource called OrganizationDomain ([#1569](https://github.com/clerk/javascript/pull/1569)) by [@panteliselef](https://github.com/panteliselef)
-
   - useOrganization has been updated in order to return a list of domain with the above type
 
 - Introduces domains and invitations in <OrganizationProfile /> ([#1560](https://github.com/clerk/javascript/pull/1560)) by [@panteliselef](https://github.com/panteliselef)
-
   - The "Members" page now accommodates Domain and Individual invitations
   - The "Settings" page allows for the addition, edit and removal of a domain
 
 - Fix a bug where it was not possible to delete the username if it was optional. ([#1580](https://github.com/clerk/javascript/pull/1580)) by [@raptisj](https://github.com/raptisj)
 
 - A OrganizationMembershipRequest can now be rejected ([#1612](https://github.com/clerk/javascript/pull/1612)) by [@panteliselef](https://github.com/panteliselef)
-
   - New `OrganizationMembershipRequest.reject` method alongside `accept`
   - As an organization admin, navigate to `Organization Profile` > `Members` > `Requests`. You can now reject a request from the table.
 
 - Ensure the session token is updated when calling `setActive()` in a non-browser environment. ([#1623](https://github.com/clerk/javascript/pull/1623)) by [@BRKalow](https://github.com/BRKalow)
 
 - Introduces an invitation list within <OrganizationSwitcher/> ([#1554](https://github.com/clerk/javascript/pull/1554)) by [@panteliselef](https://github.com/panteliselef)
-
   - Users can accept the invitation that is sent to them
 
 - When updating enrollment mode of a domain uses can now delete any pending invitations or suggestions. ([#1632](https://github.com/clerk/javascript/pull/1632)) by [@panteliselef](https://github.com/panteliselef)
 
 - Construct urls based on context in <OrganizationSwitcher/> ([#1503](https://github.com/clerk/javascript/pull/1503)) by [@panteliselef](https://github.com/panteliselef)
-
   - Deprecate `afterSwitchOrganizationUrl`
   - Introduce `afterSelectOrganizationUrl` & `afterSelectPersonalUrl`
 
   `afterSelectOrganizationUrl` accepts
-
   - Full URL -> 'https://clerk.com/'
   - relative path -> '/organizations'
   - relative path -> with param '/organizations/:id'
@@ -6401,7 +6477,6 @@
   - function that returns a string -> (user) => `/users/${user.id}`
 
 - Introduces list of suggestions within <OrganizationSwitcher/> ([#1577](https://github.com/clerk/javascript/pull/1577)) by [@panteliselef](https://github.com/panteliselef)
-
   - Users can request to join a suggested organization
 
 - Updated dependencies [[`96cc1921c`](https://github.com/clerk/javascript/commit/96cc1921cac20442f19510137ee0100df5f8a0f4), [`8d1e7d76d`](https://github.com/clerk/javascript/commit/8d1e7d76de40c0ecb367c6745094dd0a75f764b3), [`435d2cff5`](https://github.com/clerk/javascript/commit/435d2cff5dfc86c58690d3f0d843f567ac4f3c04), [`8873841fc`](https://github.com/clerk/javascript/commit/8873841fcbb96f31aaeb8a12a0ce1d90512986d4), [`0a5f632f8`](https://github.com/clerk/javascript/commit/0a5f632f83bb4dae4cc82718dc86b7df3a125a56), [`34da40a50`](https://github.com/clerk/javascript/commit/34da40a5035b37eb365c6cb273e25c4d3bcf7161), [`3158752c7`](https://github.com/clerk/javascript/commit/3158752c73b9266775f954d3adaf43c66ba8b2e8), [`8538cd0c1`](https://github.com/clerk/javascript/commit/8538cd0c1e2ee2e38bd11079735a2ffc6738f71b), [`a412a5014`](https://github.com/clerk/javascript/commit/a412a501426f5d7a32284fda47efe48a04b5d38e), [`4ea30e883`](https://github.com/clerk/javascript/commit/4ea30e883a4f5c19cdde3424bf02afa99e2bc86d), [`17b3de961`](https://github.com/clerk/javascript/commit/17b3de961096446b66853ef2a0a75dc276d89b16), [`86de584dd`](https://github.com/clerk/javascript/commit/86de584ddf1c22ec99852b983a92386e5542613c), [`e404b98f7`](https://github.com/clerk/javascript/commit/e404b98f7339f2f8167684e664153b7d5ac4400e), [`e02a1aff2`](https://github.com/clerk/javascript/commit/e02a1aff2d4b1478601a2e7b598d600ab3902169), [`09bfb793e`](https://github.com/clerk/javascript/commit/09bfb793ee54d50eb54ef4e3a5eb385ea2f2fb54), [`b2296d630`](https://github.com/clerk/javascript/commit/b2296d6304e1ca31a35450e0c67a12555c0142f9), [`dcabc22c5`](https://github.com/clerk/javascript/commit/dcabc22c5ed71094683ac7e1691c1cfa34f59783), [`52ce79108`](https://github.com/clerk/javascript/commit/52ce79108fb5cb4fc84bf4f2df3e3dc748ee4eb3), [`4764e40c7`](https://github.com/clerk/javascript/commit/4764e40c7e858803fc6379dec20fcf687dcaed64), [`1e117beec`](https://github.com/clerk/javascript/commit/1e117beeca53f27d8e9f58f2a724fbc8a7d54021), [`89bc5de04`](https://github.com/clerk/javascript/commit/89bc5de04aafa9832d4d1b5f816af2340acd14d4)]:
@@ -6428,7 +6503,6 @@
 - Introduces a new internal class `UserOrganizationInvitation` that represents and invitation to join an organization with the organization data populated ([#1527](https://github.com/clerk/javascript/pull/1527)) by [@panteliselef](https://github.com/panteliselef)
 
   Additions to support the above
-
   - UserOrganizationInvitationResource
   - UserOrganizationInvitationJSON
   - ClerkPaginatedResponse
@@ -6484,7 +6558,6 @@
 ### Minor Changes
 
 - Add a confirmation input as an additional check when doing destructive actions such as: ([#1454](https://github.com/clerk/javascript/pull/1454)) by [@raptisj](https://github.com/raptisj)
-
   - delete an organization
   - delete a user account
   - leave an organization
@@ -6500,7 +6573,6 @@
 - Fixed a bug where overriding some localization values in the sign in/up start pages with an empty string would result in showing the english translation. ([#1474](https://github.com/clerk/javascript/pull/1474)) by [@desiprisg](https://github.com/desiprisg)
 
 - Changes to OrganizationSwitcher ([#1462](https://github.com/clerk/javascript/pull/1462)) by [@panteliselef](https://github.com/panteliselef)
-
   - Removal of user identifier from the trigger & popover
   - Hidden avatar of active user when `hidePersonal` is true
 
@@ -6647,7 +6719,6 @@
 - ESM/CJS support for `@clerk/clerk-react` by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
   Changes that should affect users and OS contributors:
-
   - Better source map support for `@clerk/clerk-react`, `@clerk/shared`. This affects anyone developing in our monorepo or anyone using a debugger with Clerk installed in their app.
   - Easier node_modules debugging as `@clerk/clerk-react`, `@clerk/shared` and `@clerk/nextjs` are no longer getting bundled as a single-file package. This also improves error logging in nextjs a lot, as nextjs usually logs the line that threw the error - a minified, single-file package, usually consists of a very long single-line module, so logging error in NextJS wasn't ideal.
   - Headless clerk-js bundle size reduced by ~10kb, normal clerk-ks by ~6kb
@@ -6656,7 +6727,6 @@
 - Add support for dataURLs in User.setProfileImage by [@nikosdouvlis](https://github.com/nikosdouvlis)
 
 - Support OTP autofill for Chrome on iOS by [@nikosdouvlis](https://github.com/nikosdouvlis)
-
   - Fixes a bug preventing OTP being correctly autofilled when received via SMS
 
 - Preview known SAML error messages during failed Sign in/up flows by [@nikosdouvlis](https://github.com/nikosdouvlis)

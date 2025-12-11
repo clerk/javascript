@@ -16,7 +16,7 @@ import {
   sharedMainIdentifierSx,
 } from '@/ui/common/organizations/OrganizationPreview';
 import { organizationListParams, populateCacheUpdateItem } from '@/ui/components/OrganizationSwitcher/utils';
-import { useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
+import { useSessionTasksContext, useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { Col, descriptors, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { Action, Actions } from '@/ui/elements/Actions';
 import { Card } from '@/ui/elements/Card';
@@ -25,7 +25,6 @@ import { Header } from '@/ui/elements/Header';
 import { OrganizationPreview } from '@/ui/elements/OrganizationPreview';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 import { Add } from '@/ui/icons';
-import { useRouter } from '@/ui/router';
 import { handleError } from '@/ui/utils/errorHandler';
 
 type ChooseOrganizationScreenProps = {
@@ -107,7 +106,7 @@ export const ChooseOrganizationScreen = (props: ChooseOrganizationScreenProps) =
 const MembershipPreview = (props: { organization: OrganizationResource }) => {
   const { user } = useUser();
   const card = useCardState();
-  const { navigate } = useRouter();
+  const { navigateOnSetActive } = useSessionTasksContext();
   const { redirectUrlComplete } = useTaskChooseOrganizationContext();
   const { isLoaded, setActive } = useOrganizationList();
   const { t } = useLocalizations();
@@ -121,9 +120,8 @@ const MembershipPreview = (props: { organization: OrganizationResource }) => {
       try {
         await setActive({
           organization,
-          navigate: async () => {
-            // TODO(after-auth) ORGS-779 - Handle next tasks
-            await navigate(redirectUrlComplete);
+          navigate: async ({ session }) => {
+            await navigateOnSetActive?.({ session, redirectUrlComplete });
           },
         });
       } catch (err) {

@@ -1,11 +1,10 @@
-name: Release
-run-name: Release
+name: Release (Core 2)
+run-name: Release (Core 2)
 
 on:
   push:
     branches:
-      - main
-      - release/v4
+      - release/core-2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -43,10 +42,10 @@ jobs:
         id: config
         uses: ./.github/actions/init
         with:
-          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
-          turbo-team: ${{ vars.TURBO_TEAM }}
-          turbo-token: ${{ secrets.TURBO_TOKEN }}
           playwright-enabled: true # Must be present to enable caching on branched workflows
+          # turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          # turbo-team: ${{ vars.TURBO_TEAM }}
+          # turbo-token: ${{ secrets.TURBO_TOKEN }}
 
       - name: Build release
         run: pnpm turbo build $TURBO_ARGS --force
@@ -55,8 +54,8 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: 'ci(repo): Version packages'
-          title: 'ci(repo): Version packages'
+          commit: "ci(repo): Version packages (Core 2)"
+          title: "ci(repo): Version packages (Core 2)"
           publish: pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
@@ -83,9 +82,9 @@ jobs:
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'sdk-infra-workers',
-                workflow_id: 'update-clerkjs.yml',
+                workflow_id: 'update-pkg-versions.yml',
                 ref: 'main',
-                inputs: { version: clerkjsVersion }
+                inputs: { clerkjsVersion }
               })
 
               github.rest.actions.createWorkflowDispatch({
@@ -99,7 +98,7 @@ jobs:
               github.rest.actions.createWorkflowDispatch({
                 owner: 'clerk',
                 repo: 'clerk-docs',
-                workflow_id: 'typedoc.yml',
+                workflow_id: 'typedoc-core-2.yml',
                 ref: 'main',
               })
             } else{
@@ -139,11 +138,14 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          fetch-tags: false
+          filter: "blob:none"
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
-          turbo-team: ''
-          turbo-token: ''
+          turbo-team: ""
+          turbo-token: ""

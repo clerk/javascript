@@ -9,6 +9,7 @@ import type {
   SignInProps,
   SignUpProps,
   TaskChooseOrganizationProps,
+  TaskResetPasswordProps,
   UserAvatarProps,
   UserButtonProps,
   UserProfileProps,
@@ -257,7 +258,7 @@ const _UserButton = withClerk(
     const { customPages, customPagesPortals } = useUserProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const userProfileProps = Object.assign(props.userProfileProps || {}, { customPages });
+    const userProfileProps = { ...props.userProfileProps, customPages };
     const { customMenuItems, customMenuItemsPortals } = useUserButtonCustomMenuItems(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
@@ -435,7 +436,7 @@ const _OrganizationSwitcher = withClerk(
     const { customPages, customPagesPortals } = useOrganizationProfileCustomPages(props.children, {
       allowForAnyChildren: !!props.__experimental_asProvider,
     });
-    const organizationProfileProps = Object.assign(props.organizationProfileProps || {}, { customPages });
+    const organizationProfileProps = { ...props.organizationProfileProps, customPages };
     const sanitizedChildren = useSanitizedChildren(props.children);
 
     const passableProps = {
@@ -695,4 +696,32 @@ export const TaskChooseOrganization = withClerk(
     );
   },
   { component: 'TaskChooseOrganization', renderWhileLoading: true },
+);
+
+export const TaskResetPassword = withClerk(
+  ({ clerk, component, fallback, ...props }: WithClerkProp<TaskResetPasswordProps & FallbackProp>) => {
+    const mountingStatus = useWaitForComponentMount(component);
+    const shouldShowFallback = mountingStatus === 'rendering' || !clerk.loaded;
+
+    const rendererRootProps = {
+      ...(shouldShowFallback && fallback && { style: { display: 'none' } }),
+    };
+
+    return (
+      <>
+        {shouldShowFallback && fallback}
+        {clerk.loaded && (
+          <ClerkHostRenderer
+            component={component}
+            mount={clerk.mountTaskResetPassword}
+            unmount={clerk.unmountTaskResetPassword}
+            updateProps={(clerk as any).__unstable__updateProps}
+            props={props}
+            rootProps={rendererRootProps}
+          />
+        )}
+      </>
+    );
+  },
+  { component: 'TaskResetPassword', renderWhileLoading: true },
 );

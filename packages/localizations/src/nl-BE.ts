@@ -693,8 +693,14 @@ export const nlBE: LocalizationResource = {
       subtitle: 'om door te gaan naar {{applicationName}}',
       title: 'Vul je wachtwoord in',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Dit wachtwoord is gelekt bij een datalek. Kies een ander wachtwoord om veiligheidsredenen.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verificatiecode',
@@ -742,6 +748,10 @@ export const nlBE: LocalizationResource = {
       formTitle: 'Verificatiecode',
       subtitle: '',
       title: 'Tweestapsverificatie',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
@@ -834,6 +844,10 @@ export const nlBE: LocalizationResource = {
       title: 'Maak je account aan',
       titleCombined: 'Maak je account aan',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: 'Ga verder met {{provider|titleize}}',
@@ -861,8 +875,19 @@ export const nlBE: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Je bent al lid van de organisatie.',
+    avatar_file_size_exceeded: 'Bestandsgrootte overschrijdt de maximale limiet van 10 MB. Kies een kleiner bestand.',
+    avatar_file_type_invalid: 'Bestandstype wordt niet ondersteund. Upload een JPG-, PNG-, GIF- of WEBP-afbeelding.',
     captcha_invalid:
       'Aanmelding mislukt vanwege mislukte beveiligingsvalidaties. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     captcha_unavailable:
@@ -872,6 +897,7 @@ export const nlBE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
     form_identifier_not_found: 'We konden geen account vinden met deze details.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Het formaat van het ingevoerde gegeven is ongeldig.',
     form_param_format_invalid__email_address: 'E-mailadres moet een geldig e-mailadres zijn.',
     form_param_format_invalid__phone_number: 'Telefoonnummer moet een geldig internationaal nummer zijn.',
@@ -890,9 +916,11 @@ export const nlBE: LocalizationResource = {
     form_password_pwned__sign_in: 'Als je dit wachtwoord elders gebruikt, moet je het wijzigen.',
     form_password_size_in_bytes_exceeded:
       'Je wachtwoord heeft het maximum aantal bytes overschreden, vermijd speciale tekens.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Wachtwoord is incorrect.',
     form_username_invalid_character: 'De gebruikersnaam bevat ongeldige tekens.',
     form_username_invalid_length: 'De gebruikersnaam is te kort of te lang.',
+    form_username_needs_non_number_char: 'Uw gebruikersnaam moet minstens één niet-numeriek teken bevatten.',
     identification_deletion_failed: 'Je kunt je laatste identificatie niet verwijderen.',
     not_allowed_access:
       "Je e-mailadres of telefoonnummer is niet toegestaan voor registratie. Dit kan zijn omdat je '+', '=', '#' of '.' in je e-mailadres gebruikt, een domein dat is gekoppeld aan een tijdelijke e-mailservice gebruikt, of een expliciete uitsluiting heeft.",
@@ -920,6 +948,8 @@ export const nlBE: LocalizationResource = {
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',
@@ -1321,5 +1351,10 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Je ontvangt een bericht zodra er ruimte beschikbaar is.',
       title: 'Succes!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

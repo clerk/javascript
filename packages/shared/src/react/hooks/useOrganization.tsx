@@ -20,6 +20,7 @@ import {
 import { STABLE_KEYS } from '../stable-keys';
 import type { PaginatedHookConfig, PaginatedResources, PaginatedResourcesWithDefault } from '../types';
 import { createCacheKeys } from './createCacheKeys';
+import { useAttemptToEnableOrganizations } from './useAttemptToEnableOrganizations';
 import { usePagesOrInfinite, useWithSafeValues } from './usePagesOrInfinite';
 
 /**
@@ -30,7 +31,7 @@ export type UseOrganizationParams = {
    * If set to `true`, all default properties will be used.<br />
    * Otherwise, accepts an object with the following optional properties:
    * <ul>
-   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/verified-domains#enrollment-mode).</li>
+   *  <li>`enrollmentMode`: A string that filters the domains by the provided [enrollment mode](https://clerk.com/docs/guides/organizations/add-members/verified-domains#enable-verified-domains).</li>
    *  <li>Any of the properties described in [Shared properties](#shared-properties).</li>
    * </ul>
    */
@@ -75,27 +76,27 @@ export type UseOrganizationReturn<T extends UseOrganizationParams> =
        */
       isLoaded: false;
       /**
-       * The currently active organization.
+       * The currently Active Organization.
        */
       organization: undefined;
       /**
-       * The current organization membership.
+       * The current Organization membership.
        */
       membership: undefined;
       /**
-       * Includes a paginated list of the organization's domains.
+       * Includes a paginated list of the Organization's domains.
        */
       domains: PaginatedResourcesWithDefault<OrganizationDomainResource>;
       /**
-       * Includes a paginated list of the organization's membership requests.
+       * Includes a paginated list of the Organization's membership requests.
        */
       membershipRequests: PaginatedResourcesWithDefault<OrganizationMembershipRequestResource>;
       /**
-       * Includes a paginated list of the organization's memberships.
+       * Includes a paginated list of the Organization's memberships.
        */
       memberships: PaginatedResourcesWithDefault<OrganizationMembershipResource>;
       /**
-       * Includes a paginated list of the organization's invitations.
+       * Includes a paginated list of the Organization's invitations.
        */
       invitations: PaginatedResourcesWithDefault<OrganizationInvitationResource>;
     }
@@ -149,7 +150,7 @@ const undefinedPaginatedResource = {
 } as const;
 
 /**
- * The `useOrganization()` hook retrieves attributes of the currently active organization.
+ * The `useOrganization()` hook retrieves attributes of the currently Active Organization.
  *
  * @example
  * ### Expand and paginate attributes
@@ -184,7 +185,7 @@ const undefinedPaginatedResource = {
  * @example
  * ### Infinite pagination
  *
- * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
+ * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `memberships` attribute will be populated with the first page of the Organization's memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
  *
  * ```tsx
  * import { useOrganization } from '@clerk/clerk-react'
@@ -228,7 +229,7 @@ const undefinedPaginatedResource = {
  * @example
  * ### Simple pagination
  *
- * The following example demonstrates how to use the `fetchPrevious` and `fetchNext` helper functions to paginate through the data. The `memberships` attribute will be populated with the first page of the organization's memberships. When the "Previous page" or "Next page" button is clicked, the `fetchPrevious` or `fetchNext` helper function will be called to fetch the previous or next page of memberships.
+ * The following example demonstrates how to use the `fetchPrevious` and `fetchNext` helper functions to paginate through the data. The `memberships` attribute will be populated with the first page of the Organization's memberships. When the "Previous page" or "Next page" button is clicked, the `fetchPrevious` or `fetchNext` helper function will be called to fetch the previous or next page of memberships.
  *
  * Notice the difference between this example's pagination and the infinite pagination example above.
  *
@@ -280,6 +281,7 @@ export function useOrganization<T extends UseOrganizationParams>(params?: T): Us
   } = params || {};
 
   useAssertWrappedByClerkProvider('useOrganization');
+  useAttemptToEnableOrganizations('useOrganization');
 
   const { organization } = useOrganizationContext();
   const session = useSessionContext();

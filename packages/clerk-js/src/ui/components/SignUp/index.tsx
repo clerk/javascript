@@ -2,6 +2,7 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
+import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
 import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
 
 import { SessionTasks as LazySessionTasks } from '../../../ui/lazyModules/components';
@@ -85,6 +86,9 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='enterprise-connections'>
           <SignUpEnterpriseConnections />
+        </Route>
+        <Route path='choose-wallet'>
+          <SignUpStartSolanaWalletsCard />
         </Route>
         <Route index>
           <SignUpStart />

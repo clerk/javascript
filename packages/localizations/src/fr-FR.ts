@@ -707,8 +707,14 @@ export const frFR: LocalizationResource = {
       subtitle: 'pour continuer vers {{applicationName}}',
       title: 'Tapez votre mot de passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mot de passe compromis',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Code de vérification',
@@ -757,6 +763,10 @@ export const frFR: LocalizationResource = {
       formTitle: 'Le code de vérification',
       subtitle: "Entrez le code de l'application d'authentification.",
       title: 'Vérification en deux étapes',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
@@ -850,6 +860,10 @@ export const frFR: LocalizationResource = {
       title: 'Créez votre compte',
       titleCombined: 'Créez votre compte',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -877,8 +891,21 @@ export const frFR: LocalizationResource = {
       actionText: 'Connecté en tant que {{identifier}}',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Vous êtes déjà membre de cette organisation.',
+    avatar_file_size_exceeded:
+      'La taille du fichier dépasse la limite maximale de 10 Mo. Veuillez choisir un fichier plus petit.',
+    avatar_file_type_invalid:
+      'Type de fichier non pris en charge. Veuillez télécharger une image JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       "Inscription échouée en raison de validations de sécurité incorrectes. Veuillez rafraîchir la page pour réessayer ou contacter le support pour obtenir de l'aide.",
     captcha_unavailable:
@@ -888,6 +915,7 @@ export const frFR: LocalizationResource = {
     form_identifier_exists__phone_number: 'Ce numéro de téléphone existe déjà.',
     form_identifier_exists__username: "Ce nom d'utilisateur existe déjà.",
     form_identifier_not_found: "Nous n'avons pas trouvé de compte avec ces détails.",
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Le format est invalide',
     form_param_format_invalid__email_address: "L'adresse e-mail doit être une adresse e-mail valide.",
     form_param_format_invalid__phone_number: 'Le numéro de téléphone doit être au format international.',
@@ -907,9 +935,11 @@ export const frFR: LocalizationResource = {
     form_password_pwned__sign_in: 'Mot de passe compromis. Veuillez le réinitialiser.',
     form_password_size_in_bytes_exceeded:
       "Votre mot de passe a dépassé le nombre maximum d'octets autorisés. Veuillez le raccourcir ou supprimer certains caractères spéciaux.",
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Mot de passe incorrect',
     form_username_invalid_character: "L'identifiant contient des caractères invalides.",
     form_username_invalid_length: "Le nombre de caractères de l'identifiant est invalide.",
+    form_username_needs_non_number_char: "Votre nom d'utilisateur doit contenir au moins un caractère non numérique.",
     identification_deletion_failed: 'Vous ne pouvez pas supprimer votre dernière identification.',
     not_allowed_access:
       "L'adresse e-mail ou le numéro de téléphone n'est pas autorisée à s'inscrire. Cela peut être dû à l'utilisation de '+', '=', '#' ou '.' dans votre adresse e-mail, l'utilisation d'un domaine connecté à un service de messagerie temporaire ou l'exclusion explicite. Si vous pensez que c'est une erreur, veuillez contacter le support.",
@@ -939,6 +969,8 @@ export const frFR: LocalizationResource = {
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",
@@ -1346,5 +1378,10 @@ export const frFR: LocalizationResource = {
       subtitle: 'Nous vous contacterons bientôt avec plus de détails.',
       title: 'Inscription réussie',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

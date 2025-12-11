@@ -701,8 +701,14 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte heslo spojené s vaším účtem',
       title: 'Zadejte své heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Heslo kompromitováno',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -750,6 +756,10 @@ export const csCZ: LocalizationResource = {
       formTitle: 'Ověřovací kód',
       subtitle: 'Pro pokračování zadejte ověřovací kód vygenerovaný vaší aplikací pro ověřování',
       title: 'Dvoufázové ověření',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Zadejte své heslo',
@@ -845,6 +855,10 @@ export const csCZ: LocalizationResource = {
       title: 'Vytvořte si účet',
       titleCombined: 'Vytvořte si účet',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -872,8 +886,20 @@ export const csCZ: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    avatar_file_size_exceeded: 'Velikost souboru přesahuje maximální limit 10 MB. Vyberte prosím menší soubor.',
+    avatar_file_type_invalid:
+      'Typ souboru není podporován. Nahrajte prosím obrázek ve formátu JPG, PNG, GIF nebo WEBP.',
     captcha_invalid:
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
@@ -883,6 +909,7 @@ export const csCZ: LocalizationResource = {
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
     form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
@@ -902,9 +929,11 @@ export const csCZ: LocalizationResource = {
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo překročilo maximální povolený počet bajtů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávné heslo',
     form_username_invalid_character: 'Uživatelské jméno může obsahovat pouze alfanumerické znaky a podtržítka.',
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
+    form_username_needs_non_number_char: 'Uživatelské jméno musí obsahovat alespoň jeden nečíselný znak.',
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,
@@ -931,6 +960,8 @@ export const csCZ: LocalizationResource = {
     phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
     session_exists: 'Jste již přihlášen.',
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
       goodPassword: 'Vaše heslo splňuje všechny potřebné požadavky.',
@@ -1336,5 +1367,10 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Ozveme se vám, až bude vaše místo připraveno',
       title: 'Děkujeme za připojení k čekací listině!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

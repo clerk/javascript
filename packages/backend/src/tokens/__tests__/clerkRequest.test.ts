@@ -171,4 +171,39 @@ describe('createClerkRequest', () => {
       expect(json.cookies).toBe('{}');
     });
   });
+
+  describe('duck typing detection (instanceof workaround)', () => {
+    it('should create a new ClerkRequest from a regular Request', () => {
+      const regularRequest = new Request('http://localhost:3000');
+      const clerkRequest = createClerkRequest(regularRequest);
+
+      expect(clerkRequest).not.toBe(regularRequest);
+      expect(clerkRequest.clerkUrl).toBeDefined();
+      expect(clerkRequest.cookies).toBeDefined();
+    });
+
+    it('should return an existing ClerkRequest instance unchanged', () => {
+      const firstClerkRequest = createClerkRequest(new Request('http://localhost:3000'));
+      const secondClerkRequest = createClerkRequest(firstClerkRequest);
+
+      expect(secondClerkRequest).toBe(firstClerkRequest);
+    });
+
+    it('should work correctly with bundler-scoped Request classes', () => {
+      // Simulate bundler creating a scoped Request class (like Request$1)
+      class RequestScoped extends Request {
+        constructor(input: RequestInfo | URL, init?: RequestInit) {
+          super(input, init);
+        }
+      }
+
+      const scopedRequest = new RequestScoped('http://localhost:3000');
+      const clerkRequest = createClerkRequest(scopedRequest);
+
+      // Should create a new ClerkRequest even though scopedRequest is a different Request class
+      expect(clerkRequest).not.toBe(scopedRequest);
+      expect(clerkRequest.clerkUrl).toBeDefined();
+      expect(clerkRequest.cookies).toBeDefined();
+    });
+  });
 });

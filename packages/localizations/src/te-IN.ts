@@ -697,8 +697,14 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ ఖాతాతో సంబంధం ఉన్న పాస్‌వర్డ్‌ను నమోదు చేయండి',
       title: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'పాస్‌వర్డ్ ప్రమాదంలో ఉంది',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'ధృవీకరణ కోడ్',
@@ -747,6 +753,10 @@ export const teIN: LocalizationResource = {
       formTitle: 'ధృవీకరణ కోడ్',
       subtitle: 'కొనసాగించడానికి, దయచేసి మీ ప్రమాణీకరణ యాప్ ద్వారా రూపొందించిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'రెండు-దశల ధృవీకరణ',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
@@ -841,6 +851,10 @@ export const teIN: LocalizationResource = {
       title: 'మీ ఖాతాను సృష్టించండి',
       titleCombined: 'మీ ఖాతాను సృష్టించండి',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -868,8 +882,19 @@ export const teIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ఇప్పటికే సంస్థ సభ్యుడు.',
+    avatar_file_size_exceeded: 'ఫైల్ పరిమాణం గరిష్ట 10MB పరిమితిని మించిపోయింది. దయచేసి చిన్న ఫైల్‌ను ఎంచుకోండి.',
+    avatar_file_type_invalid: 'ఫైల్ రకం సపోర్ట్ చేయబడలేదు. దయచేసి JPG, PNG, GIF లేదా WEBP చిత్రాన్ని అప్‌లోడ్ చేయండి.',
     captcha_invalid:
       'భద్రతా ధృవీకరణలు విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     captcha_unavailable:
@@ -879,6 +904,7 @@ export const teIN: LocalizationResource = {
     form_identifier_exists__phone_number: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__username: 'ఈ వినియోగదారు పేరు తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_not_found: 'ఈ గుర్తింపుదారుతో ఖాతా కనుగొనబడలేదు. దయచేసి తనిఖీ చేసి మళ్ళీ ప్రయత్నించండి.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'నమోదు చేసిన విలువ చెల్లని ఫార్మాట్‌లో ఉంది. దయచేసి తనిఖీ చేసి దిద్దుబాటు చేయండి.',
     form_param_format_invalid__email_address: 'ఇమెయిల్ చిరునామా చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామా అయి ఉండాలి.',
     form_param_format_invalid__phone_number: 'ఫోన్ నంబర్ చెల్లుబాటు అయ్యే అంతర్జాతీయ ఫార్మాట్‌లో ఉండాలి.',
@@ -899,10 +925,12 @@ export const teIN: LocalizationResource = {
       'ఈ పాస్‌వర్డ్ డేటా ఉల్లంఘన భాగంగా కనుగొనబడింది మరియు ఉపయోగించడానికి వీలుపడదు, దయచేసి మీ పాస్‌వర్డ్‌ను రీసెట్ చేయండి.',
     form_password_size_in_bytes_exceeded:
       'మీ పాస్‌వర్డ్ అనుమతించిన గరిష్ట బైట్ల సంఖ్యను మించింది, దయచేసి దాన్ని చిన్నదిగా చేయండి లేదా కొన్ని ప్రత్యేక అక్షరాలను తొలగించండి.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'తప్పు పాస్‌వర్డ్',
     form_username_invalid_character:
       'మీ వినియోగదారు పేరులో చెల్లని అక్షరాలు ఉన్నాయి. దయచేసి అక్షరాలు, సంఖ్యలు మరియు అండర్‌స్కోర్‌లను మాత్రమే ఉపయోగించండి.',
     form_username_invalid_length: 'మీ వినియోగదారు పేరు {{min_length}} మరియు {{max_length}} అక్షరాల మధ్య ఉండాలి.',
+    form_username_needs_non_number_char: 'మీ వినియోగదారు పేరులో కనీసం ఒక సంఖ్యేతర అక్షరం ఉండాలి.',
     identification_deletion_failed: 'మీరు మీ చివరి గుర్తింపును తొలగించలేరు.',
     not_allowed_access:
       'మీకు ఈ పేజీని యాక్సెస్ చేయడానికి అనుమతి లేదు. ఇది లోపం అని మీరు నమ్మితే దయచేసి మద్దతును సంప్రదించండి.',
@@ -931,6 +959,8 @@ export const teIN: LocalizationResource = {
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger:
         'మీ పాస్‌వర్డ్ పనిచేస్తుంది, కానీ మరింత బలంగా ఉండవచ్చు. మరిన్ని అక్షరాలను జోడించడానికి ప్రయత్నించండి.',
@@ -1336,5 +1366,10 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ స్థానం సిద్ధంగా ఉన్నప్పుడు మేము మిమ్మల్ని సంప్రదిస్తాము',
       title: 'వెయిట్‌లిస్ట్‌లో చేరినందుకు ధన్యవాదాలు!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

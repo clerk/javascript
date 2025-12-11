@@ -695,8 +695,14 @@ export const svSE: LocalizationResource = {
       subtitle: 'för att fortsätta till {{applicationName}}',
       title: 'Ange ditt lösenord',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lösenord är för osäkert',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifieringskod',
@@ -744,6 +750,10 @@ export const svSE: LocalizationResource = {
       formTitle: 'Verifieringskod',
       subtitle: 'För att fortsätta, vänligen ange verifieringskoden som genereras av din autentiseringsapp',
       title: 'Tvåstegsverifiering',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
@@ -837,6 +847,10 @@ export const svSE: LocalizationResource = {
       title: 'Skapa ditt konto',
       titleCombined: 'Skapa ditt konto',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -864,8 +878,19 @@ export const svSE: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} är redan medlem i organisationen.',
+    avatar_file_size_exceeded: 'Filstorleken överskrider maxgränsen på 10 MB. Vänligen välj en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen stöds inte. Vänligen ladda upp en JPG-, PNG-, GIF- eller WEBP-bild.',
     captcha_invalid:
       'Registrering misslyckades på grund av säkerhetskontroller. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     captcha_unavailable:
@@ -875,6 +900,7 @@ export const svSE: LocalizationResource = {
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
     form_identifier_not_found: 'Vi kunde inte hitta ett konto med dessa uppgifter.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formatet är ogiltigt.',
     form_param_format_invalid__email_address: 'E-postadressen måste vara en giltig e-postadress.',
     form_param_format_invalid__phone_number: 'Telefonnumret måste vara i ett giltigt internationellt format.',
@@ -893,9 +919,11 @@ export const svSE: LocalizationResource = {
     form_password_pwned__sign_in: 'Lösenordet har läckt, vänligen logga in för att ändra det.',
     form_password_size_in_bytes_exceeded:
       'Ditt lösenord har överskridit det maximala antalet tillåtna bytes, vänligen förkorta det eller ta bort några specialtecken.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Felaktigt lösenord',
     form_username_invalid_character: 'Användarnamnet innehåller ogiltiga tecken.',
     form_username_invalid_length: 'Användarnamnets längd är ogiltig.',
+    form_username_needs_non_number_char: 'Ditt användarnamn måste innehålla minst ett icke-numeriskt tecken.',
     identification_deletion_failed: 'Du kan inte ta bort din sista identifiering.',
     not_allowed_access:
       "Adressen eller telefonnumret du använder för registrering är inte tillåtet. Detta kan bero på att du använder '+', '=', '#' eller '.' i din e-postadress, använder en domän som är kopplad till en tidsbegränsad e-posttjänst eller har ett explicit blockerat.",
@@ -923,6 +951,8 @@ export const svSE: LocalizationResource = {
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
@@ -1325,5 +1355,10 @@ export const svSE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

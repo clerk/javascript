@@ -4,6 +4,7 @@ import type { PhoneCodeChannel } from './phoneCodeChannel';
 import type { SignInFirstFactor, SignInSecondFactor, SignInStatus, UserData } from './signInCommon';
 import type { OAuthStrategy, PasskeyStrategy, Web3Strategy } from './strategies';
 import type { VerificationResource } from './verification';
+import type { Web3Provider } from './web3';
 
 export interface SignInFutureCreateParams {
   /**
@@ -244,6 +245,14 @@ export interface SignInFutureWeb3Params {
    * The verification strategy to validate the user's sign-in request.
    */
   strategy: Web3Strategy;
+  /**
+   * The Web3 wallet provider to use for the sign-in.
+   */
+  provider: Web3Provider;
+  /**
+   * The name of the wallet to use for Solana sign-ins. Required when `provider` is set to `'solana'`.
+   */
+  walletName?: string;
 }
 
 export interface SignInFuturePasskeyParams {

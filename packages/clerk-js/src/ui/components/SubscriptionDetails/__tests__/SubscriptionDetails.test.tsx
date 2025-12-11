@@ -97,7 +97,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
+    const { getByRole, getByText, queryByText, getAllByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -129,10 +129,6 @@ describe('SubscriptionDetails', () => {
       expect(getByText('$10.00')).toBeVisible();
       expect(queryByText('Ends on')).toBeNull();
     });
-
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    expect(menuButton).toBeVisible();
-    await userEvent.click(menuButton);
 
     await waitFor(() => {
       expect(getByText('Switch to annual $100 / year')).toBeVisible();
@@ -204,7 +200,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, queryByText, getAllByText, userEvent } = render(
+    const { getByRole, getByText, queryByText, getAllByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -236,10 +232,6 @@ describe('SubscriptionDetails', () => {
       expect(getByText('$100.00')).toBeVisible();
       expect(queryByText('Ends on')).toBeNull();
     });
-
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    expect(menuButton).toBeVisible();
-    await userEvent.click(menuButton);
 
     await waitFor(() => {
       expect(getByText('Switch to monthly $10 / month')).toBeVisible();
@@ -293,7 +285,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, queryByText, queryByRole } = render(
+    const { getByRole, getByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -319,7 +311,9 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Monthly')).toBeNull();
       expect(queryByText('Next payment on')).toBeNull();
       expect(queryByText('Next payment amount')).toBeNull();
-      expect(queryByRole('button', { name: /Open menu/i })).toBeNull();
+
+      expect(queryByText('Cancel subscription')).toBeNull();
+      expect(queryByText(/Switch to/i)).toBeNull();
     });
   });
 
@@ -436,7 +430,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, getAllByText, queryByText, getAllByRole, userEvent } = render(
+    const { getByRole, getByText, getAllByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -469,20 +463,13 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Begins on')).toBeVisible();
     });
 
-    const [menuButton, upcomingMenuButton] = getAllByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
     await waitFor(() => {
+      // Active (canceled) annual subscription buttons
       expect(getByText('Switch to monthly $13 / month')).toBeVisible();
       expect(getByText('Resubscribe')).toBeVisible();
-      expect(queryByText('Cancel subscription')).toBeNull();
-    });
-
-    await userEvent.click(upcomingMenuButton);
-
-    await waitFor(() => {
+      // Upcoming monthly subscription buttons
       expect(getByText('Switch to annual $90.99 / year')).toBeVisible();
-      expect(getByText('Cancel subscription')).toBeVisible();
+      expect(getAllByText('Cancel subscription').length).toBe(1);
     });
   });
 
@@ -694,7 +681,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, getAllByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -710,12 +697,9 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Active')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the cancel option to appear and click it
-    await userEvent.click(getByText('Cancel subscription'));
+    // Get the inline Cancel subscription button (first one, before confirmation dialog opens)
+    const cancelButtons = getAllByText('Cancel subscription');
+    await userEvent.click(cancelButtons[0]);
 
     await waitFor(() => {
       expect(getByText('Cancel Monthly Plan Subscription?')).toBeVisible();
@@ -727,7 +711,10 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Keep subscription')).toBeVisible();
     });
 
-    await userEvent.click(getByText('Cancel subscription'));
+    // Click the Cancel subscription button in the confirmation dialog
+    // Use getAllByText and select the last one (confirmation dialog button)
+    const allCancelButtons = getAllByText('Cancel subscription');
+    await userEvent.click(allCancelButtons[allCancelButtons.length - 1]);
 
     // Assert that the cancelSubscription method was called
     await waitFor(() => {
@@ -815,7 +802,7 @@ describe('SubscriptionDetails', () => {
       subscriptionItems: [subscription],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -829,11 +816,6 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Annual Plan')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the Resubscribe option and click it
     await userEvent.click(getByText('Resubscribe'));
 
     // Assert resubscribe was called
@@ -920,7 +902,7 @@ describe('SubscriptionDetails', () => {
       subscriptionItems: [subscription],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -934,11 +916,6 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Annual Plan')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the Switch to monthly option and click it
     await userEvent.click(getByText(/Switch to monthly/i));
 
     // Assert switchToMonthly was called
@@ -1112,7 +1089,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, getAllByText, queryByText, userEvent } = render(
+    const { getByRole, getByText, getAllByText, queryByText } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -1149,11 +1126,7 @@ describe('SubscriptionDetails', () => {
       expect(queryByText('Next payment amount')).toBeNull();
     });
 
-    // Test the menu shows free trial specific options
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    expect(menuButton).toBeVisible();
-    await userEvent.click(menuButton);
-
+    // Test the inline button shows free trial specific option
     await waitFor(() => {
       expect(getByText('Cancel free trial')).toBeVisible();
     });
@@ -1228,7 +1201,7 @@ describe('SubscriptionDetails', () => {
       ],
     });
 
-    const { getByRole, getByText, userEvent } = render(
+    const { getByText, getAllByText, userEvent } = render(
       <Drawer.Root
         open
         onOpenChange={() => {}}
@@ -1244,12 +1217,9 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Free trial')).toBeVisible();
     });
 
-    // Open the menu
-    const menuButton = getByRole('button', { name: /Open menu/i });
-    await userEvent.click(menuButton);
-
-    // Wait for the cancel option to appear and click it
-    await userEvent.click(getByText('Cancel free trial'));
+    // Get the inline Cancel free trial button (first one, before confirmation dialog opens)
+    const cancelTrialButtons = getAllByText('Cancel free trial');
+    await userEvent.click(cancelTrialButtons[0]);
 
     await waitFor(() => {
       // Should show free trial specific cancellation dialog
@@ -1262,8 +1232,10 @@ describe('SubscriptionDetails', () => {
       expect(getByText('Keep free trial')).toBeVisible();
     });
 
-    // Click the cancel button in the dialog
-    await userEvent.click(getByText('Cancel free trial'));
+    // Click the Cancel free trial button in the confirmation dialog
+    // Use getAllByText and select the last one (confirmation dialog button)
+    const allCancelTrialButtons = getAllByText('Cancel free trial');
+    await userEvent.click(allCancelTrialButtons[allCancelTrialButtons.length - 1]);
 
     // Assert that the cancelSubscription method was called
     await waitFor(() => {

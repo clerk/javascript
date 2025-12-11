@@ -695,7 +695,13 @@ export const skSK: LocalizationResource = {
       subtitle: 'pre pokračovanie do {{applicationName}}',
       title: 'Zadajte svoje heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -744,6 +750,10 @@ export const skSK: LocalizationResource = {
       formTitle: 'Overovací kód',
       subtitle: 'Pre pokračovanie zadajte overovací kód z vašej autentifikačnej aplikácie',
       title: 'Dvojfaktorové overenie',
+    },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
     },
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
@@ -839,6 +849,10 @@ export const skSK: LocalizationResource = {
       title: 'Vytvorte si účet',
       titleCombined: 'Vytvorte si účet',
     },
+    web3Solana: {
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
@@ -866,8 +880,20 @@ export const skSK: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Veľkosť súboru presahuje maximálny limit 10 MB. Vyberte prosím menší súbor.',
+    avatar_file_type_invalid:
+      'Typ súboru nie je podporovaný. Nahrajte prosím obrázok vo formáte JPG, PNG, GIF alebo WEBP.',
     captcha_invalid:
       'Registrácia zlyhala z dôvodu neúspešného overenia zabezpečenia. Obnovte stránku a skúste to znova alebo kontaktujte podporu pre ďalšiu pomoc.',
     captcha_unavailable:
@@ -877,6 +903,7 @@ export const skSK: LocalizationResource = {
     form_identifier_exists__phone_number: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     form_identifier_exists__username: 'Táto použivateľské meno je už obsadené. Skúste prosím iné.',
     form_identifier_not_found: 'Účet s týmto identifikátorom nebol nájdený. Skontrolujte údaje a skúste to znova.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Zadaná hodnota nie je v správnom formáte. Skontrolujte a opravte.',
     form_param_format_invalid__email_address: 'Emailová adresa musí byť platná.',
     form_param_format_invalid__phone_number: 'Telefónne číslo musí byť v platnom medzinárodnom formáte.',
@@ -896,11 +923,13 @@ export const skSK: LocalizationResource = {
       'Toto heslo bolo nájdené v rámci úniku dát a nemôže byť použité, prosím zvoľte iné heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo prekročilo maximálny povolený počet bytov, prosím skráťte ho alebo odstráňte niektoré špeciálne znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávne heslo',
     form_username_invalid_character:
       'Používateľské meno môže obsahovať len písmená, číslice, pomlčky a podčiarkovníky.',
     form_username_invalid_length:
       'Používateľské meno musí mať aspoň {{min_length}} znaky a maximálne {{max_length}} znakov.',
+    form_username_needs_non_number_char: 'Vaše používateľské meno musí obsahovať aspoň jeden nečíselný znak.',
     identification_deletion_failed: 'Nemôžete odstrániť váš posledný identifikátor.',
     not_allowed_access: 'Nemáte povolený prístup k tejto stránke. Ak si myslíte, že je to chyba, kontaktujte podporu.',
     organization_domain_blocked: undefined,
@@ -927,6 +956,8 @@ export const skSK: LocalizationResource = {
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
+    web3_signature_request_rejected: undefined,
+    web3_solana_signature_generation_failed: undefined,
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -1329,5 +1360,10 @@ export const skSK: LocalizationResource = {
       subtitle: 'Budeme vás informovať, keď bude prístup povolený.',
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
+  },
+  web3WalletButtons: {
+    connect: undefined,
+    continue: undefined,
+    noneAvailable: undefined,
   },
 } as const;

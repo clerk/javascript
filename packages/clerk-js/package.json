@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "5.109.0",
+  "version": "5.114.1",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -42,7 +42,6 @@
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
     "dev": "rspack serve --config rspack.config.js",
-    "dev:channel": "rspack serve --config rspack.config.js --env variant=\"clerk.channel.browser\"",
     "dev:chips": "rspack serve --config rspack.config.js --env variant=\"clerk.chips.browser\"",
     "dev:headless": "rspack serve --config rspack.config.js --env variant=\"clerk.headless.browser\"",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4000}",
@@ -69,9 +68,13 @@
     "@floating-ui/react": "0.27.12",
     "@floating-ui/react-dom": "^2.1.3",
     "@formkit/auto-animate": "^0.8.2",
+    "@solana/wallet-adapter-base": "0.9.27",
+    "@solana/wallet-adapter-react": "0.15.39",
+    "@solana/wallet-standard": "1.1.4",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.17",
     "@tanstack/query-core": "5.87.4",
+    "@wallet-standard/core": "1.1.1",
     "@zxcvbn-ts/core": "3.0.4",
     "@zxcvbn-ts/language-common": "3.0.4",
     "alien-signals": "2.0.6",
@@ -82,8 +85,7 @@
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
     "qrcode.react": "4.2.0",
-    "regenerator-runtime": "0.14.1",
-    "swr": "2.3.4"
+    "regenerator-runtime": "0.14.1"
   },
   "devDependencies": {
     "@clerk/testing": "workspace:^",
