@@ -750,8 +750,8 @@ export const nlNL: LocalizationResource = {
       title: 'Tweestapsverificatie',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecteer hieronder een wallet om in te loggen',
+      title: 'Inloggen met Solana',
     },
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
@@ -845,8 +845,8 @@ export const nlNL: LocalizationResource = {
       titleCombined: 'Maak je account aan',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecteer hieronder een wallet om je te registreren',
+      title: 'Registreren met Solana',
     },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
@@ -948,8 +948,10 @@ export const nlNL: LocalizationResource = {
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',
+    web3_solana_signature_generation_failed:
+      'Er is een fout opgetreden bij het genereren van de handtekening. Probeer het opnieuw om verder te gaan.',
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',
@@ -1318,8 +1320,8 @@ export const nlNL: LocalizationResource = {
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Selecteer een Solana-wallet om aan je account te koppelen.',
+          title: 'Solana-wallet toevoegen',
         },
       },
     },
@@ -1357,8 +1359,9 @@ export const nlNL: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Verbinden met {{walletName}}',
+    continue: 'Doorgaan met {{walletName}}',
+    noneAvailable:
+      'Geen Solana Web3-wallets gedetecteerd. Installeer een Web3-ondersteunde {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

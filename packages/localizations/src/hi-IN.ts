@@ -753,8 +753,8 @@ export const hiIN: LocalizationResource = {
       title: 'दो-चरण सत्यापन',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'साइन इन करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन इन करें',
     },
   },
   signInEnterPasswordTitle: 'अपना पासवर्ड दर्ज करें',
@@ -850,8 +850,8 @@ export const hiIN: LocalizationResource = {
       titleCombined: 'अपना खाता बनाएं',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'साइन अप करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन अप करें',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
@@ -959,8 +959,10 @@ export const hiIN: LocalizationResource = {
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'आपने सिग्नेचर अनुरोध अस्वीकार कर दिया है। जारी रखने के लिए कृपया फिर से प्रयास करें।',
+    web3_solana_signature_generation_failed:
+      'सिग्नेचर बनाते समय एक त्रुटि हुई। जारी रखने के लिए कृपया फिर से प्रयास करें।',
     zxcvbn: {
       couldBeStronger: 'आपका पासवर्ड काम करता है, लेकिन मजबूत हो सकता है। अधिक अक्षर जोड़ने का प्रयास करें।',
       goodPassword: 'आपका पासवर्ड सभी आवश्यक आवश्यकताओं को पूरा करता है।',
@@ -1331,8 +1333,8 @@ export const hiIN: LocalizationResource = {
         primaryButton: 'वॉलेट कनेक्ट करें',
         title: 'Web3 वॉलेट',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'अपने खाते से कनेक्ट करने के लिए एक Solana वॉलेट चुनें।',
+          title: 'Solana वॉलेट जोड़ें',
         },
       },
     },
@@ -1370,8 +1372,9 @@ export const hiIN: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: '{{walletName}} के साथ कनेक्ट करें',
+    continue: '{{walletName}} के साथ जारी रखें',
+    noneAvailable:
+      'कोई Solana Web3 वॉलेट नहीं मिला। कृपया Web3 समर्थित {{ solanaWalletsLink || link("wallet extension") }} इंस्टॉल करें।',
   },
 } as const;

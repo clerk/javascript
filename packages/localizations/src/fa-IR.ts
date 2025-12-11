@@ -759,8 +759,8 @@ export const faIR: LocalizationResource = {
       title: 'تأیید  دو مرحله‌ای',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'برای ورود، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ورود با Solana',
     },
   },
   signInEnterPasswordTitle: 'رمز عبور خود را وارد کنید',
@@ -856,8 +856,8 @@ export const faIR: LocalizationResource = {
       titleCombined: 'حساب کاربری خود را ایجاد کنید',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'برای ثبت‌نام، یک کیف پول را در زیر انتخاب کنید',
+      title: 'ثبت‌نام با Solana',
     },
   },
   socialButtonsBlockButton: 'ادامه با {{provider|titleize}}',
@@ -958,8 +958,8 @@ export const faIR: LocalizationResource = {
     phone_number_exists: 'این شماره تلفن قبلاً استفاده شده است.',
     session_exists: 'جلسه از قبل وجود دارد.',
     web3_missing_identifier: 'افزونه‌ی کیف پول وب۳ پیدا نشد. برای ادامه، لطفاً یکی نصب کنید.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'درخواست امضا را رد کرده‌اید. برای ادامه دوباره تلاش کنید.',
+    web3_solana_signature_generation_failed: 'هنگام ایجاد امضا خطایی رخ داد. برای ادامه دوباره تلاش کنید.',
     zxcvbn: {
       couldBeStronger: 'رمز عبور شما کار می‌کند، اما می‌توانست قوی‌تر باشد. سعی کنید کاراکترهای بیشتری اضافه کنید.',
       goodPassword: 'رمز عبور شما تمام شرایط لازم را برآورده می‌کند.',
@@ -1330,8 +1330,8 @@ export const faIR: LocalizationResource = {
         primaryButton: 'اتصال کیف پول',
         title: 'کیف پول های Web3',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'یک کیف پول Solana را برای اتصال به حساب خود انتخاب کنید.',
+          title: 'افزودن کیف پول Solana',
         },
       },
     },
@@ -1369,8 +1369,9 @@ export const faIR: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'اتصال با {{walletName}}',
+    continue: 'ادامه با {{walletName}}',
+    noneAvailable:
+      'هیچ کیف پول Solana Web3 شناسایی نشد. لطفاً یک {{ solanaWalletsLink || link("wallet extension") }} پشتیبانی‌شده از Web3 نصب کنید.',
   },
 } as const;

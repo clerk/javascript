@@ -756,8 +756,8 @@ export const esCR: LocalizationResource = {
       title: 'Verificación de dos pasos',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecciona una billetera abajo para iniciar sesión',
+      title: 'Iniciar sesión con Solana',
     },
   },
   signInEnterPasswordTitle: 'Ingresa tu contraseña',
@@ -852,8 +852,8 @@ export const esCR: LocalizationResource = {
       titleCombined: 'Crea tu cuenta',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecciona una billetera abajo para registrarte',
+      title: 'Registrarse con Solana',
     },
   },
   socialButtonsBlockButton: 'Continuar con {{provider|titleize}}',
@@ -959,8 +959,9 @@ export const esCR: LocalizationResource = {
     phone_number_exists: 'Este número de telefónico ya está en uso.',
     session_exists: undefined,
     web3_missing_identifier: 'No se puede encontrar la extension de la billetera Web3. Instala una para continuar',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Has rechazado la solicitud de firma. Inténtalo de nuevo para continuar.',
+    web3_solana_signature_generation_failed:
+      'Se produjo un error al generar la firma. Inténtalo de nuevo para continuar.',
     zxcvbn: {
       couldBeStronger: 'Tu contraseña funciona, pero puede ser más segura. Prueba añadiendo más caracteres.',
       goodPassword: 'Tu contraseña cumple con todos los requisitos necesarios.',
@@ -1334,8 +1335,8 @@ export const esCR: LocalizationResource = {
         primaryButton: 'Conectar billetera',
         title: 'Billeteras Web3',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Selecciona una billetera de Solana para conectarla a tu cuenta.',
+          title: 'Agregar una billetera de Solana',
         },
       },
     },
@@ -1373,8 +1374,9 @@ export const esCR: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Conectar con {{walletName}}',
+    continue: 'Continuar con {{walletName}}',
+    noneAvailable:
+      'No se detectaron billeteras Web3 de Solana. Instala una {{ solanaWalletsLink || link("wallet extension") }} compatible con Web3.',
   },
 } as const;

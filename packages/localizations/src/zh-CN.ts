@@ -738,8 +738,8 @@ export const zhCN: LocalizationResource = {
       title: '两步验证',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '请选择下方的钱包进行登录',
+      title: '使用 Solana 登录',
     },
   },
   signInEnterPasswordTitle: '输入您的密码',
@@ -832,8 +832,8 @@ export const zhCN: LocalizationResource = {
       titleCombined: '创建您的账户',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '请选择下方的钱包进行注册',
+      title: '使用 Solana 注册',
     },
   },
   socialButtonsBlockButton: '使用 {{provider|titleize}} 登录',
@@ -932,8 +932,8 @@ export const zhCN: LocalizationResource = {
     phone_number_exists: '该电话号码已被使用，请尝试其他号码。',
     session_exists: '您已登录。',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: '您已拒绝签名请求。请重试以继续。',
+    web3_solana_signature_generation_failed: '生成签名时发生错误。请重试以继续。',
     zxcvbn: {
       couldBeStronger: '您的密码可以用，但可以更强。试着添加更多字符。',
       goodPassword: '做得好。这是一个优秀的密码。',
@@ -1289,8 +1289,8 @@ export const zhCN: LocalizationResource = {
         primaryButton: 'Web3 钱包',
         title: 'Web3 钱包',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: '选择一个 Solana 钱包以连接到您的账户。',
+          title: '添加 Solana 钱包',
         },
       },
     },
@@ -1328,8 +1328,9 @@ export const zhCN: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: '使用 {{walletName}} 连接',
+    continue: '使用 {{walletName}} 继续',
+    noneAvailable:
+      '未检测到 Solana Web3 钱包。请安装支持 Web3 的 {{ solanaWalletsLink || link("wallet extension") }}。',
   },
 } as const;

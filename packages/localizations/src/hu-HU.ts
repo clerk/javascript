@@ -750,8 +750,8 @@ export const huHU: LocalizationResource = {
       title: 'Két lépécsős azonosítás',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Válasszon alább egy tárcát a bejelentkezéshez',
+      title: 'Bejelentkezés Solanával',
     },
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
@@ -844,8 +844,8 @@ export const huHU: LocalizationResource = {
       titleCombined: 'Fiók létrehozása',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Válasszon alább egy tárcát a regisztrációhoz',
+      title: 'Regisztráció Solanával',
     },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
@@ -949,8 +949,9 @@ export const huHU: LocalizationResource = {
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Elutasította az aláírási kérelmet. Kérjük, próbálja meg újra a folytatáshoz.',
+    web3_solana_signature_generation_failed:
+      'Hiba történt az aláírás létrehozása közben. Kérjük, próbálja meg újra a folytatáshoz.',
     zxcvbn: {
       couldBeStronger: 'A jelszavad, jó, de lehetne erősebb. Adj hozzá több karaktert.',
       goodPassword: 'A jelszavad megfelel az elvárásoknak.',
@@ -1323,8 +1324,8 @@ export const huHU: LocalizationResource = {
         primaryButton: 'Web3 tárcák',
         title: 'Web3 tárcák',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Válasszon egy Solana tárcát a fiókjához való csatlakozáshoz.',
+          title: 'Solana tárca hozzáadása',
         },
       },
     },
@@ -1362,8 +1363,9 @@ export const huHU: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Csatlakozás: {{walletName}}',
+    continue: 'Folytatás: {{walletName}}',
+    noneAvailable:
+      'Nem észlelhető Solana Web3 tárca. Kérjük, telepítsen egy Web3-kompatibilis {{ solanaWalletsLink || link("wallet extension") }}-t.',
   },
 } as const;

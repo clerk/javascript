@@ -757,8 +757,8 @@ export const itIT: LocalizationResource = {
       title: 'Verifica in due passaggi',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Seleziona un wallet qui sotto per accedere',
+      title: 'Accedi con Solana',
     },
   },
   signInEnterPasswordTitle: 'Inserisci la tua password',
@@ -853,8 +853,8 @@ export const itIT: LocalizationResource = {
       titleCombined: 'Crea il tuo account',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Seleziona un wallet qui sotto per registrarti',
+      title: 'Registrati con Solana',
     },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
@@ -957,8 +957,9 @@ export const itIT: LocalizationResource = {
     phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
     session_exists: 'Sei già loggato.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Hai rifiutato la richiesta di firma. Riprova per continuare.',
+    web3_solana_signature_generation_failed:
+      'Si è verificato un errore durante la generazione della firma. Riprova per continuare.',
     zxcvbn: {
       couldBeStronger: undefined,
       goodPassword: undefined,
@@ -1332,8 +1333,8 @@ export const itIT: LocalizationResource = {
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Seleziona un wallet Solana da collegare al tuo account.',
+          title: 'Aggiungi un wallet Solana',
         },
       },
     },
@@ -1371,8 +1372,9 @@ export const itIT: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Connetti con {{walletName}}',
+    continue: 'Continua con {{walletName}}',
+    noneAvailable:
+      'Nessun wallet Solana Web3 rilevato. Installa un {{ solanaWalletsLink || link("wallet extension") }} compatibile con Web3.',
   },
 } as const;

@@ -751,8 +751,8 @@ export const trTR: LocalizationResource = {
       title: 'İki aşamalı doğrulama',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Giriş yapmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile giriş yap',
     },
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
@@ -846,8 +846,8 @@ export const trTR: LocalizationResource = {
       titleCombined: 'Hesap oluştur',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Kaydolmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile kaydol',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
@@ -952,8 +952,9 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
+    web3_solana_signature_generation_failed:
+      'İmza oluşturulurken bir hata oluştu. Devam etmek için lütfen tekrar deneyin.',
     zxcvbn: {
       couldBeStronger:
         'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
@@ -1324,8 +1325,8 @@ export const trTR: LocalizationResource = {
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Hesabınıza bağlamak için bir Solana cüzdanı seçin.',
+          title: 'Bir Solana cüzdanı ekle',
         },
       },
     },
@@ -1363,8 +1364,9 @@ export const trTR: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: '{{walletName}} ile bağlan',
+    continue: '{{walletName}} ile devam et',
+    noneAvailable:
+      'Solana Web3 cüzdanı tespit edilmedi. Lütfen Web3 destekli {{ solanaWalletsLink || link("wallet extension") }} kurun.',
   },
 } as const;

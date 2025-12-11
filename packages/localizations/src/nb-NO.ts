@@ -750,8 +750,8 @@ export const nbNO: LocalizationResource = {
       title: 'To-trinns verifisering',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Velg en lommebok nedenfor for å logge inn',
+      title: 'Logg inn med Solana',
     },
   },
   signInEnterPasswordTitle: 'Skriv inn passordet ditt',
@@ -844,8 +844,8 @@ export const nbNO: LocalizationResource = {
       titleCombined: 'Opprett kontoen din',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Velg en lommebok nedenfor for å registrere deg',
+      title: 'Registrer deg med Solana',
     },
   },
   socialButtonsBlockButton: 'Fortsett med {{provider|titleize}}',
@@ -948,8 +948,9 @@ export const nbNO: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
     session_exists: 'Du er allerede logget inn.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Du avviste signaturforespørselen. Prøv igjen for å fortsette.',
+    web3_solana_signature_generation_failed:
+      'Det oppstod en feil under generering av signaturen. Prøv igjen for å fortsette.',
     zxcvbn: {
       couldBeStronger: 'Passordet ditt fungerer, men det kan være sterkere. Prøv å legge til flere tegn.',
       goodPassword: 'Godt jobbet. Dette er et utmerket passord.',
@@ -1320,8 +1321,8 @@ export const nbNO: LocalizationResource = {
         primaryButton: 'Web3-lommebøker',
         title: 'Web3-lommebøker',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Velg en Solana-lommebok for å koble den til kontoen din.',
+          title: 'Legg til en Solana-lommebok',
         },
       },
     },
@@ -1359,8 +1360,9 @@ export const nbNO: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Koble til med {{walletName}}',
+    continue: 'Fortsett med {{walletName}}',
+    noneAvailable:
+      'Ingen Solana Web3-lommebøker ble funnet. Installer en Web3-støttet {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

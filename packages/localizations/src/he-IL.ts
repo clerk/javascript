@@ -742,8 +742,8 @@ export const heIL: LocalizationResource = {
       title: 'אימות שני שלבים',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'בחר/י ארנק למטה כדי להתחבר',
+      title: 'התחברות עם Solana',
     },
   },
   signInEnterPasswordTitle: 'הזן את הסיסמה שלך',
@@ -836,8 +836,8 @@ export const heIL: LocalizationResource = {
       titleCombined: 'צור את החשבון שלך',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'בחר/י ארנק למטה כדי להירשם',
+      title: 'הרשמה עם Solana',
     },
   },
   socialButtonsBlockButton: 'המשך עם {{provider|titleize}}',
@@ -938,8 +938,8 @@ export const heIL: LocalizationResource = {
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     session_exists: 'אתה כבר מחובר לחשבון.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'דחית את בקשת החתימה. נסה/י שוב כדי להמשיך.',
+    web3_solana_signature_generation_failed: 'אירעה שגיאה בעת יצירת החתימה. נסה/י שוב כדי להמשיך.',
     zxcvbn: {
       couldBeStronger: 'הסיסמה שלך תקפה, אך יכולה להיות חזקה יותר. נסה להוסיף יותר תווים.',
       goodPassword: 'עבודה טובה. זו סיסמה מצוינת.',
@@ -1299,8 +1299,8 @@ export const heIL: LocalizationResource = {
         primaryButton: 'ארנקי Web3',
         title: 'ארנקי Web3',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'בחר/י ארנק Solana כדי לחבר לחשבון שלך.',
+          title: 'הוסף/י ארנק Solana',
         },
       },
     },
@@ -1338,8 +1338,9 @@ export const heIL: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'התחבר/י עם {{walletName}}',
+    continue: 'המשך/י עם {{walletName}}',
+    noneAvailable:
+      'לא זוהו ארנקי Solana Web3. נא להתקין {{ solanaWalletsLink || link("wallet extension") }} התומך ב‑Web3.',
   },
 } as const;

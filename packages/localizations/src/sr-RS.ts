@@ -749,8 +749,8 @@ export const srRS: LocalizationResource = {
       title: 'Dvostepena verifikacija',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Izaberi novčanik ispod da se prijaviš',
+      title: 'Prijavi se sa Solana',
     },
   },
   signInEnterPasswordTitle: 'Unesi svoju lozinku',
@@ -843,8 +843,8 @@ export const srRS: LocalizationResource = {
       titleCombined: 'Kreiraj svoj nalog',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Izaberi novčanik ispod da se registruješ',
+      title: 'Registruj se sa Solana',
     },
   },
   socialButtonsBlockButton: 'Nastavi sa {{provider|titleize}}',
@@ -948,8 +948,8 @@ export const srRS: LocalizationResource = {
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Odbio/la si zahtev za potpis. Pokušaj ponovo da nastaviš.',
+    web3_solana_signature_generation_failed: 'Došlo je do greške pri generisanju potpisa. Pokušaj ponovo da nastaviš.',
     zxcvbn: {
       couldBeStronger: 'Tvoja lozinka funkcioniše, ali može biti jača. Pokušaj dodati više karaktera.',
       goodPassword: 'Tvoja lozinka ispunjava sve potrebne zahteve.',
@@ -1319,8 +1319,8 @@ export const srRS: LocalizationResource = {
         primaryButton: 'Web3 novčanici',
         title: 'Web3 novčanici',
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Izaberi Solana novčanik da ga povežeš sa svojim nalogom.',
+          title: 'Dodaj Solana novčanik',
         },
       },
     },
@@ -1358,8 +1358,9 @@ export const srRS: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Poveži se sa {{walletName}}',
+    continue: 'Nastavi sa {{walletName}}',
+    noneAvailable:
+      'Nisu detektovani Solana Web3 novčanici. Instaliraj {{ solanaWalletsLink || link("wallet extension") }} koji podržava Web3.',
   },
 } as const;

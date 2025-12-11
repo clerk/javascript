@@ -753,8 +753,8 @@ export const idID: LocalizationResource = {
       title: 'Verifikasi dua langkah',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Pilih dompet di bawah untuk masuk',
+      title: 'Masuk dengan Solana',
     },
   },
   signInEnterPasswordTitle: 'Masukkan kata sandi Anda',
@@ -851,8 +851,8 @@ export const idID: LocalizationResource = {
       titleCombined: 'Buat akun Anda',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
     },
   },
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
@@ -958,8 +958,9 @@ export const idID: LocalizationResource = {
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Anda menolak permintaan tanda tangan. Silakan coba lagi untuk melanjutkan.',
+    web3_solana_signature_generation_failed:
+      'Terjadi kesalahan saat membuat tanda tangan. Silakan coba lagi untuk melanjutkan.',
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
       goodPassword: 'Kata sandi Anda memenuhi semua persyaratan yang diperlukan.',
@@ -1320,8 +1321,8 @@ export const idID: LocalizationResource = {
         primaryButton: undefined,
         title: undefined,
         web3SelectSolanaWalletScreen: {
-          subtitle: undefined,
-          title: undefined,
+          subtitle: 'Pilih dompet Solana untuk dihubungkan ke akun Anda.',
+          title: 'Tambahkan dompet Solana',
         },
       },
     },
@@ -1359,8 +1360,9 @@ export const idID: LocalizationResource = {
     },
   },
   web3SolanaWalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+    connect: 'Hubungkan dengan {{walletName}}',
+    continue: 'Lanjutkan dengan {{walletName}}',
+    noneAvailable:
+      'Tidak ada dompet Solana Web3 yang terdeteksi. Silakan instal {{ solanaWalletsLink || link("wallet extension") }} yang mendukung Web3.',
   },
 } as const;
