@@ -10,6 +10,13 @@ const { isDevOrStagingUrl } = createDevOrStagingUrlCache();
 
 const errorThrower = buildErrorThrower({ packageName: '@clerk/shared' });
 
+type ModuleName = 'Clerk' | 'Clerk UI';
+type ModuleId = 'clerk_js' | 'clerk_ui';
+
+const FAILED_TO_LOAD_ERROR = (moduleName: ModuleName) => `Failed to load ${moduleName}`;
+const FAILED_TO_LOAD_ERROR_CODE = (moduleId: ModuleId) => `failed_to_load_${moduleId}`;
+const FAILED_TO_LOAD_TIMEOUT_ERROR_CODE = (moduleId: ModuleId) => `failed_to_load_${moduleId}_timeout`;
+
 export type LoadClerkJsScriptOptions = {
   publishableKey: string;
   clerkJSUrl?: string;
@@ -123,9 +130,9 @@ function hasScriptRequestError(scriptUrl: string): boolean {
  */
 export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promise<HTMLScriptElement | null> => {
   const timeout = opts?.scriptLoadTimeout ?? 15000;
-  const rejectWith = (error?: Error) =>
-    new ClerkRuntimeError('Failed to load Clerk JS' + (error?.message ? `, ${error.message}` : ''), {
-      code: 'failed_to_load_clerk_js',
+  const rejectWith = (code: string, error?: Error) =>
+    new ClerkRuntimeError(FAILED_TO_LOAD_ERROR('Clerk') + (error?.message ? `, ${error.message}` : ''), {
+      code,
       cause: error,
     });
 
@@ -146,7 +153,12 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
       existingScript.remove();
     } else {
       try {
-        await waitForPredicateWithTimeout(timeout, isClerkProperlyLoaded, rejectWith(), existingScript);
+        await waitForPredicateWithTimeout(
+          timeout,
+          isClerkProperlyLoaded,
+          rejectWith(FAILED_TO_LOAD_ERROR_CODE('clerk_js')),
+          existingScript,
+        );
         return null;
       } catch {
         existingScript.remove();
@@ -154,7 +166,11 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
     }
   }
 
-  const loadPromise = waitForPredicateWithTimeout(timeout, isClerkProperlyLoaded, rejectWith());
+  const loadPromise = waitForPredicateWithTimeout(
+    timeout,
+    isClerkProperlyLoaded,
+    rejectWith(FAILED_TO_LOAD_TIMEOUT_ERROR_CODE('clerk_js')),
+  );
 
   loadScript(scriptUrl, {
     async: true,
@@ -162,7 +178,7 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
     nonce: opts.nonce,
     beforeLoad: applyAttributesToScript(buildClerkJsScriptAttributes(opts)),
   }).catch(error => {
-    throw rejectWith(error);
+    throw rejectWith(FAILED_TO_LOAD_ERROR_CODE('clerk_js'), error);
   });
 
   return loadPromise;
@@ -170,9 +186,9 @@ export const loadClerkJsScript = async (opts?: LoadClerkJsScriptOptions): Promis
 
 export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promise<HTMLScriptElement | null> => {
   const timeout = opts?.scriptLoadTimeout ?? 15000;
-  const rejectWith = (error?: Error) =>
-    new ClerkRuntimeError('Failed to load Clerk UI' + (error?.message ? `, ${error.message}` : ''), {
-      code: 'failed_to_load_clerk_ui',
+  const rejectWith = (code: string, error?: Error) =>
+    new ClerkRuntimeError(FAILED_TO_LOAD_ERROR('Clerk UI') + (error?.message ? `, ${error.message}` : ''), {
+      code,
       cause: error,
     });
 
@@ -193,7 +209,12 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
       existingScript.remove();
     } else {
       try {
-        await waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith(), existingScript);
+        await waitForPredicateWithTimeout(
+          timeout,
+          isClerkUiProperlyLoaded,
+          rejectWith(FAILED_TO_LOAD_TIMEOUT_ERROR_CODE('clerk_ui')),
+          existingScript,
+        );
         return null;
       } catch {
         existingScript.remove();
@@ -201,7 +222,11 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
     }
   }
 
-  const loadPromise = waitForPredicateWithTimeout(timeout, isClerkUiProperlyLoaded, rejectWith());
+  const loadPromise = waitForPredicateWithTimeout(
+    timeout,
+    isClerkUiProperlyLoaded,
+    rejectWith(FAILED_TO_LOAD_TIMEOUT_ERROR_CODE('clerk_ui')),
+  );
 
   loadScript(scriptUrl, {
     async: true,
@@ -209,7 +234,7 @@ export const loadClerkUiScript = async (opts?: LoadClerkUiScriptOptions): Promis
     nonce: opts.nonce,
     beforeLoad: applyAttributesToScript(buildClerkUiScriptAttributes(opts)),
   }).catch(error => {
-    throw rejectWith(error);
+    throw rejectWith(FAILED_TO_LOAD_ERROR_CODE('clerk_ui'), error);
   });
 
   return loadPromise;
