@@ -24,12 +24,12 @@ describe('versionSelector', () => {
     expect(versionSelector(undefined, PACKAGE_VERSION)).toEqual('next');
   });
 
-  it('should use the exact JS version if tag is snapshot', () => {
+  it('should use the exact package version if tag is snapshot', () => {
     const PACKAGE_VERSION = '1.0.0-snapshot.0';
     // @ts-ignore
     global.JS_PACKAGE_VERSION = '2.0.0-snapshot.0';
 
-    expect(versionSelector(undefined, PACKAGE_VERSION)).toEqual('2.0.0-snapshot.0');
+    expect(versionSelector(undefined, PACKAGE_VERSION)).toEqual('1.0.0-snapshot.0');
   });
 
   // We replaced semver with 2 custom regexes
