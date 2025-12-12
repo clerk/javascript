@@ -149,6 +149,10 @@ export class HandshakeService {
     url.searchParams.append(constants.QueryParameters.HandshakeReason, reason);
     url.searchParams.append(constants.QueryParameters.HandshakeFormat, 'nonce');
 
+    if (this.authenticateContext.sessionToken) {
+      url.searchParams.append(constants.QueryParameters.Session, this.authenticateContext.sessionToken);
+    }
+
     if (this.authenticateContext.instanceType === 'development' && this.authenticateContext.devBrowserToken) {
       url.searchParams.append(constants.QueryParameters.DevBrowser, this.authenticateContext.devBrowserToken);
     }
