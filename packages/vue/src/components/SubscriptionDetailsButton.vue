@@ -15,7 +15,9 @@ const attrs = useAttrs();
 
 // Authentication checks - similar to React implementation
 if (userId.value === null) {
-  throw new Error('Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.');
+  throw new Error(
+    'Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<Show when="signedIn" />` component.',
+  );
 }
 
 if (orgId.value === null && props.for === 'organization') {
