@@ -166,7 +166,7 @@ describe('keyless-custom-headers', () => {
   });
 
   describe('formatMetadataHeaders', () => {
-    it('should format complete metadata object with all fields present', () => {
+    it('should format complete metadata object with all fields present', async () => {
       const metadata = {
         nodeVersion: 'v18.17.0',
         nextVersion: 'next-server (v15.4.5)',
@@ -181,7 +181,7 @@ describe('keyless-custom-headers', () => {
         isCI: false,
       };
 
-      const result = formatMetadataHeaders(metadata);
+      const result = await formatMetadataHeaders(metadata);
 
       // Test exact header casing and values
       expect(result.get('Clerk-Node-Version')).toBe('v18.17.0');
@@ -196,7 +196,7 @@ describe('keyless-custom-headers', () => {
       expect(result.get('Clerk-Auth-Status')).toBe('signed-out');
     });
 
-    it('should handle missing optional fields gracefully', () => {
+    it('should handle missing optional fields gracefully', async () => {
       const metadata = {
         userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
         host: 'localhost:3000',
@@ -208,7 +208,7 @@ describe('keyless-custom-headers', () => {
         // Missing: nodeVersion, nextVersion, npmConfigUserAgent, port
       };
 
-      const result = formatMetadataHeaders(metadata);
+      const result = await formatMetadataHeaders(metadata);
 
       // Test that only present fields are set
       expect(result.get('Clerk-Client-User-Agent')).toBe('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)');
@@ -225,7 +225,7 @@ describe('keyless-custom-headers', () => {
       expect(result.get('Clerk-Node-Port')).toBeNull();
     });
 
-    it('should handle undefined values for optional fields', () => {
+    it('should handle undefined values for optional fields', async () => {
       const metadata = {
         nodeVersion: undefined,
         nextVersion: undefined,
@@ -240,7 +240,7 @@ describe('keyless-custom-headers', () => {
         isCI: false,
       };
 
-      const result = formatMetadataHeaders(metadata);
+      const result = await formatMetadataHeaders(metadata);
 
       // Test that undefined fields are not set
       expect(result.get('Clerk-Node-Version')).toBeNull();
@@ -257,7 +257,7 @@ describe('keyless-custom-headers', () => {
       expect(result.get('Clerk-Auth-Status')).toBe('test-auth-status');
     });
 
-    it('should handle empty string values', () => {
+    it('should handle empty string values', async () => {
       const metadata = {
         nodeVersion: '',
         nextVersion: '',
@@ -272,7 +272,7 @@ describe('keyless-custom-headers', () => {
         isCI: false,
       };
 
-      const result = formatMetadataHeaders(metadata);
+      const result = await formatMetadataHeaders(metadata);
 
       // Empty strings should not be set as headers
       expect(result.get('Clerk-Node-Version')).toBeNull();
@@ -513,7 +513,7 @@ describe('keyless-custom-headers', () => {
 
     // Collect metadata and format headers
     const metadata = await collectKeylessMetadata();
-    const headers = formatMetadataHeaders(metadata);
+    const headers = await formatMetadataHeaders(metadata);
 
     // Verify the full pipeline works correctly
     expect(headers.get('Clerk-Client-User-Agent')).toBe('Integration-Test-Agent');

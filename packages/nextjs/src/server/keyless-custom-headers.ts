@@ -99,7 +99,7 @@ function getNextVersion(): string | undefined {
 /**
  * Converts metadata to HTTP headers
  */
-export function formatMetadataHeaders(metadata: MetadataHeaders): Headers {
+export async function formatMetadataHeaders(metadata: MetadataHeaders): Promise<Headers> {
   const headers = new Headers();
 
   if (metadata.nodeVersion) {
