@@ -1,12 +1,16 @@
 import { createWorkerTimers } from '@clerk/shared/workerTimers';
 
-import { SafeLock } from './safeLock';
+import { debugLogger } from '@/utils/debug';
 
-const REFRESH_SESSION_TOKEN_LOCK_KEY = 'clerk.lock.refreshSessionToken';
 const INTERVAL_IN_MS = 5 * 1_000;
 
+/**
+ * Polls for session token refresh at regular intervals.
+ *
+ * Note: Cross-tab coordination is handled within Session.getToken() itself,
+ * so this poller simply triggers the refresh callback without additional locking.
+ */
 export class SessionCookiePoller {
-  private lock = SafeLock(REFRESH_SESSION_TOKEN_LOCK_KEY);
   private workerTimers = createWorkerTimers();
   private timerId: ReturnType<typeof this.workerTimers.setInterval> | null = null;
   // Disallows for multiple `startPollingForSessionToken()` calls before `callback` is executed.
@@ -19,8 +23,13 @@ export class SessionCookiePoller {
 
     const run = async () => {
       this.initiated = true;
-      await this.lock.acquireLockAndRun(cb);
-      this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+      try {
+        await cb();
+      } catch (error) {
+        debugLogger.error('SessionCookiePoller callback failed', { error }, 'auth');
+      } finally {
+        this.timerId = this.workerTimers.setTimeout(run, INTERVAL_IN_MS);
+      }
     };
 
     void run();
