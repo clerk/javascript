@@ -7,5 +7,5 @@ const { when } = Astro.props;
 const { userId } = Astro.locals.auth();
 ---
 
-{when === 'signedIn' ? (userId ? <slot /> : null) : null}
-{when === 'signedOut' ? (!userId ? <slot /> : null) : null}
+{when === 'signedIn' ? userId ? <slot /> : null : null}
+{when === 'signedOut' ? !userId ? <slot /> : null : null}
