@@ -16,5 +16,7 @@ export * from './usePrefersReducedMotion';
 export * from './useSafeState';
 export * from './useScrollLock';
 export * from './useSearchInput';
+export * from './useSignInRedirect';
+export * from './useSignUpRedirect';
 export * from './useTotalEnabledAuthMethods';
 export * from './useWindowEventListener';
