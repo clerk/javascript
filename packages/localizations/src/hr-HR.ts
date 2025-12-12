@@ -888,6 +888,8 @@ export const hrHR: LocalizationResource = {
     captcha_unavailable:
       'Registracija neuspješna zbog neuspjele provjere bota. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Privremene e-mail usluge nisu podržane. Molimo koristite svoju redovitu e-mail adresu za kreiranje računa.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
@@ -905,6 +907,8 @@ export const hrHR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Lozinka ili e-mail adresa je netočna. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_pwned:
