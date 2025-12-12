@@ -883,6 +883,7 @@ export const enUS: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked: undefined,
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -900,6 +901,7 @@ export const enUS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: undefined,
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:

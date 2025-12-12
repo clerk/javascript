@@ -891,6 +891,8 @@ export const beBY: LocalizationResource = {
     captcha_unavailable:
       'Рэгістрацыя не ўдалася з-за памылак праверкі ботаў. Калі ласка, абнавіце старонку, каб паспрабаваць яшчэ раз або звяжыцеся са службай падтрымкі для атрымання дапамогі.',
     form_code_incorrect: 'Невядомы код. Пераканайцеся, што вы ўвялі правільны код.',
+    form_email_address_blocked:
+      'Часовая пошта не падтрымліваецца. Калі ласка, выкарыстоўвайце свой звычайны адрас электроннай пошты для стварэння акаўнта.',
     form_identifier_exists__email_address: 'Гэты адрас электроннай пошты ўжо выкарыстоўваецца.',
     form_identifier_exists__phone_number: 'Гэты нумар тэлефона ўжо выкарыстоўваецца.',
     form_identifier_exists__username: 'Гэта імя ўжо занята.',
@@ -909,6 +911,8 @@ export const beBY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Невядомы або недапушчальны значэнне.',
     form_password_incorrect: 'Невірны пароль.',
+    form_password_or_identifier_incorrect:
+      'Пароль або адрас электроннай пошты няправільны. Паспрабуйце яшчэ раз або выкарыстоўвайце іншы метад.',
     form_password_length_too_short: 'Пароль занадта кароткі.',
     form_password_not_strong_enough: 'Ваш пароль недастаткова надзейны.',
     form_password_pwned: 'Гэты пароль быў узламаны і не можа быць выкарыстаны, паспрабуйце іншы пароль.',

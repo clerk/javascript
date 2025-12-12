@@ -897,6 +897,8 @@ export const jaJP: LocalizationResource = {
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      '一時的なメールサービスはサポートされていません。アカウントを作成するには、通常のメールアドレスを使用してください。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -914,6 +916,8 @@ export const jaJP: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'パスワードまたはメールアドレスが正しくありません。もう一度お試しいただくか、別の方法をご利用ください。',
     form_password_length_too_short: 'パスワードが短すぎます。8文字以上である必要があります。',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:

@@ -885,6 +885,8 @@ export const nlBE: LocalizationResource = {
     captcha_unavailable:
       'Aanmelding mislukt vanwege mislukte botvalidatie. Vernieuw de pagina om het opnieuw te proberen of neem contact op met de ondersteuning voor verdere hulp.',
     form_code_incorrect: 'De ingevoerde code is incorrect.',
+    form_email_address_blocked:
+      'Tijdelijke e-maildiensten worden niet ondersteund. Gebruik uw normale e-mailadres om een account aan te maken.',
     form_identifier_exists__email_address: 'Dit e-mailadres is al in gebruik.',
     form_identifier_exists__phone_number: 'Dit telefoonnummer is al in gebruik.',
     form_identifier_exists__username: 'Deze gebruikersnaam is al in gebruik.',
@@ -902,6 +904,8 @@ export const nlBE: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'De waarde die je hebt ingevoerd is ongeldig.',
     form_password_incorrect: 'Het wachtwoord is incorrect.',
+    form_password_or_identifier_incorrect:
+      'Het wachtwoord of het e-mailadres is onjuist. Probeer het opnieuw of gebruik een andere methode.',
     form_password_length_too_short: 'Het wachtwoord is te kort.',
     form_password_not_strong_enough: 'Je wachtwoord is niet sterk genoeg.',
     form_password_pwned: 'Dit wachtwoord is in een datalek gevonden.',

@@ -893,6 +893,8 @@ export const msMY: LocalizationResource = {
     captcha_unavailable:
       'Pendaftaran tidak berjaya kerana pengesahan bot gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Perkhidmatan e-mel sementara tidak disokong. Sila gunakan alamat e-mel biasa anda untuk membuat akaun.',
     form_identifier_exists__email_address: 'Alamat e-mel ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
@@ -911,6 +913,8 @@ export const msMY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
+    form_password_or_identifier_incorrect:
+      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_pwned:

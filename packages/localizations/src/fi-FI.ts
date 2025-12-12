@@ -886,6 +886,8 @@ export const fiFI: LocalizationResource = {
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Väliaikaiset sähköpostipalvelut eivät ole tuettuja. Käytä tavallista sähköpostiosoitetta tilin luomiseen.',
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
@@ -903,6 +905,8 @@ export const fiFI: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_pwned: 'Salasana on ollut osallisena tietovuodossa. Valitse toinen salasana.',

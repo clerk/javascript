@@ -884,6 +884,8 @@ export const ptPT: LocalizationResource = {
     captcha_unavailable:
       'Inscrição mal-sucedida devido a falha na validação de bot. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use o seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
@@ -901,6 +903,8 @@ export const ptPT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor de parâmetro inválido.',
     form_password_incorrect: 'Palavra-passe incorreta.',
+    form_password_or_identifier_incorrect:
+      'A palavra-passe ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'A palavra-passe é muito curta.',
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_pwned:

@@ -874,6 +874,8 @@ export const heIL: LocalizationResource = {
     captcha_invalid: 'ההרשמה נכשלה עקב כשל באימות האבטחה. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     captcha_unavailable: 'ההרשמה נכשלה עקב כשל באימות נגד בוטים. אנא רענן את הדף ונסה שוב, או פנה לתמיכה לעזרה נוספת.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'שירותי אימייל זמניים אינם נתמכים. אנא השתמש בכתובת האימייל הרגילה שלך כדי ליצור חשבון.',
     form_identifier_exists__email_address: 'כתובת המייל הזאת כבר תפוסה. אנא נסה אחרת.',
     form_identifier_exists__phone_number: 'מספר הטלפון הזה כבר תפוס. אנא נסה מספר אחר.',
     form_identifier_exists__username: 'שם המשתמש הזה כבר תפוס. אנא נסה שם משתמש אחר',
@@ -891,6 +893,7 @@ export const heIL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'הסיסמה או כתובת האימייל שגויים. נסה שוב או השתמש בשיטה אחרת.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'הסיסמה שלך אינה מספיק חזקה.',
     form_password_pwned: 'הסיסמה הזו נמצאה כחלק מהפרטים שנחשפו בהפרת נתונים ולא ניתן להשתמש בה, נסה סיסמה אחרת במקום.',

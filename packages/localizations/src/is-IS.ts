@@ -887,6 +887,8 @@ export const isIS: LocalizationResource = {
     captcha_unavailable:
       'Skráning mistókst vegna misheppnaðrar vélmenna staðfestingar. Vinsamlegast endurhlaðið síðuna til að reyna aftur eða hafið samband við stuðning til að fá frekari aðstoð.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tímabundin tölvupóstþjónusta er ekki studd. Vinsamlegast notaðu venjulega netfangið þitt til að búa til reikning.',
     form_identifier_exists__email_address: 'Þetta netfang er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__phone_number: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     form_identifier_exists__username: 'Þetta notendanafn er þegar í notkun. Vinsamlegast reyndu annað.',
@@ -904,6 +906,7 @@ export const isIS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'Lykilorðið eða netfangið er rangt. Reyndu aftur eða notaðu aðra aðferð.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Lykilorðið þitt er ekki nógu sterkt.',
     form_password_pwned:

@@ -887,6 +887,8 @@ export const trTR: LocalizationResource = {
     captcha_unavailable:
       'Bot doğrulaması başarısız olduğu için kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     form_code_incorrect: 'Hatalı kod.',
+    form_email_address_blocked:
+      'Geçici e-posta hizmetleri desteklenmemektedir. Lütfen hesap oluşturmak için normal e-posta adresinizi kullanın.',
     form_identifier_exists__email_address: 'Bu e-posta adresi zaten kullanılıyor.',
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
@@ -904,6 +906,8 @@ export const trTR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
     form_password_incorrect: 'Şifre yanlış.',
+    form_password_or_identifier_incorrect:
+      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
     form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',
