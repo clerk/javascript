@@ -1,11 +1,11 @@
 ---
-'@clerk/react': major
-'@clerk/nextjs': major
-'@clerk/expo': major
+'@clerk/astro': major
 '@clerk/chrome-extension': major
+'@clerk/expo': major
+'@clerk/nextjs': major
+'@clerk/react': major
 '@clerk/shared': minor
-'@clerk/astro': patch
-'@clerk/vue': patch
+'@clerk/vue': major
 ---
 
-Restrict `<Protect>` to App Router server usage and introduce `<Show when={...}>` as the client-side authorization component, updating shared types and Astro/Vue wrappers to align with the new API.
+Introduce `<Show when={...}>` as the cross-framework authorization control component and remove client-side `<Protect>`, `<SignedIn>`, and `<SignedOut>` in favor of `<Show>`, updating shared types and framework wrappers to align with the new API.
