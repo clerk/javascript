@@ -135,6 +135,7 @@ export type SDKMetadata = {
 };
 
 export type ListenerCallback = (emission: Resources) => void;
+export type ListenerOptions = { skipInitialEmit?: boolean };
 export type UnsubscribeCallback = () => void;
 export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
@@ -244,6 +245,13 @@ export interface Clerk {
 
   /** Current User. */
   user: UserResource | null | undefined;
+
+  /**
+   * Last emitted resources, maintains a stable reference to the resources between emits.
+   *
+   * @internal
+   */
+  __internal_lastEmittedResources: Resources | undefined;
 
   /**
    * Entrypoint for Clerk's Signal API containing resource signals along with accessible versions of `computed()` and
@@ -690,7 +698,7 @@ export interface Clerk {
    * @param callback - Callback function receiving the most updated Clerk resources after a change.
    * @returns - Unsubscribe callback
    */
-  addListener: (callback: ListenerCallback) => UnsubscribeCallback;
+  addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
 
   /**
    * Registers an event handler for a specific Clerk event.
