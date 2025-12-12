@@ -17,7 +17,7 @@ export const versionSelector = (clerkJSVersion: string | undefined, packageVersi
   const prereleaseTag = getPrereleaseTag(packageVersion);
   if (prereleaseTag) {
     if (prereleaseTag === 'snapshot') {
-      return JS_PACKAGE_VERSION;
+      return packageVersion;
     }
 
     return prereleaseTag;
