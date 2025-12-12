@@ -3,7 +3,7 @@ title: 'Sign-in Client Trust status handling'
 category: 'breaking'
 ---
 
-We've added a new Sign-in status of `needs_client_trust` which, given the conditions listed below, will need to be handled in your application.
+We've added a new Sign-in status of `needs_client_trust` which, given the conditions listed, will need to be handled in your application.
 
 [TODO: Documentation Link]
 
@@ -14,7 +14,7 @@ Prerequisites:
 - Sign-in with [Email](https://dashboard.clerk.com/~/user-authentication/user-and-authentication) and/or [Phone](https://dashboard.clerk.com/~/user-authentication/user-and-authentication?user_auth_tab=phone) identifiers are enabled.
 - If [Email](https://dashboard.clerk.com/~/user-authentication/user-and-authentication) or [SMS](https://dashboard.clerk.com/~/user-authentication/user-and-authentication?user_auth_tab=phone) sign-in verification aren't enabled.
 
-Example change:
+While your application may differ, we've provided an example change below. Please reach out to [Support](mailto:support@clerk.dev) if you have any questions.
 
 ```diff
 - const { signIn } = useSignIn()
