@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { SignedIn, OrganizationSwitcher, useAuth } from '@clerk/vue';
-
-const { isSignedIn } = useAuth();
+import { OrganizationSwitcher, Show } from '@clerk/vue';
 </script>
 
 <template>
-  <SignedIn>
+  <Show when="signedIn">
     <OrganizationSwitcher />
-  </SignedIn>
+  </Show>
   <div>
     <ul>
-      <li v-if="isSignedIn"><RouterLink to="/profile">Profile</RouterLink></li>
+      <Show when="signedIn">
+        <li>
+          <RouterLink to="/profile">Profile</RouterLink>
+        </li>
+      </Show>
     </ul>
   </div>
 </template>
