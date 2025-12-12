@@ -751,8 +751,8 @@ export const enGB: LocalizationResource = {
       title: 'Two-step verification',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Select a wallet below to sign in',
+      title: 'Sign in with Solana',
     },
   },
   signInEnterPasswordTitle: 'Enter your password',
@@ -847,8 +847,8 @@ export const enGB: LocalizationResource = {
       titleCombined: 'Create your account',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Select a wallet below to sign up',
+      title: 'Sign up with Solana',
     },
   },
   socialButtonsBlockButton: 'Continue with {{provider|titleize}}',
@@ -957,8 +957,9 @@ export const enGB: LocalizationResource = {
     phone_number_exists: 'This phone number is taken. Please try another.',
     session_exists: "You're already signed in.",
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
+    web3_solana_signature_generation_failed:
+      'An error occurred while generating the signature. Please try again to continue.',
     zxcvbn: {
       couldBeStronger: 'Your password works, but could be stronger. Try adding more characters.',
       goodPassword: 'Your password meets all the necessary requirements.',
@@ -1328,6 +1329,10 @@ export const enGB: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Select a Solana wallet to connect to your account.',
+          title: 'Add a Solana wallet',
+        },
       },
     },
     usernamePage: {
@@ -1363,9 +1368,10 @@ export const enGB: LocalizationResource = {
       title: 'Thanks for joining the waitlist!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Connect with {{walletName}}',
+    continue: 'Continue with {{walletName}}',
+    noneAvailable:
+      'No Solana Web3 wallets detected. Please install a Web3 supported {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

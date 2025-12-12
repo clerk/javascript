@@ -759,8 +759,8 @@ export const ptBR: LocalizationResource = {
       title: 'Verificação em duas etapas',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecione uma carteira abaixo para entrar',
+      title: 'Entrar com Solana',
     },
   },
   signInEnterPasswordTitle: 'Insira sua senha',
@@ -857,8 +857,8 @@ export const ptBR: LocalizationResource = {
       titleCombined: 'Criar sua conta',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecione uma carteira abaixo para se cadastrar',
+      title: 'Cadastrar-se com Solana',
     },
   },
   socialButtonsBlockButton: 'Continuar com {{provider|titleize}}',
@@ -969,8 +969,8 @@ export const ptBR: LocalizationResource = {
     session_exists: 'Você já está conectado.',
     web3_missing_identifier:
       'Uma extensão de carteira Web3 não pode ser encontrada. Por favor, instale uma para continuar.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Você rejeitou a solicitação de assinatura. Tente novamente para continuar.',
+    web3_solana_signature_generation_failed: 'Ocorreu um erro ao gerar a assinatura. Tente novamente para continuar.',
     zxcvbn: {
       couldBeStronger: 'Sua senha funciona, mas poderia ser mais forte. Tente adicionar mais caracteres.',
       goodPassword: 'Sua senha atende a todos os requisitos necessários.',
@@ -1343,6 +1343,10 @@ export const ptBR: LocalizationResource = {
         detailsAction__nonPrimary: 'Definir como principal',
         primaryButton: 'Carteiras Web3',
         title: 'Carteiras Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecione uma carteira Solana para conectar à sua conta.',
+          title: 'Adicionar uma carteira Solana',
+        },
       },
     },
     usernamePage: {
@@ -1378,9 +1382,10 @@ export const ptBR: LocalizationResource = {
       title: 'Obrigado por entrar na lista de espera!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Conectar com {{walletName}}',
+    continue: 'Continuar com {{walletName}}',
+    noneAvailable:
+      'Nenhuma carteira Solana Web3 foi detectada. Instale uma {{ solanaWalletsLink || link("wallet extension") }} compatível com Web3.',
   },
 } as const;

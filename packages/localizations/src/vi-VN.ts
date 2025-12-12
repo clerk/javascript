@@ -757,8 +757,8 @@ export const viVN: LocalizationResource = {
       title: 'Xác thực hai bước',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Chọn ví bên dưới để đăng nhập',
+      title: 'Đăng nhập với Solana',
     },
   },
   signInEnterPasswordTitle: 'Nhập mật khẩu',
@@ -853,8 +853,8 @@ export const viVN: LocalizationResource = {
       titleCombined: 'Tạo tài khoản của bạn',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Chọn ví bên dưới để đăng ký',
+      title: 'Đăng ký với Solana',
     },
   },
   socialButtonsBlockButton: 'Tiếp tục với {{provider|titleize}}',
@@ -959,8 +959,8 @@ export const viVN: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',
+    web3_solana_signature_generation_failed: 'Đã xảy ra lỗi khi tạo chữ ký. Vui lòng thử lại để tiếp tục.',
     zxcvbn: {
       couldBeStronger: 'Mật khẩu của bạn hoạt động, nhưng có thể mạnh hơn. Hãy thử thêm nhiều ký tự.',
       goodPassword: 'Mật khẩu của bạn đáp ứng tất cả các yêu cầu cần thiết.',
@@ -1332,6 +1332,10 @@ export const viVN: LocalizationResource = {
         detailsAction__nonPrimary: 'Đặt làm chính',
         primaryButton: 'Kết nối ví',
         title: 'Ví Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Chọn một ví Solana để kết nối với tài khoản của bạn.',
+          title: 'Thêm ví Solana',
+        },
       },
     },
     usernamePage: {
@@ -1367,9 +1371,10 @@ export const viVN: LocalizationResource = {
       title: 'Cảm ơn bạn đã tham gia danh sách chờ!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Kết nối với {{walletName}}',
+    continue: 'Tiếp tục với {{walletName}}',
+    noneAvailable:
+      'Không phát hiện ví Solana Web3 nào. Vui lòng cài đặt {{ solanaWalletsLink || link("wallet extension") }} hỗ trợ Web3.',
   },
 } as const;

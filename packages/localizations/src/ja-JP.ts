@@ -760,8 +760,8 @@ export const jaJP: LocalizationResource = {
       title: '二段階認証',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'サインインするには下のウォレットを選択してください',
+      title: 'Solana でサインイン',
     },
   },
   signInEnterPasswordTitle: 'パスワードを入力してください',
@@ -857,8 +857,8 @@ export const jaJP: LocalizationResource = {
       titleCombined: 'アカウントを作成',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'サインアップするには下のウォレットを選択してください',
+      title: 'Solana でサインアップ',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}で続ける',
@@ -966,8 +966,8 @@ export const jaJP: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: '署名リクエストを拒否しました。続行するにはもう一度お試しください。',
+    web3_solana_signature_generation_failed: '署名の生成中にエラーが発生しました。続行するにはもう一度お試しください。',
     zxcvbn: {
       couldBeStronger: 'パスワードは有効ですが、もう少し強化できます。文字を追加してみてください。',
       goodPassword: 'パスワードはすべての要件を満たしています。',
@@ -1334,6 +1334,10 @@ export const jaJP: LocalizationResource = {
         detailsAction__nonPrimary: 'プライマリに設定する',
         primaryButton: 'ウォレットを接続',
         title: 'Web3ウォレット',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'アカウントに接続する Solana ウォレットを選択してください。',
+          title: 'Solana ウォレットを追加',
+        },
       },
     },
     usernamePage: {
@@ -1369,9 +1373,10 @@ export const jaJP: LocalizationResource = {
       title: '待機リストへの参加ありがとうございます！',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} で接続',
+    continue: '{{walletName}} で続行',
+    noneAvailable:
+      'Solana Web3 ウォレットが検出されませんでした。Web3 に対応した {{ solanaWalletsLink || link("wallet extension") }} をインストールしてください。',
   },
 } as const;

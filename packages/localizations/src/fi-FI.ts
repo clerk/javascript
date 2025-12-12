@@ -751,8 +751,8 @@ export const fiFI: LocalizationResource = {
       title: 'Kaksivaiheinen todennus',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Valitse alta lompakko kirjautumista varten',
+      title: 'Kirjaudu sisään Solanalla',
     },
   },
   signInEnterPasswordTitle: 'Syötä salasanasi',
@@ -846,8 +846,8 @@ export const fiFI: LocalizationResource = {
       titleCombined: 'Luo tili',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Valitse alta lompakko rekisteröitymistä varten',
+      title: 'Rekisteröidy Solanalla',
     },
   },
   socialButtonsBlockButton: 'Jatka palvelun {{provider|titleize}} avulla',
@@ -953,8 +953,8 @@ export const fiFI: LocalizationResource = {
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     session_exists: 'Olet jo kirjautunut sisään.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Hylkäsit allekirjoituspyynnön. Yritä uudelleen jatkaaksesi.',
+    web3_solana_signature_generation_failed: 'Allekirjoitusta luotaessa tapahtui virhe. Yritä uudelleen jatkaaksesi.',
     zxcvbn: {
       couldBeStronger: 'Salasanasi toimii, mutta se voisi olla vahvempi. Kokeile lisätä erikoismerkkejä tai numeroita.',
       goodPassword: 'Salasanasi täyttää kaikki tarvittavat vaatimukset.',
@@ -1326,6 +1326,10 @@ export const fiFI: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3-lompakot',
         title: 'Web3-lompakot',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Valitse Solana-lompakko yhdistettäväksi tiliisi.',
+          title: 'Lisää Solana-lompakko',
+        },
       },
     },
     usernamePage: {
@@ -1361,9 +1365,10 @@ export const fiFI: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Yhdistä {{walletName}}',
+    continue: 'Jatka {{walletName}}',
+    noneAvailable:
+      'Solana Web3 -lompakoita ei havaittu. Asenna Web3-yhteensopiva {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

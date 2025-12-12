@@ -748,8 +748,8 @@ export const arSA: LocalizationResource = {
       title: 'نظام التحقق بخطوتين',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'حدد محفظة أدناه لتسجيل الدخول',
+      title: 'تسجيل الدخول باستخدام Solana',
     },
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
@@ -842,8 +842,8 @@ export const arSA: LocalizationResource = {
       titleCombined: 'أنشاء حساب جديد',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'حدد محفظة أدناه للتسجيل',
+      title: 'التسجيل باستخدام Solana',
     },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
@@ -949,8 +949,8 @@ export const arSA: LocalizationResource = {
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'لقد رفضت طلب التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
+    web3_solana_signature_generation_failed: 'حدث خطأ أثناء إنشاء التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',
@@ -1315,6 +1315,10 @@ export const arSA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'محافظ Web3',
         title: 'محافظ Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'حدد محفظة Solana للاتصال بحسابك.',
+          title: 'إضافة محفظة Solana',
+        },
       },
     },
     usernamePage: {
@@ -1350,9 +1354,10 @@ export const arSA: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'الاتصال باستخدام {{walletName}}',
+    continue: 'المتابعة باستخدام {{walletName}}',
+    noneAvailable:
+      'لم يتم اكتشاف محافظ Solana Web3. يرجى تثبيت {{ solanaWalletsLink || link("wallet extension") }} مدعوم بـ Web3.',
   },
 } as const;
