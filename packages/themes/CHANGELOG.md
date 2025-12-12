@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.4.44
+
+### Patch Changes
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/shared@3.40.0
+
 ## 2.4.43
 
 ### Patch Changes
