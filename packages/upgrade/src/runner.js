@@ -89,7 +89,7 @@ export async function runScans(config, sdk, options) {
       const content = await fs.readFile(file, 'utf8');
 
       for (const matcher of matchers) {
-        const matches = findMatches(content, matcher.matcher);
+        const matches = findMatches(content, matcher.matcher, matcher.matcherLogic);
 
         if (matches.length === 0) {
           continue;
@@ -141,9 +141,25 @@ function loadMatchers(config, sdk) {
   });
 }
 
-function findMatches(content, matcher) {
+function findMatches(content, matcher, matcherLogic = 'or') {
   if (Array.isArray(matcher)) {
-    return matcher.flatMap(m => Array.from(content.matchAll(m)));
+    if (matcherLogic === 'and') {
+      // For AND logic, all patterns must match somewhere in the file
+      const allMatch = matcher.every(m => {
+        const matches = Array.from(content.matchAll(m));
+        return matches.length > 0;
+      });
+
+      if (!allMatch) {
+        return [];
+      }
+
+      // If all patterns match, return matches from all patterns
+      return matcher.flatMap(m => Array.from(content.matchAll(m)));
+    } else {
+      // Default OR logic: match if any pattern matches
+      return matcher.flatMap(m => Array.from(content.matchAll(m)));
+    }
   }
   return Array.from(content.matchAll(matcher));
 }
