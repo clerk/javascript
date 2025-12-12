@@ -1,16 +1,16 @@
-import { useClerk } from '@clerk/shared/react';
+import { createContextAndHook, useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettingParams } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import type { SerializedStyles } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
-import { css, type Theme } from '@emotion/react';
-import { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
+import { css } from '@emotion/react';
+import React, { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
-import { common, InternalThemeProvider } from '@/ui/styledSystem';
+import { InternalThemeProvider } from '@/ui/styledSystem';
 
-import { Box, Flex, Span } from '../../../customizables';
+import { Box, Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, ClerkLogoIcon, PromptContainer, PromptSuccessIcon } from '../shared';
 
@@ -197,12 +197,21 @@ const EnableOrganizationsPromptInternal = ({
                   })}
                 >
                   <Flex sx={t => ({ marginTop: t.sizes.$2 })}>
-                    <Switch
-                      label='Allow personal account'
-                      description='Allow users to work outside of an organization by providing a personal account. We do not recommend for B2B SaaS apps.'
-                      checked={allowPersonalAccount}
-                      onChange={() => setAllowPersonalAccount(prev => !prev)}
-                    />
+                    <RadioGroup
+                      value={allowPersonalAccount ? 'allow' : 'require'}
+                      onChange={value => setAllowPersonalAccount(value === 'allow')}
+                    >
+                      <RadioGroupItem
+                        value='require'
+                        label='Require organization membership'
+                        description='Users will be required to create or join an organization to access the application. Common for most B2B SaaS applications.'
+                      />
+                      <RadioGroupItem
+                        value='allow'
+                        label='Allow personal accounts'
+                        description='Users will be able to work outside of an organization by providing a personal account.'
+                      />
+                    </RadioGroup>
                   </Flex>
                 </Flex>
               </Box>
@@ -368,136 +377,133 @@ const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant
   );
 });
 
-type SwitchProps = React.ComponentProps<'input'> & {
+type RadioGroupContextValue = {
+  name: string;
+  value: string;
+  onChange: (value: string) => void;
+};
+
+const [RadioGroupContext, useRadioGroup] = createContextAndHook<RadioGroupContextValue>('RadioGroupContext');
+
+type RadioGroupProps = {
+  value: string;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+};
+
+const RadioGroup = ({ value, onChange, children }: RadioGroupProps) => {
+  const name = useId();
+  const contextValue = React.useMemo(() => ({ value: { name, value, onChange } }), [name, value, onChange]);
+
+  return (
+    <RadioGroupContext.Provider value={contextValue}>
+      <Flex
+        role='radiogroup'
+        direction='col'
+        gap={3}
+      >
+        {children}
+      </Flex>
+    </RadioGroupContext.Provider>
+  );
+};
+
+type RadioGroupItemProps = {
+  value: string;
   label: string;
   description?: string;
 };
 
-const TRACK_PADDING = '2px';
-const TRACK_INNER_WIDTH = (t: Theme) => t.sizes.$6;
-const TRACK_HEIGHT = (t: Theme) => t.sizes.$4;
-const THUMB_WIDTH = (t: Theme) => t.sizes.$3;
+const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
+  const { name, value: selectedValue, onChange } = useRadioGroup();
+  const descriptionId = useId();
+  const checked = value === selectedValue;
 
-const Switch = forwardRef<HTMLInputElement, SwitchProps>(
-  ({ label, description, checked: controlledChecked, defaultChecked, onChange, ...props }, ref) => {
-    const descriptionId = useId();
+  return (
+    <Flex
+      as='label'
+      gap={2}
+      align='start'
+      sx={{
+        cursor: 'pointer',
+        userSelect: 'none',
+      }}
+    >
+      <input
+        type='radio'
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={() => onChange(value)}
+        aria-describedby={description ? descriptionId : undefined}
+        css={css`
+          ${basePromptElementStyles};
+          appearance: none;
+          width: 1rem;
+          height: 1rem;
+          margin: 0;
+          margin-top: 0.125rem;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          background-color: transparent;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: 120ms ease-in-out;
+          transition-property: border-color, background-color, box-shadow;
 
-    const isControlled = controlledChecked !== undefined;
-    const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
-    const checked = isControlled ? controlledChecked : internalChecked;
+          &:checked {
+            border-color: #fff;
+            background-color: #fff;
+            box-shadow: inset 0 0 0 3px #1f1f1f;
+          }
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!isControlled) {
-        setInternalChecked(e.target.checked);
-      }
-      onChange?.(e);
-    };
+          &:focus-visible {
+            outline: 2px solid white;
+            outline-offset: 2px;
+          }
 
-    return (
+          &:hover:not(:checked) {
+            border-color: rgba(255, 255, 255, 0.5);
+          }
+        `}
+      />
       <Flex
         direction='col'
         gap={1}
       >
-        <Flex
-          as='label'
-          gap={2}
-          align='center'
-          sx={{
-            isolation: 'isolate',
-            userSelect: 'none',
-            '&:has(input:focus-visible) > input + span': {
-              outline: '2px solid white',
-              outlineOffset: '2px',
-            },
-            '&:has(input:disabled) > input + span': {
-              opacity: 0.6,
-              cursor: 'not-allowed',
-              pointerEvents: 'none',
-            },
-          }}
+        <span
+          css={[
+            basePromptElementStyles,
+            css`
+              font-size: 0.875rem;
+              font-weight: 500;
+              line-height: 1.25;
+              color: white;
+            `,
+          ]}
         >
-          <input
-            type='checkbox'
-            {...props}
-            ref={ref}
-            role='switch'
-            {...(isControlled ? { checked } : { defaultChecked })}
-            onChange={handleChange}
-            css={{ ...common.visuallyHidden() }}
-            aria-describedby={description ? descriptionId : undefined}
-          />
-          <Span
-            sx={t => {
-              const trackWidth = `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING})`;
-              const trackHeight = `calc(${TRACK_HEIGHT(t)} + ${TRACK_PADDING})`;
-              return {
-                display: 'flex',
-                alignItems: 'center',
-                paddingInline: TRACK_PADDING,
-                width: trackWidth,
-                height: trackHeight,
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                backgroundColor: checked ? '#6C47FF' : 'rgba(0, 0, 0, 0.2)',
-                borderRadius: 999,
-                transition: 'background-color 0.2s ease-in-out',
-              };
-            }}
-          >
-            <Span
-              sx={t => {
-                const size = THUMB_WIDTH(t);
-                const maxTranslateX = `calc(${TRACK_INNER_WIDTH(t)} - ${size} - ${TRACK_PADDING})`;
-                return {
-                  width: size,
-                  height: size,
-                  borderRadius: 9999,
-                  backgroundColor: 'white',
-                  boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
-                  transform: `translateX(${checked ? maxTranslateX : '0'})`,
-                  transition: 'transform 0.2s ease-in-out',
-                  '@media (prefers-reduced-motion: reduce)': {
-                    transition: 'none',
-                  },
-                };
-              }}
-            />
-          </Span>
+          {label}
+        </span>
+        {description && (
           <span
+            id={descriptionId}
             css={[
               basePromptElementStyles,
               css`
-                font-size: 0.875rem;
-                font-weight: 500;
-                line-height: 1.25;
-                color: white;
+                font-size: 0.75rem;
+                line-height: 1.33;
+                color: #c3c3c6;
+                text-wrap: pretty;
               `,
             ]}
           >
-            {label}
-          </span>
-        </Flex>
-        {description ? (
-          <Span
-            id={descriptionId}
-            sx={t => [
-              basePromptElementStyles,
-              {
-                display: 'block',
-                paddingInlineStart: `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING} + ${t.sizes.$2})`,
-                fontSize: '0.75rem',
-                lineHeight: '1.3333333333',
-                color: '#c3c3c6',
-                textWrap: 'pretty',
-              },
-            ]}
-          >
             {description}
-          </Span>
-        ) : null}
+          </span>
+        )}
       </Flex>
-    );
-  },
-);
+    </Flex>
+  );
+};
 
 const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: SerializedStyles }>(
   ({ children, css: cssProp, ...props }, ref) => {
