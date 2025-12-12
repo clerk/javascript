@@ -2,8 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import chalk from 'chalk';
-import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
+import { glob } from 'tinyglobby';
 
 import { getCodemodConfig, runCodemod } from './codemods/index.js';
 import { createSpinner, renderCodemodResults } from './render.js';
@@ -68,8 +68,10 @@ export async function runScans(config, sdk, options) {
   const spinner = createSpinner('Scanning files for breaking changes...');
 
   try {
-    const pattern = convertPathToPattern(path.resolve(options.dir));
-    const files = await globby(pattern, {
+    const cwd = path.resolve(options.dir);
+    const files = await glob('**/*', {
+      cwd,
+      absolute: true,
       ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
     });
 
