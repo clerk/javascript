@@ -42,8 +42,6 @@ exports[`root public exports > should not change unexpectedly 1`] = `
   "SignOutButton",
   "SignUp",
   "SignUpButton",
-  "SignedIn",
-  "SignedOut",
   "TaskChooseOrganization",
   "TaskResetPassword",
   "UserAvatar",
