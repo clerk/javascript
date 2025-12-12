@@ -1,5 +1,124 @@
 # Change Log
 
+## 4.0.0
+
+### Major Changes
+
+- Align experimental/unstable prefixes to use consistent naming: ([#7361](https://github.com/clerk/javascript/pull/7361)) by [@brkalow](https://github.com/brkalow)
+  - Renamed all `__unstable_*` methods to `__internal_*` (for internal APIs)
+  - Renamed all `experimental__*` and `experimental_*` methods to `__experimental_*` (for beta features)
+  - Removed deprecated billing-related props and `experimental__forceOauthFirst`
+  - Moved `createTheme` and `simple` to `@clerk/ui/themes/experimental` export path (removed `__experimental_` prefix since they're now in the experimental export)
+
+  **Breaking Changes:**
+
+  ### @clerk/clerk-js
+  - `__unstable__environment` → `__internal_environment`
+  - `__unstable__updateProps` → `__internal_updateProps`
+  - `__unstable__setEnvironment` → `__internal_setEnvironment`
+  - `__unstable__onBeforeRequest` → `__internal_onBeforeRequest`
+  - `__unstable__onAfterResponse` → `__internal_onAfterResponse`
+  - `__unstable__onBeforeSetActive` → `__internal_onBeforeSetActive` (window global)
+  - `__unstable__onAfterSetActive` → `__internal_onAfterSetActive` (window global)
+
+  ### @clerk/nextjs
+  - `__unstable_invokeMiddlewareOnAuthStateChange` → `__internal_invokeMiddlewareOnAuthStateChange`
+
+  ### @clerk/ui
+  - `experimental_createTheme` / `__experimental_createTheme` → `createTheme` (now exported from `@clerk/ui/themes/experimental`)
+  - `experimental__simple` / `__experimental_simple` → `simple` (now exported from `@clerk/ui/themes/experimental`)
+
+  ### @clerk/chrome-extension
+  - `__unstable__createClerkClient` → `createClerkClient` (exported from `@clerk/chrome-extension/background`)
+
+  ### Removed (multiple packages)
+  - `__unstable_manageBillingUrl` (removed)
+  - `__unstable_manageBillingLabel` (removed)
+  - `__unstable_manageBillingMembersLimit` (removed)
+  - `experimental__forceOauthFirst` (removed)
+
+- Updated returned values of `Clerk.checkout()` and `useCheckout`. ([#7232](https://github.com/clerk/javascript/pull/7232)) by [@panteliselef](https://github.com/panteliselef)
+
+  ### Vanilla JS
+
+  ```ts
+  // Before
+  const { getState, subscribe, confirm, start, clear, finalize } = Clerk.checkout({
+    planId: 'xxx',
+    planPeriod: 'annual',
+  });
+  getState().isStarting;
+  getState().isConfirming;
+  getState().error;
+  getState().checkout;
+  getState().fetchStatus;
+  getState().status;
+
+  // After
+  const { checkout, errors, fetchStatus } = Clerk.checkout({ planId: 'xxx', planPeriod: 'annual' });
+  checkout.plan; // null or defined based on `checkout.status`
+  checkout.status;
+  checkout.start;
+  checkout.confirm;
+  ```
+
+  ### React
+
+  ```ts
+  // Before
+  const { id, plan, status, start, confirm, paymentSource } = useCheckout({ planId: 'xxx', planPeriod: 'annual' });
+
+  // After
+  const { checkout, errors, fetchStatus } = usecCheckout({ planId: 'xxx', planPeriod: 'annual' });
+  checkout.plan; // null or defined based on `checkout.status`
+  checkout.status;
+  checkout.start;
+  checkout.confirm;
+  ```
+
+- Updating minimum version of Node to v20.9.0 ([#6936](https://github.com/clerk/javascript/pull/6936)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove deprecated `saml` property from `UserSettings` in favor of `enterpriseSSO` ([#7063](https://github.com/clerk/javascript/pull/7063)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove deprecated `samlAccount` in favor of `enterpriseAccount` ([#7258](https://github.com/clerk/javascript/pull/7258)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Remove deprecated `hideSlug` in favor of `organizationSettings.slug.disabled` setting ([#7283](https://github.com/clerk/javascript/pull/7283)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+  Slugs can now be enabled directly from the Organization Settings page in the Clerk Dashboard
+
+- Remove all previously deprecated UI props across the Next.js, React and clerk-js SDKs. The legacy `afterSign(In|Up)Url`/`redirectUrl` props, `UserButton` sign-out overrides, organization `hideSlug` flags, `OrganizationSwitcher`'s `afterSwitchOrganizationUrl`, `Client.activeSessions`, `setActive({ beforeEmit })`, and the `ClerkMiddlewareAuthObject` type alias are no longer exported. Components now rely solely on the new redirect options and server-side configuration. ([#7243](https://github.com/clerk/javascript/pull/7243)) by [@jacekradko](https://github.com/jacekradko)
+
+- Remove deprecated `saml` strategy in favor of `enterprise_sso` ([#7326](https://github.com/clerk/javascript/pull/7326)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Drop support for Expo 50, 51 and 52. This release includes two breaking changes: ([#7016](https://github.com/clerk/javascript/pull/7016)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ## 1. Updated Expo peer dependency requirements
+
+  **@clerk/expo**
+  - **Added** new peer dependency: `expo: >=53 <55`
+    - The core `expo` package is now explicitly required as a peer dependency
+    - This ensures compatibility with the Expo SDK version range that supports the features used by Clerk
+
+  **@clerk/expo-passkeys**
+  - **Updated** peer dependency: `expo: >=53 <55` (previously `>=50 <55`)
+    - Minimum Expo version increased from 50 to 53
+    - This aligns with the main `@clerk/expo` package requirements
+
+  ## 2. Removed legacy subpath exports
+
+  The following packages have removed their legacy subpath export mappings:
+  - `@clerk/expo`
+  - `@clerk/shared`
+  - `@clerk/react`
+  - `@clerk/localizations`
+
+  **What changed:**
+  Previously, these packages used a workaround to support subpath imports (e.g., `@clerk/shared/react`, `@clerk/expo/web`). These legacy exports have been removed in favor of modern package.json `exports` field configuration.
+
+  All public APIs remain available through the main package entry points.
+
+- Removing deprecated top-level exports from @clerk/shared ([#6940](https://github.com/clerk/javascript/pull/6940)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 3.39.0
 
 ### Minor Changes

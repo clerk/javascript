@@ -1,5 +1,15 @@
 # @clerk/dev-cli
 
+## 1.0.0
+
+### Major Changes
+
+- Require Node.js 20.9.0 in all packages ([#7262](https://github.com/clerk/javascript/pull/7262)) by [@jacekradko](https://github.com/jacekradko)
+
+### Patch Changes
+
+- Replace `globby` dependency with `tinyglobby` for smaller bundle size and faster installation ([#7415](https://github.com/clerk/javascript/pull/7415)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
 ## 0.0.12
 
 ### Patch Changes

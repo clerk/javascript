@@ -1,5 +1,82 @@
 # Change Log
 
+## 3.0.0
+
+### Major Changes
+
+- Align experimental/unstable prefixes to use consistent naming: ([#7361](https://github.com/clerk/javascript/pull/7361)) by [@brkalow](https://github.com/brkalow)
+  - Renamed all `__unstable_*` methods to `__internal_*` (for internal APIs)
+  - Renamed all `experimental__*` and `experimental_*` methods to `__experimental_*` (for beta features)
+  - Removed deprecated billing-related props and `experimental__forceOauthFirst`
+  - Moved `createTheme` and `simple` to `@clerk/ui/themes/experimental` export path (removed `__experimental_` prefix since they're now in the experimental export)
+
+  **Breaking Changes:**
+
+  ### @clerk/clerk-js
+  - `__unstable__environment` → `__internal_environment`
+  - `__unstable__updateProps` → `__internal_updateProps`
+  - `__unstable__setEnvironment` → `__internal_setEnvironment`
+  - `__unstable__onBeforeRequest` → `__internal_onBeforeRequest`
+  - `__unstable__onAfterResponse` → `__internal_onAfterResponse`
+  - `__unstable__onBeforeSetActive` → `__internal_onBeforeSetActive` (window global)
+  - `__unstable__onAfterSetActive` → `__internal_onAfterSetActive` (window global)
+
+  ### @clerk/nextjs
+  - `__unstable_invokeMiddlewareOnAuthStateChange` → `__internal_invokeMiddlewareOnAuthStateChange`
+
+  ### @clerk/ui
+  - `experimental_createTheme` / `__experimental_createTheme` → `createTheme` (now exported from `@clerk/ui/themes/experimental`)
+  - `experimental__simple` / `__experimental_simple` → `simple` (now exported from `@clerk/ui/themes/experimental`)
+
+  ### @clerk/chrome-extension
+  - `__unstable__createClerkClient` → `createClerkClient` (exported from `@clerk/chrome-extension/background`)
+
+  ### Removed (multiple packages)
+  - `__unstable_manageBillingUrl` (removed)
+  - `__unstable_manageBillingLabel` (removed)
+  - `__unstable_manageBillingMembersLimit` (removed)
+  - `experimental__forceOauthFirst` (removed)
+
+- Require Node.js 20.9.0 in all packages ([#7262](https://github.com/clerk/javascript/pull/7262)) by [@jacekradko](https://github.com/jacekradko)
+
+- Drop support for Expo 50, 51 and 52. This release includes two breaking changes: ([#7016](https://github.com/clerk/javascript/pull/7016)) by [@nikosdouvlis](https://github.com/nikosdouvlis)
+
+  ## 1. Updated Expo peer dependency requirements
+
+  **@clerk/expo**
+  - **Added** new peer dependency: `expo: >=53 <55`
+    - The core `expo` package is now explicitly required as a peer dependency
+    - This ensures compatibility with the Expo SDK version range that supports the features used by Clerk
+
+  **@clerk/expo-passkeys**
+  - **Updated** peer dependency: `expo: >=53 <55` (previously `>=50 <55`)
+    - Minimum Expo version increased from 50 to 53
+    - This aligns with the main `@clerk/expo` package requirements
+
+  ## 2. Removed legacy subpath exports
+
+  The following packages have removed their legacy subpath export mappings:
+  - `@clerk/expo`
+  - `@clerk/shared`
+  - `@clerk/react`
+  - `@clerk/localizations`
+
+  **What changed:**
+  Previously, these packages used a workaround to support subpath imports (e.g., `@clerk/shared/react`, `@clerk/expo/web`). These legacy exports have been removed in favor of modern package.json `exports` field configuration.
+
+  All public APIs remain available through the main package entry points.
+
+- Rename package to `@clerk/expo`. ([#6941](https://github.com/clerk/javascript/pull/6941)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Use new `@clerk/react` package. ([#6911](https://github.com/clerk/javascript/pull/6911)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`e35960f`](https://github.com/clerk/javascript/commit/e35960f5e44ab758d0ab0545691f44dbafd5e7cb), [`a3e689f`](https://github.com/clerk/javascript/commit/a3e689f3b7f2f3799a263da4b7bb14c0e49e42b7), [`965e7f1`](https://github.com/clerk/javascript/commit/965e7f1b635cf25ebfe129ec338e05137d1aba9e), [`ac34168`](https://github.com/clerk/javascript/commit/ac3416849954780bd873ed3fe20a173a8aee89aa), [`cf0d0dc`](https://github.com/clerk/javascript/commit/cf0d0dc7f6380d6e0c4e552090345b7943c22b35), [`cc3b220`](https://github.com/clerk/javascript/commit/cc3b2201213055dc010f4525a467e8b4e49b792b), [`a1aaff3`](https://github.com/clerk/javascript/commit/a1aaff33700ed81f31a9f340cf6cb3a82efeef85), [`8b95393`](https://github.com/clerk/javascript/commit/8b953930536b12bd8ade6ba5c2092f40770ea8df), [`3dac245`](https://github.com/clerk/javascript/commit/3dac245456dae1522ee2546fc9cc29454f1f345f), [`65a236a`](https://github.com/clerk/javascript/commit/65a236aed8b2c4e2f3da266431586c7cfc2aad72), [`df16d8d`](https://github.com/clerk/javascript/commit/df16d8d57f4df7ba024910022f8cd3a777502816), [`26254f0`](https://github.com/clerk/javascript/commit/26254f0463312115eca4bc0a396c5acd0703187b)]:
+  - @clerk/clerk-js@6.0.0
+  - @clerk/react@6.0.0
+  - @clerk/shared@4.0.0
+
 ## 2.19.10
 
 ### Patch Changes

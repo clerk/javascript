@@ -1,5 +1,38 @@
 # @clerk/nuxt
 
+## 2.0.0
+
+### Major Changes
+
+- Require Node.js 20.9.0 in all packages ([#7262](https://github.com/clerk/javascript/pull/7262)) by [@jacekradko](https://github.com/jacekradko)
+
+- Removed deprecated `getAuth()` helper. Use `event.context.auth()` in your server routes instead. ([#7284](https://github.com/clerk/javascript/pull/7284)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  ```ts
+  export default defineEventHandler(event => {
+    const { userId } = event.context.auth();
+
+    return {
+      userId,
+    };
+  });
+  ```
+
+- Routing strategy for the ff. components now default to `path`: ([#7260](https://github.com/clerk/javascript/pull/7260)) by [@wobsoriano](https://github.com/wobsoriano)
+  - `<SignIn />`
+  - `<SignUp />`
+  - `<UserProfile />`
+  - `<OrganizationProfile />`
+  - `<CreateOrganization />`
+  - `<OrganizationList />`
+
+### Patch Changes
+
+- Updated dependencies [[`e35960f`](https://github.com/clerk/javascript/commit/e35960f5e44ab758d0ab0545691f44dbafd5e7cb), [`8c47111`](https://github.com/clerk/javascript/commit/8c4711153552d50c67611fea668f82f7c8fb7f9c), [`a3e689f`](https://github.com/clerk/javascript/commit/a3e689f3b7f2f3799a263da4b7bb14c0e49e42b7), [`965e7f1`](https://github.com/clerk/javascript/commit/965e7f1b635cf25ebfe129ec338e05137d1aba9e), [`84483c2`](https://github.com/clerk/javascript/commit/84483c2a710cef9165f9cd016ebccff13b004c78), [`ac34168`](https://github.com/clerk/javascript/commit/ac3416849954780bd873ed3fe20a173a8aee89aa), [`cf0d0dc`](https://github.com/clerk/javascript/commit/cf0d0dc7f6380d6e0c4e552090345b7943c22b35), [`cc3b220`](https://github.com/clerk/javascript/commit/cc3b2201213055dc010f4525a467e8b4e49b792b), [`a1aaff3`](https://github.com/clerk/javascript/commit/a1aaff33700ed81f31a9f340cf6cb3a82efeef85), [`8b95393`](https://github.com/clerk/javascript/commit/8b953930536b12bd8ade6ba5c2092f40770ea8df), [`3dac245`](https://github.com/clerk/javascript/commit/3dac245456dae1522ee2546fc9cc29454f1f345f), [`65a236a`](https://github.com/clerk/javascript/commit/65a236aed8b2c4e2f3da266431586c7cfc2aad72), [`26254f0`](https://github.com/clerk/javascript/commit/26254f0463312115eca4bc0a396c5acd0703187b), [`f944623`](https://github.com/clerk/javascript/commit/f944623641657438995778140fa29eee6b681e65)]:
+  - @clerk/vue@2.0.0
+  - @clerk/shared@4.0.0
+  - @clerk/backend@3.0.0
+
 ## 1.13.6
 
 ### Patch Changes
