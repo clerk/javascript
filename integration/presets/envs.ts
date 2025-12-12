@@ -204,6 +204,12 @@ const withProtectService = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service').pk);
 
+const withNeedsClientTrust = base
+  .clone()
+  .setId('withNeedsClientTrust')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-needs-client-trust').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-needs-client-trust').pk);
+
 export const envs = {
   base,
   sessionsProd1,
@@ -223,6 +229,7 @@ export const envs = {
   withEmailLinks,
   withKeyless,
   withLegalConsent,
+  withNeedsClientTrust,
   withRestrictedMode,
   withReverification,
   withSessionTasks,

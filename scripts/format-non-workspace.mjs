@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { globby } from 'globby';
+import { glob } from 'tinyglobby';
 import { $ } from 'zx';
 
 const ROOT_FILE_PATTERNS = ['*.cjs', '*.js', '*.json', '*.md', '*.mjs', '*.ts', '*.yaml'];
@@ -16,7 +16,7 @@ async function getExistingFiles() {
 
   for (const pattern of ROOT_FILE_PATTERNS) {
     try {
-      const matches = await globby(pattern, {
+      const matches = await glob(pattern, {
         ignore: ['node_modules/**', '**/node_modules/**', 'packages/**'],
       });
       existingFiles.push(...matches);
@@ -27,7 +27,7 @@ async function getExistingFiles() {
 
   for (const pattern of NON_WORKSPACE_PATTERNS) {
     try {
-      const matches = await globby(pattern, {
+      const matches = await glob(pattern, {
         ignore: [
           'node_modules/**',
           '**/node_modules/**',

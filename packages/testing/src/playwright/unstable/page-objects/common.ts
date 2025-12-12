@@ -33,7 +33,9 @@ export const common = ({ page }: { page: EnhancedPage }) => {
         const prepareVerificationPromise = page.waitForResponse(
           response =>
             response.request().method() === 'POST' &&
-            (response.url().includes('prepare_verification') || response.url().includes('prepare_first_factor')),
+            (response.url().includes('prepare_verification') ||
+              response.url().includes('prepare_first_factor') ||
+              response.url().includes('prepare_second_factor')),
         );
         await prepareVerificationPromise;
       }
@@ -52,7 +54,9 @@ export const common = ({ page }: { page: EnhancedPage }) => {
         const attemptVerificationPromise = page.waitForResponse(
           response =>
             response.request().method() === 'POST' &&
-            (response.url().includes('attempt_verification') || response.url().includes('attempt_first_factor')),
+            (response.url().includes('attempt_verification') ||
+              response.url().includes('attempt_first_factor') ||
+              response.url().includes('attempt_second_factor')),
         );
         await attemptVerificationPromise;
       }

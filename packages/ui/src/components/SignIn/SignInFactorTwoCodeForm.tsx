@@ -17,6 +17,7 @@ import { useRouter } from '../../router';
 import { isResetPasswordStrategy } from './utils';
 
 export type SignInFactorTwoCodeCard = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
+  showClientTrustNotice?: boolean;
   factor: EmailCodeFactor | PhoneCodeFactor | TOTPFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
@@ -46,6 +47,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
 
   // Only show the new device verification notice if the user is new
   // and no attributes are explicitly used for second factor.
+  // Retained for backwards compatibility.
   const showNewDeviceVerificationNotice = useMemo(() => {
     const anyAttributeUsedForSecondFactor = Object.values(env.userSettings.attributes).some(
       attr => attr.used_for_second_factor,
@@ -115,7 +117,11 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       cardSubtitle={
         isResettingPassword(signIn) ? localizationKeys('signIn.forgotPassword.subtitle') : props.cardSubtitle
       }
-      cardNotice={showNewDeviceVerificationNotice ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
+      cardNotice={
+        props.showClientTrustNotice || showNewDeviceVerificationNotice
+          ? localizationKeys('signIn.newDeviceVerificationNotice')
+          : undefined
+      }
       resendButton={props.resendButton}
       inputLabel={props.inputLabel}
       onCodeEntryFinishedAction={action}

@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 
 import fs from 'fs-extra';
-import { globby as glob } from 'globby';
+import { glob } from 'tinyglobby';
 
 const { GITHUB_REF = 'main' } = process.env;
 const baseUrl = new URL(`https://github.com/clerk/javascript/blob/${GITHUB_REF}/`);

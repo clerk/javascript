@@ -15,11 +15,13 @@ import { useCardState } from '../../elements/contexts';
 import { useEmailLink } from '../../hooks/useEmailLink';
 
 type SignInFactorTwoEmailLinkCardProps = Pick<VerificationCodeCardProps, 'onShowAlternativeMethodsClicked'> & {
+  showClientTrustNotice?: boolean;
   factor: EmailLinkFactor;
   factorAlreadyPrepared: boolean;
   onFactorPrepare: () => void;
 };
 
+// Retained for backwards compatibility.
 const isNewDevice = (resource: SignInResource) => resource.clientTrustState === 'new';
 
 export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCardProps) => {
@@ -88,7 +90,11 @@ export const SignInFactorTwoEmailLinkCard = (props: SignInFactorTwoEmailLinkCard
       <VerificationLinkCard
         cardTitle={localizationKeys('signIn.emailLinkMfa.title')}
         cardSubtitle={localizationKeys('signIn.emailLinkMfa.subtitle')}
-        cardNotice={isNewDevice(signIn) ? localizationKeys('signIn.newDeviceVerificationNotice') : undefined}
+        cardNotice={
+          props.showClientTrustNotice || isNewDevice(signIn)
+            ? localizationKeys('signIn.newDeviceVerificationNotice')
+            : undefined
+        }
         formSubtitle={localizationKeys('signIn.emailLinkMfa.formSubtitle')}
         resendButton={localizationKeys('signIn.emailLinkMfa.resendButton')}
         onResendCodeClicked={restartVerification}

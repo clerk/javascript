@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { dirname, posix } from 'node:path';
 
-import { globby } from 'globby';
+import { glob } from 'tinyglobby';
 
 import { NULL_ROOT_ERROR } from './errors.js';
 import { getMonorepoRoot } from './getMonorepoRoot.js';
@@ -17,7 +17,7 @@ export async function getClerkPackages() {
   }
   /** @type {Record<string, string>} */
   const packages = {};
-  const clerkPackages = await globby([posix.join(monorepoRoot, 'packages', '*', 'package.json'), '!*node_modules*']);
+  const clerkPackages = await glob([posix.join(monorepoRoot, 'packages', '*', 'package.json'), '!*node_modules*']);
   for (const packageJSON of clerkPackages) {
     const { name } = JSON.parse(await readFile(packageJSON, 'utf-8'));
     if (name) {
