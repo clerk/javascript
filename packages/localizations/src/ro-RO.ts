@@ -761,8 +761,8 @@ export const roRO: LocalizationResource = {
       title: 'Verificare în doi pași',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selectați un portofel mai jos pentru a vă conecta',
+      title: 'Conectare cu Solana',
     },
   },
   signInEnterPasswordTitle: 'Introdu parola',
@@ -858,8 +858,8 @@ export const roRO: LocalizationResource = {
       titleCombined: 'Creează-ți contul',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selectați un portofel mai jos pentru a vă înregistra',
+      title: 'Înregistrare cu Solana',
     },
   },
   socialButtonsBlockButton: 'Continuă cu {{provider|titleize}}',
@@ -970,8 +970,9 @@ export const roRO: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
+    web3_solana_signature_generation_failed:
+      'A apărut o eroare la generarea semnăturii. Încercați din nou pentru a continua.',
     zxcvbn: {
       couldBeStronger: 'Parola ta funcționează, dar ar putea fi mai puternică. Încearcă să adaugi mai multe caractere.',
       goodPassword: 'Parola ta îndeplinește toate cerințele necesare.',
@@ -1340,6 +1341,10 @@ export const roRO: LocalizationResource = {
         detailsAction__nonPrimary: 'Setează ca principal',
         primaryButton: 'Conectează portofel',
         title: 'Portofele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selectați un portofel Solana pentru a-l conecta la contul dvs.',
+          title: 'Adăugați un portofel Solana',
+        },
       },
     },
     usernamePage: {
@@ -1375,9 +1380,10 @@ export const roRO: LocalizationResource = {
       title: 'Mulțumim pentru înscriere!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Conectează cu {{walletName}}',
+    continue: 'Continuă cu {{walletName}}',
+    noneAvailable:
+      'Nu s-au detectat portofele Solana Web3. Instalați un {{ solanaWalletsLink || link("wallet extension") }} compatibil cu Web3.',
   },
 } as const;

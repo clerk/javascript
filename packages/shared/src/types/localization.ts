@@ -718,6 +718,10 @@ export type __internal_LocalizationResource = {
         primaryButton: LocalizationValue;
         destructiveAction: LocalizationValue;
         detailsAction__nonPrimary: LocalizationValue;
+        web3SelectSolanaWalletScreen: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+        };
       };
       dangerSection: {
         title: LocalizationValue;
@@ -1309,7 +1313,7 @@ export type __internal_LocalizationResource = {
     };
     formButtonPrimary: LocalizationValue;
   };
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: LocalizationValue<'walletName'>;
     continue: LocalizationValue<'walletName'>;
     noneAvailable: LocalizationValue<'solanaWalletsLink'>;

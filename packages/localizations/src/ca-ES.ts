@@ -751,8 +751,8 @@ export const caES: LocalizationResource = {
       title: 'Verificació de dos passos',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecciona una cartera a continuació per iniciar la sessió',
+      title: 'Inicia la sessió amb Solana',
     },
   },
   signInEnterPasswordTitle: 'Introdueix la teva contrasenya',
@@ -845,8 +845,8 @@ export const caES: LocalizationResource = {
       titleCombined: 'Crea el teu compte',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Selecciona una cartera a continuació per registrar-te',
+      title: "Registra't amb Solana",
     },
   },
   socialButtonsBlockButton: 'Continua amb {{provider|titleize}}',
@@ -954,8 +954,9 @@ export const caES: LocalizationResource = {
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
     session_exists: 'Ja estàs connectat.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Has rebutjat la sol·licitud de signatura. Torna-ho a provar per continuar.',
+    web3_solana_signature_generation_failed:
+      "S'ha produït un error en generar la signatura. Torna-ho a provar per continuar.",
     zxcvbn: {
       couldBeStronger: 'La teva contrasenya funciona, però podria ser més forta. Prova afegint més caràcters.',
       goodPassword: 'La teva contrasenya compleix tots els requisits necessaris.',
@@ -1330,6 +1331,10 @@ export const caES: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Carteres Web3',
         title: 'Carteres Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecciona una cartera de Solana per connectar-la al teu compte.',
+          title: 'Afegeix una cartera de Solana',
+        },
       },
     },
     usernamePage: {
@@ -1365,9 +1370,10 @@ export const caES: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Connecta amb {{walletName}}',
+    continue: 'Continua amb {{walletName}}',
+    noneAvailable:
+      'No s\'han detectat carteres Web3 de Solana. Instal·la una {{ solanaWalletsLink || link("wallet extension") }} compatible amb Web3.',
   },
 } as const;
