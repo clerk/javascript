@@ -75,7 +75,7 @@ const TaskResetPasswordInternal = () => {
 
   const resetPassword = () => {
     return card.runAsync(async () => {
-      if (!clerk.user) {
+      if (!canSubmit || !clerk.user) {
         return;
       }
 

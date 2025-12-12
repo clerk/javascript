@@ -32,6 +32,7 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouter.withSessionTasks', config: next.appRouter, env: envs.withSessionTasks },
     { id: 'next.appRouter.withSessionTasksResetPassword', config: next.appRouter, env: envs.withSessionTasksResetPassword },
     { id: 'next.appRouter.withLegalConsent', config: next.appRouter, env: envs.withLegalConsent },
+    { id: 'next.appRouter.withNeedsClientTrust', config: next.appRouter, env: envs.withNeedsClientTrust },
 
     /**
      * Quickstart apps
