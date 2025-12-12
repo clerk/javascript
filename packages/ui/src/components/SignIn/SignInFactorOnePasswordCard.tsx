@@ -78,8 +78,8 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           case 'complete':
             return setActive({
               session: res.createdSessionId,
-              navigate: ({ session }) => {
-                void navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+              navigate: async ({ session }) => {
+                return navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
               },
             });
           case 'needs_second_factor':
