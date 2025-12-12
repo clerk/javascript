@@ -5,6 +5,8 @@ export function assertNoLegacyProp(props: Record<string, any>) {
   const legacyProps = ['redirectUrl', 'afterSignInUrl', 'afterSignUpUrl', 'after_sign_in_url', 'after_sign_up_url'];
   const legacyProp = Object.keys(props).find(key => legacyProps.includes(key));
 
+  console.log('[DEBUG assertNoLegacyProp] legacyProp', legacyProp);
+
   if (legacyProp && props[legacyProp]) {
     // Don't warn about redirectUrl if it's auto-set by Clerk for preservation
     // (i.e., it equals the current window.location.href, which is what buildSignInUrl sets automatically)
