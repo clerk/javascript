@@ -7,11 +7,37 @@ import matter from 'gray-matter';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const VERSIONS_DIR = path.join(__dirname, 'versions');
 
-export async function loadConfig(sdk, currentVersion) {
+export async function loadConfig(sdk, currentVersion, release) {
   const versionDirs = fs
     .readdirSync(VERSIONS_DIR, { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(d => d.name);
+
+  // If a specific release is requested, load it directly
+  if (release) {
+    if (!versionDirs.includes(release)) {
+      return null;
+    }
+
+    const configPath = path.join(VERSIONS_DIR, release, 'index.js');
+    if (!fs.existsSync(configPath)) {
+      return null;
+    }
+
+    const moduleUrl = pathToFileURL(configPath).href;
+    const mod = await import(moduleUrl);
+    const config = mod.default ?? mod;
+    const changes = loadChanges(release, sdk);
+    const versionStatus = getVersionStatus(config, sdk, currentVersion);
+
+    return {
+      ...config,
+      changes,
+      versionStatus,
+      needsUpgrade: versionStatus === 'needs-upgrade',
+      alreadyUpgraded: versionStatus === 'already-upgraded',
+    };
+  }
 
   let applicableConfig = null;
 

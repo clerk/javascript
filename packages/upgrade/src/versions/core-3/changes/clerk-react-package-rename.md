@@ -1,6 +1,5 @@
 ---
 title: '`@clerk/clerk-react` renamed to `@clerk/react`'
-packages: ['react']
 matcher: '@clerk/clerk-react'
 category: 'breaking'
 docsAnchor: 'clerk-react-rename'

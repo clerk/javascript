@@ -1,18 +1,18 @@
-const SPECIFIC_RENAMES = {
-  experimental_createTheme: 'createTheme',
+const SPECIFIC_RENAMES = Object.freeze({
   __experimental_createTheme: 'createTheme',
-  experimental__simple: 'simple',
   __experimental_simple: 'simple',
   __unstable__createClerkClient: 'createClerkClient',
-  __unstable_invokeMiddlewareOnAuthStateChange: '__internal_invokeMiddlewareOnAuthStateChange',
   __unstable__environment: '__internal_environment',
-  __unstable__updateProps: '__internal_updateProps',
-  __unstable__setEnvironment: '__internal_setEnvironment',
-  __unstable__onBeforeRequest: '__internal_onBeforeRequest',
   __unstable__onAfterResponse: '__internal_onAfterResponse',
-  __unstable__onBeforeSetActive: '__internal_onBeforeSetActive',
   __unstable__onAfterSetActive: '__internal_onAfterSetActive',
-};
+  __unstable__onBeforeRequest: '__internal_onBeforeRequest',
+  __unstable__onBeforeSetActive: '__internal_onBeforeSetActive',
+  __unstable__setEnvironment: '__internal_setEnvironment',
+  __unstable__updateProps: '__internal_updateProps',
+  __unstable_invokeMiddlewareOnAuthStateChange: '__internal_invokeMiddlewareOnAuthStateChange',
+  experimental__simple: 'simple',
+  experimental_createTheme: 'createTheme',
+});
 
 const REMOVED_PROPS = new Set([
   '__unstable_manageBillingUrl',
@@ -41,10 +41,10 @@ module.exports = function transformAlignExperimentalUnstablePrefixes({ source },
   let dirty = false;
 
   const maybeRename = name => {
-    if (!name || REMOVED_PROPS.has(name)) {
+    if (!name || REMOVED_PROPS.has(name) || !Object.hasOwn(SPECIFIC_RENAMES, name)) {
       return null;
     }
-    return SPECIFIC_RENAMES[name] ?? null;
+    return SPECIFIC_RENAMES[name];
   };
 
   const renameIdentifier = node => {
@@ -195,9 +195,12 @@ module.exports = function transformAlignExperimentalUnstablePrefixes({ source },
     });
   });
 
-  root.find(j.Identifier).forEach(path => {
-    renameIdentifier(path.node);
-  });
+  root
+    .find(j.Identifier)
+    .filter(path => maybeRename(path.node.name))
+    .forEach(path => {
+      renameIdentifier(path.node);
+    });
 
   root.find(j.JSXOpeningElement).forEach(path => {
     const attributes = path.node.attributes || [];

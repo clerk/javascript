@@ -866,6 +866,8 @@ export const zhTW: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '檔案大小超過10MB的上限。請選擇較小的檔案。',
+    avatar_file_type_invalid: '不支援的檔案類型。請上傳 JPG、PNG、GIF 或 WEBP 格式的圖片。',
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,

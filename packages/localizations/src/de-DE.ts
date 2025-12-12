@@ -893,6 +893,10 @@ export const deDE: LocalizationResource = {
   },
   unstable__errors: {
     already_a_member_in_organization: 'Sie sind bereits Mitglied in dieser Organisation.',
+    avatar_file_size_exceeded:
+      'Die Dateigröße überschreitet das Maximum von 10 MB. Bitte wählen Sie eine kleinere Datei.',
+    avatar_file_type_invalid:
+      'Dateityp wird nicht unterstützt. Bitte laden Sie ein JPG-, PNG-, GIF- oder WEBP-Bild hoch.',
     captcha_invalid:
       'Anmeldung aufgrund fehlgeschlagener Sicherheitsüberprüfung nicht erfolgreich. Bitte versuchen Sie es erneut oder kontaktieren Sie uns für weitere Unterstützung.',
     captcha_unavailable:

@@ -2,8 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import chalk from 'chalk';
-import { convertPathToPattern, globby } from 'globby';
 import indexToPosition from 'index-to-position';
+import { glob } from 'tinyglobby';
 
 import { getCodemodConfig, runCodemod } from './codemods/index.js';
 import { createSpinner, renderCodemodResults } from './render.js';
@@ -26,8 +26,8 @@ const GLOBBY_IGNORE = [
   '**/yarn.lock',
   'pnpm-lock.yaml',
   '**/pnpm-lock.yaml',
-  '**/*.(png|webp|svg|gif|jpg|jpeg)+',
-  '**/*.(mp4|mkv|wmv|m4v|mov|avi|flv|webm|flac|mka|m4a|aac|ogg)+',
+  '**/*.{png,webp,svg,gif,jpg,jpeg}',
+  '**/*.{mp4,mkv,wmv,m4v,mov,avi,flv,webm,flac,mka,m4a,aac,ogg}',
 ];
 
 export async function runCodemods(config, sdk, options) {
@@ -37,13 +37,13 @@ export async function runCodemods(config, sdk, options) {
     return;
   }
 
-  const glob = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
+  const patterns = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
 
   for (const transform of codemods) {
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {
-      const result = await runCodemod(transform, glob, options);
+      const result = await runCodemod(transform, patterns, options);
       spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
       renderCodemodResults(transform, result);
 
@@ -65,48 +65,60 @@ export async function runScans(config, sdk, options) {
     return [];
   }
 
-  const pattern = convertPathToPattern(path.resolve(options.dir));
-  const files = await globby(pattern, {
-    ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
-  });
+  const spinner = createSpinner('Scanning files for breaking changes...');
 
-  const results = {};
+  try {
+    const cwd = path.resolve(options.dir);
+    const files = await glob('**/*', {
+      cwd,
+      absolute: true,
+      ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
+    });
 
-  for (let idx = 0; idx < files.length; idx++) {
-    const file = files[idx];
-    const content = await fs.readFile(file, 'utf8');
+    const results = {};
 
-    for (const matcher of matchers) {
-      const matches = findMatches(content, matcher.matcher);
+    for (let idx = 0; idx < files.length; idx++) {
+      const file = files[idx];
+      spinner.update(`Scanning ${path.basename(file)} (${idx + 1}/${files.length})`);
 
-      if (matches.length === 0) {
-        continue;
-      }
+      const content = await fs.readFile(file, 'utf8');
 
-      if (!results[matcher.title]) {
-        results[matcher.title] = { instances: [], ...matcher };
-      }
+      for (const matcher of matchers) {
+        const matches = findMatches(content, matcher.matcher);
 
-      for (const match of matches) {
-        const position = indexToPosition(content, match.index, { oneBased: true });
-        const fileRelative = path.relative(process.cwd(), file);
+        if (matches.length === 0) {
+          continue;
+        }
 
-        const isDuplicate = results[matcher.title].instances.some(
-          i => i.position.line === position.line && i.position.column === position.column && i.file === fileRelative,
-        );
+        if (!results[matcher.title]) {
+          results[matcher.title] = { instances: [], ...matcher };
+        }
 
-        if (!isDuplicate) {
-          results[matcher.title].instances.push({
-            sdk,
-            position,
-            file: fileRelative,
-          });
+        for (const match of matches) {
+          const position = indexToPosition(content, match.index, { oneBased: true });
+          const fileRelative = path.relative(process.cwd(), file);
+
+          const isDuplicate = results[matcher.title].instances.some(
+            i => i.position.line === position.line && i.position.column === position.column && i.file === fileRelative,
+          );
+
+          if (!isDuplicate) {
+            results[matcher.title].instances.push({
+              sdk,
+              position,
+              file: fileRelative,
+            });
+          }
         }
       }
     }
-  }
 
-  return Object.values(results);
+    spinner.success(`Scanned ${files.length} files`);
+    return Object.values(results);
+  } catch (error) {
+    spinner.error('Scan failed');
+    throw error;
+  }
 }
 
 function loadMatchers(config, sdk) {

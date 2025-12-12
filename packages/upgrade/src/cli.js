@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import chalk from 'chalk';
 import meow from 'meow';
 
 import { getOldPackageName, getTargetPackageName, loadConfig } from './config.js';
@@ -38,6 +37,8 @@ const cli = meow(
       --dir              Directory to scan (defaults to current directory)
       --glob             Glob pattern for files to transform (defaults to **/*.{js,jsx,ts,tsx,mjs,cjs})
       --ignore           Directories/files to ignore (can be used multiple times)
+      --skip-upgrade     Skip the upgrade step
+      --release          Name of the release you're upgrading to (e.g. core-3)
       --dry-run          Show what would be done without making changes
 
     Examples
@@ -52,12 +53,14 @@ const cli = meow(
   {
     importMeta: import.meta,
     flags: {
-      sdk: { type: 'string' },
       dir: { type: 'string', default: process.cwd() },
+      dryRun: { type: 'boolean', default: false },
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
-      dryRun: { type: 'boolean', default: false },
+      release: { type: 'string' },
+      sdk: { type: 'string' },
       skipCodemods: { type: 'boolean', default: false },
+      skipUpgrade: { type: 'boolean', default: false },
     },
   },
 );
@@ -67,10 +70,12 @@ async function main() {
 
   const options = {
     dir: cli.flags.dir,
+    dryRun: cli.flags.dryRun,
     glob: cli.flags.glob,
     ignore: cli.flags.ignore,
-    dryRun: cli.flags.dryRun,
+    release: cli.flags.release,
     skipCodemods: cli.flags.skipCodemods,
+    skipUpgrade: cli.flags.skipUpgrade,
   };
 
   if (options.dryRun) {
@@ -115,7 +120,7 @@ async function main() {
   const packageManager = detectPackageManager(options.dir);
 
   // Step 3: Load version config
-  const config = await loadConfig(sdk, currentVersion);
+  const config = await loadConfig(sdk, currentVersion, options.release);
 
   if (!config) {
     renderError(`No upgrade path found for @clerk/${sdk}. Your version may be too old for this upgrade tool.`);
@@ -133,7 +138,7 @@ async function main() {
     packageManager: getPackageManagerDisplayName(packageManager),
   });
 
-  if (isInteractive && !(await promptConfirm('Ready to upgrade?'))) {
+  if (isInteractive && !(await promptConfirm('Ready to upgrade?', true))) {
     renderError('Upgrade cancelled. Exiting...');
     process.exit(0);
   }
@@ -141,18 +146,18 @@ async function main() {
   console.log('');
 
   // Step 5: Handle upgrade status
-  if (config.alreadyUpgraded) {
+  if (options.skipUpgrade) {
+    renderText('Skipping package upgrade (--skip-upgrade flag)', 'yellow');
+    renderNewline();
+  } else if (config.alreadyUpgraded) {
     renderSuccess(`You're already on the latest major version of @clerk/${sdk}`);
   } else if (config.needsUpgrade) {
     await performUpgrade(sdk, packageManager, config, options);
   }
 
-  // Scans triggered early to make it run faster
-  const scansPromise = config.changes?.length > 0 ? runScans(config, sdk, options) : Promise.resolve([]);
-
   // Step 6: Run codemods
   if (config.codemods?.length > 0) {
-    renderText(chalk.bold(`🔧 Running ${config.codemods.length} codemod(s)...`), 'blue');
+    renderText(`Running ${config.codemods.length} codemod(s)...`, 'blue');
     await runCodemods(config, sdk, options);
     renderSuccess('All codemods applied');
     renderNewline();
@@ -160,17 +165,9 @@ async function main() {
 
   // Step 7: Run scans
   if (config.changes?.length > 0) {
-    renderText(chalk.bold('🔎 Scanning for additional breaking changes...'), 'blue');
-    const spinner = createSpinner('Scanning files for breaking changes...');
-    try {
-      const results = await scansPromise;
-      spinner.success(chalk.dim(`Scanned ${results.length} files`));
-      renderNewline();
-      renderScanResults(results, config.docsUrl);
-    } catch (error) {
-      spinner.error('Scan failed');
-      throw error;
-    }
+    renderText('Scanning for additional breaking changes...', 'blue');
+    const results = await runScans(config, sdk, options);
+    renderScanResults(results, config.docsUrl);
   }
 
   // Step 8: Done
@@ -207,9 +204,9 @@ async function performUpgrade(sdk, packageManager, config, options) {
 
   try {
     await upgradePackage(packageManager, targetPackage, targetVersion, options.dir);
-    spinner.success(chalk.green.bold(`✅ Upgraded ${targetPackage} to version ${targetVersion}`));
+    spinner.success(`Upgraded ${targetPackage} to version ${targetVersion}`);
   } catch (error) {
-    spinner.error(chalk.red.bold(`⛔ Failed to upgrade ${targetPackage}`));
+    spinner.error(`Failed to upgrade ${targetPackage}`);
     renderError(error.message);
     process.exit(1);
   }

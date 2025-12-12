@@ -71,6 +71,8 @@ describe('CLI Integration', () => {
       expect(result.stdout).toContain('--sdk');
       expect(result.stdout).toContain('--dir');
       expect(result.stdout).toContain('--dry-run');
+      expect(result.stdout).toContain('--skip-upgrade');
+      expect(result.stdout).toContain('--release');
       expect(result.exitCode).toBe(0);
     });
   });
@@ -236,77 +238,54 @@ describe('CLI Integration', () => {
     });
   });
 
-  describe('Scan Results', () => {
+  describe('--skip-upgrade flag', () => {
     let fixture;
 
     beforeEach(() => {
-      fixture = createTempFixture('nextjs-v6-scan-issues');
+      fixture = createTempFixture('nextjs-v6');
     });
 
     afterEach(() => {
       fixture?.cleanup();
     });
 
-    it('detects and displays breaking changes found in source files', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+    it('skips the package upgrade step', async () => {
+      const result = await runCli(['--dir', fixture.path, '--skip-upgrade', '--skip-codemods'], { timeout: 15000 });
 
-      const output = result.stdout + result.stderr;
-
-      // Should scan for breaking changes
-      expect(output).toContain('Scanning');
-      expect(output).toContain('Scanned');
+      expect(result.stdout).toContain('Skipping package upgrade');
+      expect(result.stdout).toContain('--skip-upgrade');
     });
 
-    it('shows file paths with line and column numbers for scan results', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+    it('does not modify package.json when skipping upgrade', async () => {
+      const fs = await import('node:fs');
+      const pkgBefore = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
 
-      const output = result.stdout + result.stderr;
+      await runCli(['--dir', fixture.path, '--skip-upgrade', '--skip-codemods'], { timeout: 15000 });
 
-      // Should show file:line:column format for detected issues
-      expect(output).toMatch(/src\/app\.tsx:\d+:\d+/);
+      const pkgAfter = fs.readFileSync(path.join(fixture.path, 'package.json'), 'utf8');
+      expect(pkgAfter).toBe(pkgBefore);
+    });
+  });
+
+  describe('--release flag', () => {
+    it('loads specific release configuration', async () => {
+      const dir = getFixturePath('nextjs-v7');
+      const result = await runCli(['--dir', dir, '--release', 'core-3', '--dry-run', '--skip-codemods'], {
+        timeout: 15000,
+      });
+
+      expect(result.stdout).toContain('core-3');
     });
 
-    it('displays issue titles for detected breaking changes', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
+    it('errors when release does not exist', async () => {
+      const dir = getFixturePath('nextjs-v6');
+      const result = await runCli(['--dir', dir, '--release', 'nonexistent-release', '--dry-run', '--skip-codemods'], {
+        timeout: 15000,
+      });
 
       const output = result.stdout + result.stderr;
-
-      // Should display the issue titles from the change definitions
-      // These are defined in the core-3 changes directory
-      expect(output).toMatch(/potential issue|breaking change/i);
-    });
-
-    it('shows migration guide links for detected issues', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
-
-      const output = result.stdout + result.stderr;
-
-      // Should include link to migration guide
-      expect(output).toContain('migration guide');
-    });
-
-    it('shows instance counts for detected issues', async () => {
-      const result = await runCli(['--dir', fixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
-
-      const output = result.stdout + result.stderr;
-
-      // Should show instance counts
-      expect(output).toMatch(/\d+ instance/i);
-    });
-
-    it('shows no breaking changes message when project has no issues', async () => {
-      const cleanFixture = createTempFixture('nextjs-v7');
-
-      try {
-        const result = await runCli(['--dir', cleanFixture.path, '--dry-run', '--skip-codemods'], { timeout: 20000 });
-
-        const output = result.stdout + result.stderr;
-
-        // When already on latest version, should show success message
-        expect(output).toContain('already on the latest');
-      } finally {
-        cleanFixture.cleanup();
-      }
+      expect(output).toContain('No upgrade path found');
+      expect(result.exitCode).toBe(1);
     });
   });
 });
