@@ -752,8 +752,8 @@ export const svSE: LocalizationResource = {
       title: 'Tvåstegsverifiering',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Välj en plånbok nedan för att logga in',
+      title: 'Logga in med Solana',
     },
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
@@ -848,8 +848,8 @@ export const svSE: LocalizationResource = {
       titleCombined: 'Skapa ditt konto',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Välj en plånbok nedan för att registrera dig',
+      title: 'Registrera dig med Solana',
     },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
@@ -955,8 +955,9 @@ export const svSE: LocalizationResource = {
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Du avvisade signaturbegäran. Försök igen för att fortsätta.',
+    web3_solana_signature_generation_failed:
+      'Ett fel uppstod när signaturen skulle genereras. Försök igen för att fortsätta.',
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
@@ -1325,6 +1326,10 @@ export const svSE: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 plånböcker',
         title: 'Web3 plånböcker',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Välj en Solana-plånbok för att ansluta den till ditt konto.',
+          title: 'Lägg till en Solana-plånbok',
+        },
       },
     },
     usernamePage: {
@@ -1360,9 +1365,10 @@ export const svSE: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Anslut med {{walletName}}',
+    continue: 'Fortsätt med {{walletName}}',
+    noneAvailable:
+      'Inga Solana Web3-plånböcker upptäcktes. Installera en Web3-stödd {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

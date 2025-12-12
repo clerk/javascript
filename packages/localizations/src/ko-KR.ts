@@ -744,8 +744,8 @@ export const koKR: LocalizationResource = {
       title: '2단계 인증',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '로그인하려면 아래에서 지갑을 선택하세요',
+      title: 'Solana로 로그인',
     },
   },
   signInEnterPasswordTitle: '비밀번호를 입력하세요',
@@ -838,8 +838,8 @@ export const koKR: LocalizationResource = {
       titleCombined: '계정 만들기',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: '가입하려면 아래에서 지갑을 선택하세요',
+      title: 'Solana로 가입',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}로 계속하기',
@@ -945,8 +945,8 @@ export const koKR: LocalizationResource = {
     phone_number_exists: '이 전화번호는 이미 사용중입니다. 다른 번호를 시도해 주세요.',
     session_exists: '이미 로그인 중입니다.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: '서명 요청을 거부했습니다. 계속하려면 다시 시도해 주세요.',
+    web3_solana_signature_generation_failed: '서명을 생성하는 동안 오류가 발생했습니다. 계속하려면 다시 시도해 주세요.',
     zxcvbn: {
       couldBeStronger: '비밀번호는 작동하지만 더 강력할 수 있습니다. 문자를 더 추가해 보세요.',
       goodPassword: '수고하셨습니다. 훌륭한 비밀번호입니다.',
@@ -1308,6 +1308,10 @@ export const koKR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 지갑',
         title: 'Web3 지갑',
+        web3SelectSolanaWalletScreen: {
+          subtitle: '계정에 연결할 Solana 지갑을 선택하세요.',
+          title: 'Solana 지갑 추가',
+        },
       },
     },
     usernamePage: {
@@ -1343,9 +1347,10 @@ export const koKR: LocalizationResource = {
       title: undefined,
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}}(으)로 연결',
+    continue: '{{walletName}}(으)로 계속',
+    noneAvailable:
+      'Solana Web3 지갑을 찾을 수 없습니다. Web3를 지원하는 {{ solanaWalletsLink || link("wallet extension") }}을(를) 설치해 주세요.',
   },
 } as const;

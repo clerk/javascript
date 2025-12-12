@@ -765,8 +765,8 @@ export const deDE: LocalizationResource = {
       title: 'Bestätigung in zwei Schritten',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Wähle unten eine Wallet aus, um dich anzumelden',
+      title: 'Mit Solana anmelden',
     },
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
@@ -860,8 +860,8 @@ export const deDE: LocalizationResource = {
       titleCombined: 'Erstellen Sie Ihr Konto',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Wähle unten eine Wallet aus, um dich zu registrieren',
+      title: 'Mit Solana registrieren',
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
@@ -980,8 +980,10 @@ export const deDE: LocalizationResource = {
     session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'Du hast die Signaturanfrage abgelehnt. Bitte versuche es erneut, um fortzufahren.',
+    web3_solana_signature_generation_failed:
+      'Beim Erstellen der Signatur ist ein Fehler aufgetreten. Bitte versuche es erneut, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -1357,6 +1359,10 @@ export const deDE: LocalizationResource = {
         detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Wähle eine Solana-Wallet aus, um sie mit deinem Konto zu verbinden.',
+          title: 'Solana-Wallet hinzufügen',
+        },
       },
     },
     usernamePage: {
@@ -1393,9 +1399,10 @@ export const deDE: LocalizationResource = {
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Mit {{walletName}} verbinden',
+    continue: 'Weiter mit {{walletName}}',
+    noneAvailable:
+      'Keine Solana-Web3-Wallets erkannt. Bitte installiere eine Web3-unterstützte {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

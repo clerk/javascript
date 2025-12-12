@@ -759,8 +759,8 @@ export const ruRU: LocalizationResource = {
       title: 'Двухфакторная верификация',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Выберите кошелёк ниже, чтобы войти',
+      title: 'Войти через Solana',
     },
   },
   signInEnterPasswordTitle: 'Введите Ваш пароль',
@@ -857,8 +857,8 @@ export const ruRU: LocalizationResource = {
       titleCombined: 'Создайте Вашу учетную запись',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Выберите кошелёк ниже, чтобы зарегистрироваться',
+      title: 'Зарегистрироваться через Solana',
     },
   },
   socialButtonsBlockButton: 'Продолжить с помощью {{provider|titleize}}',
@@ -969,8 +969,10 @@ export const ruRU: LocalizationResource = {
     phone_number_exists: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     session_exists: 'Вы уже вошли в систему.',
     web3_missing_identifier: undefined,
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected:
+      'Вы отклонили запрос на подпись. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',
+    web3_solana_signature_generation_failed:
+      'Произошла ошибка при создании подписи. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль подходит, но мог бы быть надежнее. Попробуйте добавить больше символов.',
       goodPassword: 'Хорошая работа. Это отличный пароль.',
@@ -1345,6 +1347,10 @@ export const ruRU: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 кошельки',
         title: 'Web3 кошельки',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Выберите кошелёк Solana для подключения к вашему аккаунту.',
+          title: 'Добавить кошелёк Solana',
+        },
       },
     },
     usernamePage: {
@@ -1380,9 +1386,10 @@ export const ruRU: LocalizationResource = {
       title: 'Спасибо за присоединение к списку ожидания!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Подключиться через {{walletName}}',
+    continue: 'Продолжить через {{walletName}}',
+    noneAvailable:
+      'Кошельки Solana Web3 не обнаружены. Установите {{ solanaWalletsLink || link("wallet extension") }} с поддержкой Web3.',
   },
 } as const;

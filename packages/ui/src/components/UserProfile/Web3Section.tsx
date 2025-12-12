@@ -108,7 +108,7 @@ export const Web3Section = withCardStateProvider(
               );
             })}
           </ProfileSection.ItemList>
-          {shouldAllowCreation && <AddWeb3WalletActionMenu onClick={() => setActionValue(null)} />}
+          {shouldAllowCreation && <AddWeb3WalletActionMenu />}
         </Action.Root>
       </ProfileSection.Root>
     );

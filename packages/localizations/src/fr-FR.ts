@@ -765,8 +765,8 @@ export const frFR: LocalizationResource = {
       title: 'Vérification en deux étapes',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Sélectionnez un portefeuille ci-dessous pour vous connecter',
+      title: 'Se connecter avec Solana',
     },
   },
   signInEnterPasswordTitle: 'Tapez votre mot de passe',
@@ -861,8 +861,8 @@ export const frFR: LocalizationResource = {
       titleCombined: 'Créez votre compte',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Sélectionnez un portefeuille ci-dessous pour vous inscrire',
+      title: "S'inscrire avec Solana",
     },
   },
   socialButtonsBlockButton: 'Continuer avec {{provider|titleize}}',
@@ -973,8 +973,9 @@ export const frFR: LocalizationResource = {
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     session_exists: 'Vous êtes déjà connecté.',
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Vous avez refusé la demande de signature. Veuillez réessayer pour continuer.',
+    web3_solana_signature_generation_failed:
+      "Une erreur s'est produite lors de la génération de la signature. Veuillez réessayer pour continuer.",
     zxcvbn: {
       couldBeStronger: "Votre mot de passe fonctionne mais pourrait être plus sûr. Essayez d'ajouter des caractères.",
       goodPassword: "Bien joué. C'est un excellent mot de passe.",
@@ -1348,6 +1349,10 @@ export const frFR: LocalizationResource = {
         detailsAction__nonPrimary: 'Définir comme principal',
         primaryButton: 'Portefeuilles Web3',
         title: 'Portefeuilles Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Sélectionnez un portefeuille Solana à connecter à votre compte.',
+          title: 'Ajouter un portefeuille Solana',
+        },
       },
     },
     usernamePage: {
@@ -1383,9 +1388,10 @@ export const frFR: LocalizationResource = {
       title: 'Inscription réussie',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Se connecter avec {{walletName}}',
+    continue: 'Continuer avec {{walletName}}',
+    noneAvailable:
+      'Aucun portefeuille Solana Web3 détecté. Veuillez installer une {{ solanaWalletsLink || link("wallet extension") }} compatible Web3.',
   },
 } as const;

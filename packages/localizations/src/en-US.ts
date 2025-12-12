@@ -1325,6 +1325,10 @@ export const enUS: LocalizationResource = {
         detailsAction__nonPrimary: 'Set as primary',
         primaryButton: 'Connect wallet',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Select a Solana wallet to connect to your account.',
+          title: 'Add a Solana wallet',
+        },
       },
     },
     usernamePage: {
@@ -1360,7 +1364,7 @@ export const enUS: LocalizationResource = {
       title: 'Thanks for joining the waitlist!',
     },
   },
-  web3WalletButtons: {
+  web3SolanaWalletButtons: {
     connect: 'Connect with {{walletName}}',
     continue: 'Continue with {{walletName}}',
     noneAvailable:

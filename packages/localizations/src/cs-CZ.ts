@@ -758,8 +758,8 @@ export const csCZ: LocalizationResource = {
       title: 'Dvoufázové ověření',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Vyberte níže peněženku pro přihlášení',
+      title: 'Přihlásit se pomocí Solana',
     },
   },
   signInEnterPasswordTitle: 'Zadejte své heslo',
@@ -856,8 +856,8 @@ export const csCZ: LocalizationResource = {
       titleCombined: 'Vytvořte si účet',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'Vyberte níže peněženku pro registraci',
+      title: 'Zaregistrovat se pomocí Solana',
     },
   },
   socialButtonsBlockButton: 'Pokračovat s {{provider|titleize}}',
@@ -964,8 +964,9 @@ export const csCZ: LocalizationResource = {
     phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
     session_exists: 'Jste již přihlášen.',
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',
+    web3_solana_signature_generation_failed:
+      'Při generování podpisu došlo k chybě. Chcete-li pokračovat, zkuste to prosím znovu.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by být silnější. Zkuste přidat více znaků.',
       goodPassword: 'Vaše heslo splňuje všechny potřebné požadavky.',
@@ -1337,6 +1338,10 @@ export const csCZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastavit jako primární',
         primaryButton: 'Připojit peněženku',
         title: 'Web3 peněženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vyberte Solana peněženku, kterou chcete připojit ke svému účtu.',
+          title: 'Přidat Solana peněženku',
+        },
       },
     },
     usernamePage: {
@@ -1372,9 +1377,10 @@ export const csCZ: LocalizationResource = {
       title: 'Děkujeme za připojení k čekací listině!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: 'Připojit pomocí {{walletName}}',
+    continue: 'Pokračovat pomocí {{walletName}}',
+    noneAvailable:
+      'Nebyla zjištěna žádná Solana Web3 peněženka. Nainstalujte si prosím {{ solanaWalletsLink || link("wallet extension") }} s podporou Web3.',
   },
 } as const;

@@ -755,8 +755,8 @@ export const taIN: LocalizationResource = {
       title: 'இரண்டு-படி சரிபார்ப்பு',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'உள்நுழைய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் உள்நுழையவும்',
     },
   },
   signInEnterPasswordTitle: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
@@ -852,8 +852,8 @@ export const taIN: LocalizationResource = {
       titleCombined: 'உங்கள் கணக்கை உருவாக்கவும்',
     },
     web3Solana: {
-      subtitle: undefined,
-      title: undefined,
+      subtitle: 'பதிவு செய்ய கீழே ஒரு வாலெட்டைத் தேர்ந்தெடுக்கவும்',
+      title: 'Solana மூலம் பதிவு செய்யவும்',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}} மூலம் தொடரவும்',
@@ -967,8 +967,9 @@ export const taIN: LocalizationResource = {
     phone_number_exists: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
-    web3_signature_request_rejected: undefined,
-    web3_solana_signature_generation_failed: undefined,
+    web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',
+    web3_solana_signature_generation_failed:
+      'கையொப்பத்தை உருவாக்கும் போது பிழை ஏற்பட்டது. தொடர மீண்டும் முயற்சிக்கவும்.',
     zxcvbn: {
       couldBeStronger:
         'உங்கள் கடவுச்சொல் செயல்படுகிறது, ஆனால் மேலும் வலுவாக இருக்கலாம். மேலும் எழுத்துகளைச் சேர்க்க முயற்சிக்கவும்.',
@@ -1340,6 +1341,10 @@ export const taIN: LocalizationResource = {
         detailsAction__nonPrimary: 'முதன்மையாக அமைக்கவும்',
         primaryButton: 'வாலட்டை இணைக்கவும்',
         title: 'Web3 வாலட்டுகள்',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'உங்கள் கணக்குடன் இணைக்க Solana வாலெட்டைத் தேர்ந்தெடுக்கவும்.',
+          title: 'Solana வாலெட்டை சேர்க்கவும்',
+        },
       },
     },
     usernamePage: {
@@ -1375,9 +1380,10 @@ export const taIN: LocalizationResource = {
       title: 'காத்திருப்பில் சேர்ந்ததற்கு நன்றி!',
     },
   },
-  web3WalletButtons: {
-    connect: undefined,
-    continue: undefined,
-    noneAvailable: undefined,
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} மூலம் இணைக்கவும்',
+    continue: '{{walletName}} மூலம் தொடரவும்',
+    noneAvailable:
+      'Solana Web3 வாலெட்டுகள் எதுவும் கண்டறியப்படவில்லை. Web3 ஆதரிக்கும் {{ solanaWalletsLink || link("wallet extension") }} ஐ நிறுவவும்.',
   },
 } as const;
