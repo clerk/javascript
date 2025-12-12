@@ -899,6 +899,8 @@ export const ruRU: LocalizationResource = {
     captcha_unavailable:
       'Регистрация не удалась из-за неудачной проверки бота. Пожалуйста, обновите страницу, чтобы попробовать снова, или обратитесь в службу поддержки для получения дополнительной помощи.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Временные почтовые службы не поддерживаются. Пожалуйста, используйте свой обычный адрес электронной почты для создания аккаунта.',
     form_identifier_exists__email_address: 'Этот адрес электронной почты уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__phone_number: 'Этот номер телефона уже занят. Пожалуйста, попробуйте другой.',
     form_identifier_exists__username: 'Это имя пользователя уже занято. Пожалуйста, попробуйте другое.',
@@ -916,6 +918,8 @@ export const ruRU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Пароль или адрес электронной почты неверен. Попробуйте снова или используйте другой метод.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ваш пароль недостаточно надежный.',
     form_password_pwned: 'Этот пароль был взломан и не может быть использован, попробуйте другой пароль.',

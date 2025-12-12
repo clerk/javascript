@@ -878,8 +878,8 @@ export const plPL: LocalizationResource = {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',
     },
-    title: 'Zresetuj hasło',
     subtitle: undefined,
+    title: 'Zresetuj hasło',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
@@ -890,6 +890,8 @@ export const plPL: LocalizationResource = {
     captcha_unavailable:
       'Rejestracja nie powiodła się z powodu niedostępności weryfikacji botów. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tymczasowe usługi e-mail nie są obsługiwane. Proszę użyć zwykłego adresu e-mail, aby utworzyć konto.',
     form_identifier_exists__email_address: 'Adres e-mail jest już zajęty. Proszę spróbować innego.',
     form_identifier_exists__phone_number: 'Ten numer telefonu jest zajęty. Spróbuj użyć innego.',
     form_identifier_exists__username: 'Ta nazwa użytkownika jest zajęta. Spróbuj użyć innej.',
@@ -907,6 +909,8 @@ export const plPL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Wprowadzona wartość jest nieprawidłowa. Popraw ją.',
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
+    form_password_or_identifier_incorrect:
+      'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
     form_password_pwned:

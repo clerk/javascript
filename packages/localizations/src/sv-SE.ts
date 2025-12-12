@@ -888,6 +888,8 @@ export const svSE: LocalizationResource = {
     captcha_unavailable:
       'Registrering misslyckades på grund av misslyckad bot-validering. Vänligen uppdatera sidan och försök igen eller kontakta supporten för mer hjälp.',
     form_code_incorrect: 'Koden är felaktig',
+    form_email_address_blocked:
+      'Tillfälliga e-posttjänster stöds inte. Använd din vanliga e-postadress för att skapa ett konto.',
     form_identifier_exists__email_address: 'Denna e-postadress är taget. Vänligen prova ett annat.',
     form_identifier_exists__phone_number: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     form_identifier_exists__username: 'Detta användarnamn är taget. Vänligen prova ett annat.',
@@ -905,6 +907,8 @@ export const svSE: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Lösenordet är felaktigt.',
+    form_password_or_identifier_incorrect:
+      'Lösenordet eller e-postadressen är felaktig. Försök igen eller använd en annan metod.',
     form_password_length_too_short: 'Lösenordet är för kort.',
     form_password_not_strong_enough: 'Ditt lösenord är inte tillräckligt starkt.',
     form_password_pwned: 'Lösenordet har läckt i tidigare dataintrång.',
