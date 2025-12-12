@@ -177,12 +177,9 @@ function loadChanges(versionDir, sdk) {
         : new RegExp(fm.matcher, `g${fm.matcherFlags || ''}`)
       : null;
 
-    const matcherLogic = fm.matcherLogic || 'or';
-
     changes.push({
       title: fm.title,
       matcher,
-      matcherLogic,
       packages,
       category: fm.category || 'breaking',
       warning: fm.warning || fm.category === 'warning',

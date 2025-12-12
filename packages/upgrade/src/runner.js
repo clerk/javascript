@@ -64,10 +64,25 @@ export async function runCodemods(config, sdk, options) {
 }
 
 export async function runScans(config, sdk, options) {
-  const matchers = loadMatchers(config, sdk);
+  const changes = loadMatchers(config, sdk);
 
-  if (matchers.length === 0) {
+  if (changes.length === 0) {
     return [];
+  }
+
+  const changesWithMatchers = changes.filter(change => change.matcher);
+  const changesWithoutMatchers = changes.filter(change => !change.matcher);
+
+  const results = {};
+
+  // Always include changes without matchers
+  for (const change of changesWithoutMatchers) {
+    results[change.title] = { instances: [], ...change };
+  }
+
+  // Handle scans with matchers
+  if (changesWithMatchers.length === 0) {
+    return Object.values(results);
   }
 
   const spinner = createSpinner('Scanning files for breaking changes...');
@@ -80,16 +95,14 @@ export async function runScans(config, sdk, options) {
       ignore: [...GLOBBY_IGNORE, ...(options.ignore || [])],
     });
 
-    const results = {};
-
     for (let idx = 0; idx < files.length; idx++) {
       const file = files[idx];
       spinner.update(`Scanning ${path.basename(file)} (${idx + 1}/${files.length})`);
 
       const content = await fs.readFile(file, 'utf8');
 
-      for (const matcher of matchers) {
-        const matches = findMatches(content, matcher.matcher, matcher.matcherLogic);
+      for (const matcher of changesWithMatchers) {
+        const matches = findMatches(content, matcher.matcher);
 
         if (matches.length === 0) {
           continue;
@@ -132,34 +145,14 @@ function loadMatchers(config, sdk) {
   }
 
   return config.changes.filter(change => {
-    if (!change.matcher) {
-      return false;
-    }
-
     const packages = change.packages || ['*'];
     return packages.includes('*') || packages.includes(sdk);
   });
 }
 
-function findMatches(content, matcher, matcherLogic = 'or') {
+function findMatches(content, matcher) {
   if (Array.isArray(matcher)) {
-    if (matcherLogic === 'and') {
-      // For AND logic, all patterns must match somewhere in the file
-      const allMatch = matcher.every(m => {
-        const matches = Array.from(content.matchAll(m));
-        return matches.length > 0;
-      });
-
-      if (!allMatch) {
-        return [];
-      }
-
-      // If all patterns match, return matches from all patterns
-      return matcher.flatMap(m => Array.from(content.matchAll(m)));
-    } else {
-      // Default OR logic: match if any pattern matches
-      return matcher.flatMap(m => Array.from(content.matchAll(m)));
-    }
+    return matcher.flatMap(m => Array.from(content.matchAll(m)));
   }
   return Array.from(content.matchAll(matcher));
 }
