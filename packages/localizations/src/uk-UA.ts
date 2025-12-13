@@ -747,6 +747,10 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: 'Двоетапна перевірка',
     },
+    web3Solana: {
+      subtitle: 'Виберіть гаманець нижче, щоб увійти',
+      title: 'Увійти через Solana',
+    },
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
   signUp: {
@@ -836,6 +840,10 @@ export const ukUA: LocalizationResource = {
       subtitleCombined: 'щоб продовжити роботу в "{{applicationName}}"',
       title: 'Створіть Ваш акаунт',
       titleCombined: 'Створіть Ваш акаунт',
+    },
+    web3Solana: {
+      subtitle: 'Виберіть гаманець нижче, щоб зареєструватися',
+      title: 'Зареєструватися через Solana',
     },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
@@ -942,6 +950,9 @@ export const ukUA: LocalizationResource = {
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     session_exists: 'Ви вже увійшли в систему.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Ви відхилили запит на підпис. Будь ласка, спробуйте ще раз, щоб продовжити.',
+    web3_solana_signature_generation_failed:
+      'Під час створення підпису сталася помилка. Будь ласка, спробуйте ще раз, щоб продовжити.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль підходить, але міг би бути надійнішим. Спробуйте додати більше символів.',
       goodPassword: 'Хороша робота. Це відмінний пароль.',
@@ -1311,6 +1322,10 @@ export const ukUA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Виберіть гаманець Solana, щоб підключити його до свого облікового запису.',
+          title: 'Додати гаманець Solana',
+        },
       },
     },
     usernamePage: {
@@ -1345,5 +1360,11 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Підключитися через {{walletName}}',
+    continue: 'Продовжити через {{walletName}}',
+    noneAvailable:
+      'Гаманці Solana Web3 не виявлено. Установіть {{ solanaWalletsLink || link("wallet extension") }} з підтримкою Web3.',
   },
 } as const;

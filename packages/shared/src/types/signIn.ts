@@ -16,6 +16,7 @@ import type {
   PrepareFirstFactorParams,
   PrepareSecondFactorParams,
   ResetPasswordParams,
+  SignInAuthenticateWithSolanaParams,
   SignInCreateParams,
   SignInFirstFactor,
   SignInIdentifier,
@@ -75,6 +76,8 @@ export interface SignInResource extends ClerkResource {
   authenticateWithOKXWallet: () => Promise<SignInResource>;
 
   authenticateWithBase: () => Promise<SignInResource>;
+
+  authenticateWithSolana: (params: SignInAuthenticateWithSolanaParams) => Promise<SignInResource>;
 
   authenticateWithPasskey: (params?: AuthenticateWithPasskeyParams) => Promise<SignInResource>;
 
