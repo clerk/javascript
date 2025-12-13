@@ -45,5 +45,7 @@ const { when, class: className } = Astro.props;
     }
   }
 
-  customElements.define('clerk-show', ClerkShow);
+  if (!customElements.get('clerk-show')) {
+    customElements.define('clerk-show', ClerkShow);
+  }
 </script>
