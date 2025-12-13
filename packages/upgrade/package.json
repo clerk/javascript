@@ -21,6 +21,7 @@
     "dev": "babel --keep-file-extension --out-dir=dist --watch src --copy-files",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
+    "generate-guide": "node scripts/generate-guide.js",
     "lint": "eslint src/",
     "lint:publint": "publint",
     "test": "vitest run",

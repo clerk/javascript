@@ -37,13 +37,13 @@ export async function runCodemods(config, sdk, options) {
     return;
   }
 
-  const glob = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
+  const patterns = typeof options.glob === 'string' ? options.glob.split(/[ ,]/).filter(Boolean) : options.glob;
 
   for (const transform of codemods) {
     const spinner = createSpinner(`Running codemod: ${transform}`);
 
     try {
-      const result = await runCodemod(transform, glob, options);
+      const result = await runCodemod(transform, patterns, options);
       spinner.success(`Codemod applied: ${chalk.dim(transform)}`);
       renderCodemodResults(transform, result);
 
