@@ -7,6 +7,8 @@ import { merge } from 'webpack-merge';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
 
+const isRsdoctorEnabled = !!process.env.RSDOCTOR;
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -56,19 +58,12 @@ const common = ({ mode, variant }) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
-          /**
-           * Sign up is shared between the SignUp component and the SignIn component.
-           */
-          signUp: {
-            minChunks: 1,
-            name: 'signup',
-            test: module => !!(module.resource && module.resource.includes('/components/SignUp')),
-          },
           common: {
             minChunks: 1,
             name: 'ui-common',
             priority: -20,
-            test: module => !!(module.resource && !module.resource.includes('/components')),
+            test: module =>
+              !!(module instanceof rspack.NormalModule && module.resource && !module.resource.includes('/components')),
           },
           defaultVendors: {
             minChunks: 1,
@@ -139,14 +134,34 @@ const commonForProdBrowser = () => {
 /**
  * Production configuration - builds UMD browser variant only
  * @param {'development'|'production'} mode
- * @returns {import('@rspack/core').Configuration}
+ * @returns {Promise<import('@rspack/core').Configuration>}
  */
-const prodConfig = mode => {
+const prodConfig = async mode => {
+  /** @type {import('@rspack/core').Configuration['plugins']} */
+  const plugins = [];
+
+  if (isRsdoctorEnabled) {
+    const { RsdoctorRspackPlugin } = await import('@rsdoctor/rspack-plugin');
+    plugins.push(
+      new RsdoctorRspackPlugin({
+        supports: {
+          generateTileGraph: true,
+        },
+        linter: {
+          rules: {
+            'ecma-version-check': 'off',
+          },
+        },
+      }),
+    );
+  }
+
   // Browser bundle with chunks (UMD)
   const uiBrowser = merge(
     entryForVariant(variants.uiBrowser),
     common({ mode, variant: variants.uiBrowser }),
     commonForProdBrowser(),
+    { plugins },
   );
 
   return uiBrowser;
@@ -186,7 +201,14 @@ const devConfig = (mode, env) => {
       port,
       hot: true,
       liveReload: false,
-      client: { webSocketURL: `auto://${devUrl.host}/ws` },
+      client: {
+        overlay: {
+          errors: true,
+          warnings: true,
+          runtimeErrors: false,
+        },
+        webSocketURL: `auto://${devUrl.host}/ws`,
+      },
     },
     cache: false,
     experiments: {
@@ -197,7 +219,7 @@ const devConfig = (mode, env) => {
   });
 };
 
-export default env => {
+export default async env => {
   const mode = env.production ? 'production' : 'development';
   return isProduction(mode) ? prodConfig(mode) : devConfig(mode, env);
 };
