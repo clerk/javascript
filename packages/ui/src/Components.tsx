@@ -448,158 +448,6 @@ const Components = (props: ComponentsProps) => {
     props.onComponentsMounted();
   }, []);
 
-  const mountedOneTapModal = (
-    <LazyOneTapRenderer
-      componentProps={googleOneTapModal}
-      globalAppearance={state.appearance}
-      componentAppearance={googleOneTapModal?.appearance}
-      startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}
-    />
-  );
-
-  const mountedSignInModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'signIn'}
-      componentAppearance={signInModal?.appearance}
-      flowName={'signIn'}
-      onClose={() => componentsControls.closeModal('signIn')}
-      onExternalNavigate={() => componentsControls.closeModal('signIn')}
-      startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
-      componentName={'SignInModal'}
-    >
-      <SignInModal {...signInModal} />
-      <SignUpModal {...disambiguateRedirectOptions(signInModal, 'signin')} />
-      <WaitlistModal {...waitlistModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedSignUpModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'signUp'}
-      componentAppearance={signUpModal?.appearance}
-      flowName={'signUp'}
-      onClose={() => componentsControls.closeModal('signUp')}
-      onExternalNavigate={() => componentsControls.closeModal('signUp')}
-      startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
-      componentName={'SignUpModal'}
-    >
-      <SignInModal {...disambiguateRedirectOptions(signUpModal, 'signup')} />
-      <SignUpModal {...signUpModal} />
-      <WaitlistModal {...waitlistModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedUserProfileModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'userProfile'}
-      componentAppearance={userProfileModal?.appearance}
-      flowName={'userProfile'}
-      onClose={() => componentsControls.closeModal('userProfile')}
-      onExternalNavigate={() => componentsControls.closeModal('userProfile')}
-      startPath={buildVirtualRouterUrl({
-        base: '/user',
-        path: userProfileModal?.__experimental_startPath || urlStateParam?.path,
-      })}
-      componentName={'UserProfileModal'}
-      modalContainerSx={{ alignItems: 'center' }}
-      modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
-    >
-      <UserProfileModal {...userProfileModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedUserVerificationModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'userVerification'}
-      componentAppearance={userVerificationModal?.appearance}
-      flowName={'userVerification'}
-      onClose={() => componentsControls.closeModal('userVerification')}
-      onExternalNavigate={() => componentsControls.closeModal('userVerification')}
-      startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
-      componentName={'UserVerificationModal'}
-      modalContainerSx={{ alignItems: 'center' }}
-    >
-      <UserVerificationModal {...userVerificationModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedOrganizationProfileModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'organizationProfile'}
-      componentAppearance={organizationProfileModal?.appearance}
-      flowName={'organizationProfile'}
-      onClose={() => componentsControls.closeModal('organizationProfile')}
-      onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
-      startPath={buildVirtualRouterUrl({
-        base: '/organizationProfile',
-        path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
-      })}
-      componentName={'OrganizationProfileModal'}
-      modalContainerSx={{ alignItems: 'center' }}
-      modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
-    >
-      <OrganizationProfileModal {...organizationProfileModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedCreateOrganizationModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'createOrganization'}
-      componentAppearance={createOrganizationModal?.appearance}
-      flowName={'createOrganization'}
-      onClose={() => componentsControls.closeModal('createOrganization')}
-      onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
-      startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
-      componentName={'CreateOrganizationModal'}
-      modalContainerSx={{ alignItems: 'center' }}
-      modalContentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
-    >
-      <CreateOrganizationModal {...createOrganizationModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedWaitlistModal = (
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'waitlist'}
-      componentAppearance={waitlistModal?.appearance}
-      flowName={'waitlist'}
-      onClose={() => componentsControls.closeModal('waitlist')}
-      onExternalNavigate={() => componentsControls.closeModal('waitlist')}
-      startPath={buildVirtualRouterUrl({ base: '/waitlist', path: urlStateParam?.path })}
-      componentName={'WaitlistModal'}
-    >
-      <WaitlistModal {...waitlistModal} />
-      <SignInModal {...waitlistModal} />
-    </LazyModalRenderer>
-  );
-
-  const mountedBlankCaptchaModal = (
-    /**
-     * Captcha modal should not close on `Clerk.navigate()`, hence we are not passing `onExternalNavigate`.
-     */
-    <LazyModalRenderer
-      globalAppearance={state.appearance}
-      appearanceKey={'blankCaptcha' as any}
-      componentAppearance={{}}
-      flowName={'blankCaptcha'}
-      onClose={() => componentsControls.closeModal('blankCaptcha')}
-      startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
-      componentName={'BlankCaptchaModal'}
-      canCloseModal={false}
-      modalId={'cl-modal-captcha-wrapper'}
-      modalStyle={{ visibility: 'hidden', pointerEvents: 'none' }}
-    >
-      <BlankCaptchaModal />
-    </LazyModalRenderer>
-  );
-
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -622,15 +470,154 @@ const Components = (props: ComponentsProps) => {
           );
         })}
 
-        {googleOneTapModal && mountedOneTapModal}
-        {signInModal && mountedSignInModal}
-        {signUpModal && mountedSignUpModal}
-        {userProfileModal && mountedUserProfileModal}
-        {userVerificationModal && mountedUserVerificationModal}
-        {organizationProfileModal && mountedOrganizationProfileModal}
-        {createOrganizationModal && mountedCreateOrganizationModal}
-        {waitlistModal && mountedWaitlistModal}
-        {blankCaptchaModal && mountedBlankCaptchaModal}
+        {googleOneTapModal && (
+          <LazyOneTapRenderer
+            componentProps={googleOneTapModal}
+            globalAppearance={state.appearance}
+            componentAppearance={googleOneTapModal?.appearance}
+            startPath={buildVirtualRouterUrl({ base: '/one-tap', path: '' })}
+          />
+        )}
+
+        {signInModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'signIn'}
+            componentAppearance={signInModal?.appearance}
+            flowName={'signIn'}
+            onClose={() => componentsControls.closeModal('signIn')}
+            onExternalNavigate={() => componentsControls.closeModal('signIn')}
+            startPath={buildVirtualRouterUrl({ base: '/sign-in', path: urlStateParam?.path })}
+            componentName={'SignInModal'}
+          >
+            <SignInModal {...signInModal} />
+            <SignUpModal {...disambiguateRedirectOptions(signInModal, 'signin')} />
+            <WaitlistModal {...waitlistModal} />
+          </LazyModalRenderer>
+        )}
+
+        {signUpModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'signUp'}
+            componentAppearance={signUpModal?.appearance}
+            flowName={'signUp'}
+            onClose={() => componentsControls.closeModal('signUp')}
+            onExternalNavigate={() => componentsControls.closeModal('signUp')}
+            startPath={buildVirtualRouterUrl({ base: '/sign-up', path: urlStateParam?.path })}
+            componentName={'SignUpModal'}
+          >
+            <SignInModal {...disambiguateRedirectOptions(signUpModal, 'signup')} />
+            <SignUpModal {...signUpModal} />
+            <WaitlistModal {...waitlistModal} />
+          </LazyModalRenderer>
+        )}
+
+        {userProfileModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'userProfile'}
+            componentAppearance={userProfileModal?.appearance}
+            flowName={'userProfile'}
+            onClose={() => componentsControls.closeModal('userProfile')}
+            onExternalNavigate={() => componentsControls.closeModal('userProfile')}
+            startPath={buildVirtualRouterUrl({
+              base: '/user',
+              path: userProfileModal?.__experimental_startPath || urlStateParam?.path,
+            })}
+            componentName={'UserProfileModal'}
+            modalContainerSx={{ alignItems: 'center' }}
+            modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+          >
+            <UserProfileModal {...userProfileModal} />
+          </LazyModalRenderer>
+        )}
+
+        {userVerificationModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'userVerification'}
+            componentAppearance={userVerificationModal?.appearance}
+            flowName={'userVerification'}
+            onClose={() => componentsControls.closeModal('userVerification')}
+            onExternalNavigate={() => componentsControls.closeModal('userVerification')}
+            startPath={buildVirtualRouterUrl({ base: '/user-verification', path: urlStateParam?.path })}
+            componentName={'UserVerificationModal'}
+            modalContainerSx={{ alignItems: 'center' }}
+          >
+            <UserVerificationModal {...userVerificationModal} />
+          </LazyModalRenderer>
+        )}
+
+        {organizationProfileModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'organizationProfile'}
+            componentAppearance={organizationProfileModal?.appearance}
+            flowName={'organizationProfile'}
+            onClose={() => componentsControls.closeModal('organizationProfile')}
+            onExternalNavigate={() => componentsControls.closeModal('organizationProfile')}
+            startPath={buildVirtualRouterUrl({
+              base: '/organizationProfile',
+              path: organizationProfileModal?.__experimental_startPath || urlStateParam?.path,
+            })}
+            componentName={'OrganizationProfileModal'}
+            modalContainerSx={{ alignItems: 'center' }}
+            modalContentSx={t => ({ height: `min(${t.sizes.$176}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+          >
+            <OrganizationProfileModal {...organizationProfileModal} />
+          </LazyModalRenderer>
+        )}
+
+        {createOrganizationModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'createOrganization'}
+            componentAppearance={createOrganizationModal?.appearance}
+            flowName={'createOrganization'}
+            onClose={() => componentsControls.closeModal('createOrganization')}
+            onExternalNavigate={() => componentsControls.closeModal('createOrganization')}
+            startPath={buildVirtualRouterUrl({ base: '/createOrganization', path: urlStateParam?.path })}
+            componentName={'CreateOrganizationModal'}
+            modalContainerSx={{ alignItems: 'center' }}
+            modalContentSx={t => ({ height: `min(${t.sizes.$120}, calc(100% - ${t.sizes.$12}))`, margin: 0 })}
+          >
+            <CreateOrganizationModal {...createOrganizationModal} />
+          </LazyModalRenderer>
+        )}
+
+        {waitlistModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'waitlist'}
+            componentAppearance={waitlistModal?.appearance}
+            flowName={'waitlist'}
+            onClose={() => componentsControls.closeModal('waitlist')}
+            onExternalNavigate={() => componentsControls.closeModal('waitlist')}
+            startPath={buildVirtualRouterUrl({ base: '/waitlist', path: urlStateParam?.path })}
+            componentName={'WaitlistModal'}
+          >
+            <WaitlistModal {...waitlistModal} />
+            <SignInModal {...waitlistModal} />
+          </LazyModalRenderer>
+        )}
+
+        {blankCaptchaModal && (
+          <LazyModalRenderer
+            globalAppearance={state.appearance}
+            appearanceKey={'blankCaptcha' as any}
+            componentAppearance={{}}
+            flowName={'blankCaptcha'}
+            onClose={() => componentsControls.closeModal('blankCaptcha')}
+            startPath={buildVirtualRouterUrl({ base: '/blank-captcha', path: urlStateParam?.path })}
+            componentName={'BlankCaptchaModal'}
+            canCloseModal={false}
+            modalId={'cl-modal-captcha-wrapper'}
+            modalStyle={{ visibility: 'hidden', pointerEvents: 'none' }}
+          >
+            <BlankCaptchaModal />
+          </LazyModalRenderer>
+        )}
 
         <MountedCheckoutDrawer
           appearance={state.appearance}
