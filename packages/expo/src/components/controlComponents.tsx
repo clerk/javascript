@@ -1,1 +1,1 @@
-export { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, Protect } from '@clerk/react';
+export { ClerkLoaded, ClerkLoading, Show } from '@clerk/react';

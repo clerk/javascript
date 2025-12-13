@@ -1,4 +1,4 @@
-import { PricingTable, Protect } from '@clerk/nextjs';
+import { PricingTable, Show } from '@clerk/nextjs';
 
 export default async function PricingTablePage({
   searchParams,
@@ -8,15 +8,15 @@ export default async function PricingTablePage({
   const newSubscriptionRedirectUrl = (await searchParams).newSubscriptionRedirectUrl;
   return (
     <>
-      <Protect plan='free_user'>
+      <Show when={{ plan: 'free_user' }}>
         <p>user in free</p>
-      </Protect>
-      <Protect plan='pro'>
+      </Show>
+      <Show when={{ plan: 'pro' }}>
         <p>user in pro</p>
-      </Protect>
-      <Protect plan='plus'>
+      </Show>
+      <Show when={{ plan: 'plus' }}>
         <p>user in plus</p>
-      </Protect>
+      </Show>
       <PricingTable newSubscriptionRedirectUrl={newSubscriptionRedirectUrl} />
     </>
   );

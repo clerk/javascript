@@ -1,0 +1,51 @@
+---
+type Props = {
+  when: 'signedIn' | 'signedOut';
+  class?: string;
+};
+
+const { when, class: className } = Astro.props;
+---
+
+<clerk-show
+  class={className}
+  when={when}
+  hidden
+>
+  <slot />
+</clerk-show>
+
+<script>
+  import { type AuthState, BaseClerkControlElement } from './BaseClerkControlElement';
+
+  class ClerkShow extends BaseClerkControlElement {
+    protected onAuthStateChange(state: AuthState): void {
+      const when = this.getAttribute('when');
+
+      if (when === 'signedIn') {
+        if (state.userId) {
+          this.removeAttribute('hidden');
+        } else {
+          this.setAttribute('hidden', '');
+        }
+        return;
+      }
+
+      if (when === 'signedOut') {
+        if (state.userId) {
+          this.setAttribute('hidden', '');
+        } else {
+          this.removeAttribute('hidden');
+        }
+        return;
+      }
+
+      // Unknown state; be conservative.
+      this.setAttribute('hidden', '');
+    }
+  }
+
+  if (!customElements.get('clerk-show')) {
+    customElements.define('clerk-show', ClerkShow);
+  }
+</script>

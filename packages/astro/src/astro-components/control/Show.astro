@@ -1,0 +1,27 @@
+---
+import ShowCSR from './ShowCSR.astro';
+import ShowSSR from './ShowSSR.astro';
+
+import { isStaticOutput } from 'virtual:@clerk/astro/config';
+
+type Props = {
+  when: 'signedIn' | 'signedOut';
+  isStatic?: boolean;
+  /**
+   * The class name to apply to the outermost element of the component.
+   * This class is only applied to static components.
+   */
+  class?: string;
+};
+
+const { when, isStatic, class: className } = Astro.props;
+
+const ShowComponent = isStaticOutput(isStatic) ? ShowCSR : ShowSSR;
+---
+
+<ShowComponent
+  when={when}
+  class={className}
+>
+  <slot />
+</ShowComponent>

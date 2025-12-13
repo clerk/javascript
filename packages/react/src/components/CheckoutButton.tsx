@@ -7,27 +7,26 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * A button component that opens the Clerk Checkout drawer when clicked. This component must be rendered
- * inside a `<SignedIn />` component to ensure the user is authenticated.
+ * A button component that opens the Clerk Checkout drawer when clicked. Render only when the user is signed in (e.g., wrap with `<Show when="signedIn">`).
  *
  * @example
  * ```tsx
- * import { SignedIn } from '@clerk/react';
+ * import { Show } from '@clerk/react';
  * import { CheckoutButton } from '@clerk/react/experimental';
  *
  * // Basic usage with default "Checkout" text
  * function BasicCheckout() {
  *   return (
- *     <SignedIn>
+ *     <Show when="signedIn">
  *       <CheckoutButton planId="plan_123" />
- *     </SignedIn>
+ *     </Show>
  *   );
  * }
  *
  * // Custom button with organization subscription
  * function OrganizationCheckout() {
  *   return (
- *     <SignedIn>
+ *     <Show when="signedIn">
  *       <CheckoutButton
  *         planId="plan_123"
  *         planPeriod="month"
@@ -36,12 +35,12 @@ import { withClerk } from './withClerk';
  *       >
  *         <button className="custom-button">Subscribe Now</button>
  *       </CheckoutButton>
- *     </SignedIn>
+ *     </Show>
  *   );
  * }
  * ```
  *
- * @throws {Error} When rendered outside of a `<SignedIn />` component
+ * @throws {Error} When rendered while the user is signed out
  * @throws {Error} When `for="organization"` is used without an active organization context
  *
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
@@ -61,7 +60,9 @@ export const CheckoutButton = withClerk(
     const { userId, orgId } = useAuth();
 
     if (userId === null) {
-      throw new Error('Clerk: Ensure that `<CheckoutButton />` is rendered inside a `<SignedIn />` component.');
+      throw new Error(
+        'Clerk: Ensure that `<CheckoutButton />` is rendered only when the user is signed in (wrap with `<Show when="signedIn">` or guard with `useAuth()`).',
+      );
     }
 
     if (orgId === null && _for === 'organization') {
