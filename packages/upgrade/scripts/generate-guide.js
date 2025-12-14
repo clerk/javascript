@@ -50,7 +50,10 @@ function loadChanges(version, sdk) {
     return [];
   }
 
-  const files = fs.readdirSync(changesDir).filter(f => f.endsWith('.md'));
+  const files = fs
+    .readdirSync(changesDir)
+    .filter(f => f.endsWith('.md'))
+    .sort();
   const changes = [];
 
   for (const file of files) {
@@ -94,11 +97,18 @@ function groupByCategory(changes) {
 
 function getCategoryHeading(category) {
   const headings = {
+    'behavior-change': 'Behavior Change',
     breaking: 'Breaking Changes',
+    deprecation: 'Deprecations',
     'deprecation-removal': 'Deprecation Removals',
     warning: 'Warnings',
+    version: 'Version',
   };
-  return headings[category] || category;
+  if (headings[category]) {
+    return headings[category];
+  }
+
+  return category.replace(/[-_]+/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
 }
 
 function generateMarkdown(sdk, versionConfig, changes) {
@@ -114,7 +124,8 @@ function generateMarkdown(sdk, versionConfig, changes) {
   }
 
   const grouped = groupByCategory(changes);
-  const categoryOrder = ['breaking', 'deprecation-removal', 'warning'];
+  const categoryOrder = ['breaking', 'deprecation-removal', 'deprecation', 'warning', 'version', 'behavior-change'];
+  const seenCategories = new Set();
 
   for (const category of categoryOrder) {
     const categoryChanges = grouped[category];
@@ -122,10 +133,11 @@ function generateMarkdown(sdk, versionConfig, changes) {
       continue;
     }
 
+    seenCategories.add(category);
     lines.push(`## ${getCategoryHeading(category)}`);
     lines.push('');
 
-    for (const change of categoryChanges) {
+    for (const change of [...categoryChanges].sort((a, b) => a.title.localeCompare(b.title))) {
       lines.push(`### ${change.title}`);
       lines.push('');
       lines.push(change.content);
@@ -134,15 +146,15 @@ function generateMarkdown(sdk, versionConfig, changes) {
   }
 
   // Handle any categories not in the predefined order
-  for (const [category, categoryChanges] of Object.entries(grouped)) {
-    if (categoryOrder.includes(category)) {
+  for (const [category, categoryChanges] of Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b))) {
+    if (seenCategories.has(category)) {
       continue;
     }
 
     lines.push(`## ${getCategoryHeading(category)}`);
     lines.push('');
 
-    for (const change of categoryChanges) {
+    for (const change of [...categoryChanges].sort((a, b) => a.title.localeCompare(b.title))) {
       lines.push(`### ${change.title}`);
       lines.push('');
       lines.push(change.content);
