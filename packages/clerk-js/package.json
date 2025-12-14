@@ -64,7 +64,7 @@
     "@coinbase/wallet-sdk": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "^0.5.17",
-    "@tanstack/query-core": "5.87.4",
+    "@tanstack/query-core": "5.90.12",
     "@zxcvbn-ts/core": "catalog:module-manager",
     "@zxcvbn-ts/language-common": "catalog:module-manager",
     "alien-signals": "2.0.6",

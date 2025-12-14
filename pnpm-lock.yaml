@@ -454,8 +454,8 @@ importers:
         specifier: ^0.5.17
         version: 0.5.17
       '@tanstack/query-core':
-        specifier: 5.87.4
-        version: 5.87.4
+        specifier: 5.90.12
+        version: 5.90.12
       '@zxcvbn-ts/core':
         specifier: catalog:module-manager
         version: 3.0.4
@@ -781,8 +781,8 @@ importers:
   packages/shared:
     dependencies:
       '@tanstack/query-core':
-        specifier: 5.87.4
-        version: 5.87.4
+        specifier: 5.90.12
+        version: 5.90.12
       dequal:
         specifier: 2.0.3
         version: 2.0.3
@@ -2352,7 +2352,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {'0': node >=0.10.0}
+    engines: {node: '>=0.10.0'}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
@@ -4620,8 +4620,8 @@ packages:
     resolution: {integrity: sha512-GG2R9I6QSlbNR9fEuX2sQCigY6K28w51h2634TWmkaHXlzQw+rWuIWr4nAGM9doA+kWRi1LFSFMvAiG3cOqjXQ==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.87.4':
-    resolution: {integrity: sha512-uNsg6zMxraEPDVO2Bn+F3/ctHi+Zsk+MMpcN8h6P7ozqD088F6mFY5TfGM7zuyIrL7HKpDyu6QHfLWiDxh3cuw==}
+  '@tanstack/query-core@5.90.12':
+    resolution: {integrity: sha512-T1/8t5DhV/SisWjDnaiU2drl6ySvsHj1bHBCWNXd+/T+Hh1cf6JodyEYMd5sgwm+b/mETT4EV3H+zCVczCU5hg==}
 
   '@tanstack/react-router@1.132.0':
     resolution: {integrity: sha512-tGNmQrFc4zWQZvjqYnC8ib84H/9QokRl73hr0P2XlxCY2KAgPTk2QjdzW03LqXgQZRXg7++vKznJt4LS9/M3iA==}
@@ -10737,6 +10737,7 @@ packages:
   next@15.2.3:
     resolution: {integrity: sha512-x6eDkZxk2rPpu46E1ZVUWIBhYCLszmUY6fvHBFcbzJ9dD+qRX6vcHusaqqDlnY+VngKzKbAiG2iRCkPbmi8f7w==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -19298,7 +19299,7 @@ snapshots:
 
   '@tanstack/history@1.132.0': {}
 
-  '@tanstack/query-core@5.87.4': {}
+  '@tanstack/query-core@5.90.12': {}
 
   '@tanstack/react-router@1.132.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
