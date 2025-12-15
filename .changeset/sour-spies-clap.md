@@ -1,4 +1,4 @@
 ---
-'@clerk/clerk-js': patch
+'@clerk/localizations': patch
 ---
 Update Spanish localizations for taskChooseOrganization
