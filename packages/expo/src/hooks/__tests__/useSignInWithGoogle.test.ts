@@ -21,7 +21,7 @@ vi.mock('@clerk/react', () => {
 });
 
 vi.mock('../../google-one-tap', async importOriginal => {
-  const actual = await importOriginal<typeof import('../../google-one-tap')>();
+  const actual = await importOriginal();
   return {
     ...actual,
     ClerkGoogleOneTapSignIn: mocks.ClerkGoogleOneTapSignIn,
