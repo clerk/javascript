@@ -862,12 +862,12 @@ export const esUY: LocalizationResource = {
     createOrganization: {
       formButtonReset: 'Cancelar',
       formButtonSubmit: 'Continuar',
-      formFieldInputPlaceholder__name: 'Nombre',
-      formFieldInputPlaceholder__slug: 'Identificador',
-      formFieldLabel__name: 'Mi Organización',
-      formFieldLabel__slug: 'mi-organizacion',
-      subtitle: 'Ingrese los detalles de su organización para continuar',
-      title: 'Configurar su organización',
+      formFieldInputPlaceholder__name: 'Mi Organización',
+      formFieldInputPlaceholder__slug: 'mi-organizacion',
+      formFieldLabel__name: 'Nombre',
+      formFieldLabel__slug: 'Identificador',
+      subtitle: 'Ingresá los detalles de tu organización para continuar',
+      title: 'Configurar tu organización',
     },
     signOut: {
       actionLink: 'Cerrar sesión',
