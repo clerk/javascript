@@ -2,15 +2,15 @@ import { useOrganization } from '@clerk/shared/react';
 import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/shared/types';
 import React from 'react';
 
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '@/constants';
+import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '@/contexts';
+import { Flow, localizationKeys } from '@/customizables';
+import { withCardStateProvider } from '@/elements/contexts';
+import { NavbarMenuButtonRow } from '@/elements/Navbar';
+import { ProfileCard } from '@/elements/ProfileCard';
 import type { WithInternalRouting } from '@/internal';
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '@/ui/constants';
-import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '@/ui/contexts';
-import { Flow, localizationKeys } from '@/ui/customizables';
-import { withCardStateProvider } from '@/ui/elements/contexts';
-import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { Route, Switch } from '@/ui/router';
-import type { OrganizationProfileCtx } from '@/ui/types';
+import { Route, Switch } from '@/router';
+import type { OrganizationProfileCtx } from '@/types';
 
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
