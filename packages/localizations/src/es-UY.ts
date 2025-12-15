@@ -870,7 +870,7 @@ export const esUY: LocalizationResource = {
       title: 'Configurar su organización',
     },
     signOut: {
-      actionLink: 'Cerrar sesion',
+      actionLink: 'Cerrar sesión',
       actionText: 'Logueado como {{identifier}}',
     },
   },
