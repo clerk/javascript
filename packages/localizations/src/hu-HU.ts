@@ -844,12 +844,12 @@ export const huHU: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: 'Új szervezet létrehozása',
+      action__createOrganization: 'Szervezet létrehozása',
       action__invitationAccept: 'Csatlakozás',
       action__suggestionsAccept: 'Csatlakozás kérése',
-      subtitle: 'Csatlakozzon egy meglévő szervezethez vagy hozzon létre újat',
+      subtitle: 'Csatlakozz egy meglévő szervezethez vagy hozz létre újat',
       suggestionsAcceptedLabel: 'Elfogadásra vár',
-      title: 'Válasszon szervezetet',
+      title: 'Válassz szervezetet',
     },
     createOrganization: {
       formButtonReset: 'Mégse',

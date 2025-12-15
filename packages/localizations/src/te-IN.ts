@@ -854,9 +854,9 @@ export const teIN: LocalizationResource = {
     chooseOrganization: {
       action__createOrganization: 'కొత్త సంస్థను సృష్టించండి',
       action__invitationAccept: 'చేరండి',
-      action__suggestionsAccept: 'చేరడానికి అభ్యర్థన',
+      action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
       subtitle: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి లేదా కొత్తదాన్ని సృష్టించండి',
-      suggestionsAcceptedLabel: 'అనుమతికి వేచి ఉంది',
+      suggestionsAcceptedLabel: 'ఆమోదం కోసం పెండింగ్‌లో ఉంది',
       title: 'ఒక సంస్థను ఎంచుకోండి',
     },
     createOrganization: {
