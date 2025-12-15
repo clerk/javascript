@@ -1,5 +1,5 @@
 ---
-'@clerk/clerk-js': patch
+'@clerk/ui': patch
 '@clerk/types': patch
 ---
 
