@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
@@ -692,7 +692,13 @@ export const nbNO: LocalizationResource = {
       subtitle: 'for å fortsette til {{applicationName}}',
       title: 'Skriv inn passordet ditt',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -860,17 +866,31 @@ export const nbNO: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider maksgrensen på 10 MB. Vennligst velg en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen støttes ikke. Vennligst last opp et JPG-, PNG-, GIF- eller WEBP-bilde.',
     captcha_invalid:
       'Registreringen mislyktes på grunn av mislykkede sikkerhetsvalideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Midlertidige e-posttjenester støttes ikke. Vennligst bruk din vanlige e-postadresse for å opprette en konto.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Vi klarte ikke finne en konto med disse detaljene.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'E-postadressen må være en gyldig e-postadresse',
     form_param_format_invalid__phone_number: 'Telefonnummeret må være i et gyldig internasjonalt format',
@@ -883,6 +903,8 @@ export const nbNO: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_pwned:
@@ -890,9 +912,11 @@ export const nbNO: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Passordet ditt har overskredet maksimalt antall byte tillatt. Vennligst forkort det eller fjern noen spesialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Feil passord',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'Brukernavnet ditt må inneholde minst ett ikke-numerisk tegn.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "E-postadressen eller telefonnummeret ditt er ikke tillatt for registrering. Dette kan være på grunn av bruk av '+', '=', '#' eller '.' i e-postadressen din, bruk av et domenn som er tilknyttet en midlertidig e-posttjeneste, eller eksplisitt blokkering. Hvis du mener dette er en feil, vennligst kontakt støtte.",

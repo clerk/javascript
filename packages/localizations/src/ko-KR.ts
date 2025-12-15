@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
@@ -687,7 +687,13 @@ export const koKR: LocalizationResource = {
       subtitle: '계정에 등록된 비밀번호를 입력해 주세요',
       title: '비밀번호를 입력하세요',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -854,17 +860,31 @@ export const koKR: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: '파일 크기가 최대 10MB 제한을 초과합니다. 더 작은 파일을 선택해 주세요.',
+    avatar_file_type_invalid: '지원되지 않는 파일 형식입니다. JPG, PNG, GIF 또는 WEBP 이미지를 업로드해 주세요.',
     captcha_invalid:
       'Sign up unsuccessful due to failed security validations. Please refresh the page to try again or reach out to support for more assistance.',
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      '임시 이메일 서비스는 지원되지 않습니다. 계정을 만들려면 일반 이메일 주소를 사용해 주세요.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: '이 세부 정보와 일치하는 계정을 찾을 수 없습니다.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'Email address must be a valid email address.',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -877,15 +897,19 @@ export const koKR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      '비밀번호 또는 이메일 주소가 올바르지 않습니다. 다시 시도하거나 다른 방법을 사용하세요.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '비밀번호가 충분히 안전하지 않습니다.',
     form_password_pwned: '이 비밀번호는 유출사항이 발견되어 사용할 수 없으므로 대신 다른 비밀번호를 사용해 보세요.',
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       '비밀번호가 허용되는 최대 바이트 수를 초과했습니다. 비밀번호를 줄이거나 일부 특수 문자를 제거해 주세요.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: '잘못된 비밀번호',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: '사용자 이름에는 숫자가 아닌 문자가 하나 이상 포함되어야 합니다.',
     identification_deletion_failed: 'You cannot delete your last identification.',
     not_allowed_access:
       "이메일 주소 또는 전화번호는 가입에 사용할 수 없습니다. 이는 '+', '=', '#' 또는 '.'이 이메일 주소에 사용되었거나 임시 이메일 서비스에 연결된 도메인이 사용되었거나 명시적 제외가 있는 경우입니다. 이 오류가 발생한 경우 지원에 문의하세요.",

@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
@@ -698,8 +698,14 @@ export const taIN: LocalizationResource = {
       subtitle: 'உங்கள் கணக்குடன் தொடர்புடைய கடவுச்சொல்லை உள்ளிடவும்',
       title: 'உங்கள் கடவுச்சொல்லை உள்ளிடவும்',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'கடவுச்சொல் அபாயத்தில் உள்ளது',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'சரிபார்ப்புக் குறியீடு',
@@ -868,17 +874,31 @@ export const taIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ஏற்கனவே நிறுவனத்தின் உறுப்பினராக உள்ளார்.',
+    avatar_file_size_exceeded: 'கோப்பு அளவு 10MB அதிகபட்ச வரம்பை மீறுகிறது. சிறிய கோப்பை தேர்வு செய்யவும்.',
+    avatar_file_type_invalid: 'கோப்பு வகை ஆதரிக்கப்படவில்லை. JPG, PNG, GIF அல்லது WEBP படத்தை பதிவேற்றவும்.',
     captcha_invalid:
       'பாதுகாப்பு சரிபார்ப்புகள் தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     captcha_unavailable:
       'போட் சரிபார்ப்பு தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'தற்காலிக மின்னஞ்சல் சேவைகள் ஆதரிக்கப்படவில்லை. கணக்கை உருவாக்க உங்கள் வழக்கமான மின்னஞ்சல் முகவரியைப் பயன்படுத்தவும்.',
     form_identifier_exists__email_address: 'இந்த மின்னஞ்சல் முகவரி எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__phone_number: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__username: 'இந்த பயனர்பெயர் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_not_found: 'இந்த அடையாளத்துடன் கணக்கு எதுவும் இல்லை. சரிபார்த்து மீண்டும் முயற்சிக்கவும்.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறான வடிவத்தில் உள்ளது. சரிபார்த்து திருத்தவும்.',
     form_param_format_invalid__email_address: 'மின்னஞ்சல் முகவரி சரியான மின்னஞ்சல் முகவரியாக இருக்க வேண்டும்.',
     form_param_format_invalid__phone_number: 'தொலைபேசி எண் சரியான சர்வதேச வடிவமைப்பில் இருக்க வேண்டும்.',
@@ -891,6 +911,8 @@ export const taIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
+    form_password_or_identifier_incorrect:
+      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',
@@ -900,11 +922,13 @@ export const taIN: LocalizationResource = {
       'இந்த கடவுச்சொல் தரவு மீறலின் ஒரு பகுதியாக காணப்பட்டது மற்றும் பயன்படுத்த முடியாது, தயவுசெய்து உங்கள் கடவுச்சொல்லை மீட்டமைக்கவும்.',
     form_password_size_in_bytes_exceeded:
       'உங்கள் கடவுச்சொல் அனுமதிக்கப்பட்ட அதிகபட்ச பைட்டுகளை மீறிவிட்டது, தயவுசெய்து அதை குறைக்கவும் அல்லது சில சிறப்பு எழுத்துக்களை நீக்கவும்.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'தவறான கடவுச்சொல்',
     form_username_invalid_character:
       'உங்கள் பயனர்பெயரில் தவறான எழுத்துக்கள் உள்ளன. எழுத்துக்கள், எண்கள் மற்றும் அடிக்கோடுகளை மட்டும் பயன்படுத்தவும்.',
     form_username_invalid_length:
       'உங்கள் பயனர்பெயர் {{min_length}} மற்றும் {{max_length}} எழுத்துகளுக்கு இடையில் இருக்க வேண்டும்.',
+    form_username_needs_non_number_char: 'உங்கள் பயனர் பெயரில் குறைந்தது ஒரு எண்ணல்லாத எழுத்து இருக்க வேண்டும்.',
     identification_deletion_failed: 'உங்கள் கடைசி அடையாளத்தை நீங்கள் நீக்க முடியாது.',
     not_allowed_access:
       'இந்த பக்கத்தை அணுக உங்களுக்கு அனுமதி இல்லை. இது பிழை என்று நீங்கள் நம்பினால், ஆதரவைத் தொடர்பு கொள்ளவும்.',

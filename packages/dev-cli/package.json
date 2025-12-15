@@ -27,12 +27,12 @@
     "commander": "^14.0.1",
     "concurrently": "^9.2.1",
     "dotenv": "^17.2.3",
-    "globby": "^14.1.0",
-    "jscodeshift": "^17.3.0"
+    "jscodeshift": "^17.3.0",
+    "tinyglobby": "^0.2.15"
   },
   "devDependencies": {},
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

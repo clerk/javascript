@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nextjs",
-  "version": "6.35.5",
+  "version": "6.36.1",
   "description": "Clerk SDK for NextJS",
   "keywords": [
     "clerk",
@@ -54,6 +54,11 @@
       "types": "./dist/types/experimental.d.ts",
       "import": "./dist/esm/experimental.js",
       "require": "./dist/cjs/experimental.js"
+    },
+    "./legacy": {
+      "types": "./dist/types/legacy.d.ts",
+      "import": "./dist/esm/legacy.js",
+      "require": "./dist/cjs/legacy.js"
     }
   },
   "types": "./dist/types/index.d.ts",
@@ -80,23 +85,22 @@
   },
   "dependencies": {
     "@clerk/backend": "workspace:^",
-    "@clerk/clerk-react": "workspace:^",
+    "@clerk/react": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "server-only": "0.0.1",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
     "crypto-es": "^2.1.0",
-    "next": "14.2.33"
+    "next": "15.2.3"
   },
   "peerDependencies": {
-    "next": "^13.5.7 || ^14.2.25 || ^15.2.3 || ^16",
+    "next": "^15.2.3 || ^16",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

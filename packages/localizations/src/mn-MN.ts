@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
@@ -694,7 +694,13 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Бүртгэлтэй холбоотой нууц үгээ оруулна уу',
       title: 'Нууц үгээ оруулна уу',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
+      title: undefined,
+    },
+    passwordUntrusted: {
       title: undefined,
     },
     phoneCode: {
@@ -861,17 +867,31 @@ export const mnMN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Файлын хэмжээ 10MB-ийн дээд хязгаараас хэтэрсэн. Жижиг файл сонгоно уу.',
+    avatar_file_type_invalid: 'Файлын төрөл дэмжигдэхгүй байна. JPG, PNG, GIF эсвэл WEBP зураг байршуулна уу.',
     captcha_invalid:
       'Аюулгүй байдлын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     captcha_unavailable:
       'Ботын баталгаажуулалт амжилтгүй болсны улмаас бүртгүүлж чадсангүй. Дахин оролдохын тулд хуудсыг сэргээнэ үү эсвэл нэмэлт тусламж авахын тулд тусламж авахаар холбогдоно уу.',
     form_code_incorrect: 'Маягтын код буруу байна',
+    form_email_address_blocked:
+      'Түр зуурын имэйл үйлчилгээг дэмжихгүй. Данс үүсгэхийн тулд ердийн имэйл хаягаа ашиглана уу.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: 'Тодорхойлогч олдсонгүй.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Параметрийн формат буруу.',
     form_param_format_invalid__email_address: 'Имэйл хаяг нь хүчинтэй имэйл хаяг байх ёстой.',
     form_param_format_invalid__phone_number: 'Утасны дугаар нь олон улсын хүчинтэй форматтай байх ёстой',
@@ -884,6 +904,8 @@ export const mnMN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Нууц үг буруу байна.',
+    form_password_or_identifier_incorrect:
+      'Нууц үг эсвэл имэйл хаяг буруу байна. Дахин оролдох эсвэл өөр арга ашиглана уу.',
     form_password_length_too_short: 'Нууц үгийн урт хэт богино байна.',
     form_password_not_strong_enough: 'Таны нууц үг хангалттай хүчтэй биш байна.',
     form_password_pwned:
@@ -891,9 +913,11 @@ export const mnMN: LocalizationResource = {
     form_password_pwned__sign_in: undefined,
     form_password_size_in_bytes_exceeded:
       'Энэ нууц үгийг зөрчлийн нэг хэсэг гэж олсон тул ашиглах боломжгүй. Өөр нууц үг оруулж үзнэ үү.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Нууц үг буруу',
     form_username_invalid_character: 'Хэрэглэгчийн нэр буруу тэмдэгт агуулж байна.',
     form_username_invalid_length: 'Хэрэглэгчийн нэр буруу байна.',
+    form_username_needs_non_number_char: 'Таны хэрэглэгчийн нэр дор хаяж нэг тоон бус тэмдэгт агуулсан байх ёстой.',
     identification_deletion_failed: 'Та өөрийн сүүлчийн таниулбараа устгах боломжгүй.',
     not_allowed_access:
       "Имэйл хаяг эсвэл утасны дугаарыг бүртгүүлэхийг хориглоно. Энэ нь '+', '=', '#' эсвэл '.'-г ашигласантай холбоотой байж болно. түр зуурын цахим шуудангийн үйлчилгээтэй холбогдсон домэйн ашиглах, эсвэл шууд хаагдсан байх. Хэрэв та үүнийг алдаа гэж үзэж байгаа бол дэмжлэгтэй холбогдоно уу.",

@@ -14,9 +14,8 @@ const appRouter = applicationConfig()
   .addDependency('next', constants.E2E_NEXTJS_VERSION)
   .addDependency('react', constants.E2E_REACT_VERSION)
   .addDependency('react-dom', constants.E2E_REACT_DOM_VERSION)
-  .addDependency('@clerk/nextjs', constants.E2E_CLERK_VERSION || linkPackage('nextjs'))
-  .addDependency('@clerk/shared', linkPackage('shared'))
-  .addDependency('@clerk/types', linkPackage('types'));
+  .addDependency('@clerk/nextjs', constants.E2E_CLERK_JS_VERSION || linkPackage('nextjs'))
+  .addDependency('@clerk/shared', linkPackage('shared'));
 
 const appRouterTurbo = appRouter.clone().setName('next-app-router-turbopack').addScript('dev', 'pnpm dev');
 
@@ -45,10 +44,16 @@ const appRouterAPWithClerkNextV4 = appRouterQuickstart
     `,
   );
 
+const appRouterAPWithClerkNextV6 = appRouterQuickstart
+  .clone()
+  .setName('next-app-router-ap-clerk-next-v6')
+  .addDependency('@clerk/nextjs', '6');
+
 export const next = {
   appRouter,
   appRouterTurbo,
   appRouterQuickstart,
   appRouterAPWithClerkNextLatest,
   appRouterAPWithClerkNextV4,
+  appRouterAPWithClerkNextV6,
 } as const;

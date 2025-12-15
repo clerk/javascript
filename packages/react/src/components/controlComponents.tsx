@@ -146,10 +146,7 @@ export const Protect = ({ children, fallback, treatPendingAsSignedOut, ...restAu
 export const RedirectToSignIn = withClerk(({ clerk, ...props }: WithClerkProp<RedirectToSignInProps>) => {
   const { client, session } = clerk;
 
-  const hasSignedInSessions = client.signedInSessions
-    ? client.signedInSessions.length > 0
-    : // Compat for clerk-js<5.54.0 (which was released with the `signedInSessions` property)
-      client.activeSessions && client.activeSessions.length > 0;
+  const hasSignedInSessions = (client.signedInSessions?.length ?? 0) > 0;
 
   React.useEffect(() => {
     if (session === null && hasSignedInSessions) {

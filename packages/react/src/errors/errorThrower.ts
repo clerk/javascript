@@ -1,7 +1,7 @@
 import type { ErrorThrowerOptions } from '@clerk/shared/error';
 import { buildErrorThrower } from '@clerk/shared/error';
 
-const errorThrower = buildErrorThrower({ packageName: '@clerk/clerk-react' });
+const errorThrower = buildErrorThrower({ packageName: '@clerk/react' });
 
 export { errorThrower };
 

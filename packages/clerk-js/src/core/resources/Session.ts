@@ -1,5 +1,10 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { ClerkWebAuthnError, is4xxError } from '@clerk/shared/error';
+import {
+  convertJSONToPublicKeyRequestOptions,
+  serializePublicKeyCredentialAssertion,
+  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
+} from '@clerk/shared/internal/clerk-js/passkeys';
 import { retry } from '@clerk/shared/retry';
 import type {
   ActClaim,
@@ -28,11 +33,6 @@ import { isWebAuthnSupported as isWebAuthnSupportedOnWindow } from '@clerk/share
 
 import { unixEpochToDate } from '@/utils/date';
 import { debugLogger } from '@/utils/debug';
-import {
-  convertJSONToPublicKeyRequestOptions,
-  serializePublicKeyCredentialAssertion,
-  webAuthnGetCredential as webAuthnGetCredentialOnWindow,
-} from '@/utils/passkeys';
 import { TokenId } from '@/utils/tokenId';
 
 import { clerkInvalidStrategy, clerkMissingWebAuthnPublicKeyOptions } from '../errors';
@@ -131,15 +131,9 @@ export class Session extends BaseResource implements SessionResource {
   };
 
   #hydrateCache = (token: TokenResource | null) => {
-    if (!token) {
-      return;
-    }
-
-    const tokenId = this.#getCacheId();
-    const existing = SessionTokenCache.get({ tokenId });
-    if (!existing) {
+    if (token) {
       SessionTokenCache.set({
-        tokenId,
+        tokenId: this.#getCacheId(),
         tokenResolver: Promise.resolve(token),
       });
     }

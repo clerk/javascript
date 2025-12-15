@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
@@ -690,8 +690,14 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة إلى {{applicationName}}',
       title: 'ادخل كلمة المرور',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'كلمة المرور غير آمنة',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'رمز التحقق',
@@ -858,17 +864,31 @@ export const arSA: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'حجم الملف يتجاوز الحد الأقصى البالغ 10 ميغابايت. يرجى اختيار ملف أصغر.',
+    avatar_file_type_invalid: 'نوع الملف غير مدعوم. يرجى تحميل صورة بصيغة JPG أو PNG أو GIF أو WEBP.',
     captcha_invalid:
       'لا يمكن تسجيل الحساب بسبب مشاكل تحقق أمنية. الرجاء تحديث الصفحة للمحاولة مرة أخرى أو تواصل معنا للمزيد من المساعدة',
     captcha_unavailable:
       'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'خدمات البريد الإلكتروني المؤقتة غير مدعومة. يرجى استخدام عنوان بريدك الإلكتروني العادي لإنشاء حساب.',
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
     form_identifier_not_found: 'لم يتم العثور على حساب بهذه التفاصيل',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: 'يجب أستعمال بريد إلكتروني صالح',
     form_param_format_invalid__phone_number: 'Phone number must be in a valid international format',
@@ -881,15 +901,19 @@ export const arSA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_pwned__sign_in: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',
     form_password_size_in_bytes_exceeded:
       'تجاوزت كلمة المرور الحد الأقصى للحروف المدخلة, الرجاء أدخال كلمة مرور أقصر أو حذف بعض الأحرف الخاصة',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'كلمة مرور خاطئة',
     form_username_invalid_character: undefined,
     form_username_invalid_length: undefined,
+    form_username_needs_non_number_char: 'يجب أن يحتوي اسم المستخدم على حرف واحد على الأقل غير رقمي.',
     identification_deletion_failed: 'لا يمكن حذف هويتك الآخيرة ',
     not_allowed_access:
       'لا يُسمح بالتسجيل باستخدام عنوان البريد الإلكتروني أو رقم الهاتف. قد يكون ذلك بسبب استخدام "+" أو "=" أو "#" أو "." في عنوان بريدك الإلكتروني، أو استخدام نطاق متصل بخدمة بريد إلكتروني مؤقتة، أو حظرك بشكل صريح. إذا كنت تعتقد أن هذا خطأ، يُرجى التواصل مع الدعم.',

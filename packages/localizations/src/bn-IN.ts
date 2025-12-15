@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bnIN: LocalizationResource = {
   locale: 'bn-IN',
@@ -696,8 +696,14 @@ export const bnIN: LocalizationResource = {
       subtitle: 'আপনার অ্যাকাউন্টের সাথে যুক্ত পাসওয়ার্ড লিখুন',
       title: 'আপনার পাসওয়ার্ড লিখুন',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'পাসওয়ার্ড সমঝোতা হয়েছে',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'যাচাইকরণ কোড',
@@ -866,18 +872,32 @@ export const bnIN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ইতিমধ্যে সংগঠনের একজন সদস্য।',
+    avatar_file_size_exceeded: 'ফাইলের আকার সর্বোচ্চ ১০ এমবি সীমা অতিক্রম করেছে। দয়া করে একটি ছোট ফাইল নির্বাচন করুন।',
+    avatar_file_type_invalid: 'ফাইলের ধরন সমর্থিত নয়। দয়া করে JPG, PNG, GIF বা WEBP ছবি আপলোড করুন।',
     captcha_invalid:
       'নিরাপত্তা যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     captcha_unavailable:
       'বট যাচাইকরণ ব্যর্থ হওয়ার কারণে সাইন আপ ব্যর্থ হয়েছে। আবার চেষ্টা করতে দয়া করে পৃষ্ঠাটি রিফ্রেশ করুন বা আরও সাহায্যের জন্য সাপোর্টের সাথে যোগাযোগ করুন।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'অস্থায়ী ইমেইল পরিষেবাগুলি সমর্থিত নয়। অনুগ্রহ করে অ্যাকাউন্ট তৈরি করতে আপনার নিয়মিত ইমেইল ঠিকানা ব্যবহার করুন।',
     form_identifier_exists__email_address: 'এই ইমেইল ঠিকানা ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__phone_number: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_exists__username: 'এই ব্যবহারকারীর নাম ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     form_identifier_not_found:
       'এই শনাক্তকারী দিয়ে কোনো অ্যাকাউন্ট পাওয়া যায়নি। দয়া করে চেক করুন এবং আবার চেষ্টা করুন।',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'লেখা মানটি একটি অবৈধ ফরম্যাটে আছে। দয়া করে চেক করুন এবং সংশোধন করুন।',
     form_param_format_invalid__email_address: 'ইমেইল ঠিকানা একটি বৈধ ইমেইল ঠিকানা হতে হবে।',
     form_param_format_invalid__phone_number: 'ফোন নম্বর একটি বৈধ আন্তর্জাতিক ফরম্যাটে হতে হবে।',
@@ -890,6 +910,8 @@ export const bnIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'লেখা মানটি অবৈধ। দয়া করে এটি সংশোধন করুন।',
     form_password_incorrect: 'আপনি যে পাসওয়ার্ড লিখেছেন তা ভুল। দয়া করে আবার চেষ্টা করুন।',
+    form_password_or_identifier_incorrect:
+      'পাসওয়ার্ড বা ইমেইল ঠিকানা ভুল। আবার চেষ্টা করুন বা অন্য পদ্ধতি ব্যবহার করুন।',
     form_password_length_too_short: 'আপনার পাসওয়ার্ড খুব ছোট। এটি কমপক্ষে ৮ অক্ষর দীর্ঘ হতে হবে।',
     form_password_not_strong_enough: 'আপনার পাসওয়ার্ড যথেষ্ট শক্তিশালী নয়।',
     form_password_pwned:
@@ -898,10 +920,12 @@ export const bnIN: LocalizationResource = {
       'এই পাসওয়ার্ডটি একটি ডেটা লঙ্ঘনের অংশ হিসাবে পাওয়া গেছে এবং ব্যবহার করা যাবে না, দয়া করে আপনার পাসওয়ার্ড রিসেট করুন।',
     form_password_size_in_bytes_exceeded:
       'আপনার পাসওয়ার্ড অনুমোদিত সর্বাধিক বাইট সংখ্যা অতিক্রম করেছে, দয়া করে এটি ছোট করুন বা কিছু বিশেষ অক্ষর সরান।',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'ভুল পাসওয়ার্ড',
     form_username_invalid_character:
       'আপনার ব্যবহারকারীর নামে অবৈধ অক্ষর রয়েছে। দয়া করে শুধুমাত্র অক্ষর, সংখ্যা এবং আন্ডারস্কোর ব্যবহার করুন।',
     form_username_invalid_length: 'আপনার ব্যবহারকারীর নাম {{min_length}} থেকে {{max_length}} অক্ষর দীর্ঘ হতে হবে।',
+    form_username_needs_non_number_char: 'আপনার ব্যবহারকারীর নামে কমপক্ষে একটি অ-সংখ্যাসূচক অক্ষর থাকতে হবে।',
     identification_deletion_failed: 'আপনি আপনার শেষ শনাক্তকরণ মুছতে পারবেন না।',
     not_allowed_access:
       'আপনার এই পৃষ্ঠা অ্যাক্সেস করার অনুমতি নেই। আপনি যদি মনে করেন এটি একটি ত্রুটি, দয়া করে সাপোর্টের সাথে যোগাযোগ করুন।',

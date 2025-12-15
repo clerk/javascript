@@ -180,8 +180,8 @@ describe('Clerk singleton', () => {
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('does not call session touch on signOut', async () => {
@@ -219,11 +219,11 @@ describe('Clerk singleton', () => {
         });
       });
 
-      it('calls __unstable__onBeforeSetActive before session.touch', async () => {
+      it('calls __internal_onBeforeSetActive before session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        (window as any).__unstable__onBeforeSetActive = () => {
+        (window as any).__internal_onBeforeSetActive = () => {
           expect(mockSession.touch).not.toHaveBeenCalled();
         };
 
@@ -233,111 +233,17 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('sets __session and __client_uat cookie before calling __unstable__onBeforeSetActive', async () => {
+      it('sets __session and __client_uat cookie before calling __internal_onBeforeSetActive', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
-        (window as any).__unstable__onBeforeSetActive = () => {
+        (window as any).__internal_onBeforeSetActive = () => {
           expect(eventBusSpy).toHaveBeenCalledWith('token:update', { token: mockSession.lastActiveToken });
         };
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
-      });
-
-      it('calls __unstable__onAfterSetActive after beforeEmit and session.touch', async () => {
-        const beforeEmitMock = vi.fn();
-        mockSession.touch.mockReturnValueOnce(Promise.resolve());
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-
-        (window as any).__unstable__onAfterSetActive = () => {
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalled();
-        };
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-        await sut.setActive({ session: mockSession as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-      });
-
-      // TODO: @dimkl include set transitive state
-      it('calls session.touch -> set cookie -> before emit with touched session on session switch', async () => {
-        const mockSession2 = {
-          id: '2',
-          remove: vi.fn(),
-          status: 'active',
-          user: {},
-          touch: vi.fn(),
-          getToken: vi.fn(),
-        };
-        mockClientFetch.mockReturnValue(
-          Promise.resolve({
-            signedInSessions: [mockSession, mockSession2],
-          }),
-        );
-
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession2.touch.mockImplementationOnce(() => {
-          sut.session = mockSession2 as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession2.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token-2';
-        });
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-          executionOrder.push('before emit');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ session: mockSession2 as any as ActiveSessionResource, beforeEmit: beforeEmitMock });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession2.touch).toHaveBeenCalled();
-          expect(mockSession2.getToken).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession2);
-          expect(sut.session).toMatchObject(mockSession2);
-        });
-      });
-
-      // TODO: @dimkl include set transitive state
-      it('calls with lastActiveOrganizationId session.touch -> set cookie -> before emit -> set accessors with touched session on organization switch', async () => {
-        mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
-        const sut = new Clerk(productionPublishableKey);
-        await sut.load();
-
-        const executionOrder: string[] = [];
-        mockSession.touch.mockImplementationOnce(() => {
-          sut.session = mockSession as any;
-          executionOrder.push('session.touch');
-          return Promise.resolve();
-        });
-        mockSession.getToken.mockImplementation(() => {
-          executionOrder.push('set cookie');
-          return 'mocked-token';
-        });
-
-        const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-          executionOrder.push('before emit');
-          return Promise.resolve();
-        });
-
-        await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
-
-        await waitFor(() => {
-          expect(executionOrder).toEqual(['session.touch', 'set cookie', 'before emit']);
-          expect(mockSession.touch).toHaveBeenCalled();
-          expect(mockSession.getToken).toHaveBeenCalled();
-          expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
-          expect(sut.session).toMatchObject(mockSession);
-        });
       });
 
       it('sets active organization by slug', async () => {
@@ -465,24 +371,16 @@ describe('Clerk singleton', () => {
           const sut = new Clerk(productionPublishableKey);
           await sut.load({ standardBrowser: false });
 
-          const executionOrder: string[] = [];
           mockSession.touch.mockImplementationOnce(() => {
             sut.session = mockSession as any;
-            executionOrder.push('session.touch');
-            return Promise.resolve();
-          });
-          const beforeEmitMock = vi.fn().mockImplementationOnce(() => {
-            executionOrder.push('before emit');
             return Promise.resolve();
           });
 
-          await sut.setActive({ organization: { id: 'org_id' } as Organization, beforeEmit: beforeEmitMock });
+          await sut.setActive({ organization: { id: 'org_id' } as Organization });
 
-          expect(executionOrder).toEqual(['session.touch', 'before emit']);
           expect(mockSession.touch).toHaveBeenCalled();
           expect((mockSession as any as ActiveSessionResource)?.lastActiveOrganizationId).toEqual('org_id');
           expect(mockSession.getToken).toHaveBeenCalled();
-          expect(beforeEmitMock).toHaveBeenCalledWith(mockSession);
           expect(sut.session).toMatchObject(mockSession);
         });
       });
@@ -523,8 +421,8 @@ describe('Clerk singleton', () => {
 
         eventBusSpy?.mockRestore();
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('calls session.touch by default', async () => {
@@ -537,12 +435,12 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalled();
       });
 
-      it('does not call __unstable__onBeforeSetActive before session.touch', async () => {
+      it('does not call __internal_onBeforeSetActive before session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const onBeforeSetActive = vi.fn();
-        (window as any).__unstable__onBeforeSetActive = onBeforeSetActive;
+        (window as any).__internal_onBeforeSetActive = onBeforeSetActive;
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -550,12 +448,12 @@ describe('Clerk singleton', () => {
         expect(onBeforeSetActive).not.toHaveBeenCalled();
       });
 
-      it('does not call __unstable__onAfterSetActive after session.touch', async () => {
+      it('does not call __internal_onAfterSetActive after session.touch', async () => {
         mockSession.touch.mockReturnValueOnce(Promise.resolve());
         mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [mockSession] }));
 
         const onAfterSetActive = vi.fn();
-        (window as any).__unstable__onAfterSetActive = onAfterSetActive;
+        (window as any).__internal_onAfterSetActive = onAfterSetActive;
 
         const sut = new Clerk(productionPublishableKey);
         await sut.load();
@@ -624,8 +522,8 @@ describe('Clerk singleton', () => {
         mockEnvironmentFetch.mockReset();
 
         // cleanup global window pollution
-        (window as any).__unstable__onBeforeSetActive = null;
-        (window as any).__unstable__onAfterSetActive = null;
+        (window as any).__internal_onBeforeSetActive = null;
+        (window as any).__internal_onAfterSetActive = null;
       });
 
       it('does not update session to personal workspace', async () => {
@@ -688,8 +586,8 @@ describe('Clerk singleton', () => {
 
         afterEach(() => {
           // cleanup global window pollution
-          (window as any).__unstable__onBeforeSetActive = null;
-          (window as any).__unstable__onAfterSetActive = null;
+          (window as any).__internal_onBeforeSetActive = null;
+          (window as any).__internal_onAfterSetActive = null;
         });
 
         it('gracefully handles an incorrect value returned from the user provided selectInitialSession', async () => {
@@ -2454,15 +2352,15 @@ describe('Clerk singleton', () => {
   describe('updateClient', () => {
     afterEach(() => {
       // cleanup global window pollution
-      (window as any).__unstable__onBeforeSetActive = null;
-      (window as any).__unstable__onAfterSetActive = null;
+      (window as any).__internal_onBeforeSetActive = null;
+      (window as any).__internal_onAfterSetActive = null;
     });
 
     it('runs server revalidation hooks when session transitions from `active` to `pending`', async () => {
       const mockOnBeforeSetActive = vi.fn().mockReturnValue(Promise.resolve());
       const mockOnAfterSetActive = vi.fn().mockReturnValue(Promise.resolve());
-      (window as any).__unstable__onBeforeSetActive = mockOnBeforeSetActive;
-      (window as any).__unstable__onAfterSetActive = mockOnAfterSetActive;
+      (window as any).__internal_onBeforeSetActive = mockOnBeforeSetActive;
+      (window as any).__internal_onAfterSetActive = mockOnAfterSetActive;
 
       const mockActiveSession = {
         id: 'session_1',
@@ -2510,6 +2408,11 @@ describe('Clerk singleton', () => {
   });
 
   describe('__internal_attemptToEnableEnvironmentSetting', () => {
+    afterEach(() => {
+      mockEnvironmentFetch.mockReset();
+      mockClientFetch.mockReset();
+    });
+
     describe('for organizations', () => {
       it('does not open prompt if organizations is enabled in development', async () => {
         mockEnvironmentFetch.mockReturnValue(
@@ -2628,6 +2531,68 @@ describe('Clerk singleton', () => {
         });
 
         expect(result?.isEnabled).toBe(false);
+        expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
+      });
+
+      // Handles case where environment gets enabled via BAPI, but it gets cached and the user is redirected to the choose-organization task
+      // The enable org prompt should not appear in the task screen since orgs have already been enabled
+      it('does not open prompt if organizations is disabled in development and session has choose-organization task', async () => {
+        const mockSession = {
+          id: '1',
+          remove: vi.fn(),
+          status: 'pending',
+          user: {},
+          touch: vi.fn(() => Promise.resolve()),
+          getToken: vi.fn(),
+          lastActiveToken: { getRawString: () => 'mocked-token' },
+          tasks: [{ key: 'choose-organization' }],
+          currentTask: { key: 'choose-organization' },
+          reload: vi.fn(() =>
+            Promise.resolve({
+              id: '1',
+              status: 'pending',
+              user: {},
+              tasks: [{ key: 'choose-organization' }],
+              currentTask: {
+                key: 'choose-organization',
+              },
+            }),
+          ),
+        };
+
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            organizationSettings: {
+              enabled: false,
+            },
+          }),
+        );
+
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [mockSession],
+          }),
+        );
+
+        const sut = new Clerk(developmentPublishableKey);
+
+        const __internal_openEnableOrganizationsPromptSpy = vi.fn();
+        sut.__internal_openEnableOrganizationsPrompt = __internal_openEnableOrganizationsPromptSpy;
+
+        await sut.load();
+
+        const result = await sut.__internal_attemptToEnableEnvironmentSetting({
+          for: 'organizations',
+          caller: 'OrganizationSwitcher',
+        });
+
+        // Contains the organization task, so the prompt should not be opened
+        expect(result?.isEnabled).toBe(true);
         expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
     });

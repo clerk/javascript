@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const srRS: LocalizationResource = {
   locale: 'sr-RS',
@@ -692,8 +692,14 @@ export const srRS: LocalizationResource = {
       subtitle: 'Unesi lozinku koja je povezana sa tvojim nalogom',
       title: 'Unesi svoju lozinku',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Lozinka kompromitovana',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Verifikacioni kod',
@@ -859,17 +865,31 @@ export const srRS: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Veličina fajla premašuje maksimalno ograničenje od 10 MB. Molimo izaberite manji fajl.',
+    avatar_file_type_invalid: 'Tip fajla nije podržan. Molimo otpremite sliku u formatu JPG, PNG, GIF ili WEBP.',
     captcha_invalid:
       'Registracija neuspešna zbog neuspelog sigurnosnog proveravanja. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     captcha_unavailable:
       'Registracija neuspešna zbog neuspelog proveravanja bota. Osveži stranicu da pokušaš ponovo ili se obrati podršci za više pomoći.',
     form_code_incorrect: 'Uneti kod je netačan.',
+    form_email_address_blocked:
+      'Привремене е-поште услуге нису подржане. Молимо користите своју редовну адресу е-поште за креирање налога.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušaj sa drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušaj sa drugim.',
     form_identifier_not_found: 'Nismo mogli pronaći nalog sa ovim podacima.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Format parametra je nevažeći.',
     form_param_format_invalid__email_address: 'E-mail adresa mora biti važeća e-mail adresa.',
     form_param_format_invalid__phone_number: 'Telefonski broj mora biti u važećem međunarodnom formatu',
@@ -882,6 +902,8 @@ export const srRS: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Lozinka je netačna.',
+    form_password_or_identifier_incorrect:
+      'Лозинка или адреса е-поште је нетачна. Покушај поново или користи други метод.',
     form_password_length_too_short: 'Lozinka je prekratka.',
     form_password_not_strong_enough: 'Tvoja lozinka nije dovoljno jaka.',
     form_password_pwned:
@@ -890,9 +912,11 @@ export const srRS: LocalizationResource = {
       'Ova lozinka je pronađena kao deo kompromitovanih podataka i ne može se koristiti, molimo resetuj svoju lozinku.',
     form_password_size_in_bytes_exceeded:
       'Tvoja lozinka je premašila maksimalni dozvoljeni broj bajtova, molimo skrati je ili ukloni neke specijalne znakove.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Neispravna lozinka',
     form_username_invalid_character: 'Korisničko ime sadrži nevažeće karaktere.',
     form_username_invalid_length: 'Dužina korisničkog imena nije validna.',
+    form_username_needs_non_number_char: 'Ваше корисничко име мора садржати најмање један небројни знак.',
     identification_deletion_failed: 'Ne možeš obrisati svoju poslednju identifikaciju.',
     not_allowed_access:
       "Adresa e-maila ili broja telefona nije dozvoljena za registraciju. Ovo može biti zbog korišćenja '+', '=', '#' ili '.' u adresi e-maila, korišćenja domena koji je povezan sa vremenskom e-mail uslugom ili eksplicitnom isključenju.",

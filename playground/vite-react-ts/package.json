@@ -9,11 +9,11 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "dev:yalc": "pnpm yalc:add && vite",
-    "yalc:add": "pnpm yalc add -- @clerk/clerk-react @clerk/types @clerk/shared"
+    "yalc:add": "pnpm yalc add -- @clerk/react @clerk/types @clerk/shared"
   },
   "dependencies": {
     "@clerk/clerk-js": "file:.yalc/@clerk/clerk-js",
-    "@clerk/clerk-react": "file:.yalc/@clerk/clerk-react",
+    "@clerk/react": "file:.yalc/@clerk/react",
     "@clerk/shared": "file:.yalc/@clerk/shared",
     "@clerk/types": "file:.yalc/@clerk/types",
     "react": "^18.2.0",

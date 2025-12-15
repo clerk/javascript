@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const esUY: LocalizationResource = {
   locale: 'es-UY',
@@ -697,8 +697,14 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá la contraseña asociada a tu cuenta',
       title: 'Ingresá tu contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Contraseña comprometida',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -868,17 +874,32 @@ export const esUY: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded:
+      'El tamaño del archivo supera el límite máximo de 10 MB. Por favor, elegí un archivo más pequeño.',
+    avatar_file_type_invalid: 'Tipo de archivo no compatible. Por favor, subí una imagen JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       'El registro no se pudo completar debido a validaciones de seguridad fallidas. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
     captcha_unavailable:
       'El registro no se pudo completar debido a la validación fallida contra bots. Por favor, actualizá la página para intentarlo de nuevo o contactá al soporte para más asistencia.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Los servicios de correo electrónico temporal no están soportados. Por favor, usá tu dirección de correo electrónico habitual para crear una cuenta.',
     form_identifier_exists__email_address: 'Este correo electrónico ya está en uso. Por favor, probá con otro.',
     form_identifier_exists__phone_number: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     form_identifier_exists__username: 'Este nombre de usuario ya está en uso. Por favor, probá con otro.',
     form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'El valor ingresado tiene un formato inválido. Por favor, verificá y corregí.',
     form_param_format_invalid__email_address: 'El correo electrónico debe ser válido.',
     form_param_format_invalid__phone_number: 'El número de teléfono debe estar en un formato internacional válido.',
@@ -891,6 +912,8 @@ export const esUY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'El valor ingresado es inválido. Por favor, corregilo.',
     form_password_incorrect: 'La contraseña ingresada es incorrecta. Por favor, intentá de nuevo.',
+    form_password_or_identifier_incorrect:
+      'La contraseña o la dirección de correo electrónico es incorrecta. Intentá de nuevo o usá otro método.',
     form_password_length_too_short: 'Tu contraseña es demasiado corta. Debe tener al menos 8 caracteres.',
     form_password_not_strong_enough: 'Tu contraseña no es lo suficientemente fuerte.',
     form_password_pwned:
@@ -899,10 +922,12 @@ export const esUY: LocalizationResource = {
       'Esta contraseña se encontró en una filtración y no se puede usar. Por favor, restablecé tu contraseña.',
     form_password_size_in_bytes_exceeded:
       'Tu contraseña ha excedido el número máximo de bytes permitidos. Por favor, acortala o eliminá algunos caracteres especiales.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contraseña incorrecta',
     form_username_invalid_character:
       'Tu nombre de usuario contiene caracteres inválidos. Por favor, usá solo letras, números y guiones bajos.',
     form_username_invalid_length: 'Tu nombre de usuario debe tener entre {{min_length}} y {{max_length}} caracteres.',
+    form_username_needs_non_number_char: 'Tu nombre de usuario debe contener al menos un carácter no numérico.',
     identification_deletion_failed: 'No podés eliminar tu última identificación.',
     not_allowed_access:
       "La dirección de correo electrónico o el número de teléfono no está permitido para registrarse. Esto puede deberse al uso de '+', '=', '#' o '.' en tu dirección de correo electrónico, el uso de un dominio conectado a un servicio de correo electrónico temporal o la exclusión explícita. Si cree que se trata de un error, póngase en contacto con el soporte.",

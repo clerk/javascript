@@ -41,4 +41,4 @@ async function generate() {
   ]);
 }
 
-generate().then(writeToFile(cwd));
+void generate().then(writeToFile(cwd));

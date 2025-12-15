@@ -8,10 +8,10 @@ const path = require('node:path');
 
 /** @type {() => string | undefined} */
 const getClerkExpoPath = () => {
-  const clerkExpoPath = packageJson.dependencies['@clerk/clerk-expo'];
+  const clerkExpoPath = packageJson.dependencies['@clerk/expo'];
 
   if (clerkExpoPath?.startsWith('*')) {
-    const pathToModule = require.resolve('@clerk/clerk-expo');
+    const pathToModule = require.resolve('@clerk/expo');
     return pathToModule.replace('dist/index.js', '');
   }
 
@@ -51,8 +51,8 @@ if (clerkMonorepoPath) {
   // Explicitly map @clerk packages to their source locations
   // Point to the root of the package so Metro can properly resolve subpath exports
   config.resolver.extraNodeModules = {
-    '@clerk/clerk-react': path.resolve(clerkMonorepoPath, 'packages/react'),
-    '@clerk/clerk-expo': path.resolve(clerkMonorepoPath, 'packages/expo'),
+    '@clerk/react': path.resolve(clerkMonorepoPath, 'packages/react'),
+    '@clerk/expo': path.resolve(clerkMonorepoPath, 'packages/expo'),
     '@clerk/shared': path.resolve(clerkMonorepoPath, 'packages/shared'),
     '@clerk/types': path.resolve(clerkMonorepoPath, 'packages/types'),
   };
@@ -87,7 +87,7 @@ if (clerkMonorepoPath) {
   ];
 
   // Custom resolver to handle package.json subpath exports for @clerk packages
-  // This enables Metro to resolve imports like '@clerk/clerk-react/internal'
+  // This enables Metro to resolve imports like '@clerk/react/internal'
   const originalResolveRequest = config.resolver.resolveRequest;
   config.resolver.resolveRequest = (context, moduleName, platform) => {
     // Check if this is a @clerk package with a subpath

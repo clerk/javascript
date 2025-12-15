@@ -27,7 +27,8 @@ const base = environmentConfig()
   .setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', true)
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '/sign-in')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '/sign-up')
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withKeyless = base
   .clone()
@@ -47,7 +48,8 @@ const sessionsProd1 = base
   .setId('sessionsProd1')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('sessions-prod-1').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('sessions-prod-1').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', '');
+  .setEnvVariable('public', 'CLERK_JS_URL', '')
+  .setEnvVariable('public', 'CLERK_UI_URL', '');
 
 const withEmailCodes_destroy_client = withEmailCodes
   .clone()
@@ -63,7 +65,9 @@ const withCustomRoles = base
   .clone()
   .setId('withCustomRoles')
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-custom-roles').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles').pk);
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-custom-roles').pk)
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withReverification = base
   .clone()
@@ -77,31 +81,43 @@ const withEmailCodesQuickstart = withEmailCodes
   .setEnvVariable('public', 'CLERK_SIGN_IN_URL', '')
   .setEnvVariable('public', 'CLERK_SIGN_UP_URL', '');
 
-const withAPCore1ClerkLatest = environmentConfig()
-  .setId('withAPCore1ClerkLatest')
-  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
-
 const withAPCore1ClerkV4 = environmentConfig()
   .setId('withAPCore1ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
 
-const withAPCore2ClerkLatest = environmentConfig()
-  .setId('withAPCore2ClerkLatest')
+// Uses staging instance which runs Core 3
+const withAPCore3ClerkV4 = environmentConfig()
+  .setId('withAPCore3ClerkV4')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk)
-  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js');
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
 
-const withAPCore2ClerkV4 = environmentConfig()
-  .setId('withAPCore2ClerkV4')
+const withAPCore1ClerkV6 = environmentConfig()
+  .setId('withAPCore1ClerkV6')
   .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('core-2-all-enabled').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('core-2-all-enabled').pk);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-email-codes').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-email-codes').pk);
+
+// Uses staging instance which runs Core 3
+const withAPCore3ClerkV6 = environmentConfig()
+  .setId('withAPCore3ClerkV6')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+
+// Uses staging instance which runs Core 3
+const withAPCore3ClerkLatest = environmentConfig()
+  .setId('withAPCore3ClerkLatest')
+  .setEnvVariable('public', 'CLERK_TELEMETRY_DISABLED', true)
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk)
+  .setEnvVariable('public', 'CLERK_JS_URL', constants.E2E_APP_CLERK_JS || 'http://localhost:18211/clerk.browser.js')
+  .setEnvVariable('public', 'CLERK_UI_URL', constants.E2E_APP_CLERK_UI || 'http://localhost:18212/ui.browser.js');
 
 const withDynamicKeys = withEmailCodes
   .clone()
@@ -151,12 +167,18 @@ const withSessionTasks = base
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks').pk)
   .setEnvVariable('private', 'CLERK_ENCRYPTION_KEY', constants.E2E_CLERK_ENCRYPTION_KEY || 'a-key');
 
+const withSessionTasksResetPassword = base
+  .clone()
+  .setId('withSessionTasksResetPassword')
+  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-session-tasks-reset-password').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-session-tasks-reset-password').pk);
+
 const withBillingJwtV2 = base
   .clone()
   .setId('withBillingJwtV2')
-  .setEnvVariable('private', 'CLERK_API_URL', 'https://api.clerkstage.dev')
-  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing-staging').sk)
-  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing-staging').pk);
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-billing').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-billing').pk);
 
 const withBilling = base
   .clone()
@@ -182,14 +204,21 @@ const withProtectService = base
   .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-protect-service').sk)
   .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-protect-service').pk);
 
+const withNeedsClientTrust = base
+  .clone()
+  .setId('withNeedsClientTrust')
+  .setEnvVariable('private', 'CLERK_SECRET_KEY', instanceKeys.get('with-needs-client-trust').sk)
+  .setEnvVariable('public', 'CLERK_PUBLISHABLE_KEY', instanceKeys.get('with-needs-client-trust').pk);
+
 export const envs = {
   base,
   sessionsProd1,
   withAPIKeys,
-  withAPCore1ClerkLatest,
   withAPCore1ClerkV4,
-  withAPCore2ClerkLatest,
-  withAPCore2ClerkV4,
+  withAPCore1ClerkV6,
+  withAPCore3ClerkV4,
+  withAPCore3ClerkLatest,
+  withAPCore3ClerkV6,
   withBilling,
   withBillingJwtV2,
   withCustomRoles,
@@ -200,9 +229,11 @@ export const envs = {
   withEmailLinks,
   withKeyless,
   withLegalConsent,
+  withNeedsClientTrust,
   withRestrictedMode,
   withReverification,
   withSessionTasks,
+  withSessionTasksResetPassword,
   withSignInOrUpEmailLinksFlow,
   withSignInOrUpFlow,
   withSignInOrUpwithRestrictedModeFlow,

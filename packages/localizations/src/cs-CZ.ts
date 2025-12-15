@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
@@ -701,8 +701,14 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte heslo spojené s vaším účtem',
       title: 'Zadejte své heslo',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Heslo kompromitováno',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Ověřovací kód',
@@ -872,17 +878,32 @@ export const csCZ: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} je již členem organizace.',
+    avatar_file_size_exceeded: 'Velikost souboru přesahuje maximální limit 10 MB. Vyberte prosím menší soubor.',
+    avatar_file_type_invalid:
+      'Typ souboru není podporován. Nahrajte prosím obrázek ve formátu JPG, PNG, GIF nebo WEBP.',
     captcha_invalid:
       'Registrace neúspěšná kvůli neúspěšným bezpečnostním validacím. Prosím, obnovte stránku a zkuste to znovu nebo kontaktujte podporu.',
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
     form_code_incorrect: 'Kód je nesprávný.',
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nejsou podporovány. Pro vytvoření účtu použijte prosím svou běžnou e-mailovou adresu.',
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
     form_identifier_not_found: 'Nebyl nalezen účet s těmihle detaily.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formát parametru je neplatný.',
     form_param_format_invalid__email_address: 'Emailová adresa musí být platná.',
     form_param_format_invalid__phone_number: 'Telefonní číslo musí být ve validním mezinárodním formátu.',
@@ -895,6 +916,8 @@ export const csCZ: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
     form_password_incorrect: 'Heslo je nesprávné.',
+    form_password_or_identifier_incorrect:
+      'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',
@@ -902,9 +925,11 @@ export const csCZ: LocalizationResource = {
       'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, prosím resetujte si heslo.',
     form_password_size_in_bytes_exceeded:
       'Vaše heslo překročilo maximální povolený počet bajtů, prosím zkrátit ho nebo odstranit některé speciální znaky.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Nesprávné heslo',
     form_username_invalid_character: 'Uživatelské jméno může obsahovat pouze alfanumerické znaky a podtržítka.',
     form_username_invalid_length: 'Vaše uživatelské jméno musí mít mezi {{min_length}} a {{max_length}} znaky.',
+    form_username_needs_non_number_char: 'Uživatelské jméno musí obsahovat alespoň jeden nečíselný znak.',
     identification_deletion_failed: 'Svůj poslední identifikační údaj nelze smazat.',
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

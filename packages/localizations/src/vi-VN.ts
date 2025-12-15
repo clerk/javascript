@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
@@ -700,8 +700,14 @@ export const viVN: LocalizationResource = {
       subtitle: 'Nhập mật khẩu được liên kết với tài khoản của bạn',
       title: 'Nhập mật khẩu',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Mật khẩu bị rò rỉ',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Mã xác minh',
@@ -869,16 +875,30 @@ export const viVN: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} đã là thành viên của tổ chức.',
+    avatar_file_size_exceeded: 'Kích thước tệp vượt quá giới hạn tối đa 10MB. Vui lòng chọn tệp nhỏ hơn.',
+    avatar_file_type_invalid: 'Loại tệp không được hỗ trợ. Vui lòng tải lên hình ảnh JPG, PNG, GIF hoặc WEBP.',
     captcha_invalid: undefined,
     captcha_unavailable:
       'Đăng ký không thành công do lỗi bot. Vui lòng tải lại trang để thử lại hoặc liên hệ hỗ trợ để được hỗ trợ.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Các dịch vụ email tạm thời không được hỗ trợ. Vui lòng sử dụng địa chỉ email thông thường của bạn để tạo tài khoản.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
     form_identifier_not_found: undefined,
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: undefined,
     form_param_format_invalid__email_address: undefined,
     form_param_format_invalid__phone_number: undefined,
@@ -891,6 +911,8 @@ export const viVN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_pwned:
@@ -898,9 +920,11 @@ export const viVN: LocalizationResource = {
     form_password_pwned__sign_in:
       'Mật khẩu này đã được tìm thấy trong một rò rỉ và không thể được sử dụng, vui lòng đặt lại mật khẩu của bạn.',
     form_password_size_in_bytes_exceeded: undefined,
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: undefined,
     form_username_invalid_character: undefined,
     form_username_invalid_length: 'Tên người dùng của bạn phải có giữa {{min_length}} và {{max_length}} ký tự.',
+    form_username_needs_non_number_char: 'Tên người dùng của bạn phải chứa ít nhất một ký tự không phải là số.',
     identification_deletion_failed: undefined,
     not_allowed_access: undefined,
     organization_domain_blocked: undefined,

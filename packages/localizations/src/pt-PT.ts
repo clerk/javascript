@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
@@ -691,8 +691,14 @@ export const ptPT: LocalizationResource = {
       subtitle: 'para continuar em {{applicationName}}',
       title: 'Insira a sua palavra-passe',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Este password foi comprometido em uma violação de dados. Escolha outro por motivos de segurança.',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificação',
@@ -859,17 +865,32 @@ export const ptPT: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: 'Já é membro nesta organização.',
+    avatar_file_size_exceeded:
+      'O tamanho do ficheiro excede o limite máximo de 10 MB. Por favor, escolha um ficheiro mais pequeno.',
+    avatar_file_type_invalid: 'Tipo de ficheiro não suportado. Por favor, carregue uma imagem JPG, PNG, GIF ou WEBP.',
     captcha_invalid:
       'Não foi possível inscrever-se devido a falhas nas validações de segurança. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     captcha_unavailable:
       'Inscrição mal-sucedida devido a falha na validação de bot. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use o seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
     form_identifier_not_found: 'Não foi possível encontrar uma conta com esses detalhes.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato de parâmetro inválido.',
     form_param_format_invalid__email_address: 'O endereço de e-mail deve ser válido.',
     form_param_format_invalid__phone_number: 'O número de telemóvel deve ser válido.',
@@ -882,6 +903,8 @@ export const ptPT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor de parâmetro inválido.',
     form_password_incorrect: 'Palavra-passe incorreta.',
+    form_password_or_identifier_incorrect:
+      'A palavra-passe ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'A palavra-passe é muito curta.',
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_pwned:
@@ -890,9 +913,11 @@ export const ptPT: LocalizationResource = {
       'Esta palavra-passe foi encontrada como parte de uma violação e não pode ser utilizada para login. Por favor, escolha outra.',
     form_password_size_in_bytes_exceeded:
       'A sua palavra-passe excedeu o número máximo de bytes permitidos, por favor, encurte-a ou remova alguns caracteres especiais.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Falha na validação da palavra-passe.',
     form_username_invalid_character: 'O nome de utilizador contém caracteres inválidos.',
     form_username_invalid_length: 'O nome de utilizador deve ter entre 3 e 50 caracteres.',
+    form_username_needs_non_number_char: 'O seu nome de utilizador deve conter pelo menos um caractere não numérico.',
     identification_deletion_failed: 'Você não pode excluir a sua última identificação.',
     not_allowed_access:
       "O endereço de e-mail ou número de telefone não é permitido para registro. Isso pode ser devido ao uso de '+', '=', '#' ou '.' no endereço de e-mail, o uso de um domínio associado a um serviço de e-mail temporário ou uma exclusão explícita.",

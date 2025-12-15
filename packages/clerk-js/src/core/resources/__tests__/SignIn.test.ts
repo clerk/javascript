@@ -16,6 +16,12 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 
 describe('SignIn', () => {
+  it('can be serialized with JSON.stringify', () => {
+    const signIn = new SignIn();
+    const snapshot = JSON.stringify(signIn);
+    expect(snapshot).toBeDefined();
+  });
+
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -71,6 +77,12 @@ describe('SignIn', () => {
   });
 
   describe('SignInFuture', () => {
+    it('can be serialized with JSON.stringify', () => {
+      const signIn = new SignIn();
+      const snapshot = JSON.stringify(signIn.__internal_future);
+      expect(snapshot).toBeDefined();
+    });
+
     describe('selectFirstFactor', () => {
       beforeAll(() => {
         const signInCreatedJSON = {
@@ -1290,11 +1302,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getMetamaskIdentifierModule, 'generateSignatureWithMetamask').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithMetamask: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_metamask_signature' });
@@ -1348,13 +1360,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockResolvedValue(
-          'signature_123',
-        );
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -1393,19 +1403,16 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-
+        const utilsModule = await import('../../../utils');
         const mockGenerateSignature = vi
           .fn()
           .mockRejectedValueOnce({ code: 4001, message: 'User rejected' })
           .mockResolvedValueOnce('signature_123');
 
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockImplementation(
-          mockGenerateSignature,
-        );
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: mockGenerateSignature,
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -1441,13 +1448,12 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getCoinbaseWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'getCoinbaseWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-
+        const utilsModule = await import('../../../utils');
         const mockError = { code: 5000, message: 'Other error' };
-        vi.spyOn(getCoinbaseWalletIdentifierModule, 'generateSignatureWithCoinbaseWallet').mockRejectedValue(mockError);
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getCoinbaseWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithCoinbaseWallet: vi.fn().mockRejectedValue(mockError),
+        } as any);
 
         const signIn = new SignIn();
         const result = await signIn.__internal_future.web3({ strategy: 'web3_coinbase_wallet_signature' });
@@ -1479,11 +1485,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getBaseIdentifierModule = await import('../../../utils');
-        vi.spyOn(getBaseIdentifierModule, 'getBaseIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getBaseIdentifierModule, 'generateSignatureWithBase').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getBaseIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithBase: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_base_signature' });
@@ -1522,11 +1528,11 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getOKXWalletIdentifierModule = await import('../../../utils');
-        vi.spyOn(getOKXWalletIdentifierModule, 'getOKXWalletIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
-        vi.spyOn(getOKXWalletIdentifierModule, 'generateSignatureWithOKXWallet').mockResolvedValue('signature_123');
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getOKXWalletIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+          generateSignatureWithOKXWallet: vi.fn().mockResolvedValue('signature_123'),
+        } as any);
 
         const signIn = new SignIn();
         await signIn.__internal_future.web3({ strategy: 'web3_okx_wallet_signature' });
@@ -1552,10 +1558,10 @@ describe('SignIn', () => {
         });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+        } as any);
 
         const signIn = new SignIn();
         const result = await signIn.__internal_future.web3({ strategy: 'web3_metamask_signature' });
@@ -1584,10 +1590,10 @@ describe('SignIn', () => {
           });
         BaseResource._fetch = mockFetch;
 
-        const getMetamaskIdentifierModule = await import('../../../utils');
-        vi.spyOn(getMetamaskIdentifierModule, 'getMetamaskIdentifier').mockResolvedValue(
-          '0x1234567890123456789012345678901234567890',
-        );
+        const utilsModule = await import('../../../utils');
+        vi.spyOn(utilsModule, 'web3').mockReturnValue({
+          getMetamaskIdentifier: vi.fn().mockResolvedValue('0x1234567890123456789012345678901234567890'),
+        } as any);
 
         const signIn = new SignIn();
         const result = await signIn.__internal_future.web3({ strategy: 'web3_metamask_signature' });

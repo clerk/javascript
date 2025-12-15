@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const faIR: LocalizationResource = {
   locale: 'fa-IR',
@@ -702,8 +702,14 @@ export const faIR: LocalizationResource = {
       subtitle: 'رمز عبور مرتبط با حساب کاربری خود را وارد کنید',
       title: 'رمز عبور خود را وارد کنید',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'رمز عبور به خطر افتاده است',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'کد تأیید',
@@ -872,16 +878,30 @@ export const faIR: LocalizationResource = {
       actionText: 'می‌خواهید خارج شوید؟',
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} از قبل عضو سازمان است.',
+    avatar_file_size_exceeded: 'حجم فایل از حداکثر مجاز ۱۰ مگابایت بیشتر است. لطفاً فایل کوچکتری انتخاب کنید.',
+    avatar_file_type_invalid: 'نوع فایل پشتیبانی نمی‌شود. لطفاً تصویری با فرمت JPG، PNG، GIF یا WEBP آپلود کنید.',
     captcha_invalid: 'کپچا نامعتبر است. لطفاً دوباره امتحان کنید.',
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
     form_code_incorrect: 'کد وارد شده نادرست است.',
+    form_email_address_blocked:
+      'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
     form_identifier_exists__email_address: 'این آدرس ایمیل قبلاً استفاده شده است.',
     form_identifier_exists__phone_number: 'این شماره تلفن قبلاً استفاده شده است.',
     form_identifier_exists__username: 'این نام کاربری قبلاً گرفته شده است.',
     form_identifier_not_found: 'شناسه یافت نشد.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'فرمت پارامتر نامعتبر است.',
     form_param_format_invalid__email_address: 'آدرس ایمیل نامعتبر است.',
     form_param_format_invalid__phone_number: 'شماره تلفن نامعتبر است.',
@@ -894,6 +914,8 @@ export const faIR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'شماره تلفن باید یک رشته معتبر باشد.',
     form_param_value_invalid: 'مقدار پارامتر نامعتبر است.',
     form_password_incorrect: 'رمز عبور نادرست است.',
+    form_password_or_identifier_incorrect:
+      'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
     form_password_pwned:
@@ -901,9 +923,11 @@ export const faIR: LocalizationResource = {
     form_password_pwned__sign_in:
       'این رمز عبور به عنوان بخشی از یک نقض امنیتی یافت شده و قابل استفاده نیست، لطفاً رمز عبور خود را مجدداً تنظیم کنید.',
     form_password_size_in_bytes_exceeded: 'رمز عبور خیلی طولانی است.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'اعتبارسنجی رمز عبور ناموفق بود.',
     form_username_invalid_character: 'نام کاربری شامل کاراکترهای نامعتبر است.',
     form_username_invalid_length: 'نام کاربری شما باید بین {{min_length}} و {{max_length}} کاراکتر باشد.',
+    form_username_needs_non_number_char: 'نام کاربری شما باید حداقل شامل یک کاراکتر غیر عددی باشد.',
     identification_deletion_failed: 'حذف شناسه ناموفق بود.',
     not_allowed_access: 'دسترسی مجاز نیست.',
     organization_domain_blocked: 'دامنه سازمان مسدود شده است.',

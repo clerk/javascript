@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const esMX: LocalizationResource = {
   locale: 'es-MX',
@@ -699,8 +699,14 @@ export const esMX: LocalizationResource = {
       subtitle: 'para continuar con {{applicationName}}',
       title: 'Introduzca su contraseña',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Contraseña en peligro',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Código de verificación',
@@ -869,17 +875,32 @@ export const esMX: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} ya es miembro de la organización.',
+    avatar_file_size_exceeded:
+      'El tamaño del archivo supera el límite máximo de 10 MB. Por favor, elige un archivo más pequeño.',
+    avatar_file_type_invalid: 'Tipo de archivo no compatible. Por favor, sube una imagen JPG, PNG, GIF o WEBP.',
     captcha_invalid:
       'El registro falló debido a fallos en la validación de seguridad. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     captcha_unavailable:
       'El registro falló debido a fallos en la validación de robot. Por favor, recarga la página o contáctanos para obtener más asistencia.',
     form_code_incorrect: 'Código incorrecto.',
+    form_email_address_blocked:
+      'Los servicios de correo electrónico temporal no están soportados. Por favor, use su dirección de correo electrónico regular para crear una cuenta.',
     form_identifier_exists__email_address: 'El correo electrónico ya existe',
     form_identifier_exists__phone_number: 'El número telefónico ya existe.',
     form_identifier_exists__username: 'El nombre de usuario ya existe.',
     form_identifier_not_found: 'No se encontró una cuenta con esos detalles.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formato inválido.',
     form_param_format_invalid__email_address: 'El correo electrónico debe ser válido.',
     form_param_format_invalid__phone_number: 'El número telefónico debe ser en un formato válido internacional.',
@@ -892,6 +913,8 @@ export const esMX: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor inválido',
     form_password_incorrect: 'Contraseña incorrecta.',
+    form_password_or_identifier_incorrect:
+      'La contraseña o la dirección de correo electrónico es incorrecta. Inténtalo de nuevo o usa otro método.',
     form_password_length_too_short: 'La contraseña es muy corta.',
     form_password_not_strong_enough: 'La contraseña no es suficientemente segura.',
     form_password_pwned:
@@ -900,9 +923,11 @@ export const esMX: LocalizationResource = {
       'Esta contraseña se encontró como parte de una brecha y no se puede utilizar, por favor restablece tu contraseña.',
     form_password_size_in_bytes_exceeded:
       'La contraseña excede el número máximo de bytes permitidos. Por favor, elimine algunos caracteres especiales o reduzca la longitud de la contraseña.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Contraseña incorrecta',
     form_username_invalid_character: 'El nombre de usuario contiene caracteres inválidos.',
     form_username_invalid_length: 'La longitud del nombre de usuario es demasiado corta.',
+    form_username_needs_non_number_char: 'Tu nombre de usuario debe contener al menos un carácter no numérico.',
     identification_deletion_failed: 'No se puede eliminar la última identificación.',
     not_allowed_access: 'No tienes permiso para acceder a esta página.',
     organization_domain_blocked: 'Este correo electrónico del dominio está bloqueado, intenta con otro.',

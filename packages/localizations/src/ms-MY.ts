@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const msMY: LocalizationResource = {
   locale: 'ms-MY',
@@ -698,8 +698,14 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan kata laluan yang berkaitan dengan akaun anda',
       title: 'Masukkan kata laluan anda',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Kata laluan dikompromi',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Kod pengesahan',
@@ -869,17 +875,31 @@ export const msMY: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} sudah menjadi ahli organisasi.',
+    avatar_file_size_exceeded: 'Saiz fail melebihi had maksimum 10MB. Sila pilih fail yang lebih kecil.',
+    avatar_file_type_invalid: 'Jenis fail tidak disokong. Sila muat naik imej JPG, PNG, GIF atau WEBP.',
     captcha_invalid:
       'Pendaftaran tidak berjaya kerana pengesahan keselamatan gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     captcha_unavailable:
       'Pendaftaran tidak berjaya kerana pengesahan bot gagal. Sila muat semula halaman untuk mencuba lagi atau hubungi sokongan untuk bantuan lebih lanjut.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Perkhidmatan e-mel sementara tidak disokong. Sila gunakan alamat e-mel biasa anda untuk membuat akaun.',
     form_identifier_exists__email_address: 'Alamat e-mel ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__phone_number: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     form_identifier_exists__username: 'Nama pengguna ini telah diambil. Sila cuba yang lain.',
     form_identifier_not_found: 'Tiada akaun dijumpai dengan pengenal ini. Sila periksa dan cuba lagi.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid:
       'Nilai yang dimasukkan adalah dalam format yang tidak sah. Sila periksa dan betulkannya.',
     form_param_format_invalid__email_address: 'Alamat e-mel mestilah alamat e-mel yang sah.',
@@ -893,6 +913,8 @@ export const msMY: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Nilai yang dimasukkan tidak sah. Sila betulkannya.',
     form_password_incorrect: 'Kata laluan yang anda masukkan tidak betul. Sila cuba lagi.',
+    form_password_or_identifier_incorrect:
+      'Kata laluan atau alamat e-mel tidak betul. Cuba lagi atau gunakan kaedah lain.',
     form_password_length_too_short: 'Kata laluan anda terlalu pendek. Ia mesti sekurang-kurangnya 8 aksara panjang.',
     form_password_not_strong_enough: 'Kata laluan anda tidak cukup kuat.',
     form_password_pwned:
@@ -901,11 +923,14 @@ export const msMY: LocalizationResource = {
       'Kata laluan ini telah dijumpai sebagai sebahagian daripada pelanggaran dan tidak boleh digunakan, sila tetapkan semula kata laluan anda.',
     form_password_size_in_bytes_exceeded:
       'Kata laluan anda telah melebihi bilangan maksimum bait yang dibenarkan, sila pendekkannya atau keluarkan beberapa aksara khas.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Kata Laluan Tidak Betul',
     form_username_invalid_character:
       'Nama pengguna anda mengandungi aksara yang tidak sah. Sila gunakan hanya huruf, nombor, dan garis bawah.',
     form_username_invalid_length:
       'Nama pengguna anda mestilah antara {{min_length}} dan {{max_length}} aksara panjang.',
+    form_username_needs_non_number_char:
+      'Nama pengguna anda mesti mengandungi sekurang-kurangnya satu aksara bukan nombor.',
     identification_deletion_failed: 'Anda tidak boleh memadamkan pengenalan terakhir anda.',
     not_allowed_access:
       'Anda tidak mempunyai kebenaran untuk mengakses halaman ini. Sila hubungi sokongan jika anda percaya ini adalah kesilapan.',

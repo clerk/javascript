@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
@@ -692,8 +692,14 @@ export const daDK: LocalizationResource = {
       subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Indtast din adgangskode',
     },
+    passwordCompromised: {
+      title: undefined,
+    },
     passwordPwned: {
       title: 'Sikkerhedsadvarsel',
+    },
+    passwordUntrusted: {
+      title: undefined,
     },
     phoneCode: {
       formTitle: 'Bekræftelseskode',
@@ -732,7 +738,7 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Log ind',
       titleCombined: undefined,
@@ -753,7 +759,7 @@ export const daDK: LocalizationResource = {
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Udfyld manglende felter',
     },
     emailCode: {
@@ -774,7 +780,7 @@ export const daDK: LocalizationResource = {
         title: 'Tilmelding...',
       },
       resendButton: 'Send link igen',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Bekræft din email',
       verified: {
         title: 'Vellykket tilmelding',
@@ -827,13 +833,13 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
-      subtitleCombined: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      subtitleCombined: 'Fortsæt til {{applicationName}}',
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
     },
   },
-  socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
+  socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
@@ -859,17 +865,31 @@ export const daDK: LocalizationResource = {
       actionText: undefined,
     },
   },
+  taskResetPassword: {
+    formButtonPrimary: undefined,
+    signOut: {
+      actionLink: undefined,
+      actionText: undefined,
+    },
+    subtitle: undefined,
+    title: undefined,
+  },
   unstable__errors: {
     already_a_member_in_organization: undefined,
+    avatar_file_size_exceeded: 'Filstørrelsen overskrider den maksimale grænse på 10 MB. Vælg venligst en mindre fil.',
+    avatar_file_type_invalid: 'Filtypen understøttes ikke. Upload venligst et JPG-, PNG-, GIF- eller WEBP-billede.',
     captcha_invalid:
       'Tilmelding mislykkedes på grund af fejlede sikkerhedsvalideringer. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     form_code_incorrect: 'Koden er forkert.',
+    form_email_address_blocked:
+      'Midlertidige e-mailtjenester understøttes ikke. Brug venligst din almindelige e-mailadresse til at oprette en konto.',
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
     form_identifier_not_found: 'Vi kunne ikke finde en konto med disse detaljer.',
+    form_new_password_matches_current: undefined,
     form_param_format_invalid: 'Formatet er ugyldigt.',
     form_param_format_invalid__email_address: 'E-mailadressen skal være en gyldig e-mailadresse.',
     form_param_format_invalid__phone_number: 'Telefonnummeret skal være i et gyldigt internationalt format.',
@@ -882,15 +902,19 @@ export const daDK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
+    form_password_or_identifier_incorrect:
+      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
     form_password_pwned: 'Adgangskoden er blevet kompromitteret.',
     form_password_pwned__sign_in: 'Din adgangskode er blevet kompromitteret, vælg en ny.',
     form_password_size_in_bytes_exceeded:
       'Din adgangskode har overskredet det maksimalt tilladte antal bytes, forkort den eller fjern nogle specialtegn.',
+    form_password_untrusted__sign_in: undefined,
     form_password_validation_failed: 'Forkert adgangskode.',
     form_username_invalid_character: 'Brugernavnet indeholder ugyldige tegn.',
     form_username_invalid_length: 'Brugernavnet har en ugyldig længde.',
+    form_username_needs_non_number_char: 'Dit brugernavn skal indeholde mindst ét ikke-numerisk tegn.',
     identification_deletion_failed: 'Du kan ikke slette din sidste identifikation.',
     not_allowed_access:
       "E-mailadressen eller telefonnummeret er ikke tilladt at tilmelde sig. Dette kan skyldes brug af '+', '=', '#' eller '.' i din e-mail-adresse, ved at bruge et domæne, der er forbundet med en midlertidig e-mail-tjeneste, eller ved at blive eksplicit blokeret. Hvis du mener, at dette er en fejl, bedes du kontakte support.",
