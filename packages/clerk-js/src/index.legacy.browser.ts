@@ -3,8 +3,6 @@
 // eslint-disable-next-line
 import './utils/setWebpackChunkPublicPath';
 
-import 'regenerator-runtime/runtime';
-
 import { Clerk } from './core/clerk';
 
 const publishableKey =
