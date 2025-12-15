@@ -204,12 +204,17 @@ const EnableOrganizationsPromptInternal = ({
                       <RadioGroupItem
                         value='require'
                         label='Require organization membership'
-                        description='Users will be required to create or join an organization to access the application. Common for most B2B SaaS applications.'
+                        description={
+                          <>
+                            <span className='block'>Users need to belong to at least one organization.</span>
+                            <span>Common for most B2B SaaS applications</span>
+                          </>
+                        }
                       />
                       <RadioGroupItem
                         value='allow'
                         label='Allow personal accounts'
-                        description='Users will be able to work outside of an organization by providing a personal account.'
+                        description='Users can work outside of an organization with a personal account'
                       />
                     </RadioGroup>
                   </Flex>
@@ -411,7 +416,7 @@ const RadioGroup = ({ value, onChange, children }: RadioGroupProps) => {
 type RadioGroupItemProps = {
   value: string;
   label: string;
-  description?: string;
+  description?: React.ReactNode;
 };
 
 const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
