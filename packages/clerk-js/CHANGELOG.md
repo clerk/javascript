@@ -1,5 +1,21 @@
 # Change Log
 
+## 5.115.0
+
+### Minor Changes
+
+- Add Web3 Solana support to `<UserProfile />` ([#7435](https://github.com/clerk/javascript/pull/7435)) by [@kduprey](https://github.com/kduprey)
+
+- Add support for Sign in with Solana. ([#7293](https://github.com/clerk/javascript/pull/7293)) by [@kduprey](https://github.com/kduprey)
+
+### Patch Changes
+
+- Fix navigation that was not awaited when attempting to set the session active on password sign-in ([#7459](https://github.com/clerk/javascript/pull/7459)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`375a32d`](https://github.com/clerk/javascript/commit/375a32d0f44933605ffb513ff28f522ac5e851d6), [`175883b`](https://github.com/clerk/javascript/commit/175883b05228138c9ff55d0871cc1041bd68d7fe), [`f626046`](https://github.com/clerk/javascript/commit/f626046c589956022b1e1ac70382c986822f4733), [`a2cc94e`](https://github.com/clerk/javascript/commit/a2cc94eb008601d6d75cafed568fea1fb2634234), [`14342d2`](https://github.com/clerk/javascript/commit/14342d2b34fe0882f7676195aefaaa17f034af70)]:
+  - @clerk/localizations@3.31.0
+  - @clerk/shared@3.40.0
+
 ## 5.114.1
 
 ### Patch Changes
