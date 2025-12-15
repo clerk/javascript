@@ -39,10 +39,6 @@ export const Popover = (props: PopoverProps) => {
   const portalRoot = usePortalRoot();
   const effectiveRoot = root ?? portalRoot?.() ?? undefined;
 
-  console.log('effectiveRoot', effectiveRoot);
-  console.log('portalRoot', portalRoot);
-  console.log('root', root);
-
   if (portal) {
     return (
       <FloatingNode id={nodeId}>

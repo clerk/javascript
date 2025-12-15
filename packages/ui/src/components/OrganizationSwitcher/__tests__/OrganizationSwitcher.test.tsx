@@ -1,6 +1,9 @@
 import type { MembershipRole } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import React from 'react';
+
+import { PortalProvider } from '@clerk/react';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, render } from '@/test/utils';
@@ -536,6 +539,52 @@ describe('OrganizationSwitcher', () => {
           organization: null,
         }),
       );
+    });
+  });
+
+  describe('OrganizationSwitcher with PortalProvider', () => {
+    it('passes getContainer to openOrganizationProfile', async () => {
+      const container = document.createElement('div');
+      const getContainer = () => container;
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      const { getByRole, userEvent } = render(
+        <PortalProvider getContainer={getContainer}>
+          <OrganizationSwitcher />
+        </PortalProvider>,
+        { wrapper },
+      );
+
+      await userEvent.click(getByRole('button'));
+      const manageButton = await waitFor(() => getByRole('menuitem', { name: /manage organization/i }));
+      await userEvent.click(manageButton);
+
+      expect(fixtures.clerk.openOrganizationProfile).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
+    });
+
+    it('passes getContainer to openCreateOrganization', async () => {
+      const container = document.createElement('div');
+      const getContainer = () => container;
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withOrganizations();
+        f.withUser({ email_addresses: ['test@clerk.com'] });
+      });
+
+      const { getByRole, userEvent } = render(
+        <PortalProvider getContainer={getContainer}>
+          <OrganizationSwitcher />
+        </PortalProvider>,
+        { wrapper },
+      );
+
+      await userEvent.click(getByRole('button', { name: 'Open organization switcher' }));
+      const createButton = await waitFor(() => getByRole('menuitem', { name: 'Create organization' }));
+      await userEvent.click(createButton);
+
+      expect(fixtures.clerk.openCreateOrganization).toHaveBeenCalledWith(expect.objectContaining({ getContainer }));
     });
   });
 });
