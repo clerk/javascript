@@ -1347,16 +1347,16 @@ export const itIT: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: "Unisciti alla lista d'attesa",
+      actionText: "Non hai ancora un account? Unisciti alla lista d'attesa",
+      formButton: "Unisciti alla lista d'attesa",
+      subtitle: "Puoi unirti alla lista d'attesa e ti avviseremo quando l'accesso sarà disponibile.",
+      title: "Unisciti alla lista d'attesa",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: "Ti avviseremo quando l'accesso sarà disponibile.",
+      subtitle: "Attendi un momento.",
+      title: 'Successo!',
     },
   },
 } as const;
