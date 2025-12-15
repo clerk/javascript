@@ -63,7 +63,7 @@ Additionally, you can use two flags to configure how Playwright runs:
 For example:
 
 ```shell
-pnpm test:integration:base -- --ui email.link.test.ts
+pnpm test:integration:base --ui -- email.link.test.ts
 ```
 
 > [!TIP]
