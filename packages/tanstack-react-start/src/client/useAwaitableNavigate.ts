@@ -1,8 +1,8 @@
 import type { NavigateOptions } from '@tanstack/react-router';
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import React, { useTransition } from 'react';
+import React from 'react';
 
-type Resolve = (value?: unknown) => void;
+type Resolve = () => void;
 
 export const useAwaitableNavigate = () => {
   const navigate = useNavigate();
@@ -12,18 +12,21 @@ export const useAwaitableNavigate = () => {
     resolveFunctionsRef.current.forEach(resolve => resolve());
     resolveFunctionsRef.current.splice(0, resolveFunctionsRef.current.length);
   };
-  const [_, startTransition] = useTransition();
 
   React.useEffect(() => {
     resolveAll();
   }, [location]);
 
   return (options: NavigateOptions) => {
-    return new Promise(res => {
-      startTransition(() => {
-        resolveFunctionsRef.current.push(res);
-        res(navigate(options));
-      });
+    return new Promise<void>(res => {
+      resolveFunctionsRef.current.push(res);
+      navigate(options)
+        .then(() => {
+          res();
+        })
+        .catch(() => {
+          res();
+        });
     });
   };
 };
