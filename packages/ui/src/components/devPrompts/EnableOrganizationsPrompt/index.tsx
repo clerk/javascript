@@ -203,7 +203,12 @@ const EnableOrganizationsPromptInternal = ({
                     >
                       <RadioGroupItem
                         value='require'
-                        label='Require organization membership'
+                        label={
+                          <Flex gap={2}>
+                            <span>Require organization membership</span>
+                            <PromptBadge>Most common</PromptBadge>
+                          </Flex>
+                        }
                         description={
                           <>
                             <span className='block'>Users need to belong to at least one organization.</span>
@@ -382,6 +387,31 @@ const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant
   );
 });
 
+type PromptBadgeProps = {
+  children: React.ReactNode;
+};
+
+const PromptBadge = ({ children }: PromptBadgeProps) => {
+  return (
+    <span
+      css={css`
+        ${basePromptElementStyles};
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        line-height: 1.25;
+        background-color: #ebebeb;
+        color: #2b2b34;
+      `}
+    >
+      {children}
+    </span>
+  );
+};
+
 type RadioGroupContextValue = {
   name: string;
   value: string;
@@ -415,7 +445,7 @@ const RadioGroup = ({ value, onChange, children }: RadioGroupProps) => {
 
 type RadioGroupItemProps = {
   value: string;
-  label: string;
+  label: React.ReactNode;
   description?: React.ReactNode;
 };
 
