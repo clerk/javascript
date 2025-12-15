@@ -871,8 +871,8 @@ export const esMX: LocalizationResource = {
       title: 'Configurar su organización',
     },
     signOut: {
-      actionLink: 'Cerrar sesion',
-      actionText: 'Logueado como {{identifier}}',
+      actionLink: 'Cerrar sesión',
+      actionText: 'Registrado como {{identifier}}',
     },
   },
   taskResetPassword: {
