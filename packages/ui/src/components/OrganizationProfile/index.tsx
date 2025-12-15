@@ -1,20 +1,21 @@
 import { useOrganization } from '@clerk/shared/react';
-import type { OrganizationProfileModalProps, OrganizationProfileProps, WithInternalRouting } from '@clerk/shared/types';
+import type { OrganizationProfileModalProps, OrganizationProfileProps } from '@clerk/shared/types';
 import React from 'react';
 
+import type { WithInternalRouting } from '@/internal';
+import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '@/ui/constants';
+import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '@/ui/contexts';
+import { Flow, localizationKeys } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
+import { Route, Switch } from '@/ui/router';
+import type { OrganizationProfileCtx } from '@/ui/types';
 
-import { ORGANIZATION_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { OrganizationProfileContext, SubscriberTypeContext, withCoreUserGuard } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
-import { Route, Switch } from '../../router';
-import type { OrganizationProfileCtx } from '../../types';
 import { OrganizationProfileNavbar } from './OrganizationProfileNavbar';
 import { OrganizationProfileRoutes } from './OrganizationProfileRoutes';
 
-const _OrganizationProfile = () => {
+const OrganizationProfileInternal = () => {
   const { organization } = useOrganization();
 
   if (!organization) {
@@ -56,10 +57,10 @@ const AuthenticatedRoutes = withCoreUserGuard(() => {
 });
 
 export const OrganizationProfile: React.ComponentType<OrganizationProfileProps> =
-  withCardStateProvider(_OrganizationProfile);
+  withCardStateProvider(OrganizationProfileInternal);
 
 const InternalOrganizationProfile: React.ComponentType<WithInternalRouting<OrganizationProfileProps>> =
-  withCardStateProvider(_OrganizationProfile);
+  withCardStateProvider(OrganizationProfileInternal);
 
 export const OrganizationProfileModal = (props: OrganizationProfileModalProps): JSX.Element => {
   const organizationProfileProps: OrganizationProfileCtx = {

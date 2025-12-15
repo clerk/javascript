@@ -1,7 +1,8 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignInModalProps, SignInProps, WithInternalRouting } from '@clerk/shared/types';
+import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
+import type { WithInternalRouting } from '@/internal';
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/ui/common/EmailLinkCompleteFlowCard';
 import {
   SignInContext,

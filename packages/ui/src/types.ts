@@ -24,8 +24,9 @@ import type {
   UserButtonProps,
   UserProfileProps,
   WaitlistProps,
-  WithInternalRouting,
 } from '@clerk/shared/types';
+
+import type { WithInternalRouting } from './internal';
 
 export type {
   __internal_OAuthConsentProps,

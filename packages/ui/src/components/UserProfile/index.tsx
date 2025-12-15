@@ -1,15 +1,16 @@
-import type { UserProfileModalProps, UserProfileProps, WithInternalRouting } from '@clerk/shared/types';
+import type { UserProfileModalProps, UserProfileProps } from '@clerk/shared/types';
 import React from 'react';
 
+import { USER_PROFILE_CARD_SCROLLBOX_ID } from '@/constants';
+import { UserProfileContext, withCoreUserGuard } from '@/contexts';
+import { Flow, localizationKeys } from '@/customizables';
+import type { WithInternalRouting } from '@/internal';
+import { Route, Switch } from '@/router';
+import type { UserProfileCtx } from '@/types';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
-import { USER_PROFILE_CARD_SCROLLBOX_ID } from '../../constants';
-import { UserProfileContext, withCoreUserGuard } from '../../contexts';
-import { Flow, localizationKeys } from '../../customizables';
-import { Route, Switch } from '../../router';
-import type { UserProfileCtx } from '../../types';
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';
 import { VerificationSuccessPage } from './VerifyWithLink';

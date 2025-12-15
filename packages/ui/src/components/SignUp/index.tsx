@@ -1,14 +1,15 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpModalProps, SignUpProps, WithInternalRouting } from '@clerk/shared/types';
+import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
+import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
+import { Flow } from '@/customizables';
+import type { WithInternalRouting } from '@/internal';
+import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
 
-import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { SessionTasks as LazySessionTasks } from '../../lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
