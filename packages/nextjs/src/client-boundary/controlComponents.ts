@@ -15,7 +15,7 @@ export {
   AuthenticateWithRedirectCallback,
   RedirectToCreateOrganization,
   RedirectToOrganizationProfile,
-  PortalProvider,
+  UNSAFE_PortalProvider,
 } from '@clerk/react';
 
 export { MultisessionAppSupport } from '@clerk/react/internal';

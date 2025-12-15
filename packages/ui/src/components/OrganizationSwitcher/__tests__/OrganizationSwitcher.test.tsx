@@ -3,7 +3,7 @@ import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import React from 'react';
 
-import { PortalProvider } from '@clerk/react';
+import { UNSAFE_PortalProvider } from '@clerk/react';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, render } from '@/test/utils';
@@ -552,9 +552,9 @@ describe('OrganizationSwitcher', () => {
       });
 
       const { getByRole, userEvent } = render(
-        <PortalProvider getContainer={getContainer}>
+        <UNSAFE_PortalProvider getContainer={getContainer}>
           <OrganizationSwitcher />
-        </PortalProvider>,
+        </UNSAFE_PortalProvider>,
         { wrapper },
       );
 
@@ -574,9 +574,9 @@ describe('OrganizationSwitcher', () => {
       });
 
       const { getByRole, userEvent } = render(
-        <PortalProvider getContainer={getContainer}>
+        <UNSAFE_PortalProvider getContainer={getContainer}>
           <OrganizationSwitcher />
-        </PortalProvider>,
+        </UNSAFE_PortalProvider>,
         { wrapper },
       );
 

@@ -21,4 +21,4 @@ export {
 
 export * from './billing/payment-element';
 
-export { PortalProvider, usePortalRoot } from './PortalProvider';
+export { UNSAFE_PortalProvider, usePortalRoot } from './PortalProvider';

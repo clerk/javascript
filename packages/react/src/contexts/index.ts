@@ -1,2 +1,2 @@
 export { ClerkProvider } from './ClerkProvider';
-export { PortalProvider } from '@clerk/shared/react';
+export { UNSAFE_PortalProvider } from '@clerk/shared/react';

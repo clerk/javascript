@@ -1,6 +1,6 @@
 import { deprecated } from '@clerk/shared/deprecated';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
-import { PortalProvider } from '@clerk/shared/react';
+import { UNSAFE_PortalProvider } from '@clerk/shared/react';
 import React, { lazy, Suspense } from 'react';
 
 import type { FlowMetadata } from '../elements/contexts';
@@ -86,7 +86,7 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
       appearanceKey={props.appearanceKey}
       appearance={props.componentAppearance}
     >
-      <PortalProvider getContainer={props?.componentProps?.getContainer}>
+      <UNSAFE_PortalProvider getContainer={props?.componentProps?.getContainer}>
         <Portal
           node={props.node}
           component={
@@ -97,7 +97,7 @@ export const LazyComponentRenderer = (props: LazyComponentRendererProps) => {
           props={props.componentProps}
           componentName={props.componentName}
         />
-      </PortalProvider>
+      </UNSAFE_PortalProvider>
     </AppearanceProvider>
   );
 };
@@ -130,7 +130,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
       >
         <FlowMetadataProvider flow={props.flowName || ('' as any)}>
           <InternalThemeProvider>
-            <PortalProvider getContainer={props.getContainer}>
+            <UNSAFE_PortalProvider getContainer={props.getContainer}>
               <Modal
                 id={props.modalId}
                 style={props.modalStyle}
@@ -152,7 +152,7 @@ export const LazyModalRenderer = (props: LazyModalRendererProps) => {
                   props.children
                 )}
               </Modal>
-            </PortalProvider>
+            </UNSAFE_PortalProvider>
           </InternalThemeProvider>
         </FlowMetadataProvider>
       </AppearanceProvider>

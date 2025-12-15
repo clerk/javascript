@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import { PortalProvider } from '@clerk/react';
+import { UNSAFE_PortalProvider } from '@clerk/react';
 
 import { APIKeyModal } from '../APIKeyModal';
 
@@ -66,7 +66,7 @@ describe('APIKeyModal modalRoot behavior', () => {
     const getContainer = () => container2;
 
     const { container: testContainer } = render(
-      <PortalProvider getContainer={getContainer}>
+      <UNSAFE_PortalProvider getContainer={getContainer}>
         <APIKeyModal
           modalRoot={modalRoot}
           handleOpen={() => {}}
@@ -75,7 +75,7 @@ describe('APIKeyModal modalRoot behavior', () => {
         >
           <div data-testid='modal-content'>Test Content</div>
         </APIKeyModal>
-      </PortalProvider>,
+      </UNSAFE_PortalProvider>,
     );
 
     // The modal should render in container1 (modalRoot), not container2 (PortalProvider)

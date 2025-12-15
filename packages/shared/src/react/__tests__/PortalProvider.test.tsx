@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-import { PortalProvider, usePortalRoot } from '../PortalProvider';
+import { UNSAFE_PortalProvider, usePortalRoot } from '../PortalProvider';
 import { portalRootManager } from '../portal-root-manager';
 
 describe('PortalProvider', () => {
@@ -16,9 +16,9 @@ describe('PortalProvider', () => {
     };
 
     render(
-      <PortalProvider getContainer={getContainer}>
+      <UNSAFE_PortalProvider getContainer={getContainer}>
         <TestComponent />
-      </PortalProvider>,
+      </UNSAFE_PortalProvider>,
     );
 
     expect(screen.getByTestId('test').textContent).toBe('found');
@@ -30,9 +30,9 @@ describe('PortalProvider', () => {
     const pushSpy = vi.spyOn(portalRootManager, 'push');
 
     const { unmount } = render(
-      <PortalProvider getContainer={getContainer}>
+      <UNSAFE_PortalProvider getContainer={getContainer}>
         <div>test</div>
-      </PortalProvider>,
+      </UNSAFE_PortalProvider>,
     );
 
     expect(pushSpy).toHaveBeenCalledTimes(1);
@@ -47,9 +47,9 @@ describe('PortalProvider', () => {
     const popSpy = vi.spyOn(portalRootManager, 'pop');
 
     const { unmount } = render(
-      <PortalProvider getContainer={getContainer}>
+      <UNSAFE_PortalProvider getContainer={getContainer}>
         <div>test</div>
-      </PortalProvider>,
+      </UNSAFE_PortalProvider>,
     );
 
     unmount();
@@ -70,9 +70,9 @@ describe('usePortalRoot', () => {
     };
 
     render(
-      <PortalProvider getContainer={getContainer}>
+      <UNSAFE_PortalProvider getContainer={getContainer}>
         <TestComponent />
-      </PortalProvider>,
+      </UNSAFE_PortalProvider>,
     );
 
     expect(screen.getByTestId('test').textContent).toBe('found');
@@ -107,9 +107,9 @@ describe('usePortalRoot', () => {
     };
 
     render(
-      <PortalProvider getContainer={contextGetContainer}>
+      <UNSAFE_PortalProvider getContainer={contextGetContainer}>
         <TestComponent />
-      </PortalProvider>,
+      </UNSAFE_PortalProvider>,
     );
 
     expect(screen.getByTestId('test').textContent).toBe('found');

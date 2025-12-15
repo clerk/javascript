@@ -40,7 +40,7 @@ const [PortalContext, , usePortalContextWithoutGuarantee] = createContextAndHook
  * }
  * ```
  */
-export const PortalProvider = ({ children, getContainer }: PortalProviderProps) => {
+export const UNSAFE_PortalProvider = ({ children, getContainer }: PortalProviderProps) => {
   const getContainerRef = useRef(getContainer);
   getContainerRef.current = getContainer;
 

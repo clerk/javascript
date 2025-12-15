@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import React from 'react';
 
-import { PortalProvider } from '@clerk/react';
+import { UNSAFE_PortalProvider } from '@clerk/react';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, waitFor } from '@/test/utils';
@@ -101,9 +101,9 @@ describe('UserButton', () => {
       });
 
       const { getByText, getByRole, userEvent } = render(
-        <PortalProvider getContainer={getContainer}>
+        <UNSAFE_PortalProvider getContainer={getContainer}>
           <UserButton />
-        </PortalProvider>,
+        </UNSAFE_PortalProvider>,
         { wrapper },
       );
 
