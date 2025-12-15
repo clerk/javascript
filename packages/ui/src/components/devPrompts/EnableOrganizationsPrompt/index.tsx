@@ -20,7 +20,7 @@ const EnableOrganizationsPromptInternal = ({
   caller,
   onSuccess,
   onClose,
-}: __internal_EnableOrganizationsPromptProps) => {
+}: __internal_EnableOrganizationsPromptProps): JSX.Element => {
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
@@ -199,8 +199,20 @@ const EnableOrganizationsPromptInternal = ({
                     }
                     description={
                       <>
-                        <span className='block'>Users need to belong to at least one organization.</span>
-                        <span>Common for most B2B SaaS applications</span>
+                        <span
+                          css={css`
+                            display: block;
+                          `}
+                        >
+                          Users need to belong to at least one organization.
+                        </span>
+                        <span
+                          css={css`
+                            display: block;
+                          `}
+                        >
+                          Common for most B2B SaaS applications
+                        </span>{' '}
                       </>
                     }
                   />
@@ -279,7 +291,7 @@ const EnableOrganizationsPromptInternal = ({
  * A prompt that allows the user to enable the Organizations feature for their development instance
  * @internal
  */
-export const EnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps) => {
+export const EnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps): JSX.Element => {
   return (
     <InternalThemeProvider>
       <EnableOrganizationsPromptInternal {...props} />
@@ -377,7 +389,7 @@ type PromptBadgeProps = {
   children: React.ReactNode;
 };
 
-const PromptBadge = ({ children }: PromptBadgeProps) => {
+const PromptBadge = ({ children }: PromptBadgeProps): JSX.Element => {
   return (
     <span
       css={css`
@@ -413,7 +425,7 @@ type RadioGroupProps = {
   labelledBy?: string;
 };
 
-const RadioGroup = ({ value, onChange, children, labelledBy }: RadioGroupProps) => {
+const RadioGroup = ({ value, onChange, children, labelledBy }: RadioGroupProps): JSX.Element => {
   const name = useId();
   const contextValue = React.useMemo(() => ({ value: { name, value, onChange } }), [name, value, onChange]);
 
@@ -441,7 +453,7 @@ type RadioGroupItemProps = {
 const RADIO_INDICATOR_SIZE = '1rem';
 const RADIO_GAP = '0.5rem';
 
-const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
+const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps): JSX.Element => {
   const { name, value: selectedValue, onChange } = useRadioGroup();
   const descriptionId = useId();
   const checked = value === selectedValue;
@@ -470,6 +482,7 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
           }
 
           &:hover:has(input:checked) > span:first-of-type {
+            background-color: rgba(108, 71, 255, 0.8);
             background-color: color-mix(in srgb, #6c47ff 80%, transparent);
           }
         `}
@@ -517,6 +530,7 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
             css`
               border-width: 2px;
               border-color: #6c47ff;
+              background-color: #6c47ff;
               background-color: color-mix(in srgb, #6c47ff 100%, transparent);
               box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.2);
             `}
@@ -597,7 +611,7 @@ const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: S
   },
 );
 
-const CoinFlip = ({ isEnabled }: { isEnabled: boolean }) => {
+const CoinFlip = ({ isEnabled }: { isEnabled: boolean }): JSX.Element => {
   const [rotation, setRotation] = useState(0);
 
   useLayoutEffect(() => {
