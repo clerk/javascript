@@ -865,7 +865,7 @@ export const teIN: LocalizationResource = {
       formFieldInputPlaceholder__name: 'నా సంస్థ',
       formFieldInputPlaceholder__slug: 'na-sanstha',
       formFieldLabel__name: 'పేరు',
-      formFieldLabel__slug: 'Slug',
+      formFieldLabel__slug: 'స్లగ్',
       subtitle: 'కొనసాగించడానికి మీ సంస్థ వివరాలను నమోదు చేయండి',
       title: 'మీ సంస్థను సెటప్ చేయండి',
     },

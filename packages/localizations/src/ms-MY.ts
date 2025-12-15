@@ -871,8 +871,8 @@ export const msMY: LocalizationResource = {
       title: 'Sediakan organisasi anda',
     },
     signOut: {
-      actionLink: 'Log keluar',
-      actionText: 'Dilog masuk sebagai {{identifier}}',
+      actionLink: 'Daftar keluar',
+      actionText: 'Log masuk sebagai {{identifier}}',
     },
   },
   taskResetPassword: {

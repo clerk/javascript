@@ -850,22 +850,22 @@ export const bnIN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: 'নতুন সংস্থা তৈরি করুন',
+      action__createOrganization: 'নতুন সংগঠন তৈরি করুন',
       action__invitationAccept: 'যোগ দিন',
       action__suggestionsAccept: 'যোগদানের অনুরোধ করুন',
-      subtitle: 'বিদ্যমান সংস্থায় যোগ দিন বা একটি নতুন তৈরি করুন',
+      subtitle: 'বিদ্যমান সংগঠনে যোগ দিন বা একটি নতুন তৈরি করুন',
       suggestionsAcceptedLabel: 'অনুমোদনের অপেক্ষায়',
-      title: 'একটি সংস্থা নির্বাচন করুন',
+      title: 'একটি সংগঠন নির্বাচন করুন',
     },
     createOrganization: {
       formButtonReset: 'বাতিল',
       formButtonSubmit: 'চালিয়ে যান',
-      formFieldInputPlaceholder__name: 'আমার সংস্থা',
+      formFieldInputPlaceholder__name: 'আমার সংগঠন',
       formFieldInputPlaceholder__slug: 'amar-sangstha',
       formFieldLabel__name: 'নাম',
       formFieldLabel__slug: 'Slug',
-      subtitle: 'চালিয়ে যাওয়ার জন্য আপনার সংস্থার বিবরণ লিখুন',
-      title: 'আপনার সংস্থা সেটআপ করুন',
+      subtitle: 'চালিয়ে যাওয়ার জন্য আপনার সংগঠনের বিবরণ লিখুন',
+      title: 'আপনার সংগঠন সেটআপ করুন',
     },
     signOut: {
       actionLink: 'সাইন আউট',

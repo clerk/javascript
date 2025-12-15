@@ -848,7 +848,7 @@ export const huHU: LocalizationResource = {
       action__invitationAccept: 'Csatlakozás',
       action__suggestionsAccept: 'Csatlakozás kérése',
       subtitle: 'Csatlakozzon egy meglévő szervezethez vagy hozzon létre újat',
-      suggestionsAcceptedLabel: 'Jóváhagyásra vár',
+      suggestionsAcceptedLabel: 'Elfogadásra vár',
       title: 'Válasszon szervezetet',
     },
     createOrganization: {
