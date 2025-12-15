@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
+import type { SignUpModalProps, SignUpProps, WithInternalRouting } from '@clerk/shared/types';
 import React from 'react';
 
 import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
@@ -101,6 +101,8 @@ SignUpRoutes.displayName = 'SignUp';
 
 export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
 
+const InternalSignUp: React.ComponentType<WithInternalRouting<SignUpProps>> = withCoreSessionSwitchGuard(SignUpRoutes);
+
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {
     signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
@@ -120,7 +122,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <SignUp
+          <InternalSignUp
             {...signUpProps}
             routing='virtual'
           />
