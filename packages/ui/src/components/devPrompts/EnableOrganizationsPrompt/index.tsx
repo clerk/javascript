@@ -420,15 +420,33 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
   const checked = value === selectedValue;
 
   return (
-    <Flex
-      as='label'
-      gap={2}
-      align='start'
-      sx={{
-        cursor: 'pointer',
-        userSelect: 'none',
-      }}
+    <label
+      css={css`
+        ${basePromptElementStyles};
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        cursor: pointer;
+        user-select: none;
+
+        /* Focus-visible state for indicator */
+        &:has(input:focus-visible) > span:first-of-type {
+          outline: 2px solid white;
+          outline-offset: 2px;
+        }
+
+        /* Hover state for unchecked indicator */
+        &:hover:has(input:not(:checked)) > span:first-of-type {
+          background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Hover state for checked indicator */
+        &:hover:has(input:checked) > span:first-of-type {
+          background-color: color-mix(in srgb, #6c47ff 80%, transparent);
+        }
+      `}
     >
+      {/* Visually hidden input */}
       <input
         type='radio'
         name={name}
@@ -438,35 +456,60 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
         aria-describedby={description ? descriptionId : undefined}
         css={css`
           ${basePromptElementStyles};
-          appearance: none;
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+        `}
+      />
+
+      <span
+        aria-hidden='true'
+        css={css`
+          ${basePromptElementStyles};
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           width: 1rem;
           height: 1rem;
-          margin: 0;
           margin-top: 0.125rem;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          border-radius: 50%;
-          background-color: transparent;
-          cursor: pointer;
           flex-shrink: 0;
+          border-radius: 50%;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          background-color: transparent;
           transition: 120ms ease-in-out;
           transition-property: border-color, background-color, box-shadow;
 
-          &:checked {
-            border-color: #fff;
-            background-color: #fff;
-            box-shadow: inset 0 0 0 3px #1f1f1f;
-          }
+          ${checked &&
+          css`
+            border-width: 2px;
+            border-color: #6c47ff;
+            background-color: color-mix(in srgb, #6c47ff 100%, transparent);
+            box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.2);
+          `}
 
-          &:focus-visible {
-            outline: 2px solid white;
-            outline-offset: 2px;
-          }
-
-          &:hover:not(:checked) {
-            border-color: rgba(255, 255, 255, 0.5);
+          /* Inner dot */
+          &::after {
+            content: '';
+            position: absolute;
+            width: 0.375rem;
+            height: 0.375rem;
+            border-radius: 50%;
+            background-color: white;
+            opacity: ${checked ? 1 : 0};
+            transform: scale(${checked ? 1 : 0});
+            transition: 120ms ease-in-out;
+            transition-property: opacity, transform;
           }
         `}
       />
+
       <Flex
         direction='col'
         gap={1}
@@ -501,7 +544,7 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
           </span>
         )}
       </Flex>
-    </Flex>
+    </label>
   );
 };
 
