@@ -194,27 +194,10 @@ const EnableOrganizationsPromptInternal = ({
                     label={
                       <Flex gap={2}>
                         <span>Require organization membership</span>
-                        <PromptBadge>Most common</PromptBadge>
+                        <PromptBadge>Standard</PromptBadge>
                       </Flex>
                     }
-                    description={
-                      <>
-                        <span
-                          css={css`
-                            display: block;
-                          `}
-                        >
-                          Users need to belong to at least one organization.
-                        </span>
-                        <span
-                          css={css`
-                            display: block;
-                          `}
-                        >
-                          Common for most B2B SaaS applications
-                        </span>{' '}
-                      </>
-                    }
+                    description='Users need to belong to at least one organization.'
                   />
                   <RadioGroupItem
                     value='allow'
