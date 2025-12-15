@@ -906,6 +906,9 @@ importers:
       '@formkit/auto-animate':
         specifier: ^0.8.2
         version: 0.8.4
+      '@swc/helpers':
+        specifier: ^0.5.17
+        version: 0.5.17
       copy-to-clipboard:
         specifier: 3.3.3
         version: 3.3.3
@@ -952,9 +955,6 @@ importers:
       '@svgr/webpack':
         specifier: ^6.5.1
         version: 6.5.1
-      '@swc/helpers':
-        specifier: ^0.5.17
-        version: 0.5.17
       '@types/webpack-env':
         specifier: ^1.18.8
         version: 1.18.8
