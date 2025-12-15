@@ -53,14 +53,14 @@ const cli = meow(
   {
     importMeta: import.meta,
     flags: {
-      sdk: { type: 'string' },
       dir: { type: 'string', default: process.cwd() },
+      dryRun: { type: 'boolean', default: false },
       glob: { type: 'string', default: '**/*.(js|jsx|ts|tsx|mjs|cjs)' },
       ignore: { type: 'string', isMultiple: true },
-      skipUpgrade: { type: 'boolean', default: false },
       release: { type: 'string' },
-      dryRun: { type: 'boolean', default: false },
+      sdk: { type: 'string' },
       skipCodemods: { type: 'boolean', default: false },
+      skipUpgrade: { type: 'boolean', default: false },
     },
   },
 );
@@ -70,12 +70,12 @@ async function main() {
 
   const options = {
     dir: cli.flags.dir,
+    dryRun: cli.flags.dryRun,
     glob: cli.flags.glob,
     ignore: cli.flags.ignore,
-    skipUpgrade: cli.flags.skipUpgrade,
     release: cli.flags.release,
-    dryRun: cli.flags.dryRun,
     skipCodemods: cli.flags.skipCodemods,
+    skipUpgrade: cli.flags.skipUpgrade,
   };
 
   if (options.dryRun) {
