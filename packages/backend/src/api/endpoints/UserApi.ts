@@ -203,6 +203,10 @@ type UserID = {
   userId: string;
 };
 
+type SetPasswordCompromisedParams = {
+  revokeAllSessions?: boolean;
+};
+
 export class UserAPI extends AbstractAPI {
   public async getUserList(params: UserListParams = {}) {
     const { limit, offset, orderBy, ...userCountParams } = params;
@@ -448,14 +452,12 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async __experimental_passwordCompromised(userId: string) {
+  public async __experimental_setPasswordCompromised(userId: string, params: SetPasswordCompromisedParams = {}) {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'password_compromised'),
-      bodyParams: {
-        revokeAllSessions: false,
-      },
+      path: joinPaths(basePath, userId, 'password', 'set_compromised'),
+      bodyParams: params,
     });
   }
 }
