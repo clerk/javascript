@@ -1,11 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import { UNSAFE_PortalProvider, usePortalRoot } from '../PortalProvider';
-import { portalRootManager } from '../portal-root-manager';
 
-describe('PortalProvider', () => {
+describe('UNSAFE_PortalProvider', () => {
   it('provides getContainer to children via context', () => {
     const container = document.createElement('div');
     const getContainer = () => container;
@@ -24,38 +23,31 @@ describe('PortalProvider', () => {
     expect(screen.getByTestId('test').textContent).toBe('found');
   });
 
-  it('registers with portalRootManager on mount', () => {
+  it('only affects components within the provider', () => {
     const container = document.createElement('div');
     const getContainer = () => container;
-    const pushSpy = vi.spyOn(portalRootManager, 'push');
 
-    const { unmount } = render(
-      <UNSAFE_PortalProvider getContainer={getContainer}>
-        <div>test</div>
-      </UNSAFE_PortalProvider>,
+    const InsideComponent = () => {
+      const portalRoot = usePortalRoot();
+      return <div data-testid='inside'>{portalRoot() === container ? 'container' : 'null'}</div>;
+    };
+
+    const OutsideComponent = () => {
+      const portalRoot = usePortalRoot();
+      return <div data-testid='outside'>{portalRoot() === null ? 'null' : 'container'}</div>;
+    };
+
+    render(
+      <>
+        <OutsideComponent />
+        <UNSAFE_PortalProvider getContainer={getContainer}>
+          <InsideComponent />
+        </UNSAFE_PortalProvider>
+      </>,
     );
 
-    expect(pushSpy).toHaveBeenCalledTimes(1);
-    expect(portalRootManager.getCurrent()).toBe(container);
-
-    unmount();
-  });
-
-  it('unregisters from portalRootManager on unmount', () => {
-    const container = document.createElement('div');
-    const getContainer = () => container;
-    const popSpy = vi.spyOn(portalRootManager, 'pop');
-
-    const { unmount } = render(
-      <UNSAFE_PortalProvider getContainer={getContainer}>
-        <div>test</div>
-      </UNSAFE_PortalProvider>,
-    );
-
-    unmount();
-
-    expect(popSpy).toHaveBeenCalledTimes(1);
-    expect(portalRootManager.getCurrent()).toBeNull();
+    expect(screen.getByTestId('inside').textContent).toBe('container');
+    expect(screen.getByTestId('outside').textContent).toBe('null');
   });
 });
 
@@ -78,103 +70,34 @@ describe('usePortalRoot', () => {
     expect(screen.getByTestId('test').textContent).toBe('found');
   });
 
-  it('returns manager.getCurrent when outside PortalProvider', () => {
-    const container = document.createElement('div');
-    portalRootManager.push(() => container);
-
+  it('returns a function that returns null when outside PortalProvider', () => {
     const TestComponent = () => {
       const portalRoot = usePortalRoot();
-      return <div data-testid='test'>{portalRoot() === container ? 'found' : 'not-found'}</div>;
+      return <div data-testid='test'>{portalRoot() === null ? 'null' : 'not-null'}</div>;
     };
 
     render(<TestComponent />);
 
-    expect(screen.getByTestId('test').textContent).toBe('found');
-
-    portalRootManager.pop();
+    expect(screen.getByTestId('test').textContent).toBe('null');
   });
 
-  it('context value takes precedence over manager', () => {
-    const contextContainer = document.createElement('div');
-    const managerContainer = document.createElement('div');
-    const contextGetContainer = () => contextContainer;
-
-    portalRootManager.push(() => managerContainer);
+  it('supports nested providers with innermost taking precedence', () => {
+    const outerContainer = document.createElement('div');
+    const innerContainer = document.createElement('div');
 
     const TestComponent = () => {
       const portalRoot = usePortalRoot();
-      return <div data-testid='test'>{portalRoot() === contextContainer ? 'found' : 'not-found'}</div>;
+      return <div data-testid='test'>{portalRoot() === innerContainer ? 'inner' : 'outer'}</div>;
     };
 
     render(
-      <UNSAFE_PortalProvider getContainer={contextGetContainer}>
-        <TestComponent />
+      <UNSAFE_PortalProvider getContainer={() => outerContainer}>
+        <UNSAFE_PortalProvider getContainer={() => innerContainer}>
+          <TestComponent />
+        </UNSAFE_PortalProvider>
       </UNSAFE_PortalProvider>,
     );
 
-    expect(screen.getByTestId('test').textContent).toBe('found');
-
-    portalRootManager.pop();
-  });
-});
-
-describe('portalRootManager', () => {
-  beforeEach(() => {
-    // Clear the stack before each test
-    while (portalRootManager.getCurrent() !== null) {
-      portalRootManager.pop();
-    }
-  });
-
-  it('maintains stack of portal roots', () => {
-    const container1 = document.createElement('div');
-    const container2 = document.createElement('div');
-    const getContainer1 = () => container1;
-    const getContainer2 = () => container2;
-
-    portalRootManager.push(getContainer1);
-    portalRootManager.push(getContainer2);
-
-    expect(portalRootManager.getCurrent()).toBe(container2);
-
-    portalRootManager.pop();
-    expect(portalRootManager.getCurrent()).toBe(container1);
-
-    portalRootManager.pop();
-  });
-
-  it('getCurrent returns topmost root', () => {
-    const container1 = document.createElement('div');
-    const container2 = document.createElement('div');
-    const getContainer1 = () => container1;
-    const getContainer2 = () => container2;
-
-    portalRootManager.push(getContainer1);
-    portalRootManager.push(getContainer2);
-
-    expect(portalRootManager.getCurrent()).toBe(container2);
-
-    portalRootManager.pop();
-    portalRootManager.pop();
-  });
-
-  it('pop removes topmost root', () => {
-    const container1 = document.createElement('div');
-    const container2 = document.createElement('div');
-    const getContainer1 = () => container1;
-    const getContainer2 = () => container2;
-
-    portalRootManager.push(getContainer1);
-    portalRootManager.push(getContainer2);
-
-    portalRootManager.pop();
-
-    expect(portalRootManager.getCurrent()).toBe(container1);
-
-    portalRootManager.pop();
-  });
-
-  it('getCurrent returns null when stack is empty', () => {
-    expect(portalRootManager.getCurrent()).toBeNull();
+    expect(screen.getByTestId('test').textContent).toBe('inner');
   });
 });

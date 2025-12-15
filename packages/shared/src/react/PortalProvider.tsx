@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 import { createContextAndHook } from './hooks/createContextAndHook';
-import { portalRootManager } from './portal-root-manager';
 
 type PortalProviderProps = React.PropsWithChildren<{
   /**
@@ -19,8 +18,11 @@ const [PortalContext, , usePortalContextWithoutGuarantee] = createContextAndHook
 }>('PortalProvider');
 
 /**
- * PortalProvider allows you to specify a custom container for all Clerk floating UI elements
+ * UNSAFE_PortalProvider allows you to specify a custom container for Clerk floating UI elements
  * (popovers, modals, tooltips, etc.) that use portals.
+ *
+ * Only components within this provider will be affected. Components outside the provider
+ * will continue to use the default document.body for portals.
  *
  * This is particularly useful when using Clerk components inside external UI libraries
  * like Radix Dialog or React Aria Components, where portaled elements need to render
@@ -32,28 +34,15 @@ const [PortalContext, , usePortalContextWithoutGuarantee] = createContextAndHook
  *   const containerRef = useRef(null);
  *   return (
  *     <RadixDialog ref={containerRef}>
- *       <PortalProvider getContainer={() => containerRef.current}>
+ *       <UNSAFE_PortalProvider getContainer={() => containerRef.current}>
  *         <UserButton />
- *       </PortalProvider>
+ *       </UNSAFE_PortalProvider>
  *     </RadixDialog>
  *   );
  * }
  * ```
  */
 export const UNSAFE_PortalProvider = ({ children, getContainer }: PortalProviderProps) => {
-  const getContainerRef = useRef(getContainer);
-  getContainerRef.current = getContainer;
-
-  // Register with the manager for cross-tree access (e.g., modals in Components.tsx)
-  useEffect(() => {
-    const getContainerWrapper = () => getContainerRef.current();
-    portalRootManager.push(getContainerWrapper);
-    return () => {
-      portalRootManager.pop();
-    };
-  }, []);
-
-  // Provide context for same-tree access (e.g., UserButton popover)
   const contextValue = React.useMemo(() => ({ value: { getContainer } }), [getContainer]);
 
   return <PortalContext.Provider value={contextValue}>{children}</PortalContext.Provider>;
@@ -61,17 +50,16 @@ export const UNSAFE_PortalProvider = ({ children, getContainer }: PortalProvider
 
 /**
  * Hook to get the current portal root container.
- * First checks React context (for same-tree components),
- * then falls back to PortalRootManager (for cross-tree like modals).
+ * Returns the getContainer function from context if inside a PortalProvider,
+ * otherwise returns a function that returns null (default behavior).
  */
 export const usePortalRoot = (): (() => HTMLElement | null) => {
-  // Try to get from context first (for components in the same React tree)
   const contextValue = usePortalContextWithoutGuarantee();
 
   if (contextValue && 'getContainer' in contextValue && contextValue.getContainer) {
     return contextValue.getContainer;
   }
 
-  // Fall back to manager (for components in different React trees, like modals)
-  return portalRootManager.getCurrent.bind(portalRootManager);
+  // Return a function that returns null when not inside a PortalProvider
+  return () => null;
 };
