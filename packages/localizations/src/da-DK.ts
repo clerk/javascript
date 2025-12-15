@@ -738,7 +738,7 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Log ind',
       titleCombined: undefined,
@@ -759,7 +759,7 @@ export const daDK: LocalizationResource = {
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Udfyld manglende felter',
     },
     emailCode: {
@@ -780,7 +780,7 @@ export const daDK: LocalizationResource = {
         title: 'Tilmelding...',
       },
       resendButton: 'Send link igen',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Bekræft din email',
       verified: {
         title: 'Vellykket tilmelding',
@@ -833,13 +833,13 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
-      subtitleCombined: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      subtitleCombined: 'Fortsæt til {{applicationName}}',
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
     },
   },
-  socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
+  socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
