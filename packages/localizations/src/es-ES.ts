@@ -848,7 +848,7 @@ export const esES: LocalizationResource = {
     chooseOrganization: {
       action__createOrganization: 'Crear nueva organización',
       action__invitationAccept: 'Unirse',
-      action__suggestionsAccept: 'Pedir unirse',
+      action__suggestionsAccept: 'Solicitar unirse',
       subtitle: 'Unirse a una organización existente o crear una nueva',
       suggestionsAcceptedLabel: 'Pendiente de aprobación',
       title: 'Elegir una organización',
@@ -856,16 +856,16 @@ export const esES: LocalizationResource = {
     createOrganization: {
       formButtonReset: 'Cancelar',
       formButtonSubmit: 'Continuar',
-      formFieldInputPlaceholder__name: 'Nombre',
-      formFieldInputPlaceholder__slug: 'Identificador',
-      formFieldLabel__name: 'Mi Organización',
-      formFieldLabel__slug: 'mi-organizacion',
+      formFieldInputPlaceholder__name: 'Mi Organización',
+      formFieldInputPlaceholder__slug: 'mi-organizacion',
+      formFieldLabel__name: 'Nombre',
+      formFieldLabel__slug: 'Identificador',
       subtitle: 'Ingrese los detalles de su organización para continuar',
       title: 'Configurar su organización',
     },
     signOut: {
-      actionLink: 'Cerrar sesion',
-      actionText: 'Logueado como {{identifier}}',
+      actionLink: 'Cerrar sesión',
+      actionText: 'Sesión iniciada como {{identifier}}',
     },
   },
   taskResetPassword: {
