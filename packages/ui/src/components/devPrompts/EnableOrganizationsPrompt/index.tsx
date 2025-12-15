@@ -6,9 +6,7 @@ import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import React, { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
 
-import { ArrowRightIcon } from '@/icons';
 import { useEnvironment } from '@/ui/contexts';
-import { Alert } from '@/ui/elements/Alert';
 import { Modal } from '@/ui/elements/Modal';
 import { InternalThemeProvider } from '@/ui/styledSystem';
 
@@ -212,38 +210,6 @@ const EnableOrganizationsPromptInternal = ({
                     description='Users can work outside of an organization with a personal account'
                   />
                 </RadioGroup>
-
-                {!allowPersonalAccount && (
-                  <Alert
-                    variant='warning'
-                    sx={t => ({ marginTop: t.sizes.$3 })}
-                  >
-                    Existing users will be forced to join an organization, which may break your application. If you are
-                    unsure of the impact, please contact support before enabling.
-                    <a
-                      href='https://clerk.com/docs/authentication/configuration/session-tasks#available-tasks'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      css={css`
-                        display: flex;
-                        align-items: center;
-                        gap: 4px;
-                        font-weight: 600;
-                        margin-top: 4px;
-                        text-decoration: none;
-                        transition: all 120ms ease-in-out;
-                      `}
-                    >
-                      <span>Learn more</span>
-                      <ArrowRightIcon
-                        css={css`
-                          width: 16px;
-                          height: 16px;
-                        `}
-                      />
-                    </a>
-                  </Alert>
-                )}
               </Flex>
             )}
           </Flex>
@@ -422,7 +388,7 @@ const PromptBadge = ({ children }: PromptBadgeProps) => {
         border-radius: 0.25rem;
         font-size: 0.6875rem;
         font-weight: 500;
-        line-height: 1.25;
+        line-height: 1.23;
         background-color: #ebebeb;
         color: #2b2b34;
       `}
@@ -472,102 +438,104 @@ type RadioGroupItemProps = {
   description?: React.ReactNode;
 };
 
+const RADIO_INDICATOR_SIZE = '1rem';
+const RADIO_GAP = '0.5rem';
+
 const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
   const { name, value: selectedValue, onChange } = useRadioGroup();
   const descriptionId = useId();
   const checked = value === selectedValue;
 
   return (
-    <label
-      css={css`
-        ${basePromptElementStyles};
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-        cursor: pointer;
-        user-select: none;
-
-        &:has(input:focus-visible) > span:first-of-type {
-          outline: 2px solid white;
-          outline-offset: 2px;
-        }
-
-        &:hover:has(input:not(:checked)) > span:first-of-type {
-          background-color: rgba(255, 255, 255, 0.08);
-        }
-
-        &:hover:has(input:checked) > span:first-of-type {
-          background-color: color-mix(in srgb, #6c47ff 80%, transparent);
-        }
-      `}
+    <Flex
+      direction='col'
+      gap={1}
     >
-      {/* Visually hidden input */}
-      <input
-        type='radio'
-        name={name}
-        value={value}
-        checked={checked}
-        onChange={() => onChange(value)}
-        aria-describedby={description ? descriptionId : undefined}
+      <label
         css={css`
           ${basePromptElementStyles};
-          position: absolute;
-          width: 1px;
-          height: 1px;
-          padding: 0;
-          margin: -1px;
-          overflow: hidden;
-          clip: rect(0, 0, 0, 0);
-          white-space: nowrap;
-          border-width: 0;
-        `}
-      />
+          display: flex;
+          align-items: flex-start;
+          gap: ${RADIO_GAP};
+          cursor: pointer;
+          user-select: none;
 
-      <span
-        aria-hidden='true'
-        css={css`
-          ${basePromptElementStyles};
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 1rem;
-          height: 1rem;
-          margin-top: 0.125rem;
-          flex-shrink: 0;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.3);
-          background-color: transparent;
-          transition: 120ms ease-in-out;
-          transition-property: border-color, background-color, box-shadow;
+          &:has(input:focus-visible) > span:first-of-type {
+            outline: 2px solid white;
+            outline-offset: 2px;
+          }
 
-          ${checked &&
-          css`
-            border-width: 2px;
-            border-color: #6c47ff;
-            background-color: color-mix(in srgb, #6c47ff 100%, transparent);
-            box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.2);
-          `}
+          &:hover:has(input:not(:checked)) > span:first-of-type {
+            background-color: rgba(255, 255, 255, 0.08);
+          }
 
-          &::after {
-            content: '';
-            position: absolute;
-            width: 0.375rem;
-            height: 0.375rem;
-            border-radius: 50%;
-            background-color: white;
-            opacity: ${checked ? 1 : 0};
-            transform: scale(${checked ? 1 : 0});
-            transition: 120ms ease-in-out;
-            transition-property: opacity, transform;
+          &:hover:has(input:checked) > span:first-of-type {
+            background-color: color-mix(in srgb, #6c47ff 80%, transparent);
           }
         `}
-      />
-
-      <Flex
-        direction='col'
-        gap={1}
       >
+        <input
+          type='radio'
+          name={name}
+          value={value}
+          checked={checked}
+          onChange={() => onChange(value)}
+          aria-describedby={description ? descriptionId : undefined}
+          css={css`
+            ${basePromptElementStyles};
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+          `}
+        />
+
+        <span
+          aria-hidden='true'
+          css={css`
+            ${basePromptElementStyles};
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: ${RADIO_INDICATOR_SIZE};
+            height: ${RADIO_INDICATOR_SIZE};
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: transparent;
+            transition: 120ms ease-in-out;
+            transition-property: border-color, background-color, box-shadow;
+
+            ${checked &&
+            css`
+              border-width: 2px;
+              border-color: #6c47ff;
+              background-color: color-mix(in srgb, #6c47ff 100%, transparent);
+              box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.2);
+            `}
+
+            &::after {
+              content: '';
+              position: absolute;
+              width: 0.375rem;
+              height: 0.375rem;
+              border-radius: 50%;
+              background-color: white;
+              opacity: ${checked ? 1 : 0};
+              transform: scale(${checked ? 1 : 0});
+              transition: 120ms ease-in-out;
+              transition-property: opacity, transform;
+            }
+          `}
+        />
+
         <span
           css={[
             basePromptElementStyles,
@@ -581,24 +549,26 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
         >
           {label}
         </span>
-        {description && (
-          <span
-            id={descriptionId}
-            css={[
-              basePromptElementStyles,
-              css`
-                font-size: 0.75rem;
-                line-height: 1.33;
-                color: #c3c3c6;
-                text-wrap: pretty;
-              `,
-            ]}
-          >
-            {description}
-          </span>
-        )}
-      </Flex>
-    </label>
+      </label>
+
+      {description && (
+        <span
+          id={descriptionId}
+          css={[
+            basePromptElementStyles,
+            css`
+              padding-inline-start: calc(${RADIO_INDICATOR_SIZE} + ${RADIO_GAP});
+              font-size: 0.75rem;
+              line-height: 1.33;
+              color: #c3c3c6;
+              text-wrap: pretty;
+            `,
+          ]}
+        >
+          {description}
+        </span>
+      )}
+    </Flex>
   );
 };
 
