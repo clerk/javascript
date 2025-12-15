@@ -29,6 +29,7 @@ import {
 import { ResetPassword } from './ResetPassword';
 import { ResetPasswordSuccess } from './ResetPasswordSuccess';
 import { SignInAccountSwitcher } from './SignInAccountSwitcher';
+import { SignInClientTrust } from './SignInClientTrust';
 import { SignInFactorOne } from './SignInFactorOne';
 import { SignInFactorTwo } from './SignInFactorTwo';
 import { SignInSSOCallback } from './SignInSSOCallback';
@@ -54,6 +55,9 @@ function SignInRoutes(): JSX.Element {
         </Route>
         <Route path='factor-two'>
           <SignInFactorTwo />
+        </Route>
+        <Route path='client-trust'>
+          <SignInClientTrust />
         </Route>
         <Route path='reset-password'>
           <ResetPassword />

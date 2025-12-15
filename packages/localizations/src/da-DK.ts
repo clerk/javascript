@@ -738,7 +738,7 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       subtitleCombined: undefined,
       title: 'Log ind',
       titleCombined: undefined,
@@ -759,7 +759,7 @@ export const daDK: LocalizationResource = {
     continue: {
       actionLink: 'Log ind',
       actionText: 'Har du en konto?',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Udfyld manglende felter',
     },
     emailCode: {
@@ -780,7 +780,7 @@ export const daDK: LocalizationResource = {
         title: 'Tilmelding...',
       },
       resendButton: 'Send link igen',
-      subtitle: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
       title: 'Bekræft din email',
       verified: {
         title: 'Vellykket tilmelding',
@@ -833,13 +833,13 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
-      subtitle: 'Forsæt til {{applicationName}}',
-      subtitleCombined: 'Forsæt til {{applicationName}}',
+      subtitle: 'Fortsæt til {{applicationName}}',
+      subtitleCombined: 'Fortsæt til {{applicationName}}',
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
     },
   },
-  socialButtonsBlockButton: 'Forsæt med {{provider|titleize}}',
+  socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
@@ -883,6 +883,8 @@ export const daDK: LocalizationResource = {
     captcha_unavailable:
       'Tilmelding mislykkedes på grund af fejlet botvalidering. Opdater siden for at prøve igen, eller kontakt support for yderligere assistance.',
     form_code_incorrect: 'Koden er forkert.',
+    form_email_address_blocked:
+      'Midlertidige e-mailtjenester understøttes ikke. Brug venligst din almindelige e-mailadresse til at oprette en konto.',
     form_identifier_exists__email_address: 'E-mailadressen er allerede i brug.',
     form_identifier_exists__phone_number: 'Telefonnummeret er allerede i brug.',
     form_identifier_exists__username: 'Brugernavnet er allerede i brug.',
@@ -900,6 +902,8 @@ export const daDK: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Adgangskoden er forkert.',
+    form_password_or_identifier_incorrect:
+      'Adgangskoden eller e-mailadressen er forkert. Prøv igen eller brug en anden metode.',
     form_password_length_too_short: 'Adgangskoden er for kort.',
     form_password_not_strong_enough: 'Adgangskoden er ikke stærk nok.',
     form_password_pwned: 'Adgangskoden er blevet kompromitteret.',

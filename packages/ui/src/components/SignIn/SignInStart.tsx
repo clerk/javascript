@@ -235,6 +235,8 @@ function SignInStartInternal(): JSX.Element {
           }
           case 'needs_second_factor':
             return navigate('factor-two');
+          case 'needs_client_trust':
+            return navigate('client-trust');
           case 'complete':
             removeClerkQueryParam('__clerk_ticket');
             return clerk.setActive({
@@ -390,6 +392,8 @@ function SignInStartInternal(): JSX.Element {
         }
         case 'needs_second_factor':
           return navigate('factor-two');
+        case 'needs_client_trust':
+          return navigate('client-trust');
         case 'complete':
           return clerk.setActive({
             session: res.createdSessionId,

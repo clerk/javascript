@@ -262,7 +262,7 @@ export class SignIn extends BaseResource implements SignInResource {
         emailAddressId,
         redirectUrl,
       };
-      const isSecondFactor = this.status === 'needs_second_factor';
+      const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
       const verificationKey: 'firstFactorVerification' | 'secondFactorVerification' = isSecondFactor
         ? 'secondFactorVerification'
         : 'firstFactorVerification';
