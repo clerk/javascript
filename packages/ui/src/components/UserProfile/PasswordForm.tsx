@@ -108,6 +108,10 @@ export const PasswordForm = withCardStateProvider((props: PasswordFormProps) => 
   };
 
   const updatePassword = async () => {
+    if (!canSubmit) {
+      return;
+    }
+
     try {
       successPagePropsRef.current = {
         title: user.passwordEnabled

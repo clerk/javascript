@@ -92,5 +92,5 @@ export type {
  */
 export const localUiForTesting = {
   version: PACKAGE_VERSION,
-  url: 'http://localhost:4001/npm/ui.browser.js',
+  url: 'http://localhost:4011/npm/ui.browser.js',
 } as Ui<Appearance & { newprop?: string }>;
