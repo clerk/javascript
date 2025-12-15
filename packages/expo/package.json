@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo",
-  "version": "2.19.10",
+  "version": "2.19.26",
   "description": "Clerk React Native/Expo library",
   "keywords": [
     "react",
@@ -72,6 +72,7 @@
     "ios",
     "expo-module.config.json",
     "app.plugin.js",
+    "plugin",
     "web",
     "local-credentials",
     "passkeys",
@@ -80,8 +81,9 @@
     "token-cache"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && pnpm build:plugin",
     "build:declarations": "tsc -p tsconfig.declarations.json",
+    "build:plugin": "tsc -p plugin/tsconfig.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
@@ -102,6 +104,7 @@
   },
   "devDependencies": {
     "@clerk/expo-passkeys": "workspace:*",
+    "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
     "expo-apple-authentication": "^7.2.4",
     "expo-auth-session": "^5.4.0",
