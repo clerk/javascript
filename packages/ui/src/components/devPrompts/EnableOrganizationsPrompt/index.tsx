@@ -6,11 +6,13 @@ import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import React, { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
 
+import { ArrowRightIcon } from '@/icons';
 import { useEnvironment } from '@/ui/contexts';
+import { Alert } from '@/ui/elements/Alert';
 import { Modal } from '@/ui/elements/Modal';
 import { InternalThemeProvider } from '@/ui/styledSystem';
 
-import { Box, Flex } from '../../../customizables';
+import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, ClerkLogoIcon, PromptContainer, PromptSuccessIcon } from '../shared';
 
@@ -178,53 +180,68 @@ const EnableOrganizationsPromptInternal = ({
             </Flex>
 
             {hasPersonalAccountsEnabled && (
-              <Box
-                sx={t => ({
-                  display: 'grid',
-                  gridTemplateRows: isEnabled ? '0fr' : '1fr',
-                  transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-                  marginInline: '-0.5rem',
-                  overflow: 'hidden',
-                })}
-                {...(isEnabled && { inert: '' })}
+              <Flex
+                sx={t => ({ marginTop: t.sizes.$2 })}
+                direction='col'
               >
-                <Flex
-                  sx={t => ({
-                    minHeight: 0,
-                    paddingInline: '0.5rem',
-                    opacity: isEnabled ? 0 : 1,
-                    transition: `opacity ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-                  })}
+                <RadioGroup
+                  value={allowPersonalAccount ? 'allow' : 'require'}
+                  onChange={value => setAllowPersonalAccount(value === 'allow')}
                 >
-                  <Flex sx={t => ({ marginTop: t.sizes.$2 })}>
-                    <RadioGroup
-                      value={allowPersonalAccount ? 'allow' : 'require'}
-                      onChange={value => setAllowPersonalAccount(value === 'allow')}
+                  <RadioGroupItem
+                    value='require'
+                    label={
+                      <Flex gap={2}>
+                        <span>Require organization membership</span>
+                        <PromptBadge>Most common</PromptBadge>
+                      </Flex>
+                    }
+                    description={
+                      <>
+                        <span className='block'>Users need to belong to at least one organization.</span>
+                        <span>Common for most B2B SaaS applications</span>
+                      </>
+                    }
+                  />
+                  <RadioGroupItem
+                    value='allow'
+                    label='Allow personal accounts'
+                    description='Users can work outside of an organization with a personal account'
+                  />
+                </RadioGroup>
+
+                {!allowPersonalAccount && (
+                  <Alert
+                    variant='warning'
+                    sx={t => ({ marginTop: t.sizes.$3 })}
+                  >
+                    Existing users will be forced to join an organization, which may break your application. If you are
+                    unsure of the impact, please contact support before enabling.
+                    <a
+                      href='https://clerk.com/docs/authentication/configuration/session-tasks#available-tasks'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      css={css`
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                        font-weight: 600;
+                        margin-top: 4px;
+                        text-decoration: none;
+                        transition: all 120ms ease-in-out;
+                      `}
                     >
-                      <RadioGroupItem
-                        value='require'
-                        label={
-                          <Flex gap={2}>
-                            <span>Require organization membership</span>
-                            <PromptBadge>Most common</PromptBadge>
-                          </Flex>
-                        }
-                        description={
-                          <>
-                            <span className='block'>Users need to belong to at least one organization.</span>
-                            <span>Common for most B2B SaaS applications</span>
-                          </>
-                        }
+                      <span>Learn more</span>
+                      <ArrowRightIcon
+                        css={css`
+                          width: 16px;
+                          height: 16px;
+                        `}
                       />
-                      <RadioGroupItem
-                        value='allow'
-                        label='Allow personal accounts'
-                        description='Users can work outside of an organization with a personal account'
-                      />
-                    </RadioGroup>
-                  </Flex>
-                </Flex>
-              </Box>
+                    </a>
+                  </Alert>
+                )}
+              </Flex>
             )}
           </Flex>
 
@@ -464,18 +481,15 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
         cursor: pointer;
         user-select: none;
 
-        /* Focus-visible state for indicator */
         &:has(input:focus-visible) > span:first-of-type {
           outline: 2px solid white;
           outline-offset: 2px;
         }
 
-        /* Hover state for unchecked indicator */
         &:hover:has(input:not(:checked)) > span:first-of-type {
           background-color: rgba(255, 255, 255, 0.08);
         }
 
-        /* Hover state for checked indicator */
         &:hover:has(input:checked) > span:first-of-type {
           background-color: color-mix(in srgb, #6c47ff 80%, transparent);
         }
@@ -529,7 +543,6 @@ const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps) => {
             box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.2);
           `}
 
-          /* Inner dot */
           &::after {
             content: '';
             position: absolute;
