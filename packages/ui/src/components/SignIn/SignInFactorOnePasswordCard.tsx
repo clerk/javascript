@@ -78,7 +78,7 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
           case 'complete':
             return setActive({
               session: res.createdSessionId,
-              navigate: async ({ session }) => {
+              navigate: ({ session }) => {
                 return navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
               },
             });
