@@ -95,7 +95,7 @@
     "next": "15.2.6"
   },
   "peerDependencies": {
-    "next": "^15.2.6 || ^16",
+    "next": "^15.2.6 || ^15.3.6 || ^15.4.8 || ^15.5.7 || ^15.6.0-0 || ^16.0.7 || ^16.1.0-0",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
