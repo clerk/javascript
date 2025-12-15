@@ -90,6 +90,7 @@
     "@rspack/plugin-react-refresh": "^1.5.2",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
+    "@swc/helpers": "^0.5.17",
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "cross-fetch": "^4.1.0",

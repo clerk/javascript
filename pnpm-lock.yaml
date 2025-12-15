@@ -952,6 +952,9 @@ importers:
       '@svgr/webpack':
         specifier: ^6.5.1
         version: 6.5.1
+      '@swc/helpers':
+        specifier: ^0.5.17
+        version: 0.5.17
       '@types/webpack-env':
         specifier: ^1.18.8
         version: 1.18.8
