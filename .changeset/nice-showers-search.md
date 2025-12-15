@@ -2,4 +2,4 @@
 '@clerk/localizations': patch
 ---
 
-Update Spanish localizations for taskChooseOrganization
+Update localizations for taskChooseOrganization
