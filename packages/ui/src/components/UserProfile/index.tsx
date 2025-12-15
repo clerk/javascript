@@ -4,12 +4,12 @@ import React from 'react';
 import { USER_PROFILE_CARD_SCROLLBOX_ID } from '@/constants';
 import { UserProfileContext, withCoreUserGuard } from '@/contexts';
 import { Flow, localizationKeys } from '@/customizables';
+import { withCardStateProvider } from '@/elements/contexts';
+import { NavbarMenuButtonRow } from '@/elements/Navbar';
+import { ProfileCard } from '@/elements/ProfileCard';
 import type { WithInternalRouting } from '@/internal';
 import { Route, Switch } from '@/router';
 import type { UserProfileCtx } from '@/types';
-import { withCardStateProvider } from '@/ui/elements/contexts';
-import { NavbarMenuButtonRow } from '@/ui/elements/Navbar';
-import { ProfileCard } from '@/ui/elements/ProfileCard';
 
 import { UserProfileNavbar } from './UserProfileNavbar';
 import { UserProfileRoutes } from './UserProfileRoutes';

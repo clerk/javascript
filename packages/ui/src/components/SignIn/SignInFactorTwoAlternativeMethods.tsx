@@ -4,12 +4,12 @@ import React from 'react';
 import { useCoreSignIn } from '@/contexts';
 import type { LocalizationKey } from '@/customizables';
 import { Col, descriptors, Flow, localizationKeys } from '@/customizables';
+import { ArrowBlockButton } from '@/elements/ArrowBlockButton';
+import { Card } from '@/elements/Card';
 import { useCardState } from '@/elements/contexts';
-import { ArrowBlockButton } from '@/ui/elements/ArrowBlockButton';
-import { Card } from '@/ui/elements/Card';
-import { Header } from '@/ui/elements/Header';
-import { backupCodePrefFactorComparator } from '@/ui/utils/factorSorting';
-import { formatSafeIdentifier } from '@/ui/utils/formatSafeIdentifier';
+import { Header } from '@/elements/Header';
+import { backupCodePrefFactorComparator } from '@/utils/factorSorting';
+import { formatSafeIdentifier } from '@/utils/formatSafeIdentifier';
 
 import { HavingTrouble } from './HavingTrouble';
 

@@ -2,21 +2,21 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
-import type { WithInternalRouting } from '@/internal';
-import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/ui/common/EmailLinkCompleteFlowCard';
+import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
 import {
   SignInContext,
   SignUpContext,
   useSignInContext,
   useSignUpContext,
   withCoreSessionSwitchGuard,
-} from '@/ui/contexts';
-import { Flow } from '@/ui/customizables';
-import { useFetch } from '@/ui/hooks';
-import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
-import { SessionTasks as LazySessionTasks } from '@/ui/lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/ui/router';
-import type { SignUpCtx } from '@/ui/types';
+} from '@/contexts';
+import { Flow } from '@/customizables';
+import { useFetch } from '@/hooks';
+import { usePreloadTasks } from '@/hooks/usePreloadTasks';
+import type { WithInternalRouting } from '@/internal';
+import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
+import type { SignUpCtx } from '@/types';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
 import {

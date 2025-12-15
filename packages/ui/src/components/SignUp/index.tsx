@@ -5,10 +5,10 @@ import React from 'react';
 import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
 import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
 import { Flow } from '@/customizables';
+import { usePreloadTasks } from '@/hooks/usePreloadTasks';
 import type { WithInternalRouting } from '@/internal';
 import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
-import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
 
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
