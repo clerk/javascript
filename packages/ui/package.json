@@ -95,6 +95,7 @@
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "cross-fetch": "^4.1.0",
+    "minimatch": "^10.1.1",
     "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
   },

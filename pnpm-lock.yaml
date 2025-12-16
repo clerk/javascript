@@ -1000,6 +1000,9 @@ importers:
       cross-fetch:
         specifier: ^4.1.0
         version: 4.1.0
+      minimatch:
+        specifier: ^10.1.1
+        version: 10.1.1
       tsdown:
         specifier: catalog:repo
         version: 0.15.7(publint@0.3.15)(typescript@5.8.3)(vue-tsc@3.1.4(typescript@5.8.3))
