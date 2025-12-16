@@ -1,5 +1,3 @@
-import 'regenerator-runtime/runtime';
-
 import { Clerk } from './core/clerk';
 
 export {
