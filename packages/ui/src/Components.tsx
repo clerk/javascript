@@ -18,7 +18,7 @@ import type {
   WaitlistProps,
 } from '@clerk/shared/types';
 import { createDeferredPromise } from '@clerk/shared/utils';
-import React, { Suspense } from 'react';
+import React, { Suspense, useCallback, useRef, useSyncExternalStore } from 'react';
 
 import type { AppearanceCascade } from './customizables/parseAppearance';
 // NOTE: Using `./hooks` instead of `./hooks/useClerkModalStateParams` will increase the bundle size
@@ -182,7 +182,6 @@ interface ComponentsState {
     open: false;
     props: null | __internal_SubscriptionDetailsProps;
   };
-  nodes: Map<HTMLDivElement, HtmlNodeOptions>;
   impersonationFab: boolean;
 }
 
@@ -219,7 +218,7 @@ export const mountComponentRenderer = (
   let componentsControlsResolver: Promise<ComponentControls> | undefined;
 
   return {
-    ensureMounted: async (opts?: { preloadHint: ClerkComponentName }) => {
+    ensureMounted: (opts?: { preloadHint: ClerkComponentName }) => {
       const { preloadHint } = opts || {};
       // This mechanism ensures that mountComponentControls will only be called once
       // and any calls to .mount before mountComponentControls resolves will fire in order.
@@ -288,7 +287,6 @@ const Components = (props: ComponentsProps) => {
       open: false,
       props: null,
     },
-    nodes: new Map(),
     impersonationFab: false,
   });
 
@@ -305,11 +303,27 @@ const Components = (props: ComponentsProps) => {
     checkoutDrawer,
     planDetailsDrawer,
     subscriptionDetailsDrawer,
-    nodes,
   } = state;
+  const clerk = props.getClerk();
+
+  // We do this to ensure this component re-renders before any children listening to this state does.
+  // This is necessary since `unmountComponent` uses `setState` to trigger re-renders, but this can
+  // happen _after_ `useSyncExternalStore` triggers a re-render. This can cause the Clerk components to
+  // re-render and even run effects when they should have already been unmounted.
+  // Forcing this to re-render first to remove the children is a workaround for this issue.
+  // Note that this does not fix the issue at its root, which is that it's possible for Clerk components
+  // to stay mounted even after their node has been removed.
+  useSyncExternalStore(
+    useCallback(callback => clerk.addListener(callback, { skipInitialEmit: true }), [clerk]),
+    useCallback(() => {
+      return clerk.__internal_lastEmittedResources;
+    }, [clerk]),
+  );
+
+  // See above comment on useSyncExternalStore for why we use a ref to store the nodes instead of state
+  const nodesRef = useRef<Map<HTMLDivElement, HtmlNodeOptions>>(new Map());
 
   const { urlStateParam, clearUrlStateParam, decodedRedirectParams } = useClerkModalStateParams();
-
   useSafeLayoutEffect(() => {
     if (decodedRedirectParams) {
       setState(s => ({
@@ -318,29 +332,29 @@ const Components = (props: ComponentsProps) => {
       }));
     }
 
+    const triggerRender = () => {
+      setState(s => ({ ...s }));
+    };
+
     componentsControls.mountComponent = params => {
       const { node, name, props, appearanceKey } = params;
       assertDOMElement(node);
-      setState(s => {
-        s.nodes.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });
-        return { ...s, nodes };
-      });
+      nodesRef.current.set(node, { key: `p${++portalCt}`, name, props, appearanceKey });
+      triggerRender();
     };
 
     componentsControls.unmountComponent = params => {
       const { node } = params;
-      setState(s => {
-        s.nodes.delete(node);
-        return { ...s, nodes };
-      });
+      nodesRef.current.delete(node);
+      triggerRender();
     };
 
     componentsControls.updateProps = ({ node, props, ...restProps }) => {
       if (node && props && typeof props === 'object') {
-        const nodeOptions = state.nodes.get(node);
+        const nodeOptions = nodesRef.current.get(node);
         if (nodeOptions) {
           nodeOptions.props = { ...props };
-          setState(s => ({ ...s }));
+          triggerRender();
           return;
         }
       }
@@ -608,7 +622,7 @@ const Components = (props: ComponentsProps) => {
         options={state.options}
         moduleManager={props.moduleManager}
       >
-        {[...nodes].map(([node, component]) => {
+        {[...nodesRef.current].map(([node, component]) => {
           return (
             <LazyComponentRenderer
               key={component.key}
