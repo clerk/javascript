@@ -192,7 +192,10 @@ const EnableOrganizationsPromptInternal = ({
                   <RadioGroupItem
                     value='require'
                     label={
-                      <Flex gap={2}>
+                      <Flex
+                        wrap='wrap'
+                        sx={t => ({ columnGap: t.sizes.$2, rowGap: t.sizes.$1 })}
+                      >
                         <span>Require organization membership</span>
                         <PromptBadge>Standard</PromptBadge>
                       </Flex>
@@ -386,6 +389,7 @@ const PromptBadge = ({ children }: PromptBadgeProps): JSX.Element => {
         line-height: 1.23;
         background-color: #ebebeb;
         color: #2b2b34;
+        white-space: nowrap;
       `}
     >
       {children}
