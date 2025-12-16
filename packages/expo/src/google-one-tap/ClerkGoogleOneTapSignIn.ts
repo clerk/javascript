@@ -64,32 +64,13 @@ export function isErrorWithCode(error: unknown): error is { code: string; messag
 }
 
 /**
- * Clerk's Google One Tap Sign-In module for Android.
+ * Internal Google One Tap Sign-In module.
  *
  * This module provides native Google Sign-In functionality using Google's
  * Credential Manager API with full nonce support for replay attack protection.
  *
- * @example
- * ```typescript
- * import { ClerkGoogleOneTapSignIn } from '@clerk/clerk-expo';
- * import * as Crypto from 'expo-crypto';
- *
- * // Configure once at app startup
- * ClerkGoogleOneTapSignIn.configure({
- *   webClientId: 'YOUR_WEB_CLIENT_ID',
- * });
- *
- * // Sign in with nonce
- * const nonce = Crypto.randomUUID();
- * const response = await ClerkGoogleOneTapSignIn.signIn({ nonce });
- *
- * if (response.type === 'success') {
- *   const { idToken } = response.data;
- *   // Use idToken with Clerk
- * }
- * ```
- *
- * @platform Android
+ * @internal This is an internal module. Use the `useSignInWithGoogle` hook instead.
+ * @platform Android, iOS
  */
 export const ClerkGoogleOneTapSignIn = {
   /**
