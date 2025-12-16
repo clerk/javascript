@@ -28,12 +28,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
+      // Wait for alternative methods to be visible, then check for error message
+      const altMethodsButton = u.po.signIn.getAltMethodsEmailCodeButton();
+      await expect(altMethodsButton).toBeVisible({ timeout: 10000 });
+
       await expect(
         u.page.getByText(
           'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
         ),
-      ).toBeVisible();
-      await u.po.signIn.getAltMethodsEmailCodeButton().click();
+      ).toBeVisible({ timeout: 10000 });
+      await altMethodsButton.click();
 
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });
@@ -81,12 +85,16 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       await u.po.signIn.setPassword(user.password);
       await u.po.signIn.continue();
 
+      // Wait for alternative methods to be visible, then check for error message
+      const altMethodsButton = u.po.signIn.getAltMethodsEmailCodeButton();
+      await expect(altMethodsButton).toBeVisible({ timeout: 10000 });
+
       await expect(
         u.page.getByText(
           'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
         ),
-      ).toBeVisible();
-      await u.po.signIn.getAltMethodsEmailCodeButton().click();
+      ).toBeVisible({ timeout: 10000 });
+      await altMethodsButton.click();
 
       await u.page.getByRole('textbox', { name: 'code' }).click();
       await u.page.keyboard.type('424242', { delay: 100 });

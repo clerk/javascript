@@ -81,7 +81,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
       // Navigate to protected page, with active session, where user button gets rendered
       await u.page.goToRelative('/user-button');
 
-      // Switch account, to a session that has a pending status
+      // Wait for page to be ready and user button to be mounted
+      await page.waitForLoadState('networkidle');
       await u.po.userButton.waitForMounted();
       await u.po.userButton.toggleTrigger();
       await u.po.userButton.waitForPopover();

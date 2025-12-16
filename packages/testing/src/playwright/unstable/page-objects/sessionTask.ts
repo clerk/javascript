@@ -27,8 +27,14 @@ export const createSessionTaskComponentPageObject = (testArgs: { page: EnhancedP
       newPassword: string;
       confirmPassword: string;
     }) => {
-      await page.locator('input[name=newPassword]').fill(newPassword);
-      await page.locator('input[name=confirmPassword]').fill(confirmPassword);
+      const newPasswordInput = page.locator('input[name=newPassword]');
+      const confirmPasswordInput = page.locator('input[name=confirmPassword]');
+
+      await expect(newPasswordInput).toBeVisible();
+      await expect(confirmPasswordInput).toBeVisible();
+
+      await newPasswordInput.fill(newPassword);
+      await confirmPasswordInput.fill(confirmPassword);
 
       const resetPasswordButton = page.getByRole('button', { name: /reset password/i });
       await expect(resetPasswordButton).toBeVisible();
