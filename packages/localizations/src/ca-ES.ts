@@ -1358,16 +1358,16 @@ export const caES: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Iniciar sessió',
+      actionText: 'Ja tens accés?',
+      formButton: "Unir-se a la llista d'espera",
+      subtitle: "Introdueix la teva adreça de correu electrònic i t'avisarem quan el teu lloc estigui llest",
+      title: "Unir-se a la llista d'espera",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: "Se't redirigirà aviat...",
+      subtitle: "T'enviarem un missatge quan el teu lloc estigui llest",
+      title: "Gràcies per unir-te a la llista d'espera!",
     },
   },
   web3SolanaWalletButtons: {

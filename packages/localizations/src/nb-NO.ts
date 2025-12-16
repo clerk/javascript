@@ -1351,16 +1351,16 @@ export const nbNO: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Logg inn',
+      actionText: 'Har du allerede tilgang?',
+      formButton: 'Bli med på ventelisten',
+      subtitle: 'Skriv inn e-postadressen din, så gir vi deg beskjed når plassen din er klar',
+      title: 'Bli med på ventelisten',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du vil bli omdirigert snart...',
+      subtitle: 'Vi tar kontakt når plassen din er klar',
+      title: 'Takk for at du ble med på ventelisten!',
     },
   },
   web3SolanaWalletButtons: {
