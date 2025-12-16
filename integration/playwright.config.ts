@@ -14,7 +14,9 @@ export const common: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 5 : 0,
   maxFailures: process.env.CI ? 5 : undefined,
-  workers: process.env.CI ? '50%' : '70%',
+  workers: process.env.CI
+    ? (process.env.PLAYWRIGHT_WORKERS ? Number.parseInt(process.env.PLAYWRIGHT_WORKERS, 10) : '50%')
+    : '70%',
   use: {
     actionTimeout: 10_000,
     navigationTimeout: 30_000,
