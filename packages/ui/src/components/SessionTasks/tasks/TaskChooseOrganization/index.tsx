@@ -5,6 +5,7 @@ import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
@@ -104,6 +105,38 @@ const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrga
   return <ChooseOrganizationScreen onCreateOrganizationClick={() => setCurrentFlow('create')} />;
 });
 
+const withOrganizationCreationEnabled = (Component: React.ComponentType<any>) => {
+  return (props: any) => {
+    const { user } = useUser();
+
+    if (!user?.createOrganizationEnabled) {
+      return <CreateOrganizationNotEnabledScreen />;
+    }
+
+    return <Component {...props} />;
+  };
+};
+
+function CreateOrganizationNotEnabledScreen() {
+  return (
+    <Card.Root>
+      <Header.Root
+        showLogo
+        sx={t => ({ padding: `${t.space.$none} ${t.space.$8}` })}
+      >
+        <Header.Title localizationKey={localizationKeys('taskChooseOrganization.createOrganization.title')} />
+        <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.createOrganization.subtitle')} />
+      </Header.Root>
+      <Card.Content>
+        <span>You are not allowed to create organizations</span>
+      </Card.Content>
+    </Card.Root>
+  );
+}
+
 export const TaskChooseOrganization = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskChooseOrganizationInternal), 'choose-organization'),
+  withTaskGuard(
+    withCardStateProvider(withOrganizationCreationEnabled(TaskChooseOrganizationInternal)),
+    'choose-organization',
+  ),
 );
