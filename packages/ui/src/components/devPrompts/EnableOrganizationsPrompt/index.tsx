@@ -179,32 +179,37 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {hasPersonalAccountsEnabled && (
+            {hasPersonalAccountsEnabled && !isEnabled && (
               <Flex
                 sx={t => ({ marginTop: t.sizes.$2 })}
                 direction='col'
               >
                 <RadioGroup
-                  value={allowPersonalAccount ? 'allow' : 'require'}
-                  onChange={value => setAllowPersonalAccount(value === 'allow')}
+                  value={allowPersonalAccount ? 'optional' : 'required'}
+                  onChange={value => setAllowPersonalAccount(value === 'optional')}
                   labelledBy={radioGroupLabelId}
                 >
                   <RadioGroupItem
-                    value='require'
+                    value='required'
                     label={
                       <Flex
                         wrap='wrap'
                         sx={t => ({ columnGap: t.sizes.$2, rowGap: t.sizes.$1 })}
                       >
-                        <span>Require organization membership</span>
+                        <span>Membership required</span>
                         <PromptBadge>Standard</PromptBadge>
                       </Flex>
                     }
-                    description='Users need to belong to at least one organization.'
+                    description={
+                      <>
+                        <span className='block'>Users need to belong to at least one organization.</span>
+                        <span>Common for most B2B SaaS applications</span>
+                      </>
+                    }
                   />
                   <RadioGroupItem
-                    value='allow'
-                    label='Allow personal accounts'
+                    value='optional'
+                    label='Membership optional'
                     description='Users can work outside of an organization with a personal account'
                   />
                 </RadioGroup>
