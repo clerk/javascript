@@ -1,5 +1,5 @@
 import type { DeepPartial, LocalizationResource } from '@clerk/shared/types';
-import { fastDeepMergeAndReplace } from '@clerk/shared/utils';
+import { fastDeepMergeAndKeep, fastDeepMergeAndReplace } from '@clerk/shared/utils';
 import { dequal as deepEqual } from 'dequal';
 
 import { useOptions } from '../contexts';
@@ -15,8 +15,10 @@ const parseLocalizationResource = (
   if (!cache || (!!prev && prev !== userDefined && !deepEqual(userDefined, prev))) {
     prev = userDefined;
     const res = {} as LocalizationResource;
-    fastDeepMergeAndReplace(base, res);
+    // Merge user-defined first (may contain undefined values)
     fastDeepMergeAndReplace(userDefined, res);
+    // Fill in missing/undefined values from base (English)
+    fastDeepMergeAndKeep(base, res);
     cache = res;
     return cache;
   }
