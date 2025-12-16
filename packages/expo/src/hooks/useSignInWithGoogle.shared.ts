@@ -1,7 +1,10 @@
+import { useClerk } from '@clerk/react';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClientResource, SetActive } from '@clerk/shared/types';
+import Constants from 'expo-constants';
 
 import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
+import { errorThrower } from '../utils/errors';
 import type {
   StartGoogleAuthenticationFlowParams,
   StartGoogleAuthenticationFlowReturnType,
@@ -16,6 +19,64 @@ export type GoogleAuthenticationFlowContext = {
   client: ClientResource;
   setActive: SetActive;
 };
+
+type PlatformConfig = {
+  requiresIosClientId: boolean;
+};
+
+/**
+ * Factory function to create the useSignInWithGoogle hook with platform-specific configuration.
+ *
+ * @internal
+ */
+export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
+  return function useSignInWithGoogle() {
+    const clerk = useClerk();
+
+    async function startGoogleAuthenticationFlow(
+      startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
+    ): Promise<StartGoogleAuthenticationFlowReturnType> {
+      const { client, loaded, setActive } = clerk;
+
+      if (!loaded || !client) {
+        return {
+          createdSessionId: null,
+          setActive,
+        };
+      }
+
+      // Get environment variables from expo-constants
+      const webClientId =
+        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
+        process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
+      const iosClientId =
+        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID ||
+        process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID;
+
+      if (!webClientId) {
+        return errorThrower.throw(
+          'Google Sign-In credentials not found. Please set EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID in your .env file.',
+        );
+      }
+
+      if (platformConfig.requiresIosClientId && !iosClientId) {
+        return errorThrower.throw(
+          'Google Sign-In credentials not found. Please set EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID in your .env file.',
+        );
+      }
+
+      return executeGoogleAuthenticationFlow(
+        { client, setActive },
+        { webClientId, iosClientId },
+        startGoogleAuthenticationFlowParams,
+      );
+    }
+
+    return {
+      startGoogleAuthenticationFlow,
+    };
+  };
+}
 
 /**
  * Core implementation of Google Authentication flow shared between iOS and Android.

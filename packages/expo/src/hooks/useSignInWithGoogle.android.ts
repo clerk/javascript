@@ -1,14 +1,8 @@
-import { useClerk } from '@clerk/react';
-import Constants from 'expo-constants';
-
-import { errorThrower } from '../utils/errors';
-import { executeGoogleAuthenticationFlow } from './useSignInWithGoogle.shared';
-import type {
+import { createUseSignInWithGoogle } from './useSignInWithGoogle.shared';
+export type {
   StartGoogleAuthenticationFlowParams,
   StartGoogleAuthenticationFlowReturnType,
 } from './useSignInWithGoogle.types';
-
-export type { StartGoogleAuthenticationFlowParams, StartGoogleAuthenticationFlowReturnType };
 
 /**
  * Hook for native Google Authentication on Android using Clerk's built-in Google One Tap module.
@@ -51,36 +45,4 @@ export type { StartGoogleAuthenticationFlowParams, StartGoogleAuthenticationFlow
  *
  * @returns An object containing the `startGoogleAuthenticationFlow` function
  */
-export function useSignInWithGoogle() {
-  const clerk = useClerk();
-
-  async function startGoogleAuthenticationFlow(
-    startGoogleAuthenticationFlowParams?: StartGoogleAuthenticationFlowParams,
-  ): Promise<StartGoogleAuthenticationFlowReturnType> {
-    const { client, loaded, setActive } = clerk;
-
-    if (!loaded || !client) {
-      return {
-        createdSessionId: null,
-        setActive,
-      };
-    }
-
-    // Get environment variables from expo-constants
-    const webClientId =
-      Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
-      process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
-
-    if (!webClientId) {
-      return errorThrower.throw(
-        'Google Sign-In credentials not found. Please set EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID in your .env file.',
-      );
-    }
-
-    return executeGoogleAuthenticationFlow({ client, setActive }, { webClientId }, startGoogleAuthenticationFlowParams);
-  }
-
-  return {
-    startGoogleAuthenticationFlow,
-  };
-}
+export const useSignInWithGoogle = createUseSignInWithGoogle({ requiresIosClientId: false });
