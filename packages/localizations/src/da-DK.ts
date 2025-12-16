@@ -1349,16 +1349,16 @@ export const daDK: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Log ind',
+      actionText: 'Har du allerede adgang?',
+      formButton: 'Tilmeld dig ventelisten',
+      subtitle: 'Indtast din e-mailadresse, så giver vi dig besked, når din plads er klar',
+      title: 'Tilmeld dig ventelisten',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Du vil blive omdirigeret snart...',
+      subtitle: 'Vi kontakter dig, når din plads er klar',
+      title: 'Tak fordi du tilmeldte dig ventelisten!',
     },
   },
   web3SolanaWalletButtons: {
