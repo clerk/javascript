@@ -60,8 +60,7 @@
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
     },
-    "./app.plugin.js": "./app.plugin.js",
-    "./package.json": "./package.json"
+    "./app.plugin.js": "./app.plugin.js"
   },
   "main": "./dist/index.js",
   "source": "./src/index.ts",
