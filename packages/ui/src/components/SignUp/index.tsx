@@ -2,13 +2,14 @@ import { useClerk } from '@clerk/shared/react';
 import type { SignUpModalProps, SignUpProps } from '@clerk/shared/types';
 import React from 'react';
 
-import { usePreloadTasks } from '@/ui/hooks/usePreloadTasks';
+import { SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
+import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '@/contexts';
+import { Flow } from '@/customizables';
+import { usePreloadTasks } from '@/hooks/usePreloadTasks';
+import type { WithInternalRouting } from '@/internal';
+import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
+import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 
-import { SignUpEmailLinkFlowComplete } from '../../common/EmailLinkCompleteFlowCard';
-import { SignUpContext, useSignUpContext, withCoreSessionSwitchGuard } from '../../contexts';
-import { Flow } from '../../customizables';
-import { SessionTasks as LazySessionTasks } from '../../lazyModules/components';
-import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '../../router';
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
 import { SignUpSSOCallback } from './SignUpSSOCallback';
@@ -101,6 +102,8 @@ SignUpRoutes.displayName = 'SignUp';
 
 export const SignUp: React.ComponentType<SignUpProps> = withCoreSessionSwitchGuard(SignUpRoutes);
 
+const InternalSignUp: React.ComponentType<WithInternalRouting<SignUpProps>> = withCoreSessionSwitchGuard(SignUpRoutes);
+
 export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
   const signUpProps = {
     signInUrl: `/${VIRTUAL_ROUTER_BASE_PATH}/sign-in`,
@@ -120,7 +123,7 @@ export const SignUpModal = (props: SignUpModalProps): JSX.Element => {
       >
         {/*TODO: Used by InvisibleRootBox, can we simplify? */}
         <div>
-          <SignUp
+          <InternalSignUp
             {...signUpProps}
             routing='virtual'
           />
