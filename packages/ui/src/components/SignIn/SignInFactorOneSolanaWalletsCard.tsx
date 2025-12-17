@@ -67,7 +67,7 @@ const SignInFactorOneSolanaWalletsCardInner = () => {
                       customNavigate: router.navigate,
                       redirectUrl: ctx.afterSignInUrl || '/',
                       secondFactorUrl: 'factor-two',
-                      signUpContinueUrl: ctx.isCombinedFlow ? '../create/continue' : ctx.signUpContinueUrl,
+                      signUpContinueUrl: ctx.isCombinedFlow ? 'create/continue' : ctx.signUpContinueUrl,
                       strategy: 'web3_solana_signature',
                       walletName,
                     })

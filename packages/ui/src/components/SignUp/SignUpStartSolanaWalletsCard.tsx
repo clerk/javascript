@@ -66,7 +66,7 @@ const SignUpStartSolanaWalletsCardInner = () => {
                     .authenticateWithWeb3({
                       customNavigate: router.navigate,
                       redirectUrl: ctx.afterSignUpUrl || '/',
-                      signUpContinueUrl: '../continue',
+                      signUpContinueUrl: 'continue',
                       strategy: 'web3_solana_signature',
                       unsafeMetadata: ctx.unsafeMetadata,
                       walletName,
