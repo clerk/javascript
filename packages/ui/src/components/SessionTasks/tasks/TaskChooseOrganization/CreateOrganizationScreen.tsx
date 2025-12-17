@@ -4,6 +4,7 @@ import type { CreateOrganizationParams } from '@clerk/shared/types';
 import { useEnvironment } from '@/ui/contexts';
 import { useSessionTasksContext, useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
+// or from '@/ui/elements'
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -14,6 +15,17 @@ import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { organizationListParams } from '../../../OrganizationSwitcher/utils';
+import { OrganizationCreationDefaultsAlert } from './OrganizationCreationDefaultsAlert';
+
+// TODO: Replace with actual API call to OrganizationCreationDefaults.retrieve()
+const organizationCreationDefaults = {
+  creationAdvisory: {
+    type: 'existing_org_with_domain' as const,
+    severity: 'warning' as const,
+  },
+  pathRoot: '',
+  reload: () => Promise.resolve({} as any),
+};
 
 type CreateOrganizationScreenProps = {
   onCancel?: () => void;
@@ -88,7 +100,9 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
         <Header.Title localizationKey={localizationKeys('taskChooseOrganization.createOrganization.title')} />
         <Header.Subtitle localizationKey={localizationKeys('taskChooseOrganization.createOrganization.subtitle')} />
       </Header.Root>
+
       <FormContainer sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}>
+        <OrganizationCreationDefaultsAlert organizationCreationDefaults={organizationCreationDefaults} />
         <Form.Root onSubmit={onSubmit}>
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
