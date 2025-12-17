@@ -737,6 +737,10 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: '兩步驟驗證',
     },
+    web3Solana: {
+      subtitle: '請選擇下方錢包以登入',
+      title: '使用 Solana 登入',
+    },
   },
   signInEnterPasswordTitle: '輸入您的密碼',
   signUp: {
@@ -827,6 +831,10 @@ export const zhTW: LocalizationResource = {
       subtitleCombined: '以繼續前往 {{applicationName}}',
       title: '建立您的帳戶',
       titleCombined: '建立您的帳戶',
+    },
+    web3Solana: {
+      subtitle: '請選擇下方錢包以註冊',
+      title: '使用 Solana 註冊',
     },
   },
   socialButtonsBlockButton: '以 {{provider|titleize}} 帳戶登入',
@@ -926,6 +934,8 @@ export const zhTW: LocalizationResource = {
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     session_exists: '您已經登錄。',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
+    web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',
     zxcvbn: {
       couldBeStronger: '您的密碼強度尚可，但可以更安全。請嘗試增加長度或複雜度。',
       goodPassword: '密碼強度良好。',
@@ -1278,6 +1288,10 @@ export const zhTW: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: '新增 Web3 錢包',
         title: 'Web3 錢包',
+        web3SelectSolanaWalletScreen: {
+          subtitle: '選擇一個 Solana 錢包以連線到您的帳戶。',
+          title: '新增 Solana 錢包',
+        },
       },
     },
     usernamePage: {
@@ -1312,5 +1326,11 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '使用 {{walletName}} 連線',
+    continue: '使用 {{walletName}} 繼續',
+    noneAvailable:
+      '未偵測到 Solana Web3 錢包。請安裝支援 Web3 的 {{ solanaWalletsLink || link("wallet extension") }}。',
   },
 } as const;

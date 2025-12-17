@@ -752,6 +752,10 @@ export const idID: LocalizationResource = {
       subtitle: 'Untuk melanjutkan, masukkan kode verifikasi yang dihasilkan oleh aplikasi autentikator Anda',
       title: 'Verifikasi dua langkah',
     },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk masuk',
+      title: 'Masuk dengan Solana',
+    },
   },
   signInEnterPasswordTitle: 'Masukkan kata sandi Anda',
   signUp: {
@@ -845,6 +849,10 @@ export const idID: LocalizationResource = {
       subtitleCombined: 'Selamat datang! Silakan isi detail untuk memulai.',
       title: 'Buat akun Anda',
       titleCombined: 'Buat akun Anda',
+    },
+    web3Solana: {
+      subtitle: 'Pilih dompet di bawah untuk mendaftar',
+      title: 'Daftar dengan Solana',
     },
   },
   socialButtonsBlockButton: 'Lanjutkan dengan {{provider|titleize}}',
@@ -953,6 +961,9 @@ export const idID: LocalizationResource = {
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     session_exists: 'Anda sudah masuk.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Anda menolak permintaan tanda tangan. Silakan coba lagi untuk melanjutkan.',
+    web3_solana_signature_generation_failed:
+      'Terjadi kesalahan saat membuat tanda tangan. Silakan coba lagi untuk melanjutkan.',
     zxcvbn: {
       couldBeStronger: 'Kata sandi Anda berfungsi, tapi bisa lebih kuat. Coba tambahkan lebih banyak karakter.',
       goodPassword: 'Kata sandi Anda memenuhi semua persyaratan yang diperlukan.',
@@ -1312,6 +1323,10 @@ export const idID: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: undefined,
         title: undefined,
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Pilih dompet Solana untuk dihubungkan ke akun Anda.',
+          title: 'Tambahkan dompet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1346,5 +1361,11 @@ export const idID: LocalizationResource = {
       subtitle: 'Kami akan menghubungi ketika tempat Anda siap',
       title: 'Terima kasih telah bergabung dengan daftar tunggu!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Hubungkan dengan {{walletName}}',
+    continue: 'Lanjutkan dengan {{walletName}}',
+    noneAvailable:
+      'Tidak ada dompet Solana Web3 yang terdeteksi. Silakan instal {{ solanaWalletsLink || link("wallet extension") }} yang mendukung Web3.',
   },
 } as const;

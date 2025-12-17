@@ -17,6 +17,7 @@ import type { WithInternalRouting } from '@/internal';
 import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import type { SignUpCtx } from '@/types';
+import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
 import {
@@ -81,6 +82,9 @@ function SignInRoutes(): JSX.Element {
         </Route>
         <Route path='choose'>
           <SignInAccountSwitcher />
+        </Route>
+        <Route path='choose-wallet'>
+          <SignInFactorOneSolanaWalletsCard />
         </Route>
         <Route path='verify'>
           <SignInEmailLinkFlowComplete
