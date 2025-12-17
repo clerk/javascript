@@ -868,6 +868,10 @@ export const ptPT: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Deve pertencer a uma organização',
+      subtitle: 'Contacte o administrador da sua organização para obter um convite.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

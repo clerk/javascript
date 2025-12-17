@@ -873,6 +873,10 @@ export const svSE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Du måste tillhöra en organisation',
+      subtitle: 'Kontakta din organisationsadministratör för en inbjudan.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

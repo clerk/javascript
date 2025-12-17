@@ -870,6 +870,10 @@ export const nlNL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Je moet tot een organisatie behoren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

@@ -872,6 +872,10 @@ export const isIS: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Þú verður að tilheyra samtökum',
+      subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

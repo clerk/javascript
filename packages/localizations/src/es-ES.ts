@@ -871,6 +871,10 @@ export const esES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Debe pertenecer a una organización',
+      subtitle: 'Contacte al administrador de su organización para obtener una invitación.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

@@ -861,6 +861,10 @@ export const heIL: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'עליך להשתייך לארגון',
+      subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

@@ -878,6 +878,10 @@ export const viVN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Bạn phải thuộc về một tổ chức',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

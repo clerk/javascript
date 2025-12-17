@@ -870,6 +870,10 @@ export const caES: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Heu de pertànyer a una organització',
+      subtitle: "Contacteu amb l'administrador de la vostra organització per obtenir una invitació.",
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

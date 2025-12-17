@@ -871,6 +871,10 @@ export const thTH: LocalizationResource = {
       subtitle: 'ใส่รายละเอียดองค์กรของคุณเพื่อดำเนินการต่อ',
       title: 'ตั้งค่าองค์กรของคุณ',
     },
+    organizationCreationDisabled: {
+      title: 'คุณต้องเป็นสมาชิกขององค์กร',
+      subtitle: 'ติดต่อผู้ดูแลระบบขององค์กรของคุณเพื่อขอคำเชิญ',
+    },
     signOut: {
       actionLink: 'ออกจากระบบ',
       actionText: 'เข้าสู่ระบบในนาม {{identifier}}',

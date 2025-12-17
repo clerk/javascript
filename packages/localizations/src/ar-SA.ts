@@ -867,6 +867,10 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'يجب أن تنتمي إلى منظمة',
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,
