@@ -1,7 +1,6 @@
 import { useClerk } from '@clerk/react';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClientResource, SetActive } from '@clerk/shared/types';
-import Constants from 'expo-constants';
 
 import { ClerkGoogleOneTapSignIn, isErrorWithCode, isSuccessResponse } from '../google-one-tap';
 import { errorThrower } from '../utils/errors';
@@ -25,6 +24,35 @@ type PlatformConfig = {
 };
 
 /**
+ * Helper to get Google client IDs from expo-constants or process.env.
+ * Dynamically imports expo-constants to keep it optional.
+ */
+async function getGoogleClientIds(): Promise<{ webClientId?: string; iosClientId?: string }> {
+  let webClientId: string | undefined;
+  let iosClientId: string | undefined;
+
+  // Try to get values from expo-constants first
+  try {
+    const ConstantsModule = await import('expo-constants');
+    const Constants = ConstantsModule.default as {
+      expoConfig?: { extra?: Record<string, string> };
+    };
+    webClientId =
+      Constants?.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
+    iosClientId =
+      Constants?.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID ||
+      process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID;
+  } catch {
+    // expo-constants not available, fall back to process.env only
+    webClientId = process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
+    iosClientId = process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID;
+  }
+
+  return { webClientId, iosClientId };
+}
+
+/**
  * Factory function to create the useSignInWithGoogle hook with platform-specific configuration.
  *
  * @internal
@@ -45,13 +73,8 @@ export function createUseSignInWithGoogle(platformConfig: PlatformConfig) {
         };
       }
 
-      // Get environment variables from expo-constants
-      const webClientId =
-        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID ||
-        process.env.EXPO_PUBLIC_CLERK_GOOGLE_WEB_CLIENT_ID;
-      const iosClientId =
-        Constants.expoConfig?.extra?.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID ||
-        process.env.EXPO_PUBLIC_CLERK_GOOGLE_IOS_CLIENT_ID;
+      // Get environment variables from expo-constants or process.env
+      const { webClientId, iosClientId } = await getGoogleClientIds();
 
       if (!webClientId) {
         return errorThrower.throw(
