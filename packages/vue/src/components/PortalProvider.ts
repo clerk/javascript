@@ -16,11 +16,11 @@ import { PortalInjectionKey } from '../keys';
  * @example
  * ```vue
  * <script setup>
- * import { ref } from 'vue';
+ * import { useTemplateRef } from 'vue';
  * import { DialogContent } from 'reka-ui';
  * import { UNSAFE_PortalProvider, UserButton } from '@clerk/vue';
  *
- * const dialogContentRef = ref(null);
+ * const dialogContentRef = useTemplateRef('dialogContentRef');
  * </script>
  *
  * <template>
