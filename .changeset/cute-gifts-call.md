@@ -2,4 +2,4 @@
 '@clerk/clerk-js': patch
 ---
 
-Fix locale fallback logic to render english values when keys are undefined.
+Fix locale fallback logic to render English values when localization keys are `undefined`.
