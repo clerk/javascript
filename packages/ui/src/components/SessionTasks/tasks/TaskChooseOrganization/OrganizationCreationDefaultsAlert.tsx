@@ -1,21 +1,21 @@
 import type { OrganizationCreationAdvisoryType, OrganizationCreationDefaultsResource } from '@clerk/shared/types';
 
 import { type LocalizationKey, localizationKeys } from '@/localization';
-import { Alert } from '@/ui/elements/Alert'; // or from '@/ui/elements'
+import { Alert } from '@/ui/elements/Alert';
 
 export function OrganizationCreationDefaultsAlert({
   organizationCreationDefaults,
 }: {
   organizationCreationDefaults: OrganizationCreationDefaultsResource;
 }) {
-  if (!organizationCreationDefaults.creationAdvisory) {
+  if (!organizationCreationDefaults.advisory) {
     return null;
   }
 
   return (
     <Alert
       variant='warning'
-      title={advisoryTypeToLocalizationKey[organizationCreationDefaults.creationAdvisory.type]}
+      title={advisoryTypeToLocalizationKey[organizationCreationDefaults.advisory.type]}
     />
   );
 }
