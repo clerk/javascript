@@ -1,8 +1,8 @@
 export { errorToJSON, parseError, parseErrors } from './errors/parseError';
 
-export { ClerkAPIError } from './errors/clerkApiError';
-export { ClerkAPIResponseError } from './errors/clerkApiResponseError';
-export { ClerkError } from './errors/clerkError';
+export { ClerkAPIError, isClerkAPIError } from './errors/clerkApiError';
+export { ClerkAPIResponseError, isClerkAPIResponseError } from './errors/clerkApiResponseError';
+export { ClerkError, isClerkError } from './errors/clerkError';
 
 export { buildErrorThrower, type ErrorThrower, type ErrorThrowerOptions } from './errors/errorThrower';
 
@@ -10,15 +10,13 @@ export { EmailLinkError, EmailLinkErrorCode, EmailLinkErrorCodeStatus } from './
 
 export type { MetamaskError } from './errors/metamaskError';
 
-export { ClerkRuntimeError } from './errors/clerkRuntimeError';
+export { ClerkRuntimeError, isClerkRuntimeError } from './errors/clerkRuntimeError';
 
 export { ClerkWebAuthnError } from './errors/webAuthNError';
 
 export {
   is4xxError,
   isCaptchaError,
-  isClerkAPIResponseError,
-  isClerkRuntimeError,
   isEmailLinkError,
   isKnownError,
   isMetamaskError,
