@@ -5,11 +5,16 @@ import type { Wallet } from '@wallet-standard/core';
 
 class InjectedWeb3SolanaProviders {
   #wallets: readonly Wallet[] | undefined = undefined;
+  #initialized: boolean = false;
   static #instance: InjectedWeb3SolanaProviders | null = null;
 
   private constructor() {}
 
   async #initialize() {
+    if (this.#initialized) {
+      return;
+    }
+    this.#initialized = true;
     const wallets = await import('@wallet-standard/core').then(mod => mod.getWallets());
     this.#wallets = wallets.get();
 
