@@ -451,6 +451,19 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  /**
+   * Authenticates a user using a Solana Web3 wallet during sign-in.
+   *
+   * @param params - Configuration for Solana authentication
+   * @param params.walletName - The name of the Solana wallet to use for authentication
+   * @returns A promise that resolves to the updated SignIn resource
+   * @throws {ClerkRuntimeError} If walletName is not provided or wallet connection fails
+   *
+   * @example
+   * ```typescript
+   * await signIn.authenticateWithSolana({ walletName: 'phantom' });
+   * ```
+   */
   public authenticateWithSolana = async (params: SignInAuthenticateWithSolanaParams): Promise<SignInResource> => {
     const identifier = await web3().getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({

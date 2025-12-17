@@ -358,6 +358,24 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
+  /**
+   * Authenticates a user using a Solana Web3 wallet during sign-up.
+   *
+   * @param params - Configuration for Solana authentication
+   * @param params.walletName - The name of the Solana wallet to use (e.g., 'phantom')
+   * @param params.unsafeMetadata - Optional unsafe metadata to attach to the user
+   * @param params.legalAccepted - Optional flag indicating legal terms acceptance
+   * @returns A promise that resolves to the updated SignUp resource
+   * @throws {ClerkRuntimeError} If wallet connection fails
+   *
+   * @example
+   * ```typescript
+   * await signUp.authenticateWithSolana({
+   *   walletName: 'phantom',
+   *   legalAccepted: true
+   * });
+   * ```
+   */
   public authenticateWithSolana = async (params: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
     const identifier = await web3().getSolanaIdentifier(params.walletName);
     return this.authenticateWithWeb3({
