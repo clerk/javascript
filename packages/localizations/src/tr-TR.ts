@@ -871,6 +871,10 @@ export const trTR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Bir organizasyona ait olmalısınız',
+      subtitle: 'Davet için organizasyon yöneticinizle iletişime geçin.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

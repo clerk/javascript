@@ -857,6 +857,10 @@ export const zhCN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: '您必须属于一个组织',
+      subtitle: '请联系您的组织管理员获取邀请。',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

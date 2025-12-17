@@ -883,6 +883,10 @@ export const roRO: LocalizationResource = {
       subtitle: 'Introdu detaliile organizației pentru a continua',
       title: 'Configurează-ți organizația',
     },
+    organizationCreationDisabled: {
+      title: 'Trebuie să aparții unei organizații',
+      subtitle: 'Contactează administratorul organizației tale pentru o invitație.',
+    },
     signOut: {
       actionLink: 'Deconectează-te',
       actionText: 'Autentificat ca {{identifier}}',

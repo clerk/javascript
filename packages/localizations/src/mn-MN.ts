@@ -870,6 +870,10 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Та байгууллагад харьяалагдах ёстой',
+      subtitle: 'Урилга авахын тулд байгууллагын админтай холбогдоно уу.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

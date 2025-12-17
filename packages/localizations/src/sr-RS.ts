@@ -868,6 +868,10 @@ export const srRS: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Morate pripadati organizaciji',
+      subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

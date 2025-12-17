@@ -868,6 +868,10 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Du skal tilhøre en organisation',
+      subtitle: 'Kontakt din organisationsadministrator for en invitation.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

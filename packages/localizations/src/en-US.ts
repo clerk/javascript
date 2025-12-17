@@ -869,6 +869,10 @@ export const enUS: LocalizationResource = {
       subtitle: 'Enter your organization details to continue',
       title: 'Setup your organization',
     },
+    organizationCreationDisabled: {
+      title: 'You must belong to an organization',
+      subtitle: 'Contact your organization admin for an invitation.',
+    },
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',

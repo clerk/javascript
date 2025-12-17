@@ -1,10 +1,11 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import { useState } from 'react';
+import { type ComponentType, useState } from 'react';
 
 import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Header } from '@/ui/elements/Header';
 import { useMultipleSessions } from '@/ui/hooks/useMultipleSessions';
 import { useOrganizationListInView } from '@/ui/hooks/useOrganizationListInView';
 
@@ -13,24 +14,10 @@ import { ChooseOrganizationScreen } from './ChooseOrganizationScreen';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 
 const TaskChooseOrganizationInternal = () => {
-  const { signOut } = useClerk();
-  const { user } = useUser();
-  const { session } = useSession();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
-  const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
-
-  const handleSignOut = () => {
-    if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
-    }
-
-    return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
-  };
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
-  const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
   return (
     <Flow.Root flow='taskChooseOrganization'>
@@ -58,31 +45,53 @@ const TaskChooseOrganizationInternal = () => {
             )}
           </Card.Content>
 
-          <Card.Footer>
-            <Card.Action
-              elementId='signOut'
-              gap={2}
-              justify='center'
-              sx={() => ({ width: '100%' })}
-            >
-              {identifier && (
-                <Card.ActionText
-                  truncate
-                  localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
-                    identifier,
-                  })}
-                />
-              )}
-              <Card.ActionLink
-                sx={() => ({ flexShrink: 0 })}
-                onClick={handleSignOut}
-                localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
-              />
-            </Card.Action>
-          </Card.Footer>
+          <TaskChooseOrganizationCardFooter />
         </Card.Root>
       </Flow.Part>
     </Flow.Root>
+  );
+};
+
+const TaskChooseOrganizationCardFooter = () => {
+  const { signOut } = useClerk();
+  const { user } = useUser();
+  const { session } = useSession();
+  const { otherSessions } = useMultipleSessions({ user });
+  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+
+  const handleSignOut = () => {
+    if (otherSessions.length === 0) {
+      return signOut(navigateAfterSignOut);
+    }
+
+    return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
+  };
+
+  const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
+
+  return (
+    <Card.Footer>
+      <Card.Action
+        elementId='signOut'
+        gap={2}
+        justify='center'
+        sx={() => ({ width: '100%' })}
+      >
+        {identifier && (
+          <Card.ActionText
+            truncate
+            localizationKey={localizationKeys('taskChooseOrganization.signOut.actionText', {
+              identifier,
+            })}
+          />
+        )}
+        <Card.ActionLink
+          sx={() => ({ flexShrink: 0 })}
+          onClick={handleSignOut}
+          localizationKey={localizationKeys('taskChooseOrganization.signOut.actionLink')}
+        />
+      </Card.Action>
+    </Card.Footer>
   );
 };
 
@@ -104,6 +113,44 @@ const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrga
   return <ChooseOrganizationScreen onCreateOrganizationClick={() => setCurrentFlow('create')} />;
 });
 
+export const withOrganizationCreationEnabledGuard = <T extends object>(Component: ComponentType<T>) => {
+  return (props: T) => {
+    const { user } = useUser();
+
+    if (!user?.createOrganizationEnabled) {
+      return <OrganizationCreationDisabledScreen />;
+    }
+
+    return <Component {...props} />;
+  };
+};
+
+function OrganizationCreationDisabledScreen() {
+  return (
+    <Flow.Root flow='taskChooseOrganization'>
+      <Flow.Part part='organizationCreationDisabled'>
+        <Card.Root>
+          <Card.Content>
+            <Header.Root showLogo>
+              <Header.Title
+                localizationKey={localizationKeys('taskChooseOrganization.organizationCreationDisabled.title')}
+              />
+              <Header.Subtitle
+                localizationKey={localizationKeys('taskChooseOrganization.organizationCreationDisabled.subtitle')}
+              />
+            </Header.Root>
+          </Card.Content>
+
+          <TaskChooseOrganizationCardFooter />
+        </Card.Root>
+      </Flow.Part>
+    </Flow.Root>
+  );
+}
+
 export const TaskChooseOrganization = withCoreSessionSwitchGuard(
-  withTaskGuard(withCardStateProvider(TaskChooseOrganizationInternal), 'choose-organization'),
+  withTaskGuard(
+    withCardStateProvider(withOrganizationCreationEnabledGuard(TaskChooseOrganizationInternal)),
+    'choose-organization',
+  ),
 );

@@ -871,6 +871,10 @@ export const fiFI: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Sinun täytyy kuulua organisaatioon',
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

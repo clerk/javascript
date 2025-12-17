@@ -872,6 +872,10 @@ export const enGB: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'You must belong to an organisation',
+      subtitle: 'Contact your organisation admin for an invitation.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

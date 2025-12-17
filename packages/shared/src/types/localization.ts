@@ -1303,6 +1303,10 @@ export type __internal_LocalizationResource = {
       action__createOrganization: LocalizationValue;
       action__invitationAccept: LocalizationValue;
     };
+    organizationCreationDisabled: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+    };
   };
   taskResetPassword: {
     title: LocalizationValue;

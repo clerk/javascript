@@ -869,6 +869,10 @@ export const huHU: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Egy szervezethez kell tartoznia',
+      subtitle: 'Kérjen meghívót a szervezet adminisztrátorától.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,
