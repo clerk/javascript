@@ -1,26 +1,36 @@
 import { useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams } from '@clerk/shared/types';
+import React from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
 import { useSessionTasksContext, useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
-import { localizationKeys } from '@/ui/customizables';
+import { Icon, localizationKeys } from '@/ui/customizables';
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
+import { IconButton } from '@/ui/elements/IconButton';
+import { Upload } from '@/ui/icons';
 import { createSlug } from '@/ui/utils/createSlug';
 import { handleError } from '@/ui/utils/errorHandler';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
+import { OrganizationProfileAvatarUploader } from '../../../OrganizationProfile/OrganizationProfileAvatarUploader';
 import { organizationListParams } from '../../../OrganizationSwitcher/utils';
 import { OrganizationCreationDefaultsAlert } from './OrganizationCreationDefaultsAlert';
 
 // TODO: Replace with actual API call to OrganizationCreationDefaults.retrieve()
+// TODO - Only replace if .organization_settings.organization_creation_defaults.enabled
 const organizationCreationDefaults = {
   advisory: {
     type: 'existing_org_with_domain' as const,
     severity: 'warning' as const,
+  },
+  form: {
+    name: '',
+    slug: '',
+    logo: null,
   },
   pathRoot: '',
   reload: () => Promise.resolve({} as any),
@@ -38,6 +48,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
     userMemberships: organizationListParams.userMemberships,
   });
   const { organizationSettings } = useEnvironment();
+  const [file, setFile] = React.useState<File | null>();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
@@ -68,6 +79,10 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       const organization = await createOrganization(createOrgParams);
 
+      if (file) {
+        await organization.setLogo({ file });
+      }
+
       await setActive({
         organization,
         navigate: async ({ session }) => {
@@ -88,6 +103,11 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
     slugField.setValue(val);
   };
 
+  const onAvatarRemove = () => {
+    card.setIdle();
+    return setFile(null);
+  };
+
   const isSubmitButtonDisabled = !nameField.value || !isLoaded;
 
   return (
@@ -101,8 +121,44 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
       </Header.Root>
 
       <FormContainer sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}>
-        <OrganizationCreationDefaultsAlert organizationCreationDefaults={organizationCreationDefaults} />
         <Form.Root onSubmit={onSubmit}>
+          <OrganizationCreationDefaultsAlert organizationCreationDefaults={organizationCreationDefaults} />
+          <OrganizationProfileAvatarUploader
+            organization={{ name: nameField.value }}
+            onAvatarChange={async file => await setFile(file)}
+            onAvatarRemove={file ? onAvatarRemove : null}
+            avatarPreviewPlaceholder={
+              <IconButton
+                variant='ghost'
+                aria-label='Upload organization logo'
+                icon={
+                  <Icon
+                    size='md'
+                    icon={Upload}
+                    sx={t => ({
+                      color: t.colors.$colorMutedForeground,
+                      transitionDuration: t.transitionDuration.$controls,
+                    })}
+                  />
+                }
+                sx={t => ({
+                  width: t.sizes.$16,
+                  height: t.sizes.$16,
+                  borderRadius: t.radii.$md,
+                  borderWidth: t.borderWidths.$normal,
+                  borderStyle: t.borderStyles.$dashed,
+                  borderColor: t.colors.$borderAlpha200,
+                  backgroundColor: t.colors.$neutralAlpha50,
+                  ':hover': {
+                    backgroundColor: t.colors.$neutralAlpha50,
+                    svg: {
+                      transform: 'scale(1.2)',
+                    },
+                  },
+                })}
+              />
+            }
+          />
           <Form.ControlRow elementId={nameField.id}>
             <Form.PlainInput
               {...nameField.props}

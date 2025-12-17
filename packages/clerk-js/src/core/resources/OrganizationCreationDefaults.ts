@@ -16,9 +16,11 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
   form: {
     name: string;
     slug: string;
+    logo: string | null;
   } = {
     name: '',
     slug: '',
+    logo: null,
   };
 
   public constructor(data: OrganizationCreationDefaultsJSON | OrganizationCreationDefaultsJSONSnapshot | null = null) {
@@ -38,6 +40,7 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
     if (data.form) {
       this.form.name = this.withDefault(data.form.name, this.form.name);
       this.form.slug = this.withDefault(data.form.slug, this.form.slug);
+      this.form.logo = this.withDefault(data.form.logo, this.form.logo);
     }
 
     return this;
