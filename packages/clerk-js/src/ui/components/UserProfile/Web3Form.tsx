@@ -6,10 +6,10 @@ import { Action } from '@/ui/elements/Action';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
-import { getFieldError, handleError } from '@/ui/utils/errorHandler';
+import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 import { generateWeb3Signature, getWeb3Identifier } from '../../../utils/web3';
-import { descriptors, Image, localizationKeys, Text } from '../../customizables';
+import { descriptors, Image, localizationKeys } from '../../customizables';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 
 export const AddWeb3WalletActionMenu = () => {
@@ -60,12 +60,7 @@ export const AddWeb3WalletActionMenu = () => {
       card.setIdle();
     } catch (err) {
       card.setIdle();
-      const fieldError = getFieldError(err);
-      if (fieldError) {
-        card.setError(fieldError.longMessage);
-      } else {
-        handleError(err, [], card.setError);
-      }
+      web3CallbackErrorHandler(err, card.setError);
     }
   };
 
@@ -110,18 +105,6 @@ export const AddWeb3WalletActionMenu = () => {
           <Web3SelectSolanaWalletScreen onConnect={connect} />
         </Action.Card>
       </Action.Open>
-
-      {card.error && (
-        <Text
-          colorScheme='danger'
-          sx={t => ({
-            padding: t.sizes.$1x5,
-            paddingLeft: t.sizes.$8x5,
-          })}
-        >
-          {card.error}
-        </Text>
-      )}
     </>
   );
 };

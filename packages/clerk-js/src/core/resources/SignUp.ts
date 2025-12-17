@@ -366,15 +366,37 @@ export class SignUp extends BaseResource implements SignUpResource {
     });
   };
 
-  public authenticateWithSolana = async (params: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
-    const identifier = await getSolanaIdentifier(params.walletName);
+  /**
+   * Authenticates a user using a Solana Web3 wallet during sign-up.
+   *
+   * @param params - Configuration for Solana authentication
+   * @param params.walletName - The name of the Solana wallet to use (e.g., 'phantom')
+   * @param params.unsafeMetadata - Optional unsafe metadata to attach to the user
+   * @param params.legalAccepted - Optional flag indicating legal terms acceptance
+   * @returns A promise that resolves to the updated SignUp resource
+   * @throws {ClerkRuntimeError} If wallet connection fails
+   *
+   * @example
+   * ```typescript
+   * await signUp.authenticateWithSolana({
+   *   walletName: 'phantom',
+   *   legalAccepted: true
+   * });
+   * ```
+   */
+  public authenticateWithSolana = async ({
+    walletName,
+    unsafeMetadata,
+    legalAccepted,
+  }: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
+    const identifier = await getSolanaIdentifier(walletName);
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: p => generateSignatureWithSolana({ ...p, walletName: params.walletName }),
-      unsafeMetadata: params?.unsafeMetadata,
+      generateSignature: p => generateSignatureWithSolana({ ...p, walletName }),
+      unsafeMetadata,
       strategy: 'web3_solana_signature',
-      legalAccepted: params?.legalAccepted,
-      walletName: params.walletName,
+      legalAccepted,
+      walletName,
     });
   };
 

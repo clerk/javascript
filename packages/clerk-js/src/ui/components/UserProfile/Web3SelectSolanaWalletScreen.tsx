@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { Web3Strategy } from '@clerk/shared/types';
 import { lazy, Suspense } from 'react';
 
@@ -6,11 +7,12 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
+import { handleError } from '@/ui/utils/errorHandler';
 
 import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 
 const Web3SolanaWalletButtons = lazy(() =>
-  import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
+  import(/* webpackChunkName: "web3-solana-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
     default: m.Web3SolanaWalletButtons,
   })),
 );
@@ -30,9 +32,15 @@ export const Web3SelectSolanaWalletScreen = ({ onConnect }: Web3SelectWalletProp
       card.setIdle();
     } catch (err) {
       card.setIdle();
-      console.error(err);
-    } finally {
-      close();
+      if (err instanceof Error) {
+        handleError(err, [], card.setError);
+      } else {
+        const error = new ClerkRuntimeError('An error occurred while generating the Solana signature.', {
+          code: 'web3_solana_signature_generation_failed',
+          cause: err instanceof Error ? err : undefined,
+        });
+        handleError(error, [], card.setError);
+      }
     }
   };
 
@@ -65,6 +73,7 @@ export const Web3SelectSolanaWalletScreen = ({ onConnect }: Web3SelectWalletProp
         </Suspense>
         <FormButtonContainer>
           <Button
+            type='button'
             variant='ghost'
             onClick={() => {
               close();
