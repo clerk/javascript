@@ -71,6 +71,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
 
     await u.po.page.goToRelative('/transitions');
 
@@ -113,6 +114,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
 
     await u.po.page.goToRelative('/transitions');
 
@@ -162,6 +164,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitio
     const u = createTestUtils({ app, page, context });
     await u.po.signIn.goTo();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeUser.email, password: fakeUser.password });
+    await u.po.expect.toBeSignedIn();
 
     await u.po.page.goToRelative('/transitions');
 
