@@ -872,6 +872,10 @@ export const elGR: LocalizationResource = {
       subtitle: 'Εισάγετε τα στοιχεία του οργανισμού σας για να συνεχίσετε',
       title: 'Ρυθμίστε τον οργανισμό σας',
     },
+    organizationCreationDisabled: {
+      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για πρόσκληση.',
+    },
     signOut: {
       actionLink: 'Αποσύνδεση',
       actionText: 'Συνδεδεμένος ως {{identifier}}',

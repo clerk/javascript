@@ -872,6 +872,10 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite podatke o svojoj organizaciji za nastavak',
       title: 'Postavite svoju organizaciju',
     },
+    organizationCreationDisabled: {
+      title: 'Morate pripadati organizaciji',
+      subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
+    },
     signOut: {
       actionLink: 'Odjavi se',
       actionText: 'Prijavljen kao {{identifier}}',

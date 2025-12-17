@@ -873,6 +873,10 @@ export const svSE: LocalizationResource = {
       subtitle: 'Ange din organisationsinformation för att fortsätta',
       title: 'Konfigurera din organisation',
     },
+    organizationCreationDisabled: {
+      title: 'Du måste tillhöra en organisation',
+      subtitle: 'Kontakta din organisationsadministratör för en inbjudan.',
+    },
     signOut: {
       actionLink: 'Logga ut',
       actionText: 'Inloggad som {{identifier}}',

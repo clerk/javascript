@@ -882,6 +882,10 @@ export const jaJP: LocalizationResource = {
       subtitle: '続行するには組織の詳細を入力してください',
       title: '組織をセットアップ',
     },
+    organizationCreationDisabled: {
+      title: '組織に所属する必要があります',
+      subtitle: '招待を受けるには組織の管理者にお問い合わせください。',
+    },
     signOut: {
       actionLink: 'サインアウト',
       actionText: '{{identifier}} としてサインイン中',

@@ -875,6 +875,10 @@ export const bnIN: LocalizationResource = {
       subtitle: 'চালিয়ে যাওয়ার জন্য আপনার সংগঠনের বিবরণ লিখুন',
       title: 'আপনার সংগঠন সেটআপ করুন',
     },
+    organizationCreationDisabled: {
+      title: 'আপনাকে অবশ্যই একটি সংগঠনের অন্তর্ভুক্ত হতে হবে',
+      subtitle: 'আমন্ত্রণের জন্য আপনার সংগঠনের প্রশাসকের সাথে যোগাযোগ করুন।',
+    },
     signOut: {
       actionLink: 'সাইন আউট',
       actionText: '{{identifier}} হিসাবে সাইন ইন করা হয়েছে',

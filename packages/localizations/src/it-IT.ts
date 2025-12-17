@@ -878,6 +878,10 @@ export const itIT: LocalizationResource = {
       subtitle: 'Inserisci i dettagli della tua organizzazione per continuare',
       title: 'Configura la tua organizzazione',
     },
+    organizationCreationDisabled: {
+      title: "Devi appartenere a un'organizzazione",
+      subtitle: "Contatta l'amministratore della tua organizzazione per un invito.",
+    },
     signOut: {
       actionLink: 'Esci',
       actionText: 'Accesso effettuato come {{identifier}}',

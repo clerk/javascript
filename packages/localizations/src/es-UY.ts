@@ -877,6 +877,10 @@ export const esUY: LocalizationResource = {
       subtitle: 'Ingresá los detalles de tu organización para continuar',
       title: 'Configurar tu organización',
     },
+    organizationCreationDisabled: {
+      title: 'Debés pertenecer a una organización',
+      subtitle: 'Contactá al administrador de tu organización para obtener una invitación.',
+    },
     signOut: {
       actionLink: 'Cerrar sesión',
       actionText: 'Logueado como {{identifier}}',

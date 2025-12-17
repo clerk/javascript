@@ -872,6 +872,10 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn upplýsingar um samtökin þín til að halda áfram',
       title: 'Stilltu samtökin þín',
     },
+    organizationCreationDisabled: {
+      title: 'Þú verður að tilheyra samtökum',
+      subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
+    },
     signOut: {
       actionLink: 'Skrá út',
       actionText: 'Skráður inn sem {{identifier}}',

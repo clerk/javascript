@@ -877,6 +877,10 @@ export const esCR: LocalizationResource = {
       subtitle: 'Ingrese los detalles de su organización para continuar',
       title: 'Configurar su organización',
     },
+    organizationCreationDisabled: {
+      title: 'Debe pertenecer a una organización',
+      subtitle: 'Contacte al administrador de su organización para obtener una invitación.',
+    },
     signOut: {
       actionLink: 'Cerrar sesión',
       actionText: 'Conectado como {{identifier}}',

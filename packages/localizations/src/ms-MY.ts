@@ -878,6 +878,10 @@ export const msMY: LocalizationResource = {
       subtitle: 'Masukkan butiran organisasi anda untuk meneruskan',
       title: 'Sediakan organisasi anda',
     },
+    organizationCreationDisabled: {
+      title: 'Anda mesti menjadi ahli organisasi',
+      subtitle: 'Hubungi pentadbir organisasi anda untuk jemputan.',
+    },
     signOut: {
       actionLink: 'Daftar keluar',
       actionText: 'Log masuk sebagai {{identifier}}',

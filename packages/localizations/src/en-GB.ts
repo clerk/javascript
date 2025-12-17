@@ -872,6 +872,10 @@ export const enGB: LocalizationResource = {
       subtitle: 'Enter your organisation details to continue',
       title: 'Setup your organisation',
     },
+    organizationCreationDisabled: {
+      title: 'You must belong to an organisation',
+      subtitle: 'Contact your organisation admin for an invitation.',
+    },
     signOut: {
       actionLink: 'Sign out',
       actionText: 'Signed in as {{identifier}}',

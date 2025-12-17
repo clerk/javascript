@@ -877,6 +877,10 @@ export const taIN: LocalizationResource = {
       subtitle: 'தொடர உங்கள் அமைப்பு விவரங்களை உள்ளிடவும்',
       title: 'உங்கள் அமைப்பை அமைக்கவும்',
     },
+    organizationCreationDisabled: {
+      title: 'நீங்கள் ஒரு அமைப்பில் உறுப்பினராக இருக்க வேண்டும்',
+      subtitle: 'அழைப்புக்கு உங்கள் அமைப்பின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
+    },
     signOut: {
       actionLink: 'வெளியேறு',
       actionText: '{{identifier}} என உள்நுழைந்துள்ளீர்கள்',
