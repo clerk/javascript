@@ -66,7 +66,7 @@ const common = ({ mode, variant }) => {
               !!(
                 module instanceof rspack.NormalModule &&
                 module.resource &&
-                module.resource.includes('/ui/components/SignUp')
+                module.resource.includes('/components/SignUp')
               ),
           },
           common: {

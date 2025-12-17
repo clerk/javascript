@@ -5,7 +5,7 @@
     { "path": "./dist/vendors*.js", "maxSize": "69KB" },
     { "path": "./dist/ui-common*.js", "maxSize": "123KB" },
     { "path": "./dist/signin*.js", "maxSize": "16KB" },
-    { "path": "./dist/signUp*.js", "maxSize": "3KB" },
+    { "path": "./dist/signup*.js", "maxSize": "11KB" },
     { "path": "./dist/userprofile*.js", "maxSize": "16KB" },
     { "path": "./dist/organizationprofile*.js", "maxSize": "11KB" },
     { "path": "./dist/userbutton*.js", "maxSize": "3.5KB" },
