@@ -97,7 +97,8 @@ describe('useDerivedAuth', () => {
     expect(current.orgId).toBeUndefined();
     expect(current.orgRole).toBeUndefined();
     expect(current.orgSlug).toBeUndefined();
-    expect(current.has).toBeUndefined();
+    expect(current.has).toBeInstanceOf(Function);
+    expect(current.has?.({ permission: 'test' })).toBe(false);
   });
 
   it('returns loaded but not signed in when sessionId and userId are null', () => {
