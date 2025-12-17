@@ -52,14 +52,16 @@ export function isSuccessResponse(response: OneTapResponse): response is OneTapS
 }
 
 /**
- * Check if an error has a code property (Google Sign-In error).
+ * Check if an error has code and message properties (Google Sign-In error).
  */
 export function isErrorWithCode(error: unknown): error is { code: string; message: string } {
   return (
     error !== null &&
     typeof error === 'object' &&
     'code' in error &&
-    typeof (error as { code: unknown }).code === 'string'
+    typeof (error as { code: unknown }).code === 'string' &&
+    'message' in error &&
+    typeof (error as { message: unknown }).message === 'string'
   );
 }
 
