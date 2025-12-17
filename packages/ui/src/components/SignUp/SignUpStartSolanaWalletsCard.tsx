@@ -15,8 +15,8 @@ const Web3SolanaWalletButtons = lazy(() =>
   })),
 );
 
-import { useSignUpContext } from '../../contexts';
-import { useRouter } from '../../router';
+import { useSignUpContext } from '@/contexts';
+import { useRouter } from '@/router';
 
 const SignUpStartSolanaWalletsCardInner = () => {
   const clerk = useClerk();
