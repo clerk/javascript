@@ -36,7 +36,7 @@ export const WalletInitialIcon = (props: WalletInitialIconProps) => {
           width: '100%',
         }}
       >
-        {value[0].toUpperCase()}
+        {value[0].toUpperCase() ?? ''}
       </Text>
     </Box>
   );
