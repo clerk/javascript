@@ -71,13 +71,7 @@
     "ios",
     "expo-module.config.json",
     "app.plugin.js",
-    "plugin",
-    "web",
-    "local-credentials",
-    "passkeys",
-    "secure-store",
-    "resource-cache",
-    "token-cache"
+    "plugin"
   ],
   "scripts": {
     "build": "tsup && pnpm build:plugin",
