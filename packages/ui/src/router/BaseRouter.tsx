@@ -119,6 +119,10 @@ export const BaseRouter = ({
       toURL.search = stringifyQueryParams(toQueryParams);
     }
     const internalNavRes = await internalNavigate(toURL, { metadata: { navigationType: 'internal' } });
+    // We need to flushSync to guarantee the re-render happens before handing things back to the caller,
+    // otherwise setActive might emit, and children re-render with the old navigation state.
+    // An alternative solution here could be to return a deferred promise, set that to state together
+    // with the routeParts and resolve it in an effect. That way we could avoid the flushSync performance penalty.
     flushSync(() => {
       setRouteParts({ path: toURL.pathname, queryString: toURL.search });
     });
