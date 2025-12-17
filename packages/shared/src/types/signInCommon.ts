@@ -61,6 +61,7 @@ export type SignInStatus =
   | 'needs_identifier'
   | 'needs_first_factor'
   | 'needs_second_factor'
+  | 'needs_client_trust'
   | 'needs_new_password'
   | 'complete';
 

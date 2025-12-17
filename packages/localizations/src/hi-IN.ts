@@ -850,26 +850,26 @@ export const hiIN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'नया संगठन बनाएं',
+      action__invitationAccept: 'शामिल हों',
+      action__suggestionsAccept: 'शामिल होने का अनुरोध करें',
+      subtitle: 'मौजूदा संगठन में शामिल हों या नया बनाएं',
+      suggestionsAcceptedLabel: 'अनुमोदन की प्रतीक्षा',
+      title: 'एक संगठन चुनें',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'रद्द करें',
+      formButtonSubmit: 'जारी रखें',
+      formFieldInputPlaceholder__name: 'मेरा संगठन',
+      formFieldInputPlaceholder__slug: 'mera-sangathan',
+      formFieldLabel__name: 'नाम',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'जारी रखने के लिए अपने संगठन का विवरण दर्ज करें',
+      title: 'अपने संगठन को सेटअप करें',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'साइन आउट',
+      actionText: '{{identifier}} के रूप में साइन इन किया गया',
     },
   },
   taskResetPassword: {
@@ -890,6 +890,8 @@ export const hiIN: LocalizationResource = {
     captcha_unavailable:
       'असफल बॉट सत्यापन के कारण साइन अप असफल रहा। पुनः प्रयास करने के लिए कृपया पृष्ठ को रिफ्रेश करें या अधिक सहायता के लिए सपोर्ट से संपर्क करें।',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'अस्थायी ईमेल सेवाएं समर्थित नहीं हैं। कृपया खाता बनाने के लिए अपना नियमित ईमेल पता उपयोग करें।',
     form_identifier_exists__email_address: 'यह ईमेल पता पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__phone_number: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     form_identifier_exists__username: 'यह उपयोगकर्ता नाम पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
@@ -907,6 +909,8 @@ export const hiIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'दर्ज किया गया मान अमान्य है। कृपया इसे सही करें।',
     form_password_incorrect: 'आपके द्वारा दर्ज किया गया पासवर्ड गलत है। कृपया पुनः प्रयास करें।',
+    form_password_or_identifier_incorrect:
+      'पासवर्ड या ईमेल पता गलत है। कृपया पुनः प्रयास करें या किसी अन्य विधि का उपयोग करें।',
     form_password_length_too_short: 'आपका पासवर्ड बहुत छोटा है। इसमें कम से कम 8 अक्षर होने चाहिए।',
     form_password_not_strong_enough: 'आपका पासवर्ड पर्याप्त मजबूत नहीं है।',
     form_password_pwned:

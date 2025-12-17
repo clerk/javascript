@@ -853,26 +853,26 @@ export const viVN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Tạo tổ chức mới',
+      action__invitationAccept: 'Tham gia',
+      action__suggestionsAccept: 'Yêu cầu tham gia',
+      subtitle: 'Tham gia một tổ chức hiện có hoặc tạo mới',
+      suggestionsAcceptedLabel: 'Đang chờ phê duyệt',
+      title: 'Chọn tổ chức',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Hủy',
+      formButtonSubmit: 'Tiếp tục',
+      formFieldInputPlaceholder__name: 'Tổ chức của tôi',
+      formFieldInputPlaceholder__slug: 'to-chuc-cua-toi',
+      formFieldLabel__name: 'Tên',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Nhập thông tin chi tiết tổ chức của bạn để tiếp tục',
+      title: 'Thiết lập tổ chức của bạn',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Đăng xuất',
+      actionText: 'Đã đăng nhập với {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -892,6 +892,8 @@ export const viVN: LocalizationResource = {
     captcha_unavailable:
       'Đăng ký không thành công do lỗi bot. Vui lòng tải lại trang để thử lại hoặc liên hệ hỗ trợ để được hỗ trợ.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Các dịch vụ email tạm thời không được hỗ trợ. Vui lòng sử dụng địa chỉ email thông thường của bạn để tạo tài khoản.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -909,6 +911,8 @@ export const viVN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Mật khẩu hoặc địa chỉ email không đúng. Vui lòng thử lại hoặc sử dụng phương thức khác.',
     form_password_length_too_short: 'Mật khẩu của bạn quá ngắn. Nó phải có ít nhất 8 ký tự.',
     form_password_not_strong_enough: 'Mật khẩu của bạn không đủ mạnh.',
     form_password_pwned:

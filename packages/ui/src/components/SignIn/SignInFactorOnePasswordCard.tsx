@@ -79,11 +79,13 @@ export const SignInFactorOnePasswordCard = (props: SignInFactorOnePasswordProps)
             return setActive({
               session: res.createdSessionId,
               navigate: ({ session }) => {
-                void navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
+                return navigateOnSetActive({ session, redirectUrl: afterSignInUrl });
               },
             });
           case 'needs_second_factor':
             return navigate('../factor-two');
+          case 'needs_client_trust':
+            return navigate('../client-trust');
           default:
             return console.error(clerkInvalidFAPIResponse(res.status, supportEmail));
         }

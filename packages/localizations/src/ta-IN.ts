@@ -852,26 +852,26 @@ export const taIN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'புதிய அமைப்பை உருவாக்கவும்',
+      action__invitationAccept: 'சேரவும்',
+      action__suggestionsAccept: 'சேர்வதற்கு கோரிக்கை',
+      subtitle: 'இருக்கும் அமைப்பில் சேரவும் அல்லது புதியதை உருவாக்கவும்',
+      suggestionsAcceptedLabel: 'அனுமதிக்காக காத்திருக்கிறது',
+      title: 'ஒரு அமைப்பைத் தேர்ந்தெடுக்கவும்',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'ரத்துசெய்',
+      formButtonSubmit: 'தொடரவும்',
+      formFieldInputPlaceholder__name: 'எனது அமைப்பு',
+      formFieldInputPlaceholder__slug: 'enathu-amaippu',
+      formFieldLabel__name: 'பெயர்',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'தொடர உங்கள் அமைப்பு விவரங்களை உள்ளிடவும்',
+      title: 'உங்கள் அமைப்பை அமைக்கவும்',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'வெளியேறு',
+      actionText: '{{identifier}} என உள்நுழைந்துள்ளீர்கள்',
     },
   },
   taskResetPassword: {
@@ -892,6 +892,8 @@ export const taIN: LocalizationResource = {
     captcha_unavailable:
       'போட் சரிபார்ப்பு தோல்வியடைந்ததால் பதிவு செய்ய முடியவில்லை. மீண்டும் முயற்சிக்க பக்கத்தை புதுப்பிக்கவும் அல்லது மேலும் உதவிக்கு ஆதரவை தொடர்பு கொள்ளவும்.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'தற்காலிக மின்னஞ்சல் சேவைகள் ஆதரிக்கப்படவில்லை. கணக்கை உருவாக்க உங்கள் வழக்கமான மின்னஞ்சல் முகவரியைப் பயன்படுத்தவும்.',
     form_identifier_exists__email_address: 'இந்த மின்னஞ்சல் முகவரி எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__phone_number: 'இந்த தொலைபேசி எண் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
     form_identifier_exists__username: 'இந்த பயனர்பெயர் எடுக்கப்பட்டுள்ளது. வேறொன்றை முயற்சிக்கவும்.',
@@ -909,6 +911,8 @@ export const taIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'உள்ளிடப்பட்ட மதிப்பு தவறானது. அதை திருத்தவும்.',
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
+    form_password_or_identifier_incorrect:
+      'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',

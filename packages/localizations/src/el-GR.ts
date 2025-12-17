@@ -847,26 +847,26 @@ export const elGR: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Δημιουργία νέου οργανισμού',
+      action__invitationAccept: 'Συμμετοχή',
+      action__suggestionsAccept: 'Αίτημα συμμετοχής',
+      subtitle: 'Συμμετάσχετε σε έναν υπάρχοντα οργανισμό ή δημιουργήστε νέο',
+      suggestionsAcceptedLabel: 'Σε αναμονή έγκρισης',
+      title: 'Επιλέξτε οργανισμό',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Ακύρωση',
+      formButtonSubmit: 'Συνέχεια',
+      formFieldInputPlaceholder__name: 'Ο οργανισμός μου',
+      formFieldInputPlaceholder__slug: 'o-organismos-mou',
+      formFieldLabel__name: 'Όνομα',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Εισάγετε τα στοιχεία του οργανισμού σας για να συνεχίσετε',
+      title: 'Ρυθμίστε τον οργανισμό σας',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Αποσύνδεση',
+      actionText: 'Συνδεδεμένος ως {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -888,6 +888,8 @@ export const elGR: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Οι προσωρινές υπηρεσίες email δεν υποστηρίζονται. Παρακαλώ χρησιμοποιήστε τη συνηθισμένη διεύθυνση email σας για να δημιουργήσετε λογαριασμό.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -905,6 +907,8 @@ export const elGR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Ο κωδικός πρόσβασης ή η διεύθυνση email είναι λανθασμένη. Δοκιμάστε ξανά ή χρησιμοποιήστε άλλη μέθοδο.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Ο κωδικός πρόσβασής σας δεν είναι αρκετά ισχυρός.',
     form_password_pwned:

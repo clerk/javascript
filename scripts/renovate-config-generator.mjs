@@ -2,7 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import fs from 'fs-extra';
-import { globby } from 'globby';
+import { glob } from 'tinyglobby';
 import JSON5 from 'json5';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -110,7 +110,7 @@ const defaultRules = [
 ];
 
 const getPackageNames = async () => {
-  const files = await globby('./packages/*/package.json', { cwd: ROOT_DIR });
+  const files = await glob('./packages/*/package.json', { cwd: ROOT_DIR });
   let names = [];
 
   for (const file of files) {
