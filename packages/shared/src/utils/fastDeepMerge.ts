@@ -17,7 +17,7 @@ export const fastDeepMergeAndReplace = (
         target[key] = new (Object.getPrototypeOf(source[key]).constructor)();
       }
       fastDeepMergeAndReplace(source[key], target[key]);
-    } else if (Object.prototype.hasOwnProperty.call(source, key)) {
+    } else if (Object.prototype.hasOwnProperty.call(source, key) && source[key] !== undefined) {
       target[key] = source[key];
     }
   }
