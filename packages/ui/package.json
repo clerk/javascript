@@ -9,7 +9,9 @@
   },
   "license": "MIT",
   "author": "Clerk",
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/utils/setWebpackChunkPublicPath.ts"
+  ],
   "type": "module",
   "exports": {
     ".": {
