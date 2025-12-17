@@ -10,7 +10,7 @@ import { Header } from '@/ui/elements/Header';
 import { web3CallbackErrorHandler } from '@/ui/utils/web3CallbackErrorHandler';
 
 const Web3SolanaWalletButtons = lazy(() =>
-  import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
+  import(/* webpackChunkName: "web3-solana-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
     default: m.Web3SolanaWalletButtons,
   })),
 );
