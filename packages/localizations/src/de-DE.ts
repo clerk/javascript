@@ -764,6 +764,10 @@ export const deDE: LocalizationResource = {
         'Um fortzufahren, geben Sie bitte den Verifizierungscode ein, der von Ihrer Authenticator-App generiert wurde.',
       title: 'Bestätigung in zwei Schritten',
     },
+    web3Solana: {
+      subtitle: 'Wähle unten eine Wallet aus, um dich anzumelden',
+      title: 'Mit Solana anmelden',
+    },
   },
   signInEnterPasswordTitle: 'Geben Sie Ihr Passwort ein',
   signUp: {
@@ -854,6 +858,10 @@ export const deDE: LocalizationResource = {
       subtitleCombined: 'weiter zu {{applicationName}}',
       title: 'Erstellen Sie Ihr Konto',
       titleCombined: 'Erstellen Sie Ihr Konto',
+    },
+    web3Solana: {
+      subtitle: 'Wählen Sie unten eine Wallet aus, um sich zu registrieren',
+      title: 'Mit Solana registrieren',
     },
   },
   socialButtonsBlockButton: 'Weiter mit {{provider|titleize}}',
@@ -972,6 +980,10 @@ export const deDE: LocalizationResource = {
     session_exists: 'Sie sind bereits angemeldet.',
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
+    web3_signature_request_rejected:
+      'Du hast die Signaturanfrage abgelehnt. Bitte versuche es erneut, um fortzufahren.',
+    web3_solana_signature_generation_failed:
+      'Beim Erstellen der Signatur ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -1347,6 +1359,10 @@ export const deDE: LocalizationResource = {
         detailsAction__nonPrimary: 'Als primär festlegen',
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Wählen Sie eine Solana-Wallet aus, um sie mit Ihrem Konto zu verbinden.',
+          title: 'Solana-Wallet hinzufügen',
+        },
       },
     },
     usernamePage: {
@@ -1382,5 +1398,11 @@ export const deDE: LocalizationResource = {
       subtitle: 'Vielen Dank für Ihre Geduld. Sie erhalten eine Benachrichtigung, sobald der Zugang freigegeben wird.',
       title: 'Erfolgreich auf die Warteliste gesetzt',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Mit {{walletName}} verbinden',
+    continue: 'Weiter mit {{walletName}}',
+    noneAvailable:
+      'Keine Solana-Web3-Wallets erkannt. Bitte installieren Sie eine Web3-unterstützte {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;
