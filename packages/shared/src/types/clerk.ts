@@ -1344,7 +1344,7 @@ export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
 export type SignInProps = RoutingOptions & {
   /**

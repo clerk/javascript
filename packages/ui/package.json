@@ -52,7 +52,7 @@
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
-    "dev": "tsdown --watch src",
+    "dev": "rspack serve --config rspack.config.js",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4011}",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
     "format": "node ../../scripts/format-package.mjs",
