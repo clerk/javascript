@@ -860,7 +860,7 @@ export const deDE: LocalizationResource = {
       titleCombined: 'Erstellen Sie Ihr Konto',
     },
     web3Solana: {
-      subtitle: 'Wähle unten eine Wallet aus, um dich zu registrieren',
+      subtitle: 'Wählen Sie unten eine Wallet aus, um sich zu registrieren',
       title: 'Mit Solana registrieren',
     },
   },
@@ -983,7 +983,7 @@ export const deDE: LocalizationResource = {
     web3_signature_request_rejected:
       'Du hast die Signaturanfrage abgelehnt. Bitte versuche es erneut, um fortzufahren.',
     web3_solana_signature_generation_failed:
-      'Beim Erstellen der Signatur ist ein Fehler aufgetreten. Bitte versuche es erneut, um fortzufahren.',
+      'Beim Erstellen der Signatur ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut, um fortzufahren.',
     zxcvbn: {
       couldBeStronger: 'Ihr Passwort funktioniert, könnte aber besser sein. Versuchen Sie, mehr Zeichen hinzuzufügen.',
       goodPassword: 'Ihr Passwort erfüllt alle notwendigen Anforderungen.',
@@ -1360,7 +1360,7 @@ export const deDE: LocalizationResource = {
         primaryButton: 'Web3-Wallets',
         title: 'Web3-Wallets',
         web3SelectSolanaWalletScreen: {
-          subtitle: 'Wähle eine Solana-Wallet aus, um sie mit deinem Konto zu verbinden.',
+          subtitle: 'Wählen Sie eine Solana-Wallet aus, um sie mit Ihrem Konto zu verbinden.',
           title: 'Solana-Wallet hinzufügen',
         },
       },
@@ -1403,6 +1403,6 @@ export const deDE: LocalizationResource = {
     connect: 'Mit {{walletName}} verbinden',
     continue: 'Weiter mit {{walletName}}',
     noneAvailable:
-      'Keine Solana-Web3-Wallets erkannt. Bitte installiere eine Web3-unterstützte {{ solanaWalletsLink || link("wallet extension") }}.',
+      'Keine Solana-Web3-Wallets erkannt. Bitte installieren Sie eine Web3-unterstützte {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;
