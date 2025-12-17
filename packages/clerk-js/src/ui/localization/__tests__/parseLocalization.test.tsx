@@ -76,7 +76,7 @@ describe('Localization parsing and replacing', () => {
               signIn: {
                 start: {
                   title: undefined, // Should fall back to English
-                  subtitle: 'Custom subtitle', // Should use translation
+                  subtitle: 'Custom subtitle', // Non-undefined should override
                 },
               },
             },
