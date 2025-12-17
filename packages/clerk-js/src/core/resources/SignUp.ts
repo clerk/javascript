@@ -376,15 +376,19 @@ export class SignUp extends BaseResource implements SignUpResource {
    * });
    * ```
    */
-  public authenticateWithSolana = async (params: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
-    const identifier = await web3().getSolanaIdentifier(params.walletName);
+  public authenticateWithSolana = async ({
+    walletName,
+    unsafeMetadata,
+    legalAccepted,
+  }: SignUpAuthenticateWithSolanaParams): Promise<SignUpResource> => {
+    const identifier = await web3().getSolanaIdentifier(walletName);
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName: params.walletName }),
-      unsafeMetadata: params?.unsafeMetadata,
+      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName }),
+      unsafeMetadata,
       strategy: 'web3_solana_signature',
-      legalAccepted: params?.legalAccepted,
-      walletName: params.walletName,
+      legalAccepted,
+      walletName,
     });
   };
 

@@ -464,13 +464,15 @@ export class SignIn extends BaseResource implements SignInResource {
    * await signIn.authenticateWithSolana({ walletName: 'phantom' });
    * ```
    */
-  public authenticateWithSolana = async (params: SignInAuthenticateWithSolanaParams): Promise<SignInResource> => {
-    const identifier = await web3().getSolanaIdentifier(params.walletName);
+  public authenticateWithSolana = async ({
+    walletName,
+  }: SignInAuthenticateWithSolanaParams): Promise<SignInResource> => {
+    const identifier = await web3().getSolanaIdentifier(walletName);
     return this.authenticateWithWeb3({
       identifier,
-      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName: params.walletName }),
+      generateSignature: p => web3().generateSignatureWithSolana({ ...p, walletName: walletName }),
       strategy: 'web3_solana_signature',
-      walletName: params.walletName,
+      walletName: walletName,
     });
   };
 
