@@ -1,6 +1,6 @@
 import { useOrganizationList } from '@clerk/shared/react';
 import type { CreateOrganizationParams } from '@clerk/shared/types';
-import React from 'react';
+import { useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
 import { useSessionTasksContext, useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
@@ -48,7 +48,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
     userMemberships: organizationListParams.userMemberships,
   });
   const { organizationSettings } = useEnvironment();
-  const [file, setFile] = React.useState<File | null>();
+  const [file, setFile] = useState<File | null>();
 
   const nameField = useFormControl('name', '', {
     type: 'text',
