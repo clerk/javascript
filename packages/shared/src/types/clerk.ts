@@ -1,32 +1,13 @@
+import type { ClerkGlobalHookError } from '@/errors/globalHookError';
+
+import type { ClerkUiConstructor } from '../ui/types';
 import type { APIKeysNamespace } from './apiKeys';
-import type {
-  APIKeysTheme,
-  Appearance,
-  CheckoutTheme,
-  CreateOrganizationTheme,
-  OAuthConsentTheme,
-  OrganizationListTheme,
-  OrganizationProfileTheme,
-  OrganizationSwitcherTheme,
-  PlanDetailTheme,
-  PricingTableTheme,
-  SignInTheme,
-  SignUpTheme,
-  SubscriptionDetailsTheme,
-  TaskChooseOrganizationTheme,
-  TaskResetPasswordTheme,
-  UserAvatarTheme,
-  UserButtonTheme,
-  UserProfileTheme,
-  UserVerificationTheme,
-  WaitlistTheme,
-} from './appearance';
 import type {
   BillingCheckoutResource,
   BillingNamespace,
   BillingPlanResource,
   BillingSubscriptionPlanPeriod,
-  ConfirmCheckoutParams,
+  CheckoutFlowResource,
   ForPayerType,
 } from './billing';
 import type { ClientResource } from './client';
@@ -36,6 +17,7 @@ import type { ClerkAPIResponseError } from './errors';
 import type { InstanceType } from './instance';
 import type { DisplayThemeJSON } from './json';
 import type { LocalizationResource } from './localization';
+import type { DomainOrProxyUrl, MultiDomainAndOrProxy } from './multiDomain';
 import type { OAuthProvider, OAuthScope } from './oauth';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
@@ -43,7 +25,6 @@ import type { ClerkPaginationParams } from './pagination';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
-  LegacyRedirectProps,
   NewSubscriptionRedirectUrl,
   RedirectOptions,
   RedirectUrlProp,
@@ -61,8 +42,26 @@ import type { State } from './state';
 import type { Web3Strategy } from './strategies';
 import type { TelemetryCollector } from './telemetry';
 import type { UserResource } from './user';
-import type { Autocomplete, DeepPartial, DeepSnakeToCamel } from './utils';
+import type { Autocomplete, DeepPartial, DeepSnakeToCamel, Without } from './utils';
 import type { WaitlistResource } from './waitlist';
+
+/**
+ * Global appearance type registry that can be augmented by packages that depend on `@clerk/ui`.
+ * Framework packages (like `@clerk/react`, `@clerk/nextjs`) should augment this interface
+ * to provide proper appearance types without creating circular dependencies.
+ */
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface ClerkAppearanceRegistry {}
+}
+
+/**
+ * Appearance theme type that gets overridden by framework packages.
+ * Defaults to `any` in @clerk/shared.
+ * Becomes fully typed when a framework package augments ClerkAppearanceRegistry with Theme.
+ */
+// @ts-expect-error - this is a global interface augmentation
+export type ClerkAppearanceTheme = ClerkAppearanceRegistry['theme'];
 
 type __experimental_CheckoutStatus = 'needs_initialization' | 'needs_confirmation' | 'completed';
 
@@ -81,29 +80,41 @@ export type __experimental_CheckoutOptions = {
   planId: string;
 };
 
-/**
- * @inline
- */
-type CheckoutResult =
-  | {
-      data: BillingCheckoutResource;
-      error: null;
-    }
-  | {
-      data: null;
-      error: ClerkAPIResponseError;
-    };
-
-export type __experimental_CheckoutInstance = {
-  confirm: (params: ConfirmCheckoutParams) => Promise<CheckoutResult>;
-  start: () => Promise<CheckoutResult>;
-  clear: () => void;
-  finalize: (params?: { navigate?: SetActiveNavigate }) => Promise<void>;
-  subscribe: (listener: (state: __experimental_CheckoutCacheState) => void) => () => void;
-  getState: () => __experimental_CheckoutCacheState;
+export type CheckoutErrors = {
+  /**
+   * The raw, unparsed errors from the Clerk API.
+   */
+  raw: unknown[] | null;
+  /**
+   * Parsed errors that are not related to any specific field.
+   * Does not include any errors that could be parsed as a field error
+   */
+  global: ClerkGlobalHookError[] | null;
 };
 
-type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => __experimental_CheckoutInstance;
+/**
+ * The value returned by the `useCheckout` hook.
+ */
+export interface CheckoutSignalValue {
+  /**
+   * Represents the errors that occurred during the last fetch of the parent resource.
+   */
+  errors: CheckoutErrors;
+  /**
+   * The fetch status of the underlying `Checkout` resource.
+   */
+  fetchStatus: 'idle' | 'fetching';
+  /**
+   * An instance representing the currently active `Checkout`.
+   */
+  checkout: CheckoutFlowResource;
+}
+
+export interface CheckoutSignal {
+  (): CheckoutSignalValue;
+}
+
+type __experimental_CheckoutFunction = (options: __experimental_CheckoutOptions) => CheckoutSignalValue;
 
 /**
  * @inline
@@ -125,7 +136,6 @@ export type SDKMetadata = {
 
 export type ListenerCallback = (emission: Resources) => void;
 export type UnsubscribeCallback = () => void;
-export type BeforeEmitCallback = (session?: SignedInSessionResource | null) => void | Promise<any>;
 export type SetActiveNavigate = ({ session }: { session: SessionResource }) => void | Promise<unknown>;
 
 export type SignOutCallback = () => void | Promise<any>;
@@ -976,8 +986,7 @@ export type HandleOAuthCallbackParams = TransferableOption &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
-  SignUpFallbackRedirectUrl &
-  LegacyRedirectProps & {
+  SignUpFallbackRedirectUrl & {
     /**
      * Full URL or path where the SignIn component is mounted.
      */
@@ -1047,36 +1056,25 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
-type ClerkOptionsLegacyRedirectProps = {
-  /**
-   * @deprecated Use `signInFallbackRedirectUrl` or `signInForceRedirectUrl` instead.
-   */
-  afterSignInUrl?: string | null;
-  /**
-   * @deprecated Use `signUpFallbackRedirectUrl` or `signUpForceRedirectUrl` instead.
-   */
-  afterSignUpUrl?: string | null;
-  /**
-   * @deprecated Use `signInFallbackRedirectUrl`, `signInForceRedirectUrl`, `signUpFallbackRedirectUrl`, or `signUpForceRedirectUrl` instead.
-   */
-  redirectUrl?: string | null;
-};
-
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
-  ClerkOptionsLegacyRedirectProps &
   AfterSignOutUrl &
   AfterMultiSessionSingleSignOutUrl & {
     /**
+     * Clerk UI entrypoint.
+     */
+    clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
+    /**
      * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
      */
-    appearance?: Appearance;
+    // TODO @nikos
+    appearance?: any;
     /**
-     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
     polling?: boolean;
@@ -1089,7 +1087,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     standardBrowser?: boolean;
     /**
-     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional support email for display in authentication screens. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     supportEmail?: string;
     /**
@@ -1140,7 +1138,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
      */
     sdkMetadata?: SDKMetadata;
     /**
-     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/customizing-clerk/account-portal#waitlist).
+     * The full URL or path to the waitlist page. If `undefined`, will redirect to the [Account Portal waitlist page](https://clerk.com/docs/guides/account-portal/overview#waitlist).
      */
     waitlistUrl?: string;
     /**
@@ -1311,14 +1309,7 @@ export type SetActiveParams = {
   organization?: OrganizationResource | string | null;
 
   /**
-   * @deprecated Use `redirectUrl` instead.
-   *
-   * Callback run just before the active session and/or Organization is set to the passed object. Can be used to set up for pre-navigation actions.
-   */
-  beforeEmit?: BeforeEmitCallback;
-
-  /**
-   * The full URL or path to redirect to just before the session and/or Organization is set.
+   * The full URL or path to redirect to just before the session and/or organization is set.
    */
   redirectUrl?: string;
 
@@ -1353,7 +1344,7 @@ export type SetActive = (setActiveParams: SetActiveParams) => Promise<void>;
 
 export type RoutingOptions =
   | { path: string | undefined; routing?: Extract<RoutingStrategy, 'path'> }
-  | { path?: never; routing?: Extract<RoutingStrategy, 'hash' | 'virtual'> };
+  | { path?: never; routing?: Extract<RoutingStrategy, 'hash'> };
 
 export type SignInProps = RoutingOptions & {
   /**
@@ -1386,7 +1377,7 @@ export type SignInProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: SignInTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Initial values that are used to prefill the sign in or up forms.
    */
@@ -1419,7 +1410,6 @@ export type SignInProps = RoutingOptions & {
 } & TransferableOption &
   SignUpForceRedirectUrl &
   SignUpFallbackRedirectUrl &
-  LegacyRedirectProps &
   AfterSignOutUrl;
 
 export interface TransferableOption {
@@ -1458,7 +1448,7 @@ export type __internal_UserVerificationProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: UserVerificationTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
@@ -1516,7 +1506,7 @@ export type GoogleOneTapProps = GoogleOneTapRedirectUrlProps & {
    * @default true
    */
   fedCmSupport?: boolean;
-  appearance?: SignInTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type SignUpProps = RoutingOptions & {
@@ -1545,7 +1535,7 @@ export type SignUpProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: SignUpTheme;
+  appearance?: ClerkAppearanceTheme;
 
   /**
    * Additional arbitrary metadata to be stored alongside the User object
@@ -1574,7 +1564,6 @@ export type SignUpProps = RoutingOptions & {
   oidcPrompt?: string;
 } & SignInFallbackRedirectUrl &
   SignInForceRedirectUrl &
-  LegacyRedirectProps &
   AfterSignOutUrl;
 
 export type SignUpModalProps = WithoutRouting<SignUpProps>;
@@ -1585,7 +1574,7 @@ export type UserProfileProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: UserProfileTheme;
+  appearance?: ClerkAppearanceTheme;
   /*
    * Specify additional scopes per OAuth provider that your users would like to provide if not already approved.
    * e.g. <UserProfile additionalOAuthScopes={{google: ['foo', 'bar'], github: ['qux']}} />
@@ -1633,7 +1622,7 @@ export type OrganizationProfileProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: OrganizationProfileTheme;
+  appearance?: ClerkAppearanceTheme;
   /*
    * Provide custom pages and links to be rendered inside the OrganizationProfile.
    */
@@ -1685,13 +1674,7 @@ export type CreateOrganizationProps = RoutingOptions & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: CreateOrganizationTheme;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type CreateOrganizationModalProps = WithoutRouting<CreateOrganizationProps>;
@@ -1728,19 +1711,6 @@ export type UserButtonProps = UserButtonProfileMode & {
   __experimental_asStandalone?: boolean | ((opened: boolean) => void);
 
   /**
-   * Full URL or path to navigate to after sign out is complete
-   *
-   * @deprecated Configure `afterSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
-   */
-  afterSignOutUrl?: string;
-  /**
-   * Full URL or path to navigate to after signing out the current user is complete.
-   * This option applies to multi-session applications.
-   *
-   * @deprecated Configure `afterMultiSessionSingleSignOutUrl` as a global configuration, either in `<ClerkProvider/>` or in `await Clerk.load()`.
-   */
-  afterMultiSessionSingleSignOutUrl?: string;
-  /**
    * Full URL or path to navigate to on "Add another account" action.
    * Multi-session mode only.
    */
@@ -1755,9 +1725,9 @@ export type UserButtonProps = UserButtonProfileMode & {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: UserButtonTheme;
+  appearance?: ClerkAppearanceTheme;
 
-  /*
+  /**
    * Specify options for the underlying <UserProfile /> component.
    * e.g. <UserButton userProfileProps={{additionalOAuthScopes: {google: ['foo', 'bar'], github: ['qux']}}} />
    */
@@ -1770,7 +1740,7 @@ export type UserButtonProps = UserButtonProfileMode & {
 };
 
 export type UserAvatarProps = {
-  appearance?: UserAvatarTheme;
+  appearance?: ClerkAppearanceTheme;
   rounded?: boolean;
 };
 
@@ -1815,15 +1785,7 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     hidePersonal?: boolean;
     /**
-     * Full URL or path to navigate to after a successful Organization switch.
-     *
-     * @default undefined
-     *
-     * @deprecated Use `afterSelectOrganizationUrl` or `afterSelectPersonalUrl`.
-     */
-    afterSwitchOrganizationUrl?: string;
-    /**
-     * Full URL or path to navigate to after creating a new Organization.
+     * Full URL or path to navigate to after creating a new organization.
      *
      * @default undefined
      */
@@ -1860,17 +1822,11 @@ export type OrganizationSwitcherProps = CreateOrganizationMode &
      */
     skipInvitationScreen?: boolean;
     /**
-     * @deprecated
-     * This prop will be removed in a future version.
-     * Configure whether Organization slug is enabled via the Clerk Dashboard under Organization Settings.
-     */
-    hideSlug?: boolean;
-    /**
      * Customisation options to fully match the Clerk components to your own brand.
      * These options serve as overrides and will be merged with the global `appearance`
      * prop of ClerkProvider(if one is provided)
      */
-    appearance?: OrganizationSwitcherTheme;
+    appearance?: ClerkAppearanceTheme;
     /*
      * Specify options for the underlying <OrganizationProfile /> component.
      * e.g. <UserButton userProfileProps={{appearance: {...}}} />
@@ -1901,7 +1857,7 @@ export type OrganizationListProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: OrganizationListTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Hides the screen for sending invitations after an Organization is created.
    *
@@ -1925,12 +1881,6 @@ export type OrganizationListProps = {
    * @default undefined`
    */
   afterSelectPersonalUrl?: ((user: UserResource) => string) | LooseExtractedParams<PrimitiveKeys<UserResource>>;
-  /**
-   * @deprecated
-   * This prop will be removed in a future version.
-   * Configure whether Organization slug is enabled via the Clerk Dashboard under Organization Settings.
-   */
-  hideSlug?: boolean;
 };
 
 export type WaitlistProps = {
@@ -1943,7 +1893,7 @@ export type WaitlistProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvided (if one is provided)
    */
-  appearance?: WaitlistTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Full URL or path where the SignIn component is mounted.
    */
@@ -1986,7 +1936,7 @@ type PricingTableBaseProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: PricingTableTheme;
+  appearance?: ClerkAppearanceTheme;
   /*
    * Specify options for the underlying <Checkout /> component.
    * e.g. <PricingTable checkoutProps={{appearance: {variables: {colorText: 'blue'}}}} />
@@ -2010,7 +1960,7 @@ export type APIKeysProps = {
    * These options serve as overrides and will be merged with the global `appearance`
    * prop of ClerkProvider (if one is provided)
    */
-  appearance?: APIKeysTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Whether to show the description field in the API key creation form.
    *
@@ -2040,7 +1990,7 @@ export type RevokeAPIKeyParams = {
  * @experimental This is an experimental API for the Billing feature that is available under a public beta, and the API is subject to change. It is advised to [pin](https://clerk.com/docs/pinning) the SDK version and the clerk-js version to avoid breaking changes.
  */
 export type __internal_CheckoutProps = {
-  appearance?: CheckoutTheme;
+  appearance?: ClerkAppearanceTheme;
   planId?: string;
   planPeriod?: BillingSubscriptionPlanPeriod;
   for?: ForPayerType;
@@ -2065,7 +2015,7 @@ export type __experimental_CheckoutButtonProps = {
   for?: ForPayerType;
   onSubscriptionComplete?: () => void;
   checkoutProps?: {
-    appearance?: CheckoutTheme;
+    appearance?: ClerkAppearanceTheme;
     portalId?: string;
     portalRoot?: HTMLElement | null | undefined;
     onClose?: () => void;
@@ -2094,7 +2044,7 @@ export type __internal_PlanDetailsProps = (
       planId?: never;
     }
 ) & {
-  appearance?: PlanDetailTheme;
+  appearance?: ClerkAppearanceTheme;
   initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -2118,7 +2068,7 @@ export type __experimental_PlanDetailsButtonProps = (
 ) & {
   initialPlanPeriod?: BillingSubscriptionPlanPeriod;
   planDetailsProps?: {
-    appearance?: PlanDetailTheme;
+    appearance?: ClerkAppearanceTheme;
     portalId?: string;
     portalRoot?: PortalRoot;
   };
@@ -2135,7 +2085,7 @@ export type __internal_SubscriptionDetailsProps = {
    * @default 'user'
    */
   for?: ForPayerType;
-  appearance?: SubscriptionDetailsTheme;
+  appearance?: ClerkAppearanceTheme;
   onSubscriptionCancel?: () => void;
   portalId?: string;
   portalRoot?: PortalRoot;
@@ -2154,14 +2104,14 @@ export type __experimental_SubscriptionDetailsButtonProps = {
   for?: ForPayerType;
   onSubscriptionCancel?: () => void;
   subscriptionDetailsProps?: {
-    appearance?: SubscriptionDetailsTheme;
+    appearance?: ClerkAppearanceTheme;
     portalId?: string;
     portalRoot?: PortalRoot;
   };
 };
 
 export type __internal_OAuthConsentProps = {
-  appearance?: OAuthConsentTheme;
+  appearance?: ClerkAppearanceTheme;
   /**
    * Name of the OAuth application.
    */
@@ -2257,7 +2207,7 @@ export type TaskChooseOrganizationProps = {
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
-  appearance?: TaskChooseOrganizationTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type TaskResetPasswordProps = {
@@ -2265,7 +2215,7 @@ export type TaskResetPasswordProps = {
    * Full URL or path to navigate to after successfully resolving all tasks
    */
   redirectUrlComplete: string;
-  appearance?: TaskResetPasswordTheme;
+  appearance?: ClerkAppearanceTheme;
 };
 
 export type CreateOrganizationInvitationParams = {
@@ -2342,6 +2292,66 @@ export interface AuthenticateWithBaseParams {
   unsafeMetadata?: SignUpUnsafeMetadata;
   legalAccepted?: boolean;
 }
+
+export interface HeadlessBrowserClerkConstructor {
+  new (publishableKey: string, options?: DomainOrProxyUrl): HeadlessBrowserClerk;
+}
+
+export interface BrowserClerkConstructor {
+  new (publishableKey: string, options?: DomainOrProxyUrl): BrowserClerk;
+}
+
+export interface HeadlessBrowserClerk extends Clerk {
+  load: (opts?: Without<ClerkOptions, 'isSatellite'>) => Promise<void>;
+  updateClient: (client: ClientResource) => void;
+}
+
+export interface BrowserClerk extends HeadlessBrowserClerk {
+  onComponentsReady: Promise<void>;
+  components: any;
+}
+
+export type ClerkProp =
+  | BrowserClerkConstructor
+  | BrowserClerk
+  | HeadlessBrowserClerk
+  | HeadlessBrowserClerkConstructor
+  | undefined
+  | null;
+
+export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
+  Clerk?: ClerkProp;
+  /**
+   * The URL that `@clerk/clerk-js` should be hot-loaded from.
+   */
+  clerkJSUrl?: string;
+  /**
+   * If your web application only uses [Control Components](https://clerk.com/docs/reference/components/overview#control-components), you can set this value to `'headless'` and load a minimal ClerkJS bundle for optimal page performance.
+   */
+  clerkJSVariant?: 'headless' | '';
+  /**
+   * The npm version for `@clerk/clerk-js`.
+   */
+  clerkJSVersion?: string;
+  /**
+   * The URL that `@clerk/ui` should be hot-loaded from.
+   */
+  clerkUiUrl?: string;
+  /**
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   */
+  publishableKey: string;
+  /**
+   * This nonce value will be passed through to the `@clerk/clerk-js` script tag. Use it to implement a [strict-dynamic CSP](https://clerk.com/docs/guides/secure/best-practices/csp-headers#implementing-a-strict-dynamic-csp). Requires the `dynamic` prop to also be set.
+   */
+  nonce?: string;
+  /**
+   * @internal
+   * This is a structural-only type for the `ui` object that can be passed
+   * to Clerk.load() and ClerkProvider
+   */
+  ui?: { version: string; url?: string };
+} & MultiDomainAndOrProxy;
 
 export interface LoadedClerk extends Clerk {
   client: ClientResource;

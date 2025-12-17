@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhCN: LocalizationResource = {
   locale: 'zh-CN',
@@ -832,26 +832,26 @@ export const zhCN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: '创建新组织',
+      action__invitationAccept: '加入',
+      action__suggestionsAccept: '请求加入',
+      subtitle: '加入现有组织或创建新组织',
+      suggestionsAcceptedLabel: '等待批准',
+      title: '选择组织',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: '取消',
+      formButtonSubmit: '继续',
+      formFieldInputPlaceholder__name: '我的组织',
+      formFieldInputPlaceholder__slug: 'wo-de-zu-zhi',
+      formFieldLabel__name: '名称',
+      formFieldLabel__slug: 'Slug',
+      subtitle: '输入您的组织详细信息以继续',
+      title: '设置您的组织',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: '退出',
+      actionText: '已登录为 {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -860,6 +860,7 @@ export const zhCN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -869,6 +870,7 @@ export const zhCN: LocalizationResource = {
     captcha_invalid: '由于安全验证失败，注册未成功。请刷新页面重试或联系支持获取更多帮助。',
     captcha_unavailable: '注册失败，原因是未通过机器人验证。请刷新页面重试或联系支持团队以获取更多帮助。',
     form_code_incorrect: undefined,
+    form_email_address_blocked: '不支持临时电子邮件服务。请使用您的常规电子邮件地址创建账户。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -886,6 +888,7 @@ export const zhCN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: '密码或电子邮件地址不正确。请重试或使用其他方法。',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密码强度不够。',
     form_password_pwned: '这个密码在数据泄露中被发现，不能使用，请换一个密码试试。',

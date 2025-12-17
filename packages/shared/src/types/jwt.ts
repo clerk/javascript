@@ -38,6 +38,7 @@ export interface JWTClaims extends ClerkJWTClaims {
 
 /**
  * Clerk-issued JWT payload
+ *
  * @deprecated Use `JwtPayload` instead.
  */
 export interface ClerkJWTClaims {
@@ -104,7 +105,9 @@ export interface ClerkJWTClaims {
 
 /**
  * JWT Actor - [RFC8693](https://www.rfc-editor.org/rfc/rfc8693.html#name-act-actor-claim).
+ *
  * @inline
+ *
  * @deprecated Use `ActClaim` instead.
  */
 export interface ActJWTClaim {

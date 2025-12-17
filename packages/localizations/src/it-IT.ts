@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
@@ -853,26 +853,26 @@ export const itIT: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Crea nuova organizzazione',
+      action__invitationAccept: 'Unisciti',
+      action__suggestionsAccept: 'Richiedi di unirti',
+      subtitle: "Unisciti a un'organizzazione esistente o creane una nuova",
+      suggestionsAcceptedLabel: 'In attesa di approvazione',
+      title: "Scegli un'organizzazione",
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Annulla',
+      formButtonSubmit: 'Continua',
+      formFieldInputPlaceholder__name: 'La mia organizzazione',
+      formFieldInputPlaceholder__slug: 'la-mia-organizzazione',
+      formFieldLabel__name: 'Nome',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Inserisci i dettagli della tua organizzazione per continuare',
+      title: 'Configura la tua organizzazione',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Esci',
+      actionText: 'Accesso effettuato come {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -881,6 +881,7 @@ export const itIT: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -892,6 +893,8 @@ export const itIT: LocalizationResource = {
     captcha_unavailable:
       'Registrazione non riuscita a causa della convalida del bot non riuscita. Per favore, ricarica la pagina e riprova o contatta il supporto per ulteriore assistenza.',
     form_code_incorrect: 'Il codice inserito non è corretto. Riprova.',
+    form_email_address_blocked:
+      'I servizi di posta elettronica temporanea non sono supportati. Si prega di utilizzare il proprio indirizzo email normale per creare un account.',
     form_identifier_exists__email_address: 'Questa email è già registrata.',
     form_identifier_exists__phone_number: 'Questo numero di telefono è già registrato.',
     form_identifier_exists__username: 'Questo username è già in uso.',
@@ -909,6 +912,7 @@ export const itIT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valore non valido.',
     form_password_incorrect: 'Password errata.',
+    form_password_or_identifier_incorrect: "La password o l'indirizzo email è errato. Riprova o usa un altro metodo.",
     form_password_length_too_short: 'La password deve avere almeno 8 caratteri.',
     form_password_not_strong_enough: 'La tua password non è abbastanza forte.',
     form_password_pwned: 'Questa password è stata trovata in una violazione dei dati. Scegli una password diversa.',

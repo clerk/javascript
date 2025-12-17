@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptBR: LocalizationResource = {
   locale: 'pt-BR',
@@ -885,6 +885,7 @@ export const ptBR: LocalizationResource = {
       actionLink: 'Sair',
       actionText: 'Conectado como {{identifier}}',
     },
+    subtitle: undefined,
     title: 'Resetar senha',
   },
   unstable__errors: {
@@ -897,6 +898,8 @@ export const ptBR: LocalizationResource = {
     captcha_unavailable:
       'Não foi possível se inscrever devido à indisponibilidade do captcha. Por favor atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'E-mail já está em uso. Por favor, tente outro.',
     form_identifier_exists__phone_number: 'Telefone já está em uso. Por favor, tente outro.',
     form_identifier_exists__username: 'Nome de usuário já está em uso. Por favor, tente outro.',
@@ -914,6 +917,8 @@ export const ptBR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'Número de telefone inválido.',
     form_param_value_invalid: 'Valor inválido.',
     form_password_incorrect: 'Senha incorreta.',
+    form_password_or_identifier_incorrect:
+      'A senha ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'Sua senha é muito curta. Por favor, tente novamente.',
     form_password_not_strong_enough: 'Sua senha não é forte o suficiente.',
     form_password_pwned: 'Esta senha foi comprometida e não pode ser usada, por favor, tente outra senha.',

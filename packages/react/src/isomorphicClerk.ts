@@ -1,6 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { clerkEvents, createClerkEventBus } from '@clerk/shared/clerkEventBus';
-import { loadClerkJsScript } from '@clerk/shared/loadClerkJsScript';
+import { loadClerkJsScript, loadClerkUiScript } from '@clerk/shared/loadClerkJsScript';
 import type {
   __internal_AttemptToEnableEnvironmentSettingParams,
   __internal_AttemptToEnableEnvironmentSettingResult,
@@ -58,6 +58,7 @@ import type {
   WaitlistResource,
   Without,
 } from '@clerk/shared/types';
+import type { ClerkUiConstructor } from '@clerk/shared/ui';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
 import { errorThrower } from './errors/errorThrower';
@@ -85,6 +86,7 @@ const SDK_METADATA = {
 
 export interface Global {
   Clerk?: HeadlessBrowserClerk | BrowserClerk;
+  __internal_ClerkUiCtor?: ClerkUiConstructor;
 }
 
 declare const global: Global;
@@ -253,12 +255,11 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   constructor(options: IsomorphicClerkOptions) {
-    const { Clerk = null, publishableKey } = options || {};
-    this.#publishableKey = publishableKey;
+    this.#publishableKey = options?.publishableKey;
     this.#proxyUrl = options?.proxyUrl;
     this.#domain = options?.domain;
     this.options = options;
-    this.Clerk = Clerk;
+    this.Clerk = options?.Clerk || null;
     this.mode = inBrowser() ? 'browser' : 'server';
     this.#stateProxy = new StateProxy(this);
 
@@ -269,7 +270,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     this.#eventBus.prioritizedOn(clerkEvents.Status, status => (this.#status = status));
 
     if (this.#publishableKey) {
-      void this.loadClerkJS();
+      void this.getEntryChunks();
     }
   }
 
@@ -439,7 +440,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     });
   }
 
-  async loadClerkJS(): Promise<HeadlessBrowserClerk | BrowserClerk | undefined> {
+  async getEntryChunks(): Promise<void> {
     if (this.mode !== 'browser' || this.loaded) {
       return;
     }
@@ -447,10 +448,8 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     // Store frontendAPI value on window as a fallback. This value can be used as a
     // fallback during ClerkJS hot loading in case ClerkJS fails to find the
     // "data-clerk-frontend-api" attribute on its script tag.
-
     // This can happen when the DOM is altered completely during client rehydration.
     // For example, in Remix with React 18 the document changes completely via `hydrateRoot(document)`.
-
     // For more information refer to:
     // - https://github.com/remix-run/remix/issues/2947
     // - https://github.com/facebook/react/issues/24430
@@ -461,59 +460,73 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
 
     try {
-      if (this.Clerk) {
-        // Set a fixed Clerk version
-        let c: ClerkProp;
+      const clerkUiCtor = this.getClerkUiEntryChunk();
+      const clerk = await this.getClerkJsEntryChunk();
 
-        if (isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.Clerk)) {
-          // Construct a new Clerk object if a constructor is passed
-          c = new this.Clerk(this.#publishableKey, {
-            proxyUrl: this.proxyUrl,
-            domain: this.domain,
-          } as any);
-
-          this.beforeLoad(c);
-          await c.load(this.options);
-        } else {
-          // Otherwise use the instantiated Clerk object
-          c = this.Clerk;
-          if (!c.loaded) {
-            this.beforeLoad(c);
-            await c.load(this.options);
-          }
-        }
-
-        global.Clerk = c;
-      } else if (!__BUILD_DISABLE_RHC__) {
-        // Hot-load latest ClerkJS from Clerk CDN
-        if (!global.Clerk) {
-          await loadClerkJsScript({
-            ...this.options,
-            publishableKey: this.#publishableKey,
-            proxyUrl: this.proxyUrl,
-            domain: this.domain,
-            nonce: this.options.nonce,
-          });
-        }
-
-        if (!global.Clerk) {
-          throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
-        }
-
-        this.beforeLoad(global.Clerk);
-        await global.Clerk.load(this.options);
+      if (!clerk.loaded) {
+        this.beforeLoad(clerk);
+        await clerk.load({ ...this.options, clerkUiCtor });
       }
-
-      if (global.Clerk?.loaded) {
-        return this.hydrateClerkJS(global.Clerk);
+      if (clerk.loaded) {
+        this.replayInterceptedInvocations(clerk);
       }
-      return;
     } catch (err) {
       const error = err as Error;
       this.#eventBus.emit(clerkEvents.Status, 'error');
       console.error(error.stack || error.message || error);
       return;
     }
+  }
+
+  private async getClerkJsEntryChunk(): Promise<HeadlessBrowserClerk | BrowserClerk> {
+    // Hotload bundle
+    if (!this.options.Clerk && !__BUILD_DISABLE_RHC__) {
+      // the UMD script sets the global.Clerk instance
+      // we do not want to await here as we
+      await loadClerkJsScript({
+        ...this.options,
+        publishableKey: this.#publishableKey,
+        proxyUrl: this.proxyUrl,
+        domain: this.domain,
+        nonce: this.options.nonce,
+      });
+    }
+
+    // Otherwise, set global.Clerk to the bundled ctor or instance
+    if (this.options.Clerk) {
+      global.Clerk = isConstructor<BrowserClerkConstructor | HeadlessBrowserClerkConstructor>(this.options.Clerk)
+        ? new this.options.Clerk(this.#publishableKey, { proxyUrl: this.proxyUrl, domain: this.domain })
+        : this.options.Clerk;
+    }
+
+    if (!global.Clerk) {
+      // TODO @nikos: somehow throw if clerk ui failed to load but it was not headless
+      throw new Error('Failed to download latest ClerkJS. Contact support@clerk.com.');
+    }
+
+    return global.Clerk;
+  }
+
+  private async getClerkUiEntryChunk(): Promise<ClerkUiConstructor> {
+    if (this.options.clerkUiCtor) {
+      return this.options.clerkUiCtor;
+    }
+
+    await loadClerkUiScript({
+      ...this.options,
+      clerkUiVersion: this.options.ui?.version,
+      clerkUiUrl: this.options.ui?.url || this.options.clerkUiUrl,
+      publishableKey: this.#publishableKey,
+      proxyUrl: this.proxyUrl,
+      domain: this.domain,
+      nonce: this.options.nonce,
+    });
+
+    if (!global.__internal_ClerkUiCtor) {
+      throw new Error('Failed to download latest Clerk UI. Contact support@clerk.com.');
+    }
+
+    return global.__internal_ClerkUiCtor;
   }
 
   public on: Clerk['on'] = (...args) => {
@@ -561,7 +574,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
-  private hydrateClerkJS = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
+  private replayInterceptedInvocations = (clerkjs: BrowserClerk | HeadlessBrowserClerk | undefined) => {
     if (!clerkjs) {
       throw new Error('Failed to hydrate latest Clerk JS');
     }
@@ -737,9 +750,9 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   }
 
-  get __unstable__environment(): any {
+  get __internal_environment(): any {
     if (this.clerkjs) {
-      return (this.clerkjs as any).__unstable__environment;
+      return (this.clerkjs as any).__internal_environment;
       // TODO: add ssr condition
     } else {
       return undefined;
@@ -767,23 +780,25 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   }
 
   __experimental_checkout = (...args: Parameters<Clerk['__experimental_checkout']>) => {
-    return this.clerkjs?.__experimental_checkout(...args);
+    return this.loaded && this.clerkjs
+      ? this.clerkjs.__experimental_checkout(...args)
+      : this.#stateProxy.checkoutSignal(...args);
   };
 
-  __unstable__setEnvironment(...args: any): void {
-    if (this.clerkjs && '__unstable__setEnvironment' in this.clerkjs) {
-      (this.clerkjs as any).__unstable__setEnvironment(args);
+  __internal_setEnvironment(...args: any): void {
+    if (this.clerkjs && '__internal_setEnvironment' in this.clerkjs) {
+      (this.clerkjs as any).__internal_setEnvironment(args);
     } else {
       return undefined;
     }
   }
 
   // TODO @userland-errors:
-  __unstable__updateProps = async (props: any): Promise<void> => {
+  __internal_updateProps = async (props: any): Promise<void> => {
     const clerkjs = await this.#waitForClerkJS();
     // Handle case where accounts has clerk-react@4 installed, but clerk-js@3 is manually loaded
-    if (clerkjs && '__unstable__updateProps' in clerkjs) {
-      return (clerkjs as any).__unstable__updateProps(props);
+    if (clerkjs && '__internal_updateProps' in clerkjs) {
+      return (clerkjs as any).__internal_updateProps(props);
     }
   };
 

@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const hrHR: LocalizationResource = {
   locale: 'hr-HR',
@@ -847,26 +847,26 @@ export const hrHR: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Stvori novu organizaciju',
+      action__invitationAccept: 'Pridruži se',
+      action__suggestionsAccept: 'Zatraži pridruživanje',
+      subtitle: 'Pridružite se postojećoj organizaciji ili stvorite novu',
+      suggestionsAcceptedLabel: 'Čeka odobrenje',
+      title: 'Odaberite organizaciju',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Odustani',
+      formButtonSubmit: 'Nastavi',
+      formFieldInputPlaceholder__name: 'Moja organizacija',
+      formFieldInputPlaceholder__slug: 'moja-organizacija',
+      formFieldLabel__name: 'Naziv',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Unesite podatke o svojoj organizaciji za nastavak',
+      title: 'Postavite svoju organizaciju',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Odjavi se',
+      actionText: 'Prijavljen kao {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -875,6 +875,7 @@ export const hrHR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -887,6 +888,8 @@ export const hrHR: LocalizationResource = {
     captcha_unavailable:
       'Registracija neuspješna zbog neuspjele provjere bota. Molimo osvježite stranicu i pokušajte ponovno ili se obratite podršci za dodatnu pomoć.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Privremene e-mail usluge nisu podržane. Molimo koristite svoju redovitu e-mail adresu za kreiranje računa.',
     form_identifier_exists__email_address: 'Ova e-mail adresa je zauzeta. Molimo pokušajte s drugom.',
     form_identifier_exists__phone_number: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     form_identifier_exists__username: 'Ovo korisničko ime je zauzeto. Molimo pokušajte s drugim.',
@@ -904,6 +907,8 @@ export const hrHR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Lozinka ili e-mail adresa nisu točne. Pokušajte ponovno ili koristite drugu metodu.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Vaša lozinka nije dovoljno jaka.',
     form_password_pwned:

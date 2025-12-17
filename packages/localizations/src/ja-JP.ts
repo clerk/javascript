@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
@@ -885,6 +885,7 @@ export const jaJP: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -896,6 +897,8 @@ export const jaJP: LocalizationResource = {
     captcha_unavailable:
       'ボット検証に失敗したため、サインアップに失敗しました。ページを更新して再試行するか、サポートに連絡してさらに支援を受けてください。',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      '一時的なメールサービスはサポートされていません。アカウントを作成するには、通常のメールアドレスを使用してください。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -913,20 +916,24 @@ export const jaJP: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'パスワードまたはメールアドレスが正しくありません。もう一度お試しいただくか、別の方法をご利用ください。',
     form_password_length_too_short: 'パスワードが短すぎます。8文字以上である必要があります。',
     form_password_not_strong_enough: 'パスワードの強度が不十分です。',
     form_password_pwned:
       'このパスワードは侵害の一部として見つかったため使用できません。別のパスワードを試してください。',
     form_password_pwned__sign_in:
       'このパスワードは侵害の一部として見つかったため使用できません。パスワードをリセットしてください。',
-    form_password_size_in_bytes_exceeded: undefined,
+    form_password_size_in_bytes_exceeded:
+      'パスワードのバイト数が上限を超えています。短くするか、一部の特殊文字を削除してください。',
     form_password_untrusted__sign_in: undefined,
-    form_password_validation_failed: undefined,
-    form_username_invalid_character: undefined,
+    form_password_validation_failed: 'パスワードが間違っています',
+    form_username_invalid_character: 'ユーザー名に無効な文字が含まれています。',
+    identification_deletion_failed: '最後の識別情報は削除できません。',
+    not_allowed_access:
+      "メールアドレスまたは電話番号は登録に使用できません。これは、'+', '=', '#' または '.' がメールアドレスに使用されているか、一時的な電子メールサービスに接続されたドメインが使用されているか、明示的な除外が行われているためです。エラーが発生した場合は、サポートに連絡してください。",
     form_username_invalid_length: 'ユーザー名は{{min_length}}文字以上{{max_length}}文字以下である必要があります。',
     form_username_needs_non_number_char: 'ユーザー名には少なくとも1つの数字以外の文字が含まれている必要があります。',
-    identification_deletion_failed: undefined,
-    not_allowed_access: undefined,
     organization_domain_blocked: undefined,
     organization_domain_common: undefined,
     organization_domain_exists_for_enterprise_connection: undefined,

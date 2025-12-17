@@ -1,6 +1,6 @@
 {
   "name": "@clerk/express",
-  "version": "1.7.55",
+  "version": "1.7.56",
   "description": "Clerk server SDK for usage with Express",
   "keywords": [
     "clerk",
@@ -69,7 +69,6 @@
   "dependencies": {
     "@clerk/backend": "workspace:^",
     "@clerk/shared": "workspace:^",
-    "@clerk/types": "workspace:^",
     "tslib": "catalog:repo"
   },
   "devDependencies": {
@@ -82,7 +81,7 @@
     "express": "^4.17.0 || ^5.0.0"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=20.9.0"
   },
   "publishConfig": {
     "access": "public"

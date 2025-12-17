@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enGB: LocalizationResource = {
   locale: 'en-GB',
@@ -847,26 +847,26 @@ export const enGB: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Create new organisation',
+      action__invitationAccept: 'Join',
+      action__suggestionsAccept: 'Request to join',
+      subtitle: 'Join an existing organisation or create a new one',
+      suggestionsAcceptedLabel: 'Pending approval',
+      title: 'Choose an organisation',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancel',
+      formButtonSubmit: 'Continue',
+      formFieldInputPlaceholder__name: 'My Organisation',
+      formFieldInputPlaceholder__slug: 'my-organisation',
+      formFieldLabel__name: 'Name',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Enter your organisation details to continue',
+      title: 'Setup your organisation',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Sign out',
+      actionText: 'Signed in as {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -875,6 +875,7 @@ export const enGB: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -886,6 +887,8 @@ export const enGB: LocalizationResource = {
     captcha_unavailable:
       'Sign up unsuccessful due to failed bot validation. Please refresh the page to try again or reach out to support for more assistance.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Temporary email services are not supported. Please use your regular email address to create an account.',
     form_identifier_exists__email_address: 'This email address is taken. Please try another.',
     form_identifier_exists__phone_number: 'This phone number is taken. Please try another.',
     form_identifier_exists__username: 'This username is taken. Please try another.',
@@ -903,6 +906,7 @@ export const enGB: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'The value entered is invalid. Please correct it.',
     form_password_incorrect: 'The password you entered is incorrect. Please try again.',
+    form_password_or_identifier_incorrect: 'Password or email address is incorrect. Try again, or use another method.',
     form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
     form_password_not_strong_enough: 'Your password is not strong enough.',
     form_password_pwned:

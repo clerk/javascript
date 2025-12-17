@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
@@ -846,26 +846,26 @@ export const fiFI: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Luo uusi organisaatio',
+      action__invitationAccept: 'Liity',
+      action__suggestionsAccept: 'Pyydä liittymistä',
+      subtitle: 'Liity olemassa olevaan organisaatioon tai luo uusi',
+      suggestionsAcceptedLabel: 'Odottaa hyväksyntää',
+      title: 'Valitse organisaatio',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Peruuta',
+      formButtonSubmit: 'Jatka',
+      formFieldInputPlaceholder__name: 'Minun organisaationi',
+      formFieldInputPlaceholder__slug: 'minun-organisaationi',
+      formFieldLabel__name: 'Nimi',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Syötä organisaatiosi tiedot jatkaaksesi',
+      title: 'Aseta organisaatiosi',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Kirjaudu ulos',
+      actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -874,6 +874,7 @@ export const fiFI: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -885,6 +886,8 @@ export const fiFI: LocalizationResource = {
     captcha_unavailable:
       'Rekisteröityminen epäonnistui, koska botin vahvistus epäonnistui. Päivitä sivu ja yritä uudelleen tai ota yhteyttä tukeen.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Väliaikaiset sähköpostipalvelut eivät ole tuettuja. Käytä tavallista sähköpostiosoitetta tilin luomiseen.',
     form_identifier_exists__email_address: 'Tämä sähköpostiosoite on jo käytössä. Kokeile toista.',
     form_identifier_exists__phone_number: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     form_identifier_exists__username: 'Tämä käyttäjänimi on jo käytössä. Kokeile toista.',
@@ -902,6 +905,8 @@ export const fiFI: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Salasana tai sähköpostiosoite on väärä. Yritä uudelleen tai käytä toista menetelmää.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Salasana ei ole riittävän vahva.',
     form_password_pwned: 'Salasana on ollut osallisena tietovuodossa. Valitse toinen salasana.',

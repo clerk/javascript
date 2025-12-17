@@ -13,6 +13,7 @@ export default defineConfig(overrideOptions => {
       internal: 'src/internal.ts',
       errors: 'src/errors.ts',
       experimental: 'src/experimental.ts',
+      legacy: 'src/legacy.ts',
     },
     dts: true,
     onSuccess: shouldPublish ? 'pnpm publish:local' : undefined,

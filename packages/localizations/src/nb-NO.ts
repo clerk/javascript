@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const nbNO: LocalizationResource = {
   locale: 'nb-NO',
@@ -844,26 +844,26 @@ export const nbNO: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Opprett ny organisasjon',
+      action__invitationAccept: 'Bli med',
+      action__suggestionsAccept: 'Be om å bli med',
+      subtitle: 'Bli med i en eksisterende organisasjon eller opprett en ny',
+      suggestionsAcceptedLabel: 'Venter på godkjenning',
+      title: 'Velg en organisasjon',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Avbryt',
+      formButtonSubmit: 'Fortsett',
+      formFieldInputPlaceholder__name: 'Min organisasjon',
+      formFieldInputPlaceholder__slug: 'min-organisasjon',
+      formFieldLabel__name: 'Navn',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Skriv inn organisasjonsdetaljene dine for å fortsette',
+      title: 'Sett opp din organisasjon',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Logg ut',
+      actionText: 'Innlogget som {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -872,6 +872,7 @@ export const nbNO: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -883,6 +884,8 @@ export const nbNO: LocalizationResource = {
     captcha_unavailable:
       'Registreringen mislyktes på grunn av mislykkede bot-valideringer. Vennligst oppdater siden og prøv igjen, eller ta kontakt med brukerstøtte for mer hjelp.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Midlertidige e-posttjenester støttes ikke. Vennligst bruk din vanlige e-postadresse for å opprette en konto.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -900,6 +903,8 @@ export const nbNO: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Passordet eller e-postadressen er feil. Prøv igjen eller bruk en annen metode.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'Passordet ditt er ikke sterkt nok.',
     form_password_pwned:

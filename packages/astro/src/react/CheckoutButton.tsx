@@ -1,4 +1,4 @@
-import type { __experimental_CheckoutButtonProps } from '@clerk/types';
+import type { __experimental_CheckoutButtonProps } from '@clerk/shared/types';
 import React from 'react';
 
 import type { WithClerkProp } from './utils';

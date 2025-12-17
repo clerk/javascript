@@ -11,7 +11,7 @@ export {
   useSignUp,
   useUser,
   useReverification,
-} from '@clerk/clerk-react';
+} from '@clerk/react';
 
 export {
   isClerkAPIResponseError,
@@ -22,6 +22,6 @@ export {
   isReverificationCancelledError,
   EmailLinkErrorCode,
   EmailLinkErrorCodeStatus,
-} from '@clerk/clerk-react/errors';
+} from '@clerk/react/errors';
 
 export { usePromisifiedAuth as useAuth } from './PromisifiedAuthProvider';

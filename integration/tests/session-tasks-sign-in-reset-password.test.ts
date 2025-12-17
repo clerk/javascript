@@ -19,7 +19,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       const user = u.services.users.createFakeUser();
       const createdUser = await u.services.users.createBapiUser(user);
 
-      await u.services.users.passwordCompromised(createdUser.id);
+      await u.services.users.setPasswordCompromised(createdUser.id);
 
       // Performs sign-in
       await u.po.signIn.goTo();
@@ -30,7 +30,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
 
       await expect(
         u.page.getByText(
-          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
         ),
       ).toBeVisible();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();
@@ -66,7 +66,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
       const user = u.services.users.createFakeUser();
       const createdUser = await u.services.users.createBapiUser(user);
 
-      await u.services.users.passwordCompromised(createdUser.id);
+      await u.services.users.setPasswordCompromised(createdUser.id);
       const fakeOrganization = u.services.organizations.createFakeOrganization();
       await u.services.organizations.createBapiOrganization({
         name: fakeOrganization.name,
@@ -83,7 +83,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasksResetPassword
 
       await expect(
         u.page.getByText(
-          "Your password appears to have been compromised or it's no longer trusted and cannot be used. Please use another method to continue.",
+          'Your password may be compromised. To protect your account, please continue with an alternative sign-in method. You will be required to reset your password after signing in.',
         ),
       ).toBeVisible();
       await u.po.signIn.getAltMethodsEmailCodeButton().click();

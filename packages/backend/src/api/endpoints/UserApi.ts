@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/types';
+import type { ClerkPaginationRequest, OAuthProvider, OrganizationInvitationStatus } from '@clerk/shared/types';
 
 import { runtime } from '../../runtime';
 import { joinPaths } from '../../util/path';
@@ -197,6 +197,10 @@ type DeleteWeb3WalletParams = {
 type DeleteUserExternalAccountParams = {
   userId: string;
   externalAccountId: string;
+};
+
+type SetPasswordCompromisedParams = {
+  revokeAllSessions?: boolean;
 };
 
 type UserID = {
@@ -448,14 +452,25 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async __experimental_passwordCompromised(userId: string) {
+  public async __experimental_setPasswordCompromised(
+    userId: string,
+    params: SetPasswordCompromisedParams = {
+      revokeAllSessions: false,
+    },
+  ) {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
-      path: joinPaths(basePath, userId, 'password_compromised'),
-      bodyParams: {
-        revokeAllSessions: false,
-      },
+      path: joinPaths(basePath, userId, 'password', 'set_compromised'),
+      bodyParams: params,
+    });
+  }
+
+  public async __experimental_unsetPasswordCompromised(userId: string) {
+    this.requireId(userId);
+    return this.request<User>({
+      method: 'POST',
+      path: joinPaths(basePath, userId, 'password', 'unset_compromised'),
     });
   }
 }

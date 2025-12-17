@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const faIR: LocalizationResource = {
   locale: 'fa-IR',
@@ -884,6 +884,7 @@ export const faIR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -894,6 +895,8 @@ export const faIR: LocalizationResource = {
     captcha_unavailable:
       'به دلیل عدم موفقیت در اعتبارسنجی ربات، ثبت نام ناموفق بود. لطفاً برای امتحان مجدد، صفحه را رفرش کنید یا برای راهنمایی بیشتر با پشتیبانی تماس بگیرید.',
     form_code_incorrect: 'کد وارد شده نادرست است.',
+    form_email_address_blocked:
+      'سرویس‌های ایمیل موقت پشتیبانی نمی‌شوند. لطفاً از آدرس ایمیل معمولی خود برای ایجاد حساب استفاده کنید.',
     form_identifier_exists__email_address: 'این آدرس ایمیل قبلاً استفاده شده است.',
     form_identifier_exists__phone_number: 'این شماره تلفن قبلاً استفاده شده است.',
     form_identifier_exists__username: 'این نام کاربری قبلاً گرفته شده است.',
@@ -911,6 +914,8 @@ export const faIR: LocalizationResource = {
     form_param_type_invalid__phone_number: 'شماره تلفن باید یک رشته معتبر باشد.',
     form_param_value_invalid: 'مقدار پارامتر نامعتبر است.',
     form_password_incorrect: 'رمز عبور نادرست است.',
+    form_password_or_identifier_incorrect:
+      'رمز عبور یا آدرس ایمیل نادرست است. دوباره تلاش کنید یا از روش دیگری استفاده کنید.',
     form_password_length_too_short: 'رمز عبور شما خیلی کوتاه است. باید حداقل ۸ کاراکتر داشته باشد.',
     form_password_not_strong_enough: 'رمز عبور شما به اندازه کافی قوی نیست.',
     form_password_pwned:

@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ptPT: LocalizationResource = {
   locale: 'pt-PT',
@@ -843,26 +843,26 @@ export const ptPT: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Criar nova organização',
+      action__invitationAccept: 'Participar',
+      action__suggestionsAccept: 'Solicitar participação',
+      subtitle: 'Junte-se a uma organização existente ou crie uma nova',
+      suggestionsAcceptedLabel: 'Aprovação pendente',
+      title: 'Escolha uma organização',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancelar',
+      formButtonSubmit: 'Continuar',
+      formFieldInputPlaceholder__name: 'A minha organização',
+      formFieldInputPlaceholder__slug: 'a-minha-organizacao',
+      formFieldLabel__name: 'Nome',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Introduza os detalhes da sua organização para continuar',
+      title: 'Configurar a sua organização',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Terminar sessão',
+      actionText: 'Sessão iniciada como {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -871,6 +871,7 @@ export const ptPT: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -883,6 +884,8 @@ export const ptPT: LocalizationResource = {
     captcha_unavailable:
       'Inscrição mal-sucedida devido a falha na validação de bot. Por favor, atualize a página para tentar novamente ou entre em contato com o suporte para obter mais ajuda.',
     form_code_incorrect: 'Código incorreto.',
+    form_email_address_blocked:
+      'Serviços de e-mail temporários não são suportados. Por favor, use o seu endereço de e-mail regular para criar uma conta.',
     form_identifier_exists__email_address: 'O endereço de e-mail já está em uso.',
     form_identifier_exists__phone_number: 'O número de telemóvel já está em uso.',
     form_identifier_exists__username: 'O nome de utilizador já está em uso.',
@@ -900,6 +903,8 @@ export const ptPT: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Valor de parâmetro inválido.',
     form_password_incorrect: 'Palavra-passe incorreta.',
+    form_password_or_identifier_incorrect:
+      'A palavra-passe ou o endereço de e-mail está incorreto. Tente novamente ou use outro método.',
     form_password_length_too_short: 'A palavra-passe é muito curta.',
     form_password_not_strong_enough: 'A sua palavra-passe não é forte o suficiente.',
     form_password_pwned:

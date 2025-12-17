@@ -1,8 +1,7 @@
 import { EmailAddress } from './EmailAddress';
 import { ExternalAccount } from './ExternalAccount';
-import type { ExternalAccountJSON, SamlAccountJSON, UserJSON } from './JSON';
+import type { ExternalAccountJSON, UserJSON } from './JSON';
 import { PhoneNumber } from './PhoneNumber';
-import { SamlAccount } from './SamlAccount';
 import { Web3Wallet } from './Web3Wallet';
 
 /**
@@ -121,10 +120,6 @@ export class User {
      */
     readonly externalAccounts: ExternalAccount[] = [],
     /**
-     * An array of all the `SamlAccount` objects associated with the user via SAML.
-     */
-    readonly samlAccounts: SamlAccount[] = [],
-    /**
      * Date when the user was last active.
      */
     readonly lastActiveAt: number | null,
@@ -179,7 +174,6 @@ export class User {
       (data.phone_numbers || []).map(x => PhoneNumber.fromJSON(x)),
       (data.web3_wallets || []).map(x => Web3Wallet.fromJSON(x)),
       (data.external_accounts || []).map((x: ExternalAccountJSON) => ExternalAccount.fromJSON(x)),
-      (data.saml_accounts || []).map((x: SamlAccountJSON) => SamlAccount.fromJSON(x)),
       data.last_active_at,
       data.create_organization_enabled,
       data.create_organizations_limit,

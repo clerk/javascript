@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const arSA: LocalizationResource = {
   locale: 'ar-SA',
@@ -842,26 +842,26 @@ export const arSA: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'إنشاء منظمة جديدة',
+      action__invitationAccept: 'انضم',
+      action__suggestionsAccept: 'طلب الانضمام',
+      subtitle: 'انضم إلى منظمة موجودة أو أنشئ واحدة جديدة',
+      suggestionsAcceptedLabel: 'في انتظار الموافقة',
+      title: 'اختر منظمة',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'إلغاء',
+      formButtonSubmit: 'متابعة',
+      formFieldInputPlaceholder__name: 'منظمتي',
+      formFieldInputPlaceholder__slug: 'munazzamati',
+      formFieldLabel__name: 'الاسم',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'أدخل تفاصيل منظمتك للمتابعة',
+      title: 'إعداد منظمتك',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'تسجيل الخروج',
+      actionText: 'تم تسجيل الدخول كـ {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -870,6 +870,7 @@ export const arSA: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -881,6 +882,8 @@ export const arSA: LocalizationResource = {
     captcha_unavailable:
       'التسجيل غير ناجح بسبب فشل التحقق من صحة الروبوت. يُرجى تحديث الصفحة للمحاولة مرة أخرى أو التواصل مع فريق الدعم للحصول على مزيد من المساعدة',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'خدمات البريد الإلكتروني المؤقتة غير مدعومة. يرجى استخدام عنوان بريدك الإلكتروني العادي لإنشاء حساب.',
     form_identifier_exists__email_address: 'تم إستخدام البريد الإلكتروني هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__phone_number: 'تم إستخدام رقم الهاتف هذا. يرجى المحاولة مرة أخرى',
     form_identifier_exists__username: 'تم إستخدام اسم المستخدمد هذا. يرجى المحاولة مرة أخرى',
@@ -898,6 +901,8 @@ export const arSA: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'كلمة المرور أو عنوان البريد الإلكتروني غير صحيح. حاول مرة أخرى أو استخدم طريقة أخرى.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'كلمة المرور ليست قوية',
     form_password_pwned: 'لا يمكن أستعمال كلمة السر هذه لانها غير أمنة, الرجاء اختيار كلمة مرور أخرى',

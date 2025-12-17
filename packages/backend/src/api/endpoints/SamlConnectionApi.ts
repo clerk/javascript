@@ -1,4 +1,4 @@
-import type { ClerkPaginationRequest, SamlIdpSlug } from '@clerk/types';
+import type { ClerkPaginationRequest, SamlIdpSlug } from '@clerk/shared/types';
 
 import { joinPaths } from '../../util/path';
 import type { SamlConnection } from '../resources';

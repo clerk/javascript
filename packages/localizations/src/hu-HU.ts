@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
@@ -844,26 +844,26 @@ export const huHU: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Szervezet létrehozása',
+      action__invitationAccept: 'Csatlakozás',
+      action__suggestionsAccept: 'Csatlakozás kérése',
+      subtitle: 'Csatlakozz egy meglévő szervezethez vagy hozz létre újat',
+      suggestionsAcceptedLabel: 'Elfogadásra vár',
+      title: 'Válassz szervezetet',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Mégse',
+      formButtonSubmit: 'Folytatás',
+      formFieldInputPlaceholder__name: 'Az én szervezetem',
+      formFieldInputPlaceholder__slug: 'az-en-szervezetem',
+      formFieldLabel__name: 'Név',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Adja meg szervezete adatait a folytatáshoz',
+      title: 'Állítsa be szervezetét',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Kijelentkezés',
+      actionText: 'Bejelentkezve: {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -872,6 +872,7 @@ export const huHU: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -883,6 +884,8 @@ export const huHU: LocalizationResource = {
     captcha_unavailable:
       'Bot érvényesítése miatt, a regisztráció sikertelen volt. Kérlek frissítsd az oldalt, hogy újra próbálhasd, vagy kérj támogatást.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Az ideiglenes e-mail szolgáltatások nem támogatottak. Kérlek, használd a szokásos e-mail címedet a fiók létrehozásához.',
     form_identifier_exists__email_address: 'Ez az email cím már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__phone_number: 'Ez a telefonszám már foglalt. Kérlek próbálj egy másikat.',
     form_identifier_exists__username: 'Ez a felhasználónév már foglalt. Kérlek próbálj egy másikat.',
@@ -900,6 +903,8 @@ export const huHU: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'A jelszó vagy az e-mail cím helytelen. Próbáld újra vagy használj másik módszert.',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: 'A jelszó nem elég erős',
     form_password_pwned:

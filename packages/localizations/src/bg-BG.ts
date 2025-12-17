@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bgBG: LocalizationResource = {
   locale: 'bg-BG',
@@ -846,26 +846,26 @@ export const bgBG: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Създай нова организация',
+      action__invitationAccept: 'Присъедини се',
+      action__suggestionsAccept: 'Поискай присъединяване',
+      subtitle: 'Присъедини се към съществуваща организация или създай нова',
+      suggestionsAcceptedLabel: 'В очакване на одобрение',
+      title: 'Избери организация',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Отказ',
+      formButtonSubmit: 'Продължи',
+      formFieldInputPlaceholder__name: 'Моята организация',
+      formFieldInputPlaceholder__slug: 'moyata-organizatsiya',
+      formFieldLabel__name: 'Име',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Въведете данните за вашата организация, за да продължите',
+      title: 'Настройте вашата организация',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Изход',
+      actionText: 'Влязъл като {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -874,6 +874,7 @@ export const bgBG: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -884,6 +885,8 @@ export const bgBG: LocalizationResource = {
     captcha_invalid: undefined,
     captcha_unavailable: undefined,
     form_code_incorrect: 'Невалиден код. Моля, опитайте отново.',
+    form_email_address_blocked:
+      'Временните имейл услуги не се поддържат. Моля, използвайте вашия обикновен имейл адрес, за да създадете акаунт.',
     form_identifier_exists__email_address: 'Този имейл адрес вече е регистриран.',
     form_identifier_exists__phone_number: 'Този телефонен номер вече е използван.',
     form_identifier_exists__username: 'Това потребителско име вече съществува.',
@@ -901,6 +904,8 @@ export const bgBG: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'Невалидна парола. Моля, опитайте отново.',
+    form_password_or_identifier_incorrect:
+      'Паролата или имейл адресът са невалидни. Моля, опитайте отново или използвайте друг метод.',
     form_password_length_too_short: 'Паролата е твърде кратка. Моля, въведете поне 8 символа.',
     form_password_not_strong_enough:
       'Паролата трябва да съдържа поне една главна буква, една цифра и един специален символ.',

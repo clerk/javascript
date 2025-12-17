@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const csCZ: LocalizationResource = {
   locale: 'cs-CZ',
@@ -856,26 +856,26 @@ export const csCZ: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Vytvořit novou organizaci',
+      action__invitationAccept: 'Připojit se',
+      action__suggestionsAccept: 'Požádat o připojení',
+      subtitle: 'Připojte se k existující organizaci nebo vytvořte novou',
+      suggestionsAcceptedLabel: 'Čeká na schválení',
+      title: 'Vyberte organizaci',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Zrušit',
+      formButtonSubmit: 'Pokračovat',
+      formFieldInputPlaceholder__name: 'Moje organizace',
+      formFieldInputPlaceholder__slug: 'moje-organizace',
+      formFieldLabel__name: 'Název',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Zadejte údaje o vaší organizaci pro pokračování',
+      title: 'Nastavte svou organizaci',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Odhlásit se',
+      actionText: 'Přihlášen jako {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -884,6 +884,7 @@ export const csCZ: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -896,6 +897,8 @@ export const csCZ: LocalizationResource = {
     captcha_unavailable:
       'Registrace nebyla úspěšná kvůli neúspěšné validaci bota. Prosím obnovte stránku a zkuste to znovu, nebo se obraťte na podporu pro další pomoc.',
     form_code_incorrect: 'Kód je nesprávný.',
+    form_email_address_blocked:
+      'Dočasné e-mailové služby nejsou podporovány. Pro vytvoření účtu použijte prosím svou běžnou e-mailovou adresu.',
     form_identifier_exists__email_address: 'Tato emailová adresa již byla použita.',
     form_identifier_exists__phone_number: 'Toto telefonní číslo již bylo použito.',
     form_identifier_exists__username: 'Toto uživatelské jméno již bylo použito.',
@@ -913,6 +916,8 @@ export const csCZ: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Tento parametr má neplatnou hodnotu.',
     form_password_incorrect: 'Heslo je nesprávné.',
+    form_password_or_identifier_incorrect:
+      'Heslo nebo e-mailová adresa je nesprávná. Zkuste to znovu nebo použijte jinou metodu.',
     form_password_length_too_short: 'Heslo je příliš krátké.',
     form_password_not_strong_enough: 'Vaše heslo není dostatečně silné.',
     form_password_pwned: 'Toto heslo bylo nalezeno jako součást prolomení a nelze ho použít, zkuste prosím jiné heslo.',

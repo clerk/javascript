@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const caES: LocalizationResource = {
   locale: 'ca-ES',
@@ -845,26 +845,26 @@ export const caES: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Crear nova organització',
+      action__invitationAccept: 'Unir-se',
+      action__suggestionsAccept: 'Sol·licitar unir-se',
+      subtitle: 'Uniu-vos a una organització existent o creeu-ne una de nova',
+      suggestionsAcceptedLabel: "Pendent d'aprovació",
+      title: 'Trieu una organització',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Cancel·lar',
+      formButtonSubmit: 'Continuar',
+      formFieldInputPlaceholder__name: 'La meva organització',
+      formFieldInputPlaceholder__slug: 'la-meva-organitzacio',
+      formFieldLabel__name: 'Nom',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Introduïu els detalls de la vostra organització per continuar',
+      title: 'Configureu la vostra organització',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Tancar sessió',
+      actionText: 'Sessió iniciada com a {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -873,6 +873,7 @@ export const caES: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -885,6 +886,8 @@ export const caES: LocalizationResource = {
     captcha_unavailable:
       "El registre no ha estat exitós a causa de la validació fallida de bot. Si us plau, actualitza la pàgina per tornar-ho a intentar o posa't en contacte amb el suport per obtenir més assistència.",
     form_code_incorrect: 'El codi introduït no és vàlid. Si us plau, comprova el codi i torna-ho a intentar.',
+    form_email_address_blocked:
+      'Els serveis de correu electrònic temporal no estan suportats. Si us plau, utilitzeu la vostra adreça de correu electrònic habitual per crear un compte.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -902,6 +905,8 @@ export const caES: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: 'La contrasenya introduïda és incorrecta.',
+    form_password_or_identifier_incorrect:
+      "La contrasenya o l'identificador és incorrecte. Torna-ho a intentar o utilitza un altre mètode.",
     form_password_length_too_short: 'La teva contrasenya ha de tenir almenys 8 caràcters.',
     form_password_not_strong_enough: 'La teva contrasenya no és prou forta.',
     form_password_pwned:

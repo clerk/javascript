@@ -23,6 +23,7 @@
     "declarationMap": true,
     "allowJs": true,
     "paths": {
+      "@/*": ["./src/*"],
       "virtual:data-hooks/useAPIKeys": ["./src/react/hooks/useAPIKeys.swr.tsx"],
       "virtual:data-hooks/useSubscription": ["./src/react/hooks/useSubscription.swr.tsx"],
       "virtual:data-hooks/SWRConfigCompat": ["./src/react/providers/SWRConfigCompat.swr.tsx"],

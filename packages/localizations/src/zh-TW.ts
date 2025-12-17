@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const zhTW: LocalizationResource = {
   locale: 'zh-TW',
@@ -833,26 +833,26 @@ export const zhTW: LocalizationResource = {
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: '建立新組織',
+      action__invitationAccept: '加入',
+      action__suggestionsAccept: '請求加入',
+      subtitle: '加入現有組織或建立新組織',
+      suggestionsAcceptedLabel: '等待批准',
+      title: '選擇組織',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: '取消',
+      formButtonSubmit: '繼續',
+      formFieldInputPlaceholder__name: '我的組織',
+      formFieldInputPlaceholder__slug: 'wo-de-zu-zhi',
+      formFieldLabel__name: '名稱',
+      formFieldLabel__slug: 'Slug',
+      subtitle: '輸入您的組織詳細資訊以繼續',
+      title: '設定您的組織',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: '登出',
+      actionText: '已登入為 {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -861,6 +861,7 @@ export const zhTW: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -870,6 +871,7 @@ export const zhTW: LocalizationResource = {
     captcha_invalid: '由於安全驗證失敗，註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     captcha_unavailable: '由於機器人驗證失敗導致註冊未成功。請重新整理頁面再試一次，或聯絡支援以取得協助。',
     form_code_incorrect: undefined,
+    form_email_address_blocked: '不支援臨時電子郵件服務。請使用您的常規電子郵件地址建立帳戶。',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -887,6 +889,7 @@ export const zhTW: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: '密碼或電子郵件地址不正確。請重試或使用其他方法。',
     form_password_length_too_short: undefined,
     form_password_not_strong_enough: '您的密碼強度不足。',
     form_password_pwned: '此密碼已在已知的資料外洩事件中出現，請改用其他密碼。',

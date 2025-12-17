@@ -167,7 +167,6 @@ function appearanceVariableOptions() {
     'colorDanger',
     'colorSuccess',
     'colorWarning',
-    'colorForeground',
     'colorMutedForeground',
     'colorInputForeground',
     'colorInput',
@@ -196,7 +195,7 @@ function appearanceVariableOptions() {
   });
 
   const updateVariables = () => {
-    void Clerk.__unstable__updateProps({
+    void Clerk.__internal_updateProps({
       appearance: {
         // Preserve existing appearance properties like baseTheme
         ...Clerk.__internal_getOption('appearance'),
@@ -241,7 +240,7 @@ function otherOptions() {
   });
 
   const updateOtherOptions = () => {
-    void Clerk.__unstable__updateProps({
+    void Clerk.__internal_updateProps({
       options: Object.fromEntries(
         Object.entries(otherOptionsInputs).map(([key, input]) => {
           sessionStorage.setItem(key, input.value);
@@ -316,7 +315,7 @@ void (async () => {
       Clerk.mountWaitlist(app, componentControls.waitlist.getProps() ?? {});
     },
     '/keyless': () => {
-      void Clerk.__unstable__updateProps({
+      void Clerk.__internal_updateProps({
         options: {
           __internal_keyless_claimKeylessApplicationUrl: 'https://dashboard.clerk.com',
           __internal_keyless_copyInstanceKeysUrl: 'https://dashboard.clerk.com',
@@ -378,6 +377,7 @@ void (async () => {
       ...(componentControls.clerk.getProps() ?? {}),
       signInUrl: '/sign-in',
       signUpUrl: '/sign-up',
+      clerkUiCtor: window.__internal_ClerkUiCtor,
     });
     renderCurrentRoute();
     updateVariables();

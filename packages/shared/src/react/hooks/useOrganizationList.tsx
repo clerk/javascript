@@ -157,7 +157,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * The following example demonstrates how to use the `infinite` property to fetch and append new data to the existing list. The `userMemberships` attribute will be populated with the first page of the user's Organization memberships. When the "Load more" button is clicked, the `fetchNext` helper function will be called to append the next page of memberships to the list.
  *
  * ```tsx {{ filename: 'src/components/JoinedOrganizations.tsx' }}
- * import { useOrganizationList } from '@clerk/clerk-react'
+ * import { useOrganizationList } from '@clerk/react'
  * import React from 'react'
  *
  * const JoinedOrganizations = () => {
@@ -200,7 +200,7 @@ export type UseOrganizationListReturn<T extends UseOrganizationListParams> =
  * Notice the difference between this example's pagination and the infinite pagination example above.
  *
  * ```tsx {{ filename: 'src/components/UserInvitationsTable.tsx' }}
- * import { useOrganizationList } from '@clerk/clerk-react'
+ * import { useOrganizationList } from '@clerk/react'
  * import React from 'react'
  *
  * const UserInvitationsTable = () => {

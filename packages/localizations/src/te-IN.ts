@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const teIN: LocalizationResource = {
   locale: 'te-IN',
@@ -852,26 +852,26 @@ export const teIN: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'కొత్త సంస్థను సృష్టించండి',
+      action__invitationAccept: 'చేరండి',
+      action__suggestionsAccept: 'చేరడానికి అభ్యర్థించండి',
+      subtitle: 'ఇప్పటికే ఉన్న సంస్థలో చేరండి లేదా కొత్తదాన్ని సృష్టించండి',
+      suggestionsAcceptedLabel: 'ఆమోదం కోసం పెండింగ్‌లో ఉంది',
+      title: 'ఒక సంస్థను ఎంచుకోండి',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'రద్దు చేయి',
+      formButtonSubmit: 'కొనసాగించు',
+      formFieldInputPlaceholder__name: 'నా సంస్థ',
+      formFieldInputPlaceholder__slug: 'na-sanstha',
+      formFieldLabel__name: 'పేరు',
+      formFieldLabel__slug: 'స్లగ్',
+      subtitle: 'కొనసాగించడానికి మీ సంస్థ వివరాలను నమోదు చేయండి',
+      title: 'మీ సంస్థను సెటప్ చేయండి',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'సైన్ అవుట్',
+      actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',
     },
   },
   taskResetPassword: {
@@ -880,6 +880,7 @@ export const teIN: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -891,6 +892,8 @@ export const teIN: LocalizationResource = {
     captcha_unavailable:
       'బాట్ ధృవీకరణ విఫలమైనందున సైన్ అప్ విజయవంతం కాలేదు. మళ్ళీ ప్రయత్నించడానికి దయచేసి పేజీని రిఫ్రెష్ చేయండి లేదా మరింత సహాయం కోసం మద్దతును సంప్రదించండి.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'తాత్కాలిక ఇమెయిల్ సేవలు మద్దతు లేవు. దయచేసి ఖాతాను సృష్టించడానికి మీ సాధారణ ఇమెయిల్ చిరునామాను ఉపయోగించండి.',
     form_identifier_exists__email_address: 'ఈ ఇమెయిల్ చిరునామా తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__phone_number: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     form_identifier_exists__username: 'ఈ వినియోగదారు పేరు తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
@@ -908,6 +911,8 @@ export const teIN: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'నమోదు చేసిన విలువ చెల్లనిది. దయచేసి దిద్దుబాటు చేయండి.',
     form_password_incorrect: 'మీరు నమోదు చేసిన పాస్‌వర్డ్ తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+    form_password_or_identifier_incorrect:
+      'పాస్‌వర్డ్ లేదా ఇమెయిల్ చిరునామా తప్పు. దయచేసి మళ్ళీ ప్రయత్నించండి లేదా మరొక పద్ధతిని ఉపయోగించండి.',
     form_password_length_too_short: 'మీ పాస్‌వర్డ్ చాలా చిన్నది. ఇది కనీసం 8 అక్షరాల పొడవు ఉండాలి.',
     form_password_not_strong_enough: 'మీ పాస్‌వర్డ్ సరిపడా బలంగా లేదు.',
     form_password_pwned:

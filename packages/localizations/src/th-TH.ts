@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const thTH: LocalizationResource = {
   locale: 'th-TH',
@@ -874,6 +874,7 @@ export const thTH: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -884,6 +885,7 @@ export const thTH: LocalizationResource = {
     captcha_unavailable:
       'การสมัครสมาชิกไม่สำเร็จเนื่องจากการตรวจสอบความปลอดถัยล้มเหลว โปรดรีเฟรชหน้าเพื่อลองใหม่หรือติดต่อฝ่ายสนับสนุนเพื่อขอความช่วยเหลือเพิ่มเติม',
     form_code_incorrect: undefined,
+    form_email_address_blocked: 'บริการอีเมลชั่วคราวไม่ได้รับการสนับสนุน กรุณาใช้อีเมลปกติของคุณเพื่อสร้างบัญชี',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -901,6 +903,7 @@ export const thTH: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect: 'รหัสผ่านหรือที่อยู่อีเมลไม่ถูกต้อง ลองอีกครั้งหรือใช้วิธีอื่น',
     form_password_length_too_short: 'รหัสผ่านของคุณสั้นเกินไป ต้องมีความยาวอย่างน้อย 8 ตัวอักษร',
     form_password_not_strong_enough: 'รหัสผ่านของคุณไม่แข็งแกร่งพอ',
     form_password_pwned:

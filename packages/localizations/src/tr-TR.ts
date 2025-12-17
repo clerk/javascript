@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const trTR: LocalizationResource = {
   locale: 'tr-TR',
@@ -846,26 +846,26 @@ export const trTR: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Yeni organizasyon oluştur',
+      action__invitationAccept: 'Katıl',
+      action__suggestionsAccept: 'Katılım iste',
+      subtitle: 'Mevcut bir organizasyona katılın veya yeni bir tane oluşturun',
+      suggestionsAcceptedLabel: 'Onay bekleniyor',
+      title: 'Bir organizasyon seçin',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'İptal',
+      formButtonSubmit: 'Devam et',
+      formFieldInputPlaceholder__name: 'Organizasyonum',
+      formFieldInputPlaceholder__slug: 'organizasyonum',
+      formFieldLabel__name: 'Ad',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Devam etmek için organizasyon bilgilerinizi girin',
+      title: 'Organizasyonunuzu ayarlayın',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Çıkış yap',
+      actionText: '{{identifier}} olarak giriş yapıldı',
     },
   },
   taskResetPassword: {
@@ -874,6 +874,7 @@ export const trTR: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -886,6 +887,8 @@ export const trTR: LocalizationResource = {
     captcha_unavailable:
       'Bot doğrulaması başarısız olduğu için kayıt yapılamadı. Lütfen tekrar denemek için sayfayı yenileyin veya daha fazla yardım için destek ekibi ile iletişime geçin.',
     form_code_incorrect: 'Hatalı kod.',
+    form_email_address_blocked:
+      'Geçici e-posta hizmetleri desteklenmemektedir. Lütfen hesap oluşturmak için normal e-posta adresinizi kullanın.',
     form_identifier_exists__email_address: 'Bu e-posta adresi zaten kullanılıyor.',
     form_identifier_exists__phone_number: 'Bu telefon numarası zaten kullanılıyor.',
     form_identifier_exists__username: 'Bu kullanıcı adı zaten kullanılıyor.',
@@ -903,6 +906,8 @@ export const trTR: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Parametre değeri geçersiz.',
     form_password_incorrect: 'Şifre yanlış.',
+    form_password_or_identifier_incorrect:
+      'Şifre veya e-posta adresi yanlış. Tekrar deneyin veya başka bir yöntem kullanın.',
     form_password_length_too_short: 'Şifre çok kısa.',
     form_password_not_strong_enough: 'Şifreniz yeterince güçlü değil.',
     form_password_pwned: 'Bu şifre bir veri ihlalinde tespit edildi ve kullanılamaz. Lütfen başka bir şifre deneyin.',

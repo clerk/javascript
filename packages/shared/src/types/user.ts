@@ -14,7 +14,6 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { PasskeyResource } from './passkey';
 import type { PhoneNumberResource } from './phoneNumber';
 import type { ClerkResource } from './resource';
-import type { SamlAccountResource } from './samlAccount';
 import type { SessionWithActivitiesResource } from './session';
 import type { UserJSONSnapshot } from './snapshots';
 import type { OAuthStrategy } from './strategies';
@@ -50,10 +49,6 @@ declare global {
   interface UserUnsafeMetadata {
     [k: string]: unknown;
   }
-
-  interface ikosadfas {
-    [k: string]: unknown;
-  }
 }
 
 /**
@@ -86,11 +81,6 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   externalAccounts: ExternalAccountResource[];
   enterpriseAccounts: EnterpriseAccountResource[];
   passkeys: PasskeyResource[];
-  /**
-   * @deprecated Use `enterpriseAccounts` instead.
-   */
-  samlAccounts: SamlAccountResource[];
-
   organizationMemberships: OrganizationMembershipResource[];
   passwordEnabled: boolean;
   totpEnabled: boolean;

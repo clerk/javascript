@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const plPL: LocalizationResource = {
   locale: 'pl-PL',
@@ -264,19 +264,19 @@ export const plPL: LocalizationResource = {
   membershipRole__basicMember: 'Użytkownik',
   membershipRole__guestMember: 'Gość',
   organizationList: {
-    action__createOrganization: 'Stwórz organizację',
+    action__createOrganization: 'Utwórz organizację',
     action__invitationAccept: 'Dołącz',
     action__suggestionsAccept: 'Poproś o dołączenie',
-    createOrganization: 'Stwórz organizację',
+    createOrganization: 'Utwórz organizację',
     invitationAcceptedLabel: 'Dołączono',
-    subtitle: 'to continue to {{applicationName}}',
-    suggestionsAcceptedLabel: 'Pending approval',
+    subtitle: 'aby przejść do {{applicationName}}',
+    suggestionsAcceptedLabel: 'Prośby o dołączenie',
     title: 'Wybierz konto',
     titleWithoutPersonal: 'Wybierz organizację',
   },
   organizationProfile: {
     apiKeysPage: {
-      title: undefined,
+      title: 'Klucze API',
     },
     badge__automaticInvitation: 'Automatyczne zaproszenia',
     badge__automaticSuggestion: 'Automatyczne sugestie',
@@ -495,12 +495,12 @@ export const plPL: LocalizationResource = {
     },
   },
   organizationSwitcher: {
-    action__closeOrganizationSwitcher: undefined,
+    action__closeOrganizationSwitcher: 'Zamknij',
     action__createOrganization: 'Utwórz organizację',
     action__invitationAccept: 'Dołącz',
     action__manageOrganization: 'Zarządzaj organizacją',
-    action__openOrganizationSwitcher: undefined,
-    action__suggestionsAccept: 'Prośba o dołączenie',
+    action__openOrganizationSwitcher: 'Otwórz',
+    action__suggestionsAccept: 'Poproś o dołączenie',
     notSelected: 'Nie wybrano organizacji',
     personalWorkspace: 'Przestrzeń osobista',
     suggestionsAcceptedLabel: 'Oczekiwanie na zatwierdzenie',
@@ -850,35 +850,36 @@ export const plPL: LocalizationResource = {
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Utwórz organizację',
+      action__invitationAccept: 'Dołącz',
+      action__suggestionsAccept: 'Poproś o dołączenie',
+      subtitle: 'Dołącz do istniejącej organizacji lub utwórz nową',
+      suggestionsAcceptedLabel: 'Oczekiwanie na dołączenie',
+      title: 'Wybierz organizację',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Anuluj',
+      formButtonSubmit: 'Kontynuuj',
+      formFieldInputPlaceholder__name: 'Moja Organizacja',
+      formFieldInputPlaceholder__slug: 'moja-organizacja',
+      formFieldLabel__name: 'Nazwa',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Wprowadź szczegóły swojej organizacji',
+      title: 'Utwórz swoją organizację',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Wyloguj',
+      actionText: 'Zalogowano jako {{identifier}}',
     },
   },
   taskResetPassword: {
-    formButtonPrimary: undefined,
+    formButtonPrimary: 'Zresetuj hasło',
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Wyloguj',
+      actionText: 'Zalogowano jako {{identifier}}',
     },
-    title: undefined,
+    subtitle: undefined,
+    title: 'Zresetuj hasło',
   },
   unstable__errors: {
     already_a_member_in_organization: '{{email}} jest już członkiem organizacji.',
@@ -889,6 +890,8 @@ export const plPL: LocalizationResource = {
     captcha_unavailable:
       'Rejestracja nie powiodła się z powodu niedostępności weryfikacji botów. Odśwież stronę, aby spróbować ponownie lub skontaktuj się z pomocą, aby uzyskać wsparcie.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Tymczasowe usługi e-mail nie są obsługiwane. Proszę użyć zwykłego adresu e-mail, aby utworzyć konto.',
     form_identifier_exists__email_address: 'Adres e-mail jest już zajęty. Proszę spróbować innego.',
     form_identifier_exists__phone_number: 'Ten numer telefonu jest zajęty. Spróbuj użyć innego.',
     form_identifier_exists__username: 'Ta nazwa użytkownika jest zajęta. Spróbuj użyć innej.',
@@ -906,6 +909,8 @@ export const plPL: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: 'Wprowadzona wartość jest nieprawidłowa. Popraw ją.',
     form_password_incorrect: 'Wprowadzone hasło jest nieprawidłowe. Spróbuj ponownie.',
+    form_password_or_identifier_incorrect:
+      'Hasło lub adres e-mail jest nieprawidłowy. Spróbuj ponownie lub użyj innej metody.',
     form_password_length_too_short: 'Twoje hasło jest zbyt krótkie. Musi mieć co najmniej 8 znaków.',
     form_password_not_strong_enough: 'Twoje hasło nie jest wystarczająco silne',
     form_password_pwned:

@@ -73,9 +73,10 @@ const isValidVerificationType = (type: any) => ALLOWED_TYPES.has(type);
 const prefixWithOrg = (value: string) => value.replace(/^(org:)*/, 'org:');
 
 /**
- * Checks if a user has the required Organization-level authorization.
- * Verifies if the user has the specified Role or Permission within their Organization.
- * @returns null, if unable to determine due to missing data or unspecified Role/Permission.
+ * Checks if a user has the required organization-level authorization.
+ * Verifies if the user has the specified role or permission within their organization.
+ *
+ * @returns null, if unable to determine due to missing data or unspecified role/permission.
  */
 const checkOrgAuthorization: CheckOrgAuthorization = (params, options) => {
   const { orgId, orgRole, orgPermissions } = options;
@@ -162,6 +163,7 @@ const validateReverificationConfig = (config: ReverificationConfig | undefined |
  * Evaluates if the user meets re-verification authentication requirements.
  * Compares the user's factor verification ages against the specified maxAge.
  * Handles different verification levels (first factor, second factor, multi-factor).
+ *
  * @returns null, if requirements or verification data are missing.
  */
 const checkReverificationAuthorization: CheckReverificationAuthorization = (params, { factorVerificationAge }) => {
@@ -237,6 +239,7 @@ type AuthStateOptions = {
 /**
  * Shared utility function that centralizes auth state resolution logic,
  * preventing duplication across different packages.
+ *
  * @internal
  */
 const resolveAuthState = ({
@@ -257,86 +260,86 @@ const resolveAuthState = ({
 }: AuthStateOptions): UseAuthReturn | undefined => {
   if (sessionId === undefined && userId === undefined) {
     return {
+      actor: undefined,
+      getToken,
+      has: () => false,
       isLoaded: false,
       isSignedIn: undefined,
-      sessionId,
-      sessionClaims: undefined,
-      userId,
-      actor: undefined,
       orgId: undefined,
       orgRole: undefined,
       orgSlug: undefined,
-      has: undefined,
+      sessionClaims: undefined,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (sessionId === null && userId === null) {
     return {
+      actor: null,
+      getToken,
+      has: () => false,
       isLoaded: true,
       isSignedIn: false,
-      sessionId,
-      userId,
-      sessionClaims: null,
-      actor: null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      sessionClaims: null,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (treatPendingAsSignedOut && sessionStatus === 'pending') {
     return {
+      actor: null,
+      getToken,
+      has: () => false,
       isLoaded: true,
       isSignedIn: false,
-      sessionId: null,
-      userId: null,
-      sessionClaims: null,
-      actor: null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has: () => false,
+      sessionClaims: null,
+      sessionId: null,
       signOut,
-      getToken,
+      userId: null,
     } as const;
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !!orgId && !!orgRole) {
     return {
+      actor: actor || null,
+      getToken,
+      has,
       isLoaded: true,
       isSignedIn: true,
-      sessionId,
-      sessionClaims,
-      userId,
-      actor: actor || null,
       orgId,
       orgRole,
       orgSlug: orgSlug || null,
-      has,
+      sessionClaims,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 
   if (!!sessionId && !!sessionClaims && !!userId && !orgId) {
     return {
+      actor: actor || null,
+      getToken,
+      has,
       isLoaded: true,
       isSignedIn: true,
-      sessionId,
-      sessionClaims,
-      userId,
-      actor: actor || null,
       orgId: null,
       orgRole: null,
       orgSlug: null,
-      has,
+      sessionClaims,
+      sessionId,
       signOut,
-      getToken,
+      userId,
     } as const;
   }
 };

@@ -1,4 +1,4 @@
-import type { JwtPayload } from '@clerk/types';
+import type { JwtPayload } from '@clerk/shared/types';
 
 import type { IdPOAuthAccessTokenJSON } from './JSON';
 

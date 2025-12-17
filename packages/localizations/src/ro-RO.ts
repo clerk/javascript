@@ -10,7 +10,7 @@
  * =====================================================================================
  */
 
-import type { LocalizationResource } from '@clerk/types';
+import type { LocalizationResource } from '@clerk/shared/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
@@ -886,6 +886,7 @@ export const roRO: LocalizationResource = {
       actionLink: undefined,
       actionText: undefined,
     },
+    subtitle: undefined,
     title: undefined,
   },
   unstable__errors: {
@@ -898,6 +899,8 @@ export const roRO: LocalizationResource = {
     captcha_unavailable:
       'Înregistrarea a eșuat din cauza validării anti-bot. Reîmprospătează pagina sau contactează suportul.',
     form_code_incorrect: undefined,
+    form_email_address_blocked:
+      'Serviciile de e-mail temporare nu sunt acceptate. Vă rugăm să folosiți adresa dvs. de e-mail obișnuită pentru a crea un cont.',
     form_identifier_exists__email_address: undefined,
     form_identifier_exists__phone_number: undefined,
     form_identifier_exists__username: undefined,
@@ -915,6 +918,8 @@ export const roRO: LocalizationResource = {
     form_param_type_invalid__phone_number: undefined,
     form_param_value_invalid: undefined,
     form_password_incorrect: undefined,
+    form_password_or_identifier_incorrect:
+      'Parola sau adresa de e-mail este incorectă. Încearcă din nou sau folosește o altă metodă.',
     form_password_length_too_short: 'Parola este prea scurtă. Trebuie să aibă cel puțin 8 caractere.',
     form_password_not_strong_enough: 'Parola ta nu este suficient de puternică.',
     form_password_pwned:

@@ -18,8 +18,6 @@ import type {
   PasskeyJSON,
   PhoneNumberJSON,
   PublicUserDataJSON,
-  SamlAccountConnectionJSON,
-  SamlAccountJSON,
   SessionJSON,
   SignUpJSON,
   SignUpVerificationJSON,
@@ -79,7 +77,6 @@ export type UserJSONSnapshot = Override<
     passkeys: PasskeyJSONSnapshot[];
     enterprise_accounts: EnterpriseAccountJSONSnapshot[];
     phone_numbers: PhoneNumberJSONSnapshot[];
-    saml_accounts: SamlAccountJSONSnapshot[];
     web3_wallets: Web3WalletJSONSnapshot[];
   }
 >;
@@ -154,15 +151,6 @@ export type PhoneNumberJSONSnapshot = Override<
     verification: VerificationJSONSnapshot;
   }
 >;
-
-export type SamlAccountJSONSnapshot = Override<
-  SamlAccountJSON,
-  {
-    verification: VerificationJSONSnapshot | null;
-  }
->;
-
-export type SamlAccountConnectionJSONSnapshot = SamlAccountConnectionJSON;
 
 export type SignUpVerificationsJSONSnapshot = Override<
   SignUpVerificationsJSON,
