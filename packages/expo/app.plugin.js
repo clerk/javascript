@@ -1,1 +1,1 @@
-module.exports = require('./plugin/build/withClerkExpo');
+module.exports = require('./dist/plugin/withClerkExpo');

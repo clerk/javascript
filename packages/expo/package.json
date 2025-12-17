@@ -59,8 +59,7 @@
     "./legacy": {
       "types": "./dist/legacy.d.ts",
       "default": "./dist/legacy.js"
-    },
-    "./app.plugin.js": "./app.plugin.js"
+    }
   },
   "main": "./dist/index.js",
   "source": "./src/index.ts",
@@ -70,13 +69,11 @@
     "android",
     "ios",
     "expo-module.config.json",
-    "app.plugin.js",
-    "plugin"
+    "app.plugin.js"
   ],
   "scripts": {
-    "build": "tsup && pnpm build:plugin",
+    "build": "tsup",
     "build:declarations": "tsc -p tsconfig.declarations.json",
-    "build:plugin": "tsc -p plugin/tsconfig.json",
     "clean": "rimraf ./dist",
     "dev": "tsup --watch",
     "dev:publish": "pnpm dev -- --env.publish",
