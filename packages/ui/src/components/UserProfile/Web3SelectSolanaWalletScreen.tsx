@@ -9,7 +9,7 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/utils/errorHandler';
 
-import { Button, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
+import { Button, descriptors, Flex, localizationKeys, Spinner } from '@/customizables';
 
 const Web3SolanaWalletButtons = lazy(() =>
   import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
