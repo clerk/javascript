@@ -353,4 +353,10 @@ describe('TaskChooseOrganization', () => {
       expect(await findByText('Existing Org')).toBeInTheDocument();
     });
   });
+
+  describe('with organization creation defaults', () => {
+    it.todo('displays warning when organization already exists for user email domain');
+
+    it.todo('prefills create organization form with defaults');
+  });
 });
