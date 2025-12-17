@@ -177,6 +177,7 @@ const WalletButtonIcon = forwardRef((props: WalletButtonProps, ref: Ref<HTMLButt
   return (
     <Button
       ref={ref}
+      aria-label={label}
       textVariant='buttonLarge'
       variant='outline'
       colorScheme='neutral'
