@@ -871,6 +871,10 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Въведете данните за вашата организация, за да продължите',
       title: 'Настройте вашата организация',
     },
+    organizationCreationDisabled: {
+      title: 'Трябва да принадлежите към организация',
+      subtitle: 'Свържете се с администратора на вашата организация за покана.',
+    },
     signOut: {
       actionLink: 'Изход',
       actionText: 'Влязъл като {{identifier}}',

@@ -870,6 +870,10 @@ export const caES: LocalizationResource = {
       subtitle: 'Introduïu els detalls de la vostra organització per continuar',
       title: 'Configureu la vostra organització',
     },
+    organizationCreationDisabled: {
+      title: 'Heu de pertànyer a una organització',
+      subtitle: "Contacteu amb l'administrador de la vostra organització per obtenir una invitació.",
+    },
     signOut: {
       actionLink: 'Tancar sessió',
       actionText: 'Sessió iniciada com a {{identifier}}',

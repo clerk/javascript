@@ -867,6 +867,10 @@ export const arSA: LocalizationResource = {
       subtitle: 'أدخل تفاصيل منظمتك للمتابعة',
       title: 'إعداد منظمتك',
     },
+    organizationCreationDisabled: {
+      title: 'يجب أن تنتمي إلى منظمة',
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
+    },
     signOut: {
       actionLink: 'تسجيل الخروج',
       actionText: 'تم تسجيل الدخول كـ {{identifier}}',

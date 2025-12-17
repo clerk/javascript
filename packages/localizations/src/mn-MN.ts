@@ -870,6 +870,10 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Үргэлжлүүлэхийн тулд байгууллагын мэдээллийг оруулна уу',
       title: 'Байгууллагаа тохируулах',
     },
+    organizationCreationDisabled: {
+      title: 'Та байгууллагад харьяалагдах ёстой',
+      subtitle: 'Урилга авахын тулд байгууллагын админтай холбогдоно уу.',
+    },
     signOut: {
       actionLink: 'Гарах',
       actionText: '{{identifier}} гэж нэвтэрсэн',

@@ -861,6 +861,10 @@ export const heIL: LocalizationResource = {
       subtitle: 'הזן את פרטי הארגון שלך כדי להמשיך',
       title: 'הגדר את הארגון שלך',
     },
+    organizationCreationDisabled: {
+      title: 'עליך להשתייך לארגון',
+      subtitle: 'פנה למנהל הארגון שלך לקבלת הזמנה.',
+    },
     signOut: {
       actionLink: 'התנתק',
       actionText: 'מחובר כ-{{identifier}}',

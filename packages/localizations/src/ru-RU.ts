@@ -882,6 +882,10 @@ export const ruRU: LocalizationResource = {
       subtitle: 'Введите данные вашей организации для продолжения',
       title: 'Настройте вашу организацию',
     },
+    organizationCreationDisabled: {
+      title: 'Вы должны принадлежать к организации',
+      subtitle: 'Свяжитесь с администратором вашей организации для получения приглашения.',
+    },
     signOut: {
       actionLink: 'Выйти',
       actionText: 'Вошли как {{identifier}}',

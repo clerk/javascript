@@ -878,6 +878,10 @@ export const viVN: LocalizationResource = {
       subtitle: 'Nhập thông tin chi tiết tổ chức của bạn để tiếp tục',
       title: 'Thiết lập tổ chức của bạn',
     },
+    organizationCreationDisabled: {
+      title: 'Bạn phải thuộc về một tổ chức',
+      subtitle: 'Liên hệ với quản trị viên tổ chức của bạn để nhận lời mời.',
+    },
     signOut: {
       actionLink: 'Đăng xuất',
       actionText: 'Đã đăng nhập với {{identifier}}',

@@ -869,6 +869,10 @@ export const nbNO: LocalizationResource = {
       subtitle: 'Skriv inn organisasjonsdetaljene dine for å fortsette',
       title: 'Sett opp din organisasjon',
     },
+    organizationCreationDisabled: {
+      title: 'Du må tilhøre en organisasjon',
+      subtitle: 'Kontakt organisasjonsadministratoren din for en invitasjon.',
+    },
     signOut: {
       actionLink: 'Logg ut',
       actionText: 'Innlogget som {{identifier}}',

@@ -877,6 +877,10 @@ export const teIN: LocalizationResource = {
       subtitle: 'కొనసాగించడానికి మీ సంస్థ వివరాలను నమోదు చేయండి',
       title: 'మీ సంస్థను సెటప్ చేయండి',
     },
+    organizationCreationDisabled: {
+      title: 'మీరు ఒక సంస్థకు చెంది ఉండాలి',
+      subtitle: 'ఆహ్వానం కోసం మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
+    },
     signOut: {
       actionLink: 'సైన్ అవుట్',
       actionText: '{{identifier}}గా సైన్ ఇన్ చేయబడింది',

@@ -875,6 +875,10 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जारी रखने के लिए अपने संगठन का विवरण दर्ज करें',
       title: 'अपने संगठन को सेटअप करें',
     },
+    organizationCreationDisabled: {
+      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
+      subtitle: 'आमंत्रण के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
+    },
     signOut: {
       actionLink: 'साइन आउट',
       actionText: '{{identifier}} के रूप में साइन इन किया गया',
