@@ -1,6 +1,6 @@
 import { type ConfigPlugin, createRunOncePlugin, withInfoPlist } from '@expo/config-plugins';
 
-const pkg = require('../../package.json');
+import pkg from '../../package.json';
 
 /**
  * Expo config plugin for @clerk/expo.
