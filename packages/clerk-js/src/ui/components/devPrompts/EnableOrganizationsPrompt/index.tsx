@@ -1,17 +1,17 @@
-import { useClerk } from '@clerk/shared/react';
+import { createContextAndHook, useClerk } from '@clerk/shared/react';
 import type { __internal_EnableOrganizationsPromptProps, EnableEnvironmentSettingParams } from '@clerk/shared/types';
 // eslint-disable-next-line no-restricted-imports
 import type { SerializedStyles } from '@emotion/react';
 // eslint-disable-next-line no-restricted-imports
-import { css, type Theme } from '@emotion/react';
-import { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
+import { css } from '@emotion/react';
+import React, { forwardRef, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
 import { Modal } from '@/ui/elements/Modal';
-import { common, InternalThemeProvider } from '@/ui/styledSystem';
+import { InternalThemeProvider } from '@/ui/styledSystem';
 
 import { DevTools } from '../../../../core/resources/DevTools';
-import { Box, Flex, Span } from '../../../customizables';
+import { Flex } from '../../../customizables';
 import { Portal } from '../../../elements/Portal';
 import { basePromptElementStyles, ClerkLogoIcon, PromptContainer, PromptSuccessIcon } from '../shared';
 
@@ -21,7 +21,7 @@ const EnableOrganizationsPromptInternal = ({
   caller,
   onSuccess,
   onClose,
-}: __internal_EnableOrganizationsPromptProps) => {
+}: __internal_EnableOrganizationsPromptProps): JSX.Element => {
   const clerk = useClerk();
   const [isLoading, setIsLoading] = useState(false);
   const [isEnabled, setIsEnabled] = useState(false);
@@ -29,6 +29,7 @@ const EnableOrganizationsPromptInternal = ({
 
   const initialFocusRef = useRef<HTMLHeadingElement>(null);
   const environment = useEnvironment();
+  const radioGroupLabelId = useId();
 
   const isComponent = !caller.startsWith('use');
 
@@ -141,6 +142,7 @@ const EnableOrganizationsPromptInternal = ({
               ) : (
                 <>
                   <p
+                    id={radioGroupLabelId}
                     css={[
                       basePromptElementStyles,
                       css`
@@ -178,35 +180,41 @@ const EnableOrganizationsPromptInternal = ({
               )}
             </Flex>
 
-            {hasPersonalAccountsEnabled && (
-              <Box
-                sx={t => ({
-                  display: 'grid',
-                  gridTemplateRows: isEnabled ? '0fr' : '1fr',
-                  transition: `grid-template-rows ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-                  marginInline: '-0.5rem',
-                  overflow: 'hidden',
-                })}
-                {...(isEnabled && { inert: '' })}
+            {hasPersonalAccountsEnabled && !isEnabled && (
+              <Flex
+                sx={t => ({ marginTop: t.sizes.$2 })}
+                direction='col'
               >
-                <Flex
-                  sx={t => ({
-                    minHeight: 0,
-                    paddingInline: '0.5rem',
-                    opacity: isEnabled ? 0 : 1,
-                    transition: `opacity ${t.transitionDuration.$slower} ${t.transitionTiming.$slowBezier}`,
-                  })}
+                <RadioGroup
+                  value={allowPersonalAccount ? 'optional' : 'required'}
+                  onChange={value => setAllowPersonalAccount(value === 'optional')}
+                  labelledBy={radioGroupLabelId}
                 >
-                  <Flex sx={t => ({ marginTop: t.sizes.$2 })}>
-                    <Switch
-                      label='Allow personal account'
-                      description='Allow users to work outside of an organization by providing a personal account. We do not recommend for B2B SaaS apps.'
-                      checked={allowPersonalAccount}
-                      onChange={() => setAllowPersonalAccount(prev => !prev)}
-                    />
-                  </Flex>
-                </Flex>
-              </Box>
+                  <RadioGroupItem
+                    value='required'
+                    label={
+                      <Flex
+                        wrap='wrap'
+                        sx={t => ({ columnGap: t.sizes.$2, rowGap: t.sizes.$1 })}
+                      >
+                        <span>Membership required</span>
+                        <PromptBadge>Standard</PromptBadge>
+                      </Flex>
+                    }
+                    description={
+                      <>
+                        <span className='block'>Users need to belong to at least one organization.</span>
+                        <span>Common for most B2B SaaS applications</span>
+                      </>
+                    }
+                  />
+                  <RadioGroupItem
+                    value='optional'
+                    label='Membership optional'
+                    description='Users can work outside of an organization with a personal account'
+                  />
+                </RadioGroup>
+              </Flex>
             )}
           </Flex>
 
@@ -275,7 +283,7 @@ const EnableOrganizationsPromptInternal = ({
  * A prompt that allows the user to enable the Organizations feature for their development instance
  * @internal
  */
-export const EnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps) => {
+export const EnableOrganizationsPrompt = (props: __internal_EnableOrganizationsPromptProps): JSX.Element => {
   return (
     <InternalThemeProvider>
       <EnableOrganizationsPromptInternal {...props} />
@@ -369,136 +377,207 @@ const PromptButton = forwardRef<HTMLButtonElement, PromptButtonProps>(({ variant
   );
 });
 
-type SwitchProps = React.ComponentProps<'input'> & {
-  label: string;
-  description?: string;
+type PromptBadgeProps = {
+  children: React.ReactNode;
 };
 
-const TRACK_PADDING = '2px';
-const TRACK_INNER_WIDTH = (t: Theme) => t.sizes.$6;
-const TRACK_HEIGHT = (t: Theme) => t.sizes.$4;
-const THUMB_WIDTH = (t: Theme) => t.sizes.$3;
+const PromptBadge = ({ children }: PromptBadgeProps): JSX.Element => {
+  return (
+    <span
+      css={css`
+        ${basePromptElementStyles};
+        display: inline-flex;
+        align-items: center;
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.6875rem;
+        font-weight: 500;
+        line-height: 1.23;
+        background-color: #ebebeb;
+        color: #2b2b34;
+        white-space: nowrap;
+      `}
+    >
+      {children}
+    </span>
+  );
+};
 
-const Switch = forwardRef<HTMLInputElement, SwitchProps>(
-  ({ label, description, checked: controlledChecked, defaultChecked, onChange, ...props }, ref) => {
-    const descriptionId = useId();
+type RadioGroupContextValue = {
+  name: string;
+  value: string;
+  onChange: (value: string) => void;
+};
 
-    const isControlled = controlledChecked !== undefined;
-    const [internalChecked, setInternalChecked] = useState(!!defaultChecked);
-    const checked = isControlled ? controlledChecked : internalChecked;
+const [RadioGroupContext, useRadioGroup] = createContextAndHook<RadioGroupContextValue>('RadioGroupContext');
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (!isControlled) {
-        setInternalChecked(e.target.checked);
-      }
-      onChange?.(e);
-    };
+type RadioGroupProps = {
+  value: string;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+  labelledBy?: string;
+};
 
-    return (
+const RadioGroup = ({ value, onChange, children, labelledBy }: RadioGroupProps): JSX.Element => {
+  const name = useId();
+  const contextValue = React.useMemo(() => ({ value: { name, value, onChange } }), [name, value, onChange]);
+
+  return (
+    <RadioGroupContext.Provider value={contextValue}>
       <Flex
+        role='radiogroup'
         direction='col'
-        gap={1}
+        gap={3}
+        aria-orientation='vertical'
+        aria-labelledby={labelledBy}
       >
-        <Flex
-          as='label'
-          gap={2}
-          align='center'
-          sx={{
-            isolation: 'isolate',
-            userSelect: 'none',
-            '&:has(input:focus-visible) > input + span': {
-              outline: '2px solid white',
-              outlineOffset: '2px',
-            },
-            '&:has(input:disabled) > input + span': {
-              opacity: 0.6,
-              cursor: 'not-allowed',
-              pointerEvents: 'none',
-            },
-          }}
-        >
-          <input
-            type='checkbox'
-            {...props}
-            ref={ref}
-            role='switch'
-            {...(isControlled ? { checked } : { defaultChecked })}
-            onChange={handleChange}
-            css={{ ...common.visuallyHidden() }}
-            aria-describedby={description ? descriptionId : undefined}
-          />
-          <Span
-            sx={t => {
-              const trackWidth = `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING})`;
-              const trackHeight = `calc(${TRACK_HEIGHT(t)} + ${TRACK_PADDING})`;
-              return {
-                display: 'flex',
-                alignItems: 'center',
-                paddingInline: TRACK_PADDING,
-                width: trackWidth,
-                height: trackHeight,
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                backgroundColor: checked ? '#6C47FF' : 'rgba(0, 0, 0, 0.2)',
-                borderRadius: 999,
-                transition: 'background-color 0.2s ease-in-out',
-              };
-            }}
-          >
-            <Span
-              sx={t => {
-                const size = THUMB_WIDTH(t);
-                const maxTranslateX = `calc(${TRACK_INNER_WIDTH(t)} - ${size} - ${TRACK_PADDING})`;
-                return {
-                  width: size,
-                  height: size,
-                  borderRadius: 9999,
-                  backgroundColor: 'white',
-                  boxShadow: '0px 0px 0px 1px rgba(0, 0, 0, 0.1)',
-                  transform: `translateX(${checked ? maxTranslateX : '0'})`,
-                  transition: 'transform 0.2s ease-in-out',
-                  '@media (prefers-reduced-motion: reduce)': {
-                    transition: 'none',
-                  },
-                };
-              }}
-            />
-          </Span>
-          <span
-            css={[
-              basePromptElementStyles,
-              css`
-                font-size: 0.875rem;
-                font-weight: 500;
-                line-height: 1.25;
-                color: white;
-              `,
-            ]}
-          >
-            {label}
-          </span>
-        </Flex>
-        {description ? (
-          <Span
-            id={descriptionId}
-            sx={t => [
-              basePromptElementStyles,
-              {
-                display: 'block',
-                paddingInlineStart: `calc(${TRACK_INNER_WIDTH(t)} + ${TRACK_PADDING} + ${TRACK_PADDING} + ${t.sizes.$2})`,
-                fontSize: '0.75rem',
-                lineHeight: '1.3333333333',
-                color: '#c3c3c6',
-                textWrap: 'pretty',
-              },
-            ]}
-          >
-            {description}
-          </Span>
-        ) : null}
+        {children}
       </Flex>
-    );
-  },
-);
+    </RadioGroupContext.Provider>
+  );
+};
+
+type RadioGroupItemProps = {
+  value: string;
+  label: React.ReactNode;
+  description?: React.ReactNode;
+};
+
+const RADIO_INDICATOR_SIZE = '1rem';
+const RADIO_GAP = '0.5rem';
+
+const RadioGroupItem = ({ value, label, description }: RadioGroupItemProps): JSX.Element => {
+  const { name, value: selectedValue, onChange } = useRadioGroup();
+  const descriptionId = useId();
+  const checked = value === selectedValue;
+
+  return (
+    <Flex
+      direction='col'
+      gap={1}
+    >
+      <label
+        css={css`
+          ${basePromptElementStyles};
+          display: flex;
+          align-items: flex-start;
+          gap: ${RADIO_GAP};
+          cursor: pointer;
+          user-select: none;
+
+          &:has(input:focus-visible) > span:first-of-type {
+            outline: 2px solid white;
+            outline-offset: 2px;
+          }
+
+          &:hover:has(input:not(:checked)) > span:first-of-type {
+            background-color: rgba(255, 255, 255, 0.08);
+          }
+
+          &:hover:has(input:checked) > span:first-of-type {
+            background-color: rgba(108, 71, 255, 0.8);
+            background-color: color-mix(in srgb, #6c47ff 80%, transparent);
+          }
+        `}
+      >
+        <input
+          type='radio'
+          name={name}
+          value={value}
+          checked={checked}
+          onChange={() => onChange(value)}
+          aria-describedby={description ? descriptionId : undefined}
+          css={css`
+            ${basePromptElementStyles};
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+          `}
+        />
+
+        <span
+          aria-hidden='true'
+          css={css`
+            ${basePromptElementStyles};
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: ${RADIO_INDICATOR_SIZE};
+            height: ${RADIO_INDICATOR_SIZE};
+            margin-top: 0.125rem;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: transparent;
+            transition: 120ms ease-in-out;
+            transition-property: border-color, background-color, box-shadow;
+
+            ${checked &&
+            css`
+              border-width: 2px;
+              border-color: #6c47ff;
+              background-color: #6c47ff;
+              background-color: color-mix(in srgb, #6c47ff 100%, transparent);
+              box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.2);
+            `}
+
+            &::after {
+              content: '';
+              position: absolute;
+              width: 0.375rem;
+              height: 0.375rem;
+              border-radius: 50%;
+              background-color: white;
+              opacity: ${checked ? 1 : 0};
+              transform: scale(${checked ? 1 : 0});
+              transition: 120ms ease-in-out;
+              transition-property: opacity, transform;
+            }
+          `}
+        />
+
+        <span
+          css={[
+            basePromptElementStyles,
+            css`
+              font-size: 0.875rem;
+              font-weight: 500;
+              line-height: 1.25;
+              color: white;
+            `,
+          ]}
+        >
+          {label}
+        </span>
+      </label>
+
+      {description && (
+        <span
+          id={descriptionId}
+          css={[
+            basePromptElementStyles,
+            css`
+              padding-inline-start: calc(${RADIO_INDICATOR_SIZE} + ${RADIO_GAP});
+              font-size: 0.75rem;
+              line-height: 1.33;
+              color: #c3c3c6;
+              text-wrap: pretty;
+            `,
+          ]}
+        >
+          {description}
+        </span>
+      )}
+    </Flex>
+  );
+};
 
 const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: SerializedStyles }>(
   ({ children, css: cssProp, ...props }, ref) => {
@@ -525,7 +604,7 @@ const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<'a'> & { css?: S
   },
 );
 
-const CoinFlip = ({ isEnabled }: { isEnabled: boolean }) => {
+const CoinFlip = ({ isEnabled }: { isEnabled: boolean }): JSX.Element => {
   const [rotation, setRotation] = useState(0);
 
   useLayoutEffect(() => {
