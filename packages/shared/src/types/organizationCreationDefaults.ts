@@ -13,6 +13,7 @@ export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
   form: {
     name: string;
     slug: string;
+    logo: string | null;
   };
 }
 
@@ -24,5 +25,6 @@ export interface OrganizationCreationDefaultsResource extends ClerkResource {
   form: {
     name: string;
     slug: string;
+    logo: string | null;
   };
 }
