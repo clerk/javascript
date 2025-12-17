@@ -875,6 +875,10 @@ export const plPL: LocalizationResource = {
       subtitle: 'Wprowadź szczegóły swojej organizacji',
       title: 'Utwórz swoją organizację',
     },
+    organizationCreationDisabled: {
+      title: 'Musisz należeć do organizacji',
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby uzyskać zaproszenie.',
+    },
     signOut: {
       actionLink: 'Wyloguj',
       actionText: 'Zalogowano jako {{identifier}}',

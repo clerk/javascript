@@ -867,6 +867,10 @@ export const ukUA: LocalizationResource = {
       subtitle: 'Введіть дані вашої організації для продовження',
       title: 'Налаштуйте вашу організацію',
     },
+    organizationCreationDisabled: {
+      title: 'Ви повинні належати до організації',
+      subtitle: 'Зверніться до адміністратора вашої організації для отримання запрошення.',
+    },
     signOut: {
       actionLink: 'Вийти',
       actionText: 'Увійшли як {{identifier}}',

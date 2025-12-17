@@ -863,6 +863,10 @@ export const koKR: LocalizationResource = {
       subtitle: '조직 세부 정보를 입력하여 계속하세요',
       title: '조직 설정',
     },
+    organizationCreationDisabled: {
+      title: '조직에 소속되어야 합니다',
+      subtitle: '초대를 받으려면 조직 관리자에게 문의하세요.',
+    },
     signOut: {
       actionLink: '로그아웃',
       actionText: '{{identifier}}로 로그인됨',

@@ -868,6 +868,10 @@ export const daDK: LocalizationResource = {
       subtitle: 'Indtast dine organisationsoplysninger for at fortsætte',
       title: 'Opsæt din organisation',
     },
+    organizationCreationDisabled: {
+      title: 'Du skal tilhøre en organisation',
+      subtitle: 'Kontakt din organisationsadministrator for en invitation.',
+    },
     signOut: {
       actionLink: 'Log ud',
       actionText: 'Logget ind som {{identifier}}',

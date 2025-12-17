@@ -858,6 +858,10 @@ export const zhTW: LocalizationResource = {
       subtitle: '輸入您的組織詳細資訊以繼續',
       title: '設定您的組織',
     },
+    organizationCreationDisabled: {
+      title: '您必須屬於一個組織',
+      subtitle: '請聯繫您的組織管理員以獲取邀請。',
+    },
     signOut: {
       actionLink: '登出',
       actionText: '已登入為 {{identifier}}',

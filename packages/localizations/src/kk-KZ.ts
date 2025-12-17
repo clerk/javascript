@@ -862,6 +862,10 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Жалғастыру үшін ұйымыңыздың мәліметтерін енгізіңіз',
       title: 'Ұйымыңызды баптаңыз',
     },
+    organizationCreationDisabled: {
+      title: 'Сіз ұйымға тиесілі болуыңыз керек',
+      subtitle: 'Шақыру алу үшін ұйымыңыздың әкімшісіне хабарласыңыз.',
+    },
     signOut: {
       actionLink: 'Шығу',
       actionText: '{{identifier}} ретінде кірді',

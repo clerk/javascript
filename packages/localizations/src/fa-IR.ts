@@ -881,6 +881,10 @@ export const faIR: LocalizationResource = {
       subtitle: 'سازمان جدیدی برای شروع کار ایجاد کنید',
       title: 'ایجاد سازمان جدید',
     },
+    organizationCreationDisabled: {
+      title: 'شما باید عضو یک سازمان باشید',
+      subtitle: 'برای دریافت دعوتنامه با مدیر سازمان خود تماس بگیرید.',
+    },
     signOut: {
       actionLink: 'خروج از همه حساب‌ها',
       actionText: 'می‌خواهید خارج شوید؟',
