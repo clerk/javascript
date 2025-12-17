@@ -2,6 +2,7 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { Web3Strategy } from '@clerk/shared/types';
 import { lazy, Suspense } from 'react';
 
+import { Button, descriptors, Flex, localizationKeys, Spinner } from '@/customizables';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
@@ -9,10 +10,8 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/utils/errorHandler';
 
-import { Button, descriptors, Flex, localizationKeys, Spinner } from '@/customizables';
-
 const Web3SolanaWalletButtons = lazy(() =>
-  import(/* webpackChunkName: "web3-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
+  import(/* webpackChunkName: "web3-solana-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
     default: m.Web3SolanaWalletButtons,
   })),
 );
