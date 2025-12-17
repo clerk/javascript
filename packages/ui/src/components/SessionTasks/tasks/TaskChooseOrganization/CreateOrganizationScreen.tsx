@@ -4,7 +4,6 @@ import type { CreateOrganizationParams } from '@clerk/shared/types';
 import { useEnvironment } from '@/ui/contexts';
 import { useSessionTasksContext, useTaskChooseOrganizationContext } from '@/ui/contexts/components/SessionTasks';
 import { localizationKeys } from '@/ui/customizables';
-// or from '@/ui/elements'
 import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
@@ -19,7 +18,7 @@ import { OrganizationCreationDefaultsAlert } from './OrganizationCreationDefault
 
 // TODO: Replace with actual API call to OrganizationCreationDefaults.retrieve()
 const organizationCreationDefaults = {
-  creationAdvisory: {
+  advisory: {
     type: 'existing_org_with_domain' as const,
     severity: 'warning' as const,
   },

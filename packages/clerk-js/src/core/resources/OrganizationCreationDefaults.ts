@@ -1,4 +1,6 @@
 import type {
+  OrganizationCreationAdvisorySeverity,
+  OrganizationCreationAdvisoryType,
   OrganizationCreationDefaultsJSON,
   OrganizationCreationDefaultsJSONSnapshot,
   OrganizationCreationDefaultsResource,
@@ -7,10 +9,17 @@ import type {
 import { BaseResource } from './internal';
 
 export class OrganizationCreationDefaults extends BaseResource implements OrganizationCreationDefaultsResource {
-  creationAdvisory: {
-    type: 'existing_org_with_domain';
-    severity: 'warning';
+  advisory: {
+    type: OrganizationCreationAdvisoryType;
+    severity: OrganizationCreationAdvisorySeverity;
   } | null = null;
+  form: {
+    name: string;
+    slug: string;
+  } = {
+    name: '',
+    slug: '',
+  };
 
   public constructor(data: OrganizationCreationDefaultsJSON | OrganizationCreationDefaultsJSONSnapshot | null = null) {
     super();
@@ -22,8 +31,13 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
       return this;
     }
 
-    if (data.creation_advisory) {
-      this.creationAdvisory = this.withDefault(data.creation_advisory, this.creationAdvisory ?? null);
+    if (data.advisory) {
+      this.advisory = this.withDefault(data.advisory, this.advisory ?? null);
+    }
+
+    if (data.form) {
+      this.form.name = this.withDefault(data.form.name, this.form.name);
+      this.form.slug = this.withDefault(data.form.slug, this.form.slug);
     }
 
     return this;
@@ -41,10 +55,10 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
 
   public __internal_toSnapshot(): OrganizationCreationDefaultsJSONSnapshot {
     return {
-      creation_advisory: this.creationAdvisory
+      advisory: this.advisory
         ? {
-            type: this.creationAdvisory.type,
-            severity: this.creationAdvisory.severity,
+            type: this.advisory.type,
+            severity: this.advisory.severity,
           }
         : null,
     } as unknown as OrganizationCreationDefaultsJSONSnapshot;

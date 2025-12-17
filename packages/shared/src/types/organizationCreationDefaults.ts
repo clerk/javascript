@@ -6,15 +6,23 @@ export type OrganizationCreationAdvisoryType = 'existing_org_with_domain';
 export type OrganizationCreationAdvisorySeverity = 'warning';
 
 export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
-  creation_advisory: {
+  advisory: {
     type: OrganizationCreationAdvisoryType;
     severity: OrganizationCreationAdvisorySeverity;
   } | null;
+  form: {
+    name: string;
+    slug: string;
+  };
 }
 
 export interface OrganizationCreationDefaultsResource extends ClerkResource {
-  creationAdvisory: {
+  advisory: {
     type: OrganizationCreationAdvisoryType;
     severity: OrganizationCreationAdvisorySeverity;
   } | null;
+  form: {
+    name: string;
+    slug: string;
+  };
 }
