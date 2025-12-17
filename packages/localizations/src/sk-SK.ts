@@ -751,6 +751,10 @@ export const skSK: LocalizationResource = {
       subtitle: 'Pre pokračovanie zadajte overovací kód z vašej autentifikačnej aplikácie',
       title: 'Dvojfaktorové overenie',
     },
+    web3Solana: {
+      subtitle: 'Vyberte nižšie peňaženku na prihlásenie',
+      title: 'Prihlásiť sa cez Solana',
+    },
   },
   signInEnterPasswordTitle: 'Zadajte svoje heslo',
   signUp: {
@@ -844,6 +848,10 @@ export const skSK: LocalizationResource = {
       subtitleCombined: 'Vitajte! Pre pokračovanie prosím vyplňte informácie.',
       title: 'Vytvorte si účet',
       titleCombined: 'Vytvorte si účet',
+    },
+    web3Solana: {
+      subtitle: 'Vyberte nižšie peňaženku na registráciu',
+      title: 'Zaregistrovať sa cez Solana',
     },
   },
   socialButtonsBlockButton: 'Pokračovať s {{provider|titleize}}',
@@ -952,6 +960,9 @@ export const skSK: LocalizationResource = {
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     session_exists: 'Jste už přihlášen.',
     web3_missing_identifier: 'Rozšírenie Web3 Peňaženky nebolo nájdené. Je potrebné ho nainštalovať.',
+    web3_signature_request_rejected: 'Odmietli ste žiadosť o podpis. Skúste to znova, aby ste mohli pokračovať.',
+    web3_solana_signature_generation_failed:
+      'Pri generovaní podpisu sa vyskytla chyba. Skúste to znova, aby ste mohli pokračovať.',
     zxcvbn: {
       couldBeStronger: 'Vaše heslo funguje, ale mohlo by byť silnejšie. Skúste pridať viac znakov.',
       goodPassword: 'Dobrá práca. Toto je vynikajúce heslo.',
@@ -1320,6 +1331,10 @@ export const skSK: LocalizationResource = {
         detailsAction__nonPrimary: 'Nastaiť ako hlavnú',
         primaryButton: 'Web3 peňaženky',
         title: 'Web3 peňaženky',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vyberte Solana peňaženku na pripojenie k vášmu účtu.',
+          title: 'Pridať Solana peňaženku',
+        },
       },
     },
     usernamePage: {
@@ -1354,5 +1369,11 @@ export const skSK: LocalizationResource = {
       subtitle: 'Budeme vás informovať, keď bude prístup povolený.',
       title: 'Ďakujeme, že ste sa pridali na waitlist!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Pripojiť pomocou {{walletName}}',
+    continue: 'Pokračovať pomocou {{walletName}}',
+    noneAvailable:
+      'Neboli zistené žiadne Solana Web3 peňaženky. Nainštalujte si {{ solanaWalletsLink || link("wallet extension") }} s podporou Web3.',
   },
 } as const;

@@ -750,6 +750,10 @@ export const thTH: LocalizationResource = {
       subtitle: 'เพื่อดำเนินการต่อ โปรดใส่รหัสยืนยันที่สร้างโดยแอป Authenticator ของคุณ',
       title: 'การยืนยันตัวตนสองขั้นตอน',
     },
+    web3Solana: {
+      subtitle: 'เลือกกระเป๋าเงินด้านล่างเพื่อเข้าสู่ระบบ',
+      title: 'เข้าสู่ระบบด้วย Solana',
+    },
   },
   signInEnterPasswordTitle: 'ใส่รหัสผ่านของคุณ',
   signUp: {
@@ -840,6 +844,10 @@ export const thTH: LocalizationResource = {
       subtitleCombined: 'ยินดีต้อนรับ! โปรดกรอกรายละเอียดเพื่อเริ่มต้น',
       title: 'สร้างบัญชีของคุณ',
       titleCombined: 'สร้างบัญชีของคุณ',
+    },
+    web3Solana: {
+      subtitle: 'เลือกกระเป๋าเงินด้านล่างเพื่อสมัครใช้งาน',
+      title: 'สมัครใช้งานด้วย Solana',
     },
   },
   socialButtonsBlockButton: 'ดำเนินการต่อด้วย {{provider|titleize}}',
@@ -943,6 +951,8 @@ export const thTH: LocalizationResource = {
     phone_number_exists: undefined,
     session_exists: undefined,
     web3_missing_identifier: 'ไม่พบส่วนขยาย Web3 Wallet โปรดติดตั้งเพื่อดำเนินการต่อ',
+    web3_signature_request_rejected: 'คุณได้ปฏิเสธคำขอการลงลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
+    web3_solana_signature_generation_failed: 'เกิดข้อผิดพลาดขณะสร้างลายเซ็น โปรดลองอีกครั้งเพื่อดำเนินการต่อ',
     zxcvbn: {
       couldBeStronger: 'รหัสผ่านของคุณใช้ได้ แต่อาจแข็งแกร่งกว่านี้ ลองเพิ่มตัวอักษรเพิ่มเติม',
       goodPassword: 'รหัสผ่านของคุณตรงตามข้อกำหนดที่จำเป็นทั้งหมด',
@@ -1306,6 +1316,10 @@ export const thTH: LocalizationResource = {
         detailsAction__nonPrimary: 'ตั้งเป็นหลัก',
         primaryButton: 'เชื่อมต่อวอลเล็ต',
         title: 'วอลเล็ต Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'เลือกกระเป๋าเงิน Solana เพื่อเชื่อมต่อกับบัญชีของคุณ',
+          title: 'เพิ่มกระเป๋าเงิน Solana',
+        },
       },
     },
     usernamePage: {
@@ -1340,5 +1354,11 @@ export const thTH: LocalizationResource = {
       subtitle: 'เราจะติดต่อเมื่อคิวของคุณพร้อม',
       title: 'ขอบคุณที่เข้าร่วม Waitlist!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'เชื่อมต่อด้วย {{walletName}}',
+    continue: 'ดำเนินการต่อด้วย {{walletName}}',
+    noneAvailable:
+      'ไม่พบกระเป๋าเงิน Solana Web3 โปรดติดตั้ง {{ solanaWalletsLink || link("wallet extension") }} ที่รองรับ Web3',
   },
 } as const;

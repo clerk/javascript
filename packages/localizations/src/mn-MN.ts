@@ -750,6 +750,10 @@ export const mnMN: LocalizationResource = {
       subtitle: 'Үргэлжлүүлэхийн тулд authenticator апп-аар үүсгэсэн баталгаажуулах кодыг оруулна уу',
       title: 'Two-step баталгаажуулалт',
     },
+    web3Solana: {
+      subtitle: 'Нэвтрэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар нэвтрэх',
+    },
   },
   signInEnterPasswordTitle: 'Нууц үгээ оруулна уу',
   signUp: {
@@ -839,6 +843,10 @@ export const mnMN: LocalizationResource = {
       subtitleCombined: 'Тавтай морил! Эхлэхийн тулд дэлгэрэнгүй мэдээллийг бөглөнө үү.',
       title: 'Бүртгэл үүсгэх',
       titleCombined: 'Бүртгэл үүсгэх',
+    },
+    web3Solana: {
+      subtitle: 'Бүртгүүлэхийн тулд доороос түрийвч сонгоно уу',
+      title: 'Solana-аар бүртгүүлэх',
     },
   },
   socialButtonsBlockButton: '{{provider|titleize}}-р үргэлжлүүлэх',
@@ -945,6 +953,10 @@ export const mnMN: LocalizationResource = {
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected:
+      'Та гарын үсгийн хүсэлтийг цуцалсан байна. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
+    web3_solana_signature_generation_failed:
+      'Гарын үсэг үүсгэх үед алдаа гарлаа. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',
     zxcvbn: {
       couldBeStronger: 'Таны нууц үг ажилладаг, гэхдээ илүү хүчтэй байж болно. Илүү олон тэмдэгт нэмж үзээрэй.',
       goodPassword: 'Таны нууц үг шаардлагатай бүх шаардлагыг хангаж байна.',
@@ -1314,6 +1326,10 @@ export const mnMN: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Өөрийн бүртгэлтэй холбох Solana түрийвч сонгоно уу.',
+          title: 'Solana түрийвч нэмэх',
+        },
       },
     },
     usernamePage: {
@@ -1348,5 +1364,11 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}}-аар холбох',
+    continue: '{{walletName}}-аар үргэлжлүүлэх',
+    noneAvailable:
+      'Solana Web3 түрийвч илрээгүй. Web3-ийг дэмждэг {{ solanaWalletsLink || link("wallet extension") }} суулгана уу.',
   },
 } as const;

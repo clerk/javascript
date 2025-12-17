@@ -750,6 +750,10 @@ export const bgBG: LocalizationResource = {
         'За да продължите, моля въведете кода за потвърждение, генериран от вашето приложение за удостоверяване',
       title: 'Двустепенна верификация',
     },
+    web3Solana: {
+      subtitle: 'Изберете портфейл по-долу, за да влезете',
+      title: 'Вход със Solana',
+    },
   },
   signInEnterPasswordTitle: 'Въведете вашата парола',
   signUp: {
@@ -840,6 +844,10 @@ export const bgBG: LocalizationResource = {
       subtitleCombined: 'Добре дошли! Моля, попълнете данните, за да започнете.',
       title: 'Създайте своя акаунт',
       titleCombined: 'Създайте своя акаунт',
+    },
+    web3Solana: {
+      subtitle: 'Изберете портфейл по-долу, за да се регистрирате',
+      title: 'Регистрация със Solana',
     },
   },
   socialButtonsBlockButton: 'Продължи с {{provider|titleize}}',
@@ -944,6 +952,9 @@ export const bgBG: LocalizationResource = {
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     session_exists: 'Вече сте влезнали.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Отхвърлихте заявката за подпис. Моля, опитайте отново, за да продължите.',
+    web3_solana_signature_generation_failed:
+      'Възникна грешка при генерирането на подписа. Моля, опитайте отново, за да продължите.',
     zxcvbn: {
       couldBeStronger: 'Вашата парола работи, но може да бъде по-сигурна. Опитайте да добавите повече символи.',
       goodPassword: 'Вашата парола отговаря на всички необходими изисквания.',
@@ -1314,6 +1325,10 @@ export const bgBG: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 портфейли',
         title: 'Web3 портфейли',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Изберете Solana портфейл, който да свържете с акаунта си.',
+          title: 'Добавяне на Solana портфейл',
+        },
       },
     },
     usernamePage: {
@@ -1348,5 +1363,11 @@ export const bgBG: LocalizationResource = {
       subtitle: 'Thank you for your patience.',
       title: 'Waitlist successful',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Свързване с {{walletName}}',
+    continue: 'Продължаване с {{walletName}}',
+    noneAvailable:
+      'Не са открити Solana Web3 портфейли. Моля, инсталирайте {{ solanaWalletsLink || link("wallet extension") }} с поддръжка на Web3.',
   },
 } as const;

@@ -9,6 +9,7 @@ import { usePreloadTasks } from '@/hooks/usePreloadTasks';
 import type { WithInternalRouting } from '@/internal';
 import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
+import { SignUpStartSolanaWalletsCard } from '@/ui/components/SignUp/SignUpStartSolanaWalletsCard';
 
 import { SignUpContinue } from './SignUpContinue';
 import { SignUpEnterpriseConnections } from './SignUpEnterpriseConnections';
@@ -86,6 +87,9 @@ function SignUpRoutes(): JSX.Element {
         </Route>
         <Route path='enterprise-connections'>
           <SignUpEnterpriseConnections />
+        </Route>
+        <Route path='choose-wallet'>
+          <SignUpStartSolanaWalletsCard />
         </Route>
         <Route index>
           <SignUpStart />
