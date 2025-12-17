@@ -1315,16 +1315,16 @@ export const zhTW: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登入',
+      actionText: '已有存取權限？',
+      formButton: '加入候補名單',
+      subtitle: '輸入您的電子郵件地址，我們會在您的位置準備好時通知您',
+      title: '加入候補名單',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您將很快被重新導向...',
+      subtitle: '當您的位置準備好時，我們會與您聯繫',
+      title: '感謝您加入候補名單！',
     },
   },
   web3SolanaWalletButtons: {
