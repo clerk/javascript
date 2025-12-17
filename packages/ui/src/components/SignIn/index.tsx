@@ -3,7 +3,6 @@ import type { SignInModalProps, SignInProps } from '@clerk/shared/types';
 import React from 'react';
 
 import { SignInEmailLinkFlowComplete, SignUpEmailLinkFlowComplete } from '@/common/EmailLinkCompleteFlowCard';
-import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import {
   SignInContext,
   SignUpContext,
@@ -18,6 +17,7 @@ import type { WithInternalRouting } from '@/internal';
 import { SessionTasks as LazySessionTasks } from '@/lazyModules/components';
 import { Route, Switch, VIRTUAL_ROUTER_BASE_PATH } from '@/router';
 import type { SignUpCtx } from '@/types';
+import { SignInFactorOneSolanaWalletsCard } from '@/ui/components/SignIn/SignInFactorOneSolanaWalletsCard';
 import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 
 import {
