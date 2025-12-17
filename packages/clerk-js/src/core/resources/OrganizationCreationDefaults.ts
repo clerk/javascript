@@ -29,6 +29,16 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
     return this;
   }
 
+  static async retrieve(): Promise<OrganizationCreationDefaultsResource> {
+    return await BaseResource._fetch({
+      path: '/me/organization_creation_defaults',
+      method: 'GET',
+    }).then(res => {
+      const data = res?.response as unknown as OrganizationCreationDefaultsJSON;
+      return new OrganizationCreationDefaults(data);
+    });
+  }
+
   public __internal_toSnapshot(): OrganizationCreationDefaultsJSONSnapshot {
     return {
       creation_advisory: this.creationAdvisory
