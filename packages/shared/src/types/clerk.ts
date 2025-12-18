@@ -1061,6 +1061,18 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkUnsafeOptions = {
+  /**
+   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   *
+   * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production
+   * Clerk instance. If you're disabling it, please make sure you don't ship with a non-production Clerk instance!
+   *
+   * More information: https://clerk.com/docs/guides/development/deployment/production
+   */
+  unsafe_disableDevelopmentModeConsoleWarning?: boolean;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1068,13 +1080,14 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
   AfterSignOutUrl &
-  AfterMultiSessionSingleSignOutUrl & {
+  AfterMultiSessionSingleSignOutUrl &
+  ClerkUnsafeOptions & {
     /**
      * Clerk UI entrypoint.
      */
     clerkUiCtor?: ClerkUiConstructor | Promise<ClerkUiConstructor>;
     /**
-     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/customizing-clerk/account-portal) pages.
+     * Optional object to style your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     // TODO @nikos
     appearance?: any;
