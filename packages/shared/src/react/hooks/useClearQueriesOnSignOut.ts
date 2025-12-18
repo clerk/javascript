@@ -32,18 +32,10 @@ export function useClearQueriesOnSignOut(options: ClearQueriesOnSignOutOptions) 
   const [queryClient] = useClerkQueryClient();
   const previousIsSignedIn = usePreviousValue(!isSignedOut);
 
-  // If this hook's cache keys are not authenticated, skip all cleanup logic.
-
-  if (authenticated !== true) {
-    return;
-  }
-
-  // Calling this effect conditionally because we make sure that `authenticated` is always the same throughout the component lifecycle.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const isNowSignedOut = isSignedOut === true;
 
-    if (previousIsSignedIn && isNowSignedOut) {
+    if (previousIsSignedIn && isNowSignedOut && authenticated === true) {
       queryClient.removeQueries({
         predicate: query => {
           const [cachedStableKey, queryAuthenticated] = query.queryKey;
@@ -60,5 +52,5 @@ export function useClearQueriesOnSignOut(options: ClearQueriesOnSignOutOptions) 
 
       onCleanup?.();
     }
-  }, [isSignedOut, previousIsSignedIn, queryClient]);
+  }, [isSignedOut, previousIsSignedIn, queryClient, authenticated]);
 }

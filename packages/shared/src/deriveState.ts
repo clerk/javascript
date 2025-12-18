@@ -9,17 +9,26 @@ import type {
   UserResource,
 } from './types';
 
+// We use the ReturnType of deriveFromSsrInitialState, which in turn uses the ReturnType of deriveFromClientSideState,
+// to ensure these stay in sync without having to manually type them out.
+export type DeriveStateReturnType = ReturnType<typeof deriveFromSsrInitialState>;
+
 /**
  * Derives authentication state based on the current rendering context (SSR or client-side).
  */
-export const deriveState = (clerkOperational: boolean, state: Resources, initialState: InitialState | undefined) => {
+export const deriveState = (
+  clerkOperational: boolean,
+  state: Resources,
+  initialState: InitialState | undefined,
+): DeriveStateReturnType => {
   if (!clerkOperational && initialState) {
     return deriveFromSsrInitialState(initialState);
   }
   return deriveFromClientSideState(state);
 };
 
-const deriveFromSsrInitialState = (initialState: InitialState) => {
+// We use the ReturnType of deriveFromClientSideState to ensure these stay in sync
+export const deriveFromSsrInitialState = (initialState: InitialState): ReturnType<typeof deriveFromClientSideState> => {
   const userId = initialState.userId;
   const user = initialState.user as UserResource;
   const sessionId = initialState.sessionId;
@@ -51,7 +60,7 @@ const deriveFromSsrInitialState = (initialState: InitialState) => {
   };
 };
 
-const deriveFromClientSideState = (state: Resources) => {
+export const deriveFromClientSideState = (state: Resources) => {
   const userId: string | null | undefined = state.user ? state.user.id : state.user;
   const user = state.user;
   const sessionId: string | null | undefined = state.session ? state.session.id : state.session;

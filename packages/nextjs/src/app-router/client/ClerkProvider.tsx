@@ -1,6 +1,7 @@
 'use client';
 import { ClerkProvider as ReactClerkProvider } from '@clerk/react';
 import type { Ui } from '@clerk/react/internal';
+import { InitialStateProvider } from '@clerk/shared/react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -37,12 +38,6 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
       void detectKeylessEnvDriftAction();
     }
   }, []);
-
-  // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
-  const isNested = Boolean(useClerkNextOptions());
-  if (isNested) {
-    return props.children;
-  }
 
   useSafeLayoutEffect(() => {
     window.__internal_onBeforeSetActive = intent => {
@@ -114,6 +109,16 @@ export const ClientClerkProvider = <TUi extends Ui = Ui>(
 ) => {
   const { children, disableKeyless = false, ...rest } = props;
   const safePublishableKey = mergeNextClerkPropsWithEnv(rest).publishableKey;
+
+  // Avoid rendering nested ClerkProviders by checking for the existence of the ClerkNextOptions context provider
+  const isNested = Boolean(useClerkNextOptions());
+  if (isNested) {
+    if (rest.initialState) {
+      // If using <ClerkProvider dynamic> inside a <ClerkProvider>, we do want the initial state to be available for this subtree
+      return <InitialStateProvider initialState={rest.initialState}>{children}</InitialStateProvider>;
+    }
+    return children;
+  }
 
   if (safePublishableKey || !canUseKeyless || disableKeyless) {
     return <NextClientClerkProvider {...rest}>{children}</NextClientClerkProvider>;
