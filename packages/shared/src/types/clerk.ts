@@ -1062,6 +1062,14 @@ type ClerkOptionsNavigation =
     };
 
 type ClerkUnsafeOptions = {
+  /**
+   * Disables the console warning that is logged when Clerk is initialized with development keys.
+   *
+   * [WARNING] The development mode warning is intended to ensure that you don't go to production with a non-production
+   * Clerk instance. If you're disabling it, please make sure you don't ship with a non-production Clerk instance!
+   *
+   * More information: https://clerk.com/docs/guides/development/deployment/production
+   */
   unsafe_disableDevelopmentModeConsoleWarning?: boolean;
 };
 
