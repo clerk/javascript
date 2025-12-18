@@ -696,6 +696,7 @@ export interface Clerk {
    *    When a session is loading, user and session will be undefined.
    *
    * @param callback - Callback function receiving the most updated Clerk resources after a change.
+   * @param options.skipInitialEmit - If true, the callback will not be called immediately after registration.
    * @returns - Unsubscribe callback
    */
   addListener: (callback: ListenerCallback, options?: ListenerOptions) => UnsubscribeCallback;
