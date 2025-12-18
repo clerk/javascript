@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.32.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Added waitlist translations. ([#7483](https://github.com/clerk/javascript/pull/7483)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies []:
+  - @clerk/types@4.101.8
+
 ## 3.31.0
 
 ### Minor Changes

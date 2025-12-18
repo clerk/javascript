@@ -1,5 +1,23 @@
 # Change Log
 
+## 5.116.0
+
+### Minor Changes
+
+- Display message in `TaskChooseOrganization` when user is not allowed to create organizations ([#7502](https://github.com/clerk/javascript/pull/7502)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+### Patch Changes
+
+- Fix Web3 connection error handling in `<UserProfile />` ([#7489](https://github.com/clerk/javascript/pull/7489)) by [@kduprey](https://github.com/kduprey)
+
+- Add missing selected and hover states to `RolesListItem` option. ([#7497](https://github.com/clerk/javascript/pull/7497)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Introduce radio group for `EnableOrganizationsPrompt` ([#7501](https://github.com/clerk/javascript/pull/7501)) by [@LauraBeatris](https://github.com/LauraBeatris)
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`54cd476`](https://github.com/clerk/javascript/commit/54cd476625852983053725ec3eb42abc3ba370df), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630)]:
+  - @clerk/shared@3.41.0
+  - @clerk/localizations@3.32.0
+
 ## 5.115.0
 
 ### Minor Changes

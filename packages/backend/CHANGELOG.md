@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.28.0
+
+### Minor Changes
+
+- Dropping the `__experimental_` prefix from `setPasswordCompromised` and `unsetPasswordCompromised` and marking them as stable ([#7503](https://github.com/clerk/javascript/pull/7503)) by [@octoper](https://github.com/octoper)
+
+### Patch Changes
+
+- Renaming `__experimental_passwordCompromised` to `__experimental_setPasswordCompromised` and introducing `__experimental_unsetPasswordCompromised` ([#7477](https://github.com/clerk/javascript/pull/7477)) by [@octoper](https://github.com/octoper)
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630)]:
+  - @clerk/shared@3.41.0
+  - @clerk/types@4.101.8
+
 ## 2.27.1
 
 ### Patch Changes
