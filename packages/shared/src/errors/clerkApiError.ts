@@ -7,8 +7,7 @@ export type ClerkAPIErrorMeta = Record<string, unknown>;
  * This error contains the specific error message, code, and any additional metadata that was returned by the Clerk API.
  */
 export class ClerkAPIError<Meta extends ClerkAPIErrorMeta = any> implements ClerkAPIErrorInterface {
-  // TODO: Update kind to match class name in Core 3
-  static kind = 'ClerkApiError';
+  static kind = 'ClerkAPIError';
   readonly code: string;
   readonly message: string;
   readonly longMessage: string | undefined;
