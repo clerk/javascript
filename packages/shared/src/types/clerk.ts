@@ -1061,6 +1061,10 @@ type ClerkOptionsNavigation =
       routerDebug?: boolean;
     };
 
+type ClerkUnsafeOptions = {
+  unsafe_disableDevelopmentModeConsoleWarning?: boolean;
+};
+
 export type ClerkOptions = ClerkOptionsNavigation &
   SignInForceRedirectUrl &
   SignInFallbackRedirectUrl &
@@ -1068,7 +1072,8 @@ export type ClerkOptions = ClerkOptionsNavigation &
   SignUpFallbackRedirectUrl &
   NewSubscriptionRedirectUrl &
   AfterSignOutUrl &
-  AfterMultiSessionSingleSignOutUrl & {
+  AfterMultiSessionSingleSignOutUrl &
+  ClerkUnsafeOptions & {
     /**
      * Clerk UI entrypoint.
      */
