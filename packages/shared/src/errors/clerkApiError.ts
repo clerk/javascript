@@ -1,12 +1,13 @@
 import type { ClerkAPIError as ClerkAPIErrorInterface, ClerkAPIErrorJSON } from '../types';
 import { createErrorTypeGuard } from './createErrorTypeGuard';
 
-export type ClerkApiErrorMeta = Record<string, unknown>;
+export type ClerkAPIErrorMeta = Record<string, unknown>;
 
 /**
  * This error contains the specific error message, code, and any additional metadata that was returned by the Clerk API.
  */
-export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements ClerkAPIErrorInterface {
+export class ClerkAPIError<Meta extends ClerkAPIErrorMeta = any> implements ClerkAPIErrorInterface {
+  // TODO: Update kind to match class name in Core 3
   static kind = 'ClerkApiError';
   readonly code: string;
   readonly message: string;
@@ -36,6 +37,6 @@ export class ClerkAPIError<Meta extends ClerkApiErrorMeta = any> implements Cler
 }
 
 /**
- * Type guard to check if a value is a ClerkApiError instance.
+ * Type guard to check if a value is a ClerkAPIError instance.
  */
-export const isClerkApiError = createErrorTypeGuard(ClerkAPIError);
+export const isClerkAPIError = createErrorTypeGuard(ClerkAPIError);
