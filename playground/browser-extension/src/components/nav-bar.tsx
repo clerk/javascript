@@ -1,11 +1,11 @@
-import { SignedIn, SignedOut, UserButton } from "@clerk/chrome-extension"
+import { Show, UserButton } from "@clerk/chrome-extension"
 import { Link } from "react-router-dom"
 import { Button } from "./ui/button"
 
 export const NavBar = () => {
   return (
     <>
-      <SignedIn>
+      <Show when="signedIn">
         <div className="plasmo-flex plasmo-flex-row plasmo-w-full plasmo-items-center plasmo-bg-gray-800 plasmo-border-t plasmo-border-t-gray-600 plasmo-py-2">
           <Button variant="link" asChild>
             <Link to="/" className="plasmo-mx-2">Home</Link>
@@ -20,8 +20,8 @@ export const NavBar = () => {
             <UserButton />
           </div>
         </div>
-      </SignedIn>
-      <SignedOut>
+      </Show>
+      <Show when="signedOut">
         <div className="plasmo-flex plasmo-flex-row plasmo-w-full plasmo-items-center plasmo-bg-gray-800 plasmo-border-t plasmo-border-t-gray-600 plasmo-py-2">
           <Button variant="link" asChild>
             <Link to="/">Home</Link>
@@ -37,7 +37,7 @@ export const NavBar = () => {
             </Button>
           </div>
         </div>
-      </SignedOut>
+      </Show>
 
     </>
   )

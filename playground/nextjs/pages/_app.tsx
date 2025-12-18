@@ -4,8 +4,7 @@ import '../styles/globals.css';
 import {
   ClerkProvider,
   OrganizationSwitcher,
-  SignedIn,
-  SignedOut,
+  Show,
   SignInButton,
   SignOutButton,
   UserButton,
@@ -156,14 +155,14 @@ const AppBar = (props: AppBarProps) => {
       <UserButton />
 
       {/* @ts-ignore */}
-      <SignedIn>
+      <Show when='signedIn'>
         <SignOutButton />
-      </SignedIn>
+      </Show>
 
       {/* @ts-ignore */}
-      <SignedOut>
+      <Show when='signedOut'>
         <SignInButton mode={'modal'} />
-      </SignedOut>
+      </Show>
     </div>
   );
 };

@@ -1,17 +1,17 @@
 ---
-import { SignedIn, __experimental_CheckoutButton as CheckoutButton } from '@clerk/astro/components';
+import { Show, __experimental_CheckoutButton as CheckoutButton } from '@clerk/astro/components';
 import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="Checkout Button">
   <main>
-    <SignedIn>
+    <Show when='signedIn'>
       <CheckoutButton
         planId='cplan_2wMjqdlza0hTJc4HLCoBwAiExhF'
         planPeriod='month'
       >
         Checkout Now
       </CheckoutButton>
-    </SignedIn>
+    </Show>
   </main>
 </Layout>

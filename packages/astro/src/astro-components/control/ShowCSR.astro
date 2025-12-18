@@ -1,0 +1,90 @@
+---
+import type { ShowProps } from '../../types';
+
+type Props = Omit<ShowProps, 'condition'> & {
+  class?: string;
+};
+
+const { when, class: className } = Astro.props;
+
+// For CSR, we need to serialize the when prop
+// String values ('signedIn', 'signedOut') are used as-is
+// Object values are serialized as data attributes
+const isStringWhen = typeof when === 'string';
+const whenCondition = isStringWhen ? when : null;
+const role = !isStringWhen && typeof when === 'object' ? when.role : undefined;
+const permission = !isStringWhen && typeof when === 'object' ? when.permission : undefined;
+const feature = !isStringWhen && typeof when === 'object' ? when.feature : undefined;
+const plan = !isStringWhen && typeof when === 'object' ? when.plan : undefined;
+---
+
+<clerk-show
+  data-when={whenCondition}
+  data-role={role}
+  data-permission={permission}
+  data-feature={feature}
+  data-plan={plan}
+  class={className}
+>
+  <div
+    hidden
+    data-clerk-control-slot-default
+  >
+    <slot />
+  </div>
+  <div
+    hidden
+    data-clerk-control-slot-fallback
+  >
+    <slot name='fallback' />
+  </div>
+</clerk-show>
+
+<script>
+  import { $sessionStore } from '@clerk/astro/client';
+  import { type AuthState, BaseClerkControlElement } from './BaseClerkControlElement';
+  import type { CheckAuthorization } from '@clerk/shared/types';
+
+  class ClerkShow extends BaseClerkControlElement {
+    private defaultSlot: HTMLDivElement | null = null;
+    private fallbackSlot: HTMLDivElement | null = null;
+
+    protected onAuthStateChange(state: AuthState): void {
+      this.defaultSlot = this.querySelector('[data-clerk-control-slot-default]');
+      this.fallbackSlot = this.querySelector('[data-clerk-control-slot-fallback]');
+
+      const has = $sessionStore.get()?.checkAuthorization;
+
+      const when = this.dataset.when;
+      const role = this.dataset.role;
+      const permission = this.dataset.permission;
+      const feature = this.dataset.feature;
+      const plan = this.dataset.plan;
+
+      let showContent = false;
+
+      if (when === 'signedIn') {
+        showContent = !!state.userId;
+      } else if (when === 'signedOut') {
+        showContent = !state.userId;
+      } else if (role || permission || feature || plan) {
+        // Authorization check
+        showContent =
+          !!state.userId && !!has?.({ role, permission, feature, plan } as Parameters<CheckAuthorization>[0]);
+      } else {
+        // Default to signed in check
+        showContent = !!state.userId;
+      }
+
+      if (this.defaultSlot) {
+        showContent ? this.defaultSlot.removeAttribute('hidden') : this.defaultSlot.setAttribute('hidden', '');
+      }
+
+      if (this.fallbackSlot) {
+        showContent ? this.fallbackSlot.setAttribute('hidden', '') : this.fallbackSlot.removeAttribute('hidden');
+      }
+    }
+  }
+
+  customElements.define('clerk-show', ClerkShow);
+</script>

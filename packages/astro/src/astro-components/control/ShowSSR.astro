@@ -1,0 +1,30 @@
+---
+import type { ShowProps } from '../../types';
+
+type Props = ShowProps;
+
+const { has, userId } = Astro.locals.auth();
+const { when } = Astro.props;
+
+const showContent = (() => {
+  // String conditions
+  if (when === 'signedIn') return !!userId;
+  if (when === 'signedOut') return !userId;
+
+  // Function condition
+  if (typeof when === 'function') return !!userId && when(has);
+
+  // Object-based conditions (role, permission, feature, plan)
+  if (typeof when === 'object' && when !== null) {
+    if (!userId) return false;
+    return has(when);
+  }
+
+  // Default: show if signed in
+  return !!userId;
+})();
+
+const hasShowFallback = Astro.slots.has('show-fallback');
+---
+
+{showContent ? <slot /> : hasShowFallback ? <slot name='show-fallback' /> : <slot name='fallback' />}

@@ -1,11 +1,11 @@
-import { SignedIn } from '@clerk/react';
+import { Show } from '@clerk/react';
 
 export default function Page() {
   return (
     <div>
-      <SignedIn>
+      <Show when='signedIn'>
         <div data-testid='protected'>Protected</div>
-      </SignedIn>
+      </Show>
     </div>
   );
 }

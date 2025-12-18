@@ -1,4 +1,4 @@
-import { SignedIn, UserProfile } from '@clerk/nextjs';
+import { Show, UserProfile } from '@clerk/nextjs';
 import { getAuth } from '@clerk/nextjs/server';
 import type { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
@@ -14,9 +14,9 @@ const UserProfilePage: NextPage = (props: any) => {
     <div>
       <h2>/pages/user</h2>
       <pre>{props.message}</pre>
-      <SignedIn>
+      <Show when='signedIn'>
         <h2>SignedIn</h2>
-      </SignedIn>
+      </Show>
       <UserProfile />
     </div>
   );

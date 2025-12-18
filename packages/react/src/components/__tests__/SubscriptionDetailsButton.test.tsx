@@ -46,7 +46,7 @@ describe('SubscriptionDetailsButton', () => {
 
       // Expect the component to throw an error
       expect(() => render(<SubscriptionDetailsButton />)).toThrow(
-        'Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<SignedIn />` component.',
+        'Ensure that `<SubscriptionDetailsButton />` is rendered only when the user is signed in (wrap with `<Show when="signedIn">` or guard with `useAuth()`).',
       );
     });
 
