@@ -38,7 +38,7 @@ export const defaultDerivedInitialState = {
   userId: undefined,
 };
 
-export function useAuthState(): AuthStateValue {
+export function useAuthBase(): AuthStateValue {
   const clerk = useClerkInstanceContext();
   const initialState = useInitialStateContext();
   const getInitialState = useCallback(() => initialState, [initialState]);
