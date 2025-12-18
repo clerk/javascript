@@ -355,8 +355,14 @@ describe('TaskChooseOrganization', () => {
   });
 
   describe('with organization creation defaults', () => {
-    it.todo('displays warning when organization already exists for user email domain');
+    describe('when enabled on environment', () => {
+      it.todo('displays warning when organization already exists for user email domain');
 
-    it.todo('prefills create organization form with defaults');
+      it.todo('prefills create organization form with defaults');
+    });
+
+    describe('when disabled on environment', () => {
+      it.todo('does not fetch for creation defaults');
+    });
   });
 });

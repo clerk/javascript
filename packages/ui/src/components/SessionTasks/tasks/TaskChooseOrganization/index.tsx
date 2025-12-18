@@ -1,7 +1,9 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
+import type { OrganizationCreationDefaultsResource } from '@clerk/shared/types';
 import { useState } from 'react';
 
-import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
+import { useFetch } from '@/hooks';
+import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -16,6 +18,14 @@ import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 const TaskChooseOrganizationInternal = () => {
   const { user } = useUser();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
+  const { environment } = useEnvironment();
+  const organizationCreationDefaults = useFetch(
+    environment.organizationSettings.organizationCreationDefaults.enabled
+      ? user?.getOrganizationCreationDefaults
+      : undefined,
+    'organization-creation-defaults',
+    { staleTime: Infinity },
+  );
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
@@ -47,7 +57,10 @@ const TaskChooseOrganizationInternal = () => {
                 />
               </Flex>
             ) : (
-              <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
+              <TaskChooseOrganizationFlows
+                initialFlow={hasExistingResources ? 'choose' : 'create'}
+                organizationCreationDefaults={organizationCreationDefaults.data}
+              />
             )}
           </Card.Content>
 
@@ -103,6 +116,7 @@ const TaskChooseOrganizationCardFooter = () => {
 
 type TaskChooseOrganizationFlowsProps = {
   initialFlow: 'create' | 'choose';
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource;
 };
 
 const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrganizationFlowsProps) => {
@@ -112,6 +126,7 @@ const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrga
     return (
       <CreateOrganizationScreen
         onCancel={props.initialFlow === 'choose' ? () => setCurrentFlow('choose') : undefined}
+        organizationCreationDefaults={props.organizationCreationDefaults}
       />
     );
   }

@@ -7,6 +7,7 @@ import type { ExternalAccountResource } from './externalAccount';
 import type { ImageResource } from './image';
 import type { UserJSON } from './json';
 import type { OAuthScope } from './oauth';
+import type { OrganizationCreationDefaultsResource } from './organizationCreationDefaults';
 import type { OrganizationInvitationStatus } from './organizationInvitation';
 import type { OrganizationMembershipResource } from './organizationMembership';
 import type { OrganizationSuggestionResource, OrganizationSuggestionStatus } from './organizationSuggestion';
@@ -115,6 +116,7 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
   getOrganizationSuggestions: (
     params?: GetUserOrganizationSuggestionsParams,
   ) => Promise<ClerkPaginatedResponse<OrganizationSuggestionResource>>;
+  getOrganizationCreationDefaults: () => Promise<OrganizationCreationDefaultsResource>;
   leaveOrganization: (organizationId: string) => Promise<DeletedObjectResource>;
   createTOTP: () => Promise<TOTPResource>;
   verifyTOTP: (params: VerifyTOTPParams) => Promise<TOTPResource>;

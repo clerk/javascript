@@ -1,5 +1,5 @@
 import { useOrganizationList } from '@clerk/shared/react';
-import type { CreateOrganizationParams } from '@clerk/shared/types';
+import type { CreateOrganizationParams, OrganizationCreationDefaultsResource } from '@clerk/shared/types';
 import { useState } from 'react';
 
 import { useEnvironment } from '@/ui/contexts';
@@ -20,24 +20,9 @@ import { OrganizationProfileAvatarUploader } from '../../../OrganizationProfile/
 import { organizationListParams } from '../../../OrganizationSwitcher/utils';
 import { OrganizationCreationDefaultsAlert } from './OrganizationCreationDefaultsAlert';
 
-// TODO: Replace with actual API call to OrganizationCreationDefaults.retrieve()
-// TODO - Only replace if .organization_settings.organization_creation_defaults.enabled
-const organizationCreationDefaults = {
-  advisory: {
-    type: 'existing_org_with_domain' as const,
-    severity: 'warning' as const,
-  },
-  form: {
-    name: '',
-    slug: '',
-    logo: null,
-  },
-  pathRoot: '',
-  reload: () => Promise.resolve({} as any),
-};
-
 type CreateOrganizationScreenProps = {
   onCancel?: () => void;
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource;
 };
 
 export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) => {
@@ -50,12 +35,12 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   const { organizationSettings } = useEnvironment();
   const [file, setFile] = useState<File | null>();
 
-  const nameField = useFormControl('name', '', {
+  const nameField = useFormControl('name', props.organizationCreationDefaults?.form.name ?? '', {
     type: 'text',
     label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__name'),
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__name'),
   });
-  const slugField = useFormControl('slug', '', {
+  const slugField = useFormControl('slug', props.organizationCreationDefaults?.form.slug ?? '', {
     type: 'text',
     label: localizationKeys('taskChooseOrganization.createOrganization.formFieldLabel__slug'),
     placeholder: localizationKeys('taskChooseOrganization.createOrganization.formFieldInputPlaceholder__slug'),
@@ -81,6 +66,11 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       if (file) {
         await organization.setLogo({ file });
+      } else if (defaultLogoUrl) {
+        const response = await fetch(defaultLogoUrl);
+        const blob = await response.blob();
+        const logoFile = new File([blob], 'logo', { type: blob.type });
+        await organization.setLogo({ file: logoFile });
       }
 
       await setActive({
@@ -109,6 +99,7 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
   };
 
   const isSubmitButtonDisabled = !nameField.value || !isLoaded;
+  const defaultLogoUrl = file === undefined ? props.organizationCreationDefaults?.form.logo : undefined;
 
   return (
     <>
@@ -122,11 +113,11 @@ export const CreateOrganizationScreen = (props: CreateOrganizationScreenProps) =
 
       <FormContainer sx={t => ({ padding: `${t.space.$none} ${t.space.$10} ${t.space.$8}` })}>
         <Form.Root onSubmit={onSubmit}>
-          <OrganizationCreationDefaultsAlert organizationCreationDefaults={organizationCreationDefaults} />
+          <OrganizationCreationDefaultsAlert organizationCreationDefaults={props.organizationCreationDefaults} />
           <OrganizationProfileAvatarUploader
-            organization={{ name: nameField.value }}
+            organization={{ name: nameField.value, imageUrl: defaultLogoUrl ?? undefined }}
             onAvatarChange={async file => await setFile(file)}
-            onAvatarRemove={file ? onAvatarRemove : null}
+            onAvatarRemove={file || defaultLogoUrl ? onAvatarRemove : null}
             avatarPreviewPlaceholder={
               <IconButton
                 variant='ghost'
