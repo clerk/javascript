@@ -16,6 +16,8 @@ import { APIKeySettings } from './APIKeySettings';
 import { AuthConfig, BaseResource, CommerceSettings, DisplayConfig, ProtectConfig, UserSettings } from './internal';
 import { OrganizationSettings } from './OrganizationSettings';
 
+// TODO -> Update with new flag for default orgs
+// Use it to conditionally trigger query
 export class Environment extends BaseResource implements EnvironmentResource {
   private static instance: Environment;
 
