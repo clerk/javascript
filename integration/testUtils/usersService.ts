@@ -213,7 +213,7 @@ export const createUserService = (clerkClient: ClerkClient) => {
       } satisfies FakeAPIKey;
     },
     setPasswordCompromised: async (userId: string) => {
-      await clerkClient.users.__experimental_setPasswordCompromised(userId);
+      await clerkClient.users.setPasswordCompromised(userId);
     },
   };
 
