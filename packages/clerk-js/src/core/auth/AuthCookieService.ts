@@ -41,11 +41,11 @@ import { SessionCookiePoller } from './SessionCookiePoller';
  *   - handleUnauthenticatedDevBrowser(): resets dev browser in case of invalid dev browser
  */
 export class AuthCookieService {
-  private poller: SessionCookiePoller | null = null;
-  private clientUat: ClientUatCookieHandler;
-  private sessionCookie: SessionCookieHandler;
   private activeCookie: ReturnType<typeof createCookieHandler>;
+  private clientUat: ClientUatCookieHandler;
   private devBrowser: DevBrowser;
+  private poller: SessionCookiePoller | null = null;
+  private sessionCookie: SessionCookieHandler;
 
   public static async create(
     clerk: Clerk,
@@ -77,14 +77,14 @@ export class AuthCookieService {
     this.refreshTokenOnFocus();
     this.startPollingForToken();
 
-    this.clientUat = createClientUatCookie(cookieSuffix);
-    this.sessionCookie = createSessionCookie(cookieSuffix);
     this.activeCookie = createActiveContextCookie();
+    this.clientUat = createClientUatCookie(cookieSuffix);
     this.devBrowser = createDevBrowser({
-      frontendApi: clerk.frontendApi,
-      fapiClient,
       cookieSuffix,
+      fapiClient,
+      frontendApi: clerk.frontendApi,
     });
+    this.sessionCookie = createSessionCookie(cookieSuffix);
   }
 
   public async setup() {
