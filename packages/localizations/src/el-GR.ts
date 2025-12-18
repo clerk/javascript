@@ -751,6 +751,10 @@ export const elGR: LocalizationResource = {
       subtitle: undefined,
       title: 'Aυθεντικοποίηση δύο βημάτων',
     },
+    web3Solana: {
+      subtitle: 'Επιλέξτε ένα πορτοφόλι παρακάτω για να συνδεθείτε',
+      title: 'Σύνδεση με Solana',
+    },
   },
   signInEnterPasswordTitle: 'Εισαγωγή κωδικού πρόσβασης',
   signUp: {
@@ -842,31 +846,39 @@ export const elGR: LocalizationResource = {
       title: 'Δημιουργήστε τον λογαριασμό σας',
       titleCombined: 'Δημιουργήστε τον λογαριασμό σας',
     },
+    web3Solana: {
+      subtitle: 'Επιλέξτε ένα πορτοφόλι παρακάτω για να εγγραφείτε',
+      title: 'Εγγραφή με Solana',
+    },
   },
   socialButtonsBlockButton: 'Συνέχεια με {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Δημιουργία νέου οργανισμού',
+      action__invitationAccept: 'Συμμετοχή',
+      action__suggestionsAccept: 'Αίτημα συμμετοχής',
+      subtitle: 'Συμμετάσχετε σε έναν υπάρχοντα οργανισμό ή δημιουργήστε νέο',
+      suggestionsAcceptedLabel: 'Σε αναμονή έγκρισης',
+      title: 'Επιλέξτε οργανισμό',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Ακύρωση',
+      formButtonSubmit: 'Συνέχεια',
+      formFieldInputPlaceholder__name: 'Ο οργανισμός μου',
+      formFieldInputPlaceholder__slug: 'o-organismos-mou',
+      formFieldLabel__name: 'Όνομα',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Εισάγετε τα στοιχεία του οργανισμού σας για να συνεχίσετε',
+      title: 'Ρυθμίστε τον οργανισμό σας',
+    },
+    organizationCreationDisabled: {
+      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για πρόσκληση.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Αποσύνδεση',
+      actionText: 'Συνδεδεμένος ως {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -948,6 +960,9 @@ export const elGR: LocalizationResource = {
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
     session_exists: 'Έχετε ήδη συνδεθεί.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Απορρίψατε το αίτημα υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
+    web3_solana_signature_generation_failed:
+      'Παρουσιάστηκε σφάλμα κατά τη δημιουργία της υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
     zxcvbn: {
       couldBeStronger:
         'Ο κωδικός πρόσβασής σας είναι αρκετός, αλλά θα μπορούσε να είναι πιο ισχυρός. Δοκιμάστε να προσθέσετε περισσότερους χαρακτήρες.',
@@ -1323,6 +1338,10 @@ export const elGR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Πορτοφόλια Web3',
         title: 'Πορτοφόλια Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Επιλέξτε ένα πορτοφόλι Solana για σύνδεση με τον λογαριασμό σας.',
+          title: 'Προσθήκη πορτοφολιού Solana',
+        },
       },
     },
     usernamePage: {
@@ -1357,5 +1376,11 @@ export const elGR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Σύνδεση με {{walletName}}',
+    continue: 'Συνέχεια με {{walletName}}',
+    noneAvailable:
+      'Δεν εντοπίστηκαν πορτοφόλια Solana Web3. Εγκαταστήστε ένα {{ solanaWalletsLink || link("wallet extension") }} με υποστήριξη Web3.',
   },
 } as const;

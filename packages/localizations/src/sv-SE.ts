@@ -751,6 +751,10 @@ export const svSE: LocalizationResource = {
       subtitle: 'För att fortsätta, vänligen ange verifieringskoden som genereras av din autentiseringsapp',
       title: 'Tvåstegsverifiering',
     },
+    web3Solana: {
+      subtitle: 'Välj en plånbok nedan för att logga in',
+      title: 'Logga in med Solana',
+    },
   },
   signInEnterPasswordTitle: 'Ange ditt lösenord',
   signUp: {
@@ -843,31 +847,39 @@ export const svSE: LocalizationResource = {
       title: 'Skapa ditt konto',
       titleCombined: 'Skapa ditt konto',
     },
+    web3Solana: {
+      subtitle: 'Välj en plånbok nedan för att registrera dig',
+      title: 'Registrera dig med Solana',
+    },
   },
   socialButtonsBlockButton: 'Fortsätt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Skapa ny organisation',
+      action__invitationAccept: 'Gå med',
+      action__suggestionsAccept: 'Begär att gå med',
+      subtitle: 'Gå med i en befintlig organisation eller skapa en ny',
+      suggestionsAcceptedLabel: 'Väntar på godkännande',
+      title: 'Välj en organisation',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Avbryt',
+      formButtonSubmit: 'Fortsätt',
+      formFieldInputPlaceholder__name: 'Min organisation',
+      formFieldInputPlaceholder__slug: 'min-organisation',
+      formFieldLabel__name: 'Namn',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Ange din organisationsinformation för att fortsätta',
+      title: 'Konfigurera din organisation',
+    },
+    organizationCreationDisabled: {
+      title: 'Du måste tillhöra en organisation',
+      subtitle: 'Kontakta din organisationsadministratör för en inbjudan.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Logga ut',
+      actionText: 'Inloggad som {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -947,6 +959,9 @@ export const svSE: LocalizationResource = {
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     session_exists: 'Du är redan inloggad.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Du avvisade signaturbegäran. Försök igen för att fortsätta.',
+    web3_solana_signature_generation_failed:
+      'Ett fel uppstod när signaturen skulle genereras. Försök igen för att fortsätta.',
     zxcvbn: {
       couldBeStronger: 'Ditt lösenord fungerar, men kunde vara starkare. Försök lägga till fler tecken.',
       goodPassword: 'Ditt lösenord uppfyller alla nödvändiga krav.',
@@ -1315,6 +1330,10 @@ export const svSE: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 plånböcker',
         title: 'Web3 plånböcker',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Välj en Solana-plånbok för att ansluta den till ditt konto.',
+          title: 'Lägg till en Solana-plånbok',
+        },
       },
     },
     usernamePage: {
@@ -1349,5 +1368,11 @@ export const svSE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Anslut med {{walletName}}',
+    continue: 'Fortsätt med {{walletName}}',
+    noneAvailable:
+      'Inga Solana Web3-plånböcker upptäcktes. Installera en Web3-stödd {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

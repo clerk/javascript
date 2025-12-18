@@ -741,6 +741,10 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Аутентификатор қолданбасындағы кодты енгізіңіз',
       title: 'Екі қадамды растау',
     },
+    web3Solana: {
+      subtitle: 'Кіру үшін төменде әмиянды таңдаңыз',
+      title: 'Solana арқылы кіру',
+    },
   },
   signInEnterPasswordTitle: 'Құпия сөзді енгізіңіз',
   signUp: {
@@ -832,31 +836,39 @@ export const kkKZ: LocalizationResource = {
       title: 'Есептік жазбаны құру',
       titleCombined: 'Есептік жазбаны құру',
     },
+    web3Solana: {
+      subtitle: 'Тіркелу үшін төменде әмиянды таңдаңыз',
+      title: 'Solana арқылы тіркелу',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} арқылы жалғастыру',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Жаңа ұйым құру',
+      action__invitationAccept: 'Қосылу',
+      action__suggestionsAccept: 'Қосылуды сұрау',
+      subtitle: 'Мәні бар ұйымға қосылыңыз немесе жаңасын құрыңыз',
+      suggestionsAcceptedLabel: 'Мақұлдау күтілуде',
+      title: 'Ұйым таңдаңыз',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Болдырмау',
+      formButtonSubmit: 'Жалғастыру',
+      formFieldInputPlaceholder__name: 'Менің ұйымым',
+      formFieldInputPlaceholder__slug: 'menin-uiyym',
+      formFieldLabel__name: 'Атауы',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Жалғастыру үшін ұйымыңыздың мәліметтерін енгізіңіз',
+      title: 'Ұйымыңызды баптаңыз',
+    },
+    organizationCreationDisabled: {
+      title: 'Сіз ұйымға тиесілі болуыңыз керек',
+      subtitle: 'Шақыру алу үшін ұйымыңыздың әкімшісіне хабарласыңыз.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Шығу',
+      actionText: '{{identifier}} ретінде кірді',
     },
   },
   taskResetPassword: {
@@ -934,6 +946,9 @@ export const kkKZ: LocalizationResource = {
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 Wallet кеңейтуі табылмады. Орнатыңыз.',
+    web3_signature_request_rejected: 'Сіз қолтаңба сұрауын қабылдамадыңыз. Жалғастыру үшін қайтадан көріңіз.',
+    web3_solana_signature_generation_failed:
+      'Қолтаңбаны жасау кезінде қате орын алды. Жалғастыру үшін қайтадан көріңіз.',
     zxcvbn: {
       couldBeStronger: 'Құпия сөз әлсіз. Таңбалар санын көбейтіңіз.',
       goodPassword: 'Құпия сөз талаптарға сай.',
@@ -1292,6 +1307,10 @@ export const kkKZ: LocalizationResource = {
         detailsAction__nonPrimary: 'Негізгі ретінде орнату',
         primaryButton: 'Әптәпқалманы қосу',
         title: 'Web3 әптәпқалмалары',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Есептік жазбаңызға қосу үшін Solana әмиянын таңдаңыз.',
+          title: 'Solana әмиянын қосу',
+        },
       },
     },
     usernamePage: {
@@ -1326,5 +1345,11 @@ export const kkKZ: LocalizationResource = {
       subtitle: 'Даяр болған кезде хабарласамыз',
       title: 'Күту тізіміне қосылғаныңыз үшін рақмет!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} арқылы қосылу',
+    continue: '{{walletName}} арқылы жалғастыру',
+    noneAvailable:
+      'Solana Web3 әмияндары табылмады. Web3 қолдайтын {{ solanaWalletsLink || link("wallet extension") }} орнатыңыз.',
   },
 } as const;

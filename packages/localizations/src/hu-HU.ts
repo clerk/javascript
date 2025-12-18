@@ -749,6 +749,10 @@ export const huHU: LocalizationResource = {
       subtitle: 'A folytatáshoz, kérlek írd be a visszaigazoló kódot, amit a hitelesítő app készített.',
       title: 'Két lépécsős azonosítás',
     },
+    web3Solana: {
+      subtitle: 'Válasszon alább egy tárcát a bejelentkezéshez',
+      title: 'Bejelentkezés Solanával',
+    },
   },
   signInEnterPasswordTitle: 'Írd be a jelszavad',
   signUp: {
@@ -839,31 +843,39 @@ export const huHU: LocalizationResource = {
       title: 'Fiók létrehozása',
       titleCombined: 'Fiók létrehozása',
     },
+    web3Solana: {
+      subtitle: 'Válasszon alább egy tárcát a regisztrációhoz',
+      title: 'Regisztráció Solanával',
+    },
   },
   socialButtonsBlockButton: 'Folytatás {{provider|titleize}} segítségével',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Szervezet létrehozása',
+      action__invitationAccept: 'Csatlakozás',
+      action__suggestionsAccept: 'Csatlakozás kérése',
+      subtitle: 'Csatlakozz egy meglévő szervezethez vagy hozz létre újat',
+      suggestionsAcceptedLabel: 'Elfogadásra vár',
+      title: 'Válassz szervezetet',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Mégse',
+      formButtonSubmit: 'Folytatás',
+      formFieldInputPlaceholder__name: 'Az én szervezetem',
+      formFieldInputPlaceholder__slug: 'az-en-szervezetem',
+      formFieldLabel__name: 'Név',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Adja meg szervezete adatait a folytatáshoz',
+      title: 'Állítsa be szervezetét',
+    },
+    organizationCreationDisabled: {
+      title: 'Egy szervezethez kell tartoznia',
+      subtitle: 'Kérjen meghívót a szervezet adminisztrátorától.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Kijelentkezés',
+      actionText: 'Bejelentkezve: {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -945,6 +957,9 @@ export const huHU: LocalizationResource = {
     phone_number_exists: 'Ez a telefonszám már foglalt. Kérlek próbálj meg egy másikat.',
     session_exists: 'Már be vagy jelentkezve.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Elutasította az aláírási kérelmet. Kérjük, próbálja meg újra a folytatáshoz.',
+    web3_solana_signature_generation_failed:
+      'Hiba történt az aláírás létrehozása közben. Kérjük, próbálja meg újra a folytatáshoz.',
     zxcvbn: {
       couldBeStronger: 'A jelszavad, jó, de lehetne erősebb. Adj hozzá több karaktert.',
       goodPassword: 'A jelszavad megfelel az elvárásoknak.',
@@ -1316,6 +1331,10 @@ export const huHU: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 tárcák',
         title: 'Web3 tárcák',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Válasszon egy Solana tárcát a fiókjához való csatlakozáshoz.',
+          title: 'Solana tárca hozzáadása',
+        },
       },
     },
     usernamePage: {
@@ -1350,5 +1369,11 @@ export const huHU: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Csatlakozás: {{walletName}}',
+    continue: 'Folytatás: {{walletName}}',
+    noneAvailable:
+      'Nem észlelhető Solana Web3 tárca. Kérjük, telepítsen egy Web3-kompatibilis {{ solanaWalletsLink || link("wallet extension") }}-t.',
   },
 } as const;

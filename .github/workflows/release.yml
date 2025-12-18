@@ -51,15 +51,16 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
-          commit: "ci(repo): Version packages (Core 3)"
-          title: "ci(repo): Version packages (Core 3)"
+          commit: 'ci(repo): Version packages (Core 3)'
+          title: 'ci(repo): Version packages (Core 3)'
           publish: pnpm turbo build $TURBO_ARGS --force && pnpm release
           # Workaround for https://github.com/changesets/changesets/issues/421
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.CLERK_COOKIE_PAT }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          HUSKY: '0'
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
 
       - name: Trigger workflows on related repos
@@ -138,12 +139,12 @@ jobs:
         with:
           fetch-depth: 1
           fetch-tags: false
-          filter: "blob:none"
+          filter: 'blob:none'
           show-progress: false
 
       - name: Cache node_modules (Node v${{ matrix.version }})
         uses: ./.github/actions/init
         with:
           node-version: ${{ matrix.version }}
-          turbo-team: ""
-          turbo-token: ""
+          turbo-team: ''
+          turbo-token: ''

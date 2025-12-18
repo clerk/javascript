@@ -749,6 +749,10 @@ export const nlNL: LocalizationResource = {
       subtitle: '',
       title: 'Tweestapsverificatie',
     },
+    web3Solana: {
+      subtitle: 'Selecteer hieronder een wallet om in te loggen',
+      title: 'Inloggen met Solana',
+    },
   },
   signInEnterPasswordTitle: 'Vul je wachtwoord in',
   signUp: {
@@ -840,31 +844,39 @@ export const nlNL: LocalizationResource = {
       title: 'Maak je account aan',
       titleCombined: 'Maak je account aan',
     },
+    web3Solana: {
+      subtitle: 'Selecteer hieronder een wallet om je te registreren',
+      title: 'Registreren met Solana',
+    },
   },
   socialButtonsBlockButton: 'Ga verder met {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: 'Ga verder met {{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Nieuwe organisatie aanmaken',
+      action__invitationAccept: 'Deelnemen',
+      action__suggestionsAccept: 'Verzoek om deel te nemen',
+      subtitle: 'Deelnemen aan een bestaande organisatie of een nieuwe aanmaken',
+      suggestionsAcceptedLabel: 'Wachten op goedkeuring',
+      title: 'Kies een organisatie',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Annuleren',
+      formButtonSubmit: 'Doorgaan',
+      formFieldInputPlaceholder__name: 'Mijn organisatie',
+      formFieldInputPlaceholder__slug: 'mijn-organisatie',
+      formFieldLabel__name: 'Naam',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Voer de gegevens van je organisatie in om door te gaan',
+      title: 'Stel je organisatie in',
+    },
+    organizationCreationDisabled: {
+      title: 'Je moet tot een organisatie behoren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Uitloggen',
+      actionText: 'Ingelogd als {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -944,6 +956,10 @@ export const nlNL: LocalizationResource = {
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     session_exists: 'Je bent al ingelogd.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected:
+      'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',
+    web3_solana_signature_generation_failed:
+      'Er is een fout opgetreden bij het genereren van de handtekening. Probeer het opnieuw om verder te gaan.',
     zxcvbn: {
       couldBeStronger: 'Je wachtwoord werkt, maar kan sterker zijn. Probeer meer tekens toe te voegen.',
       goodPassword: 'Je wachtwoord voldoet aan alle vereisten.',
@@ -1311,6 +1327,10 @@ export const nlNL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 portefeuilles',
         title: 'Web3 portefeuilles',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Selecteer een Solana-wallet om aan je account te koppelen.',
+          title: 'Solana-wallet toevoegen',
+        },
       },
     },
     usernamePage: {
@@ -1345,5 +1365,11 @@ export const nlNL: LocalizationResource = {
       subtitle: 'Je ontvangt een bericht zodra er ruimte beschikbaar is.',
       title: 'Succes!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Verbinden met {{walletName}}',
+    continue: 'Doorgaan met {{walletName}}',
+    noneAvailable:
+      'Geen Solana Web3-wallets gedetecteerd. Installeer een Web3-ondersteunde {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

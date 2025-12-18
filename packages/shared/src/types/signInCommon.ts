@@ -192,3 +192,7 @@ export type SignInStrategy =
   | BackupCodeStrategy
   | OAuthStrategy
   | EnterpriseSSOStrategy;
+
+export interface SignInAuthenticateWithSolanaParams {
+  walletName: string;
+}

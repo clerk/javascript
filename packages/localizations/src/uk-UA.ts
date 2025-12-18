@@ -747,6 +747,10 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: 'Двоетапна перевірка',
     },
+    web3Solana: {
+      subtitle: 'Виберіть гаманець нижче, щоб увійти',
+      title: 'Увійти через Solana',
+    },
   },
   signInEnterPasswordTitle: 'Введіть Ваш пароль',
   signUp: {
@@ -837,31 +841,39 @@ export const ukUA: LocalizationResource = {
       title: 'Створіть Ваш акаунт',
       titleCombined: 'Створіть Ваш акаунт',
     },
+    web3Solana: {
+      subtitle: 'Виберіть гаманець нижче, щоб зареєструватися',
+      title: 'Зареєструватися через Solana',
+    },
   },
   socialButtonsBlockButton: 'Продовжити за допомогою {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Створити нову організацію',
+      action__invitationAccept: 'Приєднатися',
+      action__suggestionsAccept: 'Запросити приєднання',
+      subtitle: 'Приєднайтеся до існуючої організації або створіть нову',
+      suggestionsAcceptedLabel: 'Очікує схвалення',
+      title: 'Виберіть організацію',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Скасувати',
+      formButtonSubmit: 'Продовжити',
+      formFieldInputPlaceholder__name: 'Моя організація',
+      formFieldInputPlaceholder__slug: 'moya-organizatsiya',
+      formFieldLabel__name: 'Назва',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Введіть дані вашої організації для продовження',
+      title: 'Налаштуйте вашу організацію',
+    },
+    organizationCreationDisabled: {
+      title: 'Ви повинні належати до організації',
+      subtitle: 'Зверніться до адміністратора вашої організації для отримання запрошення.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Вийти',
+      actionText: 'Увійшли як {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -942,6 +954,9 @@ export const ukUA: LocalizationResource = {
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     session_exists: 'Ви вже увійшли в систему.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Ви відхилили запит на підпис. Будь ласка, спробуйте ще раз, щоб продовжити.',
+    web3_solana_signature_generation_failed:
+      'Під час створення підпису сталася помилка. Будь ласка, спробуйте ще раз, щоб продовжити.',
     zxcvbn: {
       couldBeStronger: 'Ваш пароль підходить, але міг би бути надійнішим. Спробуйте додати більше символів.',
       goodPassword: 'Хороша робота. Це відмінний пароль.',
@@ -1311,6 +1326,10 @@ export const ukUA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 гаманці',
         title: 'Web3 гаманці',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Виберіть гаманець Solana, щоб підключити його до свого облікового запису.',
+          title: 'Додати гаманець Solana',
+        },
       },
     },
     usernamePage: {
@@ -1345,5 +1364,11 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Підключитися через {{walletName}}',
+    continue: 'Продовжити через {{walletName}}',
+    noneAvailable:
+      'Гаманці Solana Web3 не виявлено. Установіть {{ solanaWalletsLink || link("wallet extension") }} з підтримкою Web3.',
   },
 } as const;

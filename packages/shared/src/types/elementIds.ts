@@ -25,7 +25,8 @@ export type FieldId =
   | 'apiKeyDescription'
   | 'apiKeyExpirationDate'
   | 'apiKeyRevokeConfirmation'
-  | 'apiKeySecret';
+  | 'apiKeySecret'
+  | 'web3WalletName';
 export type ProfileSectionId =
   | 'profile'
   | 'username'

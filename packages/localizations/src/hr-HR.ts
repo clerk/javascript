@@ -750,6 +750,10 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Za nastavak, unesite verifikacijski kod generiran vašom aplikacijom za autentifikaciju',
       title: 'Dvostupanjska verifikacija',
     },
+    web3Solana: {
+      subtitle: 'Odaberite novčanik u nastavku za prijavu',
+      title: 'Prijava putem Solane',
+    },
   },
   signInEnterPasswordTitle: 'Unesite svoju lozinku',
   signUp: {
@@ -842,31 +846,39 @@ export const hrHR: LocalizationResource = {
       title: 'Kreirajte svoj račun',
       titleCombined: 'Kreirajte svoj račun',
     },
+    web3Solana: {
+      subtitle: 'Odaberite novčanik u nastavku za registraciju',
+      title: 'Registracija putem Solane',
+    },
   },
   socialButtonsBlockButton: 'Nastavite s {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
   taskChooseOrganization: {
     chooseOrganization: {
-      action__createOrganization: undefined,
-      action__invitationAccept: undefined,
-      action__suggestionsAccept: undefined,
-      subtitle: undefined,
-      suggestionsAcceptedLabel: undefined,
-      title: undefined,
+      action__createOrganization: 'Stvori novu organizaciju',
+      action__invitationAccept: 'Pridruži se',
+      action__suggestionsAccept: 'Zatraži pridruživanje',
+      subtitle: 'Pridružite se postojećoj organizaciji ili stvorite novu',
+      suggestionsAcceptedLabel: 'Čeka odobrenje',
+      title: 'Odaberite organizaciju',
     },
     createOrganization: {
-      formButtonReset: undefined,
-      formButtonSubmit: undefined,
-      formFieldInputPlaceholder__name: undefined,
-      formFieldInputPlaceholder__slug: undefined,
-      formFieldLabel__name: undefined,
-      formFieldLabel__slug: undefined,
-      subtitle: undefined,
-      title: undefined,
+      formButtonReset: 'Odustani',
+      formButtonSubmit: 'Nastavi',
+      formFieldInputPlaceholder__name: 'Moja organizacija',
+      formFieldInputPlaceholder__slug: 'moja-organizacija',
+      formFieldLabel__name: 'Naziv',
+      formFieldLabel__slug: 'Slug',
+      subtitle: 'Unesite podatke o svojoj organizaciji za nastavak',
+      title: 'Postavite svoju organizaciju',
+    },
+    organizationCreationDisabled: {
+      title: 'Morate pripadati organizaciji',
+      subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
     },
     signOut: {
-      actionLink: undefined,
-      actionText: undefined,
+      actionLink: 'Odjavi se',
+      actionText: 'Prijavljen kao {{identifier}}',
     },
   },
   taskResetPassword: {
@@ -951,6 +963,9 @@ export const hrHR: LocalizationResource = {
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušajte s drugim.',
     session_exists: 'Već ste prijavljeni.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
+    web3_solana_signature_generation_failed:
+      'Došlo je do pogreške pri generiranju potpisa. Pokušajte ponovno za nastavak.',
     zxcvbn: {
       couldBeStronger: 'Vaša lozinka funkcionira, ali mogla bi biti jača. Pokušajte dodati više znakova.',
       goodPassword: 'Vaša lozinka zadovoljava sve potrebne zahtjeve.',
@@ -1319,6 +1334,10 @@ export const hrHR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Poveži novčanik',
         title: 'Web3 novčanici',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Odaberite Solana novčanik za povezivanje s vašim računom.',
+          title: 'Dodaj Solana novčanik',
+        },
       },
     },
     usernamePage: {
@@ -1353,5 +1372,11 @@ export const hrHR: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Poveži se s {{walletName}}',
+    continue: 'Nastavi s {{walletName}}',
+    noneAvailable:
+      'Nisu otkrivene Solana Web3 novčanike. Instalirajte {{ solanaWalletsLink || link("wallet extension") }} s podrškom za Web3.',
   },
 } as const;
