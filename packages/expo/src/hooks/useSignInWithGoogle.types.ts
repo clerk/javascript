@@ -1,7 +1,5 @@
 import type { SetActive, SignInResource, SignUpResource } from '@clerk/shared/types';
 
-export type SignUpUnsafeMetadata = Record<string, unknown>;
-
 export type StartGoogleAuthenticationFlowParams = {
   unsafeMetadata?: SignUpUnsafeMetadata;
 };
