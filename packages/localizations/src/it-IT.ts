@@ -1366,16 +1366,16 @@ export const itIT: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Accedi',
+      actionText: 'Hai già accesso?',
+      formButton: "Unisciti alla lista d'attesa",
+      subtitle: 'Inserisci il tuo indirizzo email e ti avviseremo quando il tuo posto sarà pronto',
+      title: "Unisciti alla lista d'attesa",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Verrai reindirizzato a breve...',
+      subtitle: 'Ti contatteremo quando il tuo posto sarà pronto',
+      title: "Grazie per esserti unito alla lista d'attesa!",
     },
   },
   web3SolanaWalletButtons: {
