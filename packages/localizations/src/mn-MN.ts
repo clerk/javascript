@@ -1357,16 +1357,16 @@ export const mnMN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Нэвтрэх',
+      actionText: 'Та аль хэдийн нэвтрэх эрхтэй юу?',
+      formButton: 'Хүлээлгийн жагсаалтад нэгдэх',
+      subtitle: 'Имэйл хаягаа оруулаад таны байр бэлэн болоход мэдэгдэх болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдэх',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Удахгүй дахин чиглүүлэх болно...',
+      subtitle: 'Таны байр бэлэн болоход бид холбогдох болно',
+      title: 'Хүлээлгийн жагсаалтад нэгдсэнд баярлалаа!',
     },
   },
   web3SolanaWalletButtons: {
