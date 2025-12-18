@@ -875,6 +875,10 @@ export const beBY: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Вы павінны належаць да арганізацыі',
+      subtitle: 'Звярніцеся да адміністратара вашай арганізацыі для атрымання запрашэння.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

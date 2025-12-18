@@ -875,6 +875,10 @@ export const skSK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'Musíte patriť do organizácie',
+      subtitle: 'Kontaktujte administrátora vašej organizácie pre pozvánku.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

@@ -858,6 +858,10 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: '您必須屬於一個組織',
+      subtitle: '請聯繫您的組織管理員以獲取邀請。',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

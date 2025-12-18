@@ -877,6 +877,10 @@ export const teIN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    organizationCreationDisabled: {
+      title: 'మీరు ఒక సంస్థకు చెంది ఉండాలి',
+      subtitle: 'ఆహ్వానం కోసం మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
+    },
     signOut: {
       actionLink: undefined,
       actionText: undefined,

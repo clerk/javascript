@@ -885,6 +885,10 @@ export const deDE: LocalizationResource = {
       subtitle: 'Geben Sie Ihre Organisationsdetails ein, um fortzufahren',
       title: 'Organisation einrichten',
     },
+    organizationCreationDisabled: {
+      title: 'Sie müssen einer Organisation angehören',
+      subtitle: 'Kontaktieren Sie Ihren Organisationsadministrator für eine Einladung.',
+    },
     signOut: {
       actionLink: 'Abmelden',
       actionText: 'Angemeldet als {{identifier}}',
