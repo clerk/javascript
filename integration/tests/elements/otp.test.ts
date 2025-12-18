@@ -138,6 +138,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('OTP @elem
       await otp.pressSequentially('12');
 
       await otp.press('ArrowLeft');
+      await expect(page.getByTestId('segmented-otp-1')).toHaveAttribute('data-status', 'selected');
       await otp.pressSequentially('1');
       await expect(otp).toHaveValue('11');
     });
@@ -200,10 +201,13 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('OTP @elem
 
       await otp.press('ArrowLeft');
       await otp.press('ArrowLeft');
+      // Wait for selection to update - cursor should be on index 2 (selecting "3")
+      await expect(page.getByTestId('segmented-otp-2')).toHaveAttribute('data-status', 'selected');
       await otp.press('Delete');
 
       await expect(otp).toHaveValue('124');
       await otp.press('ArrowRight');
+      await expect(page.getByTestId('segmented-otp-2')).toHaveAttribute('data-status', 'selected');
       await otp.press('Delete');
       await expect(otp).toHaveValue('12');
     });
