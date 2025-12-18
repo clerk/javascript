@@ -747,6 +747,10 @@ export const arSA: LocalizationResource = {
       subtitle: 'للمتابعة، يرجى إدخال رمز التحقق الذي تم إنشاؤه بواسطة تطبيق المصادقة الخاص بك',
       title: 'نظام التحقق بخطوتين',
     },
+    web3Solana: {
+      subtitle: 'حدد محفظة أدناه لتسجيل الدخول',
+      title: 'تسجيل الدخول باستخدام Solana',
+    },
   },
   signInEnterPasswordTitle: 'إدخل كلمة المرور',
   signUp: {
@@ -837,6 +841,10 @@ export const arSA: LocalizationResource = {
       title: 'أنشاء حساب جديد',
       titleCombined: 'أنشاء حساب جديد',
     },
+    web3Solana: {
+      subtitle: 'حدد محفظة أدناه للتسجيل',
+      title: 'التسجيل باستخدام Solana',
+    },
   },
   socialButtonsBlockButton: 'للمتابعة مع {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -858,6 +866,10 @@ export const arSA: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'أدخل تفاصيل منظمتك للمتابعة',
       title: 'إعداد منظمتك',
+    },
+    organizationCreationDisabled: {
+      title: 'يجب أن تنتمي إلى منظمة',
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
     },
     signOut: {
       actionLink: 'تسجيل الخروج',
@@ -941,6 +953,8 @@ export const arSA: LocalizationResource = {
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     session_exists: 'لقد قمت بتسجيل الدخول بالفعل',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'لقد رفضت طلب التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
+    web3_solana_signature_generation_failed: 'حدث خطأ أثناء إنشاء التوقيع. يرجى المحاولة مرة أخرى للمتابعة.',
     zxcvbn: {
       couldBeStronger: 'كلمة مرورك سليمة من الأفضل ان تكون اقوى. الرجاء أضافة حروف أكثر',
       goodPassword: 'كلمة مرورك طابقت جميع المتطلبات الازمة',
@@ -1305,6 +1319,10 @@ export const arSA: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'محافظ Web3',
         title: 'محافظ Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'حدد محفظة Solana للاتصال بحسابك.',
+          title: 'إضافة محفظة Solana',
+        },
       },
     },
     usernamePage: {
@@ -1339,5 +1357,11 @@ export const arSA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'الاتصال باستخدام {{walletName}}',
+    continue: 'المتابعة باستخدام {{walletName}}',
+    noneAvailable:
+      'لم يتم اكتشاف محافظ Solana Web3. يرجى تثبيت {{ solanaWalletsLink || link("wallet extension") }} مدعوم بـ Web3.',
   },
 } as const;

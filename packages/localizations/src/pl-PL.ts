@@ -751,6 +751,10 @@ export const plPL: LocalizationResource = {
       subtitle: 'Aby kontynuować, wprowadź kod weryfikacyjny wygenerowany przez aplikację uwierzytelniającą',
       title: 'Weryfikacja dwustopniowa',
     },
+    web3Solana: {
+      subtitle: 'Wybierz poniżej portfel, aby się zalogować',
+      title: 'Zaloguj się przez Solana',
+    },
   },
   signInEnterPasswordTitle: 'Wprowadź swoje hasło',
   signUp: {
@@ -845,6 +849,10 @@ export const plPL: LocalizationResource = {
       title: 'Utwórz swoje konto',
       titleCombined: 'Utwórz swoje konto',
     },
+    web3Solana: {
+      subtitle: 'Wybierz poniżej portfel, aby się zarejestrować',
+      title: 'Zarejestruj się przez Solana',
+    },
   },
   socialButtonsBlockButton: 'Kontynuuj z {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -866,6 +874,10 @@ export const plPL: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Wprowadź szczegóły swojej organizacji',
       title: 'Utwórz swoją organizację',
+    },
+    organizationCreationDisabled: {
+      title: 'Musisz należeć do organizacji',
+      subtitle: 'Skontaktuj się z administratorem swojej organizacji, aby uzyskać zaproszenie.',
     },
     signOut: {
       actionLink: 'Wyloguj',
@@ -953,6 +965,9 @@ export const plPL: LocalizationResource = {
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
     session_exists: 'Jesteś już zalogowany.',
     web3_missing_identifier: 'Nie można znaleźć rozszerzenia Web3 Wallet. Zainstaluj je, aby kontynuować.',
+    web3_signature_request_rejected: 'Odrzuciłeś prośbę o podpis. Spróbuj ponownie, aby kontynuować.',
+    web3_solana_signature_generation_failed:
+      'Wystąpił błąd podczas generowania podpisu. Spróbuj ponownie, aby kontynuować.',
     zxcvbn: {
       couldBeStronger: 'Twoje hasło jest odpowiednie, ale mogłoby być silniejsze. Spróbuj dodać więcej znaków.',
       goodPassword: 'Twoje hasło jest wystarczająco silne.',
@@ -1323,6 +1338,10 @@ export const plPL: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Portfele Web3',
         title: 'Portfele Web3',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Wybierz portfel Solana, aby połączyć go z kontem.',
+          title: 'Dodaj portfel Solana',
+        },
       },
     },
     usernamePage: {
@@ -1357,5 +1376,11 @@ export const plPL: LocalizationResource = {
       subtitle: 'Skontaktujemy się z Tobą, gdy miejsce dla Ciebie będzie gotowe',
       title: 'Dziękujemy za dołączenie do listy oczekujących!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Połącz z {{walletName}}',
+    continue: 'Kontynuuj z {{walletName}}',
+    noneAvailable:
+      'Nie wykryto portfeli Solana Web3. Zainstaluj {{ solanaWalletsLink || link("wallet extension") }} obsługujący Web3.',
   },
 } as const;

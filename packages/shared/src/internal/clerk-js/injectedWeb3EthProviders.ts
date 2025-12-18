@@ -27,15 +27,15 @@ interface EIP6963ProviderDetail {
 }
 
 type EIP6963AnnounceProviderEvent = CustomEvent<EIP6963ProviderDetail>;
-type InjectedWeb3Provider = MetamaskWeb3Provider | OKXWalletWeb3Provider;
+type InjectedWeb3EthProvider = MetamaskWeb3Provider | OKXWalletWeb3Provider;
 
-class InjectedWeb3Providers {
+class InjectedWeb3EthProviders {
   #providers: EIP6963ProviderDetail[] = [];
-  #providerIdMap: Record<InjectedWeb3Provider, string> = {
+  #providerIdMap: Record<InjectedWeb3EthProvider, string> = {
     metamask: 'MetaMask',
     okx_wallet: 'OKX Wallet',
   } as const;
-  static #instance: InjectedWeb3Providers | null = null;
+  static #instance: InjectedWeb3EthProviders | null = null;
 
   private constructor() {
     if (typeof window === 'undefined') {
@@ -45,14 +45,14 @@ class InjectedWeb3Providers {
     window.dispatchEvent(new Event('eip6963:requestProvider'));
   }
 
-  public static getInstance(): InjectedWeb3Providers {
-    if (!InjectedWeb3Providers.#instance) {
-      InjectedWeb3Providers.#instance = new InjectedWeb3Providers();
+  public static getInstance(): InjectedWeb3EthProviders {
+    if (!InjectedWeb3EthProviders.#instance) {
+      InjectedWeb3EthProviders.#instance = new InjectedWeb3EthProviders();
     }
-    return InjectedWeb3Providers.#instance;
+    return InjectedWeb3EthProviders.#instance;
   }
 
-  get = (provider: InjectedWeb3Provider) => {
+  get = (provider: InjectedWeb3EthProvider) => {
     const ethProvider = this.#providers.find(p => p.info.name === this.#providerIdMap[provider])?.provider;
     if (ethProvider !== undefined) {
       return ethProvider;
@@ -73,4 +73,4 @@ class InjectedWeb3Providers {
   };
 }
 
-export const getInjectedWeb3Providers = () => InjectedWeb3Providers.getInstance();
+export const getInjectedWeb3EthProviders = () => InjectedWeb3EthProviders.getInstance();

@@ -9,7 +9,9 @@
   },
   "license": "MIT",
   "author": "Clerk",
-  "sideEffects": false,
+  "sideEffects": [
+    "./src/utils/setWebpackChunkPublicPath.ts"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -52,7 +54,7 @@
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
     "bundlewatch:fix": "node bundlewatch-fix.mjs",
     "clean": "rimraf ./dist",
-    "dev": "tsdown --watch src",
+    "dev": "rspack serve --config rspack.config.js",
     "dev:origin": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:${PORT:-4011}",
     "dev:sandbox": "rspack serve --config rspack.config.js --env devOrigin=http://localhost:4011",
     "format": "node ../../scripts/format-package.mjs",
@@ -73,6 +75,9 @@
     "@emotion/react": "11.11.1",
     "@floating-ui/react": "0.27.12",
     "@formkit/auto-animate": "^0.8.2",
+    "@solana/wallet-adapter-base": "catalog:module-manager",
+    "@solana/wallet-adapter-react": "catalog:module-manager",
+    "@solana/wallet-standard": "catalog:module-manager",
     "copy-to-clipboard": "3.3.3",
     "csstype": "3.1.3",
     "dequal": "2.0.3",
@@ -92,6 +97,7 @@
     "@types/webpack-env": "^1.18.8",
     "bundlewatch": "^0.4.1",
     "cross-fetch": "^4.1.0",
+    "minimatch": "^10.1.1",
     "tsdown": "catalog:repo",
     "webpack-merge": "^5.10.0"
   },

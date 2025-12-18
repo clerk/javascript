@@ -751,6 +751,10 @@ export const isIS: LocalizationResource = {
       subtitle: 'Til að halda áfram, vinsamlegast sláðu inn staðfestingarkóðann sem auðkennisforritið þitt bjó til',
       title: 'Tveggja þrepa auðkenning',
     },
+    web3Solana: {
+      subtitle: 'Veldu veski hér að neðan til að skrá þig inn',
+      title: 'Skrá inn með Solana',
+    },
   },
   signInEnterPasswordTitle: 'Sláðu inn lykilorðið þitt',
   signUp: {
@@ -842,6 +846,10 @@ export const isIS: LocalizationResource = {
       title: 'Stofna reikning',
       titleCombined: 'Stofna reikning',
     },
+    web3Solana: {
+      subtitle: 'Veldu veski hér að neðan til að skrá þig',
+      title: 'Skráðu þig með Solana',
+    },
   },
   socialButtonsBlockButton: 'Halda áfram með {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -863,6 +871,10 @@ export const isIS: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Sláðu inn upplýsingar um samtökin þín til að halda áfram',
       title: 'Stilltu samtökin þín',
+    },
+    organizationCreationDisabled: {
+      title: 'Þú verður að tilheyra samtökum',
+      subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
     },
     signOut: {
       actionLink: 'Skrá út',
@@ -948,6 +960,9 @@ export const isIS: LocalizationResource = {
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     session_exists: 'Þú ert nú þegar innskráður.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Þú hafðir hafnað beiðni um undirritun. Reyndu aftur til að halda áfram.',
+    web3_solana_signature_generation_failed:
+      'Villa kom upp við að búa til undirritun. Reyndu aftur til að halda áfram.',
     zxcvbn: {
       couldBeStronger: 'Lykilorðið þitt virkar, en gæti verið sterkara. Reyndu að bæta við fleiri stöfum.',
       goodPassword: 'Lykilorðið þitt uppfyllir allar nauðsynlegar kröfur.',
@@ -1319,6 +1334,10 @@ export const isIS: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 veski',
         title: 'Web3 veski',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Veldu Solana-veski til að tengja við aðganginn þinn.',
+          title: 'Bæta við Solana-veski',
+        },
       },
     },
     usernamePage: {
@@ -1353,5 +1372,11 @@ export const isIS: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Tengjast með {{walletName}}',
+    continue: 'Halda áfram með {{walletName}}',
+    noneAvailable:
+      'Engin Solana Web3 veski fundust. Vinsamlegast settu upp Web3-stutt {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;

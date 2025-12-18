@@ -7,8 +7,10 @@ name: PR Title Lint
 on:
   pull_request:
     types:
-      - opened
       - edited
+      - opened
+      - reopened
+      - synchronize
 
 permissions:
   contents: read

@@ -750,6 +750,10 @@ export const trTR: LocalizationResource = {
       subtitle: 'Devam etmek için lütfen kimlik doğrulayıcı uygulamanız tarafından oluşturulan doğrulama kodunu girin',
       title: 'İki aşamalı doğrulama',
     },
+    web3Solana: {
+      subtitle: 'Giriş yapmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile giriş yap',
+    },
   },
   signInEnterPasswordTitle: 'Şifrenizi girin',
   signUp: {
@@ -841,6 +845,10 @@ export const trTR: LocalizationResource = {
       title: 'Hesap oluştur',
       titleCombined: 'Hesap oluştur',
     },
+    web3Solana: {
+      subtitle: 'Kaydolmak için aşağıdan bir cüzdan seçin',
+      title: 'Solana ile kaydol',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} ile giriş yapın',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -862,6 +870,10 @@ export const trTR: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Devam etmek için organizasyon bilgilerinizi girin',
       title: 'Organizasyonunuzu ayarlayın',
+    },
+    organizationCreationDisabled: {
+      title: 'Bir organizasyona ait olmalısınız',
+      subtitle: 'Davet için organizasyon yöneticinizle iletişime geçin.',
     },
     signOut: {
       actionLink: 'Çıkış yap',
@@ -948,6 +960,9 @@ export const trTR: LocalizationResource = {
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     session_exists: 'Zaten giriş yapmışsınız.',
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
+    web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
+    web3_solana_signature_generation_failed:
+      'İmza oluşturulurken bir hata oluştu. Devam etmek için lütfen tekrar deneyin.',
     zxcvbn: {
       couldBeStronger:
         'Şifreniz kriterleri karşılıyor; fakat birkaç karakter daha ekleyerek daha güçlü bir şifre oluşturabilirsiniz.',
@@ -1317,6 +1332,10 @@ export const trTR: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 cüzdanları',
         title: 'Web3 cüzdanları',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Hesabınıza bağlamak için bir Solana cüzdanı seçin.',
+          title: 'Bir Solana cüzdanı ekle',
+        },
       },
     },
     usernamePage: {
@@ -1351,5 +1370,11 @@ export const trTR: LocalizationResource = {
       subtitle: 'Bekleme listesinde olduğunuz için teşekkür ederiz.',
       title: 'Bekleme Listesine Katıldınız',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} ile bağlan',
+    continue: '{{walletName}} ile devam et',
+    noneAvailable:
+      'Solana Web3 cüzdanı tespit edilmedi. Lütfen Web3 destekli {{ solanaWalletsLink || link("wallet extension") }} kurun.',
   },
 } as const;

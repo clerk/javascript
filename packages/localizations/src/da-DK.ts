@@ -748,6 +748,10 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: 'Totrinsbekræftelse',
     },
+    web3Solana: {
+      subtitle: 'Vælg en wallet nedenfor for at logge ind',
+      title: 'Log ind med Solana',
+    },
   },
   signInEnterPasswordTitle: 'Indtast din adgangskode',
   signUp: {
@@ -838,6 +842,10 @@ export const daDK: LocalizationResource = {
       title: 'Opret din konto',
       titleCombined: 'Opret din konto',
     },
+    web3Solana: {
+      subtitle: 'Vælg en wallet nedenfor for at tilmelde dig',
+      title: 'Tilmeld dig med Solana',
+    },
   },
   socialButtonsBlockButton: 'Fortsæt med {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
@@ -859,6 +867,10 @@ export const daDK: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Indtast dine organisationsoplysninger for at fortsætte',
       title: 'Opsæt din organisation',
+    },
+    organizationCreationDisabled: {
+      title: 'Du skal tilhøre en organisation',
+      subtitle: 'Kontakt din organisationsadministrator for en invitation.',
     },
     signOut: {
       actionLink: 'Log ud',
@@ -942,6 +954,9 @@ export const daDK: LocalizationResource = {
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     session_exists: 'Du er allerede logget ind.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Du har afvist signaturanmodningen. Prøv igen for at fortsætte.',
+    web3_solana_signature_generation_failed:
+      'Der opstod en fejl under generering af signaturen. Prøv igen for at fortsætte.',
     zxcvbn: {
       couldBeStronger: 'Din adgangskode virker, men kunne være stærkere. Prøv at tilføje flere tegn.',
       goodPassword: 'Din adgangskode opfylder alle nødvendige krav.',
@@ -1311,6 +1326,10 @@ export const daDK: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Tilføj Web3 tegnebøger',
         title: 'Web3 tegnebøger',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Vælg en Solana-wallet for at forbinde den til din konto.',
+          title: 'Tilføj en Solana-wallet',
+        },
       },
     },
     usernamePage: {
@@ -1345,5 +1364,11 @@ export const daDK: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Forbind med {{walletName}}',
+    continue: 'Fortsæt med {{walletName}}',
+    noneAvailable:
+      'Ingen Solana Web3-wallets fundet. Installer venligst en Web3-understøttet {{ solanaWalletsLink || link("wallet extension") }}.',
   },
 } as const;
