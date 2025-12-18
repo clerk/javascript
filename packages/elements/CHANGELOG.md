@@ -1,5 +1,16 @@
 # @clerk/elements
 
+## 0.24.1
+
+### Patch Changes
+
+- Fix elements otp test interactions ([#7507](https://github.com/clerk/javascript/pull/7507)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`79eb5af`](https://github.com/clerk/javascript/commit/79eb5afd91d7b002faafd2980850d944acb37917), [`b3b02b4`](https://github.com/clerk/javascript/commit/b3b02b46dfa6d194ed12d2e6b9e332796ee73c4a), [`7b3024a`](https://github.com/clerk/javascript/commit/7b3024a71e6e45e926d83f1a9e887216e7c14424), [`2cd4da9`](https://github.com/clerk/javascript/commit/2cd4da9c72bc7385c0c7c71e2a7ca856d79ce630)]:
+  - @clerk/shared@3.41.0
+  - @clerk/clerk-react@5.59.1
+  - @clerk/types@4.101.8
+
 ## 0.24.0
 
 ### Minor Changes
