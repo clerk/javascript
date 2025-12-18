@@ -452,7 +452,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async __experimental_setPasswordCompromised(
+  public async setPasswordCompromised(
     userId: string,
     params: SetPasswordCompromisedParams = {
       revokeAllSessions: false,
@@ -466,7 +466,7 @@ export class UserAPI extends AbstractAPI {
     });
   }
 
-  public async __experimental_unsetPasswordCompromised(userId: string) {
+  public async unsetPasswordCompromised(userId: string) {
     this.requireId(userId);
     return this.request<User>({
       method: 'POST',
