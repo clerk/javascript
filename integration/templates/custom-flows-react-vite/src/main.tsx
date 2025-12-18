@@ -7,6 +7,7 @@ import { Home } from './routes/Home';
 import { SignIn } from './routes/SignIn';
 import { SignUp } from './routes/SignUp';
 import { Protected } from './routes/Protected';
+import { Waitlist } from './routes/Waitlist';
 
 // Import your Publishable Key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -42,6 +43,10 @@ createRoot(document.getElementById('root')!).render(
               <Route
                 path='/sign-up'
                 element={<SignUp />}
+              />
+              <Route
+                path='/waitlist'
+                element={<Waitlist />}
               />
               <Route
                 path='/protected'

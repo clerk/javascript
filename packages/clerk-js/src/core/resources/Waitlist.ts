@@ -1,6 +1,9 @@
+import type { ClerkError } from '@clerk/shared/error';
 import type { JoinWaitlistParams, WaitlistJSON, WaitlistResource } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
+import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { eventBus } from '../events';
 import { BaseResource } from './internal';
 
 export class Waitlist extends BaseResource implements WaitlistResource {
@@ -10,7 +13,7 @@ export class Waitlist extends BaseResource implements WaitlistResource {
   updatedAt: Date | null = null;
   createdAt: Date | null = null;
 
-  constructor(data: WaitlistJSON) {
+  constructor(data: WaitlistJSON | null = null) {
     super();
     this.fromJSON(data);
   }
@@ -23,18 +26,24 @@ export class Waitlist extends BaseResource implements WaitlistResource {
     this.id = data.id;
     this.updatedAt = unixEpochToDate(data.updated_at);
     this.createdAt = unixEpochToDate(data.created_at);
+
+    eventBus.emit('resource:update', { resource: this });
     return this;
   }
 
-  static async join(params: JoinWaitlistParams): Promise<WaitlistResource> {
-    const json = (
-      await BaseResource._fetch<WaitlistJSON>({
-        path: '/waitlist',
-        method: 'POST',
-        body: params as any,
-      })
-    )?.response as unknown as WaitlistJSON;
+  async join(params: JoinWaitlistParams): Promise<{ error: ClerkError | null }> {
+    return runAsyncResourceTask(this, async () => {
+      await Waitlist.join(params);
+    });
+  }
 
-    return new Waitlist(json);
+  static async join(params: JoinWaitlistParams): Promise<WaitlistResource> {
+    const json = await BaseResource._fetch<WaitlistJSON>({
+      path: '/waitlist',
+      method: 'POST',
+      body: params as any,
+    });
+
+    return new Waitlist(json as unknown as WaitlistJSON);
   }
 }
