@@ -1,5 +1,14 @@
 # @clerk/expo-passkeys
 
+## 0.4.28
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/shared@3.41.1
+
 ## 0.4.27
 
 ### Patch Changes

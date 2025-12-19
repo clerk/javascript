@@ -1,5 +1,17 @@
 # Change Log
 
+## 2.29.0
+
+### Minor Changes
+
+- Improves resilience by keeping users logged in when Clerk's origin is temporarily unavailable using edge-based token generation ([#7516](https://github.com/clerk/javascript/pull/7516)) by [@bratsos](https://github.com/bratsos)
+
+### Patch Changes
+
+- Updated dependencies [[`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/shared@3.41.1
+  - @clerk/types@4.101.9
+
 ## 2.28.0
 
 ### Minor Changes

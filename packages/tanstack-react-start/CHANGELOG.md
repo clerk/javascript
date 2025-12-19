@@ -1,5 +1,17 @@
 # @clerk/tanstack-react-start
 
+## 0.27.12
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updated dependencies [[`ede3e2a`](https://github.com/clerk/javascript/commit/ede3e2a326c9cbbd4ab09375f4bb291483681892), [`03dd374`](https://github.com/clerk/javascript/commit/03dd37458eedf59198dc3574e12030b217efcb41)]:
+  - @clerk/backend@2.29.0
+  - @clerk/clerk-react@5.59.2
+  - @clerk/shared@3.41.1
+  - @clerk/types@4.101.9
+
 ## 0.27.11
 
 ### Patch Changes
