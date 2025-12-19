@@ -885,7 +885,7 @@ export const enUS: LocalizationResource = {
       actionText: 'Signed in as {{identifier}}',
     },
     alerts: {
-      existingOrgWithDomain:
+      organizationAlreadyExists:
         'An organization already exists for the detected company name and {{email}}. Join by invitation.',
     },
   },

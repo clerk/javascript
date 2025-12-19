@@ -371,7 +371,7 @@ describe('TaskChooseOrganization', () => {
         fixtures.clerk.user?.getOrganizationCreationDefaults.mockReturnValueOnce(
           Promise.resolve({
             advisory: {
-              code: 'existing_org_with_domain',
+              code: 'organization_already_exists',
               severity: 'warning',
               meta: { email: 'test@clerk.com' },
             },
