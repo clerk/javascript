@@ -1,6 +1,6 @@
 {
   "name": "@clerk/themes",
-  "version": "2.4.45",
+  "version": "2.4.46",
   "description": "Themes for the Clerk auth components",
   "keywords": [
     "react",

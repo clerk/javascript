@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.41.1
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7513](https://github.com/clerk/javascript/pull/7513)) by [@jacekradko](https://github.com/jacekradko)
+
 ## 3.41.0
 
 ### Minor Changes
