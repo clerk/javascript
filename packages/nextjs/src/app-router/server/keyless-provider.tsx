@@ -5,7 +5,6 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import { createClerkClientWithOptions } from '../../server/createClerkClient';
-import { collectKeylessMetadata, formatMetadataHeaders } from '../../server/keyless-custom-headers';
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
@@ -19,7 +18,7 @@ export async function getKeylessStatus(
   let [shouldRunAsKeyless, runningWithClaimedKeys, locallyStoredPublishableKey] = [false, false, ''];
   if (canUseKeyless) {
     locallyStoredPublishableKey = await import('../../server/keyless-node.js')
-      .then(mod => mod.safeParseClerkFile()?.publishableKey || '')
+      .then(mod => mod.keyless().readKeys()?.publishableKey || '')
       .catch(() => '');
 
     runningWithClaimedKeys = Boolean(params.publishableKey) && params.publishableKey === locallyStoredPublishableKey;
@@ -44,7 +43,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
 
   // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
   const newOrReadKeys = await import('../../server/keyless-node.js')
-    .then(mod => mod.createOrReadKeyless())
+    .then(mod => mod.keyless().getOrCreateKeys())
     .catch(() => null);
 
   const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } = await import(
@@ -84,7 +83,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
 
   if (runningWithClaimedKeys) {
     try {
-      const secretKey = await import('../../server/keyless-node.js').then(mod => mod.safeParseClerkFile()?.secretKey);
+      const secretKey = await import('../../server/keyless-node.js').then(mod => mod.keyless().readKeys()?.secretKey);
       if (!secretKey) {
         // we will ignore it later
         throw new Error('Missing secret key from `.clerk/`');
@@ -93,20 +92,12 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
         secretKey,
       });
 
-      // Collect metadata
-      const keylessHeaders = await collectKeylessMetadata()
-        .then(formatMetadataHeaders)
-        .catch(() => new Headers());
-
       /**
        * Notifying the dashboard the should runs once. We are controlling this behaviour by caching the result of the request.
        * If the request fails, it will be considered stale after 10 minutes, otherwise it is cached for 24 hours.
        */
       await clerkDevelopmentCache?.run(
-        () =>
-          client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
-            requestHeaders: keylessHeaders,
-          }),
+        () => client.__experimental_accountlessApplications.completeAccountlessApplicationOnboarding(),
         {
           cacheKey: `${newOrReadKeys.publishableKey}_complete`,
           onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
