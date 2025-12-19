@@ -754,6 +754,10 @@ export const teIN: LocalizationResource = {
       subtitle: 'కొనసాగించడానికి, దయచేసి మీ ప్రమాణీకరణ యాప్ ద్వారా రూపొందించిన ధృవీకరణ కోడ్‌ను నమోదు చేయండి',
       title: 'రెండు-దశల ధృవీకరణ',
     },
+    web3Solana: {
+      subtitle: 'సైన్ ఇన్ చేయడానికి క్రింద వాలెట్‌ను ఎంచుకోండి',
+      title: 'Solana తో సైన్ ఇన్ చేయండి',
+    },
   },
   signInEnterPasswordTitle: 'మీ పాస్‌వర్డ్‌ను నమోదు చేయండి',
   signUp: {
@@ -847,6 +851,10 @@ export const teIN: LocalizationResource = {
       title: 'మీ ఖాతాను సృష్టించండి',
       titleCombined: 'మీ ఖాతాను సృష్టించండి',
     },
+    web3Solana: {
+      subtitle: 'సైన్ అప్ చేయడానికి క్రింద వాలెట్‌ను ఎంచుకోండి',
+      title: 'Solana తో సైన్ అప్ చేయండి',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}}తో కొనసాగించండి',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -868,6 +876,10 @@ export const teIN: LocalizationResource = {
       formFieldLabel__slug: 'స్లగ్',
       subtitle: 'కొనసాగించడానికి మీ సంస్థ వివరాలను నమోదు చేయండి',
       title: 'మీ సంస్థను సెటప్ చేయండి',
+    },
+    organizationCreationDisabled: {
+      title: 'మీరు ఒక సంస్థకు చెంది ఉండాలి',
+      subtitle: 'ఆహ్వానం కోసం మీ సంస్థ నిర్వాహకుడిని సంప్రదించండి.',
     },
     signOut: {
       actionLink: 'సైన్ అవుట్',
@@ -955,6 +967,9 @@ export const teIN: LocalizationResource = {
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
+    web3_signature_request_rejected: 'మీరు సంతకం అభ్యర్థనను తిరస్కరించారు. కొనసాగేందుకు దయచేసి మళ్లీ ప్రయత్నించండి.',
+    web3_solana_signature_generation_failed:
+      'సంతకం తయారు చేసే సమయంలో లోపం జరిగింది. కొనసాగేందుకు దయచేసి మళ్లీ ప్రయత్నించండి.',
     zxcvbn: {
       couldBeStronger:
         'మీ పాస్‌వర్డ్ పనిచేస్తుంది, కానీ మరింత బలంగా ఉండవచ్చు. మరిన్ని అక్షరాలను జోడించడానికి ప్రయత్నించండి.',
@@ -1326,6 +1341,10 @@ export const teIN: LocalizationResource = {
         detailsAction__nonPrimary: 'ప్రాథమికంగా సెట్ చేయండి',
         primaryButton: 'వాలెట్‌ను కనెక్ట్ చేయండి',
         title: 'Web3 వాలెట్‌లు',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'మీ ఖాతాతో కనెక్ట్ చేయడానికి Solana వాలెట్‌ను ఎంచుకోండి.',
+          title: 'Solana వాలెట్‌ను జోడించండి',
+        },
       },
     },
     usernamePage: {
@@ -1360,5 +1379,11 @@ export const teIN: LocalizationResource = {
       subtitle: 'మీ స్థానం సిద్ధంగా ఉన్నప్పుడు మేము మిమ్మల్ని సంప్రదిస్తాము',
       title: 'వెయిట్‌లిస్ట్‌లో చేరినందుకు ధన్యవాదాలు!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} తో కనెక్ట్ అవ్వండి',
+    continue: '{{walletName}} తో కొనసాగించండి',
+    noneAvailable:
+      'Solana Web3 వాలెట్లు ఏవీ గుర్తించబడలేదు. Web3 కి మద్దతు ఉన్న {{ solanaWalletsLink || link("wallet extension") }} ను ఇన్‌స్టాల్ చేయండి.',
   },
 } as const;

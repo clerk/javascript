@@ -752,6 +752,10 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जारी रखने के लिए, कृपया अपने प्रमाणकर्ता ऐप द्वारा जनरेट किए गए कोड को दर्ज करें',
       title: 'दो-चरण सत्यापन',
     },
+    web3Solana: {
+      subtitle: 'साइन इन करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन इन करें',
+    },
   },
   signInEnterPasswordTitle: 'अपना पासवर्ड दर्ज करें',
   signUp: {
@@ -845,6 +849,10 @@ export const hiIN: LocalizationResource = {
       title: 'अपना खाता बनाएं',
       titleCombined: 'अपना खाता बनाएं',
     },
+    web3Solana: {
+      subtitle: 'साइन अप करने के लिए नीचे एक वॉलेट चुनें',
+      title: 'Solana के साथ साइन अप करें',
+    },
   },
   socialButtonsBlockButton: '{{provider|titleize}} के साथ जारी रखें',
   socialButtonsBlockButtonManyInView: '{{provider|titleize}}',
@@ -866,6 +874,10 @@ export const hiIN: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'जारी रखने के लिए अपने संगठन का विवरण दर्ज करें',
       title: 'अपने संगठन को सेटअप करें',
+    },
+    organizationCreationDisabled: {
+      title: 'आपको किसी संगठन से संबंधित होना चाहिए',
+      subtitle: 'आमंत्रण के लिए अपने संगठन के व्यवस्थापक से संपर्क करें।',
     },
     signOut: {
       actionLink: 'साइन आउट',
@@ -955,6 +967,10 @@ export const hiIN: LocalizationResource = {
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     session_exists: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
+    web3_signature_request_rejected:
+      'आपने सिग्नेचर अनुरोध अस्वीकार कर दिया है। जारी रखने के लिए कृपया फिर से प्रयास करें।',
+    web3_solana_signature_generation_failed:
+      'सिग्नेचर बनाते समय एक त्रुटि हुई। जारी रखने के लिए कृपया फिर से प्रयास करें।',
     zxcvbn: {
       couldBeStronger: 'आपका पासवर्ड काम करता है, लेकिन मजबूत हो सकता है। अधिक अक्षर जोड़ने का प्रयास करें।',
       goodPassword: 'आपका पासवर्ड सभी आवश्यक आवश्यकताओं को पूरा करता है।',
@@ -1324,6 +1340,10 @@ export const hiIN: LocalizationResource = {
         detailsAction__nonPrimary: 'प्राथमिक के रूप में सेट करें',
         primaryButton: 'वॉलेट कनेक्ट करें',
         title: 'Web3 वॉलेट',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'अपने खाते से कनेक्ट करने के लिए एक Solana वॉलेट चुनें।',
+          title: 'Solana वॉलेट जोड़ें',
+        },
       },
     },
     usernamePage: {
@@ -1358,5 +1378,11 @@ export const hiIN: LocalizationResource = {
       subtitle: 'जब आपका स्थान तैयार होगा तो हम आपसे संपर्क करेंगे',
       title: 'प्रतीक्षा सूची में शामिल होने के लिए धन्यवाद!',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '{{walletName}} के साथ कनेक्ट करें',
+    continue: '{{walletName}} के साथ जारी रखें',
+    noneAvailable:
+      'कोई Solana Web3 वॉलेट नहीं मिला। कृपया Web3 समर्थित {{ solanaWalletsLink || link("wallet extension") }} इंस्टॉल करें।',
   },
 } as const;

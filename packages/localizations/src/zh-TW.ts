@@ -737,6 +737,10 @@ export const zhTW: LocalizationResource = {
       subtitle: undefined,
       title: '兩步驟驗證',
     },
+    web3Solana: {
+      subtitle: '請選擇下方錢包以登入',
+      title: '使用 Solana 登入',
+    },
   },
   signInEnterPasswordTitle: '輸入您的密碼',
   signUp: {
@@ -828,6 +832,10 @@ export const zhTW: LocalizationResource = {
       title: '建立您的帳戶',
       titleCombined: '建立您的帳戶',
     },
+    web3Solana: {
+      subtitle: '請選擇下方錢包以註冊',
+      title: '使用 Solana 註冊',
+    },
   },
   socialButtonsBlockButton: '以 {{provider|titleize}} 帳戶登入',
   socialButtonsBlockButtonManyInView: undefined,
@@ -849,6 +857,10 @@ export const zhTW: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: '輸入您的組織詳細資訊以繼續',
       title: '設定您的組織',
+    },
+    organizationCreationDisabled: {
+      title: '您必須屬於一個組織',
+      subtitle: '請聯繫您的組織管理員以獲取邀請。',
     },
     signOut: {
       actionLink: '登出',
@@ -926,6 +938,8 @@ export const zhTW: LocalizationResource = {
     phone_number_exists: '此電話號碼已被使用，請嘗試其他號碼。',
     session_exists: '您已經登錄。',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: '您已拒絕簽名請求。請再試一次以繼續。',
+    web3_solana_signature_generation_failed: '產生簽名時發生錯誤。請再試一次以繼續。',
     zxcvbn: {
       couldBeStronger: '您的密碼強度尚可，但可以更安全。請嘗試增加長度或複雜度。',
       goodPassword: '密碼強度良好。',
@@ -1278,6 +1292,10 @@ export const zhTW: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: '新增 Web3 錢包',
         title: 'Web3 錢包',
+        web3SelectSolanaWalletScreen: {
+          subtitle: '選擇一個 Solana 錢包以連線到您的帳戶。',
+          title: '新增 Solana 錢包',
+        },
       },
     },
     usernamePage: {
@@ -1301,16 +1319,22 @@ export const zhTW: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登入',
+      actionText: '已有存取權限？',
+      formButton: '加入候補名單',
+      subtitle: '輸入您的電子郵件地址，我們會在您的位置準備好時通知您',
+      title: '加入候補名單',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您將很快被重新導向...',
+      subtitle: '當您的位置準備好時，我們會與您聯繫',
+      title: '感謝您加入候補名單！',
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: '使用 {{walletName}} 連線',
+    continue: '使用 {{walletName}} 繼續',
+    noneAvailable:
+      '未偵測到 Solana Web3 錢包。請安裝支援 Web3 的 {{ solanaWalletsLink || link("wallet extension") }}。',
   },
 } as const;

@@ -3,8 +3,8 @@ packages:
 
 catalogs:
   peer-react:
-    react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
-    react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+    react: ^18.0.0 || ^19.0.3 || ^19.1.4 || ^19.2.3 || ^19.3.0-0
+    react-dom: ^18.0.0 || ^19.0.3 || ^19.1.4 || ^19.2.3 || ^19.3.0-0
   react:
     '@types/react': 18.3.26
     '@types/react-dom': 18.3.7
@@ -21,6 +21,10 @@ catalogs:
   module-manager:
     '@base-org/account': 2.0.1
     '@coinbase/wallet-sdk': 4.3.0
+    '@solana/wallet-adapter-base': 0.9.27
+    '@solana/wallet-adapter-react': 0.15.39
+    '@solana/wallet-standard': 1.1.4
+    '@wallet-standard/core': 1.1.1
     '@zxcvbn-ts/core': 3.0.4
     '@zxcvbn-ts/language-common': 3.0.4
 

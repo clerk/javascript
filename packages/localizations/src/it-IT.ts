@@ -756,6 +756,10 @@ export const itIT: LocalizationResource = {
       subtitle: 'Inserisci il codice di verifica dalla tua app di autenticazione.',
       title: 'Verifica in due passaggi',
     },
+    web3Solana: {
+      subtitle: 'Seleziona un wallet qui sotto per accedere',
+      title: 'Accedi con Solana',
+    },
   },
   signInEnterPasswordTitle: 'Inserisci la tua password',
   signUp: {
@@ -848,6 +852,10 @@ export const itIT: LocalizationResource = {
       title: 'Crea il tuo account',
       titleCombined: 'Crea il tuo account',
     },
+    web3Solana: {
+      subtitle: 'Seleziona un wallet qui sotto per registrarti',
+      title: 'Registrati con Solana',
+    },
   },
   socialButtonsBlockButton: 'Continua con {{provider|titleize}}',
   socialButtonsBlockButtonManyInView: undefined,
@@ -869,6 +877,10 @@ export const itIT: LocalizationResource = {
       formFieldLabel__slug: 'Slug',
       subtitle: 'Inserisci i dettagli della tua organizzazione per continuare',
       title: 'Configura la tua organizzazione',
+    },
+    organizationCreationDisabled: {
+      title: "Devi appartenere a un'organizzazione",
+      subtitle: "Contatta l'amministratore della tua organizzazione per un invito.",
     },
     signOut: {
       actionLink: 'Esci',
@@ -952,6 +964,9 @@ export const itIT: LocalizationResource = {
     phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
     session_exists: 'Sei già loggato.',
     web3_missing_identifier: undefined,
+    web3_signature_request_rejected: 'Hai rifiutato la richiesta di firma. Riprova per continuare.',
+    web3_solana_signature_generation_failed:
+      'Si è verificato un errore durante la generazione della firma. Riprova per continuare.',
     zxcvbn: {
       couldBeStronger: undefined,
       goodPassword: undefined,
@@ -1324,6 +1339,10 @@ export const itIT: LocalizationResource = {
         detailsAction__nonPrimary: undefined,
         primaryButton: 'Web3 wallets',
         title: 'Web3 wallets',
+        web3SelectSolanaWalletScreen: {
+          subtitle: 'Seleziona un wallet Solana da collegare al tuo account.',
+          title: 'Aggiungi un wallet Solana',
+        },
       },
     },
     usernamePage: {
@@ -1347,16 +1366,22 @@ export const itIT: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Accedi',
+      actionText: 'Hai già accesso?',
+      formButton: "Unisciti alla lista d'attesa",
+      subtitle: 'Inserisci il tuo indirizzo email e ti avviseremo quando il tuo posto sarà pronto',
+      title: "Unisciti alla lista d'attesa",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Verrai reindirizzato a breve...',
+      subtitle: 'Ti contatteremo quando il tuo posto sarà pronto',
+      title: "Grazie per esserti unito alla lista d'attesa!",
     },
+  },
+  web3SolanaWalletButtons: {
+    connect: 'Connetti con {{walletName}}',
+    continue: 'Continua con {{walletName}}',
+    noneAvailable:
+      'Nessun wallet Solana Web3 rilevato. Installa un {{ solanaWalletsLink || link("wallet extension") }} compatibile con Web3.',
   },
 } as const;
