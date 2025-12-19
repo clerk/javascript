@@ -25,10 +25,6 @@ import type { BuildClerkOptions } from './types';
 
 const KEY = '__clerk_client_jwt';
 
-/**
- * @deprecated Use `getClerkInstance()` instead. `Clerk` will be removed in the next major version.
- */
-export let clerk: HeadlessBrowserClerk | BrowserClerk;
 let __internal_clerk: HeadlessBrowserClerk | BrowserClerk | undefined;
 
 export function createClerkInstance(ClerkClass: typeof Clerk) {
@@ -53,7 +49,7 @@ export function createClerkInstance(ClerkClass: typeof Clerk) {
 
       const getToken = tokenCache.getToken;
       const saveToken = tokenCache.saveToken;
-      __internal_clerk = clerk = new ClerkClass(publishableKey);
+      __internal_clerk = new ClerkClass(publishableKey);
 
       if (Platform.OS === 'ios' || Platform.OS === 'android') {
         // @ts-expect-error - This is an internal API
