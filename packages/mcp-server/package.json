@@ -1,0 +1,39 @@
+{
+  "name": "@clerk/mcp-server",
+  "version": "0.0.0",
+  "description": "Connect to Clerk's remote MCP server via stdio",
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/mcp-server"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "type": "module",
+  "main": "dist/cli.js",
+  "bin": {
+    "clerk-mcp": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --env.NODE_ENV production",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

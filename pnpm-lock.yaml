@@ -684,6 +684,8 @@ importers:
         specifier: workspace:^
         version: link:../shared
 
+  packages/mcp-server: {}
+
   packages/nextjs:
     dependencies:
       '@clerk/backend':
