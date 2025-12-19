@@ -5,6 +5,7 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 import { handleValueOrFn } from '@clerk/shared/utils';
 
+import { canUseKeyless } from '../utils/feature-flags';
 import { errorThrower } from '../utils';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
@@ -29,7 +30,8 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  if (!secretKey) {
+  // In keyless mode, don't throw if secretKey is missing - ClerkProvider will handle it
+  if (!secretKey && !canUseKeyless) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: no secret key provided');
   }
@@ -39,7 +41,7 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     throw errorThrower.throw('Clerk: satellite mode requires a proxy URL or domain');
   }
 
-  if (isSatellite && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
+  if (isSatellite && secretKey && !isHttpOrHttps(signInUrl) && isDevelopmentFromSecretKey(secretKey)) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: satellite mode requires a sign-in URL in production');
   }

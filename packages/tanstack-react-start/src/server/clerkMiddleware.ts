@@ -5,15 +5,45 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
 import { createMiddleware, json } from '@tanstack/react-start';
 
+import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
+import { keyless } from './keyless';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions } from './types';
 import { getResponseClerkState, patchRequest } from './utils';
 
 export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMiddleware => {
-  return createMiddleware().server(async args => {
-    const clerkRequest = createClerkRequest(patchRequest(args.request));
-    const loadedOptions = loadOptions(clerkRequest, options);
+  return createMiddleware().server(async ({ request, next }) => {
+    const clerkRequest = createClerkRequest(patchRequest(request));
+
+    // Get keys - either from options, env, or keyless mode
+    let publishableKey = options?.publishableKey;
+    let secretKey = options?.secretKey;
+    let keylessClaimUrl: string | undefined;
+    let keylessApiKeysUrl: string | undefined;
+
+    // In keyless mode, try to read/create keys from the file system
+    if (canUseKeyless && (!publishableKey || !secretKey)) {
+      const keylessApp = await keyless.getOrCreateKeys();
+      if (keylessApp) {
+        publishableKey = publishableKey || keylessApp.publishableKey;
+        secretKey = secretKey || keylessApp.secretKey;
+        keylessClaimUrl = keylessApp.claimUrl;
+        keylessApiKeysUrl = keylessApp.apiKeysUrl;
+
+        keyless.logKeylessMessage(keylessApp.claimUrl);
+      }
+    }
+
+    // Load options with keyless fallback
+    const effectiveOptions = {
+      ...options,
+      publishableKey,
+      secretKey,
+    };
+
+    const loadedOptions = loadOptions(clerkRequest, effectiveOptions);
+
     const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,
       acceptsToken: 'any',
@@ -37,7 +67,16 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMid
 
     const clerkInitialState = getResponseClerkState(requestState as RequestState, loadedOptions);
 
-    const result = await args.next({
+    // Include keyless mode URLs if applicable
+    if (canUseKeyless && keylessClaimUrl) {
+      (clerkInitialState as Record<string, unknown>).__internal_clerk_state = {
+        ...((clerkInitialState as Record<string, unknown>).__internal_clerk_state as Record<string, unknown>),
+        __keylessClaimUrl: keylessClaimUrl,
+        __keylessApiKeysUrl: keylessApiKeysUrl,
+      };
+    }
+
+    const result = await next({
       context: {
         clerkInitialState,
         auth: (opts?: PendingSessionOptions) => requestState.toAuth(opts),
