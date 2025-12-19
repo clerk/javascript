@@ -113,7 +113,7 @@ const TaskChooseOrganizationCardFooter = () => {
 
 type TaskChooseOrganizationFlowsProps = {
   initialFlow: 'create' | 'choose';
-  organizationCreationDefaults?: OrganizationCreationDefaultsResource;
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource | null;
 };
 
 const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrganizationFlowsProps) => {

@@ -10,8 +10,9 @@ import { BaseResource } from './internal';
 
 export class OrganizationCreationDefaults extends BaseResource implements OrganizationCreationDefaultsResource {
   advisory: {
-    type: OrganizationCreationAdvisoryType;
+    code: OrganizationCreationAdvisoryType;
     severity: OrganizationCreationAdvisorySeverity;
+    meta: Record<string, string>;
   } | null = null;
   form: {
     name: string;
@@ -60,7 +61,8 @@ export class OrganizationCreationDefaults extends BaseResource implements Organi
     return {
       advisory: this.advisory
         ? {
-            type: this.advisory.type,
+            code: this.advisory.code,
+            meta: this.advisory.meta,
             severity: this.advisory.severity,
           }
         : null,

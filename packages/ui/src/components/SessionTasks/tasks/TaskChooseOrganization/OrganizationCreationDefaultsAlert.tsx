@@ -1,14 +1,15 @@
-import type { OrganizationCreationAdvisoryType, OrganizationCreationDefaultsResource } from '@clerk/shared/types';
+import type { OrganizationCreationDefaultsResource } from '@clerk/shared/types';
 
 import { Alert, Text } from '@/customizables';
-import { type LocalizationKey, localizationKeys } from '@/localization';
+import { localizationKeys } from '@/localization';
 
 export function OrganizationCreationDefaultsAlert({
   organizationCreationDefaults,
 }: {
   organizationCreationDefaults?: OrganizationCreationDefaultsResource;
 }) {
-  if (!organizationCreationDefaults?.advisory) {
+  const localizationKey = advisoryToLocalizationKey(organizationCreationDefaults?.advisory);
+  if (!localizationKey) {
     return null;
   }
 
@@ -16,15 +17,24 @@ export function OrganizationCreationDefaultsAlert({
     <Alert colorScheme='warning'>
       <Text
         colorScheme='warning'
-        localizationKey={advisoryTypeToLocalizationKey[organizationCreationDefaults.advisory.type]}
+        localizationKey={localizationKey}
         variant='caption'
       />
     </Alert>
   );
 }
 
-// TODO -> Update with latest advisory where meta is returned
-// TODO -> Include email domain in message, eg: {{ meta }}
-const advisoryTypeToLocalizationKey: Record<OrganizationCreationAdvisoryType, LocalizationKey> = {
-  existing_org_with_domain: localizationKeys('taskChooseOrganization.alerts.existingOrgWithDomain'),
+const advisoryToLocalizationKey = (advisory?: OrganizationCreationDefaultsResource['advisory']) => {
+  if (!advisory) {
+    return null;
+  }
+
+  switch (advisory.code) {
+    case 'existing_org_with_domain':
+      return localizationKeys('taskChooseOrganization.alerts.existingOrgWithDomain', {
+        email: advisory.meta.email,
+      });
+    default:
+      return null;
+  }
 };
