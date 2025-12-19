@@ -11,4 +11,4 @@
 '@clerk/vue': major
 ---
 
-Introduce `<Show when={...}>` as the cross-framework authorization control component and remove `<Protect>`, `<SignedIn>`, and `<SignedOut>` in favor of `<Show>`, updating shared types and framework wrappers to align with the new API.
+Introduce `<Show when={...}>` as the cross-framework authorization control component and remove `<Protect>`, `<SignedIn>`, and `<SignedOut>` in favor of `<Show>`.
