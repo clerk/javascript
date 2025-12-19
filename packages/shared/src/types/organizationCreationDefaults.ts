@@ -7,8 +7,9 @@ export type OrganizationCreationAdvisorySeverity = 'warning';
 
 export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
   advisory: {
-    type: OrganizationCreationAdvisoryType;
+    code: OrganizationCreationAdvisoryType;
     severity: OrganizationCreationAdvisorySeverity;
+    meta: Record<string, string>;
   } | null;
   form: {
     name: string;
@@ -19,8 +20,9 @@ export interface OrganizationCreationDefaultsJSON extends ClerkResourceJSON {
 
 export interface OrganizationCreationDefaultsResource extends ClerkResource {
   advisory: {
-    type: OrganizationCreationAdvisoryType;
+    code: OrganizationCreationAdvisoryType;
     severity: OrganizationCreationAdvisorySeverity;
+    meta: Record<string, string>;
   } | null;
   form: {
     name: string;
