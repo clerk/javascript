@@ -38,6 +38,12 @@ catalogs:
       specifier: 18.3.7
       version: 18.3.7
   repo:
+    '@swc/helpers':
+      specifier: 0.5.17
+      version: 0.5.17
+    core-js:
+      specifier: 3.47.0
+      version: 3.47.0
     tsdown:
       specifier: 0.15.7
       version: 0.15.7
@@ -472,7 +478,7 @@ importers:
         specifier: 5.6.0
         version: 5.6.0
       '@swc/helpers':
-        specifier: ^0.5.17
+        specifier: catalog:repo
         version: 0.5.17
       '@tanstack/query-core':
         specifier: 5.87.4
@@ -493,8 +499,8 @@ importers:
         specifier: 1.3.0
         version: 1.3.0
       core-js:
-        specifier: 3.41.0
-        version: 3.41.0
+        specifier: catalog:repo
+        version: 3.47.0
       crypto-js:
         specifier: ^4.2.0
         version: 4.2.0
@@ -948,9 +954,15 @@ importers:
       '@solana/wallet-standard':
         specifier: catalog:module-manager
         version: 1.1.4(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bs58@6.0.0)(react@18.3.1)
+      '@swc/helpers':
+        specifier: catalog:repo
+        version: 0.5.17
       copy-to-clipboard:
         specifier: 3.3.3
         version: 3.3.3
+      core-js:
+        specifier: catalog:repo
+        version: 3.47.0
       csstype:
         specifier: 3.1.3
         version: 3.1.3
@@ -7170,8 +7182,8 @@ packages:
   core-js-compat@3.46.0:
     resolution: {integrity: sha512-p9hObIIEENxSV8xIu+V68JjSeARg6UVMG5mR+JEUguG3sI6MsiS1njz2jHmyJDvA+8jX/sytkBHup6kxhM9law==}
 
-  core-js@3.41.0:
-    resolution: {integrity: sha512-SJ4/EHwS36QMJd6h/Rg+GyR4A5xE0FSI3eZ+iBVpfqf1x0eTSg1smWLHrA+2jQThZSh97fmSgFSU8B61nxosxA==}
+  core-js@3.47.0:
+    resolution: {integrity: sha512-c3Q2VVkGAUyupsjRnaNX6u8Dq2vAdzm9iuPj5FW0fRxzlxgq9Q39MDq10IvmQSpLgHQNyQzQmOo6bgGHmH3NNg==}
 
   core-util-is@1.0.2:
     resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
@@ -11205,7 +11217,6 @@ packages:
   next@15.2.8:
     resolution: {integrity: sha512-pe2trLKZTdaCuvNER0S9Wp+SP2APf7SfFmyUP9/w1SFA2UqmW0u+IsxCKkiky3n6um7mryaQIlgiDnKrf1ZwIw==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
-    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -23259,7 +23270,7 @@ snapshots:
     dependencies:
       browserslist: 4.27.0
 
-  core-js@3.41.0: {}
+  core-js@3.47.0: {}
 
   core-util-is@1.0.2: {}
 
