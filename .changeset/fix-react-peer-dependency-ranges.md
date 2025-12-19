@@ -1,9 +1,9 @@
 ---
 '@clerk/chrome-extension': patch
-'@clerk/expo': patch
+'@clerk/clerk-expo': patch
 '@clerk/expo-passkeys': patch
 '@clerk/nextjs': patch
-'@clerk/react': patch
+'@clerk/clerk-react': patch
 '@clerk/react-router': patch
 '@clerk/shared': patch
 '@clerk/tanstack-react-start': patch
