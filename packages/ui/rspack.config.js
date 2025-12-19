@@ -3,9 +3,12 @@ import rspack from '@rspack/core';
 import packageJSON from './package.json' with { type: 'json' };
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 import { merge } from 'webpack-merge';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 import { svgLoader, typescriptLoaderProd, typescriptLoaderDev } from '../../scripts/rspack-common.js';
+
+const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,10 +18,12 @@ const isDevelopment = mode => !isProduction(mode);
 
 const variants = {
   uiBrowser: 'ui.browser',
+  uiLegacyBrowser: 'ui.legacy.browser',
 };
 
 const variantToSourceFile = {
   [variants.uiBrowser]: './src/index.browser.ts',
+  [variants.uiLegacyBrowser]: './src/index.legacy.browser.ts',
 };
 
 /**
@@ -126,9 +131,12 @@ const entryForVariant = variant => {
 
 /**
  * Common production configuration for chunked browser builds
+ * @param {object} [options]
+ * @param {string} [options.targets] - Browserslist targets
+ * @param {boolean} [options.useCoreJs] - Whether to use core-js polyfills
  * @returns {import('@rspack/core').Configuration}
  */
-const commonForProdBrowser = () => {
+const commonForProdBrowser = ({ targets = 'last 2 years', useCoreJs = false } = {}) => {
   return {
     devtool: false,
     output: {
@@ -138,7 +146,7 @@ const commonForProdBrowser = () => {
       globalObject: 'globalThis',
     },
     module: {
-      rules: [svgLoader(), ...typescriptLoaderProd({ targets: 'last 2 years' })],
+      rules: [svgLoader(), ...typescriptLoaderProd({ targets, useCoreJs })],
     },
     optimization: {
       minimize: true,
@@ -157,13 +165,22 @@ const commonForProdBrowser = () => {
         }),
       ],
     },
+    ...(useCoreJs
+      ? {
+          resolve: {
+            alias: {
+              'core-js': path.dirname(require.resolve('core-js/package.json')),
+            },
+          },
+        }
+      : {}),
   };
 };
 
 /**
- * Production configuration - builds UMD browser variant only
+ * Production configuration - builds UMD browser variants
  * @param {'development'|'production'} mode
- * @returns {import('@rspack/core').Configuration}
+ * @returns {import('@rspack/core').Configuration[]}
  */
 const prodConfig = mode => {
   // Browser bundle with chunks (UMD)
@@ -173,7 +190,14 @@ const prodConfig = mode => {
     commonForProdBrowser(),
   );
 
-  return uiBrowser;
+  // Legacy browser bundle with chunks (UMD) for Safari 12 support
+  const uiLegacyBrowser = merge(
+    entryForVariant(variants.uiLegacyBrowser),
+    common({ mode, variant: variants.uiLegacyBrowser }),
+    commonForProdBrowser({ targets: packageJSON.browserslistLegacy, useCoreJs: true }),
+  );
+
+  return [uiBrowser, uiLegacyBrowser];
 };
 
 /**
