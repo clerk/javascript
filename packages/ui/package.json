@@ -80,7 +80,7 @@
     "@solana/wallet-standard": "catalog:module-manager",
     "@swc/helpers": "^0.5.17",
     "copy-to-clipboard": "3.3.3",
-    "core-js": "3.41.0",
+    "core-js": "catalog:repo",
     "csstype": "3.1.3",
     "dequal": "2.0.3",
     "input-otp": "1.4.2",
