@@ -3,4 +3,4 @@
 '@clerk/backend': minor
 ---
 
-Adds support for origin outage mode
+Improves resilience by keeping users logged in when Clerk's origin is temporarily unavailable using edge-based token generation
