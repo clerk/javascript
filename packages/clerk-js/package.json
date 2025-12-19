@@ -66,7 +66,7 @@
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
-    "@swc/helpers": "^0.5.17",
+    "@swc/helpers": "catalog:repo",
     "@tanstack/query-core": "5.87.4",
     "@wallet-standard/core": "catalog:module-manager",
     "@zxcvbn-ts/core": "catalog:module-manager",

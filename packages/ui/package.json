@@ -78,7 +78,7 @@
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
-    "@swc/helpers": "^0.5.17",
+    "@swc/helpers": "catalog:repo",
     "copy-to-clipboard": "3.3.3",
     "core-js": "catalog:repo",
     "csstype": "3.1.3",
