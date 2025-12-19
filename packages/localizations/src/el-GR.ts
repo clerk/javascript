@@ -872,6 +872,10 @@ export const elGR: LocalizationResource = {
       subtitle: 'Εισάγετε τα στοιχεία του οργανισμού σας για να συνεχίσετε',
       title: 'Ρυθμίστε τον οργανισμό σας',
     },
+    organizationCreationDisabled: {
+      title: 'Πρέπει να ανήκετε σε έναν οργανισμό',
+      subtitle: 'Επικοινωνήστε με τον διαχειριστή του οργανισμού σας για πρόσκληση.',
+    },
     signOut: {
       actionLink: 'Αποσύνδεση',
       actionText: 'Συνδεδεμένος ως {{identifier}}',
@@ -1361,16 +1365,17 @@ export const elGR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Σύνδεση',
+      actionText: 'Έχετε ήδη πρόσβαση;',
+      formButton: 'Εγγραφή στη λίστα αναμονής',
+      subtitle:
+        'Εισάγετε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας και θα σας ενημερώσουμε όταν η θέση σας είναι έτοιμη',
+      title: 'Εγγραφή στη λίστα αναμονής',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Θα ανακατευθυνθείτε σύντομα...',
+      subtitle: 'Θα επικοινωνήσουμε μαζί σας όταν η θέση σας είναι έτοιμη',
+      title: 'Ευχαριστούμε που εγγραφήκατε στη λίστα αναμονής!',
     },
   },
   web3SolanaWalletButtons: {

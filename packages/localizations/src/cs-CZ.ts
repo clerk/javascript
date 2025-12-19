@@ -881,6 +881,10 @@ export const csCZ: LocalizationResource = {
       subtitle: 'Zadejte údaje o vaší organizaci pro pokračování',
       title: 'Nastavte svou organizaci',
     },
+    organizationCreationDisabled: {
+      title: 'Musíte patřit do organizace',
+      subtitle: 'Kontaktujte administrátora vaší organizace pro pozvánku.',
+    },
     signOut: {
       actionLink: 'Odhlásit se',
       actionText: 'Přihlášen jako {{identifier}}',

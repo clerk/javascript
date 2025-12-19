@@ -875,6 +875,10 @@ export const beBY: LocalizationResource = {
       subtitle: 'Увядзіце даныя вашай арганізацыі для працягу',
       title: 'Наладзьце вашу арганізацыю',
     },
+    organizationCreationDisabled: {
+      title: 'Вы павінны належаць да арганізацыі',
+      subtitle: 'Звярніцеся да адміністратара вашай арганізацыі для атрымання запрашэння.',
+    },
     signOut: {
       actionLink: 'Выйсці',
       actionText: 'Увайшлі як {{identifier}}',

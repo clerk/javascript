@@ -878,6 +878,10 @@ export const itIT: LocalizationResource = {
       subtitle: 'Inserisci i dettagli della tua organizzazione per continuare',
       title: 'Configura la tua organizzazione',
     },
+    organizationCreationDisabled: {
+      title: "Devi appartenere a un'organizzazione",
+      subtitle: "Contatta l'amministratore della tua organizzazione per un invito.",
+    },
     signOut: {
       actionLink: 'Esci',
       actionText: 'Accesso effettuato come {{identifier}}',
@@ -1362,16 +1366,16 @@ export const itIT: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Accedi',
+      actionText: 'Hai già accesso?',
+      formButton: "Unisciti alla lista d'attesa",
+      subtitle: 'Inserisci il tuo indirizzo email e ti avviseremo quando il tuo posto sarà pronto',
+      title: "Unisciti alla lista d'attesa",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Verrai reindirizzato a breve...',
+      subtitle: 'Ti contatteremo quando il tuo posto sarà pronto',
+      title: "Grazie per esserti unito alla lista d'attesa!",
     },
   },
   web3SolanaWalletButtons: {

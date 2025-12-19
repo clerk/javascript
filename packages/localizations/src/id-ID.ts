@@ -876,6 +876,10 @@ export const idID: LocalizationResource = {
       subtitle: 'Masukkan detail organisasi Anda untuk melanjutkan',
       title: 'Atur organisasi Anda',
     },
+    organizationCreationDisabled: {
+      title: 'Anda harus menjadi anggota organisasi',
+      subtitle: 'Hubungi admin organisasi Anda untuk mendapatkan undangan.',
+    },
     signOut: {
       actionLink: 'Keluar',
       actionText: 'Masuk sebagai {{identifier}}',

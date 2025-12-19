@@ -870,6 +870,10 @@ export const nlBE: LocalizationResource = {
       subtitle: 'Voer de gegevens van je organisatie in om door te gaan',
       title: 'Stel je organisatie in',
     },
+    organizationCreationDisabled: {
+      title: 'Je moet tot een organisatie behoren',
+      subtitle: 'Neem contact op met de beheerder van je organisatie voor een uitnodiging.',
+    },
     signOut: {
       actionLink: 'Uitloggen',
       actionText: 'Ingelogd als {{identifier}}',

@@ -872,6 +872,10 @@ export const isIS: LocalizationResource = {
       subtitle: 'Sláðu inn upplýsingar um samtökin þín til að halda áfram',
       title: 'Stilltu samtökin þín',
     },
+    organizationCreationDisabled: {
+      title: 'Þú verður að tilheyra samtökum',
+      subtitle: 'Hafðu samband við stjórnanda samtakanna til að fá boð.',
+    },
     signOut: {
       actionLink: 'Skrá út',
       actionText: 'Skráður inn sem {{identifier}}',
@@ -1357,16 +1361,16 @@ export const isIS: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Skrá inn',
+      actionText: 'Áttu nú þegar aðgang?',
+      formButton: 'Skrá sig á biðlista',
+      subtitle: 'Sláðu inn netfangið þitt og við látum þig vita þegar staða þín er tilbúin',
+      title: 'Skrá sig á biðlista',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Þú verður áframsendur fljótlega...',
+      subtitle: 'Við höfum samband þegar staða þín er tilbúin',
+      title: 'Takk fyrir að skrá sig á biðlistann!',
     },
   },
   web3SolanaWalletButtons: {

@@ -871,6 +871,10 @@ export const fiFI: LocalizationResource = {
       subtitle: 'Syötä organisaatiosi tiedot jatkaaksesi',
       title: 'Aseta organisaatiosi',
     },
+    organizationCreationDisabled: {
+      title: 'Sinun täytyy kuulua organisaatioon',
+      subtitle: 'Ota yhteyttä organisaatiosi ylläpitäjään saadaksesi kutsun.',
+    },
     signOut: {
       actionLink: 'Kirjaudu ulos',
       actionText: 'Kirjautuneena käyttäjänä {{identifier}}',
@@ -1353,16 +1357,16 @@ export const fiFI: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Kirjaudu sisään',
+      actionText: 'Onko sinulla jo pääsy?',
+      formButton: 'Liity jonoon',
+      subtitle: 'Syötä sähköpostiosoitteesi ja ilmoitamme sinulle, kun paikkasi on valmis',
+      title: 'Liity jonoon',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Sinut ohjataan pian...',
+      subtitle: 'Olemme yhteydessä, kun paikkasi on valmis',
+      title: 'Kiitos liittymisestä jonoon!',
     },
   },
   web3SolanaWalletButtons: {

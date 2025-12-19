@@ -870,6 +870,10 @@ export const caES: LocalizationResource = {
       subtitle: 'Introduïu els detalls de la vostra organització per continuar',
       title: 'Configureu la vostra organització',
     },
+    organizationCreationDisabled: {
+      title: 'Heu de pertànyer a una organització',
+      subtitle: "Contacteu amb l'administrador de la vostra organització per obtenir una invitació.",
+    },
     signOut: {
       actionLink: 'Tancar sessió',
       actionText: 'Sessió iniciada com a {{identifier}}',
@@ -1358,16 +1362,16 @@ export const caES: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Iniciar sessió',
+      actionText: 'Ja tens accés?',
+      formButton: "Unir-se a la llista d'espera",
+      subtitle: "Introdueix la teva adreça de correu electrònic i t'avisarem quan el teu lloc estigui llest",
+      title: "Unir-se a la llista d'espera",
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: "Se't redirigirà aviat...",
+      subtitle: "T'enviarem un missatge quan el teu lloc estigui llest",
+      title: "Gràcies per unir-te a la llista d'espera!",
     },
   },
   web3SolanaWalletButtons: {

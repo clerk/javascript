@@ -857,6 +857,10 @@ export const zhCN: LocalizationResource = {
       subtitle: '输入您的组织详细信息以继续',
       title: '设置您的组织',
     },
+    organizationCreationDisabled: {
+      title: '您必须属于一个组织',
+      subtitle: '请联系您的组织管理员获取邀请。',
+    },
     signOut: {
       actionLink: '退出',
       actionText: '已登录为 {{identifier}}',
@@ -1317,16 +1321,16 @@ export const zhCN: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: '登录',
+      actionText: '已有访问权限？',
+      formButton: '加入候补名单',
+      subtitle: '输入您的电子邮件地址，我们会在您的位置准备好时通知您',
+      title: '加入候补名单',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: '您将很快被重定向...',
+      subtitle: '当您的位置准备好时，我们会与您联系',
+      title: '感谢您加入候补名单！',
     },
   },
   web3SolanaWalletButtons: {

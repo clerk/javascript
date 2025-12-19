@@ -867,6 +867,10 @@ export const arSA: LocalizationResource = {
       subtitle: 'أدخل تفاصيل منظمتك للمتابعة',
       title: 'إعداد منظمتك',
     },
+    organizationCreationDisabled: {
+      title: 'يجب أن تنتمي إلى منظمة',
+      subtitle: 'تواصل مع مسؤول منظمتك للحصول على دعوة.',
+    },
     signOut: {
       actionLink: 'تسجيل الخروج',
       actionText: 'تم تسجيل الدخول كـ {{identifier}}',
@@ -1342,16 +1346,16 @@ export const arSA: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'تسجيل الدخول',
+      actionText: 'هل لديك وصول بالفعل؟',
+      formButton: 'الانضمام إلى قائمة الانتظار',
+      subtitle: 'أدخل عنوان بريدك الإلكتروني وسنخبرك عندما يكون مكانك جاهزًا',
+      title: 'الانضمام إلى قائمة الانتظار',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'سيتم إعادة توجيهك قريبًا...',
+      subtitle: 'سنكون على اتصال عندما يكون مكانك جاهزًا',
+      title: 'شكرًا للانضمام إلى قائمة الانتظار!',
     },
   },
   web3SolanaWalletButtons: {

@@ -868,6 +868,10 @@ export const ptPT: LocalizationResource = {
       subtitle: 'Introduza os detalhes da sua organização para continuar',
       title: 'Configurar a sua organização',
     },
+    organizationCreationDisabled: {
+      title: 'Deve pertencer a uma organização',
+      subtitle: 'Contacte o administrador da sua organização para obter um convite.',
+    },
     signOut: {
       actionLink: 'Terminar sessão',
       actionText: 'Sessão iniciada como {{identifier}}',

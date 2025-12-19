@@ -872,6 +872,10 @@ export const hrHR: LocalizationResource = {
       subtitle: 'Unesite podatke o svojoj organizaciji za nastavak',
       title: 'Postavite svoju organizaciju',
     },
+    organizationCreationDisabled: {
+      title: 'Morate pripadati organizaciji',
+      subtitle: 'Kontaktirajte administratora svoje organizacije za pozivnicu.',
+    },
     signOut: {
       actionLink: 'Odjavi se',
       actionText: 'Prijavljen kao {{identifier}}',
@@ -1357,16 +1361,16 @@ export const hrHR: LocalizationResource = {
   },
   waitlist: {
     start: {
-      actionLink: undefined,
-      actionText: undefined,
-      formButton: undefined,
-      subtitle: undefined,
-      title: undefined,
+      actionLink: 'Prijavi se',
+      actionText: 'Već imaš pristup?',
+      formButton: 'Pridruži se listi čekanja',
+      subtitle: 'Unesi svoju e-mail adresu i obavijestit ćemo te kada tvoje mjesto bude spremno',
+      title: 'Pridruži se listi čekanja',
     },
     success: {
-      message: undefined,
-      subtitle: undefined,
-      title: undefined,
+      message: 'Uskoro ćeš biti preusmjeren...',
+      subtitle: 'Javit ćemo ti se kada tvoje mjesto bude spremno',
+      title: 'Hvala što si se pridružio/la listi čekanja!',
     },
   },
   web3SolanaWalletButtons: {
