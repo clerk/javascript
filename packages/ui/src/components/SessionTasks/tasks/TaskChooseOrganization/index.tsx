@@ -17,12 +17,10 @@ import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 
 const TaskChooseOrganizationInternal = () => {
   const { user } = useUser();
-  const { environment } = useEnvironment();
+  const { organizationSettings } = useEnvironment();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
   const organizationCreationDefaults = useFetch(
-    environment.organizationSettings.organizationCreationDefaults.enabled
-      ? user?.getOrganizationCreationDefaults
-      : undefined,
+    organizationSettings.organizationCreationDefaults?.enabled ? user?.getOrganizationCreationDefaults : undefined,
     'organization-creation-defaults',
     { staleTime: Infinity },
   );
