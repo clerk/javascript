@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError, isClerkApiResponseError } from './clerkApiResponseError';
+import { ClerkAPIResponseError, isClerkAPIResponseError } from './clerkApiResponseError';
 
 /**
  * Error class representing a missing expired token error from the API.
@@ -36,7 +36,7 @@ export class MissingExpiredTokenError extends ClerkAPIResponseError {
    */
   static is(err: unknown): err is ClerkAPIResponseError {
     return (
-      isClerkApiResponseError(err) &&
+      isClerkAPIResponseError(err) &&
       err.status === MissingExpiredTokenError.STATUS &&
       err.errors.length > 0 &&
       err.errors[0].code === MissingExpiredTokenError.ERROR_CODE
