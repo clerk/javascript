@@ -8,8 +8,8 @@ const { when } = Astro.props;
 
 const showContent = (() => {
   // String conditions
-  if (when === 'signedIn') return !!userId;
-  if (when === 'signedOut') return !userId;
+  if (when === 'signed-in') return !!userId;
+  if (when === 'signed-out') return !userId;
 
   // Function condition
   if (typeof when === 'function') return !!userId && when(has);

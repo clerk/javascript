@@ -4,10 +4,10 @@ import './App.css';
 function App() {
   return (
     <header>
-      <Show when='signedOut'>
+      <Show when='signed-out'>
         <SignInButton />
       </Show>
-      <Show when='signedIn'>
+      <Show when='signed-in'>
         <UserButton />
       </Show>
     </header>

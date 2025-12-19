@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Index Route</h1>
-    <Show when="signedIn">
+    <Show when="signed-in">
       <p>You are signed in!</p>
       <div>
         <p>View your profile here</p>
@@ -12,7 +12,7 @@
         <SignOutButton />
       </div>
     </Show>
-    <Show when="signedOut">
+    <Show when="signed-out">
       <p>You are signed out</p>
 
       <SignIn />

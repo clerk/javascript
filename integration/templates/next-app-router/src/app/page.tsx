@@ -7,11 +7,11 @@ export default function Home() {
     <main>
       <UserButton fallback={<>Loading user button</>} />
       <ClientId />
-      <Show when='signedIn'>SignedIn</Show>
-      <Show when='signedOut'>SignedOut</Show>
+      <Show when='signed-in'>SignedIn</Show>
+      <Show when='signed-out'>SignedOut</Show>
       <Show
         fallback={'SignedOut from protect'}
-        when='signedIn'
+        when='signed-in'
       >
         SignedIn from protect
       </Show>

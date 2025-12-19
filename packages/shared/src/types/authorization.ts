@@ -50,8 +50,8 @@ export type ProtectParams =
  * or a callback function receiving the `has` helper for complex conditions.
  */
 export type ShowWhenCondition =
-  | 'signedIn'
-  | 'signedOut'
+  | 'signed-in'
+  | 'signed-out'
   | ProtectParams
   | ((has: CheckAuthorizationWithCustomPermissions) => boolean);
 

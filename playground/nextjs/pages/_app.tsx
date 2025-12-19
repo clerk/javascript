@@ -155,12 +155,12 @@ const AppBar = (props: AppBarProps) => {
       <UserButton />
 
       {/* @ts-ignore */}
-      <Show when='signedIn'>
+      <Show when='signed-in'>
         <SignOutButton />
       </Show>
 
       {/* @ts-ignore */}
-      <Show when='signedOut'>
+      <Show when='signed-out'>
         <SignInButton mode={'modal'} />
       </Show>
     </div>

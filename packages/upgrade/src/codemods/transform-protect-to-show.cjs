@@ -13,8 +13,8 @@ const isClerkPackageSource = sourceValue => {
  * - `<Protect feature="user:premium">` → `<Show when={{ feature: 'user:premium' }}>`
  * - `<Protect plan="pro">` → `<Show when={{ plan: 'pro' }}>`
  * - `<Protect condition={(has) => ...}>` → `<Show when={(has) => ...}>`
- * - `<SignedIn>...` → `<Show when="signedIn">...`
- * - `<SignedOut>...` → `<Show when="signedOut">...`
+ * - `<SignedIn>...` → `<Show when="signed-in">...`
+ * - `<SignedOut>...` → `<Show when="signed-out">...`
  *
  * Also updates ESM/CJS imports from `Protect` to `Show`.
  *
@@ -60,8 +60,8 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
           originalImportedName === 'Protect'
             ? 'protect'
             : originalImportedName === 'SignedIn'
-              ? 'signedIn'
-              : 'signedOut';
+              ? 'signed-in'
+              : 'signed-out';
         spec.imported.name = 'Show';
         if (spec.local && spec.local.name === originalImportedName) {
           spec.local.name = 'Show';
@@ -165,8 +165,8 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
           originalImportedName === 'Protect'
             ? 'protect'
             : originalImportedName === 'SignedIn'
-              ? 'signedIn'
-              : 'signedOut';
+              ? 'signed-in'
+              : 'signed-out';
 
         prop.key.name = 'Show';
 
@@ -241,7 +241,7 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
         const propertyName = member.property.name;
 
         if (namespaceImports.has(objectName) && ['Protect', 'SignedIn', 'SignedOut'].includes(propertyName)) {
-          kind = propertyName === 'Protect' ? 'protect' : propertyName === 'SignedIn' ? 'signedIn' : 'signedOut';
+          kind = propertyName === 'Protect' ? 'protect' : propertyName === 'SignedIn' ? 'signed-in' : 'signed-out';
 
           renameNodeToShow = node => {
             if (j.JSXMemberExpression.check(node) && j.Identifier.check(node.property)) {
@@ -288,8 +288,8 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     // Build the `when` prop
     let whenValue = null;
 
-    if (kind === 'signedIn' || kind === 'signedOut') {
-      whenValue = j.stringLiteral(kind === 'signedIn' ? 'signedIn' : 'signedOut');
+    if (kind === 'signed-in' || kind === 'signed-out') {
+      whenValue = j.stringLiteral(kind === 'signed-in' ? 'signed-in' : 'signed-out');
     } else if (conditionAttr) {
       // condition prop becomes the when callback directly
       whenValue = conditionAttr.value;
@@ -325,7 +325,7 @@ module.exports = function transformProtectToShow({ source }, { jscodeshift: j })
     // Reconstruct attributes with `when` prop
     const newAttributes = [];
 
-    const defaultWhenValue = kind === 'signedOut' ? 'signedOut' : 'signedIn';
+    const defaultWhenValue = kind === 'signed-out' ? 'signed-out' : 'signed-in';
     const finalWhenValue = whenValue || j.stringLiteral(defaultWhenValue);
 
     newAttributes.push(j.jsxAttribute(j.jsxIdentifier('when'), finalWhenValue));

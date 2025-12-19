@@ -7,7 +7,7 @@ import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/componen
 
 <Layout title='Welcome to Astro.'>
   <h1>Welcome to <span class='text-gradient'>Astro</span></h1>
-  <Show when='signedIn'>
+  <Show when='signed-in'>
     <OrganizationSwitcher
       appearance={{
         elements: {
@@ -26,7 +26,7 @@ import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/componen
     role='list'
     class='link-card-grid'
   >
-    <Show when='signedOut'>
+    <Show when='signed-out'>
       <Card
         href='/sign-in'
         title='Log in'
@@ -38,7 +38,7 @@ import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/componen
         body='Supercharge your project with new frameworks and libraries.'
       />
     </Show>
-    <Show when='signedIn'>
+    <Show when='signed-in'>
       <Card
         href='/user'
         title='User Profile'

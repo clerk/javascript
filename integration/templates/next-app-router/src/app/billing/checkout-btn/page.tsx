@@ -4,7 +4,7 @@ import { CheckoutButton } from '@clerk/nextjs/experimental';
 export default function Home() {
   return (
     <main>
-      <Show when='signedIn'>
+      <Show when='signed-in'>
         <CheckoutButton
           planId='cplan_2wMjqdlza0hTJc4HLCoBwAiExhF'
           planPeriod='month'

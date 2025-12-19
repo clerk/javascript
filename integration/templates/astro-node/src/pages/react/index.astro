@@ -7,7 +7,10 @@ import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/react';
 
 <Layout title='Welcome to Astro.'>
   <h1>Welcome to <span class='text-gradient'>Astro</span> + React</h1>
-  <Show when='signedIn' client:load>
+  <Show
+    when='signed-in'
+    client:load
+  >
     <OrganizationSwitcher
       client:load
       appearance={{
@@ -31,7 +34,10 @@ import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/react';
     role='list'
     class='link-card-grid'
   >
-    <Show when='signedOut' client:load>
+    <Show
+      when='signed-out'
+      client:load
+    >
       <Card
         href='/sign-in'
         title='Log in'
@@ -43,7 +49,10 @@ import { Show, SignOutButton, OrganizationSwitcher } from '@clerk/astro/react';
         body='Supercharge your project with new frameworks and libraries.'
       />
     </Show>
-    <Show when='signedIn' client:load>
+    <Show
+      when='signed-in'
+      client:load
+    >
       <Card
         href='/user'
         title='User Profile'

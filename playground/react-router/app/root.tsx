@@ -52,10 +52,10 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <ClerkProvider loaderData={loaderData}>
       <header className="flex items-center justify-center py-8 px-4">
-        <Show when="signedOut">
+        <Show when="signed-out">
           <SignInButton />
         </Show>
-        <Show when="signedIn">
+        <Show when="signed-in">
           <UserButton />
         </Show>
       </header>

@@ -9,8 +9,8 @@ export default function Home() {
   return (
     <div>
       <UserButton />
-      <Show when='signedIn'>SignedIn</Show>
-      <Show when='signedOut'>SignedOut</Show>
+      <Show when='signed-in'>SignedIn</Show>
+      <Show when='signed-out'>SignedOut</Show>
     </div>
   );
 }

@@ -7,14 +7,20 @@ export const prerender = false;
 ---
 
 <Layout title='Home'>
-  <Show when='signedOut' isStatic={false}>
+  <Show
+    when='signed-out'
+    isStatic={false}
+  >
     <h1>Signed out</h1>
     <SignInButton
       mode='modal'
       fallbackRedirectUrl='/'
     />
   </Show>
-  <Show when='signedIn' isStatic={false}>
+  <Show
+    when='signed-in'
+    isStatic={false}
+  >
     <h1>Signed in</h1>
     <UserButton />
     <OrganizationSwitcher client:load />

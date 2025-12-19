@@ -3,12 +3,12 @@ import { OrganizationSwitcher, Show } from '@clerk/vue';
 </script>
 
 <template>
-  <Show when="signedIn">
+  <Show when="signed-in">
     <OrganizationSwitcher />
   </Show>
   <div>
     <ul>
-      <Show when="signedIn">
+      <Show when="signed-in">
         <li>
           <RouterLink to="/profile">Profile</RouterLink>
         </li>

@@ -16,7 +16,7 @@ export type AppRouterShowProps = React.PropsWithChildren<
  * Renders the provided `fallback` (or `null`) when the condition fails.
  *
  * The `when` prop supports:
- * - `"signedIn"` or `"signedOut"` shorthands
+ * - `"signed-in"` or `"signed-out"` shorthands
  * - Authorization objects such as `{ permission: "..." }`, `{ role: "..." }`, `{ feature: "..." }`, or `{ plan: "..." }`
  * - Predicate functions `(has) => boolean` that receive the `has` helper
  *
@@ -34,7 +34,7 @@ export type AppRouterShowProps = React.PropsWithChildren<
  *   <ProtectedFeature />
  * </Show>
  *
- * <Show when="signedIn">
+ * <Show when="signed-in">
  *   <Dashboard />
  * </Show>
  * ```
@@ -48,7 +48,7 @@ export async function Show(props: AppRouterShowProps): Promise<React.JSX.Element
   const unauthorized = fallback ? <>{fallback}</> : null;
 
   if (typeof resolvedWhen === 'string') {
-    if (resolvedWhen === 'signedOut') {
+    if (resolvedWhen === 'signed-out') {
       return userId ? unauthorized : authorized;
     }
     return userId ? authorized : unauthorized;

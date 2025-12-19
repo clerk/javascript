@@ -70,7 +70,7 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
   const authorized = <>{children}</>;
   const unauthorized = <>{fallback ?? null}</>;
 
-  if (when === 'signedOut') {
+  if (when === 'signed-out') {
     return userId ? unauthorized : authorized;
   }
 
@@ -78,7 +78,7 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
     return unauthorized;
   }
 
-  if (when === 'signedIn') {
+  if (when === 'signed-in') {
     return authorized;
   }
 

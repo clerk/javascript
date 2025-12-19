@@ -24,8 +24,8 @@ const setAuthReturn = (value: { has?: (params: unknown) => boolean; userId: stri
   mockAuth.mockResolvedValue(value);
 };
 
-const signedInWhen: ShowWhenCondition = 'signedIn';
-const signedOutWhen: ShowWhenCondition = 'signedOut';
+const signedInWhen: ShowWhenCondition = 'signed-in';
+const signedOutWhen: ShowWhenCondition = 'signed-out';
 
 describe('Show (App Router server)', () => {
   afterEach(() => {

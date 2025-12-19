@@ -27,7 +27,7 @@ export default async function Page() {
         <h1>Hello, Next.js!</h1>
         {userId ? <h3>Signed in as: {userId}</h3> : <h3>Signed out</h3>}
         {/* @ts-ignore */}
-        <Show when='signedIn'>
+        <Show when='signed-in'>
           <UserButton
             userProfileMode='navigation'
             userProfileUrl='/app-dir/user'
@@ -42,7 +42,7 @@ export default async function Page() {
           <div>{JSON.stringify(currentUser_)}</div>
         </Show>
         {/* @ts-ignore */}
-        <Show when='signedOut'>
+        <Show when='signed-out'>
           <SignIn routing='hash' />
         </Show>
       </div>

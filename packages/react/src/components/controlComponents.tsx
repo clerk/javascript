@@ -62,7 +62,7 @@ export type ShowProps = React.PropsWithChildren<
  * pending sessions as signed out during that period.
  *
  * The `when` prop supports:
- * - `"signedIn"` or `"signedOut"` shorthands
+ * - `"signed-in"` or `"signed-out"` shorthands
  * - Authorization descriptors (e.g., `{ permission: "org:billing:manage" }`, `{ role: "admin" }`)
  * - A predicate function `(has) => boolean` that receives the `has` helper
  *
@@ -95,7 +95,7 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
   const authorized = children;
   const unauthorized = fallback ?? null;
 
-  if (resolvedWhen === 'signedOut') {
+  if (resolvedWhen === 'signed-out') {
     return userId ? unauthorized : authorized;
   }
 
@@ -103,7 +103,7 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
     return unauthorized;
   }
 
-  if (resolvedWhen === 'signedIn') {
+  if (resolvedWhen === 'signed-in') {
     return authorized;
   }
 
@@ -115,7 +115,7 @@ export const Show = ({ children, fallback, treatPendingAsSignedOut, when }: Show
 };
 
 function checkAuthorization(
-  when: Exclude<ShowWhenCondition, 'signedIn' | 'signedOut'>,
+  when: Exclude<ShowWhenCondition, 'signed-in' | 'signed-out'>,
   has: NonNullable<ReturnType<typeof useAuth>['has']>,
 ): boolean {
   if (typeof when === 'function') {

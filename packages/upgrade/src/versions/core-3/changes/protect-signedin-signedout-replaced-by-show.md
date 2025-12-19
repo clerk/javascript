@@ -14,13 +14,13 @@ The authorization control components `Protect`, `SignedIn`, and `SignedOut` have
 +import { Show } from '@clerk/react';
 
 -<SignedIn>
-+<Show when="signedIn">
++<Show when="signed-in">
    <Dashboard />
 -</SignedIn>
 +</Show>
 
 -<SignedOut>
-+<Show when="signedOut">
++<Show when="signed-out">
    <SignIn />
 -</SignedOut>
 +</Show>

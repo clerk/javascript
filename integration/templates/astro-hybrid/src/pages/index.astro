@@ -7,14 +7,14 @@ export const prerender = true;
 ---
 
 <Layout title='Home'>
-  <Show when='signedOut'>
+  <Show when='signed-out'>
     <h1>Signed out</h1>
     <SignInButton
       mode='modal'
       fallbackRedirectUrl='/'
     />
   </Show>
-  <Show when='signedIn'>
+  <Show when='signed-in'>
     <h1>Signed in</h1>
     <UserButton />
     <OrganizationSwitcher client:only='react' />

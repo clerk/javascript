@@ -68,7 +68,7 @@ const App = () => (
 import { Show } from "@clerk/react"
 
 const App = () => (
-  <Show when="signedIn">
+  <Show when="signed-in">
     <div>Child</div>
   </Show>
 )
@@ -89,7 +89,7 @@ const App = () => (
 import { Show } from "@clerk/react"
 
 const App = () => (
-  <Show when="signedOut">
+  <Show when="signed-out">
     <div>Child</div>
   </Show>
 )
@@ -110,7 +110,7 @@ const App = () => (
 import * as Clerk from "@clerk/react"
 
 const App = () => (
-  <Clerk.Show when="signedIn">
+  <Clerk.Show when="signed-in">
     <div>Child</div>
   </Clerk.Show>
 )
@@ -171,7 +171,7 @@ const Thing = () => <Protect />
     output: `
 import { Show } from "@clerk/react"
 
-const Thing = () => <Show when="signedIn" />
+const Thing = () => <Show when="signed-in" />
 `,
   },
   {
@@ -212,7 +212,7 @@ const App = () => (
 import { Show } from "@clerk/react"
 
 const App = () => (
-  <Show when="signedOut" fallback={<Other />}>
+  <Show when="signed-out" fallback={<Other />}>
     <div>Child</div>
   </Show>
 )
@@ -233,7 +233,7 @@ const App = () => (
 import * as Clerk from "@clerk/react"
 
 const App = () => (
-  <Clerk.Show when="signedOut" fallback={<Other />}>
+  <Clerk.Show when="signed-out" fallback={<Other />}>
     <div>Child</div>
   </Clerk.Show>
 )
@@ -318,7 +318,7 @@ const App = () => <Protect {...props} />
 import { Show } from "@clerk/react"
 
 const props = { permission: "org:read" }
-const App = () => <Show when="signedIn" {...props} />
+const App = () => <Show when="signed-in" {...props} />
 `,
   },
   {
@@ -361,8 +361,8 @@ const {
 
 const App = () => (
   <>
-    <Show when="signedIn">in</Show>
-    <Show when="signedOut">out</Show>
+    <Show when="signed-in">in</Show>
+    <Show when="signed-out">out</Show>
   </>
 );
 `,
@@ -466,8 +466,8 @@ import { Show } from "@clerk/react";
 
 const App = () => (
   <>
-    <Show when="signedIn" />
-    <Show when="signedOut" />
+    <Show when="signed-in" />
+    <Show when="signed-out" />
   </>
 );
 `,
@@ -487,7 +487,7 @@ const App = () => (
 import { Show as OnlyWhenSignedIn } from "@clerk/react";
 
 const App = () => (
-  <OnlyWhenSignedIn when="signedIn">
+  <OnlyWhenSignedIn when="signed-in">
     ok
   </OnlyWhenSignedIn>
 );

@@ -16,7 +16,7 @@ const attrs = useAttrs();
 // Authentication checks - similar to React implementation
 if (userId.value === null) {
   throw new Error(
-    'Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<Show when="signedIn" />` component.',
+    'Ensure that `<SubscriptionDetailsButton />` is rendered inside a `<Show when="signed-in" />` component.',
   );
 }
 

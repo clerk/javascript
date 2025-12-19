@@ -11,10 +11,10 @@ import LanguagePicker from './components/LanguagePicker.vue';
         <p class="title">Vue Clerk Integration test</p>
       </div>
       <LanguagePicker />
-      <Show when="signedIn">
+      <Show when="signed-in">
         <CustomUserButton />
       </Show>
-      <Show when="signedOut">
+      <Show when="signed-out">
         <RouterLink to="/sign-in">Sign in</RouterLink>
       </Show>
     </div>

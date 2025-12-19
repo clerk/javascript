@@ -7,7 +7,7 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * A button component that opens the Clerk Checkout drawer when clicked. Render only when the user is signed in (e.g., wrap with `<Show when="signedIn">`).
+ * A button component that opens the Clerk Checkout drawer when clicked. Render only when the user is signed in (e.g., wrap with `<Show when="signed-in">`).
  *
  * @example
  * ```tsx
@@ -17,7 +17,7 @@ import { withClerk } from './withClerk';
  * // Basic usage with default "Checkout" text
  * function BasicCheckout() {
  *   return (
- *     <Show when="signedIn">
+ *     <Show when="signed-in">
  *       <CheckoutButton planId="plan_123" />
  *     </Show>
  *   );
@@ -26,7 +26,7 @@ import { withClerk } from './withClerk';
  * // Custom button with organization subscription
  * function OrganizationCheckout() {
  *   return (
- *     <Show when="signedIn">
+ *     <Show when="signed-in">
  *       <CheckoutButton
  *         planId="plan_123"
  *         planPeriod="month"
@@ -61,7 +61,7 @@ export const CheckoutButton = withClerk(
 
     if (userId === null) {
       throw new Error(
-        'Clerk: Ensure that `<CheckoutButton />` is rendered only when the user is signed in (wrap with `<Show when="signedIn">` or guard with `useAuth()`).',
+        'Clerk: Ensure that `<CheckoutButton />` is rendered only when the user is signed in (wrap with `<Show when="signed-in">` or guard with `useAuth()`).',
       );
     }
 

@@ -9,8 +9,8 @@ function App() {
       <UserButton />
       <OrganizationSwitcher fallback={<>Loading organization switcher</>} />
       <ClientId />
-      <Show when='signedOut'>SignedOut</Show>
-      <Show when='signedIn'>SignedIn</Show>
+      <Show when='signed-out'>SignedOut</Show>
+      <Show when='signed-in'>SignedIn</Show>
       <Link href='/protected'>Protected</Link>
     </main>
   );

@@ -6,10 +6,10 @@ import { Show, SignIn, UserButton } from '@clerk/react';
 function App() {
   return (
     <main>
-      <Show when='signedOut'>
+      <Show when='signed-out'>
         <SignIn />
       </Show>
-      <Show when='signedIn'>Signed In</Show>
+      <Show when='signed-in'>Signed In</Show>
       <UserButton />
     </main>
   );

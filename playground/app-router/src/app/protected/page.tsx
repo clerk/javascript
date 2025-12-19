@@ -13,10 +13,10 @@ export default async function Page() {
     <div>
       <h1>Protected page</h1>
       <pre></pre>
-      <Show when='signedIn'>
+      <Show when='signed-in'>
         <h2>Signed in</h2>
       </Show>
-      <Show when='signedOut'>
+      <Show when='signed-out'>
         <h2>Signed out</h2>
       </Show>
       <ClerkLoaded>
@@ -26,7 +26,7 @@ export default async function Page() {
 
       <ClientSideWrapper>
         server content
-        <Show when='signedIn'>
+        <Show when='signed-in'>
           <div>SignedIn</div>
         </Show>
         <ClerkLoaded>

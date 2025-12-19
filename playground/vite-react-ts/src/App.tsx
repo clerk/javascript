@@ -125,10 +125,10 @@ function ClerkProviderWithRoutes() {
           path='/protected'
           element={
             <>
-              <Show when='signedIn'>
+              <Show when='signed-in'>
                 <ProtectedPage />
               </Show>
-              <Show when='signedOut'>
+              <Show when='signed-out'>
                 <RedirectToSignIn />
               </Show>
             </>

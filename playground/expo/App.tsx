@@ -145,10 +145,10 @@ export default function App() {
       __experimental_passkeys={passkeys}
     >
       <View style={styles.container}>
-        <Show when='signedIn'>
+        <Show when='signed-in'>
           <ProtectedView />
         </Show>
-        <Show when='signedOut'>
+        <Show when='signed-out'>
           <PublicView />
         </Show>
       </View>

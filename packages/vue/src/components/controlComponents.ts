@@ -105,7 +105,7 @@ export const AuthenticateWithRedirectCallback = defineComponent((props: HandleOA
  *
  * @public
  * @property fallback Optional content shown when the condition fails; can be provided via prop or `fallback` slot.
- * @property when Condition controlling visibility; supports `"signedIn"`, `"signedOut"`, authorization descriptors, or a predicate that receives the `has` helper.
+ * @property when Condition controlling visibility; supports `"signed-in"`, `"signed-out"`, authorization descriptors, or a predicate that receives the `has` helper.
  * @property treatPendingAsSignedOut Inherited from `PendingSessionOptions`; treat pending sessions as signed out while loading.
  * @example
  * ```vue
@@ -137,7 +137,7 @@ export const Show = defineComponent((props: ShowProps, { slots }) => {
     const fallbackFromProp = (props.fallback as VNodeChild | null | undefined) ?? null;
     const unauthorized = (fallbackFromSlot ?? fallbackFromProp ?? null) as VNodeChild | null;
 
-    if (props.when === 'signedOut') {
+    if (props.when === 'signed-out') {
       return userId.value ? unauthorized : authorized;
     }
 
@@ -145,7 +145,7 @@ export const Show = defineComponent((props: ShowProps, { slots }) => {
       return unauthorized;
     }
 
-    if (props.when === 'signedIn') {
+    if (props.when === 'signed-in') {
       return authorized;
     }
 

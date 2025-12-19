@@ -10,16 +10,16 @@ function App() {
   return (
     <>
       <header>
-        <Show when='signedOut'>
+        <Show when='signed-out'>
           <SignInButton mode='modal' />
         </Show>
-        <Show when='signedIn'>
+        <Show when='signed-in'>
           <UserButton />
         </Show>
       </header>
       <main>
-        <Show when='signedOut'>Please Sign In</Show>
-        <Show when='signedIn'>Welcome!</Show>
+        <Show when='signed-out'>Please Sign In</Show>
+        <Show when='signed-in'>Welcome!</Show>
       </main>
     </>
   );
@@ -80,8 +80,8 @@ function AppWithRouting() {
         path='/'
         element={
           <>
-            <Show when='signedIn'>Welcome User!</Show>
-            <Show when='signedOut'>
+            <Show when='signed-in'>Welcome User!</Show>
+            <Show when='signed-out'>
               <SignIn
                 forceRedirectUrl='/'
                 signUpUrl='/sign-up'

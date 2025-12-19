@@ -5,10 +5,10 @@ import Layout from '../../layouts/ViewTransitionsLayout.astro';
 
 <Layout title='Sign in'>
   <div class='w-full flex justify-center'>
-    <Show when='signedOut'>
+    <Show when='signed-out'>
       <a href='/transitions/sign-in'>Sign in</a>
     </Show>
-    <Show when='signedIn'>
+    <Show when='signed-in'>
       <UserButton />
     </Show>
   </div>

@@ -14,7 +14,7 @@ const UserProfilePage: NextPage = (props: any) => {
     <div>
       <h2>/pages/user</h2>
       <pre>{props.message}</pre>
-      <Show when='signedIn'>
+      <Show when='signed-in'>
         <h2>SignedIn</h2>
       </Show>
       <UserProfile />

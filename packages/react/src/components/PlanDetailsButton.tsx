@@ -22,7 +22,7 @@ import { withClerk } from './withClerk';
  * // Custom button with custom text
  * function CustomPlanDetails() {
  *   return (
- *     <Show when="signedIn">
+ *     <Show when="signed-in">
  *       <PlanDetailsButton planId="plan_123">
  *         <button>View Plan Details</button>
  *       </PlanDetailsButton>

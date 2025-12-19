@@ -7,7 +7,7 @@ import { assertSingleChild, normalizeWithDefaultValue, safeExecute } from '../ut
 import { withClerk } from './withClerk';
 
 /**
- * A button component that opens the Clerk Subscription Details drawer when clicked. Render only when the user is signed in (e.g., wrap with `<Show when="signedIn">`).
+ * A button component that opens the Clerk Subscription Details drawer when clicked. Render only when the user is signed in (e.g., wrap with `<Show when="signed-in">`).
  *
  * @example
  * ```tsx
@@ -22,7 +22,7 @@ import { withClerk } from './withClerk';
  * // Custom button with Organization Subscription
  * function OrganizationSubscriptionDetails() {
  *   return (
- *     <Show when="signedIn">
+ *     <Show when="signed-in">
  *       <SubscriptionDetailsButton
  *         for="organization"
  *         onSubscriptionCancel={() => console.log('Subscription canceled')}
@@ -53,7 +53,7 @@ export const SubscriptionDetailsButton = withClerk(
 
     if (userId === null) {
       throw new Error(
-        'Clerk: Ensure that `<SubscriptionDetailsButton />` is rendered only when the user is signed in (wrap with `<Show when="signedIn">` or guard with `useAuth()`).',
+        'Clerk: Ensure that `<SubscriptionDetailsButton />` is rendered only when the user is signed in (wrap with `<Show when="signed-in">` or guard with `useAuth()`).',
       );
     }
 

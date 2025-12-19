@@ -1,6 +1,6 @@
 <template>
   <main>
-    <Show when="signedIn">
+    <Show when="signed-in">
       <CheckoutButton
         planId="cplan_2wMjqdlza0hTJc4HLCoBwAiExhF"
         planPeriod="month"
