@@ -22,7 +22,6 @@ const TaskChooseOrganizationInternal = () => {
   const organizationCreationDefaults = useFetch(
     organizationSettings.organizationCreationDefaults?.enabled ? user?.getOrganizationCreationDefaults : undefined,
     'organization-creation-defaults',
-    { staleTime: Infinity },
   );
 
   const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
