@@ -43,7 +43,6 @@ export async function syncKeylessConfigAction(args: AccountlessApplication & { r
      * Force middleware to execute to read the new keys from the cookies and populate the authentication state correctly.
      */
     redirect(`/clerk-sync-keyless?returnUrl=${returnUrl}`, RedirectType.replace);
-    return;
   }
 
   return;

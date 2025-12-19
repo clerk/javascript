@@ -3,20 +3,35 @@ import { createKeylessService } from '@clerk/shared/keyless';
 import { clerkClient } from '../clerkClient';
 import { createFileStorage } from './fileStorage';
 
-// Create a singleton keyless service for TanStack Start
-export const keyless = createKeylessService({
-  storage: createFileStorage(),
-  api: {
-    createAccountlessApplication: async (requestHeaders?: Headers) => {
-      return await clerkClient().__experimental_accountlessApplications.createAccountlessApplication({
-        requestHeaders,
-      });
-    },
-    completeOnboarding: async (requestHeaders?: Headers) => {
-      return await clerkClient().__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
-        requestHeaders,
-      });
-    },
-  },
-  framework: 'tanstack-react-start',
-});
+// Lazily initialized keyless service singleton
+let keylessServiceInstance: ReturnType<typeof createKeylessService> | null = null;
+
+export function keyless() {
+  if (!keylessServiceInstance) {
+    keylessServiceInstance = createKeylessService({
+      storage: createFileStorage(),
+      api: {
+        async createAccountlessApplication(requestHeaders?: Headers) {
+          try {
+            return await clerkClient().__experimental_accountlessApplications.createAccountlessApplication({
+              requestHeaders,
+            });
+          } catch {
+            return null;
+          }
+        },
+        async completeOnboarding(requestHeaders?: Headers) {
+          try {
+            return await clerkClient().__experimental_accountlessApplications.completeAccountlessApplicationOnboarding({
+              requestHeaders,
+            });
+          } catch {
+            return null;
+          }
+        },
+      },
+      framework: 'tanstack-react-start',
+    });
+  }
+  return keylessServiceInstance;
+}

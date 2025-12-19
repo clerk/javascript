@@ -24,14 +24,15 @@ export const clerkMiddleware = (options?: ClerkMiddlewareOptions): AnyRequestMid
 
     // In keyless mode, try to read/create keys from the file system
     if (canUseKeyless && (!publishableKey || !secretKey)) {
-      const keylessApp = await keyless.getOrCreateKeys();
+      const keylessService = keyless();
+      const keylessApp = await keylessService.getOrCreateKeys();
       if (keylessApp) {
         publishableKey = publishableKey || keylessApp.publishableKey;
         secretKey = secretKey || keylessApp.secretKey;
         keylessClaimUrl = keylessApp.claimUrl;
         keylessApiKeysUrl = keylessApp.apiKeysUrl;
 
-        keyless.logKeylessMessage(keylessApp.claimUrl);
+        keylessService.logKeylessMessage(keylessApp.claimUrl);
       }
     }
 
