@@ -1,7 +1,7 @@
 import type { ClerkResourceJSON } from './json';
 import type { ClerkResource } from './resource';
 
-export type OrganizationCreationAdvisoryType = 'existing_org_with_domain';
+export type OrganizationCreationAdvisoryType = 'organization_already_exists';
 
 export type OrganizationCreationAdvisorySeverity = 'warning';
 

@@ -30,9 +30,9 @@ const advisoryToLocalizationKey = (advisory?: OrganizationCreationDefaultsResour
   }
 
   switch (advisory.code) {
-    case 'existing_org_with_domain':
-      return localizationKeys('taskChooseOrganization.alerts.existingOrgWithDomain', {
-        email: advisory.meta.email,
+    case 'organization_already_exists':
+      return localizationKeys('taskChooseOrganization.alerts.organizationAlreadyExists', {
+        email: advisory.meta.organization_domain,
       });
     default:
       return null;
