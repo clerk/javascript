@@ -36,7 +36,6 @@ type CreateOrganizationFormProps = {
   };
 };
 
-// TODO -> Prefill form with organization creation defaults
 export const CreateOrganizationForm = withCardStateProvider((props: CreateOrganizationFormProps) => {
   const card = useCardState();
   const wizard = useWizard({ onNextStep: () => card.setError(undefined) });
