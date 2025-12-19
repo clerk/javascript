@@ -76,7 +76,11 @@ export function createFileStorage(options: FileStorageOptions = {}): KeylessStor
   };
 
   const writeReadme = () => {
-    fs.writeFileSync(getReadmePath(), `## DO NOT COMMIT\nThis directory contains keyless mode secrets.\n`, {
+    const readme = `## DO NOT COMMIT
+This directory is auto-generated from \`@clerk/tanstack-react-start\` because you are running in Keyless mode.
+Avoid committing the \`.clerk/\` directory as it includes the secret key of the unclaimed instance.
+`;
+    fs.writeFileSync(getReadmePath(), readme, {
       encoding: 'utf8',
       mode: 0o600,
     });
