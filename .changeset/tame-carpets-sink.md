@@ -4,22 +4,12 @@
 
 Remove deprecated `Clerk` export in favor of `getClerkInstance()`.
 
-Before:
+```diff
+- import { Clerk } from '@clerk/clerk-expo';
++ import { getClerkInstance } from '@clerk/expo';
 
-```tsx
-import { Clerk } from '@clerk/expo';
-
-// Access the Clerk instance
-const token = await Clerk.session?.getToken();
-```
-
-After:
-
-```tsx
-import { getClerkInstance } from '@clerk/expo';
-
-// Access the Clerk instance
-const token = await getClerkInstance().session?.getToken();
+- const token = await Clerk.session?.getToken();
++ const token = await getClerkInstance().session?.getToken();
 ```
 
 If you need to create the instance before `ClerkProvider` renders, pass the `publishableKey`:
