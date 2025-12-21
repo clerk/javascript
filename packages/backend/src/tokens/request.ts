@@ -590,13 +590,14 @@ export const authenticateRequest: AuthenticateRequest = (async (
         );
       }
 
-      const authObject = signedInRequestState.toAuth();
-      // Org sync if necessary
-      if (authObject.userId) {
-        const handshakeRequestState = handleMaybeOrganizationSyncHandshake(authenticateContext, authObject);
-        if (handshakeRequestState) {
-          return handshakeRequestState;
-        }
+      const authObject = signedInRequestState.toAuth({
+        // The organization sync handshake will handle the pending session case, so we don't need to treat it as signed out here
+        treatPendingAsSignedOut: false,
+      });
+
+      const handshakeRequestState = handleMaybeOrganizationSyncHandshake(authenticateContext, authObject);
+      if (handshakeRequestState) {
+        return handshakeRequestState;
       }
 
       return signedInRequestState;
