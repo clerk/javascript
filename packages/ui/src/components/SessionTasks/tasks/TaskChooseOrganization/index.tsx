@@ -1,7 +1,9 @@
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import { useState, type ComponentType } from 'react';
+import type { OrganizationCreationDefaultsResource } from '@clerk/shared/types';
+import { type ComponentType, useState } from 'react';
 
-import { useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
+import { useFetch } from '@/hooks';
+import { useEnvironment, useSignOutContext, withCoreSessionSwitchGuard } from '@/ui/contexts';
 import { descriptors, Flex, Flow, localizationKeys, Spinner } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -14,24 +16,20 @@ import { ChooseOrganizationScreen } from './ChooseOrganizationScreen';
 import { CreateOrganizationScreen } from './CreateOrganizationScreen';
 
 const TaskChooseOrganizationInternal = () => {
-  const { signOut } = useClerk();
   const { user } = useUser();
-  const { session } = useSession();
+  const { organizationSettings } = useEnvironment();
   const { userMemberships, userSuggestions, userInvitations } = useOrganizationListInView();
-  const { otherSessions } = useMultipleSessions({ user });
-  const { navigateAfterSignOut, navigateAfterMultiSessionSingleSignOutUrl } = useSignOutContext();
+  const organizationCreationDefaults = useFetch(
+    organizationSettings.organizationCreationDefaults?.enabled ? user?.getOrganizationCreationDefaults : undefined,
+    'organization-creation-defaults',
+  );
 
-  const handleSignOut = () => {
-    if (otherSessions.length === 0) {
-      return signOut(navigateAfterSignOut);
-    }
-
-    return signOut(navigateAfterMultiSessionSingleSignOutUrl, { sessionId: session?.id });
-  };
-
-  const isLoading = userMemberships?.isLoading || userInvitations?.isLoading || userSuggestions?.isLoading;
+  const isLoading =
+    userMemberships?.isLoading ||
+    userInvitations?.isLoading ||
+    userSuggestions?.isLoading ||
+    organizationCreationDefaults.isLoading;
   const hasExistingResources = !!(userMemberships?.count || userInvitations?.count || userSuggestions?.count);
-  const identifier = user?.primaryEmailAddress?.emailAddress ?? user?.username;
 
   return (
     <Flow.Root flow='taskChooseOrganization'>
@@ -55,7 +53,10 @@ const TaskChooseOrganizationInternal = () => {
                 />
               </Flex>
             ) : (
-              <TaskChooseOrganizationFlows initialFlow={hasExistingResources ? 'choose' : 'create'} />
+              <TaskChooseOrganizationFlows
+                initialFlow={hasExistingResources ? 'choose' : 'create'}
+                organizationCreationDefaults={organizationCreationDefaults.data}
+              />
             )}
           </Card.Content>
 
@@ -111,6 +112,7 @@ const TaskChooseOrganizationCardFooter = () => {
 
 type TaskChooseOrganizationFlowsProps = {
   initialFlow: 'create' | 'choose';
+  organizationCreationDefaults?: OrganizationCreationDefaultsResource | null;
 };
 
 const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrganizationFlowsProps) => {
@@ -120,6 +122,7 @@ const TaskChooseOrganizationFlows = withCardStateProvider((props: TaskChooseOrga
     return (
       <CreateOrganizationScreen
         onCancel={props.initialFlow === 'choose' ? () => setCurrentFlow('choose') : undefined}
+        organizationCreationDefaults={props.organizationCreationDefaults}
       />
     );
   }

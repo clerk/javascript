@@ -90,9 +90,10 @@ export const AvatarUploader = (props: AvatarUploaderProps) => {
     await handleFileDrop(f);
   };
 
+  const hasExistingImage = !!(avatarPreview.props as { imageUrl?: string })?.imageUrl;
   const previewElement = objectUrl
     ? React.cloneElement(avatarPreview, { imageUrl: objectUrl })
-    : avatarPreviewPlaceholder
+    : avatarPreviewPlaceholder && !hasExistingImage
       ? React.cloneElement(avatarPreviewPlaceholder, { onClick: openDialog })
       : avatarPreview;
 

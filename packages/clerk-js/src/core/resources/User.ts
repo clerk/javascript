@@ -53,6 +53,7 @@ import {
   UserOrganizationInvitation,
   Web3Wallet,
 } from './internal';
+import { OrganizationCreationDefaults } from './OrganizationCreationDefaults';
 
 export class User extends BaseResource implements UserResource {
   pathRoot = '/me';
@@ -274,6 +275,8 @@ export class User extends BaseResource implements UserResource {
 
   getOrganizationMemberships: GetOrganizationMemberships = retrieveMembership =>
     OrganizationMembership.retrieve(retrieveMembership);
+
+  getOrganizationCreationDefaults = () => OrganizationCreationDefaults.retrieve();
 
   leaveOrganization = async (organizationId: string): Promise<DeletedObjectResource> => {
     const json = (
