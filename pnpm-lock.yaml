@@ -394,9 +394,6 @@ importers:
       '@clerk/shared':
         specifier: workspace:^
         version: link:../shared
-      cookie:
-        specifier: 1.0.2
-        version: 1.0.2
       standardwebhooks:
         specifier: ^1.0.0
         version: 1.0.0
@@ -407,6 +404,9 @@ importers:
       '@edge-runtime/vm':
         specifier: 5.0.0
         version: 5.0.0
+      cookie:
+        specifier: 1.0.2
+        version: 1.0.2
       msw:
         specifier: 2.11.6
         version: 2.11.6(@types/node@22.19.0)(typescript@5.8.3)
@@ -2427,7 +2427,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@0.22.26':
     resolution: {integrity: sha512-I689wc8Fn/AX7aUGiwrh3HnssiORMJtR2fpksX+JIe8Cj/EDleblYMSwRPd0025wrwOV9UN1KM/RuEt/QjCS3Q==}
