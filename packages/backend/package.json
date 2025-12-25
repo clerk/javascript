@@ -110,7 +110,7 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "cookie": "1.0.2",
+    "cookie-es": "^1.3.1",
     "standardwebhooks": "^1.0.0",
     "tslib": "catalog:repo"
   },

@@ -1,4 +1,4 @@
-import { parse } from 'cookie';
+import { parse } from 'cookie-es';
 
 import { constants } from '../constants';
 import type { ClerkUrl } from './clerkUrl';
