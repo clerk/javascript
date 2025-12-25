@@ -1,5 +1,67 @@
 # Change Log
 
+## 7.0.0
+
+### Major Changes
+
+- Align experimental/unstable prefixes to use consistent naming: ([#7361](https://github.com/clerk/javascript/pull/7361)) by [@brkalow](https://github.com/brkalow)
+  - Renamed all `__unstable_*` methods to `__internal_*` (for internal APIs)
+  - Renamed all `experimental__*` and `experimental_*` methods to `__experimental_*` (for beta features)
+  - Removed deprecated billing-related props and `experimental__forceOauthFirst`
+  - Moved `createTheme` and `simple` to `@clerk/ui/themes/experimental` export path (removed `__experimental_` prefix since they're now in the experimental export)
+
+  **Breaking Changes:**
+
+  ### @clerk/clerk-js
+  - `__unstable__environment` → `__internal_environment`
+  - `__unstable__updateProps` → `__internal_updateProps`
+  - `__unstable__setEnvironment` → `__internal_setEnvironment`
+  - `__unstable__onBeforeRequest` → `__internal_onBeforeRequest`
+  - `__unstable__onAfterResponse` → `__internal_onAfterResponse`
+  - `__unstable__onBeforeSetActive` → `__internal_onBeforeSetActive` (window global)
+  - `__unstable__onAfterSetActive` → `__internal_onAfterSetActive` (window global)
+
+  ### @clerk/nextjs
+  - `__unstable_invokeMiddlewareOnAuthStateChange` → `__internal_invokeMiddlewareOnAuthStateChange`
+
+  ### @clerk/ui
+  - `experimental_createTheme` / `__experimental_createTheme` → `createTheme` (now exported from `@clerk/ui/themes/experimental`)
+  - `experimental__simple` / `__experimental_simple` → `simple` (now exported from `@clerk/ui/themes/experimental`)
+
+  ### @clerk/chrome-extension
+  - `__unstable__createClerkClient` → `createClerkClient` (exported from `@clerk/chrome-extension/background`)
+
+  ### Removed (multiple packages)
+  - `__unstable_manageBillingUrl` (removed)
+  - `__unstable_manageBillingLabel` (removed)
+  - `__unstable_manageBillingMembersLimit` (removed)
+  - `experimental__forceOauthFirst` (removed)
+
+- Updating minimum version of Node to v20.9.0 ([#6936](https://github.com/clerk/javascript/pull/6936)) by [@jacekradko](https://github.com/jacekradko)
+
+- Throw an error when an encryption key is missing when passing a secret key at runtime `clerkMiddleware()`. To migrate, ensure your application specifies a `CLERK_ENCRYPTION_KEY` environment variable when passing `secretKey` as a runtime option. ([#7360](https://github.com/clerk/javascript/pull/7360)) by [@brkalow](https://github.com/brkalow)
+
+- Remove all previously deprecated UI props across the Next.js, React and clerk-js SDKs. The legacy `afterSign(In|Up)Url`/`redirectUrl` props, `UserButton` sign-out overrides, organization `hideSlug` flags, `OrganizationSwitcher`'s `afterSwitchOrganizationUrl`, `Client.activeSessions`, `setActive({ beforeEmit })`, and the `ClerkMiddlewareAuthObject` type alias are no longer exported. Components now rely solely on the new redirect options and server-side configuration. ([#7243](https://github.com/clerk/javascript/pull/7243)) by [@jacekradko](https://github.com/jacekradko)
+
+- Drop support for `next@13` and `next@14` since they have reached [EOL](https://nextjs.org/support-policy#unsupported-versions). Now `>= next@15.2.3` is required. ([#7197](https://github.com/clerk/javascript/pull/7197)) by [@panteliselef](https://github.com/panteliselef)
+
+### Minor Changes
+
+- Add `unsafe_disableDevelopmentModeConsoleWarning` option to disable the development mode warning that's emitted to the console when Clerk is first loaded. ([#7505](https://github.com/clerk/javascript/pull/7505)) by [@dstaley](https://github.com/dstaley)
+
+### Patch Changes
+
+- Fix React peer dependency version ranges to use `~` instead of `^` for React 19 versions, ensuring non-overlapping version constraints. ([#7512](https://github.com/clerk/javascript/pull/7512)) by [@jacekradko](https://github.com/jacekradko)
+
+- Updating peerDependency for CVE-2025-55182 ([#7423](https://github.com/clerk/javascript/pull/7423)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Use new `@clerk/react` package. ([#6911](https://github.com/clerk/javascript/pull/6911)) by [@dstaley](https://github.com/dstaley)
+
+- Updated dependencies [[`db6b18e`](https://github.com/clerk/javascript/commit/db6b18e03860e3ef371ba86e72331dbef2dd4af0), [`e35960f`](https://github.com/clerk/javascript/commit/e35960f5e44ab758d0ab0545691f44dbafd5e7cb), [`e76d248`](https://github.com/clerk/javascript/commit/e76d248b7ad3e7a7218fd70f9a1c512231ae26c5), [`8c47111`](https://github.com/clerk/javascript/commit/8c4711153552d50c67611fea668f82f7c8fb7f9c), [`00882e8`](https://github.com/clerk/javascript/commit/00882e8993d9aa49feb1106bfe68164b72ba29d9), [`7c12ada`](https://github.com/clerk/javascript/commit/7c12adae402040667248152b9c59607d9e698e4b), [`e9be68d`](https://github.com/clerk/javascript/commit/e9be68db7eddec9c537f1def49326f3de1058bf2), [`0f1011a`](https://github.com/clerk/javascript/commit/0f1011a062c3705fc1a69593672b96ad03936de1), [`a3e689f`](https://github.com/clerk/javascript/commit/a3e689f3b7f2f3799a263da4b7bb14c0e49e42b7), [`965e7f1`](https://github.com/clerk/javascript/commit/965e7f1b635cf25ebfe129ec338e05137d1aba9e), [`84483c2`](https://github.com/clerk/javascript/commit/84483c2a710cef9165f9cd016ebccff13b004c78), [`ac34168`](https://github.com/clerk/javascript/commit/ac3416849954780bd873ed3fe20a173a8aee89aa), [`cf0d0dc`](https://github.com/clerk/javascript/commit/cf0d0dc7f6380d6e0c4e552090345b7943c22b35), [`db6b18e`](https://github.com/clerk/javascript/commit/db6b18e03860e3ef371ba86e72331dbef2dd4af0), [`a1aaff3`](https://github.com/clerk/javascript/commit/a1aaff33700ed81f31a9f340cf6cb3a82efeef85), [`d85646a`](https://github.com/clerk/javascript/commit/d85646a0b9efc893e2548dc55dbf08954117e8c2), [`8887fac`](https://github.com/clerk/javascript/commit/8887fac93fccffac7d1612cf5fb773ae614ceb22), [`8b95393`](https://github.com/clerk/javascript/commit/8b953930536b12bd8ade6ba5c2092f40770ea8df), [`063ab4d`](https://github.com/clerk/javascript/commit/063ab4d0f6037f9dbd38c06d3e17001eed00591a), [`3dac245`](https://github.com/clerk/javascript/commit/3dac245456dae1522ee2546fc9cc29454f1f345f), [`65a236a`](https://github.com/clerk/javascript/commit/65a236aed8b2c4e2f3da266431586c7cfc2aad72), [`f7780c8`](https://github.com/clerk/javascript/commit/f7780c8dbb64b84c182418e0550de114eb10d99d), [`da415c8`](https://github.com/clerk/javascript/commit/da415c813332998dafd4ec4690a6731a98ded65f), [`97c9ab3`](https://github.com/clerk/javascript/commit/97c9ab3c2130dbe4500c3feb83232d1ccbbd910e), [`97c9ab3`](https://github.com/clerk/javascript/commit/97c9ab3c2130dbe4500c3feb83232d1ccbbd910e), [`df16d8d`](https://github.com/clerk/javascript/commit/df16d8d57f4df7ba024910022f8cd3a777502816), [`26254f0`](https://github.com/clerk/javascript/commit/26254f0463312115eca4bc0a396c5acd0703187b)]:
+  - @clerk/shared@4.0.0
+  - @clerk/react@6.0.0
+  - @clerk/backend@3.0.0
+
 ## 6.36.1
 
 ### Patch Changes
